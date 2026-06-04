@@ -1,0 +1,3575 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API tokens — Operationalize</title>
+  <style>
+    /* === tokens.css === */
+/* Icarus Design Tokens
+ * Single source of truth for color, type, space, radii, shadows, motion.
+ * Pierce shadow DOM via CSS custom properties — components read these directly.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ================================================================
+     COLOR — PRIMITIVE PALETTE (from Figma: Mobile-App / Color Palette)
+     ================================================================ */
+
+  /* Neutral */
+  --ic-palette-white: #FFFFFF;
+  --ic-palette-black: #000000;
+
+  /* Gray */
+  --ic-palette-gray-100: #FCFCFC;
+  --ic-palette-gray-150: #F0F1F3;
+  --ic-palette-gray-200: #E0E1E5;
+  --ic-palette-gray-300: #CCCDD3;
+  --ic-palette-gray-400: #B3B5BC;
+  --ic-palette-gray-500: #999BA4;
+  --ic-palette-gray-600: #84888E;
+  --ic-palette-gray-700: #5F636A;
+  --ic-palette-gray-800: #3D4149;
+  --ic-palette-gray-900: #24272D;
+
+  /* Zinc */
+  --ic-palette-zinc-100: #D1D2D3;
+  --ic-palette-zinc-200: #949597;
+  --ic-palette-zinc-300: #636466;
+  --ic-palette-zinc-400: #484A4C;
+  --ic-palette-zinc-500: #343536;
+  --ic-palette-zinc-600: #282829;
+  --ic-palette-zinc-700: #1E1E1F;
+  --ic-palette-zinc-800: #141415;
+  --ic-palette-zinc-900: #0A0A0A;
+
+  /* Graphite (Operationalize brand) */
+  --ic-palette-graphite-100: #E0E3EA;
+  --ic-palette-graphite-150: #CDD1DC;
+  --ic-palette-graphite-200: #B3B9C8;
+  --ic-palette-graphite-300: #8F96AA;
+  --ic-palette-graphite-400: #6A7389;
+  --ic-palette-graphite-500: #455065;
+  --ic-palette-graphite-600: #3A4457;
+  --ic-palette-graphite-700: #303A4A;
+  --ic-palette-graphite-800: #262D3D;
+  --ic-palette-graphite-900: #191E28;
+
+  /* Red */
+  --ic-palette-red-100: #FBEDF1;
+  --ic-palette-red-150: #F5D8E0;
+  --ic-palette-red-200: #F0B8C4;
+  --ic-palette-red-300: #E5637D;
+  --ic-palette-red-400: #DA3F62;
+  --ic-palette-red-500: #D42551;
+  --ic-palette-red-600: #A81D41;
+  --ic-palette-red-700: #7D1530;
+  --ic-palette-red-800: #5C0F24;
+  --ic-palette-red-900: #3D0A18;
+
+  /* Yellow */
+  --ic-palette-yellow-100: #FFF5E3;
+  --ic-palette-yellow-150: #F8E7C8;
+  --ic-palette-yellow-200: #F2D9A6;
+  --ic-palette-yellow-300: #EDCA7E;
+  --ic-palette-yellow-400: #E9B340;
+  --ic-palette-yellow-500: #E59C01;
+  --ic-palette-yellow-600: #C08301;
+  --ic-palette-yellow-700: #9A6A01;
+  --ic-palette-yellow-800: #704D01;
+  --ic-palette-yellow-900: #4A3301;
+
+  /* Orange */
+  --ic-palette-orange-100: #FFF0E6;
+  --ic-palette-orange-150: #FFDFC7;
+  --ic-palette-orange-200: #FFCBA3;
+  --ic-palette-orange-300: #F5C07A;
+  --ic-palette-orange-400: #F58E42;
+  --ic-palette-orange-500: #F07018;
+  --ic-palette-orange-600: #C05F0E;
+  --ic-palette-orange-700: #964A0A;
+  --ic-palette-orange-800: #6E3607;
+  --ic-palette-orange-900: #482404;
+
+  /* Green */
+  --ic-palette-green-100: #EAFBF5;
+  --ic-palette-green-150: #D7F3E9;
+  --ic-palette-green-200: #A8E6D0;
+  --ic-palette-green-300: #66D4AB;
+  --ic-palette-green-400: #33D097;
+  --ic-palette-green-500: #00CC83;
+  --ic-palette-green-600: #03B080;
+  --ic-palette-green-700: #05947C;
+  --ic-palette-green-800: #046B5A;
+  --ic-palette-green-900: #034539;
+
+  /* Cyan — single shade. Pending removal: components currently using
+     cyan-500 (.tag-blue-light, .badge-info text, --color-info) will
+     migrate to a blue shade in the next pass, after which the ramp goes
+     away entirely. */
+  --ic-palette-cyan-500: #25A9EF;
+
+  /* Blue */
+  --ic-palette-blue-100: #EDF1FD;
+  --ic-palette-blue-150: #D5DEFA;
+  --ic-palette-blue-200: #B0C1F5;
+  --ic-palette-blue-300: #7B9AEE;
+  --ic-palette-blue-400: #4A6FE0;
+  --ic-palette-blue-500: #204ECF;
+  --ic-palette-blue-600: #183A9E;
+  --ic-palette-blue-700: #0F256E;
+  --ic-palette-blue-800: #0A1A50;
+  --ic-palette-blue-900: #061035;
+
+  /* Purple */
+  --ic-palette-purple-100: #F1ECFD;
+  --ic-palette-purple-150: #DFD3F9;
+  --ic-palette-purple-200: #C9B5F4;
+  --ic-palette-purple-300: #A47DE2;
+  --ic-palette-purple-400: #8552D9;
+  --ic-palette-purple-500: #6727CF;
+  --ic-palette-purple-600: #5019A8;
+  --ic-palette-purple-700: #3A1280;
+  --ic-palette-purple-800: #280D5C;
+  --ic-palette-purple-900: #1A0840;
+
+
+  /* ---- Typography ---- */
+
+  --ic-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ic-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --ic-font-display: var(--ic-font-sans);
+
+  /* Size scale — Figma spec */
+  --ic-text-xxs:  0.6875rem;  /* 11px — Body Xxsmall */
+  --ic-text-xs:   0.75rem;    /* 12px — Body Xsmall */
+  --ic-text-sm:   0.8125rem;  /* 13px — Body Small */
+  --ic-text-base: 0.875rem;   /* 14px — Body Medium, H4 */
+  --ic-text-md:   1rem;       /* 16px — Body Large, H3 */
+  --ic-text-lg:   1.125rem;   /* 18px — utility (avatar initials, card titles) */
+  --ic-text-xl:   1.25rem;    /* 20px — H2 */
+  --ic-text-2xl:  1.75rem;    /* 28px — H1 */
+
+  /* Line heights — Figma spec (absolute, mirrors design intent) */
+  --ic-lh-h1:       2.625rem;  /* 42px */
+  --ic-lh-h2:       1.875rem;  /* 30px */
+  --ic-lh-h3:       1.5rem;    /* 24px */
+  --ic-lh-h4:       1.375rem;  /* 22px */
+  --ic-lh-body-lg:  1.5rem;    /* 24px */
+  --ic-lh-body-md:  1.375rem;  /* 22px */
+  --ic-lh-body-sm:  1.25rem;   /* 20px */
+  --ic-lh-body-xs:  1.125rem;  /* 18px */
+  --ic-lh-body-xxs: 1rem;      /* 16px */
+
+  --ic-leading-tight:   1.2;
+  --ic-leading-normal:  1.5;
+  --ic-leading-relaxed: 1.75;
+
+  --ic-weight-regular:  400;
+  --ic-weight-medium:   500;
+  --ic-weight-semibold: 600;
+  --ic-weight-bold:     700;
+
+  /* ---- Spacing (4px base) ---- */
+  --ic-space-0: 0;
+  --ic-space-1: 4px;
+  --ic-space-2: 8px;
+  --ic-space-3: 12px;
+  --ic-space-4: 16px;
+  --ic-space-5: 24px;
+  --ic-space-6: 32px;
+  --ic-space-7: 40px;
+  --ic-space-8: 48px;
+  --ic-space-10: 64px;
+  --ic-space-12: 80px;
+  --ic-space-16: 128px;
+
+  /* ---- Radii ---- */
+  --ic-radius-none: 0;
+  --ic-radius-sm: 4px;
+  --ic-radius-md: 8px;
+  --ic-radius-lg: 12px;
+  --ic-radius-xl: 16px;
+  --ic-radius-2xl: 24px;
+  --ic-radius-full: 9999px;
+
+  /* Numeric aliases — reach for these by px value */
+  --ic-radius-0:  var(--ic-radius-none);
+  --ic-radius-4:  var(--ic-radius-sm);
+  --ic-radius-8:  var(--ic-radius-md);
+  --ic-radius-12: var(--ic-radius-lg);
+
+  /* ---- Shadows ---- */
+  --ic-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --ic-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --ic-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --ic-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.10);
+  --ic-shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.14);
+
+  /* ---- Z-index scale ---- */
+  --ic-z-base: 0;
+  --ic-z-dropdown: 100;
+  --ic-z-sticky: 200;
+  --ic-z-overlay: 800;
+  --ic-z-modal: 900;
+  --ic-z-toast: 1000;
+
+  /* ---- Motion ---- */
+  --ic-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ic-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ic-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ic-duration-fast: 120ms;
+  --ic-duration-base: 200ms;
+  --ic-duration-slow: 320ms;
+
+  /* ---- Layout ---- */
+  --ic-container-sm: 640px;
+  --ic-container-md: 768px;
+  --ic-container-lg: 1024px;
+  --ic-container-xl: 1280px;
+}
+
+    /* === semantic.css === */
+/* semantic.css — intent-named aliases over Icarus primitives.
+ * Prototypes and components reference these, NOT raw palette tokens.
+ * Swap a brand or theme by re-pointing aliases here — primitives never change.
+ */
+
+:root {
+  /* ---- Surfaces ---- */
+  --color-bg:             var(--ic-palette-gray-100);   /* page background */
+  --color-surface:        var(--ic-palette-white);      /* cards, panels */
+  --color-surface-muted:  var(--ic-palette-gray-150);   /* hover, subtle fills */
+  --color-surface-sunken: var(--ic-palette-gray-200);   /* wells, inset areas */
+
+  /* ---- Borders ---- */
+  --color-border:         var(--ic-palette-gray-200);
+  --color-border-strong:  var(--ic-palette-gray-300);
+  --color-border-focus:   var(--ic-palette-blue-500);
+
+  /* ---- Text ---- */
+  --color-text:           var(--ic-palette-graphite-900);
+  --color-text-muted:     var(--ic-palette-gray-700);
+  --color-text-subtle:    var(--ic-palette-gray-500);
+  --color-text-inverse:   var(--ic-palette-white);
+  --color-text-link:      var(--ic-palette-blue-500);
+
+  /* ---- Brand / primary action ---- */
+  --color-brand:          var(--ic-palette-green-500);
+  --color-brand-hover:    var(--ic-palette-green-600);
+  --color-brand-active:   var(--ic-palette-green-700);
+  --color-brand-subtle:   var(--ic-palette-green-100);
+
+  /* ---- Accent (interactive secondary, links) ---- */
+  --color-accent:         var(--ic-palette-blue-500);
+  --color-accent-hover:   var(--ic-palette-blue-600);
+  --color-accent-subtle:  var(--ic-palette-blue-100);
+
+  /* ---- Status ---- */
+  --color-success:        var(--ic-palette-green-500);
+  --color-success-subtle: var(--ic-palette-green-100);
+  --color-warning:        var(--ic-palette-yellow-500);
+  --color-warning-subtle: var(--ic-palette-yellow-100);
+  --color-danger:         var(--ic-palette-red-500);
+  --color-danger-hover:   var(--ic-palette-red-600);
+  --color-danger-subtle:  var(--ic-palette-red-100);
+  --color-info:           var(--ic-palette-cyan-500);
+  /* --color-info-subtle is en route to blue. cyan-100 was retired in the
+     palette cleanup; backed by blue-100 until --color-info itself moves
+     to blue, at which point the cyan-500 reference above also goes. */
+  --color-info-subtle:    var(--ic-palette-blue-100);
+
+  /* ---- Overlays ---- */
+  --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
+
+  /* ---- Type roles (size + line height paired) ---- */
+  --type-h1: var(--ic-weight-semibold) var(--ic-text-2xl)/var(--ic-lh-h1) var(--ic-font-sans);
+  --type-h2: var(--ic-weight-semibold) var(--ic-text-xl)/var(--ic-lh-h2) var(--ic-font-sans);
+  --type-h3: var(--ic-weight-semibold) var(--ic-text-md)/var(--ic-lh-h3) var(--ic-font-sans);
+  --type-h4: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-h4) var(--ic-font-sans);
+  --type-body-lg:  var(--ic-weight-regular) var(--ic-text-md)/var(--ic-lh-body-lg) var(--ic-font-sans);
+  --type-body:     var(--ic-weight-regular) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  --type-body-sm:  var(--ic-weight-regular) var(--ic-text-sm)/var(--ic-lh-body-sm) var(--ic-font-sans);
+  --type-caption:  var(--ic-weight-medium) var(--ic-text-xs)/var(--ic-lh-body-xs) var(--ic-font-sans);
+  --type-mono:     var(--ic-weight-regular) var(--ic-text-sm)/var(--ic-lh-body-sm) var(--ic-font-mono);
+}
+
+/* ---- Dark theme override ---- */
+[data-theme="dark"] {
+  --color-bg:             var(--ic-palette-zinc-900);
+  --color-surface:        var(--ic-palette-zinc-800);
+  --color-surface-muted:  var(--ic-palette-zinc-700);
+  --color-surface-sunken: var(--ic-palette-zinc-900);
+
+  --color-border:         var(--ic-palette-zinc-600);
+  --color-border-strong:  var(--ic-palette-zinc-500);
+
+  --color-text:           var(--ic-palette-gray-100);
+  --color-text-muted:     var(--ic-palette-gray-400);
+  --color-text-subtle:    var(--ic-palette-gray-600);
+  --color-text-inverse:   var(--ic-palette-zinc-900);
+
+  --color-brand:          var(--ic-palette-green-400);
+  --color-brand-hover:    var(--ic-palette-green-300);
+  --color-brand-active:   var(--ic-palette-green-200);
+  --color-brand-subtle:   var(--ic-palette-green-800);
+}
+
+/* ---- Reset + base ---- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: var(--ic-container-lg);
+  margin: 0 auto;
+  padding: var(--ic-space-8) var(--ic-space-5);
+}
+
+    /* === components.css === */
+/* components.css — built on semantic aliases (semantic.css), never raw palette. */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ic-space-2);
+  height: 32px; /* default — sm */
+  padding: 0 var(--ic-space-3);
+  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
+  border-radius: var(--ic-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              transform var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.btn-xs {
+  height: 24px;
+  padding: 0 var(--ic-space-2);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+}
+
+/* Icons inside buttons. Place an <svg class="btn-icon" /> as a child. */
+.btn-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-xs .btn-icon { width: 12px; height: 12px; }
+
+/* Square icon-only button (no text) */
+.btn-icon-only            { width: 32px; padding: 0; }
+.btn-icon-only.btn-xs     { width: 24px; }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.btn-primary {
+  background: var(--color-brand);
+  color: var(--color-text-inverse);
+}
+.btn-primary:hover  { background: var(--color-brand-hover); }
+.btn-primary:active { background: var(--color-brand-active); }
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn-secondary:hover { background: var(--color-surface-muted); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+.btn-danger:hover  { background: var(--color-danger-hover); }
+
+/* ---------- Field + Input ---------- */
+.field { display: flex; flex-direction: column; gap: var(--ic-space-2); }
+.field-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+}
+.field-hint {
+  font: var(--type-caption);
+  color: var(--color-text-subtle);
+}
+.field-hint.is-error { color: var(--color-danger); }
+.input {
+  height: 32px; /* default — sm */
+  padding: 0 var(--ic-space-3);
+  font: var(--type-body-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text);
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-xs {
+  height: 24px;
+  padding: 0 var(--ic-space-2);
+  font: var(--ic-weight-regular) var(--ic-text-xs)/var(--ic-lh-body-sm) var(--ic-font-sans);
+}
+
+/* Textarea variant of .input */
+textarea.input {
+  height: auto;
+  min-height: 80px;
+  padding: var(--ic-space-3) var(--ic-space-4);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* Right-aligned hint — used for character counters */
+.field-hint-end {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.field-hint-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+}
+
+/* ---------- Select (dropdown input) ----------
+ * Trigger styled like .input, paired with a .dropdown-menu via JS toggle.
+ *
+ *   <div class="input-select">
+ *     <button class="input-select-trigger" aria-expanded="false">
+ *       <span class="input-select-value input-select-placeholder">Choose…</span>
+ *       <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+ *     </button>
+ *     <div class="dropdown-menu" hidden>...</div>
+ *   </div>
+ */
+.input-select {
+  position: relative;
+  width: 100%;
+}
+.input-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-2);
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--ic-space-2) 0 var(--ic-space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body-sm);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-select-trigger:hover               { border-color: var(--color-border-strong); }
+.input-select-trigger:focus-visible,
+.input-select-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.input-select-trigger > .btn-icon {
+  color: var(--color-text-muted);
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+.input-select-trigger[aria-expanded="true"] > .btn-icon { transform: rotate(180deg); }
+.input-select-placeholder { color: var(--color-text-subtle); }
+.input-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.input-select .dropdown-menu {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  left: 0;
+  right: 0;
+  z-index: var(--ic-z-dropdown);
+}
+.input-select .dropdown-menu[hidden] { display: none; }
+
+/* ---------- Tag input ----------
+ * Container behaves like .input; chips + a free-text input live inside.
+ * On Enter the typed text becomes a chip; Backspace on empty removes the last chip.
+ *
+ *   <div class="input-tags">
+ *     <span class="dropdown-chip">React<button class="dropdown-chip-remove">…</button></span>
+ *     <input class="input-tags-input" placeholder="Add tag…" />
+ *   </div>
+ */
+.input-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ic-space-1);
+  min-height: 40px;
+  padding: 4px var(--ic-space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  cursor: text;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-tags:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.input-tags-input {
+  flex: 1;
+  min-width: 80px;
+  height: 28px;
+  padding: 0 var(--ic-space-1);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--type-body);
+  color: var(--color-text);
+}
+.input-tags-input::placeholder { color: var(--color-text-subtle); }
+
+/* ---------- Rich text editor ----------
+ * Toolbar + contenteditable body. Compose with .field for label + counter + error.
+ *
+ *   <div class="editor">
+ *     <div class="editor-toolbar">…buttons…</div>
+ *     <div class="editor-content" contenteditable="true" data-placeholder="…"></div>
+ *   </div>
+ */
+.editor {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.editor:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.editor.is-error                { border-color: var(--color-danger); }
+.editor.is-error:focus-within   { box-shadow: 0 0 0 3px var(--color-danger-subtle); }
+.editor.is-disabled             { opacity: 0.5; pointer-events: none; }
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+.editor-toolbar-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--color-border);
+  margin: 0 var(--ic-space-1);
+}
+
+/* Toolbar select (e.g. "Normal Text" heading picker) — slimmer than .input-select */
+.editor-toolbar-select { width: auto; }
+.editor-toolbar-select .input-select-trigger {
+  height: 32px;
+  min-width: 120px;
+  padding: 0 var(--ic-space-2);
+  border: 0;
+  background: transparent;
+  font: var(--type-body-sm);
+  gap: var(--ic-space-2);
+}
+.editor-toolbar-select .input-select-trigger:hover {
+  background: var(--color-surface-muted);
+}
+.editor-toolbar-select .input-select-trigger:focus-visible,
+.editor-toolbar-select .input-select-trigger[aria-expanded="true"] {
+  box-shadow: none;
+  background: var(--color-surface-muted);
+}
+
+.editor-toolbar-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.editor-toolbar-btn:hover               { background: var(--color-surface-muted); }
+.editor-toolbar-btn.is-active           { background: var(--color-surface-muted); color: var(--color-brand); }
+
+.editor-content {
+  min-height: 160px;
+  padding: var(--ic-space-4);
+  font: var(--type-body);
+  color: var(--color-text);
+  outline: 0;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+.editor-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}
+.editor-content > :first-child { margin-top: 0; }
+.editor-content > :last-child  { margin-bottom: 0; }
+.editor-content ul,
+.editor-content ol {
+  margin: var(--ic-space-2) 0;
+  padding-left: var(--ic-space-5);
+}
+.editor-content code {
+  font: var(--type-mono);
+  background: var(--color-surface-muted);
+  padding: 1px 4px;
+  border-radius: var(--ic-radius-sm);
+}
+.editor-content a { color: var(--color-text-link); }
+
+/* Footer pattern — char count + validation tick, lives in .field-hint-row */
+.editor-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+}
+.editor-counter-ok {
+  width: 14px;
+  height: 14px;
+  color: var(--color-success);
+}
+.input::placeholder { color: var(--color-text-subtle); }
+.input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-lg);
+  padding: var(--ic-space-5);
+}
+.card-title { font: var(--type-h3); margin: 0 0 var(--ic-space-2); color: var(--color-text); }
+.card-body  { font: var(--type-body); color: var(--color-text-muted); margin: 0; }
+
+/* ---------- Table ----------
+ * Base: semantic <table>/<thead>/<tbody>/<tr>/<th>/<td>. Left-aligned, no grid lines,
+ * subtle bottom border on the header row.
+ *
+ *   <table class="table table-wide">
+ *     <thead><tr>
+ *       <th><button class="th-sort">Name<svg .../></button></th>
+ *       <th>Status</th>
+ *     </tr></thead>
+ *     <tbody>
+ *       <tr><td>…</td><td>…</td></tr>
+ *     </tbody>
+ *   </table>
+ *
+ * Modifier:
+ *   .table-wide — tall rows (80px) + zebra striping; for content-heavy lists.
+ *
+ * Cell-content helpers (compose inside <td>):
+ *   .cell-title  — title + small subtype label
+ *   .cell-user   — avatar + name + role
+ *   .cell-meta   — small title + caption row (optional icon)
+ *   .cell-actions— right-aligned action buttons (kebab etc.)
+ */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--type-body-sm);
+  color: var(--color-text);
+  text-align: left;
+}
+.table thead th {
+  padding: var(--ic-space-3) var(--ic-space-4);
+  font: var(--ic-weight-regular) var(--ic-text-sm)/1 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.table tbody td {
+  padding: var(--ic-space-3) var(--ic-space-4);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Wide variant — generous row height with zebra striping. */
+.table-wide tbody td { padding: var(--ic-space-5) var(--ic-space-4); }
+.table-wide tbody tr:nth-child(even) td { background: var(--color-surface-muted); }
+
+/* Scroll container — wraps a .table to enable both axes of scrolling.
+ * Sticky header keeps column labels visible while scrolling vertically. */
+.table-scroll {
+  overflow: auto;
+  max-height: 480px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+}
+.table-scroll .table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+/* Sortable header — button-styled span with an arrow icon */
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.th-sort .ph { font-size: 12px; color: var(--color-text-subtle); }
+.th-sort:hover { color: var(--color-text); }
+.th-sort:hover .ph { color: var(--color-text-muted); }
+
+/* Right-aligned utility for action cells */
+.cell-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--ic-space-2); }
+
+/* Title + sub-label stack — bold title, small muted type below.
+ * Wrap with .cell-title-row to add an expand/collapse toggle for tree tables. */
+.cell-title { display: flex; flex-direction: column; gap: var(--ic-space-1); min-width: 0; }
+.cell-title-text { font: var(--ic-weight-medium) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); }
+.cell-title-sub  { font: var(--ic-weight-regular) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text-muted); }
+.cell-title-row  { display: flex; align-items: center; gap: var(--ic-space-2); }
+
+/* Nested row hierarchy — drive indentation off data-level on the <tr>. */
+.table tbody tr[data-level="1"] .cell-title-row { padding-left: var(--ic-space-5); }
+.table tbody tr[data-level="2"] .cell-title-row { padding-left: calc(var(--ic-space-5) * 2); }
+
+/* Expand/collapse caret + a same-sized spacer for leaf rows so titles align across levels. */
+.row-toggle {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease), color var(--ic-duration-fast) var(--ic-ease);
+}
+.row-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.row-toggle .ph { font-size: 14px; transition: transform var(--ic-duration-fast) var(--ic-ease); }
+.row-toggle[aria-expanded="true"] .ph { transform: rotate(90deg); }
+.row-toggle-spacer { display: inline-block; width: 20px; height: 20px; flex-shrink: 0; }
+
+/* User cell — circular avatar + name + role */
+.cell-user { display: flex; align-items: center; gap: var(--ic-space-3); min-width: 0; }
+.cell-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+/* Size variants — for compact rows and comment threads */
+.cell-avatar-xs { width: 18px; height: 18px; font-size: 9px; }
+.cell-avatar-sm { width: 24px; height: 24px; font-size: 10px; }
+/* Colored variant — use with inline style="background:..." for per-person tint */
+.cell-avatar-color { color: #FFFFFF; font-weight: var(--ic-weight-semibold); }
+.cell-user-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cell-user-name { font: var(--ic-weight-medium) var(--ic-text-sm)/1.2 var(--ic-font-sans); color: var(--color-text); }
+.cell-user-role { font: var(--type-caption); color: var(--color-text-muted); }
+
+/* Meta cell — body text with optional caption row underneath */
+.cell-meta { display: flex; flex-direction: column; gap: var(--ic-space-1); }
+.cell-meta-title { font: var(--type-body-sm); color: var(--color-text); }
+.cell-meta-sub   { font: var(--type-caption); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: var(--ic-space-1); }
+.cell-meta-sub .ph { font-size: 12px; color: var(--color-text-subtle); }
+
+/* Health dot — small colored circle used inline in a cell */
+.cell-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-success);
+}
+.cell-dot.is-warning { background: var(--color-warning); }
+.cell-dot.is-danger  { background: var(--color-danger); }
+
+/* ---------- Alert ----------
+ * Horizontal block with: icon · message · optional CTAs · optional close button.
+ *
+ *   <div class="alert alert-danger" role="alert">
+ *     <i class="ph ph-warning-octagon alert-icon"></i>
+ *     <p class="alert-message">Something went wrong.</p>
+ *     <div class="alert-actions">              optional — drop if no CTAs
+ *       <button class="btn btn-xs btn-primary">Retry</button>
+ *       <button class="btn btn-xs btn-secondary">Dismiss</button>
+ *     </div>
+ *     <button class="alert-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *   </div>
+ *
+ * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
+ * Omit the .alert-close button for persistent alerts.
+ */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  min-height: 56px;
+  padding: var(--ic-space-4);
+  border-radius: var(--ic-radius-md);
+  border: 1px solid transparent;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: var(--type-body-sm);
+}
+.alert-icon    { font-size: 16px; flex-shrink: 0; }
+.alert-message { flex: 1; min-width: 0; margin: 0; }
+.alert-actions { display: inline-flex; gap: var(--ic-space-2); flex-shrink: 0; }
+.alert-close {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease), color var(--ic-duration-fast) var(--ic-ease);
+}
+.alert-close:hover { background: color-mix(in srgb, currentColor 10%, transparent); color: var(--color-text); }
+.alert-close .ph { font-size: 14px; }
+
+/* Variants — soft tinted background + matching border in the variant hue. */
+.alert-danger  { background: var(--color-danger-subtle);  border-color: color-mix(in srgb, var(--color-danger) 22%, transparent); }
+.alert-danger  .alert-icon { color: var(--color-danger); }
+.alert-warning { background: var(--color-warning-subtle); border-color: color-mix(in srgb, var(--color-warning) 32%, transparent); }
+.alert-warning .alert-icon { color: var(--color-warning); }
+.alert-success { background: var(--color-success-subtle); border-color: color-mix(in srgb, var(--color-success) 22%, transparent); }
+.alert-success .alert-icon { color: var(--color-success); }
+.alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.alert-info    .alert-icon { color: var(--color-accent); }
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex; align-items: center;
+  font: var(--type-caption);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+
+/* ---------- Tag ----------
+ * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
+ *   <span class="tag tag-positive">Label</span>           → solid filled chip + white text
+ *   <span class="tag tag-indicator tag-positive">Label</span>  → colored dot + text
+ */
+.tag {
+  --tag-color: var(--ic-palette-graphite-900);
+  --tag-text:  var(--ic-palette-white);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  height: 16px;
+  padding: 0 var(--ic-space-2);
+  border: 0;
+  border-radius: var(--ic-radius-sm);
+  font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
+  background: var(--tag-color);
+  color: var(--tag-text);
+}
+
+/* Status colors — drive both solid bg and indicator dot via --tag-color */
+.tag-positive   { --tag-color: var(--color-success); }
+.tag-negative   { --tag-color: var(--color-danger); }
+.tag-warning    { --tag-color: var(--color-warning);          --tag-text: var(--ic-palette-graphite-900); }
+.tag-dark       { --tag-color: var(--ic-palette-graphite-900); }
+.tag-blue-light { --tag-color: var(--ic-palette-cyan-500); }
+.tag-blue       { --tag-color: var(--ic-palette-blue-500); }
+.tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
+.tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
+
+/* Indicator style — colored dot + text on a muted gray pill */
+.tag-indicator {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  height: auto;
+  gap: var(--ic-space-2);
+  font-weight: var(--ic-weight-regular);
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.tag-indicator:hover { background: var(--ic-palette-gray-200); }
+.tag-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ic-radius-full);
+  background: var(--tag-color);
+  flex-shrink: 0;
+}
+
+/* ---------- Count badge ----------
+ * Circular numeric indicator (notification dot with a count).
+ * Variants: primary (filled), secondary (outlined). Sizes: sm/md/lg → 12/16/20px.
+ */
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--ic-space-1);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-danger);
+  color: var(--ic-palette-white);
+  font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+.count-badge-sm {
+  min-width: 12px;
+  height: 12px;
+  font-size: 9px;
+  padding: 0 3px;
+}
+.count-badge-lg {
+  min-width: 20px;
+  height: 20px;
+  font-size: 11px;
+  padding: 0 5px;
+}
+.count-badge-secondary {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Avatar ----------
+ * Squarish identity badge (4px corner radius). Three content types share
+ * the same root — the markup inside decides which renders:
+ *
+ *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
+ *   Initials:  <span class="avatar avatar-md">JD</span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><i class="ph ph-buildings"></i></span>
+ *
+ * Sizes (default = avatar-md / 32px):
+ *   .avatar-xs   16px
+ *   .avatar-sm   24px
+ *   .avatar-md   32px (default)
+ *   .avatar-lg   40px
+ *   .avatar-xl   80px
+ *   .avatar-2xl 120px
+ *
+ * Interactive: render as <button> or <a> instead of <span> — picks up
+ * pointer cursor, hover dim and focus-visible ring automatically.
+ */
+.avatar {
+  --avatar-size: 32px;
+  --avatar-text: var(--ic-text-sm);
+  --avatar-icon: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--ic-radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font: var(--ic-weight-semibold) var(--avatar-text)/1 var(--ic-font-sans);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.avatar-xs  { --avatar-size: 16px;  --avatar-text: var(--ic-text-xxs); --avatar-icon: 10px; }
+.avatar-sm  { --avatar-size: 24px;  --avatar-text: var(--ic-text-xs);  --avatar-icon: 14px; }
+.avatar-md  { --avatar-size: 32px;  --avatar-text: var(--ic-text-sm);  --avatar-icon: 16px; }
+.avatar-lg  { --avatar-size: 40px;  --avatar-text: var(--ic-text-base);--avatar-icon: 20px; }
+.avatar-xl  { --avatar-size: 80px;  --avatar-text: var(--ic-text-2xl); --avatar-icon: 36px; }
+.avatar-2xl { --avatar-size: 120px; --avatar-text: 42px;               --avatar-icon: 56px; }
+
+/* Photo content — image fills the avatar */
+.avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Icon content — Phosphor or inline SVG, sized by --avatar-icon */
+.avatar > .ph { font-size: var(--avatar-icon); }
+.avatar > svg { width: var(--avatar-icon); height: var(--avatar-icon); }
+
+/* Team / company variant — same neutral fill as initials; icon is the
+ * differentiator from people avatars. */
+.avatar-team {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* Interactive — applies when rendered as <button> or <a> */
+button.avatar,
+a.avatar {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+button.avatar:hover,
+a.avatar:hover { filter: brightness(0.95); }
+button.avatar:focus-visible,
+a.avatar:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Switch ----------
+ * Usage:
+ *   <label class="switch">
+ *     <input type="checkbox" class="switch-input" />
+ *     <span class="switch-track"></span>
+ *   </label>
+ */
+.switch {
+  display: inline-flex;
+  position: relative;
+  width: 40px;
+  height: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.switch-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.switch-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color-border-strong);
+  border-radius: var(--ic-radius-full);
+  transition: background var(--ic-duration-base) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--ic-palette-white);
+  border-radius: var(--ic-radius-full);
+  box-shadow: var(--ic-shadow-sm);
+  transition: transform var(--ic-duration-base) var(--ic-ease);
+}
+.switch-input:checked ~ .switch-track             { background: var(--color-accent); }
+.switch-input:checked ~ .switch-track::after      { transform: translateX(16px); }
+.switch-input:focus-visible ~ .switch-track       { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.switch-input:disabled                            { cursor: not-allowed; }
+.switch:has(.switch-input:disabled)               { cursor: not-allowed; }
+.switch-input:disabled ~ .switch-track            { opacity: 0.5; }
+
+/* ---------- Checkbox ----------
+ * Usage:
+ *   <label class="checkbox">
+ *     <input type="checkbox" class="checkbox-input" />
+ *     <span class="checkbox-box">
+ *       <svg class="checkbox-mark"><use href="#i-check"/></svg>
+ *       <svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg>
+ *     </span>
+ *     <span class="checkbox-label">Label</span>
+ *   </label>
+ * Add `.is-error` to .checkbox for invalid state.
+ * Set `input.indeterminate = true` via JS for the indeterminate state.
+ */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  cursor: pointer;
+  position: relative;
+}
+.checkbox-input {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.checkbox-box {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--ic-radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  flex-shrink: 0;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.checkbox-mark {
+  position: absolute;
+  inset: 1px;
+  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  color: var(--ic-palette-white);
+  opacity: 0;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+  pointer-events: none;
+}
+.checkbox-label {
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+/* States */
+.checkbox:hover .checkbox-box                  { border-color: var(--color-text-muted); }
+.checkbox-input:checked ~ .checkbox-box,
+.checkbox-input:indeterminate ~ .checkbox-box  { background: var(--color-accent); border-color: var(--color-accent); }
+.checkbox-input:checked ~ .checkbox-box .checkbox-mark:not(.checkbox-mark-dash),
+.checkbox-input:indeterminate ~ .checkbox-box .checkbox-mark-dash { opacity: 1; }
+.checkbox-input:focus-visible ~ .checkbox-box  { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.checkbox-input:disabled ~ .checkbox-box,
+.checkbox-input:disabled ~ .checkbox-label     { opacity: 0.5; }
+.checkbox:has(.checkbox-input:disabled)        { cursor: not-allowed; }
+
+/* Error */
+.checkbox.is-error .checkbox-box               { border-color: var(--color-danger); }
+.checkbox.is-error .checkbox-input:checked ~ .checkbox-box {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Radio ----------
+ * Usage:
+ *   <label class="radio">
+ *     <input type="radio" name="group" class="radio-input" />
+ *     <span class="radio-circle"></span>
+ *     <span class="radio-label">Label</span>
+ *   </label>
+ * Add `.is-error` to .radio for invalid state.
+ */
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  cursor: pointer;
+  position: relative;
+}
+.radio-input {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.radio-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--ic-radius-full);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.radio-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ic-radius-full);
+  background: var(--ic-palette-white);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+.radio-label {
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+/* States */
+.radio:hover .radio-circle                     { border-color: var(--color-text-muted); }
+.radio-input:checked ~ .radio-circle           { background: var(--color-accent); border-color: var(--color-accent); }
+.radio-input:checked ~ .radio-circle::after    { transform: translate(-50%, -50%) scale(1); }
+.radio-input:focus-visible ~ .radio-circle     { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.radio-input:disabled ~ .radio-circle,
+.radio-input:disabled ~ .radio-label           { opacity: 0.5; }
+.radio:has(.radio-input:disabled)              { cursor: not-allowed; }
+
+/* Error */
+.radio.is-error .radio-circle                  { border-color: var(--color-danger); }
+.radio.is-error .radio-input:checked ~ .radio-circle {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Modal ----------
+ * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
+ *
+ *   <div class="modal-overlay" id="my-modal" hidden>
+ *     <div class="modal modal-md">
+ *       <header class="modal-header">
+ *         <h2 class="modal-title">Title</h2>
+ *         <button class="modal-close" data-modal-close aria-label="Close"><svg><use href="#i-x"/></svg></button>
+ *       </header>
+ *       <div class="modal-body">…</div>
+ *       <footer class="modal-footer">
+ *         <button class="btn btn-secondary" data-modal-close>Cancel</button>
+ *         <button class="btn btn-primary">Confirm</button>
+ *       </footer>
+ *     </div>
+ *   </div>
+ *
+ * Trigger: any element with data-modal-open="my-modal". Close on overlay-click, Escape, or any data-modal-close.
+ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ic-space-5);
+  z-index: var(--ic-z-modal);
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-xl);
+  width: 100%;
+  max-height: calc(100vh - var(--ic-space-9));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-xs { max-width: 328px; }
+.modal-sm { max-width: 520px; }
+.modal-md { max-width: 650px; }
+.modal-lg { max-width: 800px; }
+.modal-xl { max-width: 1200px; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-4) var(--ic-space-5);
+}
+.modal-title {
+  font: var(--ic-weight-semibold) var(--ic-text-md)/1.3 var(--ic-font-sans);
+  color: var(--color-text);
+  margin: 0;
+}
+.modal-close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.modal-close:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.modal-close svg   { width: 16px; height: 16px; }
+
+.modal-body {
+  flex: 1;
+  min-height: 0; /* allow shrink below content for proper scroll behavior */
+  padding: 0 var(--ic-space-5) var(--ic-space-5);
+  overflow-y: auto;
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-4) var(--ic-space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Mobile — buttons stack full width */
+@media (max-width: 480px) {
+  .modal-footer { flex-direction: column; }
+  .modal-footer > .btn { width: 100%; }
+}
+
+/* ---------- Drawer ----------
+ * Right-anchored side panel. Reuses .modal-header / .modal-body / .modal-footer for layout.
+ * Sizes: narrow / regular / medium / wide / ultra / full.
+ *
+ *   <div class="drawer-overlay" id="my-drawer" hidden>
+ *     <aside class="drawer drawer-regular">
+ *       <header class="modal-header">…title + close…</header>
+ *       <div class="modal-body">…</div>
+ *       <footer class="modal-footer">…</footer>
+ *     </aside>
+ *   </div>
+ */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  z-index: var(--ic-z-modal);
+}
+.drawer-overlay[hidden] { display: none; }
+
+.drawer {
+  background: var(--color-surface);
+  box-shadow: var(--ic-shadow-xl);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.drawer-narrow  { max-width: 440px; }
+.drawer-regular { max-width: 560px; }
+.drawer-medium  { max-width: 640px; }
+.drawer-wide    { max-width: 960px; }
+.drawer-ultra   { max-width: 1180px; }
+.drawer-full    { max-width: 100%; }
+
+/* On narrow viewports, any drawer goes full-width + footer buttons stack */
+@media (max-width: 480px) {
+  .drawer { max-width: 100%; }
+}
+
+/* ---------- Side navigation ----------
+ * Two states: expanded (236px) and compact (62px), toggled with `.is-compact`.
+ *
+ *   <aside class="sidenav">
+ *     <button class="sidenav-toggle" aria-label="Toggle">…chevron…</button>
+ *     <ul class="sidenav-list">
+ *       <li><a class="sidenav-item is-active" href="#">…icon… <span class="sidenav-item-label">Label</span></a></li>
+ *     </ul>
+ *     <div class="sidenav-spacer"></div>
+ *     <div class="sidenav-footer">…more items…</div>
+ *   </aside>
+ */
+.sidenav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 236px;
+  height: 100%;
+  padding: var(--ic-space-3);
+  background: var(--ic-palette-gray-150);
+  border-right: 1px solid var(--color-border);
+  transition: width var(--ic-duration-base) var(--ic-ease);
+  flex-shrink: 0;
+}
+.sidenav.is-compact { width: 62px; }
+
+.sidenav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  height: 36px;
+  padding: 0 var(--ic-space-3);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  width: 100%;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item:hover {
+  background: var(--ic-palette-gray-200);
+}
+.sidenav-item.is-active {
+  background: var(--ic-palette-gray-200);
+  color: var(--color-text);
+  font-weight: var(--ic-weight-medium);
+}
+.sidenav-item-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: color var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item.is-active .sidenav-item-icon { color: var(--color-text); }
+.sidenav-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+
+/* Nested group — a parent item that expands to reveal child items. */
+.sidenav-group { display: contents; }
+.sidenav-group-trigger[aria-expanded="true"] .sidenav-item-chevron { transform: rotate(180deg); }
+.sidenav-sublist {
+  list-style: none;
+  margin: 0;
+  /* Indent so subitem labels line up with the parent label (icon + gap). */
+  padding: 0 0 0 calc(var(--ic-space-2) + 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.sidenav-group-trigger[aria-expanded="false"] + .sidenav-sublist { display: none; }
+.sidenav-subitem {
+  height: 32px;
+  font: var(--type-body-sm);
+}
+
+/* Compact state — icon-only square buttons, labels hidden */
+.sidenav.is-compact .sidenav-item {
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+  margin: 0 auto;
+}
+.sidenav.is-compact .sidenav-item-label,
+.sidenav.is-compact .sidenav-item-chevron { display: none; }
+.sidenav.is-compact .sidenav-sublist { display: none; }
+
+.sidenav-spacer { flex: 1; }
+.sidenav-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--ic-space-3);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--ic-space-3);
+}
+
+/* Toggle button — floats over the right edge of the sidebar */
+.sidenav-toggle {
+  position: absolute;
+  top: var(--ic-space-4);
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  z-index: var(--ic-z-sticky);
+  box-shadow: var(--ic-shadow-sm);
+  transition: color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-toggle:hover { color: var(--color-text); background: var(--color-surface-muted); }
+.sidenav-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--ic-duration-base) var(--ic-ease);
+}
+.sidenav.is-compact .sidenav-toggle svg { transform: rotate(180deg); }
+
+/* App shell — pairs sidenav + main content */
+.app-shell {
+  display: flex;
+  height: 560px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+}
+.app-shell-main {
+  flex: 1;
+  background: var(--color-surface);
+  padding: var(--ic-space-5);
+  overflow: auto;
+}
+
+/* ---------- Page head ----------
+ * Page-level header. Title (+ optional count + subtitle) on the left, actions on the right.
+ *
+ *   <div class="page-head">
+ *     <div class="page-head-main">
+ *       <div class="page-head-title">
+ *         <h1 class="page-head-heading">Processes</h1>
+ *         <span class="page-head-count">12</span>
+ *       </div>
+ *       <p class="page-head-subtitle">Optional subtitle.</p>
+ *     </div>
+ *     <div class="page-head-actions">
+ *       <button class="btn btn-secondary">Filter</button>
+ *       <button class="btn btn-primary">New process</button>
+ *     </div>
+ *   </div>
+ */
+.page-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ic-space-5);
+  padding-bottom: var(--ic-space-5);
+  border-bottom: 1px solid var(--ic-palette-gray-150);
+  margin-bottom: var(--ic-space-6);
+}
+.page-head-main { min-width: 0; }
+.page-head-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+}
+.page-head-heading {
+  font: var(--type-h1);
+  color: var(--color-text);
+  margin: 0;
+}
+.page-head-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 var(--ic-space-2);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
+}
+.page-head-subtitle {
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+  margin: var(--ic-space-1) 0 0;
+}
+.page-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  flex-shrink: 0;
+}
+
+/* Template frame — full app preview: topbar + sidenav + main, vertically stacked */
+.template-frame {
+  display: flex;
+  flex-direction: column;
+  height: 760px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+}
+.template-frame .app-shell {
+  border: 0;
+  border-radius: 0;
+  height: auto;
+  flex: 1;
+}
+
+/* Stat tile — used inside templates */
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-4);
+}
+.stat-card-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.stat-card-value {
+  font: var(--ic-weight-semibold) var(--ic-text-2xl)/1.2 var(--ic-font-sans);
+  color: var(--color-text);
+  margin: var(--ic-space-1) 0 0;
+}
+
+/* List row — denser card variant for index pages */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-3) var(--ic-space-4);
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.list-row:hover { background: var(--color-surface-muted); }
+.list-row-title  { font: var(--type-body); font-weight: var(--ic-weight-medium); color: var(--color-text); margin: 0; }
+.list-row-meta   { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
+
+/* ---------- Tabs ----------
+ * Horizontal tab strip with a hairline border underneath and a 2px accent
+ * indicator under the active tab. Triggers are buttons; pair with
+ * `<div role="tabpanel">` panels via aria-controls + matching ids.
+ *
+ *   <div class="tabs" role="tablist">
+ *     <button class="tab is-active" role="tab" aria-selected="true" aria-controls="p-1" id="t-1" type="button">Overview</button>
+ *     <button class="tab" role="tab" aria-selected="false" aria-controls="p-2" id="t-2" type="button">Activity</button>
+ *   </div>
+ *   <div role="tabpanel" id="p-1" aria-labelledby="t-1">…</div>
+ *   <div role="tabpanel" id="p-2" aria-labelledby="t-2" hidden>…</div>
+ */
+.tabs {
+  display: flex;
+  gap: var(--ic-space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+.tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 var(--ic-space-1);
+  margin-bottom: -1px;
+  cursor: pointer;
+  font: var(--ic-weight-semibold) var(--ic-text-sm)/1.25 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  transition: color var(--ic-duration-fast) var(--ic-ease),
+              border-color var(--ic-duration-fast) var(--ic-ease);
+}
+.tab:hover { color: var(--color-text); }
+.tab.is-active {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--ic-radius-sm);
+}
+
+/* ---------- Tooltip ----------
+ * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
+ * is top; override with [data-placement="bottom"|"left"|"right"].
+ *
+ *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ *
+ * Renders via ::after so no extra DOM. Reveals on :hover and :focus-visible.
+ */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: var(--ic-palette-graphite-900);
+  color: var(--color-text-inverse);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-caption);
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after { opacity: 1; }
+
+[data-tooltip][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+[data-tooltip][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 6px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 6px);
+  transform: translateY(-50%);
+}
+
+/* ---------- Toast ----------
+ * Floating notification anchored to the top-right corner. Spawn via the
+ * global `toast(...)` helper (see example.html). Three behaviors —
+ *   persistent → no auto-dismiss, shows close button
+ *   timed      → auto-dismisses after `timeout` ms (default 5000)
+ *   action     → shows an action button + close button
+ *
+ * Five color variants:
+ *   .toast-neutral · .toast-error · .toast-warning · .toast-success · .toast-info
+ *
+ *   <div class="toast-region" aria-live="polite"></div>     ← one per page
+ *   <div class="toast toast-success">
+ *     <i class="ph ph-check-circle toast-icon"></i>
+ *     <p class="toast-message">Saved.</p>
+ *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
+ *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *   </div>
+ */
+.toast-region {
+  position: fixed;
+  top: var(--ic-space-4);
+  right: var(--ic-space-4);
+  z-index: var(--ic-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ic-space-2);
+  max-width: 380px;
+  pointer-events: none;
+}
+.toast {
+  --toast-accent: var(--color-border-strong);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-3) var(--ic-space-4);
+  border-radius: var(--ic-radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font: var(--type-body-sm);
+  box-shadow: var(--ic-shadow-md);
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 380px;
+  transition: opacity var(--ic-duration-base) var(--ic-ease),
+              transform var(--ic-duration-base) var(--ic-ease);
+}
+.toast.is-entering { opacity: 0; transform: translateX(20%); }
+.toast.is-leaving  { opacity: 0; transform: translateX(20%); }
+
+.toast-icon { font-size: 18px; flex-shrink: 0; color: var(--toast-accent); margin-top: 1px; }
+.toast-message { flex: 1; min-width: 0; margin: 0; line-height: 1.4; }
+.toast-action { flex-shrink: 0; align-self: center; }
+.toast-close {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  align-self: center;
+  transition: color var(--ic-duration-fast) var(--ic-ease);
+}
+.toast-close:hover { color: var(--color-text); }
+.toast-close .ph { font-size: 14px; }
+
+/* Color variants — set --toast-accent, icon color follows */
+.toast-neutral { --toast-accent: var(--color-border-strong); }
+.toast-neutral .toast-icon { color: var(--color-text-muted); }
+.toast-error   { --toast-accent: var(--color-danger);  background: var(--color-danger-subtle); }
+.toast-warning { --toast-accent: var(--color-warning); background: var(--color-warning-subtle); }
+.toast-success { --toast-accent: var(--color-success); background: var(--color-success-subtle); }
+.toast-info    { --toast-accent: var(--color-accent);  background: var(--color-accent-subtle); }
+
+/* ---------- Top bar ----------
+ * Dark application chrome. 56px tall, graphite-800 background.
+ * Brand on left, search in middle, avatar on right.
+ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-5);
+  height: 56px;
+  padding: 0 var(--ic-space-5);
+  background: var(--ic-palette-graphite-800);
+  color: var(--ic-palette-white);
+}
+.topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  text-decoration: none;
+  color: inherit;
+  font: var(--ic-weight-semibold) var(--ic-text-md)/1 var(--ic-font-sans);
+  flex-shrink: 0;
+}
+.topbar-logo {
+  width: 20px; height: 20px;
+  border-radius: var(--ic-radius-full);
+  border: 1.5px solid currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.topbar-brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-4);
+  flex-shrink: 0;
+}
+
+.topbar-search {
+  position: relative;
+  width: 360px;
+}
+.topbar-search .search-icon {
+  position: absolute;
+  left: var(--ic-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+.topbar-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--ic-space-4) 0 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--ic-radius-sm);
+  color: var(--ic-palette-white);
+  font: var(--type-body);
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              border-color var(--ic-duration-fast) var(--ic-ease);
+}
+.topbar-search-input::placeholder { color: rgba(255, 255, 255, 0.55); }
+.topbar-search-input:hover { background: rgba(255, 255, 255, 0.12); }
+.topbar-search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
+.topbar-avatar {
+  width: 32px; height: 32px;
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ic-palette-gray-300);
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);
+  color: var(--ic-palette-graphite-800);
+  text-decoration: none;
+}
+.topbar-avatar:hover { background: var(--ic-palette-gray-400, #CBD5E1); color: var(--ic-palette-graphite-900); }
+.topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 720px) {
+  .topbar-search { width: 200px; }
+}
+
+/* ---------- Dropdown menu ----------
+ * The OPEN menu panel — paired with a trigger (input/button) elsewhere.
+ * Items compose: icon, label, description, avatar, selected check, removable chip.
+ *
+ * Usage:
+ *   <div class="dropdown-menu">
+ *     <button class="dropdown-item">
+ *       <svg class="dropdown-item-icon"><use href="#i-bell"/></svg>
+ *       <div class="dropdown-item-text">
+ *         <span class="dropdown-item-label">Label</span>
+ *         <span class="dropdown-item-description">Optional sub-line</span>
+ *       </div>
+ *     </button>
+ *   </div>
+ */
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-lg);
+  padding: var(--ic-space-2);
+  min-width: 200px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+  padding: var(--ic-space-2) var(--ic-space-3);
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.dropdown-item:hover  { background: var(--color-surface-muted); }
+.dropdown-item:disabled,
+.dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+/* Hairline divider inside a menu — render as <hr class="dropdown-divider"> */
+.dropdown-divider {
+  height: 1px;
+  margin: var(--ic-space-1) 0;
+  background: var(--color-border);
+  border: 0;
+}
+
+/* Optional pieces inside an item */
+.dropdown-item-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px; /* sizes Phosphor <i> icons; harmless for inline SVG */
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+.dropdown-item-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ic-radius-full);
+  flex-shrink: 0;
+  object-fit: cover;
+  background: var(--color-surface-muted);
+}
+.dropdown-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.dropdown-item-label {
+  font: var(--type-body);
+  color: var(--color-text);
+  line-height: 1.3;
+}
+.dropdown-item-description {
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* Selected state — leading check + semibold label */
+.dropdown-item-check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-text);
+  opacity: 0; /* placeholder slot keeps labels aligned across selected/unselected */
+}
+.dropdown-item.is-selected .dropdown-item-check  { opacity: 1; }
+.dropdown-item.is-selected .dropdown-item-label,
+.dropdown-item.is-selected                        { font-weight: var(--ic-weight-semibold); }
+
+/* Multi-select chip list inside a dropdown panel (layout only — chips live in .chip) */
+.dropdown-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-1);
+}
+
+/* ---------- Chip ----------
+ * Removable interactive pill. Reused in: dropdown multi-select, .input-tags, anywhere
+ * a user-added/removable token belongs.
+ *
+ *   <span class="chip">React
+ *     <button class="chip-remove" aria-label="Remove"><svg><use href="#i-x"/></svg></button>
+ *   </span>
+ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  height: 28px;
+  padding: 0 var(--ic-space-3);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--color-text);
+}
+/* Tight right padding when a remove button is present */
+.chip:has(.chip-remove) { padding-right: 2px; }
+.chip-remove {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-full);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.chip-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.chip-remove svg   { width: 12px; height: 12px; }
+
+.dropdown-menu-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+  padding: var(--ic-space-1) var(--ic-space-2);
+}
+
+/* Generic dropdown wrapper — pairs a `.dropdown-trigger` with a `.dropdown-menu` */
+.dropdown {
+  position: relative;
+  display: inline-flex;
+}
+.dropdown-menu-end {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  right: 0;
+  z-index: var(--ic-z-dropdown);
+  min-width: 180px;
+}
+.dropdown-menu-start {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  left: 0;
+  z-index: var(--ic-z-dropdown);
+  min-width: 180px;
+}
+.dropdown .dropdown-menu[hidden] { display: none; }
+
+/* Destructive item variant */
+.dropdown-item-danger              { color: var(--color-danger); }
+.dropdown-item-danger:hover        { background: var(--color-danger-subtle); }
+.dropdown-item-danger .dropdown-item-icon { color: var(--color-danger); }
+
+/* ---------- Type helpers ---------- */
+.h1 { font: var(--type-h1); margin: 0; color: var(--color-text); }
+.h2 { font: var(--type-h2); margin: 0; color: var(--color-text); }
+.h3 { font: var(--type-h3); margin: 0; color: var(--color-text); }
+.h4 { font: var(--type-h4); margin: 0; color: var(--color-text); }
+.body    { font: var(--type-body);    color: var(--color-text); }
+.body-sm { font: var(--type-body-sm); color: var(--color-text-muted); }
+.caption { font: var(--type-caption); color: var(--color-text-subtle); }
+
+/* ---------- Layout helpers ----------
+ * Tiny flex/grid primitives used across prototypes. `.page` lives in
+ * semantic.css (it's the content max-width wrapper). The three below are
+ * the everyday building blocks for stacking content vertically (`.stack`),
+ * placing items in a wrapping row (`.row`), or a two-column grid that
+ * collapses on narrow viewports (`.grid-2`).
+ */
+.stack  { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+.row    { display: flex; gap: var(--ic-space-3); align-items: center; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-5); }
+
+@media (max-width: 720px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Drawer parts ----------
+ * Mirrors the .modal-header/.modal-body/.modal-footer pattern, since drawers
+ * use the same three-section layout. (The drawer container itself lives above
+ * in the Modal/Drawer section.)
+ */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-5);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ic-space-5);
+  font: var(--type-body);
+  color: var(--color-text);
+}
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-4) var(--ic-space-5);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* The annotation tool's CSS lives in devtools.css — author tooling, not a
+ * user-facing UI primitive. See design.md §7 for the four-file inline order. */
+
+    /* === devtools.css === */
+/* devtools.css — author/dev tooling only.
+ *
+ * This file is auto-inlined into every prototype alongside the three-layer
+ * design system (tokens.css → semantic.css → components.css), but it is
+ * explicitly NOT part of that layer chain — nothing here is a user-facing
+ * UI primitive. Everything is dormant until the matching trigger fires
+ * (e.g. ?notes=1 in the URL for the annotation tool).
+ *
+ * Rules of thumb:
+ * - Reach for this file when adding something authors/devs use to *build*
+ *   prototypes (annotation overlays, grid debug toggles, coachmark editors,
+ *   responsive frame previewers).
+ * - Anything end users see (buttons, cards, alerts, status colors) belongs
+ *   in components.css.
+ * - Keep selectors namespaced (`.annot-*`, `.grid-debug-*`, …) so they
+ *   can't collide with feature CSS.
+ */
+
+/* ---------- Annotation tool ----------
+ * In-page batch annotation overlay. Enable on any prototype by appending
+ * ?notes=1 to the URL. The matching JS lives in the example.html script
+ * block (delegated handlers — copy that whole block into every prototype).
+ *
+ * Usage flow:
+ *   1. Click "Inspect" → cursor becomes crosshair, hovering outlines elements.
+ *   2. Click an element → numbered pin + popover with a textarea opens.
+ *   3. Type the note, Enter to save (Shift+Enter for newline, Esc cancels).
+ *   4. Repeat. "Copy batch" puts all notes onto the clipboard as one payload.
+ *   5. Paste back to your coding agent to execute all changes in a single turn.
+ *
+ * Notes clear on reload (no persistence). Selectors use the shortest readable
+ * form (#id > unique class > tag.class > parent path).
+ */
+.annot-toolbar {
+  position: fixed; bottom: 16px; right: 16px;
+  z-index: 99999;
+  display: flex; gap: 6px; align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  box-shadow: var(--ic-shadow-lg);
+  font: var(--type-body-sm);
+}
+.annot-toolbar button {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 10px;
+  border-radius: var(--ic-radius-sm);
+  cursor: pointer;
+  font: inherit;
+}
+.annot-toolbar button:disabled { opacity: 0.4; cursor: default; }
+.annot-toolbar button.is-active {
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-color: var(--color-accent);
+}
+.annot-toolbar .annot-count {
+  padding: 0 var(--ic-space-2);
+  color: var(--color-text-muted);
+  font: var(--type-caption);
+}
+.annot-mode,
+.annot-mode * { cursor: crosshair !important; }
+.annot-mode *:hover {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: -2px;
+}
+.annot-pin {
+  position: absolute;
+  z-index: 99998;
+  width: 20px; height: 20px;
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font: 600 11px/1 var(--ic-font-sans);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+.annot-popover {
+  position: absolute;
+  z-index: 100000;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-3);
+  box-shadow: var(--ic-shadow-xl);
+  width: 280px;
+  font: var(--type-body-sm);
+}
+.annot-popover textarea {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  padding: 6px 8px;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.annot-popover-meta { margin-bottom: 6px; }
+.annot-popover-meta code {
+  font: var(--type-mono);
+  font-size: 11px;
+  background: var(--color-surface-muted);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.annot-popover-text { color: var(--color-text-muted); font-size: 11px; margin: 4px 0 6px; }
+.annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
+
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <style>
+    /* App shell layout (mirrors integrations/action-items prototypes) */
+    body { background: var(--color-bg); }
+    .shell { height: 100vh; display: flex; flex-direction: column; }
+    .shell-body { display: flex; flex: 1; min-height: 0; }
+    .shell-main {
+      flex: 1;
+      padding: var(--ic-space-6) var(--ic-space-7);
+      overflow: auto;
+      min-width: 0;
+    }
+    .shell-main > .page { max-width: var(--ic-container-xl); margin: 0; padding: 0; }
+    @media (max-width: 720px) { .shell-main { padding: var(--ic-space-5); } }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      font: var(--type-body-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--ic-space-3);
+    }
+    .breadcrumb a { color: var(--color-text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--color-text); }
+    .breadcrumb i { font-size: 14px; color: var(--color-text-subtle); }
+    .breadcrumb-current { color: var(--color-text); }
+
+    /* `display:flex` on .page-head-actions defeats the global [hidden] rule — restore it */
+    .page-head-actions[hidden] { display: none; }
+
+    /* Tabs sit immediately under the heading on this page — drop the page-head divider */
+    .page-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+
+    /* Anchor-flavored buttons inherit the link underline — strip it on button-styled anchors */
+    a.btn { text-decoration: none; }
+
+    /* `display:inline-flex` on .btn defeats the global [hidden] rule — restore it */
+    .btn[hidden] { display: none; }
+
+    /* Sub-tabs spacing — page-head tabs sit directly under the page-head row */
+    .page-tabs { margin: var(--ic-space-3) 0 var(--ic-space-6); border-bottom: 1px solid var(--color-border); }
+    .page-tabs .tabs { margin: 0; }
+
+    /* Per-tab action bar (sits inside a tab panel, above its content) */
+    .tab-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); margin-bottom: var(--ic-space-5); }
+    .tab-actions-end { justify-content: flex-end; }
+
+    /* Integrations grid + card (lifted from features/integrations) */
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ic-space-3); margin: 0 0 var(--ic-space-4); }
+    .section-head .h3 { margin: 0; }
+    .section-head-meta { font: var(--type-body-sm); color: var(--color-text-muted); }
+    .integration-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ic-space-4); }
+    @media (max-width: 1100px) { .integration-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px) { .integration-grid { grid-template-columns: 1fr; } }
+    .integration-card { display: flex; flex-direction: column; }
+    .integration-card[hidden] { display: none; }
+    .integration-head { display: flex; align-items: start; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3); }
+    .integration-logo { width: 40px; height: 40px; border-radius: var(--ic-radius-sm); display: grid; place-items: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
+    .integration-title { font: var(--type-h4); color: var(--color-text); margin: 0; }
+    .integration-cat { font: var(--type-caption); color: var(--color-text-muted); margin: 2px 0 0; }
+    .integration-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0 0 var(--ic-space-4); flex: 1; }
+    .integration-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-1); }
+    .integration-foot-end { justify-content: flex-end; }
+    .integration-card-cta { background: var(--color-surface); border-style: dashed; }
+    .integration-card-cta .integration-head { align-items: center; }
+    .integration-card-cta .integration-cta-icon { width: 40px; height: 40px; border-radius: var(--ic-radius-sm); background: var(--color-info-subtle, var(--color-surface)); color: var(--color-info, var(--color-text-muted)); display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+    .integration-card .tag-indicator { cursor: default; }
+    .integration-card .tag-indicator:hover { background: transparent; }
+
+    /* Token-specific bits */
+    .token-preview {
+      font: var(--type-mono);
+      color: var(--color-text-muted);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    .scope-tags { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
+
+    /* Code reveal block — full token shown once after creation */
+    .token-reveal {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      padding: var(--ic-space-3) var(--ic-space-4);
+      background: var(--color-surface-sunken);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      font: var(--type-mono);
+      font-size: 13px;
+      color: var(--color-text);
+      word-break: break-all;
+    }
+    .token-reveal-value { flex: 1; min-width: 0; }
+    .token-reveal-copy {
+      flex-shrink: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      padding: var(--ic-space-1) var(--ic-space-3);
+      border-radius: var(--ic-radius-sm);
+      font: var(--type-body-sm);
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ic-space-1);
+      transition: background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .token-reveal-copy:hover { background: var(--color-surface-muted); }
+    .token-reveal-copy.is-copied {
+      background: var(--color-success-subtle);
+      border-color: var(--color-success);
+      color: var(--color-success);
+    }
+
+    /* Scope picker — list of checkboxes inside the drawer */
+    .scope-list { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .scope-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: border-color var(--ic-duration-fast) var(--ic-ease), background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .scope-item:hover { border-color: var(--color-border-strong); }
+    .scope-item.is-checked { border-color: var(--color-accent); background: var(--color-surface); }
+    .scope-item .checkbox { margin-top: 2px; }
+    .scope-item-body { flex: 1; min-width: 0; }
+    .scope-item-name { font: var(--type-h4); color: var(--color-text); margin: 0; }
+    .scope-item-name code { font: var(--type-mono); font-size: 12px; color: var(--color-text-muted); margin-left: var(--ic-space-2); padding: 2px 6px; background: var(--color-surface-muted); border-radius: var(--ic-radius-sm); }
+    .scope-item-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 4px 0 0; }
+
+    /* Consolidated per-resource permission group — borderless list, divider between resources */
+    .scope-list { gap: 0; }
+    .scope-card { padding: 0; border: 0; background: none; }
+    .scope-card + .scope-card {
+      border-top: 1px solid var(--color-border);
+      margin-top: var(--ic-space-5);
+      padding-top: var(--ic-space-5);
+    }
+    .scope-card-head { margin-bottom: var(--ic-space-3); }
+    .scope-perm-group { display: flex; gap: var(--ic-space-2); flex-wrap: wrap; }
+    .scope-perm-btn {
+      display: inline-flex; align-items: center; gap: var(--ic-space-2);
+      padding: var(--ic-space-2) var(--ic-space-3);
+      border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm);
+      background: var(--color-surface); cursor: pointer;
+      transition: border-color var(--ic-duration-fast) var(--ic-ease), background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .scope-perm-btn:hover { border-color: var(--color-border-strong); }
+    .scope-perm-btn:has(.checkbox-input:checked) { border-color: var(--color-accent); background: var(--color-accent-subtle); }
+    .scope-perm-label { display: inline-flex; align-items: center; gap: var(--ic-space-2); font: var(--type-body); color: var(--color-text); }
+    .scope-perm-label code { font: var(--type-mono); font-size: 12px; color: var(--color-text-muted); padding: 2px 6px; background: var(--color-surface-muted); border-radius: var(--ic-radius-sm); }
+
+    /* Empty-state styling kept here in case the prototype is forked into a no-token variant */
+    .empty-state { text-align: center; padding: var(--ic-space-8) var(--ic-space-5); color: var(--color-text-muted); }
+
+    /* Clickable token name — opens the view-token drawer */
+    .cell-title-link {
+      background: none; border: 0; padding: 0; margin: 0;
+      font: inherit; font-weight: 500; color: var(--color-text);
+      text-align: left; cursor: pointer;
+    }
+    .cell-title-link:hover { color: var(--color-text-link); text-decoration: underline; }
+
+    /* Definition-list metadata grid (token detail drawer) */
+    .meta-grid { display: grid; grid-template-columns: 120px 1fr; gap: var(--ic-space-3) var(--ic-space-4); margin: var(--ic-space-2) 0 0; }
+    .meta-grid dt { color: var(--color-text-muted); font: var(--type-body-sm); }
+    .meta-grid dd { margin: 0; color: var(--color-text); font: var(--type-body-sm); }
+    .drawer-section-label { font: var(--type-h4); color: var(--color-text); display: block; }
+
+    /* View/edit mode toggle for the token detail drawer */
+    #view-token-aside[data-mode="view"] .edit-only { display: none !important; }
+    #view-token-aside[data-mode="edit"] .view-only { display: none !important; }
+
+    /* Cell user (created-by) */
+    .cell-created-by { display: flex; align-items: center; gap: var(--ic-space-2); }
+    .cell-created-by .avatar { flex-shrink: 0; }
+    .cell-created-by-name { font: var(--type-body-sm); color: var(--color-text); }
+
+    .warning-callout {
+      display: flex; gap: var(--ic-space-3);
+      padding: var(--ic-space-4);
+      background: var(--color-warning-subtle);
+      border: 1px solid var(--color-warning);
+      border-radius: var(--ic-radius-md);
+      color: var(--color-text);
+    }
+    .warning-callout i { color: var(--color-warning); font-size: 20px; flex-shrink: 0; }
+    .warning-callout p { margin: 0; font: var(--type-body-sm); }
+
+    /* Last-used dot indicator */
+    .last-used { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+    .last-used .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+    .last-used.is-stale .dot { background: var(--color-text-subtle); }
+    .last-used.is-never .dot { background: var(--color-border-strong); }
+  </style>
+</head>
+<body>
+
+  <!-- Inline SVG sprite — checkbox marks use the design-system icons (matches designmd/example.html) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="shell">
+
+    <header class="topbar">
+      <a class="topbar-brand" href="#">
+        <svg class="topbar-brand-logo" width="170" height="28" viewBox="0 0 170 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6925 5.00513C11.5704 4.99755 11.4673 5.09285 11.4624 5.21506L11.3199 8.82092C11.3151 8.94296 11.4101 9.04543 11.5319 9.05404C11.8046 9.07331 12.0729 9.10838 12.3359 9.15832C12.4556 9.18105 12.5735 9.1067 12.6003 8.98783L13.3946 5.47129C13.4215 5.35225 13.3469 5.2337 13.2274 5.20915C12.7273 5.10639 12.2148 5.03755 11.6925 5.00513Z" fill="white"/><path d="M10.3897 5.00033C10.5112 4.99369 10.6133 5.08877 10.6181 5.21036L10.7609 8.8204C10.7657 8.94254 10.6705 9.04505 10.5486 9.05354C10.2758 9.07254 10.0074 9.10734 9.74432 9.15703C9.6247 9.17962 9.50695 9.10527 9.48012 8.98649L8.68264 5.45569C8.65561 5.33604 8.7311 5.21703 8.8514 5.19323C9.35276 5.09405 9.86636 5.02892 10.3897 5.00033Z" fill="white"/><path d="M7.58847 5.52244C7.70397 5.48484 7.82696 5.55023 7.86302 5.66626L8.93861 9.12776C8.97494 9.24467 8.90922 9.36851 8.79343 9.40815C8.53582 9.49634 8.28507 9.5993 8.04218 9.71601C7.93249 9.76871 7.7996 9.72736 7.74298 9.61962L6.05349 6.4046C5.99643 6.296 6.03858 6.16148 6.14865 6.10737C6.61125 5.87995 7.09212 5.68404 7.58847 5.52244Z" fill="white"/><path d="M5.01218 6.7527C5.11403 6.68657 5.24968 6.71793 5.31449 6.82064L7.25525 9.89609C7.32062 9.99969 7.2891 10.1364 7.18735 10.2046C6.96161 10.3559 6.74526 10.5201 6.53936 10.6962C6.44705 10.7751 6.30831 10.7694 6.2259 10.6802L3.75345 8.00296C3.6701 7.91271 3.67617 7.77161 3.76878 7.6909C4.15993 7.35 4.57537 7.03629 5.01218 6.7527Z" fill="white"/><path d="M3.14377 8.5954C3.05475 8.51312 2.91591 8.51778 2.83455 8.60765C2.48506 8.99368 2.16255 9.4046 1.86999 9.83744C1.80108 9.93939 1.83165 10.0775 1.93568 10.1432L5.02874 12.0963C5.13123 12.161 5.2664 12.1309 5.33529 12.0311C5.49018 11.8068 5.65795 11.5921 5.83754 11.3881C5.91865 11.2959 5.91392 11.1553 5.82376 11.072L3.14377 8.5954Z" fill="white"/><path d="M1.49729 10.8734C1.39011 10.817 1.25734 10.8573 1.20192 10.965C0.963642 11.428 0.757205 11.9101 0.585497 12.4084C0.545434 12.5247 0.610701 12.6501 0.728093 12.6866L4.23398 13.7766C4.34974 13.8126 4.47253 13.7485 4.51329 13.6343C4.60557 13.3757 4.71279 13.1241 4.83391 12.8807C4.88869 12.7707 4.84782 12.6358 4.73902 12.5785L1.49729 10.8734Z" fill="white"/><path d="M0.494446 13.5089C0.376194 13.4822 0.258268 13.5557 0.232794 13.6743C0.123741 14.1818 0.0496438 14.7024 0.0131471 15.2333C0.0047196 15.3558 0.100176 15.4599 0.222917 15.4648L3.90175 15.6103C4.0229 15.6151 4.12492 15.5213 4.13464 15.4005C4.15686 15.1241 4.19529 14.8523 4.24898 14.5861C4.27328 14.4656 4.19889 14.346 4.07905 14.3189L0.494446 13.5089Z" fill="white"/><path d="M0.210291 16.321C0.0892093 16.3258 -0.00566608 16.4272 0.000263525 16.5483C0.0263981 17.0819 0.0904871 17.6055 0.189887 18.1165C0.213358 18.2372 0.332522 18.3131 0.452388 18.286L4.05308 17.4722C4.17122 17.4455 4.2455 17.3287 4.22385 17.2095C4.17514 16.9413 4.14188 16.6677 4.125 16.3897C4.11755 16.2669 4.0147 16.1705 3.89181 16.1753L0.210291 16.321Z" fill="white"/><path d="M0.662998 19.119C0.547156 19.155 0.481772 19.2778 0.519099 19.3932C0.682854 19.8997 0.882286 20.3902 1.11443 20.8617C1.16859 20.9717 1.303 21.0137 1.4115 20.9567L4.68415 19.2355C4.79158 19.179 4.83301 19.0466 4.78085 18.937C4.66271 18.6888 4.55891 18.4324 4.47051 18.1689C4.4314 18.0524 4.30715 17.9859 4.18977 18.0224L0.662998 19.119Z" fill="white"/><path d="M1.83513 21.7058C1.73232 21.7707 1.70106 21.9067 1.76746 22.0086C2.05728 22.4533 2.37835 22.8758 2.72754 23.2729C2.8084 23.3649 2.94892 23.3706 3.03885 23.2874L5.75571 20.7763C5.84491 20.6938 5.85059 20.5551 5.77166 20.4627C5.59177 20.2523 5.42427 20.0309 5.27029 19.7998C5.20225 19.6977 5.0653 19.6659 4.96156 19.7314L1.83513 21.7058Z" fill="white"/><path d="M3.64398 23.9008C3.56141 23.9902 3.56648 24.1298 3.65715 24.2109C4.05164 24.5642 4.47175 24.8894 4.91433 25.1835C5.01622 25.2512 5.15324 25.2203 5.21854 25.1168L7.19314 21.9886C7.25803 21.8858 7.22753 21.7502 7.12726 21.6814C6.89753 21.524 6.67777 21.353 6.46912 21.1697C6.37698 21.0887 6.23655 21.0935 6.15333 21.1837L3.64398 23.9008Z" fill="white"/><path d="M5.96361 25.5511C5.9069 25.659 5.94811 25.7927 6.05697 25.8475C6.5284 26.0847 7.01922 26.2891 7.5264 26.4576C7.64215 26.4961 7.76595 26.4307 7.80216 26.3142L8.89888 22.7853C8.93505 22.6689 8.87006 22.5455 8.75499 22.5053C8.4906 22.4131 8.23352 22.3052 7.98484 22.1829C7.87491 22.1288 7.74073 22.1699 7.68373 22.2783L5.96361 25.5511Z" fill="white"/><path d="M8.63566 26.5354C8.6087 26.6546 8.68365 26.7734 8.80348 26.7976C9.31726 26.9017 9.84401 26.9699 10.381 26.9997C10.5026 27.0064 10.6048 26.9113 10.6096 26.7896L10.7553 23.106C10.7601 22.9839 10.665 22.8814 10.5432 22.8728C10.262 22.853 9.98549 22.8164 9.7146 22.7641C9.5947 22.7409 9.47633 22.8152 9.4494 22.9344L8.63566 26.5354Z" fill="white"/><path d="M11.4709 26.7849C11.4758 26.9072 11.579 27.0025 11.7011 26.9948C12.237 26.9611 12.7624 26.8891 13.2747 26.7815C13.3938 26.7565 13.4678 26.6382 13.441 26.5195L12.631 22.9331C12.604 22.8138 12.4855 22.7394 12.3655 22.7628C12.0948 22.8154 11.8184 22.8523 11.5373 22.8723C11.4156 22.881 11.3206 22.9835 11.3255 23.1054L11.4709 26.7849Z" fill="white"/><path d="M14.2708 26.2896C14.3071 26.4067 14.4319 26.472 14.548 26.4326C15.052 26.2611 15.5396 26.0541 16.0077 25.8146C16.1157 25.7593 16.1563 25.6263 16.0998 25.5189L14.3952 22.2756C14.3382 22.167 14.2039 22.126 14.0939 22.1802C13.8456 22.3027 13.5888 22.4107 13.3248 22.5031C13.2098 22.5433 13.145 22.6666 13.1811 22.783L14.2708 26.2896Z" fill="white"/><path d="M16.8377 25.0791C16.9033 25.183 17.0412 25.2136 17.1431 25.145C17.5813 24.8498 17.9972 24.524 18.3877 24.1705C18.4776 24.0891 18.4822 23.9502 18.3999 23.8611L15.9238 21.1804C15.8405 21.0902 15.7 21.0855 15.6079 21.1665C15.3996 21.3497 15.1803 21.5206 14.951 21.6781C14.8509 21.7468 14.8205 21.8824 14.8853 21.9851L16.8377 25.0791Z" fill="white"/><path d="M18.9971 23.2462C19.0874 23.3296 19.2285 23.3235 19.3091 23.2308C19.6536 22.8351 19.9702 22.4145 20.256 21.9722C20.3218 21.8703 20.2904 21.7349 20.1879 21.6701L17.114 19.7283C17.0102 19.6627 16.8732 19.6945 16.8051 19.7967C16.6514 20.0277 16.4842 20.249 16.3046 20.4593C16.2258 20.5517 16.2315 20.6904 16.3207 20.7728L18.9971 23.2462Z" fill="white"/><path d="M20.6049 20.9229C20.7137 20.9801 20.8484 20.9377 20.9023 20.8272C21.1308 20.3591 21.327 19.8725 21.4882 19.3701C21.5252 19.2547 21.4598 19.1323 21.3441 19.0963L17.8842 18.0205C17.7668 17.984 17.6426 18.0505 17.6035 18.1671C17.5153 18.4302 17.4117 18.6863 17.2938 18.9343C17.2417 19.0439 17.2832 19.1762 17.3906 19.2327L20.6049 20.9229Z" fill="white"/><path d="M21.5508 18.2685C21.6709 18.2956 21.7901 18.2195 21.8134 18.0987C21.911 17.5923 21.974 17.0736 21.9997 16.5451C22.0056 16.424 21.9108 16.3226 21.7897 16.3178L18.1816 16.1751C18.0587 16.1702 17.9558 16.2667 17.9484 16.3895C17.9316 16.667 17.8984 16.9402 17.8498 17.208C17.8282 17.3272 17.9025 17.4439 18.0206 17.4706L21.5508 18.2685Z" fill="white"/><path d="M21.7771 15.468C21.8999 15.4631 21.9953 15.3591 21.9869 15.2365C21.9509 14.7107 21.878 14.1949 21.7708 13.6919C21.7455 13.5732 21.6275 13.4995 21.5091 13.5262L17.9946 14.3205C17.8748 14.3476 17.8004 14.4672 17.8247 14.5876C17.8783 14.8534 17.9166 15.1248 17.9388 15.4007C17.9485 15.5216 18.0505 15.6154 18.1717 15.6106L21.7771 15.468Z" fill="white"/><path d="M21.2795 12.7091C21.3967 12.6726 21.462 12.5475 21.4222 12.4314C21.2532 11.9373 21.05 11.459 20.8155 10.9994C20.7604 10.8913 20.6273 10.8506 20.5199 10.9071L17.3358 12.5814C17.227 12.6386 17.1861 12.7734 17.2408 12.8835C17.3617 13.1266 17.4687 13.3778 17.5607 13.6361C17.6015 13.7503 17.7243 13.8145 17.8401 13.7785L21.2795 12.7091Z" fill="white"/><path d="M20.088 10.1786C20.1918 10.1131 20.2225 9.97549 20.1542 9.87356C19.8655 9.44286 19.5473 9.03367 19.2024 8.64888C19.1212 8.55829 18.9818 8.55327 18.8925 8.63583L16.2526 11.0754C16.1625 11.1587 16.1577 11.2992 16.2387 11.3914C16.418 11.5954 16.5856 11.81 16.7402 12.0342C16.8091 12.134 16.9443 12.1642 17.0469 12.0995L20.088 10.1786Z" fill="white"/><path d="M18.291 8.04211C18.3741 7.9522 18.3684 7.81172 18.2766 7.73081C17.8894 7.38964 17.4781 7.07525 17.0456 6.79054C16.9437 6.72348 16.8072 6.75458 16.7421 6.85774L14.8228 9.89922C14.7575 10.0028 14.7889 10.1394 14.8905 10.2076C15.116 10.359 15.332 10.5232 15.5377 10.6993C15.63 10.7783 15.7688 10.7727 15.8512 10.6834L18.291 8.04211Z" fill="white"/><path d="M16.0105 6.43642C16.0673 6.32832 16.0259 6.19442 15.9167 6.13982C15.4571 5.91008 14.9792 5.71154 14.4858 5.54698C14.37 5.50835 14.2461 5.57372 14.2098 5.69034L13.1414 9.13004C13.1051 9.24687 13.1707 9.37062 13.2863 9.41034C13.5437 9.49873 13.7942 9.60187 14.0369 9.71874C14.1466 9.77158 14.2796 9.73027 14.3363 9.62245L16.0105 6.43642Z" fill="white"/><path d="M31.6491 10.712C34.6731 10.712 36.6651 13.52 36.6651 16.952C36.6651 20.36 34.6731 23.192 31.6251 23.192H30.9291C29.9931 23.192 28.7931 22.592 28.1211 21.704V27.896H25.0251V10.904H28.1211V12.224C28.6731 11.408 29.8251 10.712 30.9051 10.712H31.6491ZM30.3531 13.376C28.9851 13.376 27.9051 14.864 27.9051 16.952C27.9051 19.04 28.9851 20.528 30.3531 20.528H31.1211C32.4171 20.528 33.5451 19.064 33.5451 16.952C33.5451 14.84 32.4171 13.376 31.1211 13.376H30.3531ZM38.3755 16.928C38.3755 13.04 40.9915 10.712 43.6795 10.712H44.5435C47.4955 10.712 49.6075 13.304 49.6075 16.568C49.6075 17.096 49.5835 17.384 49.5595 17.624H41.4715C41.6635 19.568 42.6235 20.624 43.7515 20.624H44.6155C45.6475 20.624 46.3915 19.856 46.5595 18.92H49.5595C49.2955 21.44 47.1355 23.192 44.5675 23.192H43.7515C40.6315 23.192 38.3755 20.576 38.3755 16.928ZM41.6155 15.44H46.5355C46.4875 14.12 45.5995 13.112 44.5675 13.112H43.7515C42.8635 13.112 41.9515 13.952 41.6155 15.44ZM57.318 13.496C55.878 13.496 55.062 14.888 55.062 16.304V23H51.966V10.904H55.062V12.488C55.542 11.48 56.382 10.904 57.51 10.904H58.998V13.496H57.318ZM64.0292 23.192C61.5332 23.192 59.9492 21.776 59.9492 19.64C59.9492 17.336 61.8452 16.136 64.1732 15.8L67.3172 15.344V15.08C67.3172 13.976 66.5972 13.184 65.7092 13.184H64.8692C63.9092 13.184 63.2372 13.784 63.1412 14.816H60.0212C60.2132 12.32 62.3972 10.712 64.8692 10.712H65.7092C68.6852 10.712 70.4132 12.728 70.4132 15.2V19.52C70.4132 20.336 70.8452 20.408 71.7572 20.408V23H69.6932C68.4932 23 67.7492 22.52 67.6772 21.416C67.0772 22.52 65.7092 23.192 64.0292 23.192ZM63.0932 19.52C63.0932 20.336 63.7412 20.84 64.6292 20.84C66.2372 20.84 67.3172 19.712 67.3172 18.08V17.552L65.0132 17.96C63.8612 18.176 63.0932 18.464 63.0932 19.52ZM74.3162 7.976L77.4122 6.68V10.904H80.6762V13.496H77.4122V19.088C77.4122 20.096 77.9162 20.408 78.6122 20.408H80.6042V23H77.7002C75.5882 23 74.3162 21.896 74.3162 19.424V13.496H72.0602V10.904H74.3162V7.976ZM82.6626 23V10.904H85.7586V23H82.6626ZM82.5666 6.2H85.8786V8.984H82.5666V6.2ZM93.4437 23.192C90.3717 23.192 88.0677 20.552 88.0677 16.952C88.0677 13.328 90.3717 10.712 93.4197 10.712H94.3797C97.4517 10.712 99.7317 13.328 99.7317 16.952C99.7317 20.576 97.4517 23.192 94.4037 23.192H93.4437ZM94.2837 20.528C95.5797 20.528 96.6117 18.968 96.6117 16.952C96.6117 14.936 95.5797 13.376 94.2597 13.376H93.5397C92.2197 13.376 91.1877 14.888 91.1877 16.952C91.1877 19.016 92.2197 20.528 93.5397 20.528H94.2837ZM102.033 23V10.904H105.129V12.512C105.729 11.504 106.977 10.712 108.129 10.712H109.137C111.225 10.712 112.977 12.68 112.977 15.344V23H109.881V15.848C109.881 14.552 109.185 13.472 108.081 13.472H107.313C106.041 13.472 105.129 14.816 105.129 16.544V23H102.033ZM119.253 23.192C116.757 23.192 115.173 21.776 115.173 19.64C115.173 17.336 117.069 16.136 119.397 15.8L122.541 15.344V15.08C122.541 13.976 121.821 13.184 120.933 13.184H120.093C119.133 13.184 118.461 13.784 118.365 14.816H115.245C115.437 12.32 117.621 10.712 120.093 10.712H120.933C123.909 10.712 125.637 12.728 125.637 15.2V19.52C125.637 20.336 126.069 20.408 126.981 20.408V23H124.917C123.717 23 122.973 22.52 122.901 21.416C122.301 22.52 120.933 23.192 119.253 23.192ZM118.317 19.52C118.317 20.336 118.965 20.84 119.853 20.84C121.461 20.84 122.541 19.712 122.541 18.08V17.552L120.237 17.96C119.085 18.176 118.317 18.464 118.317 19.52ZM128.693 23V6.2H131.789V23H128.693ZM134.722 23V10.904H137.818V23H134.722ZM134.626 6.2H137.938V8.984H134.626V6.2ZM140.031 23V20.408L146.103 13.496H140.415V10.904H149.631V13.496L143.607 20.408H149.991V23H140.031ZM151.312 16.928C151.312 13.04 153.928 10.712 156.616 10.712H157.48C160.432 10.712 162.544 13.304 162.544 16.568C162.544 17.096 162.52 17.384 162.496 17.624H154.408C154.6 19.568 155.56 20.624 156.688 20.624H157.552C158.584 20.624 159.328 19.856 159.496 18.92H162.496C162.232 21.44 160.072 23.192 157.504 23.192H156.688C153.568 23.192 151.312 20.576 151.312 16.928ZM154.552 15.44H159.472C159.424 14.12 158.536 13.112 157.504 13.112H156.688C155.8 13.112 154.888 13.952 154.552 15.44Z" fill="white"/></svg>
+      </a>
+      <div class="topbar-actions">
+        <div class="topbar-search">
+          <i class="ph ph-magnifying-glass search-icon"></i>
+          <input class="topbar-search-input" type="search" placeholder="Search Operationalize…" />
+        </div>
+        <button class="topbar-avatar" aria-label="Account" type="button">MV</button>
+      </div>
+    </header>
+
+    <div class="shell-body">
+
+      <aside class="sidenav">
+        <button class="sidenav-toggle" aria-label="Toggle navigation" type="button">
+          <i class="ph ph-caret-left"></i>
+        </button>
+        <ul class="sidenav-list">
+          <li><a class="sidenav-item" href="#"><i class="ph ph-arrows-clockwise sidenav-item-icon"></i><span class="sidenav-item-label">Processes</span></a></li>
+          <li><a class="sidenav-item" href="#"><i class="ph ph-rocket-launch sidenav-item-icon"></i><span class="sidenav-item-label">Initiatives</span></a></li>
+          <li><a class="sidenav-item" href="#"><i class="ph ph-calendar sidenav-item-icon"></i><span class="sidenav-item-label">RoB Meetings</span></a></li>
+          <li><a class="sidenav-item" href="#"><i class="ph ph-target sidenav-item-icon"></i><span class="sidenav-item-label">OKRs</span></a></li>
+          <li><a class="sidenav-item" href="#"><i class="ph ph-users sidenav-item-icon"></i><span class="sidenav-item-label">People</span></a></li>
+          <li><a class="sidenav-item" href="#"><i class="ph ph-tree-structure sidenav-item-icon"></i><span class="sidenav-item-label">Team</span></a></li>
+        </ul>
+        <div class="sidenav-spacer"></div>
+        <div class="sidenav-footer">
+          <a class="sidenav-item is-active" href="#"><i class="ph ph-gear sidenav-item-icon"></i><span class="sidenav-item-label">Admin Settings</span></a>
+          <a class="sidenav-item" href="#"><i class="ph ph-lightbulb sidenav-item-icon"></i><span class="sidenav-item-label">Learning Hub</span></a>
+        </div>
+      </aside>
+
+      <main class="shell-main">
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="#">Admin Settings</a>
+          <i class="ph ph-caret-right"></i>
+          <span class="breadcrumb-current">Integrations</span>
+        </nav>
+
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Integrations</h1>
+            </div>
+          </div>
+          <div class="page-head-actions" data-tab-panel="panel-tokens" hidden>
+            <a class="btn btn-secondary" href="#" hidden>API docs</a>
+            <button class="btn btn-primary" data-modal-open="drawer-create-token" type="button">Create token</button>
+          </div>
+        </div>
+
+        <div class="page-tabs">
+          <div class="tabs" role="tablist" aria-label="Developers sections">
+            <button class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-integrations" id="tab-integrations" type="button">Integrations</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="panel-tokens" id="tab-tokens" type="button">API tokens</button>
+          </div>
+        </div>
+
+        <!-- ============== Tab 1: Integrations ============== -->
+        <section role="tabpanel" id="panel-integrations" aria-labelledby="tab-integrations">
+
+          <div class="tab-actions" style="justify-content: flex-start">
+            <div class="topbar-search" style="flex: 1; max-width: 400px">
+              <i class="ph ph-magnifying-glass search-icon" style="color: var(--color-text-subtle)"></i>
+              <input class="input" type="search" placeholder="Search integrations…" style="padding-left: 36px; width: 100%" />
+            </div>
+            <div class="input-select" id="integration-filter" style="max-width: 200px">
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">Show all</span>
+                <i class="ph ph-caret-down"></i>
+              </button>
+              <div class="dropdown-menu" hidden>
+                <button class="dropdown-item is-selected" type="button"><i class="ph ph-check dropdown-item-check"></i>Show all</button>
+                <button class="dropdown-item" type="button"><i class="ph ph-check dropdown-item-check"></i>Connected</button>
+                <button class="dropdown-item" type="button"><i class="ph ph-check dropdown-item-check"></i>Available</button>
+              </div>
+            </div>
+          </div>
+
+          <section data-section="communication">
+            <header class="section-head"><h2 class="h3">Communication</h2></header>
+            <div class="integration-grid">
+
+              <article class="card integration-card" data-status="connected">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-purple-100); color: var(--ic-palette-purple-600)">S</div>
+                  <div><p class="integration-title">Slack</p><p class="integration-cat">Messaging</p></div>
+                </div>
+                <p class="integration-desc">Push status changes, OKR check-ins, and meeting reminders into Slack so the team stays in the loop.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary">Configure</button></div>
+              </article>
+
+              <article class="card integration-card" data-status="connected">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-blue-100); color: var(--ic-palette-blue-500)">Z</div>
+                  <div><p class="integration-title">Zoom</p><p class="integration-cat">Video meetings</p></div>
+                </div>
+                <p class="integration-desc">Auto-create meeting links and attach recordings, keeping every RoB session connected to its outcomes.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary">Configure</button></div>
+              </article>
+
+            </div>
+          </section>
+
+          <section data-section="okrs" style="margin-top: var(--ic-space-7)">
+            <header class="section-head"><h2 class="h3">OKRs</h2></header>
+            <div class="integration-grid">
+
+              <article class="card integration-card" data-status="available">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-orange-100); color: var(--ic-palette-orange-600)">T</div>
+                  <div><p class="integration-title">Tableau</p><p class="integration-cat">Analytics</p></div>
+                </div>
+                <p class="integration-desc">Sync OKRs from Tableau into Operationalize as read-only, and embed live dashboards inside OKR detail pages.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-light">Not connected</span><button class="btn btn-sm btn-primary">Connect</button></div>
+              </article>
+
+              <article class="card integration-card" data-status="available">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-blue-100); color: var(--ic-palette-blue-600)">BQ</div>
+                  <div><p class="integration-title">BigQuery</p><p class="integration-cat">Data warehouse</p></div>
+                </div>
+                <p class="integration-desc">Query warehouse data alongside Operationalize metrics to feed live key result progress back into OKRs.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-blue">Coming soon</span><button class="btn btn-sm btn-secondary" disabled>Notify me</button></div>
+              </article>
+
+            </div>
+          </section>
+
+          <section data-section="productivity" style="margin-top: var(--ic-space-7)">
+            <header class="section-head"><h2 class="h3">Productivity</h2></header>
+            <div class="integration-grid">
+
+              <article class="card integration-card" data-status="connected">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-red-100); color: var(--ic-palette-red-500)">G</div>
+                  <div><p class="integration-title">Google Workspace</p><p class="integration-cat">Calendar & docs</p></div>
+                </div>
+                <p class="integration-desc">Bring calendars, Docs, and Sheets into Operationalize so context lives next to objectives and initiatives.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary">Configure</button></div>
+              </article>
+
+              <article class="card integration-card" data-status="available">
+                <div class="integration-head">
+                  <div class="integration-logo" style="background: var(--ic-palette-blue-100); color: var(--ic-palette-blue-700)">J</div>
+                  <div><p class="integration-title">Jira</p><p class="integration-cat">Project tracking</p></div>
+                </div>
+                <p class="integration-desc">Mirror Jira epics as Operationalize initiatives with two-way status sync — one source of truth across both.</p>
+                <div class="integration-foot"><span class="tag tag-indicator tag-light">Not connected</span><button class="btn btn-sm btn-primary">Connect</button></div>
+              </article>
+
+            </div>
+          </section>
+
+        </section><!-- /panel-integrations -->
+
+        <!-- ============== Tab 2: API tokens ============== -->
+        <section role="tabpanel" id="panel-tokens" aria-labelledby="tab-tokens" hidden>
+
+        <!-- Optional safety reminder. Kept dismissable so it doesn't dominate the page on revisits. -->
+        <div class="alert alert-info" role="status" style="margin-bottom: var(--ic-space-5)">
+          <i class="ph ph-info alert-icon"></i>
+          <div class="alert-message">
+            <strong>Treat tokens like passwords.</strong> Operationalize will only show a token's full value once, at creation time. Rotate tokens at least every 90 days.
+          </div>
+          <div class="alert-actions">
+            <button class="btn btn-xs btn-secondary" type="button" data-alert-dismiss>Remind me later</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="table table-wide">
+            <thead>
+              <tr>
+                <th style="width: 28%">Name</th>
+                <th style="width: 16%">Token</th>
+                <th style="width: 18%">Permission policy</th>
+                <th style="width: 14%">Last used</th>
+                <th style="width: 14%">Expires</th>
+                <th style="width: 10%">Created by</th>
+                <th style="width: 40px" aria-label="Actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td class="cell-title">
+                  <button class="cell-title-link" type="button" data-view-token="prod-webhook">Production webhook</button>
+                  <div class="cell-meta-sub">Posts deploy events from CI</div>
+                </td>
+                <td><code class="token-preview">op_live_••••••••3a2f</code></td>
+                <td>
+                  <div class="scope-tags">
+                    <span class="tag tag-blue">Initiatives · Read/Write</span>
+                  </div>
+                </td>
+                <td><span class="last-used"><span class="dot"></span>4 minutes ago</span></td>
+                <td>Never</td>
+                <td>
+                  <div class="cell-created-by">
+                    <span class="avatar avatar-sm" style="background: var(--ic-palette-blue-100); color: var(--ic-palette-blue-700)">MV</span>
+                    <span class="cell-created-by-name">Matthew Vella</span>
+                  </div>
+                </td>
+                <td style="text-align: right">
+                  <div class="dropdown" style="display: inline-block">
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><i class="ph ph-dots-three-vertical"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" hidden>
+                      <button class="dropdown-item" type="button" data-token-action="edit"><i class="ph ph-pencil-simple dropdown-item-icon"></i>Edit details</button>
+                      <button class="dropdown-item" type="button"><i class="ph ph-arrow-clockwise dropdown-item-icon"></i>Roll token</button>
+                      <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke"><i class="ph ph-trash dropdown-item-icon"></i>Revoke</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-title">
+                  <button class="cell-title-link" type="button" data-view-token="sales-bi">Sales BI dashboard</button>
+                  <div class="cell-meta-sub">Read-only Looker connector</div>
+                </td>
+                <td><code class="token-preview">op_live_••••••••b104</code></td>
+                <td>
+                  <div class="scope-tags">
+                    <span class="tag tag-blue">OKRs · Read-only</span>
+                  </div>
+                </td>
+                <td><span class="last-used"><span class="dot"></span>2 hours ago</span></td>
+                <td>Mar 4, 2026</td>
+                <td>
+                  <div class="cell-created-by">
+                    <span class="avatar avatar-sm" style="background: var(--ic-palette-purple-100); color: var(--ic-palette-purple-700)">AC</span>
+                    <span class="cell-created-by-name">Anna Costa</span>
+                  </div>
+                </td>
+                <td style="text-align: right">
+                  <div class="dropdown" style="display: inline-block">
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><i class="ph ph-dots-three-vertical"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" hidden>
+                      <button class="dropdown-item" type="button" data-token-action="edit"><i class="ph ph-pencil-simple dropdown-item-icon"></i>Edit details</button>
+                      <button class="dropdown-item" type="button"><i class="ph ph-arrow-clockwise dropdown-item-icon"></i>Roll token</button>
+                      <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke"><i class="ph ph-trash dropdown-item-icon"></i>Revoke</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-title">
+                  <button class="cell-title-link" type="button" data-view-token="zapier">Zapier integration</button>
+                  <div class="cell-meta-sub">No-code workflows for product team</div>
+                </td>
+                <td><code class="token-preview">op_live_••••••••f7d8</code></td>
+                <td>
+                  <div class="scope-tags">
+                    <span class="tag tag-blue">Initiatives · Read/Write</span>
+                    <span class="tag tag-blue">OKRs · Read-only</span>
+                  </div>
+                </td>
+                <td><span class="last-used is-stale"><span class="dot"></span>11 days ago</span></td>
+                <td><span style="color: var(--color-warning)">In 8 days</span></td>
+                <td>
+                  <div class="cell-created-by">
+                    <span class="avatar avatar-sm" style="background: var(--ic-palette-green-100); color: var(--ic-palette-green-700)">RS</span>
+                    <span class="cell-created-by-name">Renu Sharma</span>
+                  </div>
+                </td>
+                <td style="text-align: right">
+                  <div class="dropdown" style="display: inline-block">
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><i class="ph ph-dots-three-vertical"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" hidden>
+                      <button class="dropdown-item" type="button" data-token-action="edit"><i class="ph ph-pencil-simple dropdown-item-icon"></i>Edit details</button>
+                      <button class="dropdown-item" type="button"><i class="ph ph-arrow-clockwise dropdown-item-icon"></i>Roll token</button>
+                      <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke"><i class="ph ph-trash dropdown-item-icon"></i>Revoke</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-title">
+                  <button class="cell-title-link" type="button" data-view-token="local-dev">Local dev — Matthew</button>
+                  <div class="cell-meta-sub">Personal scratchpad</div>
+                </td>
+                <td><code class="token-preview">op_test_••••••••2c91</code></td>
+                <td>
+                  <div class="scope-tags">
+                    <span class="tag tag-blue">All · Read/Write</span>
+                  </div>
+                </td>
+                <td><span class="last-used is-never"><span class="dot"></span>Never used</span></td>
+                <td>May 30, 2026</td>
+                <td>
+                  <div class="cell-created-by">
+                    <span class="avatar avatar-sm" style="background: var(--ic-palette-blue-100); color: var(--ic-palette-blue-700)">MV</span>
+                    <span class="cell-created-by-name">Matthew Vella</span>
+                  </div>
+                </td>
+                <td style="text-align: right">
+                  <div class="dropdown" style="display: inline-block">
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><i class="ph ph-dots-three-vertical"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" hidden>
+                      <button class="dropdown-item" type="button" data-token-action="edit"><i class="ph ph-pencil-simple dropdown-item-icon"></i>Edit details</button>
+                      <button class="dropdown-item" type="button"><i class="ph ph-arrow-clockwise dropdown-item-icon"></i>Roll token</button>
+                      <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke"><i class="ph ph-trash dropdown-item-icon"></i>Revoke</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-title">
+                  <div style="display: flex; align-items: center"><button class="cell-title-link" type="button" data-view-token="legacy-export">Legacy data export</button><span class="tag tag-indicator tag-warning" style="margin-left: var(--ic-space-2)">Expired</span></div>
+                  <div class="cell-meta-sub">Decommissioned in Feb — pending cleanup</div>
+                </td>
+                <td><code class="token-preview">op_live_••••••••48ae</code></td>
+                <td>
+                  <div class="scope-tags">
+                    <span class="tag tag-blue">All · Read-only</span>
+                  </div>
+                </td>
+                <td><span class="last-used is-stale"><span class="dot"></span>3 months ago</span></td>
+                <td><span style="color: var(--color-danger)">Feb 14, 2026</span></td>
+                <td>
+                  <div class="cell-created-by">
+                    <span class="avatar avatar-sm" style="background: var(--ic-palette-orange-100); color: var(--ic-palette-orange-700)">JK</span>
+                    <span class="cell-created-by-name">Jin Kim</span>
+                  </div>
+                </td>
+                <td style="text-align: right">
+                  <div class="dropdown" style="display: inline-block">
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><i class="ph ph-dots-three-vertical"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" hidden>
+                      <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke"><i class="ph ph-trash dropdown-item-icon"></i>Delete</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        </section><!-- /panel-tokens -->
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================== View / edit token drawer ================== -->
+  <div class="drawer-overlay" id="drawer-view-token" hidden>
+    <aside class="drawer drawer-regular" id="view-token-aside" data-mode="view" role="dialog" aria-modal="true" aria-labelledby="view-token-title">
+      <header class="drawer-header">
+        <div style="display: flex; align-items: center; gap: var(--ic-space-3); min-width: 0">
+          <h2 id="view-token-title" class="h3" style="margin: 0">Token</h2>
+          <span class="tag tag-indicator" id="view-token-status">Active</span>
+        </div>
+        <button class="modal-close" data-modal-close type="button" aria-label="Close"><i class="ph ph-x"></i></button>
+      </header>
+      <div class="drawer-body">
+        <div class="stack" style="gap: var(--ic-space-6)">
+
+          <!-- Description (view) -->
+          <p id="view-token-desc" class="body view-only" style="margin: 0; color: var(--color-text-muted)"></p>
+
+          <!-- Editable name + description (edit) -->
+          <label class="field edit-only">
+            <span class="field-label">Token name</span>
+            <input class="input" type="text" id="edit-token-name" />
+          </label>
+          <label class="field edit-only">
+            <span class="field-label">Description <span style="color: var(--color-text-subtle); font-weight: 400">— optional</span></span>
+            <input class="input" type="text" id="edit-token-desc" placeholder="What is this token used for?" />
+          </label>
+
+          <!-- Token value (both modes, always read-only) -->
+          <label class="field">
+            <span class="field-label">Token</span>
+            <input class="input" type="text" id="view-token-value" readonly style="font: var(--type-mono); font-size: 13px; background: var(--color-surface-sunken);" />
+            <span class="field-hint">The full value was shown only once, at creation. If it's lost, revoke this token and create a new one.</span>
+          </label>
+
+          <!-- Permission policy (read-only in both modes — immutable after creation) -->
+          <div style="border-top: 1px solid var(--color-border); padding-top: var(--ic-space-5);">
+            <span class="drawer-section-label">Permission policy</span>
+            <div class="scope-tags" id="view-token-scopes" style="margin-top: var(--ic-space-2)"></div>
+            <span class="field-hint edit-only" style="margin-top: var(--ic-space-2)">Permissions can't be changed after creation. Roll the token to issue a new secret with different permissions.</span>
+          </div>
+
+          <!-- Metadata (both modes) -->
+          <div>
+            <span class="drawer-section-label">Details</span>
+            <dl class="meta-grid">
+              <dt>Created by</dt>
+              <dd><span class="cell-created-by"><span class="avatar avatar-sm" id="view-token-avatar"></span><span id="view-token-createdby"></span></span></dd>
+              <dt>Created on</dt>
+              <dd id="view-token-createdon"></dd>
+              <dt>Last used</dt>
+              <dd id="view-token-lastused"></dd>
+              <dt>Last used IP</dt>
+              <dd id="view-token-ip"></dd>
+              <dt>Expires</dt>
+              <dd id="view-token-expires"></dd>
+            </dl>
+          </div>
+
+        </div>
+      </div>
+      <footer class="drawer-footer">
+        <!-- View mode actions -->
+        <button class="btn btn-secondary view-only" data-modal-close type="button">Close</button>
+        <button class="btn btn-danger view-only" type="button" id="view-token-revoke">Revoke token</button>
+        <!-- Edit mode actions -->
+        <button class="btn btn-secondary edit-only" type="button" id="edit-token-cancel">Cancel</button>
+        <button class="btn btn-primary edit-only" type="button" id="edit-token-save">Save changes</button>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- ================== Create token drawer ================== -->
+  <div class="drawer-overlay" id="drawer-create-token" hidden>
+    <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="create-token-title">
+      <header class="drawer-header">
+        <h2 id="create-token-title" class="h3" style="margin: 0">Create API token</h2>
+        <button class="modal-close" data-modal-close type="button" aria-label="Close"><i class="ph ph-x"></i></button>
+      </header>
+      <div class="drawer-body">
+        <div class="stack" style="gap: var(--ic-space-5)">
+
+          <label class="field">
+            <span class="field-label">Token name</span>
+            <input class="input" type="text" placeholder="e.g. Production webhook" />
+            <span class="field-hint">A descriptive label so you can identify this token later.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Description <span style="color: var(--color-text-subtle); font-weight: 400">— optional</span></span>
+            <input class="input" type="text" placeholder="What is this token used for?" />
+          </label>
+
+          <div class="field">
+            <span class="field-label">Expiration</span>
+            <div class="input-select">
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">90 days</span>
+                <i class="ph ph-caret-down"></i>
+              </button>
+              <div class="dropdown-menu" hidden>
+                <button class="dropdown-item" type="button"><i class="ph ph-check dropdown-item-check"></i>30 days</button>
+                <button class="dropdown-item is-selected" type="button"><i class="ph ph-check dropdown-item-check"></i>90 days</button>
+                <button class="dropdown-item" type="button"><i class="ph ph-check dropdown-item-check"></i>1 year</button>
+                <button class="dropdown-item" type="button"><i class="ph ph-check dropdown-item-check"></i>Never</button>
+              </div>
+            </div>
+            <span class="field-hint">Best practice is to rotate tokens at least every 90 days.</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Permission policy</span>
+            <div class="scope-list">
+
+              <div class="scope-card is-active">
+                <div class="scope-card-head">
+                  <p class="scope-item-name">Initiatives</p>
+                  <p class="scope-item-desc">Access to initiatives, milestones, and status updates.</p>
+                </div>
+                <div class="scope-perm-group">
+                  <label class="scope-perm-btn">
+                    <span class="checkbox">
+                      <input class="checkbox-input scope-toggle" type="checkbox" checked />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                    </span>
+                    <span class="scope-perm-label">Read</span>
+                  </label>
+                  <label class="scope-perm-btn">
+                    <span class="checkbox">
+                      <input class="checkbox-input scope-toggle" type="checkbox" />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                    </span>
+                    <span class="scope-perm-label">Write</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="scope-card is-active">
+                <div class="scope-card-head">
+                  <p class="scope-item-name">OKRs</p>
+                  <p class="scope-item-desc">Access to objectives, key results, and check-ins.</p>
+                </div>
+                <div class="scope-perm-group">
+                  <label class="scope-perm-btn">
+                    <span class="checkbox">
+                      <input class="checkbox-input scope-toggle" type="checkbox" checked />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                    </span>
+                    <span class="scope-perm-label">Read</span>
+                  </label>
+                  <label class="scope-perm-btn">
+                    <span class="checkbox">
+                      <input class="checkbox-input scope-toggle" type="checkbox" />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                    </span>
+                    <span class="scope-perm-label">Write</span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+            <span class="field-hint is-error" id="scope-error" hidden>Select at least one permission to create a token.</span>
+          </div>
+
+        </div>
+      </div>
+      <footer class="drawer-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-primary" type="button" id="create-token-submit">Create token</button>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- ================== Token reveal modal ================== -->
+  <div class="modal-overlay" id="modal-token-created" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="token-created-title">
+      <header class="modal-header">
+        <h2 id="token-created-title" class="h3" style="margin: 0; display: flex; align-items: center; gap: var(--ic-space-2)">
+          <i class="ph ph-check-circle" style="color: var(--color-success); font-size: 22px"></i>
+          Token created
+        </h2>
+      </header>
+      <div class="modal-body">
+        <p class="body" style="margin: 0 0 var(--ic-space-4)">Copy your token now — you won't be able to see it again after closing this dialog.</p>
+
+        <div class="token-reveal" id="token-reveal">
+          <code class="token-reveal-value">op_live_T3kqx9_82A4lN7vP6mFwY1bDcX0hRsLZ_3a2fH8gKuQp</code>
+          <button class="token-reveal-copy" type="button" id="copy-token-btn">
+            <i class="ph ph-copy"></i><span>Copy</span>
+          </button>
+        </div>
+
+        <div class="warning-callout" style="margin-top: var(--ic-space-4)">
+          <i class="ph ph-warning"></i>
+          <p>Store this token in a secrets manager. If you lose it, revoke the token and create a new one — we can't recover it for you.</p>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-primary" data-modal-close type="button">Done</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ================== Revoke confirmation modal ================== -->
+  <div class="modal-overlay" id="modal-revoke" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="revoke-title">
+      <header class="modal-header">
+        <h2 id="revoke-title" class="h3" style="margin: 0">Revoke this token?</h2>
+        <button class="modal-close" data-modal-close type="button" aria-label="Close"><i class="ph ph-x"></i></button>
+      </header>
+      <div class="modal-body">
+        <p class="body" style="margin: 0 0 var(--ic-space-3)">Any service using <strong>Production webhook</strong> will immediately stop working. This can't be undone.</p>
+        <p class="body-sm" style="color: var(--color-text-muted); margin: 0">Last used 4 minutes ago by IP <code style="font: var(--type-mono); font-size: 12px">10.4.21.8</code>.</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-danger" type="button" id="confirm-revoke">Revoke token</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // === Universal handlers (mirrors designmd/example.html) =====================
+
+    // Toast helper
+    window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+      let region = document.querySelector('.toast-region');
+      if (!region) {
+        region = document.createElement('div');
+        region.className = 'toast-region';
+        region.setAttribute('aria-live', 'polite');
+        document.body.appendChild(region);
+      }
+      const defaultIcon = { neutral: 'info', info: 'info', success: 'check-circle', warning: 'warning', error: 'warning-octagon' }[variant] || 'info';
+      const el = document.createElement('div');
+      el.className = `toast toast-${variant} is-entering`;
+      el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+      const actionHTML = behavior === 'action' && action ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>` : '';
+      el.innerHTML = `<i class="ph ph-${icon || defaultIcon} toast-icon"></i><p class="toast-message"></p>${actionHTML}${closeHTML}`;
+      el.querySelector('.toast-message').textContent = message;
+      region.appendChild(el);
+      requestAnimationFrame(() => el.classList.remove('is-entering'));
+      const dismiss = () => {
+        if (!el.isConnected) return;
+        el.classList.add('is-leaving');
+        const cleanup = () => el.remove();
+        el.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 400);
+      };
+      el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+      if (behavior === 'action' && action) {
+        el.querySelector('.toast-action').addEventListener('click', () => { try { action.onClick?.(); } catch (e) {} dismiss(); });
+      }
+      if (behavior === 'timed') setTimeout(dismiss, timeout);
+      return { dismiss };
+    };
+
+    // Overlays (modals + drawers)
+    (function wireOverlays() {
+      const OVERLAY_SELECTOR = '.modal-overlay, .drawer-overlay';
+      const close = (overlay) => { if (overlay) overlay.hidden = true; };
+      document.querySelectorAll('[data-modal-open]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          document.getElementById(trigger.dataset.modalOpen)?.removeAttribute('hidden');
+        });
+      });
+      document.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-modal-close]');
+        if (closeBtn) { close(closeBtn.closest(OVERLAY_SELECTOR)); return; }
+        const overlay = e.target.closest(OVERLAY_SELECTOR);
+        if (overlay && e.target === overlay) close(overlay);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll(OVERLAY_SELECTOR).forEach(o => { if (!o.hidden) close(o); });
+      });
+    })();
+
+    // Select (input-select) — toggle menu, sync chosen value
+    document.querySelectorAll('.input-select').forEach(sel => {
+      const trigger = sel.querySelector('.input-select-trigger');
+      const menu = sel.querySelector('.dropdown-menu');
+      const value = sel.querySelector('.input-select-value');
+      if (!trigger || !menu) return;
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+          item.classList.add('is-selected');
+          value.textContent = (item.textContent || '').trim();
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+
+    // Generic .dropdown
+    document.querySelectorAll('.dropdown').forEach(d => {
+      const trigger = d.querySelector('.dropdown-trigger');
+      const menu = d.querySelector('.dropdown-menu');
+      if (!trigger || !menu) return;
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.input-select, .dropdown').forEach(d => {
+        if (d.contains(e.target)) return;
+        d.querySelector('[aria-expanded]')?.setAttribute('aria-expanded', 'false');
+        const menu = d.querySelector('.dropdown-menu');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Sidenav toggle
+    document.querySelectorAll('.sidenav-toggle').forEach(btn => {
+      btn.addEventListener('click', () => btn.closest('.sidenav').classList.toggle('is-compact'));
+    });
+
+    // Alert close / dismiss
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.alert-close, [data-alert-dismiss]');
+      if (btn) btn.closest('.alert')?.remove();
+    });
+
+    // Tabs — click to activate, toggle aria-controlled panels
+    document.querySelectorAll('.tabs').forEach(tablist => {
+      const tabs = [...tablist.querySelectorAll('.tab')];
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+            const panelId = t.getAttribute('aria-controls');
+            if (panelId) {
+              const panel = document.getElementById(panelId);
+              if (panel) panel.hidden = !on;
+              // Toggle any page-head actions bound to this panel
+              document.querySelectorAll(`[data-tab-panel="${panelId}"]`).forEach(el => { el.hidden = !on; });
+            }
+          });
+        });
+      });
+    });
+
+    // === Feature-specific behaviors =============================================
+
+    // Permission cards — highlight a card while any of its read/write toggles is on
+    document.querySelectorAll('.scope-card').forEach(card => {
+      const toggles = [...card.querySelectorAll('.scope-toggle')];
+      const sync = () => card.classList.toggle('is-active', toggles.some(t => t.checked));
+      toggles.forEach(t => t.addEventListener('change', sync));
+      sync();
+    });
+
+    // Clear the "select a permission" error as soon as any permission is chosen
+    document.querySelectorAll('#drawer-create-token .scope-toggle').forEach(t => {
+      t.addEventListener('change', () => {
+        const any = [...document.querySelectorAll('#drawer-create-token .scope-toggle')].some(x => x.checked);
+        if (any) document.getElementById('scope-error').hidden = true;
+      });
+    });
+
+    // Create token submit — requires at least one permission, then opens reveal modal
+    document.getElementById('create-token-submit')?.addEventListener('click', () => {
+      const anyScope = [...document.querySelectorAll('#drawer-create-token .scope-toggle')].some(t => t.checked);
+      const err = document.getElementById('scope-error');
+      if (!anyScope) {
+        err.hidden = false;
+        err.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+      err.hidden = true;
+      document.getElementById('drawer-create-token').hidden = true;
+      document.getElementById('modal-token-created').hidden = false;
+    });
+
+    // Copy token
+    document.getElementById('copy-token-btn')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const value = document.querySelector('#token-reveal .token-reveal-value').textContent.trim();
+      try { await navigator.clipboard.writeText(value); } catch (_) {}
+      btn.classList.add('is-copied');
+      btn.querySelector('span').textContent = 'Copied';
+      btn.querySelector('i').className = 'ph ph-check';
+      setTimeout(() => {
+        btn.classList.remove('is-copied');
+        btn.querySelector('span').textContent = 'Copy';
+        btn.querySelector('i').className = 'ph ph-copy';
+      }, 1800);
+    });
+
+    // Revoke confirmation
+    document.getElementById('confirm-revoke')?.addEventListener('click', () => {
+      document.getElementById('modal-revoke').hidden = true;
+      toast({ variant: 'success', message: 'Token revoked.' });
+    });
+
+    // === View token drawer ======================================================
+    // Each token's full metadata (richer than the table row shows).
+    const TOKENS = {
+      'prod-webhook': {
+        name: 'Production webhook', desc: 'Posts deploy events from CI',
+        value: 'op_live_••••••••••••••••••••••••3a2f', status: 'active',
+        scopes: ['Initiatives · Read/Write'],
+        createdBy: 'Matthew Vella', initials: 'MV', avatar: ['blue-100', 'blue-700'],
+        createdOn: 'Nov 2, 2025', lastUsed: '4 minutes ago', ip: '10.4.21.8', expires: 'Never',
+      },
+      'sales-bi': {
+        name: 'Sales BI dashboard', desc: 'Read-only Looker connector',
+        value: 'op_live_••••••••••••••••••••••••b104', status: 'active',
+        scopes: ['OKRs · Read-only'],
+        createdBy: 'Anna Costa', initials: 'AC', avatar: ['purple-100', 'purple-700'],
+        createdOn: 'Dec 1, 2025', lastUsed: '2 hours ago', ip: '34.120.8.91', expires: 'Mar 4, 2026',
+      },
+      'zapier': {
+        name: 'Zapier integration', desc: 'No-code workflows for product team',
+        value: 'op_live_••••••••••••••••••••••••f7d8', status: 'active',
+        scopes: ['Initiatives · Read/Write', 'OKRs · Read-only'],
+        createdBy: 'Renu Sharma', initials: 'RS', avatar: ['green-100', 'green-700'],
+        createdOn: 'Jan 15, 2026', lastUsed: '11 days ago', ip: '52.9.114.3', expires: 'In 8 days (Jun 4, 2026)',
+      },
+      'local-dev': {
+        name: 'Local dev — Matthew', desc: 'Personal scratchpad',
+        value: 'op_test_••••••••••••••••••••••••2c91', status: 'active',
+        scopes: ['All · Read/Write'],
+        createdBy: 'Matthew Vella', initials: 'MV', avatar: ['blue-100', 'blue-700'],
+        createdOn: 'May 26, 2026', lastUsed: 'Never used', ip: '—', expires: 'May 30, 2026',
+      },
+      'legacy-export': {
+        name: 'Legacy data export', desc: 'Decommissioned in Feb — pending cleanup',
+        value: 'op_live_••••••••••••••••••••••••48ae', status: 'expired',
+        scopes: ['All · Read-only'],
+        createdBy: 'Jin Kim', initials: 'JK', avatar: ['orange-100', 'orange-700'],
+        createdOn: 'Aug 9, 2025', lastUsed: '3 months ago', ip: '198.51.100.7', expires: 'Feb 14, 2026',
+      },
+    };
+
+    const STATUS_TAG = {
+      active:  { label: 'Active',  cls: 'tag-positive' },
+      expired: { label: 'Expired', cls: 'tag-warning' },
+      revoked: { label: 'Revoked', cls: 'tag-negative' },
+    };
+
+    let activeTokenId = null;
+
+    function openTokenDrawer(id, mode = 'view') {
+      const t = TOKENS[id];
+      if (!t) return;
+      activeTokenId = id;
+      const $ = (sel) => document.querySelector(sel);
+
+      document.getElementById('view-token-aside').dataset.mode = mode;
+      $('#view-token-title').textContent = mode === 'edit' ? 'Edit token' : t.name;
+
+      // Prefill edit inputs
+      $('#edit-token-name').value = t.name;
+      $('#edit-token-desc').value = t.desc || '';
+
+      const st = STATUS_TAG[t.status] || STATUS_TAG.active;
+      const statusEl = $('#view-token-status');
+      statusEl.textContent = st.label;
+      statusEl.className = `tag tag-indicator ${st.cls}`;
+
+      const descEl = $('#view-token-desc');
+      descEl.textContent = t.desc || '';
+      descEl.hidden = !t.desc;
+
+      $('#view-token-value').value = t.value;
+
+      $('#view-token-scopes').innerHTML = t.scopes
+        .map(s => `<span class="tag tag-blue">${s}</span>`).join('');
+
+      const av = $('#view-token-avatar');
+      av.textContent = t.initials;
+      av.style.background = `var(--ic-palette-${t.avatar[0]})`;
+      av.style.color = `var(--ic-palette-${t.avatar[1]})`;
+      $('#view-token-createdby').textContent = t.createdBy;
+      $('#view-token-createdon').textContent = t.createdOn;
+      $('#view-token-lastused').textContent = t.lastUsed;
+      $('#view-token-ip').textContent = t.ip;
+      $('#view-token-expires').textContent = t.expires;
+
+      // Only active tokens can be revoked
+      $('#view-token-revoke').hidden = t.status !== 'active';
+
+      document.getElementById('drawer-view-token').hidden = false;
+    }
+
+    document.querySelectorAll('[data-view-token]').forEach(btn => {
+      btn.addEventListener('click', () => openTokenDrawer(btn.dataset.viewToken, 'view'));
+    });
+
+    // "Edit details" in a row's kebab → open the same drawer in edit mode.
+    // Token id is read from the row's clickable name button.
+    document.querySelectorAll('[data-token-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.closest('tr')?.querySelector('[data-view-token]')?.dataset.viewToken;
+        if (id) openTokenDrawer(id, 'edit');
+      });
+    });
+
+    // Edit → Cancel returns to read-only view of the same token
+    document.getElementById('edit-token-cancel')?.addEventListener('click', () => {
+      if (activeTokenId) openTokenDrawer(activeTokenId, 'view');
+    });
+
+    // Edit → Save: persist into the data map + table row, return to view mode
+    document.getElementById('edit-token-save')?.addEventListener('click', () => {
+      if (!activeTokenId) return;
+      const t = TOKENS[activeTokenId];
+      t.name = document.getElementById('edit-token-name').value.trim() || t.name;
+      t.desc = document.getElementById('edit-token-desc').value.trim();
+      // Reflect changes back into the table row
+      const nameBtn = document.querySelector(`[data-view-token="${activeTokenId}"]`);
+      if (nameBtn) {
+        nameBtn.textContent = t.name;
+        const sub = nameBtn.closest('.cell-title')?.querySelector('.cell-meta-sub');
+        if (sub) sub.textContent = t.desc;
+      }
+      openTokenDrawer(activeTokenId, 'view');
+      toast({ variant: 'success', message: 'Changes saved.' });
+    });
+
+    // Revoke from the view drawer → close drawer, open the confirm modal
+    document.getElementById('view-token-revoke')?.addEventListener('click', () => {
+      document.getElementById('drawer-view-token').hidden = true;
+      document.getElementById('modal-revoke').hidden = false;
+    });
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // Lets you click multiple UI elements, queue notes, then "Copy batch" to paste
+    // a single grouped payload into the chat. Notes clear on reload.
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        // Position below the element, clamped to viewport
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+  </script>
+
+</body>
+</html>
