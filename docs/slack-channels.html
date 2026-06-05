@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slack Channels — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item is-active">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Slack Channels</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            Link the Slack channels where your team communicates about this initiative. Operationalize uses these connections to surface relevant conversations in context and post automated status updates without extra manual work.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-4)">Slack Channels</div>
+              <div style="display:flex;flex-direction:column;gap:var(--ic-space-3)">
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:#4A154B20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font:var(--ic-weight-bold) 16px/1 var(--ic-font-sans);color:#4A154B">#</span>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">#emea-expansion</div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-top:2px">42 members · Primary channel</div>
+                  </div>
+                  <span class="tag tag-indicator tag-positive">Primary</span>
+                  <button class="btn btn-ghost btn-xs btn-icon-only" aria-label="Remove"><i class="ph ph-x" style="font-size:12px"></i></button>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:#4A154B20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font:var(--ic-weight-bold) 16px/1 var(--ic-font-sans);color:#4A154B">#</span>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">#product-leadership</div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-top:2px">18 members · Receives status digests</div>
+                  </div>
+                  <span class="tag tag-indicator tag-blue">Digest</span>
+                  <button class="btn btn-ghost btn-xs btn-icon-only" aria-label="Remove"><i class="ph ph-x" style="font-size:12px"></i></button>
+                </div>
+                <button class="btn btn-secondary" style="align-self:flex-start">
+                  <i class="ph ph-plus" style="font-size:14px"></i> Add a channel
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">Two channels linked — a primary team channel and a leadership digest channel that receives automated status updates.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="channel-types">Channel types</h2>
+          <p class="body">When you link a Slack channel, you set a role for it. The role determines what Operationalize posts to the channel.</p>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Role</th><th>What gets posted</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-indicator tag-positive">Primary</span></td>
+                <td class="body-sm">All initiative updates: status changes, blocker flags, new document links, and meeting agenda previews. Intended for the core team working on the initiative.</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-indicator tag-blue">Digest</span></td>
+                <td class="body-sm">Weekly status digest only — a single Friday message summarizing progress, KR scores, and upcoming milestones. Good for leadership or stakeholder channels.</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-indicator tag-dark">Alerts only</span></td>
+                <td class="body-sm">Only posts when status changes to <strong>At Risk</strong> or <strong>Off Track</strong>. Useful for on-call or escalation channels that should only be notified when something needs attention.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="connecting-slack">Connecting your Slack workspace</h2>
+          <p class="body">Operationalize uses the Slack OAuth integration to search channels and post messages. If your workspace isn't connected yet, an admin needs to authorize it first.</p>
+
+          <div class="docs-steps">
+            <div class="docs-step">
+              <div class="docs-step-num">1</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Admin authorizes the Slack app</div>
+                <div class="docs-step-desc">Go to Admin Settings → Integrations → Slack and click "Connect Workspace." This is a one-time step per workspace. The Operationalize bot is added to your Slack org.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">2</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Invite the bot to channels you want to use</div>
+                <div class="docs-step-desc">In Slack, type <kbd>/invite @Operationalize</kbd> in any channel you plan to link. The bot needs to be a member before it can post there.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">3</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Link channels from the initiative</div>
+                <div class="docs-step-desc">Back in Operationalize, open the Slack Channels section of your initiative and search for the channel by name. Channels where the bot is a member will appear in the results.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="what-gets-posted">What gets posted automatically</h2>
+
+          <!-- Second screenshot placeholder -->
+          <div class="docs-screenshot">
+            <div class="docs-screenshot-inner">
+              <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+              <div class="docs-screenshot-body" style="background:var(--color-surface)">
+                <div style="display:flex;gap:var(--ic-space-3);margin-bottom:var(--ic-space-4)">
+                  <div style="width:32px;height:32px;border-radius:var(--ic-radius-sm);background:var(--color-brand);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font:var(--ic-weight-bold) 12px/1 var(--ic-font-sans);color:white">OP</span>
+                  </div>
+                  <div style="flex:1">
+                    <div style="display:flex;align-items:baseline;gap:var(--ic-space-2);margin-bottom:var(--ic-space-2)">
+                      <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Operationalize</span>
+                      <span style="font:var(--type-caption);color:var(--color-text-subtle)">Friday 5:00 PM</span>
+                    </div>
+                    <div style="background:var(--color-surface-muted);border-left:3px solid var(--color-brand);border-radius:0 var(--ic-radius-sm) var(--ic-radius-sm) 0;padding:var(--ic-space-3)">
+                      <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1.3 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-2)">Weekly Digest · Q3 Product Expansion</div>
+                      <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-bottom:var(--ic-space-3)">Status: <span style="color:var(--color-brand);font-weight:600">On Track</span> · Updated by Sarah Chen</div>
+                      <div style="display:flex;flex-direction:column;gap:var(--ic-space-2)">
+                        <div style="display:flex;justify-content:space-between;font:var(--type-body-sm);color:var(--color-text)">
+                          <span>Launch in 3 EU countries</span><span style="font-weight:600;color:var(--color-brand)">2/3</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font:var(--type-body-sm);color:var(--color-text)">
+                          <span>ISO 27001 certification</span><span style="font-weight:600;color:var(--color-warning)">40%</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font:var(--type-body-sm);color:var(--color-text)">
+                          <span>Sign 5 EU enterprise contracts</span><span style="font-weight:600;color:var(--color-danger)">1/5</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="docs-screenshot-caption">The automated weekly digest posted every Friday to Digest channels. It summarizes status and Key Result progress in a single message.</p>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="best-practices">Best practices</h2>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>One primary channel per initiative</strong>
+              Don't link five channels as Primary — you'll fragment the conversation. Pick the one place your team already communicates about this work and set it as Primary. Use Digest or Alerts for everything else.
+            </div>
+          </div>
+
+          <div class="docs-callout is-warning" style="margin-top:var(--ic-space-3)">
+            <i class="ph ph-warning docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Avoid linking private channels</strong>
+              Operationalize can post to private channels where the bot is a member, but channel name search only returns public channels. To link a private channel, copy its Slack channel ID (starts with C) and paste it into the search box directly.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="okrs.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">OKRs</span>
+          </a>
+          <a href="jira.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">Jira <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#channel-types" class="docs-toc-item">Channel types</a>
+        <a href="#connecting-slack" class="docs-toc-item">Connecting your workspace</a>
+        <a href="#what-gets-posted" class="docs-toc-item">What gets posted</a>
+        <a href="#best-practices" class="docs-toc-item">Best practices</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

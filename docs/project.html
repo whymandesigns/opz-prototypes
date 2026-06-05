@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item is-active">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Project</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            The Project section places your Initiative within the organizational structure — which team or program owns it, who is contributing, and how it rolls up to broader company goals.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div class="docs-mock-form">
+                <div class="docs-mock-row">
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">Parent Project <span class="docs-optional">Optional</span></div>
+                    <div class="docs-mock-input is-filled" style="display:flex;align-items:center;gap:var(--ic-space-2)">
+                      <i class="ph ph-folders" style="color:var(--color-accent)"></i> EMEA Go-to-Market
+                    </div>
+                  </div>
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">Team <span class="docs-required">Required</span></div>
+                    <div class="docs-mock-input is-filled" style="display:flex;align-items:center;gap:var(--ic-space-2)">
+                      <i class="ph ph-users" style="color:var(--color-text-muted)"></i> Product — International
+                    </div>
+                  </div>
+                </div>
+
+                <div class="docs-mock-field">
+                  <div class="docs-mock-label">Contributors</div>
+                  <div class="docs-mock-chip-row">
+                    <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">SC</span>Sarah Chen</span>
+                    <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">DP</span>Dev Patel</span>
+                    <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">AK</span>Aria Kim</span>
+                    <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">JM</span>James Moore</span>
+                    <span style="font:var(--type-caption);color:var(--color-text-muted);display:flex;align-items:center;gap:4px"><i class="ph ph-plus"></i>Add</span>
+                  </div>
+                </div>
+
+                <div class="docs-mock-field">
+                  <div class="docs-mock-label">Visibility</div>
+                  <div style="display:flex;gap:var(--ic-space-3)">
+                    <div style="flex:1;padding:var(--ic-space-3);border:2px solid var(--color-brand);border-radius:var(--ic-radius-sm);background:var(--color-brand-subtle)">
+                      <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
+                        <i class="ph ph-buildings" style="color:var(--color-brand)"></i>
+                        <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Company-wide</span>
+                      </div>
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">Visible to everyone</span>
+                    </div>
+                    <div style="flex:1;padding:var(--ic-space-3);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);background:var(--color-surface)">
+                      <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
+                        <i class="ph ph-users" style="color:var(--color-text-muted)"></i>
+                        <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Team only</span>
+                      </div>
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">Team members only</span>
+                    </div>
+                    <div style="flex:1;padding:var(--ic-space-3);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);background:var(--color-surface)">
+                      <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
+                        <i class="ph ph-lock" style="color:var(--color-text-muted)"></i>
+                        <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Private</span>
+                      </div>
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">Contributors only</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">The Project section showing a parent project, owning team, four contributors, and the visibility set to Company-wide.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="fields">Fields</h2>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Field</th><th>Required</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">team</span></td>
+                <td><span class="docs-required">Required</span></td>
+                <td class="body-sm">The team that owns this initiative. Determines who receives team-level reporting, which ROB meetings are suggested by default, and which admin has oversight. Teams are configured by your organization admin.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">parent_project</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">A parent Project or Program this initiative rolls up into. Use this when your initiative is one piece of a larger program (e.g. "EMEA Expansion" as the parent of "Localization Launch" and "Compliance Certification"). Parent projects aggregate progress across their child initiatives.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">contributors</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">Team members who can edit the initiative. Contributors can update status, Key Results, documents, and linked items. They receive edit-related notifications but not ownership-level escalations. Add everyone actively working on the initiative.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">visibility</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">Controls who can see this initiative. Defaults to <strong>Company-wide</strong>. See the Visibility section below for details on each option.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="parent-projects">Parent Projects and Programs</h2>
+          <p class="body">A <strong>Project</strong> in Operationalize is a container for related Initiatives. It's useful when multiple initiatives are coordinated toward a shared business outcome.</p>
+
+          <!-- Hierarchy diagram mockup -->
+          <div class="docs-screenshot">
+            <div class="docs-screenshot-inner">
+              <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+              <div class="docs-screenshot-body">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+                  <!-- Program -->
+                  <div style="padding:var(--ic-space-3) var(--ic-space-5);background:var(--color-accent-subtle);border:1px solid color-mix(in srgb,var(--color-accent) 30%,transparent);border-radius:var(--ic-radius-md);font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-accent)">
+                    <i class="ph ph-folders"></i> EMEA Go-to-Market Program
+                  </div>
+                  <!-- Connector -->
+                  <div style="width:1px;height:24px;background:var(--color-border)"></div>
+                  <!-- Row of initiatives -->
+                  <div style="display:flex;gap:var(--ic-space-4);position:relative;width:100%">
+                    <div style="position:absolute;top:0;left:25%;right:25%;height:1px;background:var(--color-border)"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+                      <div style="width:1px;height:16px;background:var(--color-border)"></div>
+                      <div style="padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);font:var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);color:var(--color-text);text-align:center;width:100%">
+                        <span class="tag tag-indicator tag-positive" style="margin-bottom:4px;display:block">On Track</span>
+                        Localization Launch
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+                      <div style="width:1px;height:16px;background:var(--color-border)"></div>
+                      <div style="padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:2px solid var(--color-brand);border-radius:var(--ic-radius-sm);font:var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);color:var(--color-text);text-align:center;width:100%">
+                        <span class="tag tag-indicator tag-positive" style="margin-bottom:4px;display:block">On Track</span>
+                        Q3 Product Expansion ← you are here
+                      </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+                      <div style="width:1px;height:16px;background:var(--color-border)"></div>
+                      <div style="padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);font:var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);color:var(--color-text);text-align:center;width:100%">
+                        <span class="tag tag-indicator tag-warning" style="margin-bottom:4px;display:block">At Risk</span>
+                        ISO Compliance
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="docs-screenshot-caption">Three initiatives nested under the "EMEA Go-to-Market" parent program. The program view aggregates status across all child initiatives.</p>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="visibility">Visibility settings</h2>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Setting</th><th>Who can see it</th><th>When to use</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">Company-wide</span></td>
+                <td class="body-sm">All members of your Operationalize workspace.</td>
+                <td class="body-sm">Default for most initiatives. Transparency is usually better — people can't stay aligned on things they can't see.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Team only</span></td>
+                <td class="body-sm">Members of the owning team plus contributors.</td>
+                <td class="body-sm">Early-stage initiatives that aren't ready to share broadly, or team-internal work that isn't relevant to the wider org.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Private</span></td>
+                <td class="body-sm">Only the owner and contributors.</td>
+                <td class="body-sm">Sensitive work — HR initiatives, M&A due diligence, executive planning. Initiative will not appear in any shared views or digests.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Start public, go private intentionally</strong>
+              The default is Company-wide for a reason. Most initiatives benefit from broad visibility — stakeholders can find context without having to ask, and unexpected connections get surfaced. Only restrict visibility when there's a clear reason to.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="contributors">Managing contributors</h2>
+          <p class="body">Contributors are added by searching for users within your organization. You can add individuals or entire teams as contributors.</p>
+          <p class="body">Contributors can:</p>
+          <ul class="body" style="padding-left:var(--ic-space-5);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+            <li>Edit all initiative fields including status, documents, and linked items</li>
+            <li>Update Key Result progress on linked OKRs</li>
+            <li>Post updates and comments on the initiative</li>
+          </ul>
+          <p class="body">Contributors cannot:</p>
+          <ul class="body" style="padding-left:var(--ic-space-5);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+            <li>Transfer ownership (only the owner or an admin can do this)</li>
+            <li>Delete the initiative</li>
+            <li>Change visibility settings</li>
+          </ul>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="documents.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">Documents</span>
+          </a>
+          <a href="index.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Back to start</span>
+            <span class="docs-page-nav-title">Introduction <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#fields" class="docs-toc-item">Fields</a>
+        <a href="#parent-projects" class="docs-toc-item">Parent Projects</a>
+        <a href="#visibility" class="docs-toc-item">Visibility settings</a>
+        <a href="#contributors" class="docs-toc-item">Managing contributors</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

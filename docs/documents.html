@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documents — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item is-active">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Documents</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            Attach the reference material that anyone working on or reviewing this initiative needs — PRDs, briefs, specs, decks, design files, and external links. Documents create a single source of truth so nothing lives only in someone's browser history.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-4)">Documents <span class="count-badge count-badge-secondary" style="margin-left:4px">7</span></div>
+              <div style="display:flex;flex-direction:column;gap:var(--ic-space-2)">
+
+                <!-- Group label -->
+                <div style="font:var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);color:var(--color-text-subtle);text-transform:uppercase;letter-spacing:.05em;padding:var(--ic-space-1) 0;border-bottom:1px solid var(--color-border);margin-bottom:var(--ic-space-1)">Strategy</div>
+
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <i class="ph ph-file-doc" style="font-size:20px;color:#4285F4;flex-shrink:0"></i>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">EMEA Expansion — PRD</div>
+                    <div style="font:var(--type-caption);color:var(--color-text-muted);margin-top:1px">Google Doc · Updated 3 days ago</div>
+                  </div>
+                  <span class="tag tag-indicator tag-blue">PRD</span>
+                  <button class="btn btn-ghost btn-xs btn-icon-only"><i class="ph ph-arrow-square-out" style="font-size:13px"></i></button>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <i class="ph ph-file-ppt" style="font-size:20px;color:#FF6B35;flex-shrink:0"></i>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Q3 Kickoff Deck</div>
+                    <div style="font:var(--type-caption);color:var(--color-text-muted);margin-top:1px">Google Slides · Jun 1, 2025</div>
+                  </div>
+                  <span class="tag tag-indicator tag-dark">Deck</span>
+                  <button class="btn btn-ghost btn-xs btn-icon-only"><i class="ph ph-arrow-square-out" style="font-size:13px"></i></button>
+                </div>
+
+                <!-- Group label -->
+                <div style="font:var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);color:var(--color-text-subtle);text-transform:uppercase;letter-spacing:.05em;padding:var(--ic-space-1) 0;border-bottom:1px solid var(--color-border);margin:var(--ic-space-2) 0 var(--ic-space-1)">Design</div>
+
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-2) var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <i class="ph ph-figma-logo" style="font-size:20px;color:#A259FF;flex-shrink:0"></i>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Localization UI — Figma</div>
+                    <div style="font:var(--type-caption);color:var(--color-text-muted);margin-top:1px">Figma · Updated today</div>
+                  </div>
+                  <span class="tag tag-indicator tag-blue-light">Design</span>
+                  <button class="btn btn-ghost btn-xs btn-icon-only"><i class="ph ph-arrow-square-out" style="font-size:13px"></i></button>
+                </div>
+
+              </div>
+              <button class="btn btn-secondary" style="align-self:flex-start;margin-top:var(--ic-space-3)">
+                <i class="ph ph-plus" style="font-size:14px"></i> Add document
+              </button>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">Documents organized by group (Strategy, Design). Each doc shows its source type, label, and last-updated timestamp.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="adding-documents">Adding documents</h2>
+          <p class="body">Documents can be added in two ways:</p>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Method</th><th>How it works</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">Paste a URL</span></td>
+                <td class="body-sm">Paste any link — Google Doc, Notion page, Figma file, Confluence page, or any URL. Operationalize fetches the page title automatically. The document opens in its original tool when clicked.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Upload a file</span></td>
+                <td class="body-sm">Upload PDFs, images, or office files (up to 50 MB). Files are stored securely and accessible to anyone with access to the initiative. Uploaded files can be downloaded directly from Operationalize.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-callout is-info" style="margin-top:var(--ic-space-4)">
+            <i class="ph ph-info docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Supported integrations</strong>
+              Google Workspace (Docs, Sheets, Slides, Drive), Notion, Confluence, Figma, and Loom links are enriched with metadata — title, last-modified date, and a preview thumbnail where available. Plain URLs work too, just without the enrichment.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="labels-and-groups">Labels and groups</h2>
+          <p class="body">Each document can have a <strong>label</strong> (a short tag like PRD, Deck, Design, Brief) and belong to a <strong>group</strong> (a freeform section heading). Use groups to organize documents when there are more than 4–5 of them.</p>
+
+          <p class="body">Common group structures:</p>
+          <ul class="body" style="padding-left:var(--ic-space-5);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+            <li><strong>Strategy</strong> — PRDs, OKR docs, exec briefs</li>
+            <li><strong>Design</strong> — Figma files, design specs, UX research</li>
+            <li><strong>Engineering</strong> — Tech specs, architecture diagrams, RFCs</li>
+            <li><strong>Legal / Compliance</strong> — Contracts, certifications, privacy assessments</li>
+          </ul>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="pinning">Pinning key documents</h2>
+          <p class="body">Pin up to 3 documents to surface them at the top of the list and include them in the initiative summary card. Pin the documents that every stakeholder reviewing this initiative should read first — typically the PRD and the kickoff deck.</p>
+
+          <!-- Second screenshot placeholder -->
+          <div class="docs-screenshot">
+            <div class="docs-screenshot-inner">
+              <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+              <div class="docs-screenshot-body">
+                <div style="font:var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);color:var(--color-text-subtle);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--ic-space-3)">Pinned</div>
+                <div style="display:flex;gap:var(--ic-space-3)">
+                  <div style="flex:1;padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+                    <div style="display:flex;align-items:center;gap:var(--ic-space-2)">
+                      <i class="ph ph-file-doc" style="font-size:18px;color:#4285F4"></i>
+                      <span class="tag tag-indicator tag-blue">PRD</span>
+                      <i class="ph ph-push-pin" style="font-size:13px;color:var(--color-brand);margin-left:auto"></i>
+                    </div>
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);color:var(--color-text)">EMEA Expansion — PRD</div>
+                    <div style="font:var(--type-caption);color:var(--color-text-subtle)">Updated 3 days ago</div>
+                  </div>
+                  <div style="flex:1;padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+                    <div style="display:flex;align-items:center;gap:var(--ic-space-2)">
+                      <i class="ph ph-file-ppt" style="font-size:18px;color:#FF6B35"></i>
+                      <span class="tag tag-indicator tag-dark">Deck</span>
+                      <i class="ph ph-push-pin" style="font-size:13px;color:var(--color-brand);margin-left:auto"></i>
+                    </div>
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);color:var(--color-text)">Q3 Kickoff Deck</div>
+                    <div style="font:var(--type-caption);color:var(--color-text-subtle)">Jun 1, 2025</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="docs-screenshot-caption">Pinned documents appear in a card grid at the top of the Documents section and are visible on the initiative summary.</p>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="best-practices">Best practices</h2>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Link, don't copy</strong>
+              Always link to the live document rather than uploading a snapshot. This ensures reviewers always see the latest version, not a stale copy from the day the initiative was created.
+            </div>
+          </div>
+
+          <div class="docs-callout is-warning" style="margin-top:var(--ic-space-3)">
+            <i class="ph ph-warning docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Check document permissions</strong>
+              Operationalize stores the URL but doesn't change the access settings of the linked document. If a stakeholder clicks a Google Doc link and sees "Request access," the doc is restricted in Google. Ensure documents are shared with the right people in their source tool.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="jira.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">Jira</span>
+          </a>
+          <a href="project.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">Project <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#adding-documents" class="docs-toc-item">Adding documents</a>
+        <a href="#labels-and-groups" class="docs-toc-item">Labels and groups</a>
+        <a href="#pinning" class="docs-toc-item">Pinning key documents</a>
+        <a href="#best-practices" class="docs-toc-item">Best practices</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

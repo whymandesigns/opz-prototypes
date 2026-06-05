@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basic Info — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item is-active">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Basic Info</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            The Basic Info section is the foundation of every Initiative. It establishes the initiative's identity — who owns it, what it's trying to achieve, and the timeframe it operates within.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div class="docs-mock-form">
+                <div class="docs-mock-field">
+                  <div class="docs-mock-label">Initiative Name <span class="docs-required">Required</span></div>
+                  <div class="docs-mock-input is-filled">Q3 Product Expansion</div>
+                </div>
+                <div class="docs-mock-field">
+                  <div class="docs-mock-label">Description</div>
+                  <div class="docs-mock-textarea">Expand our product suite to enterprise customers in EMEA, with a focus on localization, SSO, and compliance certifications by end of Q3.</div>
+                </div>
+                <div class="docs-mock-row">
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">Owner <span class="docs-required">Required</span></div>
+                    <div class="docs-mock-input is-filled" style="gap:var(--ic-space-2);display:flex;align-items:center">
+                      <span class="avatar avatar-xs">SC</span> Sarah Chen
+                    </div>
+                  </div>
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">Status</div>
+                    <div class="docs-mock-input is-filled" style="gap:var(--ic-space-2)">
+                      <span class="tag tag-indicator tag-positive">On Track</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="docs-mock-row">
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">Start Date</div>
+                    <div class="docs-mock-input is-filled"><i class="ph ph-calendar" style="margin-right:6px;color:var(--color-text-muted)"></i>Jun 1, 2025</div>
+                  </div>
+                  <div class="docs-mock-field">
+                    <div class="docs-mock-label">End Date</div>
+                    <div class="docs-mock-input is-filled"><i class="ph ph-calendar" style="margin-right:6px;color:var(--color-text-muted)"></i>Sep 30, 2025</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">The Basic Info form when creating a new Initiative. Required fields are marked — the initiative can't be saved without a Name and Owner.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="fields">Fields</h2>
+          <table class="docs-field-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">name</span></td>
+                <td><span class="docs-required">Required</span></td>
+                <td class="body-sm">A short, descriptive title for the initiative. Shown in lists, dashboards, and notifications. Aim for clarity over cleverness — "Q3 EMEA Expansion" beats "Project Falcon".</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">description</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">A rich-text field for context, background, and scope. Use it to explain <em>why</em> this initiative exists, what success looks like, and what's explicitly out of scope. Supports bold, bullet lists, and links.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">owner</span></td>
+                <td><span class="docs-required">Required</span></td>
+                <td class="body-sm">The single accountable person for this initiative. The owner receives all escalations, status reminders, and is the default contact shown to stakeholders. Only one owner is allowed — use contributors for additional team members.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">status</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">
+                  Current health of the initiative. Defaults to <strong>Draft</strong> until manually updated.
+                  <div style="display:flex;gap:var(--ic-space-2);flex-wrap:wrap;margin-top:var(--ic-space-2)">
+                    <span class="tag tag-indicator tag-light">Draft</span>
+                    <span class="tag tag-indicator tag-positive">On Track</span>
+                    <span class="tag tag-indicator tag-warning">At Risk</span>
+                    <span class="tag tag-indicator tag-negative">Off Track</span>
+                    <span class="tag tag-indicator tag-dark">Complete</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">start_date</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">When work begins. Used to calculate timeline position on roadmap views and to trigger kickoff reminders for the owner.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">end_date</span></td>
+                <td><span class="docs-optional">Optional</span></td>
+                <td class="body-sm">Target completion date. When an initiative passes its end date without being marked Complete, it is automatically flagged as overdue and the owner is notified.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="ownership">Ownership vs. Contributors</h2>
+          <p class="body">An Initiative has exactly one <strong>Owner</strong> — the single accountable person. This keeps escalation paths clear and avoids diffusion of responsibility.</p>
+          <p class="body">Additional team members working on the initiative should be added as <strong>Contributors</strong> in the Project section. Contributors can edit the initiative but don't receive ownership-level notifications.</p>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Best practice</strong>
+              The Owner should be the person who will present this initiative in your ROB meeting — not necessarily the person doing the most work. Align owner with accountability, not workload.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="status-lifecycle">Status lifecycle</h2>
+          <p class="body">Status is a manual signal — it reflects the owner's judgment about initiative health, not an automated rollup. Update it weekly, ideally before your ROB meeting.</p>
+
+          <div class="docs-steps">
+            <div class="docs-step">
+              <div class="docs-step-num">1</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Draft</div>
+                <div class="docs-step-desc">Initiative is being scoped. Not yet visible to stakeholders outside the team. Use this phase to fill in details and get alignment on the plan.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">2</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">On Track / At Risk / Off Track</div>
+                <div class="docs-step-desc">Initiative is active. Owner updates status weekly. "At Risk" signals a potential problem; "Off Track" signals the plan needs to change.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">3</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Complete</div>
+                <div class="docs-step-desc">Work is done. Initiative moves to read-only mode. OKR progress is snapshotted and a completion summary is sent to all contributors.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="naming-tips">Naming tips</h2>
+          <p class="body">Initiative names appear in ROB meeting agendas, Slack notifications, and executive dashboards. A good name is:</p>
+          <ul class="body" style="padding-left: var(--ic-space-5); display:flex; flex-direction:column; gap:var(--ic-space-2)">
+            <li><strong>Specific</strong> — "EMEA Localization Launch" not "Localization"</li>
+            <li><strong>Time-bounded</strong> — include the quarter or year when relevant</li>
+            <li><strong>Outcome-oriented</strong> — name the result, not the activity</li>
+          </ul>
+
+          <div class="docs-callout is-warning">
+            <i class="ph ph-warning docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Avoid codenames</strong>
+              Codenames (Project Falcon, Operation Sunrise) look cool but confuse stakeholders who weren't in the room when the name was chosen. Use descriptive names from day one.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="index.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">Introduction</span>
+          </a>
+          <a href="rob-meetings.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">ROB Meetings <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#fields" class="docs-toc-item">Fields</a>
+        <a href="#ownership" class="docs-toc-item">Ownership vs. Contributors</a>
+        <a href="#status-lifecycle" class="docs-toc-item">Status lifecycle</a>
+        <a href="#naming-tips" class="docs-toc-item">Naming tips</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

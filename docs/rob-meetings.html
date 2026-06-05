@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ROB Meetings — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item is-active">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">ROB Meetings</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            ROB stands for <strong>Rhythm of Business</strong> — the recurring meetings that keep your organization in sync. Linking ROB meetings to an Initiative ensures the right work surfaces in the right forum, automatically.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-4)">Linked ROB Meetings</div>
+              <div style="display:flex;flex-direction:column;gap:var(--ic-space-3)">
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:var(--color-accent-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="ph ph-calendar-check" style="color:var(--color-accent);font-size:18px"></i>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Product Weekly</div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-top:2px">Every Monday · 10:00 AM · 45 min</div>
+                  </div>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
+                  <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:var(--color-brand-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="ph ph-calendar-check" style="color:var(--color-brand);font-size:18px"></i>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Exec Review — Q3</div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-top:2px">Every other Thursday · 2:00 PM · 60 min</div>
+                  </div>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <button class="btn btn-secondary" style="align-self:flex-start">
+                  <i class="ph ph-plus" style="font-size:14px"></i> Link a meeting
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">Two ROB meetings linked to this initiative. Each meeting shows its cadence and current status.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="what-is-rob">What is a Rhythm of Business?</h2>
+          <p class="body">
+            A Rhythm of Business (ROB) is the structured cadence of recurring meetings that organizations use to review progress, make decisions, and maintain alignment. Common examples include weekly team standups, bi-weekly leadership syncs, monthly business reviews, and quarterly planning sessions.
+          </p>
+          <p class="body">
+            When you link an ROB meeting to an Initiative, that initiative automatically appears on the meeting's agenda when it is <strong>Active</strong> or <strong>At Risk</strong>. This removes the manual work of deciding what to cover — the system surfaces what needs attention.
+          </p>
+
+          <div class="docs-callout is-info">
+            <i class="ph ph-info docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>ROB meetings live at the org level</strong>
+              Meetings are created and managed by admins in the ROB Meetings section of Operationalize. When creating an initiative, you link to existing meetings rather than creating new ones. If a meeting you need doesn't exist yet, ask your admin to create it first.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="linking-meetings">Linking meetings to an Initiative</h2>
+
+          <div class="docs-steps">
+            <div class="docs-step">
+              <div class="docs-step-num">1</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Open the ROB Meetings tab</div>
+                <div class="docs-step-desc">Inside the initiative form, navigate to the "ROB Meetings" section. You'll see a list of all ROB meetings configured for your organization.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">2</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Search or browse meetings</div>
+                <div class="docs-step-desc">Use the search bar to filter by meeting name, cadence, or owner. Meetings are grouped by team and frequency — weekly, biweekly, monthly.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">3</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Click "Link" to attach</div>
+                <div class="docs-step-desc">Linking is immediate. The initiative will appear in that meeting's auto-generated agenda starting from the next occurrence.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="agenda-behavior">How the agenda works</h2>
+          <p class="body">Once linked, Operationalize inserts the initiative into the meeting agenda automatically. The agenda entry includes:</p>
+          <ul class="body" style="padding-left:var(--ic-space-5);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+            <li>Current status (<span class="tag tag-indicator tag-positive" style="display:inline-flex">On Track</span>, <span class="tag tag-indicator tag-warning" style="display:inline-flex">At Risk</span>, etc.)</li>
+            <li>Owner name and last status update date</li>
+            <li>Any blockers flagged since the last meeting</li>
+            <li>Key Result progress from linked OKRs</li>
+          </ul>
+          <p class="body">Initiatives marked <strong>Complete</strong> are automatically removed from future agendas. Initiatives marked <strong>Draft</strong> are not shown until they become Active.</p>
+
+          <!-- Second screenshot placeholder -->
+          <div class="docs-screenshot">
+            <div class="docs-screenshot-inner">
+              <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+              <div class="docs-screenshot-body">
+                <div style="font:var(--ic-weight-semibold) var(--ic-text-base)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-1)">Product Weekly — Jun 9, 2025</div>
+                <div style="font:var(--type-body-sm);color:var(--color-text-muted);margin-bottom:var(--ic-space-5)">Auto-generated agenda · 3 initiatives</div>
+                <div style="display:flex;flex-direction:column;gap:var(--ic-space-3)">
+                  <div style="padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);border-left:3px solid var(--color-brand)">
+                    <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:var(--ic-space-2)">
+                      <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Q3 Product Expansion</span>
+                      <span class="tag tag-indicator tag-positive">On Track</span>
+                    </div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted)">Owner: Sarah Chen · Updated 2 days ago · 68% KR progress</div>
+                  </div>
+                  <div style="padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);border-left:3px solid var(--color-warning)">
+                    <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:var(--ic-space-2)">
+                      <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">API v3 Migration</span>
+                      <span class="tag tag-indicator tag-warning">At Risk</span>
+                    </div>
+                    <div style="font:var(--type-body-sm);color:var(--color-text-muted)">Owner: Dev Patel · 1 blocker · Updated today</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="docs-screenshot-caption">An auto-generated agenda for a weekly meeting, showing two linked initiatives with their current status and key signals.</p>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="best-practices">Best practices</h2>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Link to the right level</strong>
+              A tactical initiative (a sprint goal, a bug fix release) belongs in a team-level weekly. A strategic initiative (a new product line, a market expansion) belongs in an exec review. Linking to both adds noise to the exec forum.
+            </div>
+          </div>
+
+          <div class="docs-callout is-warning" style="margin-top:var(--ic-space-3)">
+            <i class="ph ph-warning docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Update status before the meeting</strong>
+              The agenda is generated 1 hour before meeting start. If you haven't updated your initiative status since the last meeting, the agenda will show stale data. Build a habit of updating status the morning of your ROB meeting.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="basic-info.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">Basic Info</span>
+          </a>
+          <a href="okrs.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">OKRs <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#what-is-rob" class="docs-toc-item">What is a Rhythm of Business?</a>
+        <a href="#linking-meetings" class="docs-toc-item">Linking meetings</a>
+        <a href="#agenda-behavior" class="docs-toc-item">How the agenda works</a>
+        <a href="#best-practices" class="docs-toc-item">Best practices</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>
