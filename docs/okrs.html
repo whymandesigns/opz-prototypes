@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OKRs — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item is-active">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">OKRs</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            OKRs — Objectives and Key Results — are the measurable outcomes that define what success looks like for your Initiative. Linking OKRs ties your initiative's work directly to the outcomes your organization cares about.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-4)">Linked OKRs</div>
+              <!-- Objective -->
+              <div style="border:1px solid var(--color-border);border-radius:var(--ic-radius-md);overflow:hidden;margin-bottom:var(--ic-space-4)">
+                <div style="padding:var(--ic-space-4);background:var(--color-surface);border-bottom:1px solid var(--color-border)">
+                  <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:var(--ic-space-2)">
+                    <i class="ph ph-target" style="color:var(--color-accent);font-size:16px"></i>
+                    <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Expand into EMEA markets</span>
+                    <span class="badge badge-info" style="margin-left:auto">Q3 2025</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:0">
+                  <div style="padding:var(--ic-space-3) var(--ic-space-4);display:flex;align-items:center;gap:var(--ic-space-3);border-bottom:1px solid var(--color-border)">
+                    <div style="flex:1">
+                      <div style="font:var(--type-body-sm);color:var(--color-text)">Launch in 3 new EU countries</div>
+                      <div style="height:6px;background:var(--color-surface-sunken);border-radius:99px;margin-top:var(--ic-space-2);overflow:hidden">
+                        <div style="width:66%;height:100%;background:var(--color-brand);border-radius:99px"></div>
+                      </div>
+                    </div>
+                    <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);flex-shrink:0">2 / 3</span>
+                  </div>
+                  <div style="padding:var(--ic-space-3) var(--ic-space-4);display:flex;align-items:center;gap:var(--ic-space-3);border-bottom:1px solid var(--color-border)">
+                    <div style="flex:1">
+                      <div style="font:var(--type-body-sm);color:var(--color-text)">Achieve ISO 27001 certification</div>
+                      <div style="height:6px;background:var(--color-surface-sunken);border-radius:99px;margin-top:var(--ic-space-2);overflow:hidden">
+                        <div style="width:40%;height:100%;background:var(--color-warning);border-radius:99px"></div>
+                      </div>
+                    </div>
+                    <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);flex-shrink:0">40%</span>
+                  </div>
+                  <div style="padding:var(--ic-space-3) var(--ic-space-4);display:flex;align-items:center;gap:var(--ic-space-3)">
+                    <div style="flex:1">
+                      <div style="font:var(--type-body-sm);color:var(--color-text)">Sign 5 enterprise contracts in EU</div>
+                      <div style="height:6px;background:var(--color-surface-sunken);border-radius:99px;margin-top:var(--ic-space-2);overflow:hidden">
+                        <div style="width:20%;height:100%;background:var(--color-danger);border-radius:99px"></div>
+                      </div>
+                    </div>
+                    <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);flex-shrink:0">1 / 5</span>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="align-self:flex-start">
+                <i class="ph ph-plus" style="font-size:14px"></i> Link an OKR
+              </button>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">An Objective with three Key Results linked to this initiative. Progress bars show real-time completion — green (on track), yellow (at risk), red (off track).</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="okr-basics">OKR basics</h2>
+          <p class="body">An <strong>Objective</strong> is a qualitative, inspiring goal — the "what" you want to achieve. <strong>Key Results</strong> are the quantitative metrics that define whether you've achieved it — the "how you'll know."</p>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Part</th><th>Type</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">Objective</span></td>
+                <td><span class="docs-optional">Qualitative</span></td>
+                <td class="body-sm">Expand into EMEA markets</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Key Result</span></td>
+                <td><span class="docs-optional">Quantitative</span></td>
+                <td class="body-sm">Launch in 3 new EU countries by Sep 30</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Key Result</span></td>
+                <td><span class="docs-optional">Quantitative</span></td>
+                <td class="body-sm">Achieve ISO 27001 certification</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Key Result</span></td>
+                <td><span class="docs-optional">Quantitative</span></td>
+                <td class="body-sm">Sign 5 enterprise contracts in EU</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-callout is-info">
+            <i class="ph ph-info docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>OKRs are managed separately</strong>
+              OKRs are created and managed in the OKRs section of Operationalize — not inside the initiative form. When creating an initiative, you link to OKRs that already exist. This design keeps OKRs as the source of truth and allows multiple initiatives to contribute to the same objective.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="linking-okrs">Linking OKRs to an Initiative</h2>
+          <p class="body">An Initiative can be linked to one or more Objectives. It's common for a large initiative to contribute to multiple Objectives — for example, a platform migration might advance both a performance OKR and a reliability OKR.</p>
+
+          <div class="docs-steps">
+            <div class="docs-step">
+              <div class="docs-step-num">1</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Open the OKRs tab</div>
+                <div class="docs-step-desc">Inside the initiative form, navigate to the "OKRs" section. You'll see OKRs grouped by quarter and team.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">2</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Find the Objective</div>
+                <div class="docs-step-desc">Search by objective name or browse by team. You can link at the Objective level — all Key Results under it are automatically included.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">3</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Update Key Result progress</div>
+                <div class="docs-step-desc">Once linked, Key Result progress is editable directly from the initiative. Updates sync back to the OKR record — no need to update in two places.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="progress-tracking">Progress tracking</h2>
+          <p class="body">Key Result progress is shown as a progress bar in the initiative view and feeds into ROB meeting agendas. Progress is calculated differently based on Key Result type:</p>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>KR Type</th><th>How progress is calculated</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="docs-field-name">Numeric</span></td>
+                <td class="body-sm">Current value ÷ target value. E.g. 2 countries launched out of 3 target = 66%.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Percentage</span></td>
+                <td class="body-sm">Manually entered as a percentage (0–100%). Used for milestones like certification where the path is non-linear.</td>
+              </tr>
+              <tr>
+                <td><span class="docs-field-name">Boolean</span></td>
+                <td class="body-sm">Done / Not done. Shows 0% or 100%. Good for binary deliverables.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-callout is-tip">
+            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Update KRs weekly, not just at quarter-end</strong>
+              Progress visibility is only useful if it's current. Teams that update Key Results weekly catch problems early. Teams that update at quarter-end use OKRs as a reporting exercise rather than a management tool.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="writing-good-krs">Writing good Key Results</h2>
+          <p class="body">A Key Result should be measurable, time-bound, and ambitious but achievable. Avoid vague language.</p>
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Weak KR</th><th>Strong KR</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="body-sm" style="color:var(--color-danger)">Improve performance</td>
+                <td class="body-sm">Reduce p95 API latency from 800ms to under 200ms by Aug 31</td>
+              </tr>
+              <tr>
+                <td class="body-sm" style="color:var(--color-danger)">Get more enterprise customers</td>
+                <td class="body-sm">Sign 5 enterprise contracts ≥ $50K ARR in Q3</td>
+              </tr>
+              <tr>
+                <td class="body-sm" style="color:var(--color-danger)">Launch in Europe</td>
+                <td class="body-sm">Go live in DE, FR, and NL with localized UI and GDPR-compliant data handling</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="rob-meetings.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">ROB Meetings</span>
+          </a>
+          <a href="slack-channels.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">Slack Channels <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#okr-basics" class="docs-toc-item">OKR basics</a>
+        <a href="#linking-okrs" class="docs-toc-item">Linking OKRs</a>
+        <a href="#progress-tracking" class="docs-toc-item">Progress tracking</a>
+        <a href="#writing-good-krs" class="docs-toc-item">Writing good Key Results</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

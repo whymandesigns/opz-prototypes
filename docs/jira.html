@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jira — Operationalize Docs</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item is-active">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Initiative Fields</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Jira</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            Link Jira epics, projects, or boards to your Initiative to surface delivery progress alongside strategic context. No more switching tabs to see where the work actually stands.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome"><span></span><span></span><span></span></div>
+            <div class="docs-screenshot-body">
+              <div style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text);margin-bottom:var(--ic-space-4)">Jira Links</div>
+              <div style="display:flex;flex-direction:column;gap:var(--ic-space-3)">
+                <!-- Epic row -->
+                <div style="border:1px solid var(--color-border);border-radius:var(--ic-radius-md);overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3) var(--ic-space-4);background:var(--color-surface);border-bottom:1px solid var(--color-border)">
+                    <div style="width:20px;height:20px;border-radius:3px;background:#6554C0;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <span style="font:var(--ic-weight-bold) 10px/1 var(--ic-font-sans);color:white">E</span>
+                    </div>
+                    <div style="flex:1">
+                      <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">EMEA — Localization & Compliance Epic</div>
+                      <div style="font:var(--type-caption);color:var(--color-text-muted);margin-top:1px">EMEA-421 · Product</div>
+                    </div>
+                    <span class="tag tag-indicator tag-blue">Epic</span>
+                  </div>
+                  <div style="padding:var(--ic-space-3) var(--ic-space-4);background:var(--color-surface-muted)">
+                    <div style="display:flex;align-items:center;gap:var(--ic-space-3);margin-bottom:var(--ic-space-2)">
+                      <div style="flex:1">
+                        <div style="display:flex;justify-content:space-between;font:var(--type-caption);color:var(--color-text-muted);margin-bottom:var(--ic-space-1)">
+                          <span>Sprint progress</span><span>18 / 27 issues done</span>
+                        </div>
+                        <div style="height:6px;background:var(--color-surface-sunken);border-radius:99px;overflow:hidden">
+                          <div style="width:66%;height:100%;background:var(--color-brand);border-radius:99px"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:var(--ic-space-3)">
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">3 <span style="color:var(--color-danger)">●</span> Blocked</span>
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">5 <span style="color:var(--color-warning)">●</span> In Review</span>
+                      <span style="font:var(--type-caption);color:var(--color-text-muted)">18 <span style="color:var(--color-brand)">●</span> Done</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Project row -->
+                <div style="border:1px solid var(--color-border);border-radius:var(--ic-radius-md);overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3) var(--ic-space-4);background:var(--color-surface)">
+                    <div style="width:20px;height:20px;border-radius:3px;background:#0052CC;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <span style="font:var(--ic-weight-bold) 10px/1 var(--ic-font-sans);color:white">P</span>
+                    </div>
+                    <div style="flex:1">
+                      <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">EMEA Infrastructure</div>
+                      <div style="font:var(--type-caption);color:var(--color-text-muted);margin-top:1px">INFRA · Engineering</div>
+                    </div>
+                    <span class="tag tag-indicator tag-blue-dark">Project</span>
+                  </div>
+                </div>
+
+                <button class="btn btn-secondary" style="align-self:flex-start">
+                  <i class="ph ph-plus" style="font-size:14px"></i> Link Jira item
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">An Epic linked with live sprint progress and a Jira Project linked for broader tracking across engineering work.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="what-you-can-link">What you can link</h2>
+          <p class="body">Operationalize supports three types of Jira links. Choose based on the granularity of work you want to track:</p>
+
+          <table class="docs-field-table">
+            <thead>
+              <tr><th>Jira type</th><th>When to use</th><th>What's shown</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-indicator tag-blue">Epic</span></td>
+                <td class="body-sm">The work for this initiative maps to one or more Jira epics. Most common for product teams.</td>
+                <td class="body-sm">Issue count by status, sprint progress bar, blocked issue count.</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-indicator tag-blue-dark">Project</span></td>
+                <td class="body-sm">The initiative spans an entire Jira project (e.g. an infrastructure project that only exists for this initiative).</td>
+                <td class="body-sm">Aggregate issue count, active sprint name, last updated date.</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-indicator tag-dark">Board</span></td>
+                <td class="body-sm">You want to track a specific kanban or scrum board regardless of project boundaries.</td>
+                <td class="body-sm">Column distribution of issues, WIP counts.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="connecting-jira">Connecting Jira</h2>
+
+          <div class="docs-callout is-info">
+            <i class="ph ph-info docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Jira Cloud only</strong>
+              Operationalize currently integrates with Jira Cloud (atlassian.net). Jira Data Center / Server support is on the roadmap. If your team uses Jira Server, you can still paste issue URLs as document links in the <a href="documents.html" class="docs-link">Documents</a> section.
+            </div>
+          </div>
+
+          <div class="docs-steps" style="margin-top:var(--ic-space-5)">
+            <div class="docs-step">
+              <div class="docs-step-num">1</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Admin connects Jira Cloud</div>
+                <div class="docs-step-desc">Go to Admin Settings → Integrations → Jira. Click "Connect Jira Cloud" and authorize via Atlassian OAuth. This links your Atlassian organization — all projects become searchable.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">2</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Search for epics or projects</div>
+                <div class="docs-step-desc">In the initiative's Jira section, type the epic name, issue key (e.g. EMEA-421), or project name. Results appear as you type.</div>
+              </div>
+            </div>
+            <div class="docs-step">
+              <div class="docs-step-num">3</div>
+              <div class="docs-step-body">
+                <div class="docs-step-title">Select and confirm</div>
+                <div class="docs-step-desc">Click the item to link it. Progress data syncs every 15 minutes. You'll see a "Last synced" timestamp next to each linked item.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="progress-signals">Progress signals</h2>
+          <p class="body">Jira progress data appears in three places across Operationalize:</p>
+          <ul class="body" style="padding-left:var(--ic-space-5);display:flex;flex-direction:column;gap:var(--ic-space-2)">
+            <li><strong>Initiative detail view</strong> — live progress bar and issue breakdown</li>
+            <li><strong>ROB meeting agenda</strong> — sprint completion % shown next to the initiative name</li>
+            <li><strong>Slack digest</strong> — blocked issue count included in the weekly Friday message</li>
+          </ul>
+
+          <div class="docs-callout is-warning" style="margin-top:var(--ic-space-5)">
+            <i class="ph ph-warning docs-callout-icon"></i>
+            <div class="docs-callout-body">
+              <strong>Delivery progress ≠ initiative status</strong>
+              Jira progress tells you how much work is done. It doesn't automatically update the initiative's status (On Track / At Risk). The owner still sets status manually based on their judgment. A sprint at 90% completion can still be At Risk if the remaining 10% is a critical path blocker.
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-page-nav">
+          <a href="slack-channels.html" class="docs-page-nav-prev">
+            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-title">Slack Channels</span>
+          </a>
+          <a href="documents.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">Documents <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#what-you-can-link" class="docs-toc-item">What you can link</a>
+        <a href="#connecting-jira" class="docs-toc-item">Connecting Jira</a>
+        <a href="#progress-signals" class="docs-toc-item">Progress signals</a>
+      </nav>
+    </aside>
+  </div>
+
+</body>
+</html>

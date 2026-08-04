@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Operationalize Docs — Initiatives</title>
+  <link rel="stylesheet" href="../../icarus/tokens.css" />
+  <link rel="stylesheet" href="../../icarus/semantic.css" />
+  <link rel="stylesheet" href="../../icarus/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="docs-topbar">
+    <a class="docs-topbar-brand" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Operationalize</span>
+    </a>
+    <nav class="docs-topbar-nav">
+      <a href="index.html" class="is-active">Docs</a>
+      <a href="#">API</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="docs-topbar-actions">
+      <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
+        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+
+    <!-- Left sidebar -->
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Getting Started</span>
+          <a href="index.html" class="docs-nav-item is-active">Introduction</a>
+        </div>
+        <div class="docs-nav-section">
+          <span class="docs-nav-label">Initiative Fields</span>
+          <a href="basic-info.html" class="docs-nav-item">Basic Info</a>
+          <a href="rob-meetings.html" class="docs-nav-item">ROB Meetings</a>
+          <a href="okrs.html" class="docs-nav-item">OKRs</a>
+          <a href="slack-channels.html" class="docs-nav-item">Slack Channels</a>
+          <a href="jira.html" class="docs-nav-item">Jira</a>
+          <a href="documents.html" class="docs-nav-item">Documents</a>
+          <a href="project.html" class="docs-nav-item">Project</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+      <div class="docs-page">
+
+        <div class="docs-page-header">
+          <span class="badge badge-info">Getting Started</span>
+          <h1 class="h1" style="margin-top: var(--ic-space-3)">Initiatives</h1>
+          <p class="body" style="color: var(--color-text-muted); margin-top: var(--ic-space-2)">
+            An Initiative is the central unit of work in Operationalize. It ties together your goals, meetings, tools, and team into a single coordinated view — so everyone knows what's being worked on, why, and how it's progressing.
+          </p>
+        </div>
+
+        <!-- Screenshot placeholder -->
+        <div class="docs-screenshot">
+          <div class="docs-screenshot-inner">
+            <div class="docs-screenshot-chrome">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="docs-screenshot-body">
+              <div style="display:flex;gap:var(--ic-space-4);align-items:center;margin-bottom:var(--ic-space-5)">
+                <div style="width:40px;height:40px;border-radius:var(--ic-radius-md);background:var(--color-brand-subtle);display:flex;align-items:center;justify-content:center">
+                  <i class="ph ph-rocket" style="font-size:20px;color:var(--color-brand)"></i>
+                </div>
+                <div>
+                  <div style="font:var(--type-h4);color:var(--color-text)">Q3 Product Expansion</div>
+                  <div style="font:var(--type-body-sm);color:var(--color-text-muted)">Started Jun 1 · Owned by Sarah Chen</div>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:var(--ic-space-2)">
+                  <span class="tag tag-indicator tag-positive">On Track</span>
+                  <span class="badge badge-info">Active</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--ic-space-3)">
+                <div class="docs-mini-card"><i class="ph ph-calendar" style="color:var(--color-brand)"></i><span>3 Meetings</span></div>
+                <div class="docs-mini-card"><i class="ph ph-target" style="color:var(--color-accent)"></i><span>4 OKRs</span></div>
+                <div class="docs-mini-card"><i class="ph ph-chat-circle-dots" style="color:var(--color-warning)"></i><span>2 Channels</span></div>
+                <div class="docs-mini-card"><i class="ph ph-files" style="color:var(--color-text-muted)"></i><span>7 Docs</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="docs-screenshot-caption">An Initiative card showing its summary view with linked meetings, OKRs, Slack channels, and documents.</p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="what-is-an-initiative">What is an Initiative?</h2>
+          <p class="body">
+            Initiatives represent meaningful business bets — a product launch, a process improvement, a strategic pivot. Unlike a task or ticket, an Initiative lives at the intersection of strategy and execution. It has a clear owner, a time horizon, and a set of measurable outcomes.
+          </p>
+          <p class="body">
+            Creating an Initiative in Operationalize automatically creates the connective tissue between your planning tools: it links to your OKRs, surfaces the right recurring meetings, connects your Jira project, and keeps relevant documents in one place.
+          </p>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="creating-an-initiative">Creating an Initiative</h2>
+          <p class="body">To create an Initiative, click <strong>New Initiative</strong> from the Initiatives list or hit <kbd>C</kbd> anywhere on the page. You'll be walked through a form with the following sections:</p>
+
+          <div class="docs-field-list">
+            <a href="basic-info.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-info"></i></div>
+              <div>
+                <div class="docs-field-card-title">Basic Info</div>
+                <div class="docs-field-card-desc">Name, description, owner, dates, and status.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="rob-meetings.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-calendar"></i></div>
+              <div>
+                <div class="docs-field-card-title">ROB Meetings</div>
+                <div class="docs-field-card-desc">Link recurring Rhythm of Business meetings to this initiative.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="okrs.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-target"></i></div>
+              <div>
+                <div class="docs-field-card-title">OKRs</div>
+                <div class="docs-field-card-desc">Connect Objectives and Key Results to track measurable outcomes.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="slack-channels.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-chat-circle-dots"></i></div>
+              <div>
+                <div class="docs-field-card-title">Slack Channels</div>
+                <div class="docs-field-card-desc">Attach Slack channels where the team communicates about this work.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="jira.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-circles-three"></i></div>
+              <div>
+                <div class="docs-field-card-title">Jira</div>
+                <div class="docs-field-card-desc">Link Jira epics or projects to surface delivery progress.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="documents.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-files"></i></div>
+              <div>
+                <div class="docs-field-card-title">Documents</div>
+                <div class="docs-field-card-desc">Attach PRDs, briefs, specs, and other reference material.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+            <a href="project.html" class="docs-field-card">
+              <div class="docs-field-card-icon"><i class="ph ph-folders"></i></div>
+              <div>
+                <div class="docs-field-card-title">Project</div>
+                <div class="docs-field-card-desc">Associate this initiative with a parent project or program.</div>
+              </div>
+              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="h2" id="next-steps">Next steps</h2>
+          <p class="body">Start with <a href="basic-info.html" class="docs-link">Basic Info</a> to set up the core details, then work through each section to connect your initiative to the tools your team already uses.</p>
+        </div>
+
+        <div class="docs-page-nav">
+          <div></div>
+          <a href="basic-info.html" class="docs-page-nav-next">
+            <span class="docs-page-nav-label">Next</span>
+            <span class="docs-page-nav-title">Basic Info <i class="ph ph-arrow-right"></i></span>
+          </a>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Right TOC -->
+    <aside class="docs-toc">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#what-is-an-initiative" class="docs-toc-item">What is an Initiative?</a>
+        <a href="#creating-an-initiative" class="docs-toc-item">Creating an Initiative</a>
+        <a href="#next-steps" class="docs-toc-item">Next steps</a>
+      </nav>
+    </aside>
+
+  </div>
+
+</body>
+</html>

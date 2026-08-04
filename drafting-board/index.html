@@ -1,0 +1,3136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drafting Board — Finance Quarterly Planning Q3/26</title>
+
+  <style>
+    /* ── Animatable gradient stop (Chrome 85+, FF 128+, Safari 16.4+) ── */
+    @property --g-stop {
+      syntax: '<percentage>';
+      inherits: false;
+      initial-value: 100%;
+    }
+
+    /* ── Full-viewport app shell ── */
+    html, body { margin: 0; height: 100%; overflow: hidden; background: var(--color-bg); }
+    body { display: flex; flex-direction: column; font-family: var(--ic-font-sans); }
+
+    .shell-body { flex: 1; display: flex; overflow: hidden; }
+    .app-shell-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* ── Page header ── */
+    .page-header {
+      flex-shrink: 0;
+      padding: var(--ic-space-4) var(--ic-space-5) 0;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .page-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--ic-space-3);
+    }
+
+    .page-title-row h1 {
+      font: var(--type-h2);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .page-title-actions { display: flex; gap: var(--ic-space-2); align-items: center; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; border-bottom: none; margin-top: 2px; }
+
+    .tab {
+      padding: 6px 0;
+      margin-right: 28px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #455065;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .tab.is-active { color: #191e28; border-bottom-color: #204ecf; }
+    .tab:hover:not(.is-active) { color: #191e28; }
+
+    /* ── Workspace body ── */
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Sub-sidebar ── */
+    .sub-sidebar {
+      width: 124px;
+      flex-shrink: 0;
+      background: #f3f4f6;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: relative;
+      border-right: 1px solid #ebeced;
+    }
+
+    .sub-nav-item {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #262d3d;
+      cursor: pointer;
+      line-height: 20px;
+    }
+    .sub-nav-item.is-active { background: #ebeced; color: #000; }
+    .sub-nav-item:hover:not(.is-active) { background: #ebeced; }
+
+    .sidebar-collapse-btn {
+      position: absolute;
+      top: 8px;
+      right: -12px;
+      width: 24px;
+      height: 24px;
+      border-radius: 100px;
+      background: white;
+      border: 1px solid #ebeced;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      z-index: 10;
+    }
+
+    /* ── Content area ── */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Column headers ── */
+    .col-headers {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 8px 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #455065;
+      flex-shrink: 0;
+    }
+
+    .col-idea { flex: 1; min-width: 0; }
+    .col-right { display: flex; gap: 6px; align-items: center; }
+    .col-initiative { width: 500px; }
+    .col-owner { width: 252px; }
+
+    /* ── Row list ── */
+    .row-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 8px 24px 8px;
+    }
+
+    /* ════════════════════════════════════════════
+       DRAFT ROW — the star of the show
+       ════════════════════════════════════════════ */
+
+    .draft-row {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* Background layer — animated */
+    .draft-row-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      /* State 1 default: light blue */
+      background-color: #EDF1FD;
+      transition: background-color 0.45s ease;
+    }
+
+    /* State: gradient animating — same hues as solid states for seamless blend */
+    .draft-row-bg.is-sweeping {
+      background-image: linear-gradient(to right, #EDF1FD 0%, #F1FCF8 var(--g-stop));
+      transition: --g-stop 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* State 5: done — light green */
+    .draft-row-bg.is-done {
+      background-image: none;
+      background-color: #F1FCF8;
+      transition: background-color 0.35s ease;
+    }
+
+    /* Inner content layer */
+    .draft-row-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 8px 8px 16px;
+      border-radius: 4px;
+      border-left: 3px solid #204ECF;
+      background: transparent;
+      transition: border-color 0.45s ease, background-color 0.45s ease;
+      min-height: 52px;
+    }
+
+    .draft-row-inner.is-done {
+      border-color: #03B080;
+      background: transparent;
+    }
+
+    /* Idea column */
+    .row-col-idea {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tip-icon-wrap {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tip-icon-wrap svg {
+      width: 20px;
+      height: 20px;
+      transition: color 0.45s ease;
+      color: #455065;
+    }
+
+    .tip-icon-wrap.is-done svg { color: #03B080; }
+
+    .idea-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #191e28;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Right columns container */
+    .row-col-right {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Initiative card */
+    .initiative-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      box-shadow: 0 0 4px rgba(0,0,0,0.08);
+      border-radius: 4px;
+      padding: 4px 8px;
+      width: 500px;
+      min-height: 36px;
+    }
+
+    .initiative-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.45s ease;
+      color: #455065;
+    }
+
+    .initiative-icon.is-done { color: #03B080; }
+
+    .initiative-icon svg { width: 18px; height: 18px; }
+
+    .initiative-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .initiative-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .initiative-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    .tag-rollover {
+      background: #191e28;
+      color: #EDF1FD;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 4px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .initiative-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: #000;
+      line-height: 16px;
+    }
+
+    .arrow-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: #455065;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .arrow-icon svg { width: 16px; height: 16px; }
+
+    /* Owner card */
+    .owner-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      box-shadow: 0 0 4px rgba(0,0,0,0.08);
+      border-radius: 4px;
+      padding: 4px;
+      width: 200px;
+      min-height: 36px;
+    }
+
+    .owner-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #c8d0df;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #455065;
+      flex-shrink: 0;
+    }
+
+    .owner-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    /* Check button */
+    .check-btn {
+      flex-shrink: 0;
+      width: 44px;
+      align-self: stretch;
+      border-radius: 4px;
+      border: 1px solid #D8D9DC;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: #999BA4;
+      box-shadow: 0 0 8px rgba(0,0,0,0.08);
+      transition:
+        background 0.45s ease,
+        border-color 0.45s ease,
+        color 0.45s ease,
+        box-shadow 0.2s ease;
+      outline: none;
+    }
+
+    .check-btn svg { width: 16px; height: 16px; transition: color 0.45s ease; }
+
+    .check-btn:hover { box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+
+    /* State 5: white button, green checkmark */
+    .check-btn.is-done {
+      background: white;
+      border: 1px solid #D8D9DC;
+      color: #03B080;
+    }
+
+    /* More button */
+    .more-btn {
+      flex-shrink: 0;
+      width: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #455065;
+      padding: 0;
+    }
+    .more-btn svg { width: 16px; height: 16px; }
+
+    /* ── Progress indicator label ── */
+    .row-state-badge {
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 5px;
+      border-radius: 0 4px 0 4px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .draft-row:hover .row-state-badge { opacity: 1; }
+
+    .row-state-badge.state-1 { background: #EDF1FD; color: #204ECF; }
+    .row-state-badge.state-sweeping { background: #204ECF; color: white; }
+    .row-state-badge.state-done { background: #03B080; color: white; }
+
+    /* ── Reset hint ── */
+    .reset-hint {
+      font-size: 11px;
+      color: #455065;
+      padding: 6px 16px;
+      font-style: italic;
+    }
+
+    /* ── Prototype controls bar ── */
+    .proto-bar {
+      flex-shrink: 0;
+      background: #262D3D;
+      color: #c4c6ca;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .proto-bar span { opacity: 0.5; }
+    .proto-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .state-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+
+  <style>
+/* Icarus Design Tokens
+ * Single source of truth for color, type, space, radii, shadows, motion.
+ * Pierce shadow DOM via CSS custom properties — components read these directly.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ================================================================
+     COLOR — PRIMITIVE PALETTE (from Figma: Mobile-App / Color Palette)
+     ================================================================ */
+
+  /* Neutral */
+  --ic-palette-white: #FFFFFF;
+  --ic-palette-black: #000000;
+
+  /* Gray */
+  --ic-palette-gray-100: #FCFCFC;
+  --ic-palette-gray-150: #F0F1F3;
+  --ic-palette-gray-200: #E0E1E5;
+  --ic-palette-gray-300: #CCCDD3;
+  --ic-palette-gray-400: #B3B5BC;
+  --ic-palette-gray-500: #999BA4;
+  --ic-palette-gray-600: #84888E;
+  --ic-palette-gray-700: #5F636A;
+  --ic-palette-gray-800: #3D4149;
+  --ic-palette-gray-900: #24272D;
+
+  /* Zinc */
+  --ic-palette-zinc-100: #D1D2D3;
+  --ic-palette-zinc-200: #949597;
+  --ic-palette-zinc-300: #636466;
+  --ic-palette-zinc-400: #484A4C;
+  --ic-palette-zinc-500: #343536;
+  --ic-palette-zinc-600: #282829;
+  --ic-palette-zinc-700: #1E1E1F;
+  --ic-palette-zinc-800: #141415;
+  --ic-palette-zinc-900: #0A0A0A;
+
+  /* Graphite (Operationalize brand) */
+  --ic-palette-graphite-100: #E0E3EA;
+  --ic-palette-graphite-150: #CDD1DC;
+  --ic-palette-graphite-200: #B3B9C8;
+  --ic-palette-graphite-300: #8F96AA;
+  --ic-palette-graphite-400: #6A7389;
+  --ic-palette-graphite-500: #455065;
+  --ic-palette-graphite-600: #3A4457;
+  --ic-palette-graphite-700: #303A4A;
+  --ic-palette-graphite-800: #262D3D;
+  --ic-palette-graphite-900: #191E28;
+
+  /* Red */
+  --ic-palette-red-100: #FBEDF1;
+  --ic-palette-red-150: #F5D8E0;
+  --ic-palette-red-200: #F0B8C4;
+  --ic-palette-red-300: #E5637D;
+  --ic-palette-red-400: #DA3F62;
+  --ic-palette-red-500: #D42551;
+  --ic-palette-red-600: #A81D41;
+  --ic-palette-red-700: #7D1530;
+  --ic-palette-red-800: #5C0F24;
+  --ic-palette-red-900: #3D0A18;
+
+  /* Yellow */
+  --ic-palette-yellow-100: #FFF5E3;
+  --ic-palette-yellow-150: #F8E7C8;
+  --ic-palette-yellow-200: #F2D9A6;
+  --ic-palette-yellow-300: #EDCA7E;
+  --ic-palette-yellow-400: #E9B340;
+  --ic-palette-yellow-500: #E59C01;
+  --ic-palette-yellow-600: #C08301;
+  --ic-palette-yellow-700: #9A6A01;
+  --ic-palette-yellow-800: #704D01;
+  --ic-palette-yellow-900: #4A3301;
+
+  /* Orange */
+  --ic-palette-orange-100: #FFF0E6;
+  --ic-palette-orange-150: #FFDFC7;
+  --ic-palette-orange-200: #FFCBA3;
+  --ic-palette-orange-300: #F5C07A;
+  --ic-palette-orange-400: #F58E42;
+  --ic-palette-orange-500: #F07018;
+  --ic-palette-orange-600: #C05F0E;
+  --ic-palette-orange-700: #964A0A;
+  --ic-palette-orange-800: #6E3607;
+  --ic-palette-orange-900: #482404;
+
+  /* Green */
+  --ic-palette-green-100: #EAFBF5;
+  --ic-palette-green-150: #D7F3E9;
+  --ic-palette-green-200: #A8E6D0;
+  --ic-palette-green-300: #66D4AB;
+  --ic-palette-green-400: #33D097;
+  --ic-palette-green-500: #00CC83;
+  --ic-palette-green-600: #03B080;
+  --ic-palette-green-700: #05947C;
+  --ic-palette-green-800: #046B5A;
+  --ic-palette-green-900: #034539;
+
+  /* Cyan */
+  --ic-palette-cyan-100: #E6F6FE;
+  --ic-palette-cyan-150: #C8EBFD;
+  --ic-palette-cyan-200: #A1DDFB;
+  --ic-palette-cyan-300: #6ECAF5;
+  --ic-palette-cyan-400: #45B9F2;
+  --ic-palette-cyan-500: #25A9EF;
+  --ic-palette-cyan-600: #1B8AC5;
+  --ic-palette-cyan-700: #136B9B;
+  --ic-palette-cyan-800: #0E5078;
+  --ic-palette-cyan-900: #07334C;
+
+  /* Blue */
+  --ic-palette-blue-100: #EDF1FD;
+  --ic-palette-blue-150: #D5DEFA;
+  --ic-palette-blue-200: #B0C1F5;
+  --ic-palette-blue-300: #7B9AEE;
+  --ic-palette-blue-400: #4A6FE0;
+  --ic-palette-blue-500: #204ECF;
+  --ic-palette-blue-600: #183A9E;
+  --ic-palette-blue-700: #0F256E;
+  --ic-palette-blue-800: #0A1A50;
+  --ic-palette-blue-900: #061035;
+
+  /* Purple */
+  --ic-palette-purple-100: #F1ECFD;
+  --ic-palette-purple-150: #DFD3F9;
+  --ic-palette-purple-200: #C9B5F4;
+  --ic-palette-purple-300: #A47DE2;
+  --ic-palette-purple-400: #8552D9;
+  --ic-palette-purple-500: #6727CF;
+  --ic-palette-purple-600: #5019A8;
+  --ic-palette-purple-700: #3A1280;
+  --ic-palette-purple-800: #280D5C;
+  --ic-palette-purple-900: #1A0840;
+
+
+  /* ---- Typography ---- */
+
+  --ic-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ic-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --ic-font-display: var(--ic-font-sans);
+
+  /* Size scale — Figma spec */
+  --ic-text-xxs:  0.6875rem;  /* 11px — Body Xxsmall */
+  --ic-text-xs:   0.75rem;    /* 12px — Body Xsmall */
+  --ic-text-sm:   0.8125rem;  /* 13px — Body Small */
+  --ic-text-base: 0.875rem;   /* 14px — Body Medium, H4 */
+  --ic-text-md:   1rem;       /* 16px — Body Large, H3 */
+  --ic-text-lg:   1.125rem;   /* 18px — utility (avatar initials, card titles) */
+  --ic-text-xl:   1.25rem;    /* 20px — H2 */
+  --ic-text-2xl:  1.75rem;    /* 28px — H1 */
+
+  /* Line heights — Figma spec (absolute, mirrors design intent) */
+  --ic-lh-h1:       2.625rem;  /* 42px */
+  --ic-lh-h2:       1.875rem;  /* 30px */
+  --ic-lh-h3:       1.5rem;    /* 24px */
+  --ic-lh-h4:       1.375rem;  /* 22px */
+  --ic-lh-body-lg:  1.5rem;    /* 24px */
+  --ic-lh-body-md:  1.375rem;  /* 22px */
+  --ic-lh-body-sm:  1.25rem;   /* 20px */
+  --ic-lh-body-xs:  1.125rem;  /* 18px */
+  --ic-lh-body-xxs: 1rem;      /* 16px */
+
+  --ic-leading-tight:   1.2;
+  --ic-leading-normal:  1.5;
+  --ic-leading-relaxed: 1.75;
+
+  --ic-weight-regular:  400;
+  --ic-weight-medium:   500;
+  --ic-weight-semibold: 600;
+  --ic-weight-bold:     700;
+
+  /* ---- Spacing (4px base) ---- */
+  --ic-space-0: 0;
+  --ic-space-1: 4px;
+  --ic-space-2: 8px;
+  --ic-space-3: 12px;
+  --ic-space-4: 16px;
+  --ic-space-5: 24px;
+  --ic-space-6: 32px;
+  --ic-space-7: 40px;
+  --ic-space-8: 48px;
+  --ic-space-10: 64px;
+  --ic-space-12: 80px;
+  --ic-space-16: 128px;
+
+  /* ---- Radii ---- */
+  --ic-radius-none: 0;
+  --ic-radius-sm: 4px;
+  --ic-radius-md: 8px;
+  --ic-radius-lg: 12px;
+  --ic-radius-xl: 16px;
+  --ic-radius-2xl: 24px;
+  --ic-radius-full: 9999px;
+
+  /* Numeric aliases — reach for these by px value */
+  --ic-radius-0:  var(--ic-radius-none);
+  --ic-radius-4:  var(--ic-radius-sm);
+  --ic-radius-8:  var(--ic-radius-md);
+  --ic-radius-12: var(--ic-radius-lg);
+
+  /* ---- Shadows ---- */
+  --ic-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --ic-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --ic-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --ic-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.10);
+  --ic-shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.14);
+
+  /* ---- Z-index scale ---- */
+  --ic-z-base: 0;
+  --ic-z-dropdown: 100;
+  --ic-z-sticky: 200;
+  --ic-z-overlay: 800;
+  --ic-z-modal: 900;
+  --ic-z-toast: 1000;
+
+  /* ---- Motion ---- */
+  --ic-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ic-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ic-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ic-duration-fast: 120ms;
+  --ic-duration-base: 200ms;
+  --ic-duration-slow: 320ms;
+
+  /* ---- Layout ---- */
+  --ic-container-sm: 640px;
+  --ic-container-md: 768px;
+  --ic-container-lg: 1024px;
+  --ic-container-xl: 1280px;
+}
+/* semantic.css — intent-named aliases over Icarus primitives.
+ * Prototypes and components reference these, NOT raw palette tokens.
+ * Swap a brand or theme by re-pointing aliases here — primitives never change.
+ */
+
+:root {
+  /* ---- Surfaces ---- */
+  --color-bg:             var(--ic-palette-gray-100);   /* page background */
+  --color-surface:        var(--ic-palette-white);      /* cards, panels */
+  --color-surface-muted:  var(--ic-palette-gray-150);   /* hover, subtle fills */
+  --color-surface-sunken: var(--ic-palette-gray-200);   /* wells, inset areas */
+
+  /* ---- Borders ---- */
+  --color-border:         var(--ic-palette-gray-200);
+  --color-border-strong:  var(--ic-palette-gray-300);
+  --color-border-focus:   var(--ic-palette-blue-500);
+
+  /* ---- Text ---- */
+  --color-text:           var(--ic-palette-graphite-900);
+  --color-text-muted:     var(--ic-palette-gray-700);
+  --color-text-subtle:    var(--ic-palette-gray-500);
+  --color-text-inverse:   var(--ic-palette-white);
+  --color-text-link:      var(--ic-palette-blue-500);
+
+  /* ---- Brand / primary action ---- */
+  --color-brand:          var(--ic-palette-green-500);
+  --color-brand-hover:    var(--ic-palette-green-600);
+  --color-brand-active:   var(--ic-palette-green-700);
+  --color-brand-subtle:   var(--ic-palette-green-100);
+
+  /* ---- Accent (interactive secondary, links) ---- */
+  --color-accent:         var(--ic-palette-blue-500);
+  --color-accent-hover:   var(--ic-palette-blue-600);
+  --color-accent-subtle:  var(--ic-palette-blue-100);
+
+  /* ---- Status ---- */
+  --color-success:        var(--ic-palette-green-500);
+  --color-success-subtle: var(--ic-palette-green-100);
+  --color-warning:        var(--ic-palette-yellow-500);
+  --color-warning-subtle: var(--ic-palette-yellow-100);
+  --color-danger:         var(--ic-palette-red-500);
+  --color-danger-hover:   var(--ic-palette-red-600);
+  --color-danger-subtle:  var(--ic-palette-red-100);
+  --color-info:           var(--ic-palette-cyan-500);
+  --color-info-subtle:    var(--ic-palette-cyan-100);
+
+  /* ---- Overlays ---- */
+  --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
+
+  /* ---- Type roles (size + line height paired) ---- */
+  --type-h1: var(--ic-weight-semibold) var(--ic-text-2xl)/var(--ic-lh-h1) var(--ic-font-sans);
+  --type-h2: var(--ic-weight-semibold) var(--ic-text-xl)/var(--ic-lh-h2) var(--ic-font-sans);
+  --type-h3: var(--ic-weight-semibold) var(--ic-text-md)/var(--ic-lh-h3) var(--ic-font-sans);
+  --type-h4: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-h4) var(--ic-font-sans);
+  --type-body-lg:  var(--ic-weight-regular) var(--ic-text-md)/var(--ic-lh-body-lg) var(--ic-font-sans);
+  --type-body:     var(--ic-weight-regular) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  --type-body-sm:  var(--ic-weight-regular) var(--ic-text-sm)/var(--ic-lh-body-sm) var(--ic-font-sans);
+  --type-caption:  var(--ic-weight-medium) var(--ic-text-xs)/var(--ic-lh-body-xs) var(--ic-font-sans);
+  --type-mono:     var(--ic-weight-regular) var(--ic-text-sm)/var(--ic-lh-body-sm) var(--ic-font-mono);
+}
+
+/* ---- Dark theme override ---- */
+[data-theme="dark"] {
+  --color-bg:             var(--ic-palette-zinc-900);
+  --color-surface:        var(--ic-palette-zinc-800);
+  --color-surface-muted:  var(--ic-palette-zinc-700);
+  --color-surface-sunken: var(--ic-palette-zinc-900);
+
+  --color-border:         var(--ic-palette-zinc-600);
+  --color-border-strong:  var(--ic-palette-zinc-500);
+
+  --color-text:           var(--ic-palette-gray-100);
+  --color-text-muted:     var(--ic-palette-gray-400);
+  --color-text-subtle:    var(--ic-palette-gray-600);
+  --color-text-inverse:   var(--ic-palette-zinc-900);
+
+  --color-brand:          var(--ic-palette-green-400);
+  --color-brand-hover:    var(--ic-palette-green-300);
+  --color-brand-active:   var(--ic-palette-green-200);
+  --color-brand-subtle:   var(--ic-palette-green-800);
+}
+
+/* ---- Reset + base ---- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: var(--ic-container-lg);
+  margin: 0 auto;
+  padding: var(--ic-space-8) var(--ic-space-5);
+}
+/* components.css — built on semantic aliases (semantic.css), never raw palette. */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ic-space-2);
+  height: 32px; /* default — sm */
+  padding: 0 var(--ic-space-3);
+  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
+  border-radius: var(--ic-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              transform var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.btn-xs {
+  height: 24px;
+  padding: 0 var(--ic-space-2);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+}
+
+/* Icons inside buttons. Place an <svg class="btn-icon" /> as a child. */
+.btn-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-xs .btn-icon { width: 12px; height: 12px; }
+
+/* Square icon-only button (no text) */
+.btn-icon-only            { width: 32px; padding: 0; }
+.btn-icon-only.btn-xs     { width: 24px; }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.btn-primary {
+  background: var(--color-brand);
+  color: var(--color-text-inverse);
+}
+.btn-primary:hover  { background: var(--color-brand-hover); }
+.btn-primary:active { background: var(--color-brand-active); }
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn-secondary:hover { background: var(--color-surface-muted); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+.btn-danger:hover  { background: var(--color-danger-hover); }
+
+/* ---------- Field + Input ---------- */
+.field { display: flex; flex-direction: column; gap: var(--ic-space-2); }
+.field-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+}
+.field-hint {
+  font: var(--type-caption);
+  color: var(--color-text-subtle);
+}
+.field-hint.is-error { color: var(--color-danger); }
+.input {
+  height: 32px; /* default — sm */
+  padding: 0 var(--ic-space-3);
+  font: var(--type-body-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text);
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-xs {
+  height: 24px;
+  padding: 0 var(--ic-space-2);
+  font: var(--ic-weight-regular) var(--ic-text-xs)/var(--ic-lh-body-sm) var(--ic-font-sans);
+}
+
+/* Textarea variant of .input */
+textarea.input {
+  height: auto;
+  min-height: 80px;
+  padding: var(--ic-space-3) var(--ic-space-4);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* Right-aligned hint — used for character counters */
+.field-hint-end {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.field-hint-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+}
+
+/* ---------- Select (dropdown input) ----------
+ * Trigger styled like .input, paired with a .dropdown-menu via JS toggle.
+ *
+ *   <div class="input-select">
+ *     <button class="input-select-trigger" aria-expanded="false">
+ *       <span class="input-select-value input-select-placeholder">Choose…</span>
+ *       <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+ *     </button>
+ *     <div class="dropdown-menu" hidden>...</div>
+ *   </div>
+ */
+.input-select {
+  position: relative;
+  width: 100%;
+}
+.input-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-2);
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--ic-space-2) 0 var(--ic-space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body-sm);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-select-trigger:hover               { border-color: var(--color-border-strong); }
+.input-select-trigger:focus-visible,
+.input-select-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.input-select-trigger > .btn-icon {
+  color: var(--color-text-muted);
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+.input-select-trigger[aria-expanded="true"] > .btn-icon { transform: rotate(180deg); }
+.input-select-placeholder { color: var(--color-text-subtle); }
+.input-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.input-select .dropdown-menu {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  left: 0;
+  right: 0;
+  z-index: var(--ic-z-dropdown);
+}
+.input-select .dropdown-menu[hidden] { display: none; }
+
+/* ---------- Tag input ----------
+ * Container behaves like .input; chips + a free-text input live inside.
+ * On Enter the typed text becomes a chip; Backspace on empty removes the last chip.
+ *
+ *   <div class="input-tags">
+ *     <span class="dropdown-chip">React<button class="dropdown-chip-remove">…</button></span>
+ *     <input class="input-tags-input" placeholder="Add tag…" />
+ *   </div>
+ */
+.input-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ic-space-1);
+  min-height: 40px;
+  padding: 4px var(--ic-space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  cursor: text;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.input-tags:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.input-tags-input {
+  flex: 1;
+  min-width: 80px;
+  height: 28px;
+  padding: 0 var(--ic-space-1);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--type-body);
+  color: var(--color-text);
+}
+.input-tags-input::placeholder { color: var(--color-text-subtle); }
+
+/* ---------- Rich text editor ----------
+ * Toolbar + contenteditable body. Compose with .field for label + counter + error.
+ *
+ *   <div class="editor">
+ *     <div class="editor-toolbar">…buttons…</div>
+ *     <div class="editor-content" contenteditable="true" data-placeholder="…"></div>
+ *   </div>
+ */
+.editor {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.editor:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.editor.is-error                { border-color: var(--color-danger); }
+.editor.is-error:focus-within   { box-shadow: 0 0 0 3px var(--color-danger-subtle); }
+.editor.is-disabled             { opacity: 0.5; pointer-events: none; }
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+.editor-toolbar-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--color-border);
+  margin: 0 var(--ic-space-1);
+}
+
+/* Toolbar select (e.g. "Normal Text" heading picker) — slimmer than .input-select */
+.editor-toolbar-select { width: auto; }
+.editor-toolbar-select .input-select-trigger {
+  height: 32px;
+  min-width: 120px;
+  padding: 0 var(--ic-space-2);
+  border: 0;
+  background: transparent;
+  font: var(--type-body-sm);
+  gap: var(--ic-space-2);
+}
+.editor-toolbar-select .input-select-trigger:hover {
+  background: var(--color-surface-muted);
+}
+.editor-toolbar-select .input-select-trigger:focus-visible,
+.editor-toolbar-select .input-select-trigger[aria-expanded="true"] {
+  box-shadow: none;
+  background: var(--color-surface-muted);
+}
+
+.editor-toolbar-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.editor-toolbar-btn:hover               { background: var(--color-surface-muted); }
+.editor-toolbar-btn.is-active           { background: var(--color-surface-muted); color: var(--color-brand); }
+
+.editor-content {
+  min-height: 160px;
+  padding: var(--ic-space-4);
+  font: var(--type-body);
+  color: var(--color-text);
+  outline: 0;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+.editor-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}
+.editor-content > :first-child { margin-top: 0; }
+.editor-content > :last-child  { margin-bottom: 0; }
+.editor-content ul,
+.editor-content ol {
+  margin: var(--ic-space-2) 0;
+  padding-left: var(--ic-space-5);
+}
+.editor-content code {
+  font: var(--type-mono);
+  background: var(--color-surface-muted);
+  padding: 1px 4px;
+  border-radius: var(--ic-radius-sm);
+}
+.editor-content a { color: var(--color-text-link); }
+
+/* Footer pattern — char count + validation tick, lives in .field-hint-row */
+.editor-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+}
+.editor-counter-ok {
+  width: 14px;
+  height: 14px;
+  color: var(--color-success);
+}
+.input::placeholder { color: var(--color-text-subtle); }
+.input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-lg);
+  padding: var(--ic-space-5);
+}
+.card-title { font: var(--type-h3); margin: 0 0 var(--ic-space-2); color: var(--color-text); }
+.card-body  { font: var(--type-body); color: var(--color-text-muted); margin: 0; }
+
+/* ---------- Table ----------
+ * Base: semantic <table>/<thead>/<tbody>/<tr>/<th>/<td>. Left-aligned, no grid lines,
+ * subtle bottom border on the header row.
+ *
+ *   <table class="table table-wide">
+ *     <thead><tr>
+ *       <th><button class="th-sort">Name<svg .../></button></th>
+ *       <th>Status</th>
+ *     </tr></thead>
+ *     <tbody>
+ *       <tr><td>…</td><td>…</td></tr>
+ *     </tbody>
+ *   </table>
+ *
+ * Modifier:
+ *   .table-wide — tall rows (80px) + zebra striping; for content-heavy lists.
+ *
+ * Cell-content helpers (compose inside <td>):
+ *   .cell-title  — title + small subtype label
+ *   .cell-user   — avatar + name + role
+ *   .cell-meta   — small title + caption row (optional icon)
+ *   .cell-actions— right-aligned action buttons (kebab etc.)
+ */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--type-body-sm);
+  color: var(--color-text);
+  text-align: left;
+}
+.table thead th {
+  padding: var(--ic-space-3) var(--ic-space-4);
+  font: var(--ic-weight-regular) var(--ic-text-sm)/1 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.table tbody td {
+  padding: var(--ic-space-3) var(--ic-space-4);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Wide variant — generous row height with zebra striping. */
+.table-wide tbody td { padding: var(--ic-space-5) var(--ic-space-4); }
+.table-wide tbody tr:nth-child(even) td { background: var(--color-surface-muted); }
+
+/* Scroll container — wraps a .table to enable both axes of scrolling.
+ * Sticky header keeps column labels visible while scrolling vertically. */
+.table-scroll {
+  overflow: auto;
+  max-height: 480px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+}
+.table-scroll .table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+/* Sortable header — button-styled span with an arrow icon */
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.th-sort .ph { font-size: 12px; color: var(--color-text-subtle); }
+.th-sort:hover { color: var(--color-text); }
+.th-sort:hover .ph { color: var(--color-text-muted); }
+
+/* Right-aligned utility for action cells */
+.cell-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--ic-space-2); }
+
+/* Title + sub-label stack — bold title, small muted type below.
+ * Wrap with .cell-title-row to add an expand/collapse toggle for tree tables. */
+.cell-title { display: flex; flex-direction: column; gap: var(--ic-space-1); min-width: 0; }
+.cell-title-text { font: var(--ic-weight-medium) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); }
+.cell-title-sub  { font: var(--ic-weight-regular) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text-muted); }
+.cell-title-row  { display: flex; align-items: center; gap: var(--ic-space-2); }
+
+/* Nested row hierarchy — drive indentation off data-level on the <tr>. */
+.table tbody tr[data-level="1"] .cell-title-row { padding-left: var(--ic-space-5); }
+.table tbody tr[data-level="2"] .cell-title-row { padding-left: calc(var(--ic-space-5) * 2); }
+
+/* Expand/collapse caret + a same-sized spacer for leaf rows so titles align across levels. */
+.row-toggle {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease), color var(--ic-duration-fast) var(--ic-ease);
+}
+.row-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.row-toggle .ph { font-size: 14px; transition: transform var(--ic-duration-fast) var(--ic-ease); }
+.row-toggle[aria-expanded="true"] .ph { transform: rotate(90deg); }
+.row-toggle-spacer { display: inline-block; width: 20px; height: 20px; flex-shrink: 0; }
+
+/* User cell — circular avatar + name + role */
+.cell-user { display: flex; align-items: center; gap: var(--ic-space-3); min-width: 0; }
+.cell-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.cell-user-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cell-user-name { font: var(--ic-weight-medium) var(--ic-text-sm)/1.2 var(--ic-font-sans); color: var(--color-text); }
+.cell-user-role { font: var(--type-caption); color: var(--color-text-muted); }
+
+/* Meta cell — body text with optional caption row underneath */
+.cell-meta { display: flex; flex-direction: column; gap: var(--ic-space-1); }
+.cell-meta-title { font: var(--type-body-sm); color: var(--color-text); }
+.cell-meta-sub   { font: var(--type-caption); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: var(--ic-space-1); }
+.cell-meta-sub .ph { font-size: 12px; color: var(--color-text-subtle); }
+
+/* Health dot — small colored circle used inline in a cell */
+.cell-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-success);
+}
+.cell-dot.is-warning { background: var(--color-warning); }
+.cell-dot.is-danger  { background: var(--color-danger); }
+
+/* ---------- Alert ----------
+ * Horizontal block with: icon · message · optional CTAs · optional close button.
+ *
+ *   <div class="alert alert-danger" role="alert">
+ *     <i class="ph ph-warning-octagon alert-icon"></i>
+ *     <p class="alert-message">Something went wrong.</p>
+ *     <div class="alert-actions">              optional — drop if no CTAs
+ *       <button class="btn btn-xs btn-primary">Retry</button>
+ *       <button class="btn btn-xs btn-secondary">Dismiss</button>
+ *     </div>
+ *     <button class="alert-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *   </div>
+ *
+ * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
+ * Omit the .alert-close button for persistent alerts.
+ */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  min-height: 56px;
+  padding: var(--ic-space-4);
+  border-radius: var(--ic-radius-md);
+  border: 1px solid transparent;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: var(--type-body-sm);
+}
+.alert-icon    { font-size: 16px; flex-shrink: 0; }
+.alert-message { flex: 1; min-width: 0; margin: 0; }
+.alert-actions { display: inline-flex; gap: var(--ic-space-2); flex-shrink: 0; }
+.alert-close {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease), color var(--ic-duration-fast) var(--ic-ease);
+}
+.alert-close:hover { background: color-mix(in srgb, currentColor 10%, transparent); color: var(--color-text); }
+.alert-close .ph { font-size: 14px; }
+
+/* Variants — soft tinted background + matching border in the variant hue. */
+.alert-danger  { background: var(--color-danger-subtle);  border-color: color-mix(in srgb, var(--color-danger) 22%, transparent); }
+.alert-danger  .alert-icon { color: var(--color-danger); }
+.alert-warning { background: var(--color-warning-subtle); border-color: color-mix(in srgb, var(--color-warning) 32%, transparent); }
+.alert-warning .alert-icon { color: var(--color-warning); }
+.alert-success { background: var(--color-success-subtle); border-color: color-mix(in srgb, var(--color-success) 22%, transparent); }
+.alert-success .alert-icon { color: var(--color-success); }
+.alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.alert-info    .alert-icon { color: var(--color-accent); }
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex; align-items: center;
+  font: var(--type-caption);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+
+/* ---------- Tag ----------
+ * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
+ *   <span class="tag tag-positive">Label</span>           → solid filled chip + white text
+ *   <span class="tag tag-indicator tag-positive">Label</span>  → colored dot + text
+ */
+.tag {
+  --tag-color: var(--ic-palette-graphite-900);
+  --tag-text:  var(--ic-palette-white);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  height: 16px;
+  padding: 0 var(--ic-space-2);
+  border-radius: var(--ic-radius-sm);
+  font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
+  background: var(--tag-color);
+  color: var(--tag-text);
+}
+
+/* Status colors — drive both solid bg and indicator dot via --tag-color */
+.tag-positive   { --tag-color: var(--color-success); }
+.tag-negative   { --tag-color: var(--color-danger); }
+.tag-warning    { --tag-color: var(--color-warning);          --tag-text: var(--ic-palette-graphite-900); }
+.tag-dark       { --tag-color: var(--ic-palette-graphite-900); }
+.tag-blue-light { --tag-color: var(--ic-palette-cyan-500); }
+.tag-blue       { --tag-color: var(--ic-palette-blue-500); }
+.tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
+.tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
+
+/* Indicator style — colored dot + text, ghost-button hover affordance */
+.tag-indicator {
+  background: transparent;
+  color: var(--color-text);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  height: auto;
+  gap: var(--ic-space-2);
+  font-weight: var(--ic-weight-regular);
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.tag-indicator:hover { background: var(--color-surface-muted); }
+.tag-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ic-radius-full);
+  background: var(--tag-color);
+  flex-shrink: 0;
+}
+
+/* ---------- Count badge ----------
+ * Circular numeric indicator (notification dot with a count).
+ * Variants: primary (filled), secondary (outlined). Sizes: sm/md/lg → 12/16/20px.
+ */
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--ic-space-1);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-danger);
+  color: var(--ic-palette-white);
+  font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+.count-badge-sm {
+  min-width: 12px;
+  height: 12px;
+  font-size: 9px;
+  padding: 0 3px;
+}
+.count-badge-lg {
+  min-width: 20px;
+  height: 20px;
+  font-size: 11px;
+  padding: 0 5px;
+}
+.count-badge-secondary {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Avatar ----------
+ * Squarish identity badge (4px corner radius). Three content types share
+ * the same root — the markup inside decides which renders:
+ *
+ *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
+ *   Initials:  <span class="avatar avatar-md">JD</span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><i class="ph ph-buildings"></i></span>
+ *
+ * Sizes (default = avatar-md / 32px):
+ *   .avatar-xs   16px
+ *   .avatar-sm   24px
+ *   .avatar-md   32px (default)
+ *   .avatar-lg   40px
+ *   .avatar-xl   80px
+ *   .avatar-2xl 120px
+ *
+ * Interactive: render as <button> or <a> instead of <span> — picks up
+ * pointer cursor, hover dim and focus-visible ring automatically.
+ */
+.avatar {
+  --avatar-size: 32px;
+  --avatar-text: var(--ic-text-sm);
+  --avatar-icon: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--ic-radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font: var(--ic-weight-semibold) var(--avatar-text)/1 var(--ic-font-sans);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.avatar-xs  { --avatar-size: 16px;  --avatar-text: var(--ic-text-xxs); --avatar-icon: 10px; }
+.avatar-sm  { --avatar-size: 24px;  --avatar-text: var(--ic-text-xs);  --avatar-icon: 14px; }
+.avatar-md  { --avatar-size: 32px;  --avatar-text: var(--ic-text-sm);  --avatar-icon: 16px; }
+.avatar-lg  { --avatar-size: 40px;  --avatar-text: var(--ic-text-base);--avatar-icon: 20px; }
+.avatar-xl  { --avatar-size: 80px;  --avatar-text: var(--ic-text-2xl); --avatar-icon: 36px; }
+.avatar-2xl { --avatar-size: 120px; --avatar-text: 42px;               --avatar-icon: 56px; }
+
+/* Photo content — image fills the avatar */
+.avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Icon content — Phosphor or inline SVG, sized by --avatar-icon */
+.avatar > .ph { font-size: var(--avatar-icon); }
+.avatar > svg { width: var(--avatar-icon); height: var(--avatar-icon); }
+
+/* Team / company variant — same neutral fill as initials; icon is the
+ * differentiator from people avatars. */
+.avatar-team {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* Interactive — applies when rendered as <button> or <a> */
+button.avatar,
+a.avatar {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+button.avatar:hover,
+a.avatar:hover { filter: brightness(0.95); }
+button.avatar:focus-visible,
+a.avatar:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Switch ----------
+ * Usage:
+ *   <label class="switch">
+ *     <input type="checkbox" class="switch-input" />
+ *     <span class="switch-track"></span>
+ *   </label>
+ */
+.switch {
+  display: inline-flex;
+  position: relative;
+  width: 40px;
+  height: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.switch-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.switch-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color-border-strong);
+  border-radius: var(--ic-radius-full);
+  transition: background var(--ic-duration-base) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--ic-palette-white);
+  border-radius: var(--ic-radius-full);
+  box-shadow: var(--ic-shadow-sm);
+  transition: transform var(--ic-duration-base) var(--ic-ease);
+}
+.switch-input:checked ~ .switch-track             { background: var(--color-accent); }
+.switch-input:checked ~ .switch-track::after      { transform: translateX(16px); }
+.switch-input:focus-visible ~ .switch-track       { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.switch-input:disabled                            { cursor: not-allowed; }
+.switch:has(.switch-input:disabled)               { cursor: not-allowed; }
+.switch-input:disabled ~ .switch-track            { opacity: 0.5; }
+
+/* ---------- Checkbox ----------
+ * Usage:
+ *   <label class="checkbox">
+ *     <input type="checkbox" class="checkbox-input" />
+ *     <span class="checkbox-box">
+ *       <svg class="checkbox-mark"><use href="#i-check"/></svg>
+ *       <svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg>
+ *     </span>
+ *     <span class="checkbox-label">Label</span>
+ *   </label>
+ * Add `.is-error` to .checkbox for invalid state.
+ * Set `input.indeterminate = true` via JS for the indeterminate state.
+ */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  cursor: pointer;
+  position: relative;
+}
+.checkbox-input {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.checkbox-box {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--ic-radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  flex-shrink: 0;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.checkbox-mark {
+  position: absolute;
+  inset: 1px;
+  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  color: var(--ic-palette-white);
+  opacity: 0;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+  pointer-events: none;
+}
+.checkbox-label {
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+/* States */
+.checkbox:hover .checkbox-box                  { border-color: var(--color-text-muted); }
+.checkbox-input:checked ~ .checkbox-box,
+.checkbox-input:indeterminate ~ .checkbox-box  { background: var(--color-accent); border-color: var(--color-accent); }
+.checkbox-input:checked ~ .checkbox-box .checkbox-mark:not(.checkbox-mark-dash),
+.checkbox-input:indeterminate ~ .checkbox-box .checkbox-mark-dash { opacity: 1; }
+.checkbox-input:focus-visible ~ .checkbox-box  { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.checkbox-input:disabled ~ .checkbox-box,
+.checkbox-input:disabled ~ .checkbox-label     { opacity: 0.5; }
+.checkbox:has(.checkbox-input:disabled)        { cursor: not-allowed; }
+
+/* Error */
+.checkbox.is-error .checkbox-box               { border-color: var(--color-danger); }
+.checkbox.is-error .checkbox-input:checked ~ .checkbox-box {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Radio ----------
+ * Usage:
+ *   <label class="radio">
+ *     <input type="radio" name="group" class="radio-input" />
+ *     <span class="radio-circle"></span>
+ *     <span class="radio-label">Label</span>
+ *   </label>
+ * Add `.is-error` to .radio for invalid state.
+ */
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  cursor: pointer;
+  position: relative;
+}
+.radio-input {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.radio-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--ic-radius-full);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.radio-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ic-radius-full);
+  background: var(--ic-palette-white);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+.radio-label {
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+/* States */
+.radio:hover .radio-circle                     { border-color: var(--color-text-muted); }
+.radio-input:checked ~ .radio-circle           { background: var(--color-accent); border-color: var(--color-accent); }
+.radio-input:checked ~ .radio-circle::after    { transform: translate(-50%, -50%) scale(1); }
+.radio-input:focus-visible ~ .radio-circle     { box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.radio-input:disabled ~ .radio-circle,
+.radio-input:disabled ~ .radio-label           { opacity: 0.5; }
+.radio:has(.radio-input:disabled)              { cursor: not-allowed; }
+
+/* Error */
+.radio.is-error .radio-circle                  { border-color: var(--color-danger); }
+.radio.is-error .radio-input:checked ~ .radio-circle {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ---------- Modal ----------
+ * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
+ *
+ *   <div class="modal-overlay" id="my-modal" hidden>
+ *     <div class="modal modal-md">
+ *       <header class="modal-header">
+ *         <h2 class="modal-title">Title</h2>
+ *         <button class="modal-close" data-modal-close aria-label="Close"><svg><use href="#i-x"/></svg></button>
+ *       </header>
+ *       <div class="modal-body">…</div>
+ *       <footer class="modal-footer">
+ *         <button class="btn btn-secondary" data-modal-close>Cancel</button>
+ *         <button class="btn btn-primary">Confirm</button>
+ *       </footer>
+ *     </div>
+ *   </div>
+ *
+ * Trigger: any element with data-modal-open="my-modal". Close on overlay-click, Escape, or any data-modal-close.
+ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ic-space-5);
+  z-index: var(--ic-z-modal);
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-xl);
+  width: 100%;
+  max-height: calc(100vh - var(--ic-space-9));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-xs { max-width: 328px; }
+.modal-sm { max-width: 520px; }
+.modal-md { max-width: 650px; }
+.modal-lg { max-width: 800px; }
+.modal-xl { max-width: 1200px; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-4) var(--ic-space-5);
+}
+.modal-title {
+  font: var(--ic-weight-semibold) var(--ic-text-md)/1.3 var(--ic-font-sans);
+  color: var(--color-text);
+  margin: 0;
+}
+.modal-close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.modal-close:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.modal-close svg   { width: 16px; height: 16px; }
+
+.modal-body {
+  flex: 1;
+  min-height: 0; /* allow shrink below content for proper scroll behavior */
+  padding: 0 var(--ic-space-5) var(--ic-space-5);
+  overflow-y: auto;
+  font: var(--type-body);
+  color: var(--color-text);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-4) var(--ic-space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Mobile — buttons stack full width */
+@media (max-width: 480px) {
+  .modal-footer { flex-direction: column; }
+  .modal-footer > .btn { width: 100%; }
+}
+
+/* ---------- Drawer ----------
+ * Right-anchored side panel. Reuses .modal-header / .modal-body / .modal-footer for layout.
+ * Sizes: narrow / regular / medium / wide / ultra / full.
+ *
+ *   <div class="drawer-overlay" id="my-drawer" hidden>
+ *     <aside class="drawer drawer-regular">
+ *       <header class="modal-header">…title + close…</header>
+ *       <div class="modal-body">…</div>
+ *       <footer class="modal-footer">…</footer>
+ *     </aside>
+ *   </div>
+ */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  z-index: var(--ic-z-modal);
+}
+.drawer-overlay[hidden] { display: none; }
+
+.drawer {
+  background: var(--color-surface);
+  box-shadow: var(--ic-shadow-xl);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.drawer-narrow  { max-width: 440px; }
+.drawer-regular { max-width: 560px; }
+.drawer-medium  { max-width: 640px; }
+.drawer-wide    { max-width: 960px; }
+.drawer-ultra   { max-width: 1180px; }
+.drawer-full    { max-width: 100%; }
+
+/* On narrow viewports, any drawer goes full-width + footer buttons stack */
+@media (max-width: 480px) {
+  .drawer { max-width: 100%; }
+}
+
+/* ---------- Side navigation ----------
+ * Two states: expanded (236px) and compact (62px), toggled with `.is-compact`.
+ *
+ *   <aside class="sidenav">
+ *     <button class="sidenav-toggle" aria-label="Toggle">…chevron…</button>
+ *     <ul class="sidenav-list">
+ *       <li><a class="sidenav-item is-active" href="#">…icon… <span class="sidenav-item-label">Label</span></a></li>
+ *     </ul>
+ *     <div class="sidenav-spacer"></div>
+ *     <div class="sidenav-footer">…more items…</div>
+ *   </aside>
+ */
+.sidenav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 236px;
+  height: 100%;
+  padding: var(--ic-space-3);
+  background: var(--ic-palette-gray-150);
+  border-right: 1px solid var(--color-border);
+  transition: width var(--ic-duration-base) var(--ic-ease);
+  flex-shrink: 0;
+}
+.sidenav.is-compact { width: 62px; }
+
+.sidenav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  height: 36px;
+  padding: 0 var(--ic-space-3);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  width: 100%;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item:hover {
+  background: var(--ic-palette-gray-200);
+}
+.sidenav-item.is-active {
+  background: var(--ic-palette-gray-200);
+  color: var(--color-text);
+  font-weight: var(--ic-weight-medium);
+}
+.sidenav-item-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: color var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item.is-active .sidenav-item-icon { color: var(--color-text); }
+.sidenav-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-item-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--ic-duration-fast) var(--ic-ease);
+}
+
+/* Nested group — a parent item that expands to reveal child items. */
+.sidenav-group { display: contents; }
+.sidenav-group-trigger[aria-expanded="true"] .sidenav-item-chevron { transform: rotate(180deg); }
+.sidenav-sublist {
+  list-style: none;
+  margin: 0;
+  /* Indent so subitem labels line up with the parent label (icon + gap). */
+  padding: 0 0 0 calc(var(--ic-space-2) + 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.sidenav-group-trigger[aria-expanded="false"] + .sidenav-sublist { display: none; }
+.sidenav-subitem {
+  height: 32px;
+  font: var(--type-body-sm);
+}
+
+/* Compact state — icon-only square buttons, labels hidden */
+.sidenav.is-compact .sidenav-item {
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+  margin: 0 auto;
+}
+.sidenav.is-compact .sidenav-item-label,
+.sidenav.is-compact .sidenav-item-chevron { display: none; }
+.sidenav.is-compact .sidenav-sublist { display: none; }
+
+.sidenav-spacer { flex: 1; }
+.sidenav-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--ic-space-3);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--ic-space-3);
+}
+
+/* Toggle button — floats over the right edge of the sidebar */
+.sidenav-toggle {
+  position: absolute;
+  top: var(--ic-space-4);
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  z-index: var(--ic-z-sticky);
+  box-shadow: var(--ic-shadow-sm);
+  transition: color var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.sidenav-toggle:hover { color: var(--color-text); background: var(--color-surface-muted); }
+.sidenav-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--ic-duration-base) var(--ic-ease);
+}
+.sidenav.is-compact .sidenav-toggle svg { transform: rotate(180deg); }
+
+/* App shell — pairs sidenav + main content */
+.app-shell {
+  display: flex;
+  height: 560px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+}
+.app-shell-main {
+  flex: 1;
+  background: var(--color-surface);
+  padding: var(--ic-space-5);
+  overflow: auto;
+}
+
+/* ---------- Page head ----------
+ * Page-level header. Title (+ optional count + subtitle) on the left, actions on the right.
+ *
+ *   <div class="page-head">
+ *     <div class="page-head-main">
+ *       <div class="page-head-title">
+ *         <h1 class="page-head-heading">Processes</h1>
+ *         <span class="page-head-count">12</span>
+ *       </div>
+ *       <p class="page-head-subtitle">Optional subtitle.</p>
+ *     </div>
+ *     <div class="page-head-actions">
+ *       <button class="btn btn-secondary">Filter</button>
+ *       <button class="btn btn-primary">New process</button>
+ *     </div>
+ *   </div>
+ */
+.page-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ic-space-5);
+  padding-bottom: var(--ic-space-5);
+  border-bottom: 1px solid var(--ic-palette-gray-150);
+  margin-bottom: var(--ic-space-6);
+}
+.page-head-main { min-width: 0; }
+.page-head-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+}
+.page-head-heading {
+  font: var(--type-h1);
+  color: var(--color-text);
+  margin: 0;
+}
+.page-head-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 var(--ic-space-2);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
+}
+.page-head-subtitle {
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+  margin: var(--ic-space-1) 0 0;
+}
+.page-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  flex-shrink: 0;
+}
+
+/* Template frame — full app preview: topbar + sidenav + main, vertically stacked */
+.template-frame {
+  display: flex;
+  flex-direction: column;
+  height: 760px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+}
+.template-frame .app-shell {
+  border: 0;
+  border-radius: 0;
+  height: auto;
+  flex: 1;
+}
+
+/* Stat tile — used inside templates */
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-4);
+}
+.stat-card-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.stat-card-value {
+  font: var(--ic-weight-semibold) var(--ic-text-2xl)/1.2 var(--ic-font-sans);
+  color: var(--color-text);
+  margin: var(--ic-space-1) 0 0;
+}
+
+/* List row — denser card variant for index pages */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-3) var(--ic-space-4);
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.list-row:hover { background: var(--color-surface-muted); }
+.list-row-title  { font: var(--type-body); font-weight: var(--ic-weight-medium); color: var(--color-text); margin: 0; }
+.list-row-meta   { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
+
+/* ---------- Tabs ----------
+ * Horizontal tab strip with a hairline border underneath and a 2px accent
+ * indicator under the active tab. Triggers are buttons; pair with
+ * `<div role="tabpanel">` panels via aria-controls + matching ids.
+ *
+ *   <div class="tabs" role="tablist">
+ *     <button class="tab is-active" role="tab" aria-selected="true" aria-controls="p-1" id="t-1" type="button">Overview</button>
+ *     <button class="tab" role="tab" aria-selected="false" aria-controls="p-2" id="t-2" type="button">Activity</button>
+ *   </div>
+ *   <div role="tabpanel" id="p-1" aria-labelledby="t-1">…</div>
+ *   <div role="tabpanel" id="p-2" aria-labelledby="t-2" hidden>…</div>
+ */
+.tabs {
+  display: flex;
+  gap: var(--ic-space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+.tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 var(--ic-space-1);
+  margin-bottom: -1px;
+  cursor: pointer;
+  font: var(--ic-weight-semibold) var(--ic-text-sm)/1.25 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  transition: color var(--ic-duration-fast) var(--ic-ease),
+              border-color var(--ic-duration-fast) var(--ic-ease);
+}
+.tab:hover { color: var(--color-text); }
+.tab.is-active {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--ic-radius-sm);
+}
+
+/* ---------- Tooltip ----------
+ * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
+ * is top; override with [data-placement="bottom"|"left"|"right"].
+ *
+ *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ *
+ * Renders via ::after so no extra DOM. Reveals on :hover and :focus-visible.
+ */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: var(--ic-palette-graphite-900);
+  color: var(--color-text-inverse);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-caption);
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after { opacity: 1; }
+
+[data-tooltip][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+[data-tooltip][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 6px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 6px);
+  transform: translateY(-50%);
+}
+
+/* ---------- Toast ----------
+ * Floating notification anchored to the top-right corner. Spawn via the
+ * global `toast(...)` helper (see example.html). Three behaviors —
+ *   persistent → no auto-dismiss, shows close button
+ *   timed      → auto-dismisses after `timeout` ms (default 5000)
+ *   action     → shows an action button + close button
+ *
+ * Five color variants:
+ *   .toast-neutral · .toast-error · .toast-warning · .toast-success · .toast-info
+ *
+ *   <div class="toast-region" aria-live="polite"></div>     ← one per page
+ *   <div class="toast toast-success">
+ *     <i class="ph ph-check-circle toast-icon"></i>
+ *     <p class="toast-message">Saved.</p>
+ *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
+ *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *   </div>
+ */
+.toast-region {
+  position: fixed;
+  top: var(--ic-space-4);
+  right: var(--ic-space-4);
+  z-index: var(--ic-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ic-space-2);
+  max-width: 380px;
+  pointer-events: none;
+}
+.toast {
+  --toast-accent: var(--color-border-strong);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-3) var(--ic-space-4);
+  border-radius: var(--ic-radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font: var(--type-body-sm);
+  box-shadow: var(--ic-shadow-md);
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 380px;
+  transition: opacity var(--ic-duration-base) var(--ic-ease),
+              transform var(--ic-duration-base) var(--ic-ease);
+}
+.toast.is-entering { opacity: 0; transform: translateX(20%); }
+.toast.is-leaving  { opacity: 0; transform: translateX(20%); }
+
+.toast-icon { font-size: 18px; flex-shrink: 0; color: var(--toast-accent); margin-top: 1px; }
+.toast-message { flex: 1; min-width: 0; margin: 0; line-height: 1.4; }
+.toast-action { flex-shrink: 0; align-self: center; }
+.toast-close {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  align-self: center;
+  transition: color var(--ic-duration-fast) var(--ic-ease);
+}
+.toast-close:hover { color: var(--color-text); }
+.toast-close .ph { font-size: 14px; }
+
+/* Color variants — set --toast-accent, icon color follows */
+.toast-neutral { --toast-accent: var(--color-border-strong); }
+.toast-neutral .toast-icon { color: var(--color-text-muted); }
+.toast-error   { --toast-accent: var(--color-danger);  background: var(--color-danger-subtle); }
+.toast-warning { --toast-accent: var(--color-warning); background: var(--color-warning-subtle); }
+.toast-success { --toast-accent: var(--color-success); background: var(--color-success-subtle); }
+.toast-info    { --toast-accent: var(--color-accent);  background: var(--color-accent-subtle); }
+
+/* ---------- Top bar ----------
+ * Dark application chrome. 56px tall, graphite-800 background.
+ * Brand on left, search in middle, avatar on right.
+ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-5);
+  height: 56px;
+  padding: 0 var(--ic-space-5);
+  background: var(--ic-palette-graphite-800);
+  color: var(--ic-palette-white);
+}
+.topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  text-decoration: none;
+  color: inherit;
+  font: var(--ic-weight-semibold) var(--ic-text-md)/1 var(--ic-font-sans);
+  flex-shrink: 0;
+}
+.topbar-logo {
+  width: 20px; height: 20px;
+  border-radius: var(--ic-radius-full);
+  border: 1.5px solid currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.topbar-brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-4);
+  flex-shrink: 0;
+}
+
+.topbar-search {
+  position: relative;
+  width: 360px;
+}
+.topbar-search .search-icon {
+  position: absolute;
+  left: var(--ic-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+.topbar-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--ic-space-4) 0 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--ic-radius-sm);
+  color: var(--ic-palette-white);
+  font: var(--type-body);
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              border-color var(--ic-duration-fast) var(--ic-ease);
+}
+.topbar-search-input::placeholder { color: rgba(255, 255, 255, 0.55); }
+.topbar-search-input:hover { background: rgba(255, 255, 255, 0.12); }
+.topbar-search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
+.topbar-avatar {
+  width: 32px; height: 32px;
+  border-radius: var(--ic-radius-sm);
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ic-palette-gray-300);
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);
+  color: var(--ic-palette-graphite-800);
+}
+.topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 720px) {
+  .topbar-search { width: 200px; }
+}
+
+/* ---------- Dropdown menu ----------
+ * The OPEN menu panel — paired with a trigger (input/button) elsewhere.
+ * Items compose: icon, label, description, avatar, selected check, removable chip.
+ *
+ * Usage:
+ *   <div class="dropdown-menu">
+ *     <button class="dropdown-item">
+ *       <svg class="dropdown-item-icon"><use href="#i-bell"/></svg>
+ *       <div class="dropdown-item-text">
+ *         <span class="dropdown-item-label">Label</span>
+ *         <span class="dropdown-item-description">Optional sub-line</span>
+ *       </div>
+ *     </button>
+ *   </div>
+ */
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-lg);
+  padding: var(--ic-space-2);
+  min-width: 200px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+  padding: var(--ic-space-2) var(--ic-space-3);
+  border: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-body);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.dropdown-item:hover  { background: var(--color-surface-muted); }
+.dropdown-item:disabled,
+.dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+/* Hairline divider inside a menu — render as <hr class="dropdown-divider"> */
+.dropdown-divider {
+  height: 1px;
+  margin: var(--ic-space-1) 0;
+  background: var(--color-border);
+  border: 0;
+}
+
+/* Optional pieces inside an item */
+.dropdown-item-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px; /* sizes Phosphor <i> icons; harmless for inline SVG */
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+.dropdown-item-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ic-radius-full);
+  flex-shrink: 0;
+  object-fit: cover;
+  background: var(--color-surface-muted);
+}
+.dropdown-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.dropdown-item-label {
+  font: var(--type-body);
+  color: var(--color-text);
+  line-height: 1.3;
+}
+.dropdown-item-description {
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* Selected state — leading check + semibold label */
+.dropdown-item-check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-text);
+  opacity: 0; /* placeholder slot keeps labels aligned across selected/unselected */
+}
+.dropdown-item.is-selected .dropdown-item-check  { opacity: 1; }
+.dropdown-item.is-selected .dropdown-item-label,
+.dropdown-item.is-selected                        { font-weight: var(--ic-weight-semibold); }
+
+/* Multi-select chip list inside a dropdown panel (layout only — chips live in .chip) */
+.dropdown-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-1);
+}
+
+/* ---------- Chip ----------
+ * Removable interactive pill. Reused in: dropdown multi-select, .input-tags, anywhere
+ * a user-added/removable token belongs.
+ *
+ *   <span class="chip">React
+ *     <button class="chip-remove" aria-label="Remove"><svg><use href="#i-x"/></svg></button>
+ *   </span>
+ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  height: 28px;
+  padding: 0 var(--ic-space-3);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--color-text);
+}
+/* Tight right padding when a remove button is present */
+.chip:has(.chip-remove) { padding-right: 2px; }
+.chip-remove {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: var(--ic-radius-full);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.chip-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.chip-remove svg   { width: 12px; height: 12px; }
+
+.dropdown-menu-label {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+  padding: var(--ic-space-1) var(--ic-space-2);
+}
+
+/* Generic dropdown wrapper — pairs a `.dropdown-trigger` with a `.dropdown-menu` */
+.dropdown {
+  position: relative;
+  display: inline-flex;
+}
+.dropdown-menu-end {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  right: 0;
+  z-index: var(--ic-z-dropdown);
+  min-width: 180px;
+}
+.dropdown-menu-start {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  left: 0;
+  z-index: var(--ic-z-dropdown);
+  min-width: 180px;
+}
+.dropdown .dropdown-menu[hidden] { display: none; }
+
+/* Destructive item variant */
+.dropdown-item-danger              { color: var(--color-danger); }
+.dropdown-item-danger:hover        { background: var(--color-danger-subtle); }
+.dropdown-item-danger .dropdown-item-icon { color: var(--color-danger); }
+
+/* ---------- Type helpers ---------- */
+.h1 { font: var(--type-h1); margin: 0; color: var(--color-text); }
+.h2 { font: var(--type-h2); margin: 0; color: var(--color-text); }
+.h3 { font: var(--type-h3); margin: 0; color: var(--color-text); }
+.h4 { font: var(--type-h4); margin: 0; color: var(--color-text); }
+.body    { font: var(--type-body);    color: var(--color-text); }
+.body-sm { font: var(--type-body-sm); color: var(--color-text-muted); }
+.caption { font: var(--type-caption); color: var(--color-text-subtle); }
+  </style>
+</head>
+<body>
+
+  <!-- ════ TOPBAR ════ -->
+  <header class="topbar">
+    <a class="topbar-brand" href="#">
+      <img class="topbar-brand-logo" src="../../icarus/assets/logo.svg" alt="Operationalize" />
+    </a>
+    <div class="topbar-actions">
+      <div class="topbar-search">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="9.5" y1="9.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input class="topbar-search-input" type="search" placeholder="Search Operationalize…" />
+      </div>
+      <button class="topbar-avatar" type="button" aria-label="Account">RL</button>
+    </div>
+  </header>
+
+  <!-- ════ SHELL BODY ════ -->
+  <div class="shell-body">
+
+    <!-- Sidenav -->
+    <aside class="sidenav is-compact">
+      <button class="sidenav-toggle" type="button" aria-label="Toggle navigation">
+        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <ul class="sidenav-list">
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1010.5-4M14 4h-4M10 4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="sidenav-item-label">Processes</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 12 4 12 8c0 2.5-2 4-2 4L8 14 6 12s-2-1.5-2-4c0-4 4-6 4-6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/></svg>
+          <span class="sidenav-item-label">Initiatives</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5V4M11 1.5V4M2 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="sidenav-item-label">Meetings</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>
+          <span class="sidenav-item-label">OKRs</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 13c0-2.5 2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="sidenav-item-label">People</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><rect x="6" y="1" width="4" height="3" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="10" width="4" height="3" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="10" width="4" height="3" rx="0.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v3M8 7H3v3M8 7h5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="sidenav-item-label">Org</span>
+        </a></li>
+        <li><a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span class="sidenav-item-label">Perf</span>
+        </a></li>
+      </ul>
+      <div class="sidenav-spacer"></div>
+      <div class="sidenav-footer">
+        <a class="sidenav-item" href="#">
+          <svg class="sidenav-item-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M12.8 3.2l-1.4 1.4M4.6 11.4l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="sidenav-item-label">Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ════ MAIN ════ -->
+    <main class="app-shell-main">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-title-row">
+          <h1>Finance Quarterly Planning Q3/26</h1>
+          <div class="page-title-actions">
+            <button class="btn btn-secondary" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Guide
+            </button>
+            <button class="btn btn-primary" type="button">Add Idea</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" type="button">Workflow</button>
+          <button class="tab" role="tab" type="button">Label</button>
+          <button class="tab is-active" role="tab" type="button">Drafting Board</button>
+        </div>
+      </div>
+
+      <!-- Workspace -->
+      <div class="workspace">
+
+        <!-- Sub-sidebar -->
+        <div class="sub-sidebar">
+          <div class="sub-nav-item">OKRs</div>
+          <div class="sub-nav-item">Initiatives</div>
+          <div class="sub-nav-item is-active">Projects</div>
+          <div class="sub-nav-item">Priorities</div>
+          <button class="sidebar-collapse-btn" aria-label="Collapse sidebar">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Content area -->
+        <div class="content-area">
+
+          <!-- Column headers -->
+          <div class="col-headers">
+            <div class="col-idea">Idea</div>
+            <div class="col-right">
+              <div class="col-initiative">Initiative</div>
+              <div class="col-owner">Owner</div>
+            </div>
+          </div>
+
+          <!-- Row list -->
+          <div class="row-list" id="row-list">
+
+            <!-- ── ROW 1 ── -->
+            <div class="draft-row" data-state="1" id="row-1">
+              <div class="draft-row-bg" id="bg-1"></div>
+              <div class="draft-row-inner" id="inner-1">
+
+                <div class="row-col-idea">
+                  <div class="tip-icon-wrap" id="tip-1">
+                    <!-- Lightbulb / Tip icon -->
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 2a6 6 0 0 1 3.5 10.8V14a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.2A6 6 0 0 1 10 2z"/>
+                      <path d="M8 17h4M9 19h2"/>
+                    </svg>
+                  </div>
+                  <span class="idea-text">Variance threshold policy — define what triggers escalation</span>
+                </div>
+
+                <div class="row-col-right">
+                  <!-- Initiative card -->
+                  <div class="initiative-card">
+                    <div class="initiative-icon" id="init-icon-1">
+                      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 2C9 2 13 4 13 8c0 2.5-2.5 4.5-2.5 4.5L9 14l-1.5-1.5S5 10.5 5 8c0-4 4-6 4-6z"/>
+                        <circle cx="9" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </div>
+                    <div class="initiative-content">
+                      <div class="initiative-title-row">
+                        <span class="initiative-title">Migrate to new FP&amp;A platform</span>
+                        <span class="tag-rollover">Rollover</span>
+                      </div>
+                      <div class="initiative-subtitle">Connected to: FP&amp;A tool migration fully completed</div>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <!-- Owner card -->
+                  <div class="owner-card">
+                    <div class="owner-info">
+                      <div class="avatar">SL</div>
+                      <span class="owner-name">Sara Lin</span>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <!-- Check button -->
+                  <button class="check-btn" id="btn-1" data-row="1" aria-label="Approve idea">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 8l4 4 6-7"/>
+                    </svg>
+                  </button>
+
+                  <!-- More -->
+                  <button class="more-btn" aria-label="More options">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
+                  </button>
+                </div>
+
+              </div>
+              <div class="row-state-badge state-1" id="badge-1">State 1</div>
+            </div>
+
+            <!-- ── ROW 2 ── -->
+            <div class="draft-row" data-state="1" id="row-2">
+              <div class="draft-row-bg" id="bg-2"></div>
+              <div class="draft-row-inner" id="inner-2">
+
+                <div class="row-col-idea">
+                  <div class="tip-icon-wrap" id="tip-2">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 2a6 6 0 0 1 3.5 10.8V14a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.2A6 6 0 0 1 10 2z"/>
+                      <path d="M8 17h4M9 19h2"/>
+                    </svg>
+                  </div>
+                  <span class="idea-text">Headcount freeze exception process — fast track for critical hires</span>
+                </div>
+
+                <div class="row-col-right">
+                  <div class="initiative-card">
+                    <div class="initiative-icon" id="init-icon-2">
+                      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 2C9 2 13 4 13 8c0 2.5-2.5 4.5-2.5 4.5L9 14l-1.5-1.5S5 10.5 5 8c0-4 4-6 4-6z"/>
+                        <circle cx="9" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </div>
+                    <div class="initiative-content">
+                      <div class="initiative-title-row">
+                        <span class="initiative-title">Talent acquisition pipeline refresh</span>
+                        <span class="tag-rollover">Q3</span>
+                      </div>
+                      <div class="initiative-subtitle">Connected to: Hiring plan approved by Q3 start</div>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <div class="owner-card">
+                    <div class="owner-info">
+                      <div class="avatar" style="background:#c0d0e0;">MK</div>
+                      <span class="owner-name">Mia Kim</span>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <button class="check-btn" id="btn-2" data-row="2" aria-label="Approve idea">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 8l4 4 6-7"/>
+                    </svg>
+                  </button>
+
+                  <button class="more-btn" aria-label="More options">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
+                  </button>
+                </div>
+
+              </div>
+              <div class="row-state-badge state-1" id="badge-2">State 1</div>
+            </div>
+
+            <!-- ── ROW 3 ── -->
+            <div class="draft-row" data-state="1" id="row-3">
+              <div class="draft-row-bg" id="bg-3"></div>
+              <div class="draft-row-inner" id="inner-3">
+
+                <div class="row-col-idea">
+                  <div class="tip-icon-wrap" id="tip-3">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 2a6 6 0 0 1 3.5 10.8V14a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.2A6 6 0 0 1 10 2z"/>
+                      <path d="M8 17h4M9 19h2"/>
+                    </svg>
+                  </div>
+                  <span class="idea-text">Automated budget reforecast — trigger when actuals deviate &gt; 5%</span>
+                </div>
+
+                <div class="row-col-right">
+                  <div class="initiative-card">
+                    <div class="initiative-icon" id="init-icon-3">
+                      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 2C9 2 13 4 13 8c0 2.5-2.5 4.5-2.5 4.5L9 14l-1.5-1.5S5 10.5 5 8c0-4 4-6 4-6z"/>
+                        <circle cx="9" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </div>
+                    <div class="initiative-content">
+                      <div class="initiative-title-row">
+                        <span class="initiative-title">Migrate to new FP&amp;A platform</span>
+                        <span class="tag-rollover">Rollover</span>
+                      </div>
+                      <div class="initiative-subtitle">Connected to: FP&amp;A tool migration fully completed</div>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <div class="owner-card">
+                    <div class="owner-info">
+                      <div class="avatar" style="background:#d0c8e0;">JP</div>
+                      <span class="owner-name">James Park</span>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <button class="check-btn" id="btn-3" data-row="3" aria-label="Approve idea">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 8l4 4 6-7"/>
+                    </svg>
+                  </button>
+
+                  <button class="more-btn" aria-label="More options">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
+                  </button>
+                </div>
+
+              </div>
+              <div class="row-state-badge state-1" id="badge-3">State 1</div>
+            </div>
+
+            <!-- ── ROW 4 ── -->
+            <div class="draft-row" data-state="1" id="row-4">
+              <div class="draft-row-bg" id="bg-4"></div>
+              <div class="draft-row-inner" id="inner-4">
+
+                <div class="row-col-idea">
+                  <div class="tip-icon-wrap" id="tip-4">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 2a6 6 0 0 1 3.5 10.8V14a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.2A6 6 0 0 1 10 2z"/>
+                      <path d="M8 17h4M9 19h2"/>
+                    </svg>
+                  </div>
+                  <span class="idea-text">Cross-functional OKR dependency map — prevent conflicting goals</span>
+                </div>
+
+                <div class="row-col-right">
+                  <div class="initiative-card">
+                    <div class="initiative-icon" id="init-icon-4">
+                      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 2C9 2 13 4 13 8c0 2.5-2.5 4.5-2.5 4.5L9 14l-1.5-1.5S5 10.5 5 8c0-4 4-6 4-6z"/>
+                        <circle cx="9" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </div>
+                    <div class="initiative-content">
+                      <div class="initiative-title-row">
+                        <span class="initiative-title">Cross-team OKR alignment sprint</span>
+                        <span class="tag-rollover">New</span>
+                      </div>
+                      <div class="initiative-subtitle">Connected to: All Q3 OKRs finalized by July 1</div>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <div class="owner-card">
+                    <div class="owner-info">
+                      <div class="avatar" style="background:#c0e0d0;">AL</div>
+                      <span class="owner-name">Amy Lee</span>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </div>
+
+                  <button class="check-btn" id="btn-4" data-row="4" aria-label="Approve idea">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 8l4 4 6-7"/>
+                    </svg>
+                  </button>
+
+                  <button class="more-btn" aria-label="More options">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
+                  </button>
+                </div>
+
+              </div>
+              <div class="row-state-badge state-1" id="badge-4">State 1</div>
+            </div>
+
+          </div><!-- /row-list -->
+
+          <p class="reset-hint">Click any ✓ button to animate approval · Click again to reset</p>
+
+        </div><!-- /content-area -->
+      </div><!-- /workspace -->
+
+      <!-- Prototype state legend bar -->
+      <div class="proto-bar">
+        <span>PROTOTYPE</span>
+        <div class="proto-label"><span class="state-dot" style="background:#EDF1FD;border:1px solid #204ECF"></span> State 1 — Default (light blue)</div>
+        <div class="proto-label"><span class="state-dot" style="background:linear-gradient(to right,#EDF1FD,#F1FCF8);border:1px solid #ccc"></span> State 2–4 — Soft gradient sweeps right → left</div>
+        <div class="proto-label"><span class="state-dot" style="background:#F1FCF8;border:1px solid #03B080"></span> State 5 — Approved (light green)</div>
+      </div>
+
+    </main><!-- /app-shell-main -->
+  </div><!-- /shell-body -->
+
+
+  <script>
+    /* ─── Sidenav toggle ─── */
+    document.querySelectorAll('.sidenav-toggle').forEach(btn =>
+      btn.addEventListener('click', () =>
+        btn.closest('.sidenav').classList.toggle('is-compact')));
+
+    /* ─── Row animation state machine ─── */
+    const BLUE   = '#204ECF';
+    const GREEN  = '#03B080';
+    const LT_BLUE  = '#EDF1FD';
+    const LT_GREEN = '#F1FCF8';
+
+    // Track animation timers per row
+    const timers = {};
+
+    function getEls(n) {
+      return {
+        row:   document.getElementById(`row-${n}`),
+        bg:    document.getElementById(`bg-${n}`),
+        inner: document.getElementById(`inner-${n}`),
+        btn:   document.getElementById(`btn-${n}`),
+        tip:   document.getElementById(`tip-${n}`),
+        badge: document.getElementById(`badge-${n}`),
+        initIcon: document.getElementById(`init-icon-${n}`),
+      };
+    }
+
+    function resetRow(n) {
+      const e = getEls(n);
+
+      // Clear any pending timers
+      (timers[n] || []).forEach(clearTimeout);
+      timers[n] = [];
+
+      // Reset background
+      e.bg.classList.remove('is-sweeping', 'is-done');
+      e.bg.style.removeProperty('--g-stop');
+      e.bg.style.removeProperty('transition');
+
+      // Reset inner
+      e.inner.classList.remove('is-done');
+
+      // Reset button
+      e.btn.classList.remove('is-done');
+      e.btn.disabled = false;
+
+      // Reset icons
+      e.tip.classList.remove('is-done');
+      e.initIcon.classList.remove('is-done');
+
+      // Reset badge
+      e.badge.className = 'row-state-badge state-1';
+      e.badge.textContent = 'State 1';
+
+      // Reset row data attribute
+      e.row.dataset.state = '1';
+    }
+
+    function animateRow(n) {
+      const e = getEls(n);
+      e.btn.disabled = true;
+      e.row.dataset.state = 'animating';
+
+      // ── Phase 1: Set gradient at full (100%) instantly, no transition ──
+      e.bg.style.setProperty('transition', 'none');
+      e.bg.style.setProperty('--g-stop', '100%');
+      e.bg.classList.add('is-sweeping');
+
+      e.badge.className = 'row-state-badge state-sweeping';
+      e.badge.textContent = 'State 2';
+
+      // ── Phase 2: One frame later — enable CSS transition, sweep to 7% ──
+      // The @property transition will animate --g-stop smoothly
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          e.bg.style.removeProperty('transition'); // let CSS @property take over
+          e.bg.style.setProperty('--g-stop', '7%');
+        });
+      });
+
+      // Update badge to show intermediate states at approximate timing
+      const t1 = setTimeout(() => {
+        e.badge.textContent = 'State 3';
+      }, 350);
+
+      const t2 = setTimeout(() => {
+        e.badge.textContent = 'State 4';
+      }, 750);
+
+      // ── Phase 3: After sweep completes (~1.15s) — switch to solid green ──
+      const t3 = setTimeout(() => {
+        // Freeze the sweep animation by removing class (prevents gradient flash)
+        e.bg.style.setProperty('transition', 'none');
+        e.bg.classList.remove('is-sweeping');
+        e.bg.classList.add('is-done');
+
+        // Re-enable transition for smooth color shift
+        requestAnimationFrame(() => {
+          e.bg.style.removeProperty('transition');
+        });
+
+        // Update inner border to green
+        e.inner.classList.add('is-done');
+
+        // Update button checkmark to green
+        e.btn.classList.add('is-done');
+
+        // Update icons to green
+        e.tip.classList.add('is-done');
+        e.initIcon.classList.add('is-done');
+
+        // Badge
+        e.badge.className = 'row-state-badge state-done';
+        e.badge.textContent = 'State 5';
+
+        // Re-enable button for reset
+        const t4 = setTimeout(() => {
+          e.btn.disabled = false;
+          e.row.dataset.state = '5';
+        }, 400);
+
+        timers[n].push(t4);
+      }, 1200);
+
+      timers[n] = [t1, t2, t3];
+    }
+
+    // Wire up all check buttons
+    document.querySelectorAll('.check-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const n = btn.dataset.row;
+        const row = document.getElementById(`row-${n}`);
+        if (row.dataset.state === '5') {
+          resetRow(n);
+        } else if (row.dataset.state === '1') {
+          animateRow(n);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
