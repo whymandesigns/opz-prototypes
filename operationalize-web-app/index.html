@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Operationalize web app</title>
+  <link rel="stylesheet" href="../../designmd/tokens.css" />
+  <link rel="stylesheet" href="../../designmd/semantic.css" />
+  <link rel="stylesheet" href="../../designmd/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <style>
+    /* Feature-local: make the app shell fill the viewport instead of the
+       fixed-height demo frame from the component kit. Survives inline.py. */
+    html, body { height: 100%; }
+    body { margin: 0; }
+    .app-shell {
+      height: calc(100vh - 56px); /* topbar is 56px */
+      border: 0;
+      border-radius: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Icon sprite (from example.html) -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+            <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+            <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14"/></symbol>
+            <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+            <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+            <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></symbol>
+            <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+            <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12h12"/></symbol>
+            <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+            <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+            <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+            <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+            <symbol id="i-bold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h7a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6zM6 12h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></symbol>
+            <symbol id="i-italic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4h-9M14 20H5M15 4 9 20"/></symbol>
+            <symbol id="i-list-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></symbol>
+            <symbol id="i-list-ordered" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+            <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+            <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+            <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.81.01L6 21"/></symbol>
+            <symbol id="i-cycle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.18-6.84"/><path d="M21 3v6h-6"/></symbol>
+            <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+            <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+            <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+            <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+            <symbol id="i-org" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M12 7v3M12 10H6v7M12 10h6v7"/></symbol>
+            <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4 1 1.1 1 1.8V18h6v-1.5c0-.7.5-1.4 1-1.8A7 7 0 0 0 12 2z"/></symbol>
+            <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+            <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></symbol>
+            <symbol id="i-more-vertical" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></symbol>
+            <symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+            <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+            <symbol id="i-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></symbol>
+          </defs>
+        </svg>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <a class="topbar-brand" href="#">
+      <img class="topbar-brand-logo" src="../../designmd/assets/logo.svg" alt="Operationalize" />
+    </a>
+    <div class="topbar-actions">
+      <div class="topbar-search">
+        <svg class="search-icon"><use href="#i-search"/></svg>
+        <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
+      </div>
+      <div class="dropdown">
+        <button class="topbar-avatar dropdown-trigger" aria-label="Account" aria-expanded="false" type="button">MV</button>
+        <div class="dropdown-menu dropdown-menu-end" hidden>
+          <button class="dropdown-item" type="button">My profile</button>
+          <button class="dropdown-item" type="button">Feedback</button>
+          <hr class="dropdown-divider" />
+          <button class="dropdown-item" type="button">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidenav + Main -->
+  <div class="app-shell">
+    <aside class="sidenav">
+      <button class="sidenav-toggle" aria-label="Toggle navigation" type="button"><svg><use href="#i-chevron-left"/></svg></button>
+      <ul class="sidenav-list">
+        <li><a class="sidenav-item is-active" href="#" data-page="processes"><svg class="sidenav-item-icon"><use href="#i-cycle"/></svg><span class="sidenav-item-label">Processes</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="initiatives"><svg class="sidenav-item-icon"><use href="#i-rocket"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="rob-meetings"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="okrs"><svg class="sidenav-item-icon"><use href="#i-target"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="people"><svg class="sidenav-item-icon"><use href="#i-users"/></svg><span class="sidenav-item-label">People</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="team"><svg class="sidenav-item-icon"><use href="#i-org"/></svg><span class="sidenav-item-label">Team</span></a></li>
+      </ul>
+      <div class="sidenav-spacer"></div>
+      <div class="sidenav-footer">
+        <div class="sidenav-group">
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin Settings</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
+          <ul class="sidenav-sublist">
+            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="permissions"><span class="sidenav-item-label">Permissions</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="settings"><span class="sidenav-item-label">Settings</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="integrations"><span class="sidenav-item-label">Integrations</span></a></li>
+          </ul>
+        </div>
+        <a class="sidenav-item" href="#" data-page="learning"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
+      </div>
+    </aside>
+
+    <main class="app-shell-main" style="padding: var(--ic-space-7)">
+
+      <section class="page-view" data-page="processes">
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Processes</h1>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-secondary" type="button">Export to CSV</button>
+            <button class="btn btn-primary" type="button">Create Process</button>
+          </div>
+        </div>
+        <!-- Processes content -->
+      </section>
+
+      <section class="page-view" data-page="initiatives" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Initiatives</h1>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-secondary" type="button">Export to CSV</button>
+            <button class="btn btn-primary" type="button">Create Initiative</button>
+          </div>
+        </div>
+        <!-- Initiatives content -->
+      </section>
+
+      <section class="page-view" data-page="rob-meetings" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">RoB Meetings</h1>
+        </div></div></div>
+        <!-- RoB Meetings content -->
+      </section>
+
+      <section class="page-view" data-page="okrs" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">OKRs</h1>
+        </div></div></div>
+        <!-- OKRs content -->
+      </section>
+
+      <section class="page-view" data-page="people" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">People</h1>
+        </div></div></div>
+        <!-- People content -->
+      </section>
+
+      <section class="page-view" data-page="team" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">Team</h1>
+        </div></div></div>
+        <!-- Team content -->
+      </section>
+
+      <section class="page-view" data-page="permissions" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">Permissions</h1>
+        </div></div></div>
+        <!-- Permissions content -->
+      </section>
+
+      <section class="page-view" data-page="settings" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">Settings</h1>
+        </div></div></div>
+        <!-- Settings content -->
+      </section>
+
+      <section class="page-view" data-page="integrations" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">Integrations</h1>
+        </div></div></div>
+        <!-- Integrations content -->
+      </section>
+
+      <section class="page-view" data-page="learning" hidden>
+        <div class="page-head"><div class="page-head-main"><div class="page-head-title">
+          <h1 class="page-head-heading">Learning Hub</h1>
+        </div></div></div>
+        <!-- Learning Hub content -->
+      </section>
+
+    </main>
+  </div>
+
+
+  <script>
+    const ramps = [
+      { name: 'Neutral',  tokens: ['white', 'black'] },
+      { name: 'Gray',     prefix: 'gray',     shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Zinc',     prefix: 'zinc',     shades: [100,200,300,400,500,600,700,800,900] },
+      { name: 'Graphite', prefix: 'graphite', shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Red',      prefix: 'red',      shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Orange',   prefix: 'orange',   shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Yellow',   prefix: 'yellow',   shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Green',    prefix: 'green',    shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Cyan',     prefix: 'cyan',     shades: [500] }, /* single-shade interim — see design.md §2 */
+      { name: 'Blue',     prefix: 'blue',     shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Purple',   prefix: 'purple',   shades: [100,150,200,300,400,500,600,700,800,900] },
+    ];
+
+    // Apply indeterminate state to checkboxes marked with data-indeterminate
+    document.querySelectorAll('input[type=checkbox][data-indeterminate]').forEach(cb => {
+      cb.indeterminate = true;
+    });
+
+    // Chase spinners — stagger each segment's fade around the ring.
+    document.querySelectorAll('.chase').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      paths.forEach((p, i) => { p.style.animationDelay = (i / paths.length * 1.1).toFixed(3) + 's'; });
+    });
+    document.querySelectorAll('.chase-cw').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      const n = paths.length;
+      paths.forEach((p, i) => { p.style.animationDelay = ((n - 1 - i) / n * 1.1).toFixed(3) + 's'; });
+    });
+
+    // Sliders — keep the filled-track gradient in sync with the value, plus
+    // any live readout (<output data-slider-output>) or number field
+    // (.slider-field, synced both ways).
+    document.querySelectorAll('.slider').forEach(slider => {
+      const range = slider.querySelector('.slider-input');
+      if (!range) return;
+      const out   = slider.querySelector('[data-slider-output]');
+      const field = slider.querySelector('.slider-field');
+      const update = () => {
+        const min = parseFloat(range.min) || 0;
+        const max = parseFloat(range.max) || 100;
+        const pct = ((range.value - min) / (max - min)) * 100;
+        range.style.setProperty('--slider-progress', pct + '%');
+        if (out) out.textContent = range.value;
+        if (field && field.value !== range.value) field.value = range.value;
+      };
+      range.addEventListener('input', update);
+      if (field) field.addEventListener('input', () => {
+        const v = parseFloat(field.value);
+        if (!Number.isNaN(v)) { range.value = v; update(); }
+      });
+      update();
+    });
+
+    // Toast — global helper that spawns a notification in the top-right region.
+    //   toast({ variant: 'success', message: 'Saved.' })
+    //   toast({ variant: 'error', message: '…', behavior: 'persistent' })
+    //   toast({ variant: 'neutral', message: '…', behavior: 'action', action: { label: 'Undo', onClick: () => {…} } })
+    window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+      let region = document.querySelector('.toast-region');
+      if (!region) {
+        region = document.createElement('div');
+        region.className = 'toast-region';
+        region.setAttribute('aria-live', 'polite');
+        region.setAttribute('aria-atomic', 'false');
+        document.body.appendChild(region);
+      }
+      const defaultIcon = { neutral: 'info', info: 'info', success: 'check-circle', warning: 'warning', error: 'warning-octagon' }[variant] || 'info';
+      const el = document.createElement('div');
+      el.className = `toast toast-${variant} is-entering`;
+      el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+      const actionHTML = behavior === 'action' && action ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>` : '';
+      el.innerHTML = `<i class="ph ph-${icon || defaultIcon} toast-icon"></i><p class="toast-message"></p>${actionHTML}${closeHTML}`;
+      el.querySelector('.toast-message').textContent = message;
+      region.appendChild(el);
+      // Trigger entrance transition on next frame
+      requestAnimationFrame(() => el.classList.remove('is-entering'));
+
+      const dismiss = () => {
+        if (!el.isConnected) return;
+        el.classList.add('is-leaving');
+        const cleanup = () => el.remove();
+        el.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 400); // fallback if transitionend doesn't fire
+      };
+
+      el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+      if (behavior === 'action' && action) {
+        el.querySelector('.toast-action').addEventListener('click', () => {
+          try { action.onClick?.(); } catch (e) { /* swallow */ }
+          dismiss();
+        });
+      }
+      if (behavior === 'timed') {
+        setTimeout(dismiss, timeout);
+      }
+      return { dismiss };
+    };
+
+    // Heading anchors — inject a hover-revealed "#" button next to every
+    // section heading. Clicking copies a direct link to that section so a
+    // reviewer can point at "use this component" by sharing the URL.
+    document.querySelectorAll('section[id] > h3.h3, section[id] > div > h3.h3, h2.section-head').forEach(heading => {
+      const section = heading.closest('section[id]');
+      if (!section) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'heading-anchor';
+      btn.textContent = '#';
+      btn.title = 'Copy link to this section';
+      btn.setAttribute('aria-label', `Copy link to ${heading.textContent.trim()}`);
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const url = `${window.location.origin}${window.location.pathname}#${section.id}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          if (window.toast) toast({ variant: 'success', message: `Link copied — ${section.id}`, timeout: 2400 });
+        } catch {
+          if (window.toast) toast({ variant: 'error', message: 'Copy failed — select the URL bar instead' });
+        }
+        history.replaceState(null, '', `#${section.id}`);
+      });
+      heading.appendChild(btn);
+    });
+
+    // Sidebar TOC — fixed vertical nav listing every section + subsection,
+    // with scroll-spy highlighting the section currently in view.
+    (function buildSidebarToc() {
+      const container = document.querySelector('.page-toc');
+      if (!container) return;
+      document.querySelectorAll('main > section[id]').forEach(top => {
+        const sectionWrap = document.createElement('div');
+        sectionWrap.className = 'page-toc-section';
+        const label = document.createElement('div');
+        label.className = 'page-toc-section-label';
+        const topHeading = top.querySelector('h2.section-head');
+        // Strip the trailing "#" injected by the heading-anchor button
+        label.textContent = (topHeading?.firstChild?.textContent || top.id).trim();
+        sectionWrap.appendChild(label);
+        top.querySelectorAll(':scope > section[id]').forEach(sub => {
+          const heading = sub.querySelector('h3.h3');
+          if (!heading) return;
+          const a = document.createElement('a');
+          a.className = 'page-toc-item';
+          a.href = '#' + sub.id;
+          a.dataset.tocTarget = sub.id;
+          a.textContent = (heading.firstChild?.textContent || sub.id).trim();
+          sectionWrap.appendChild(a);
+        });
+        container.appendChild(sectionWrap);
+      });
+      // Scroll-spy: highlight item whose section is most prominent in viewport
+      const items = container.querySelectorAll('.page-toc-item');
+      const idToItem = new Map([...items].map(i => [i.dataset.tocTarget, i]));
+      const setActive = id => {
+        items.forEach(i => i.classList.toggle('is-active', i.dataset.tocTarget === id));
+      };
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length === 0) return;
+        // Pick the one closest to the top of the viewport
+        visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        setActive(visible[0].target.id);
+      }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+      document.querySelectorAll('main > section[id] > section[id]').forEach(sec => observer.observe(sec));
+
+      // Hamburger toggle (narrow viewports). Opens panel, closes on outside
+      // click or after a TOC item is clicked.
+      const toggle = document.querySelector('.page-toc-toggle');
+      const panel = document.querySelector('.page-toc');
+      if (toggle && panel) {
+        const setOpen = open => {
+          panel.classList.toggle('is-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+          toggle.setAttribute('aria-label', open ? 'Close table of contents' : 'Open table of contents');
+        };
+        toggle.addEventListener('click', e => {
+          e.stopPropagation();
+          setOpen(!panel.classList.contains('is-open'));
+        });
+        document.addEventListener('click', e => {
+          if (!panel.classList.contains('is-open')) return;
+          if (panel.contains(e.target) || toggle.contains(e.target)) return;
+          setOpen(false);
+        });
+        panel.addEventListener('click', e => {
+          if (e.target.closest('.page-toc-item')) setOpen(false);
+        });
+      }
+    })();
+
+    // Inline TOC — build a per-section list of links from each <section id>'s h3.
+    document.querySelectorAll('.toc[data-toc-for]').forEach(nav => {
+      const parent = document.getElementById(nav.dataset.tocFor);
+      if (!parent) return;
+      const items = parent.querySelectorAll(':scope > section[id]');
+      items.forEach(sec => {
+        const heading = sec.querySelector('h3.h3');
+        if (!heading) return;
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        // First text node only — skips the injected heading-anchor "#" button
+        a.textContent = (heading.firstChild?.textContent || heading.textContent).trim();
+        nav.appendChild(a);
+      });
+    });
+
+    // CTA linking — clone <button class="btn"> children from a [data-cta-source]
+    // master into every [data-cta-link] target with the same id. Lets the demo
+    // page-head act as the source of truth for action labels everywhere they
+    // appear (e.g. template-app-shell page-heads).
+    document.querySelectorAll('[data-cta-link]').forEach(target => {
+      const id = target.dataset.ctaLink;
+      const source = document.querySelector(`[data-cta-source="${id}"]`);
+      if (!source) return;
+      const clones = [...source.querySelectorAll(':scope > .btn')].map(b => b.cloneNode(true));
+      target.prepend(...clones);
+    });
+
+    // Modal + Drawer — open via [data-modal-open="id"], close via [data-modal-close], overlay click, or Escape.
+    // Selector covers both .modal-overlay and .drawer-overlay so a single handler runs both components.
+    (function wireOverlays() {
+      const OVERLAY_SELECTOR = '.modal-overlay, .drawer-overlay';
+      const close = (overlay) => { if (overlay) overlay.hidden = true; };
+      document.querySelectorAll('[data-modal-open]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          document.getElementById(trigger.dataset.modalOpen)?.removeAttribute('hidden');
+        });
+      });
+      document.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-modal-close]');
+        if (closeBtn) { close(closeBtn.closest(OVERLAY_SELECTOR)); return; }
+        const overlay = e.target.closest(OVERLAY_SELECTOR);
+        if (overlay && e.target === overlay) close(overlay);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll(`${OVERLAY_SELECTOR}`).forEach(o => { if (!o.hidden) close(o); });
+      });
+    })();
+
+    // Single-select dropdowns — any menu whose items carry a .dropdown-item-check slot
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (!menu.querySelector('.dropdown-item-check')) return;
+      const items = menu.querySelectorAll('.dropdown-item');
+      items.forEach(item => item.addEventListener('click', () => {
+        items.forEach(i => i.classList.remove('is-selected'));
+        item.classList.add('is-selected');
+      }));
+    });
+
+    // Select (dropdown input) — toggle menu, sync chosen value into the trigger
+    document.querySelectorAll('.input-select').forEach(sel => {
+      const trigger = sel.querySelector('.input-select-trigger');
+      const menu = sel.querySelector('.dropdown-menu');
+      const value = sel.querySelector('.input-select-value');
+      if (!trigger || !menu) return;
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          // Item text without the check icon
+          const label = (item.textContent || '').trim();
+          value.textContent = label;
+          value.classList.remove('input-select-placeholder');
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+
+    // Close any open select when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.input-select').forEach(sel => {
+        if (sel.contains(e.target)) return;
+        sel.querySelector('.input-select-trigger')?.setAttribute('aria-expanded', 'false');
+        const menu = sel.querySelector('.dropdown-menu');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Generic .dropdown — pairs .dropdown-trigger with .dropdown-menu
+    document.querySelectorAll('.dropdown').forEach(d => {
+      const trigger = d.querySelector('.dropdown-trigger');
+      const menu = d.querySelector('.dropdown-menu');
+      if (!trigger || !menu) return;
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+      // Item click closes the menu
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+    // Close any open generic dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.dropdown').forEach(d => {
+        if (d.contains(e.target)) return;
+        const trigger = d.querySelector('.dropdown-trigger');
+        const menu = d.querySelector('.dropdown-menu');
+        trigger?.setAttribute('aria-expanded', 'false');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Character counters — .field[data-char-limit] with one .field-hint as the readout
+    document.querySelectorAll('.field[data-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.charLimit, 10);
+      const input = field.querySelector('.input');
+      const counter = field.querySelector('.field-hint');
+      if (!input || !counter) return;
+      const update = () => {
+        const n = input.value.length;
+        counter.textContent = `${n} / ${max}`;
+        counter.classList.toggle('is-error', n >= max);
+      };
+      input.addEventListener('input', update);
+      update();
+    });
+
+    // Side navigation — toggle compact/expanded
+    document.querySelectorAll('.sidenav-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.sidenav').classList.toggle('is-compact');
+      });
+    });
+
+    // Side navigation — expand/collapse nested groups
+    document.querySelectorAll('.sidenav-group-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
+    // Tree tables — expand/collapse nested rows. Visibility derives from the
+    // stack of currently collapsed ancestor levels, so a deeply collapsed
+    // branch stays hidden even when an outer ancestor is re-expanded.
+    document.querySelectorAll('.table tbody').forEach(tbody => {
+      if (!tbody.querySelector('.row-toggle')) return;
+      const refresh = () => {
+        const collapsedAt = [];
+        [...tbody.children].forEach(row => {
+          const lvl = parseInt(row.dataset.level || '0', 10);
+          while (collapsedAt.length && collapsedAt[collapsedAt.length - 1] >= lvl) collapsedAt.pop();
+          row.hidden = collapsedAt.length > 0;
+          const t = row.querySelector('.row-toggle');
+          if (t && t.getAttribute('aria-expanded') === 'false') collapsedAt.push(lvl);
+        });
+      };
+      tbody.querySelectorAll('.row-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = btn.getAttribute('aria-expanded') !== 'false';
+          btn.setAttribute('aria-expanded', String(!open));
+          refresh();
+        });
+      });
+    });
+
+    // Side navigation routing (template only) — clicking an item shows the matching .page-view
+    document.querySelectorAll('#template-app-shell .sidenav-item[data-page]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = link.dataset.page;
+        const shell = link.closest('#template-app-shell');
+        // Toggle active class across all items in this template
+        shell.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+        link.classList.add('is-active');
+        // Show only the matching page-view
+        shell.querySelectorAll('.page-view').forEach(p => {
+          p.hidden = p.dataset.page !== name;
+        });
+        // Scroll the main area to top so the new page-head is visible
+        shell.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    });
+
+    // Rich text editors — toolbar commands + heading select + character counter
+    document.querySelectorAll('.editor').forEach(editor => {
+      const content = editor.querySelector('.editor-content');
+
+      // Generic execCommand buttons (bold, italic, lists)
+      editor.querySelectorAll('[data-cmd]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault()); // keep selection
+        btn.addEventListener('click', () => {
+          content.focus();
+          document.execCommand(btn.dataset.cmd, false, null);
+        });
+      });
+
+      // Inline code — wraps selection in <code>
+      editor.querySelectorAll('[data-cmd-code]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          content.focus();
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          const text = sel.toString();
+          if (!text) return;
+          document.execCommand('insertHTML', false, `<code>${text}</code>`);
+        });
+      });
+
+      // Link prompt
+      editor.querySelectorAll('[data-cmd-link]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          const url = prompt('Enter URL');
+          if (!url) return;
+          content.focus();
+          document.execCommand('createLink', false, url);
+        });
+      });
+
+      // Heading select — formatBlock
+      editor.querySelectorAll('.editor-toolbar-select .dropdown-item[data-block]').forEach(item => {
+        item.addEventListener('click', () => {
+          content.focus();
+          document.execCommand('formatBlock', false, item.dataset.block);
+        });
+      });
+    });
+
+    // Editor character counters — count plain text, update sibling .editor-counter
+    document.querySelectorAll('.field[data-editor-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.editorCharLimit, 10);
+      const content = field.querySelector('.editor-content');
+      const text = field.querySelector('.editor-counter-text');
+      const tick = field.querySelector('.editor-counter-ok');
+      if (!content || !text) return;
+      const update = () => {
+        const len = content.textContent.length;
+        const left = max - len;
+        text.textContent = `${left} character${left === 1 ? '' : 's'} left`;
+        const valid = left >= 0;
+        text.parentElement.classList.toggle('is-error', !valid);
+        if (tick) tick.style.opacity = (len > 0 && valid) ? '1' : '0';
+      };
+      content.addEventListener('input', update);
+      update();
+    });
+
+    // Universal chip remove — clicking .chip-remove removes its parent .chip
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip-remove');
+      if (btn) btn.closest('.chip')?.remove();
+    });
+
+    // Alert dismiss — clicking .alert-close removes its parent .alert
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.alert-close');
+      if (btn) btn.closest('.alert')?.remove();
+    });
+
+    // Badge remove — clicking .badge-remove deletes its parent pill
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.badge-remove');
+      if (btn) btn.closest('.badge')?.remove();
+    });
+
+    // Tabs — click to activate. If a tab declares aria-controls, also toggle
+    // the matching tabpanel's visibility.
+    document.querySelectorAll('.tabs').forEach(tablist => {
+      const tabs = [...tablist.querySelectorAll('.tab')];
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+            const panelId = t.getAttribute('aria-controls');
+            if (panelId) {
+              const panel = document.getElementById(panelId);
+              if (panel) panel.hidden = !on;
+            }
+          });
+        });
+      });
+    });
+
+    // Tag inputs — Enter to add, Backspace on empty to remove last
+    document.querySelectorAll('.input-tags').forEach(wrap => {
+      const input = wrap.querySelector('.input-tags-input');
+
+      const addTag = (text) => {
+        const t = text.trim();
+        if (!t) return;
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `${t}<button class="chip-remove" aria-label="Remove" type="button"><svg><use href="#i-x"/></svg></button>`;
+        input.before(chip);
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          e.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        } else if (e.key === 'Backspace' && !input.value) {
+          const chips = wrap.querySelectorAll('.chip');
+          chips[chips.length - 1]?.remove();
+        }
+      });
+
+      // Click anywhere in the wrap focuses the text input
+      wrap.addEventListener('click', (e) => {
+        if (e.target === wrap) input.focus();
+      });
+    });
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // In-page batch annotation overlay. Lets you click multiple UI elements,
+    // queue notes, then "Copy batch" to paste a single grouped payload into
+    // your coding agent. Notes clear on reload. CSS lives in components.css
+    // (`.annot-toolbar`, `.annot-pin`, `.annot-popover`, `.annot-mode`).
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+
+    const css = getComputedStyle(document.documentElement);
+    const root = document.getElementById('palette-root');
+
+    const swatch = (token) => {
+      const hex = css.getPropertyValue(token).trim().toUpperCase();
+      // Drop "--ic-palette-{ramp}-" so the label is just the shade ("100", "white").
+      // Full token shows on hover via the title attribute.
+      const short = token.replace(/^--ic-palette-([a-z]+-)?/, '');
+      return `
+        <div class="swatch-card" title="${token}">
+          <div class="swatch" style="background: var(${token})"></div>
+          <div class="swatch-label">
+            <code class="swatch-token">${short}</code>
+            <code class="swatch-hex">${hex}</code>
+          </div>
+        </div>`;
+    };
+
+    // Radii
+    const radii = ['none','sm','md','lg','xl'].map(k => `--ic-radius-${k}`);
+    const radiiRoot = document.getElementById('radii-root');
+    radii.forEach(token => {
+      const value = css.getPropertyValue(token).trim();
+      const display = token === '--ic-radius-full' ? 'pill' : value;
+      const card = document.createElement('div');
+      card.className = 'radius-card';
+      card.innerHTML = `
+        <div class="radius-shape" style="border-radius: var(${token})"></div>
+        <code class="radius-token">${token.replace('--ic-radius-', '')}</code>
+        <code class="radius-value">${display}</code>
+      `;
+      radiiRoot.appendChild(card);
+    });
+
+    ramps.forEach(ramp => {
+      const tokens = ramp.tokens
+        ? ramp.tokens.map(t => `--ic-palette-${t}`)
+        : ramp.shades.map(s => `--ic-palette-${ramp.prefix}-${s}`);
+      const row = document.createElement('div');
+      row.className = 'ramp';
+      row.innerHTML = `
+        <div class="ramp-name">${ramp.name}</div>
+        <div class="swatch-row">${tokens.map(swatch).join('')}</div>
+      `;
+      root.appendChild(row);
+    });
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // In-page batch annotation overlay. Lets you click multiple UI elements,
+    // queue notes, then "Copy batch" to paste a single grouped payload into
+    // your coding agent. Notes clear on reload. CSS lives in devtools.css
+    // (`.annot-toolbar`, `.annot-pin`, `.annot-popover`, `.annot-mode`).
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+  </script>
+
+  <!-- Sidebar routing — clicking a nav item shows the matching .page-view -->
+  <script>
+    (function () {
+      const shell = document.querySelector('.app-shell');
+      if (!shell) return;
+      shell.querySelectorAll('.sidenav-item[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const name = link.dataset.page;
+          shell.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+          link.classList.add('is-active');
+          shell.querySelectorAll('.page-view').forEach(p => {
+            p.hidden = p.dataset.page !== name;
+          });
+          shell.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

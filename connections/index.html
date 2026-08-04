@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agenda topics — Operationalize</title>
+  <title>RoB Meetings — Operationalize</title>
   <style>
     /* === tokens.css === */
 /* Icarus Design Tokens
@@ -3042,7 +3042,7 @@ body { overflow: hidden; }
         </button>
         <ul class="sidenav-list">
           <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-cycle"/></svg><span class="sidenav-item-label">Processes</span></a></li>
-          <li><a class="sidenav-item" href="initiatives.html"><svg class="sidenav-item-icon"><use href="#i-rocket"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-rocket"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
           <li><a class="sidenav-item is-active" href="#"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
           <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-target"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
           <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-users"/></svg><span class="sidenav-item-label">People</span></a></li>
@@ -3080,7 +3080,7 @@ body { overflow: hidden; }
           </div>
           <div class="page-head-actions">
             <button class="btn btn-secondary">Filter</button>
-            <button class="btn btn-primary" data-modal-open="create-meeting">Create meeting</button>
+            <a class="btn btn-primary" href="create-meeting.html">Create meeting</a>
           </div>
         </div>
 
@@ -3322,6 +3322,89 @@ body { overflow: hidden; }
     .cm-conn-desc  { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
     .cm-conn-extra { margin-top: var(--ic-space-2); }
 
+    /* ===== Connections — empty-state picker =====
+     * Compact, click-to-open: each connection type is a trigger row that
+     * opens a searchable dropdown. Chosen items render as removable chips.
+     */
+    .cn-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); }
+    .cn-help-link {
+      display: inline-flex; align-items: center; gap: var(--ic-space-1);
+      border: 0; background: transparent; padding: 0;
+      font: var(--type-body-sm); color: var(--color-text-link); cursor: pointer;
+    }
+    .cn-help-link:hover { text-decoration: underline; }
+    .cn-help-link .ph { font-size: 15px; }
+
+    .cn-list  { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .cn-field { position: relative; display: flex; flex-direction: column; gap: var(--ic-space-2); }
+
+    .cn-trigger {
+      display: flex; align-items: center; gap: var(--ic-space-3);
+      width: 100%; padding: var(--ic-space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      cursor: pointer; text-align: left;
+      transition: border-color var(--ic-duration-fast) var(--ic-ease),
+                  box-shadow var(--ic-duration-fast) var(--ic-ease);
+    }
+    .cn-trigger:hover { border-color: var(--color-border-strong); }
+    .cn-trigger[aria-expanded="true"] {
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px var(--color-accent-subtle);
+    }
+    .cn-trigger-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-sm);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--color-text);
+    }
+    .cn-trigger-label { font: var(--ic-weight-semibold) var(--ic-text-base)/1.4 var(--ic-font-sans); color: var(--color-text); }
+    .cn-trigger-hint  { font: var(--type-body-sm); color: var(--color-text-subtle); margin-left: auto; white-space: nowrap; }
+    .cn-trigger-caret { color: var(--color-text-muted); font-size: 16px; transition: transform var(--ic-duration-fast) var(--ic-ease); }
+    .cn-trigger[aria-expanded="true"] .cn-trigger-caret { transform: rotate(180deg); }
+
+    .cn-menu {
+      position: absolute; top: calc(100% + var(--ic-space-1)); left: 0; right: 0;
+      z-index: var(--ic-z-dropdown);
+    }
+    .cn-menu[hidden] { display: none; }
+    .cn-search { position: relative; margin-bottom: var(--ic-space-1); }
+    .cn-search .ph {
+      position: absolute; left: var(--ic-space-3); top: 50%; transform: translateY(-50%);
+      color: var(--color-text-muted); font-size: 15px; pointer-events: none;
+    }
+    .cn-search input {
+      width: 100%; height: 32px; padding: 0 var(--ic-space-3) 0 30px;
+      border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm);
+      background: var(--color-surface); font: var(--type-body-sm); color: var(--color-text);
+    }
+    .cn-search input:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+    .cn-options { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 232px; }
+    .cn-options .dropdown-item[hidden] { display: none; }
+    .cn-empty { padding: var(--ic-space-3); text-align: center; font: var(--type-body-sm); color: var(--color-text-muted); }
+    .cn-create { border-top: 1px solid var(--color-border); margin-top: var(--ic-space-1); padding-top: var(--ic-space-1); }
+    .cn-create .dropdown-item-icon { color: var(--color-accent); }
+
+    .cn-selected { display: flex; flex-wrap: wrap; gap: var(--ic-space-2); }
+    .cn-selected:empty { display: none; }
+
+    .cn-trigger-main { display: inline-flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+    .cn-pill {
+      display: inline-flex; align-items: center; flex-shrink: 0;
+      padding: 1px 8px; border-radius: var(--ic-radius-full);
+      font: var(--ic-weight-semibold) var(--ic-text-xs)/1.5 var(--ic-font-sans);
+    }
+    .cn-pill-recommended { background: var(--color-accent-subtle); color: var(--color-accent); }
+
+    .cn-na { align-self: flex-start; }
+    .cn-field.is-na .cn-trigger { opacity: 0.55; pointer-events: none; }
+    .cn-field.is-na .cn-trigger-icon { filter: grayscale(1); }
+    .cn-field.is-na .cn-pill-recommended,
+    .cn-field.is-na .cn-selected { display: none; }
+
     .cm-owner-row {
       display: flex; gap: var(--ic-space-3); align-items: center;
       padding: var(--ic-space-2) 0;
@@ -3353,213 +3436,6 @@ body { overflow: hidden; }
       .cm-divider-v { display: none; }
     }
   </style>
-
-  <div class="modal-overlay" id="create-meeting" hidden>
-    <div class="modal modal-xl" role="dialog" aria-modal="true" aria-labelledby="cm-title-label" style="max-height: calc(100vh - var(--ic-space-6))">
-      <!-- HEADER: title input + close -->
-      <header class="modal-header" style="padding-bottom: var(--ic-space-3)">
-        <input id="cm-title-label" class="input" type="text" placeholder="Add meeting name" style="flex: 1" />
-        <button class="modal-close" data-modal-close aria-label="Close"><i class="ph ph-x"></i></button>
-      </header>
-
-      <!-- BODY -->
-      <div class="modal-body" style="padding-top: 0">
-        <!-- Info alert -->
-        <div class="alert alert-info" style="margin-bottom: var(--ic-space-5)">
-          <i class="ph ph-info alert-icon"></i>
-          <p class="alert-message">Zoom room will be created automatically.</p>
-        </div>
-
-        <div class="cm-grid">
-          <!-- LEFT COLUMN -->
-          <div>
-            <!-- Meeting details -->
-            <section class="cm-section">
-              <h3 class="cm-section-title">Meeting details</h3>
-
-              <div class="cm-row">
-                <label class="field">
-                  <span class="field-label">Date</span>
-                  <div class="cm-input-icon">
-                    <i class="ph ph-calendar-blank"></i>
-                    <input class="input" type="text" value="Jan 21, 2026" />
-                  </div>
-                </label>
-                <label class="field">
-                  <span class="field-label">Time Zone</span>
-                  <div class="cm-input-suffix">
-                    <i class="ph ph-caret-down"></i>
-                    <input class="input" type="text" value="(GMT-04:00) New York" readonly />
-                  </div>
-                </label>
-              </div>
-
-              <div class="cm-time-row">
-                <div class="cm-time">
-                  <div class="cm-time-fields">
-                    <label class="field" style="flex: 1">
-                      <span class="field-label">Time</span>
-                      <div class="cm-input-suffix">
-                        <i class="ph ph-clock"></i>
-                        <input class="input" type="text" value="14:30" />
-                      </div>
-                    </label>
-                    <span class="cm-time-to">to</span>
-                    <label class="field" style="flex: 1">
-                      <span class="field-label" style="visibility: hidden">to</span>
-                      <div class="cm-input-suffix">
-                        <i class="ph ph-clock"></i>
-                        <input class="input" type="text" value="15:30" />
-                      </div>
-                    </label>
-                  </div>
-                  <button class="btn btn-secondary" type="button">Find Time</button>
-                </div>
-                <label class="field">
-                  <span class="field-label">Recurrence</span>
-                  <div class="cm-input-suffix">
-                    <i class="ph ph-caret-down"></i>
-                    <input class="input" type="text" value="Every Day" readonly />
-                  </div>
-                </label>
-              </div>
-
-              <label class="field">
-                <span class="field-label">Availability</span>
-                <div class="cm-input-suffix">
-                  <i class="ph ph-caret-down"></i>
-                  <input class="input" type="text" value="Busy" readonly />
-                </div>
-              </label>
-            </section>
-
-            <!-- Description + extras -->
-            <section class="cm-section">
-              <div class="cm-editor">
-                <div class="cm-editor-toolbar">
-                  <div class="cm-input-suffix" style="width: 120px">
-                    <i class="ph ph-caret-down"></i>
-                    <input class="input" type="text" value="Normal Text" readonly />
-                  </div>
-                  <button class="cm-tb-btn" type="button" aria-label="Bold"><i class="ph ph-text-b"></i></button>
-                  <button class="cm-tb-btn" type="button" aria-label="Italic"><i class="ph ph-text-italic"></i></button>
-                  <span class="cm-tb-divider"></span>
-                  <button class="cm-tb-btn" type="button" aria-label="Bullet list"><i class="ph ph-list-bullets"></i></button>
-                  <button class="cm-tb-btn" type="button" aria-label="Numbered list"><i class="ph ph-list-numbers"></i></button>
-                  <span class="cm-tb-divider"></span>
-                  <button class="cm-tb-btn" type="button" aria-label="Inline code"><i class="ph ph-code"></i></button>
-                  <button class="cm-tb-btn" type="button" aria-label="Code block"><i class="ph ph-code-block"></i></button>
-                  <span class="cm-tb-divider"></span>
-                  <button class="cm-tb-btn" type="button" aria-label="Link"><i class="ph ph-link"></i></button>
-                  <button class="cm-tb-btn" type="button" aria-label="Image"><i class="ph ph-image"></i></button>
-                </div>
-                <div class="cm-editor-area" contenteditable="true" data-placeholder="Add a description."></div>
-              </div>
-              <div class="cm-helper-row">
-                <span>1000 characters left</span>
-                <i class="ph ph-check-circle" style="font-size: 14px; color: var(--color-success)"></i>
-              </div>
-
-              <label class="field">
-                <span class="field-label">Business Line (optional)</span>
-                <div class="cm-input-suffix">
-                  <i class="ph ph-caret-down"></i>
-                  <input class="input" type="text" placeholder="Select Business Lines" readonly />
-                </div>
-              </label>
-
-              <label class="cm-checkbox">
-                <input type="checkbox" />
-                Auto-Recording
-              </label>
-            </section>
-
-            <!-- Connections -->
-            <section class="cm-section">
-              <h3 class="cm-section-title">Connections</h3>
-
-              <div class="cm-conn">
-                <span class="cm-conn-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Slack</p>
-                  <p class="cm-conn-desc">Create or add Slack channels to sync conversations with this meeting</p>
-                  <div class="cm-conn-extra">
-                    <label class="cm-checkbox">
-                      <input type="checkbox" />
-                      Not applicable
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="cm-conn">
-                <span class="cm-conn-icon"><i class="ph ph-rocket-launch"></i></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Initiatives</p>
-                  <p class="cm-conn-desc">Connect to the Initiative this work advances</p>
-                </div>
-              </div>
-
-              <div class="cm-conn">
-                <span class="cm-conn-icon"><i class="ph ph-cpu"></i></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Processes</p>
-                  <p class="cm-conn-desc">Connect processes that this meeting drives</p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div class="cm-divider-v"></div>
-
-          <!-- RIGHT COLUMN -->
-          <div>
-            <section class="cm-section">
-              <h3 class="cm-section-title">Owner</h3>
-              <div class="cm-input-suffix">
-                <i class="ph ph-caret-down"></i>
-                <input class="input" type="text" value="Adan Jones" readonly />
-              </div>
-              <div class="cm-owner-row">
-                <span class="cm-avatar">AJ</span>
-                <div style="flex: 1; min-width: 0">
-                  <p class="cm-owner-name">Adan Jones</p>
-                  <p class="cm-owner-role">Senior Director of Program Management</p>
-                </div>
-                <button class="cm-trash" type="button" aria-label="Remove owner"><i class="ph ph-trash"></i></button>
-              </div>
-            </section>
-
-            <section class="cm-section">
-              <h3 class="cm-section-title">Team</h3>
-              <input class="input" type="text" value="New Business" />
-              <div class="cm-team-meta">
-                <i class="ph ph-tree-structure"></i>
-                <div>
-                  <div class="cm-team-meta-label">New Business</div>
-                  <div class="cm-team-meta-sub">Function</div>
-                </div>
-              </div>
-            </section>
-
-            <section class="cm-section">
-              <h3 class="cm-section-title">Participants (0)</h3>
-              <div class="cm-input-suffix">
-                <i class="ph ph-caret-down"></i>
-                <input class="input" type="text" placeholder="Select participants" readonly />
-              </div>
-            </section>
-          </div>
-        </div>
-      </div>
-
-      <!-- FOOTER -->
-      <footer class="modal-footer">
-        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
-        <button class="btn btn-primary" type="button">Create meeting</button>
-      </footer>
-    </div>
-  </div>
 
   <!-- ============ MEETING DETAIL MODAL ============ -->
   <style>
@@ -3614,7 +3490,7 @@ body { overflow: hidden; }
       padding: 4px var(--ic-space-3);
       background: var(--ic-palette-graphite-800);
       color: var(--ic-palette-white);
-      border-radius: var(--ic-radius-sm);
+      border-radius: var(--ic-radius-full);
       font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
     }
 
@@ -3653,324 +3529,6 @@ body { overflow: hidden; }
       font: var(--type-body);
     }
     .md-bullets li { margin: 0 0 var(--ic-space-2); }
-
-    /* === Concept B: dedicated Agenda section === */
-    .md-agenda-section { margin-top: var(--ic-space-2); }
-    .md-agenda-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--ic-space-3);
-      margin: 0 0 var(--ic-space-2);
-    }
-    .md-agenda-title-wrap { display: flex; flex-direction: column; gap: 2px; }
-    .md-agenda-title-row {
-      display: flex;
-      align-items: center;
-      gap: var(--ic-space-2);
-    }
-    .md-agenda-title {
-      margin: 0;
-      font: var(--ic-weight-semibold) var(--ic-text-md)/1.4 var(--ic-font-sans);
-      color: var(--color-text);
-    }
-    /* Neutral tag — uses designmd's tag-light tokens (gray-200 bg, muted text). */
-    /* Modifier on top of DS .tag.tag-light — adds the icon gap +
-       uppercase styling specific to the agenda series-wide marker. */
-    .md-agenda-series-pill {
-      gap: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-      font-weight: var(--ic-weight-semibold);
-    }
-    .md-agenda-series-pill .ph { font-size: 12px; color: var(--color-text-muted); }
-    .md-agenda-section .md-agenda-sub {
-      margin: 0;
-      font: var(--type-body-sm);
-      color: var(--color-text-muted);
-    }
-    .md-agenda-list {
-      list-style: none;
-      margin: 0 0 var(--ic-space-3);
-      padding: 0;
-      border: 1px solid var(--color-border, #E2E8F0);
-      border-radius: var(--ic-radius-sm, 4px);
-      background: var(--ic-palette-white, #fff);
-    }
-    /* Round the first/last item corners directly so we don't need
-       overflow:hidden on the list (which was clipping tooltips). */
-    .md-agenda-list > .md-agenda-item:first-child {
-      border-top-left-radius: var(--ic-radius-sm, 4px);
-      border-top-right-radius: var(--ic-radius-sm, 4px);
-    }
-    .md-agenda-list > .md-agenda-item:last-child {
-      border-bottom-left-radius: var(--ic-radius-sm, 4px);
-      border-bottom-right-radius: var(--ic-radius-sm, 4px);
-    }
-    .md-agenda-item {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--ic-space-3);
-      padding: 10px var(--ic-space-3);
-      border-top: 1px solid var(--color-border, #E2E8F0);
-      transition: background 120ms ease;
-    }
-    .md-agenda-item:first-child { border-top: 0; }
-    .md-agenda-item:hover { background: var(--ic-palette-graphite-50, #F8FAFC); }
-    .md-agenda-index {
-      flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--ic-palette-graphite-50, #F1F5F9);
-      color: var(--color-text-muted);
-      border-radius: var(--ic-radius-full);
-      font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);
-      margin-top: 1px;
-      cursor: grab;
-      user-select: none;
-      transition: background 120ms ease, color 120ms ease;
-    }
-    .md-agenda-item:hover .md-agenda-index {
-      background: var(--color-accent-subtle, #EDF1FD);
-      color: var(--color-accent, #204ECF);
-    }
-    .md-agenda-index:active { cursor: grabbing; }
-
-    /* Drag/drop reorder visuals */
-    .md-agenda-item.is-dragging {
-      opacity: 0.4;
-    }
-    .md-agenda-item.is-drop-before {
-      box-shadow: 0 -2px 0 0 var(--color-accent, #204ECF) inset;
-      box-shadow: 0 -2px 0 0 var(--color-accent, #204ECF);
-    }
-    .md-agenda-item.is-drop-after {
-      box-shadow: 0 2px 0 0 var(--color-accent, #204ECF);
-    }
-
-    /* Cadence + Owner chips per agenda item — reuse design-system .tag
-       (without indicator) and .avatar.avatar-xs primitives, same as the
-       Action items section. */
-    .md-agenda-content {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .md-agenda-meta {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-    }
-    .md-agenda-cadence { cursor: pointer; }
-    /* Owner chip — avatar + name laid out inline. No background or border so
-       only the avatar carries visual weight; the name is plain text. */
-    .md-agenda-owner {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      cursor: pointer;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);
-      color: var(--color-text);
-    }
-    .md-agenda-owner:hover .md-agenda-owner-name { color: var(--color-text-link); }
-    .md-agenda-owner:focus-visible {
-      outline: 2px solid var(--color-accent, #204ECF);
-      outline-offset: 2px;
-      border-radius: var(--ic-radius-sm);
-    }
-    /* TBD — dashed avatar + muted italic name */
-    .md-agenda-owner.is-tbd .avatar {
-      background: transparent;
-      border: 1px dashed var(--color-border-strong, #CBD5E1);
-      color: var(--color-text-subtle);
-    }
-    .md-agenda-owner.is-tbd .md-agenda-owner-name {
-      color: var(--color-text-subtle);
-      font-style: italic;
-    }
-
-    /* Picker popover — reuses .ai-pop styling */
-    .md-meta-pop {
-      position: fixed;
-      z-index: 1100;
-      min-width: 200px;
-      max-width: 260px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-sm);
-      box-shadow: var(--ic-shadow-lg, 0 12px 32px rgba(15, 23, 42, 0.14));
-      padding: 4px;
-    }
-    .md-meta-pop[hidden] { display: none; }
-    .md-meta-pop button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      padding: 6px 10px;
-      background: transparent;
-      border: 0;
-      border-radius: var(--ic-radius-sm);
-      cursor: pointer;
-      text-align: left;
-      font: var(--type-body-sm);
-      color: var(--color-text);
-    }
-    .md-meta-pop button:hover { background: var(--color-surface-muted); }
-    .md-meta-pop button .ph { font-size: 14px; color: var(--color-text-muted); flex-shrink: 0; }
-    .md-meta-pop button[aria-current="true"] {
-      background: var(--color-accent-subtle, #EDF1FD);
-      color: var(--color-accent, #204ECF);
-    }
-    .md-meta-pop button[aria-current="true"] .ph { color: var(--color-accent, #204ECF); }
-    .md-meta-pop hr {
-      border: 0;
-      border-top: 1px solid var(--color-border);
-      margin: 4px 0;
-    }
-
-        /* "Not covered this meeting" — cancelled items move here so the live
-       agenda stays focused on what's actually being discussed. */
-    .md-agenda-cancelled-section { margin-top: var(--ic-space-4); }
-    .md-agenda-cancelled-section[data-empty] { display: none; }
-    .md-agenda-covered-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0 4px;
-      font: var(--ic-weight-semibold) 11px/1.2 var(--ic-font-sans);
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-        .md-agenda-cancelled-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0;
-      font: var(--ic-weight-semibold) 11px/1.2 var(--ic-font-sans);
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .md-agenda-cancelled-count {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 5px;
-      background: var(--ic-palette-gray-200);
-      color: var(--color-text-muted);
-      border-radius: var(--ic-radius-full);
-      font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
-    }
-    .md-agenda-list-cancelled .md-agenda-index { visibility: hidden; }
-    .md-agenda-list-cancelled .md-agenda-cancel { opacity: 1; color: var(--color-text-muted); }
-    .md-agenda-list-cancelled .md-agenda-cancel:hover { color: var(--color-success, #0F9D58); }
-
-    .md-agenda-body {
-      flex: 1;
-      min-width: 0;
-      font: var(--type-body);
-      color: var(--color-text);
-      outline: none;
-      cursor: text;
-      padding: 2px 4px;
-      margin: -2px -4px;
-      border-radius: var(--ic-radius-sm, 4px);
-      transition: background 100ms ease, box-shadow 100ms ease;
-    }
-    /* Edit-affordance: subtle hover bg, focus ring once you start typing. */
-    .md-agenda-body:hover { background: var(--color-surface-muted); }
-    .md-agenda-body:focus-within {
-      background: var(--color-surface);
-      box-shadow: 0 0 0 1px var(--color-accent, #204ECF), 0 0 0 3px var(--color-accent-subtle, #EDF1FD);
-    }
-
-    /* Inline toggle buttons: ✓ → Discussed (strikethrough), × → Cancelled
-       (disabled style). Hover-revealed by default; stay visible once the
-       row enters that state so the user can see what's been set. */
-    .md-agenda-toggle {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: 0;
-      border-radius: var(--ic-radius-sm);
-      color: var(--color-text-muted);
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 120ms ease, background 120ms ease, color 120ms ease;
-    }
-    .md-agenda-toggle .ph { font-size: 14px; }
-    .md-agenda-item:hover .md-agenda-toggle { opacity: 1; }
-    /* Archive is always visible — done/cancel are still hover-revealed. */
-    .md-agenda-archive { opacity: 1; }
-    .md-agenda-toggle:hover { background: var(--ic-palette-graphite-100, #E2E8F0); }
-    .md-agenda-done:hover   { color: var(--color-success, #0F9D58); }
-    .md-agenda-cancel:hover { color: var(--color-warning, #F4B400); }
-    .md-agenda-archive:hover { color: var(--color-danger, #DC2626); }
-
-    /* When a toggle state is set, the matching button stays lit. Delete is
-       a one-shot action — never persistent. */
-    .md-agenda-item[data-status="discussed"] .md-agenda-done {
-      opacity: 1;
-      color: var(--color-success, #0F9D58);
-    }
-    .md-agenda-item[data-status="cancelled"] .md-agenda-cancel {
-      opacity: 1;
-      color: var(--color-text-muted);
-    }
-
-    /* Row state visual treatments */
-    .md-agenda-item[data-status="discussed"] .md-agenda-body {
-      text-decoration: line-through;
-      text-decoration-color: var(--color-text-muted);
-      text-decoration-thickness: 1px;
-    }
-    .md-agenda-item[data-status="discussed"] { background: var(--color-surface-muted); }
-    .md-agenda-add-row {
-      display: flex;
-      align-items: center;
-      gap: var(--ic-space-2);
-    }
-    /* Match the Action items add button: ghost ink in blue-500 */
-    .md-agenda-add-btn.btn-ghost {
-      color: var(--ic-palette-blue-500, #1A73E8);
-    }
-    .md-agenda-add-btn.btn-ghost:hover {
-      background: rgba(26, 115, 232, 0.08);
-      color: var(--ic-palette-blue-500, #1A73E8);
-    }
-    .md-agenda-placeholder {
-      display: inline;
-      padding: 0;
-      background: transparent;
-      color: var(--color-text-subtle);
-      font-style: italic;
-      font-weight: var(--ic-weight-regular);
-    }
-    .md-agenda-meta {
-      display: flex;
-      align-items: center;
-      gap: var(--ic-space-2);
-      font: var(--type-body-sm);
-      color: var(--color-text-muted);
-    }
-    .md-agenda-meta .ph { font-size: 14px; }
 
     .md-do-not-delete {
       font: var(--type-body-sm);
@@ -4041,39 +3599,19 @@ body { overflow: hidden; }
     .ai-list {
       display: flex;
       flex-direction: column;
-      gap: var(--ic-space-3);
+      gap: var(--ic-space-2);
     }
     .ai-item {
       position: relative;
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: var(--ic-radius-md);
-      padding: var(--ic-space-3) var(--ic-space-4);
+      padding: var(--ic-space-2);
       transition: border-color var(--ic-duration-fast) var(--ic-ease), box-shadow var(--ic-duration-fast) var(--ic-ease);
     }
     .ai-item:hover { border-color: var(--color-border-strong, #CBD5E1); }
     .ai-item.is-done .ai-desc { text-decoration: line-through; color: var(--color-text-muted); }
     .ai-item.is-done { background: var(--color-surface-muted); }
-    /* Action items: avatar + full name as a single click target. */
-    .ai-assignee {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      cursor: pointer;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);
-      color: var(--color-text);
-    }
-    .ai-assignee-name { white-space: nowrap; }
-    .ai-assignee:hover .ai-assignee-name { color: var(--color-text-link); }
-    .ai-assignee[disabled] { cursor: not-allowed; opacity: 0.7; }
-    .ai-assignee:focus-visible {
-      outline: 2px solid var(--color-accent, #204ECF);
-      outline-offset: 2px;
-      border-radius: var(--ic-radius-sm);
-    }
     .ai-item[hidden] { display: none; }
 
     .ai-meta-row {
@@ -4089,8 +3627,28 @@ body { overflow: hidden; }
        Disabled state for non-editable status pills (assignees can't change
        other people's items). */
     .tag-indicator[disabled] { cursor: not-allowed; opacity: 0.7; }
+    /* Carried-over pill — soft yellow-100 fill with yellow-500 text */
+    .tag.ai-carried { background: var(--ic-palette-yellow-100); color: var(--ic-palette-yellow-500); }
     /* Match status pill weight to the filled .tag (semibold) */
     .ai-item .tag-indicator[data-status] { font-weight: var(--ic-weight-semibold); }
+    /* Assignee chip — avatar + name, matches the .tag font size */
+    .ai-assignee {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 0;
+      background: transparent;
+      padding: 0 4px 0 0;
+      cursor: pointer;
+      font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
+      color: var(--color-text);
+      border-radius: var(--ic-radius-sm);
+      transition: background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-assignee:hover { background: var(--color-surface-muted); }
+    .ai-assignee[disabled] { cursor: default; }
+    .ai-assignee[disabled]:hover { background: transparent; }
+    .ai-assignee-name { white-space: nowrap; }
     /* Overdue due-date pill — red-100 fill with red-500 text (soft danger).
        Hovers to red-150 for an interactive cue, matching the gray-150→gray-200
        affordance on neutral pills. */
@@ -4127,8 +3685,21 @@ body { overflow: hidden; }
       background: var(--color-surface-muted);
       box-shadow: inset 0 0 0 1px var(--color-border-strong, #CBD5E1);
     }
+    /* Character counter — shown when the description is focused */
+    .ai-desc-counter {
+      display: none;
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
+      margin: 4px 0 0;
+      padding: 0 4px;
+      text-align: right;
+    }
+    .ai-item.is-desc-focused .ai-desc-counter,
+    .ai-item.is-editing .ai-desc-counter { display: block; }
+    .ai-desc-counter.is-warning { color: var(--color-warning); }
+    .ai-desc-counter.is-danger  { color: var(--color-danger); font-weight: var(--ic-weight-semibold); }
 
-    /* Avatars use .cell-avatar + .cell-avatar-xs + .cell-avatar-color from the design system */
+    /* Avatars use .avatar + .avatar-xs from the design system */
 
     /* Icon-button (comment + history + kebab share styling) */
     .ai-icon-btn {
@@ -4330,6 +3901,13 @@ body { overflow: hidden; }
       gap: 4px;
     }
     .ai-show-completed[hidden] { display: none; }
+    /* Chevron mirrors the .md-toggle pattern — flips on expand */
+    .ai-show-completed .ph-caret-down {
+      transition: transform var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-show-completed[aria-expanded="true"] .ph-caret-down {
+      transform: rotate(180deg);
+    }
 
     .ai-empty {
       font: var(--type-body-sm);
@@ -5294,74 +4872,6 @@ body { overflow: hidden; }
 
             <div class="md-divider"></div>
 
-            <!-- AGENDA — series-wide template (Concept B) -->
-            <section class="md-agenda-section" aria-labelledby="md-agenda-heading">
-              <div class="md-agenda-head">
-                <div class="md-agenda-title-wrap">
-                  <div class="md-agenda-title-row">
-                    <h3 class="md-agenda-title" id="md-agenda-heading">Agenda topics</h3>
-                    <span class="tag tag-light md-agenda-series-pill" data-tooltip="Applies to every meeting in this series.">
-                      <i class="ph ph-repeat"></i>
-                      Series wide
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="md-agenda-covered-head">This Meeting's Agenda</div>
-              <ol class="md-agenda-list" role="list">
-                <li class="md-agenda-item" data-status="active">
-                  <span class="md-agenda-index">1</span>
-                  <div class="md-agenda-content"><div class="md-agenda-body" contenteditable="true" spellcheck="false">Roadmap — walk through <a href="#" class="agenda-link">Launch Tech Services</a> and any shifts since last review</div><div class="md-agenda-meta"><button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Weekly">Weekly</button><button class="md-agenda-owner" type="button" data-owner="Adan Jones" aria-label="Owner: Adan Jones"><span class="avatar avatar-xs">AJ</span><span class="md-agenda-owner-name">Adan Jones</span></button></div></div>
-                  <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-                  <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Remove from this agenda" data-tooltip="Remove from this agenda"><i class="ph ph-prohibit"></i></button>
-                  <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-                </li>
-                <li class="md-agenda-item" data-status="active">
-                  <span class="md-agenda-index">2</span>
-                  <div class="md-agenda-content"><div class="md-agenda-body" contenteditable="true" spellcheck="false">Review recent updates to <a href="#" class="agenda-link">SEM Revenue Growth</a></div><div class="md-agenda-meta"><button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Bi-weekly">Bi-weekly</button><button class="md-agenda-owner" type="button" data-owner="Maria Santos" aria-label="Owner: Maria Santos"><span class="avatar avatar-xs">MS</span><span class="md-agenda-owner-name">Maria Santos</span></button></div></div>
-                  <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-                  <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Remove from this agenda" data-tooltip="Remove from this agenda"><i class="ph ph-prohibit"></i></button>
-                  <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-                </li>
-                <li class="md-agenda-item" data-status="active">
-                  <span class="md-agenda-index">3</span>
-                  <div class="md-agenda-content"><div class="md-agenda-body" contenteditable="true" spellcheck="false">Blockers &amp; risks — anything threatening the next milestone</div><div class="md-agenda-meta"><button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Weekly">Weekly</button><button class="md-agenda-owner" type="button" data-owner="Henrik Andersson" aria-label="Owner: Henrik Andersson"><span class="avatar avatar-xs">HA</span><span class="md-agenda-owner-name">Henrik Andersson</span></button></div></div>
-                  <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-                  <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Remove from this agenda" data-tooltip="Remove from this agenda"><i class="ph ph-prohibit"></i></button>
-                  <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-                </li>
-                <li class="md-agenda-item" data-status="active">
-                  <span class="md-agenda-index">4</span>
-                  <div class="md-agenda-content"><div class="md-agenda-body" contenteditable="true" spellcheck="false">Action items &amp; owners — confirm follow-ups before the meeting ends</div><div class="md-agenda-meta"><button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Weekly">Weekly</button><button class="md-agenda-owner is-tbd" type="button" data-owner="TBD" aria-label="Assign owner"><span class="avatar avatar-xs"><i class="ph ph-user"></i></span><span class="md-agenda-owner-name">TBD</span></button></div></div>
-                  <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-                  <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Remove from this agenda" data-tooltip="Remove from this agenda"><i class="ph ph-prohibit"></i></button>
-                  <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-                </li>
-              </ol>
-
-              <div class="md-agenda-add-row">
-                <button class="btn btn-ghost btn-xs md-agenda-add-btn" type="button">
-                  <i class="ph ph-plus btn-icon"></i> Add agenda item
-                </button>
-              </div>
-
-              <div class="md-agenda-cancelled-section">
-                <div class="md-agenda-cancelled-head">Not on This Agenda</div>
-                <ol class="md-agenda-list md-agenda-list-cancelled" role="list">
-                <li class="md-agenda-item" data-status="cancelled">
-                  <span class="md-agenda-index">3</span>
-                  <div class="md-agenda-content"><div class="md-agenda-body" contenteditable="true" spellcheck="false">Review of proposed <a href="#" class="agenda-link">Landing page redesign</a></div><div class="md-agenda-meta"><button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Monthly">Monthly</button><button class="md-agenda-owner is-tbd" type="button" data-owner="TBD" aria-label="Assign owner"><span class="avatar avatar-xs"><i class="ph ph-user"></i></span><span class="md-agenda-owner-name">TBD</span></button></div></div>
-                  <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-                  <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Add to this agenda" data-tooltip="Add to this agenda"><i class="ph ph-arrow-counter-clockwise"></i></button>
-                  <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-                </li>
-                </ol>
-              </div>
-            </section>
-
-            <div class="md-divider"></div>
-
             <!-- ACTION ITEMS -->
             <section data-ai-section data-current-occurrence="2026-01-21" data-prev-occurrence="2026-01-14" data-next-occurrence="2026-01-28">
               <div class="ai-section-head">
@@ -5369,9 +4879,6 @@ body { overflow: hidden; }
                   <h3 class="md-section-title">Action items</h3>
                   <span class="ai-count" data-ai-count>0</span>
                 </div>
-                <button class="ai-show-completed" type="button" data-ai-show-completed hidden>
-                  <span data-ai-completed-label>Show all</span>
-                </button>
               </div>
 
               <div class="ai-list" data-ai-list></div>
@@ -5380,6 +4887,10 @@ body { overflow: hidden; }
               <div class="ai-footer">
                 <button class="btn btn-ghost btn-xs ai-add-btn" type="button" data-ai-add>
                   <i class="ph ph-plus btn-icon"></i> Add action item
+                </button>
+                <button class="ai-show-completed" type="button" data-ai-show-completed aria-expanded="false" hidden>
+                  <span data-ai-completed-label>Show all</span>
+                  <i class="ph ph-caret-down"></i>
                 </button>
               </div>
             </section>
@@ -5396,55 +4907,97 @@ body { overflow: hidden; }
             <div class="md-divider"></div>
 
             <section>
-              <h3 class="md-section-title">Connections</h3>
-
-              <div class="md-conn">
-                <div class="md-conn-head">
-                  <span class="md-conn-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
-                  <p class="md-conn-title">Slack</p>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#eng-weekly-standup</a>
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Default</span>
-                    <button class="md-trash-btn" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#platform-reliability</a>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#data-pipeline-migration</a>
-                </div>
+              <div class="cn-head">
+                <h3 class="md-section-title">Connections</h3>
+                <button class="cn-help-link" type="button" data-modal-open="connections-help">
+                  <i class="ph ph-info"></i> Learn about connections
+                </button>
               </div>
 
-              <div class="md-conn">
-                <div class="md-conn-head">
-                  <span class="md-conn-icon"><i class="ph ph-rocket-launch"></i></span>
-                  <p class="md-conn-title">Initiatives</p>
+              <div class="cn-list">
+                <!-- Slack -->
+                <div class="cn-field" data-conn-field data-conn-mode="multi">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
+                    <span class="cn-trigger-main">
+                      <span class="cn-trigger-label">Slack</span>
+                      <span class="cn-pill cn-pill-recommended">Recommended</span>
+                    </span>
+                    <span class="cn-trigger-hint">Add channels</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search channels…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-default><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#eng-weekly-standup</span></span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#platform-reliability</span></span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#data-pipeline-migration</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#incident-response</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#release-planning</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#sre-oncall</span></span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No channels match</p>
+                    <div class="cn-create">
+                      <button class="dropdown-item" type="button" data-conn-create><i class="ph ph-plus-circle dropdown-item-icon"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Create new channel</span></span></button>
+                    </div>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
+                  <label class="cn-na cm-checkbox">
+                    <input type="checkbox" data-conn-na />
+                    Not applicable
+                  </label>
                 </div>
-                <div class="md-conn-row">
-                  Platform Reliability &amp; Observability
-                  <span class="md-conn-row-end"><span class="md-tag">Initiative</span></span>
-                </div>
-              </div>
 
-              <div class="md-conn">
-                <div class="md-conn-head">
-                  <span class="md-conn-icon"><i class="ph ph-cpu"></i></span>
-                  <p class="md-conn-title">Processes</p>
+                <!-- Initiatives -->
+                <div class="cn-field" data-conn-field data-conn-mode="single">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon"><i class="ph ph-rocket-launch"></i></span>
+                    <span class="cn-trigger-main"><span class="cn-trigger-label">Initiatives</span></span>
+                    <span class="cn-trigger-hint">Connect an initiative</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search initiatives…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Platform Reliability &amp; Observability</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Data Platform Modernization</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Developer Experience Uplift</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Cloud Cost Optimization</span></span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No initiatives match</p>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
                 </div>
-                <div class="md-conn-row">
-                  Incident Response Review
-                  <span class="md-conn-row-end"><span class="md-tag">Sub-Activity</span></span>
-                </div>
-                <div class="md-conn-row">
-                  Weekly Engineering Sync
-                  <span class="md-conn-row-end"><span class="md-tag">Activity</span></span>
-                </div>
-                <div class="md-conn-row">
-                  Platform Engineering
-                  <span class="md-conn-row-end"><span class="md-tag">Focus Area</span></span>
+
+                <!-- Processes -->
+                <div class="cn-field" data-conn-field data-conn-mode="multi">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon"><i class="ph ph-cpu"></i></span>
+                    <span class="cn-trigger-main"><span class="cn-trigger-label">Processes</span></span>
+                    <span class="cn-trigger-hint">Connect processes</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search processes…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Sub-Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Incident Response Review</span></span><span class="md-tag">Sub-Activity</span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Weekly Engineering Sync</span></span><span class="md-tag">Activity</span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Focus Area"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Platform Engineering</span></span><span class="md-tag">Focus Area</span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Capacity Planning</span></span><span class="md-tag">Activity</span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Sub-Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Postmortem Review</span></span><span class="md-tag">Sub-Activity</span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No processes match</p>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
                 </div>
               </div>
             </section>
@@ -5830,73 +5383,97 @@ body { overflow: hidden; }
             </section>
 
             <section class="cm-section">
-              <h3 class="cm-section-title">Connections</h3>
-
-              <div class="cm-conn" style="flex-direction: column; align-items: stretch">
-                <div style="display: flex; align-items: center; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-                  <span class="cm-conn-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
-                  <p class="cm-conn-title" style="flex: 1">Slack</p>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#eng-weekly-standup</a>
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Default</span>
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#platform-reliability</a>
-                  <span class="md-conn-row-end">
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-                <div class="md-conn-row">
-                  <a href="#">#data-pipeline-migration</a>
-                  <span class="md-conn-row-end">
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
+              <div class="cn-head">
+                <h3 class="cm-section-title">Connections</h3>
+                <button class="cn-help-link" type="button" data-modal-open="connections-help">
+                  <i class="ph ph-info"></i> Learn about connections
+                </button>
               </div>
 
-              <div class="cm-conn" style="flex-direction: column; align-items: stretch">
-                <div style="display: flex; align-items: center; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-                  <span class="cm-conn-icon"><i class="ph ph-rocket-launch"></i></span>
-                  <p class="cm-conn-title" style="flex: 1">Initiatives</p>
+              <div class="cn-list">
+                <!-- Slack -->
+                <div class="cn-field" data-conn-field data-conn-mode="multi">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
+                    <span class="cn-trigger-main">
+                      <span class="cn-trigger-label">Slack</span>
+                      <span class="cn-pill cn-pill-recommended">Recommended</span>
+                    </span>
+                    <span class="cn-trigger-hint">Add channels</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search channels…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-default><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#eng-weekly-standup</span></span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#platform-reliability</span></span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#data-pipeline-migration</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#incident-response</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#release-planning</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">#sre-oncall</span></span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No channels match</p>
+                    <div class="cn-create">
+                      <button class="dropdown-item" type="button" data-conn-create><i class="ph ph-plus-circle dropdown-item-icon"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Create new channel</span></span></button>
+                    </div>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
+                  <label class="cn-na cm-checkbox">
+                    <input type="checkbox" data-conn-na />
+                    Not applicable
+                  </label>
                 </div>
-                <div class="md-conn-row">
-                  Platform Reliability &amp; Observability
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Initiative</span>
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-              </div>
 
-              <div class="cm-conn" style="flex-direction: column; align-items: stretch">
-                <div style="display: flex; align-items: center; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-                  <span class="cm-conn-icon"><i class="ph ph-cpu"></i></span>
-                  <p class="cm-conn-title" style="flex: 1">Processes</p>
+                <!-- Initiatives -->
+                <div class="cn-field" data-conn-field data-conn-mode="single">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon"><i class="ph ph-rocket-launch"></i></span>
+                    <span class="cn-trigger-main"><span class="cn-trigger-label">Initiatives</span></span>
+                    <span class="cn-trigger-hint">Connect an initiative</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search initiatives…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Platform Reliability &amp; Observability</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Data Platform Modernization</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Developer Experience Uplift</span></span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Initiative"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Cloud Cost Optimization</span></span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No initiatives match</p>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
                 </div>
-                <div class="md-conn-row">
-                  Incident Response Review
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Sub-Activity</span>
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-                <div class="md-conn-row">
-                  Weekly Engineering Sync
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Activity</span>
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
-                </div>
-                <div class="md-conn-row">
-                  Platform Engineering
-                  <span class="md-conn-row-end">
-                    <span class="md-tag">Focus Area</span>
-                    <button class="me-trash" type="button" aria-label="Remove"><i class="ph ph-trash"></i></button>
-                  </span>
+
+                <!-- Processes -->
+                <div class="cn-field" data-conn-field data-conn-mode="multi">
+                  <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cn-trigger-icon"><i class="ph ph-cpu"></i></span>
+                    <span class="cn-trigger-main"><span class="cn-trigger-label">Processes</span></span>
+                    <span class="cn-trigger-hint">Connect processes</span>
+                    <i class="ph ph-caret-down cn-trigger-caret"></i>
+                  </button>
+                  <div class="cn-menu dropdown-menu" hidden>
+                    <div class="cn-search">
+                      <i class="ph ph-magnifying-glass"></i>
+                      <input type="text" placeholder="Search processes…" data-conn-search />
+                    </div>
+                    <div class="cn-options" data-conn-options>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Sub-Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Incident Response Review</span></span><span class="md-tag">Sub-Activity</span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Weekly Engineering Sync</span></span><span class="md-tag">Activity</span></button>
+                      <button class="dropdown-item is-selected" type="button" data-conn-option data-tag="Focus Area"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Platform Engineering</span></span><span class="md-tag">Focus Area</span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Capacity Planning</span></span><span class="md-tag">Activity</span></button>
+                      <button class="dropdown-item" type="button" data-conn-option data-tag="Sub-Activity"><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Postmortem Review</span></span><span class="md-tag">Sub-Activity</span></button>
+                    </div>
+                    <p class="cn-empty" data-conn-empty hidden>No processes match</p>
+                  </div>
+                  <div class="cn-selected" data-conn-selected></div>
                 </div>
               </div>
             </section>
@@ -6173,32 +5750,6 @@ body { overflow: hidden; }
       <footer class="modal-footer">
         <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
         <button class="btn btn-danger" type="button" data-confirm-archive-ai>Archive</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Confirm: archive an agenda topic (series-wide warning + escape hatch to mark as not covered) -->
-  <div class="modal-overlay" id="archive-agenda-confirm" hidden style="z-index: 1000">
-    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="archive-agenda-title">
-      <header class="modal-header">
-        <h2 id="archive-agenda-title" class="modal-title">Archive agenda topic?</h2>
-        <button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="ph ph-x"></i></button>
-      </header>
-      <div class="modal-body" style="padding-top: var(--ic-space-3)">
-        <div style="display: flex; gap: var(--ic-space-3); align-items: flex-start">
-          <span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--ic-radius-full); background: var(--color-warning-subtle); color: var(--color-warning); display: inline-flex; align-items: center; justify-content: center;">
-            <i class="ph ph-archive" style="font-size: 18px"></i>
-          </span>
-          <p class="body" style="margin: 0">
-            This will archive the topic <strong>across the entire RoB series</strong>. Future meetings won't include it.
-            <br><br>
-            If you just don't want to discuss it today, <a href="#" data-not-covered-instead style="color: var(--color-text-link); font-weight: var(--ic-weight-medium)">mark it as not on this agenda</a> instead.
-          </p>
-        </div>
-      </div>
-      <footer class="modal-footer">
-        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
-        <button class="btn btn-danger" type="button" data-confirm-archive-agenda>Archive series-wide</button>
       </footer>
     </div>
   </div>
@@ -6709,6 +6260,9 @@ body { overflow: hidden; }
       const OWNER_ID = 'adan-jones';
 
       const TODAY = new Date('2026-01-21');
+      // Description length: soft warning at SOFT, hard cap at MAX.
+      const DESC_MAX = 200;
+      const DESC_SOFT = 150;
       const ymd = (d) => d.toISOString().slice(0, 10);
       const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const fmtTime = (iso) => new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
@@ -7040,6 +6594,7 @@ body { overflow: hidden; }
         if (doneCount > 0) {
           showCompletedBtn.hidden = false;
           showCompletedBtn.querySelector('[data-ai-completed-label]').textContent = showCompleted ? 'Show less' : 'Show all';
+          showCompletedBtn.setAttribute('aria-expanded', String(showCompleted));
         } else {
           showCompletedBtn.hidden = true;
         }
@@ -7099,16 +6654,20 @@ body { overflow: hidden; }
               Due on ${fmtDate(item.due)}
             </span>
             ${carriedHTML}
-            <button class="ai-assignee" type="button" data-action="assignee" ${editableAssign ? '' : 'disabled'} title="Assignee: ${escapeHTML(person.name)}" aria-label="Assignee: ${escapeHTML(person.name)}"><span class="avatar avatar-xs">${person.photo ? `<img src="${person.photo}" alt="${escapeHTML(person.name)}" />` : person.initials}</span><span class="ai-assignee-name">${escapeHTML(person.name)}</span></button>
+            <button class="ai-assignee" type="button" data-action="assignee" ${editableAssign ? '' : 'disabled'} title="Assignee: ${escapeHTML(person.name)}" aria-label="Assignee: ${escapeHTML(person.name)}">
+              <span class="avatar avatar-xs">${person.photo ? `<img src="${person.photo}" alt="${escapeHTML(person.name)}" />` : person.initials}</span>
+              <span class="ai-assignee-name">${escapeHTML(person.name)}</span>
+            </button>
             <span class="ai-spacer"></span>
             <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${commentTitle}" ${editableComment ? '' : 'disabled'} aria-label="Comment">
               <i class="ph ph-chat-circle"></i>
             </button>
-            <button class="ai-icon-btn ai-kebab" type="button" data-action="kebab" ${canManage() ? '' : 'disabled'} aria-label="More">
-              <i class="ph ph-dots-three-vertical"></i>
+            <button class="ai-icon-btn ai-kebab" type="button" data-action="archive" ${canManage() ? '' : 'disabled'} title="Archive" aria-label="Archive">
+              <i class="ph ph-archive"></i>
             </button>
           </div>
           <p class="ai-desc" data-action="desc" ${editableDesc ? 'contenteditable="true" spellcheck="false"' : ''}>${escapeHTML(item.desc)}</p>
+          <p class="ai-desc-counter" data-desc-counter>${item.desc.length}/${DESC_MAX}</p>
         `;
         return node;
       };
@@ -7130,11 +6689,14 @@ body { overflow: hidden; }
         const action = trigger.dataset.action;
 
         if (action === 'status' && canEdit(item, 'status')) openStatusPop(trigger, item);
-        else if (action === 'kebab' && canManage()) openKebabPop(trigger, item);
         else if (action === 'assignee' && canEdit(item, 'assignee')) openAssigneePop(trigger, item);
         else if (action === 'due' && canEdit(item, 'due')) openDuePop(trigger, item);
         else if (action === 'comment') openCommentPop(trigger, item);
         else if (action === 'history') openHistoryPop(trigger, item);
+        else if (action === 'archive' && canManage()) {
+          pendingArchiveId = item.id;
+          document.getElementById('archive-ai-confirm')?.removeAttribute('hidden');
+        }
       });
 
       // Inline edits (description only — comment is popover-edited)
@@ -7144,6 +6706,7 @@ body { overflow: hidden; }
         const item = findItem(node.dataset.itemId);
         if (!item) return;
         if (e.target.matches('[data-action="desc"]') && canEdit(item, 'desc')) {
+          node.classList.remove('is-desc-focused');
           const next = e.target.textContent.trim();
           if (next !== item.desc) {
             recordHistory(item, 'description', item.desc, next);
@@ -7151,6 +6714,42 @@ body { overflow: hidden; }
             render();
           }
         }
+      });
+
+      // Description character-counter — show on focus, update + enforce 200-char cap on input
+      const updateDescCounter = (node, text) => {
+        const counter = node.querySelector('[data-desc-counter]');
+        if (!counter) return;
+        const n = text.length;
+        counter.textContent = `${n}/${DESC_MAX}`;
+        counter.classList.toggle('is-warning', n >= DESC_SOFT && n < DESC_MAX);
+        counter.classList.toggle('is-danger',  n >= DESC_MAX);
+      };
+      list.addEventListener('focusin', (e) => {
+        if (!e.target.matches('[data-action="desc"]')) return;
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        node.classList.add('is-desc-focused');
+        updateDescCounter(node, e.target.textContent);
+      });
+      list.addEventListener('input', (e) => {
+        if (!e.target.matches('[data-action="desc"]')) return;
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        let text = e.target.textContent;
+        if (text.length > DESC_MAX) {
+          // Truncate to the hard cap, preserving caret at the end
+          text = text.slice(0, DESC_MAX);
+          e.target.textContent = text;
+          // Move caret to end
+          const range = document.createRange();
+          range.selectNodeContents(e.target);
+          range.collapse(false);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        updateDescCounter(node, text);
       });
 
       // Status popover
@@ -7395,7 +6994,8 @@ body { overflow: hidden; }
         node.className = 'ai-item is-editing';
         node.dataset.itemId = draft.id;
         node.innerHTML = `
-          <input type="text" class="ai-edit-input" data-draft="desc" placeholder="What needs to happen?" style="width: 100%;" />
+          <input type="text" class="ai-edit-input" data-draft="desc" placeholder="What needs to happen?" style="width: 100%;" maxlength="${DESC_MAX}" />
+          <p class="ai-desc-counter" data-desc-counter>0/${DESC_MAX}</p>
           <div class="ai-edit-row">
             <select class="ai-edit-input" data-draft="status">
               ${STATUS_ORDER.map(s => `<option value="${s}" ${s === 'open' ? 'selected' : ''}>${STATUS[s].label}</option>`).join('')}
@@ -7413,7 +7013,10 @@ body { overflow: hidden; }
         `;
         list.appendChild(node);
         empty.hidden = true;
-        node.querySelector('[data-draft="desc"]').focus();
+        // Live counter on the draft input (maxlength enforces the cap natively)
+        const draftDesc = node.querySelector('[data-draft="desc"]');
+        draftDesc.addEventListener('input', () => updateDescCounter(node, draftDesc.value));
+        draftDesc.focus();
 
         node.addEventListener('click', (e) => {
           if (e.target.closest('[data-draft-cancel]')) {
@@ -7932,373 +7535,213 @@ body { overflow: hidden; }
       </div>
     </div>
   </div>
-  <script>
-    // Agenda topics — supports multiple instances on the page. Each list
-    // runs in its own closure.
-    (function () {
-      document.querySelectorAll('.md-agenda-list').forEach(initAgendaList);
-    })();
-
-    function initAgendaList(list) {
-      if (list.classList.contains('md-agenda-list-cancelled')) return;
-      const container = list.closest('.md-agenda-section, .init-conn-agenda');
-      const addBtn = container?.querySelector('.md-agenda-add-btn');
-      if (!addBtn) return;
-
-      function renumber() {
-        list.querySelectorAll('.md-agenda-item').forEach((li, i) => {
-          const idx = li.querySelector('.md-agenda-index');
-          if (idx) idx.textContent = String(i + 1);
-        });
-      }
-
-      const cancelledList = container?.querySelector('.md-agenda-list-cancelled');
-      const cancelledSection = container?.querySelector('.md-agenda-cancelled-section');
-      const cancelledCount = container?.querySelector('[data-cancelled-count]');
-
-      function refreshCancelledVisibility() {
-        if (!cancelledSection || !cancelledList) return;
-        const n = cancelledList.children.length;
-        if (n === 0) cancelledSection.setAttribute('data-empty', '');
-        else cancelledSection.removeAttribute('data-empty');
-      }
-
-      function setCancelButtonMode(item, isCancelled) {
-        const btn = item.querySelector('[data-action="cancel"]');
-        if (!btn) return;
-        const icon = btn.querySelector('.ph');
-        if (icon) icon.className = 'ph ' + (isCancelled ? 'ph-arrow-counter-clockwise' : 'ph-prohibit');
-        btn.setAttribute('data-tooltip', isCancelled ? 'Add to this agenda' : 'Remove from this agenda');
-        btn.setAttribute('aria-label', isCancelled ? 'Add to this agenda' : 'Remove from this agenda');
-      }
-
-      // Row actions — bound to the SECTION so clicks in either list fire here.
-      (container || list).addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-action]');
-        if (!btn) return;
-        const item = btn.closest('.md-agenda-item');
-        if (!item) return;
-        const action = btn.dataset.action;
-        if (action === 'archive') {
-          // Defer the removal until the user confirms in the modal. Stash a
-          // reference + the per-list helpers so the modal-level handler can
-          // call back into the right section.
-          window.__pendingArchive = {
-            item,
-            commit: () => {
-              item.style.transition = 'opacity 120ms ease';
-              item.style.opacity = '0';
-              setTimeout(() => { item.remove(); renumber(); refreshCancelledVisibility(); }, 130);
-            },
-            cancelInstead: () => {
-              // Simulate a click on the same item's cancel button, which
-              // moves it into the "Not covered" list.
-              const cancelBtn = item.querySelector('[data-action="cancel"]');
-              cancelBtn?.click();
-            },
-          };
-          document.getElementById('archive-agenda-confirm')?.removeAttribute('hidden');
-          return;
-        }
-        if (action === 'done') {
-          const current = item.dataset.status || 'active';
-          item.setAttribute('data-status', current === 'discussed' ? 'active' : 'discussed');
-          return;
-        }
-        if (action === 'cancel') {
-          const inCancelled = cancelledList && item.parentElement === cancelledList;
-          if (inCancelled) {
-            item.setAttribute('data-status', 'active');
-            list.appendChild(item);
-            setCancelButtonMode(item, false);
-            // Manually adding a topic to this meeting's agenda outside its
-            // normal recurrence → flip cadence to One-time so it's clear
-            // this is a one-off for this meeting only.
-            const cadBtn = item.querySelector('.md-agenda-cadence');
-            if (cadBtn && cadBtn.dataset.cadence !== 'One-time') {
-              cadBtn.dataset.cadence = 'One-time';
-              cadBtn.textContent = 'One-time';
-            }
-          } else if (cancelledList) {
-            item.setAttribute('data-status', 'cancelled');
-            cancelledList.appendChild(item);
-            setCancelButtonMode(item, true);
-          } else {
-            const current = item.dataset.status || 'active';
-            item.setAttribute('data-status', current === 'cancelled' ? 'active' : 'cancelled');
-          }
-          renumber();
-          refreshCancelledVisibility();
-          return;
-        }
-      });
-      refreshCancelledVisibility();
-
-      addBtn.addEventListener('click', () => {
-        const li = document.createElement('li');
-        li.className = 'md-agenda-item';
-        li.setAttribute('data-status', 'active');
-        li.innerHTML = `
-          <span class="md-agenda-index"></span>
-          <div class="md-agenda-content">
-            <div class="md-agenda-body" contenteditable="true" spellcheck="false"></div>
-            <div class="md-agenda-meta">
-              <button class="tag tag-light md-agenda-cadence" type="button" data-cadence="Weekly">Weekly</button>
-              <button class="md-agenda-owner is-tbd" type="button" data-owner="TBD" aria-label="Assign owner"><span class="avatar avatar-xs"><i class="ph ph-user"></i></span><span class="md-agenda-owner-name">TBD</span></button>
+  <!-- ============ CONNECTIONS HELP MODAL ============ -->
+  <style>
+    .cn-help-intro { font: var(--type-body); color: var(--color-text-muted); margin: 0 0 var(--ic-space-5); }
+    .cn-help-types { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .cn-help-type { display: flex; gap: var(--ic-space-3); align-items: flex-start; }
+    .cn-help-type .cn-trigger-icon { cursor: default; }
+    .cn-help-type-body { flex: 1; min-width: 0; }
+    .cn-help-type-title { font: var(--ic-weight-semibold) var(--ic-text-base)/1.4 var(--ic-font-sans); color: var(--color-text); margin: 0; }
+    .cn-help-type-desc  { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
+    .cn-help-doc {
+      display: inline-flex; align-items: center; gap: var(--ic-space-1);
+      margin-top: var(--ic-space-5); font: var(--type-body-sm);
+      color: var(--color-text-link); text-decoration: none;
+    }
+    .cn-help-doc:hover { text-decoration: underline; }
+  </style>
+  <div class="modal-overlay" id="connections-help" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="cn-help-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="cn-help-title">About connections</h2>
+        <button class="modal-close" data-modal-close aria-label="Close"><i class="ph ph-x"></i></button>
+      </header>
+      <div class="modal-body">
+        <p class="cn-help-intro">Connections link this meeting to the channels, goals, and work it relates to — so discussion, action items, and context stay in sync across your tools. Add what's relevant; leave the rest empty.</p>
+        <div class="cn-help-types">
+          <div class="cn-help-type">
+            <span class="cn-trigger-icon" style="color: #4a154b"><i class="ph ph-slack-logo"></i></span>
+            <div class="cn-help-type-body">
+              <p class="cn-help-type-title">Slack</p>
+              <p class="cn-help-type-desc">Sync the conversation and action items to one or more channels. The first channel you add becomes the default.</p>
             </div>
           </div>
-          <button class="md-agenda-toggle md-agenda-done" type="button" data-action="done" aria-label="Mark as discussed" data-tooltip="Discussed"><i class="ph ph-check"></i></button>
-          <button class="md-agenda-toggle md-agenda-cancel" type="button" data-action="cancel" aria-label="Remove from this agenda" data-tooltip="Remove from this agenda"><i class="ph ph-prohibit"></i></button>
-          <button class="md-agenda-toggle md-agenda-archive" type="button" data-action="archive" aria-label="Archive item" data-tooltip="Archive"><i class="ph ph-archive"></i></button>
-        `;
-        list.appendChild(li);
-        renumber();
-        li.querySelector('.md-agenda-body').focus();
-      });
+          <div class="cn-help-type">
+            <span class="cn-trigger-icon"><i class="ph ph-rocket-launch"></i></span>
+            <div class="cn-help-type-body">
+              <p class="cn-help-type-title">Initiatives</p>
+              <p class="cn-help-type-desc">Tie this meeting to the strategic initiative it advances, so progress rolls up to the right goal.</p>
+            </div>
+          </div>
+          <div class="cn-help-type">
+            <span class="cn-trigger-icon"><i class="ph ph-cpu"></i></span>
+            <div class="cn-help-type-body">
+              <p class="cn-help-type-title">Processes</p>
+              <p class="cn-help-type-desc">Link the recurring activities and focus areas this meeting drives across your operating model.</p>
+            </div>
+          </div>
+        </div>
+        <a class="cn-help-doc" href="#"><i class="ph ph-book-open"></i> View connections documentation</a>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-primary" type="button" data-modal-close>Got it</button>
+      </footer>
+    </div>
+  </div>
 
-      // -------- Drag-and-drop reorder --------
-      // The numbered cell is the drag handle (cursor: grab). On mousedown
-      // on the index, the parent <li>'s `draggable` is enabled; on dragend
-      // / mouseup it's removed. This keeps clicks inside the editable body
-      // from initiating a drag (which would conflict with text selection).
-      let dragged = null;
-
-      list.addEventListener('mousedown', (e) => {
-        const idx = e.target.closest('.md-agenda-index');
-        if (!idx) return;
-        const li = idx.closest('.md-agenda-item');
-        if (li) li.setAttribute('draggable', 'true');
-      });
-      list.addEventListener('mouseup', () => {
-        list.querySelectorAll('[draggable="true"]').forEach((el) => el.removeAttribute('draggable'));
-      });
-
-      list.addEventListener('dragstart', (e) => {
-        const li = e.target.closest('.md-agenda-item');
-        if (!li || li.getAttribute('draggable') !== 'true') {
-          e.preventDefault();
-          return;
-        }
-        dragged = li;
-        e.dataTransfer.effectAllowed = 'move';
-        // Firefox needs some data set or dragstart fizzles
-        try { e.dataTransfer.setData('text/plain', ''); } catch (_) {}
-        // Defer class add until next frame so the drag image captures the
-        // un-faded version of the row.
-        requestAnimationFrame(() => li.classList.add('is-dragging'));
-      });
-
-      function clearDropHints() {
-        list.querySelectorAll('.is-drop-before, .is-drop-after').forEach((el) => {
-          el.classList.remove('is-drop-before', 'is-drop-after');
-        });
-      }
-
-      list.addEventListener('dragover', (e) => {
-        if (!dragged) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        const target = e.target.closest('.md-agenda-item');
-        clearDropHints();
-        if (!target || target === dragged) return;
-        const rect = target.getBoundingClientRect();
-        const after = (e.clientY - rect.top) > rect.height / 2;
-        target.classList.add(after ? 'is-drop-after' : 'is-drop-before');
-      });
-
-      list.addEventListener('drop', (e) => {
-        if (!dragged) return;
-        e.preventDefault();
-        const target = e.target.closest('.md-agenda-item');
-        if (!target || target === dragged) { clearDropHints(); return; }
-        const rect = target.getBoundingClientRect();
-        const after = (e.clientY - rect.top) > rect.height / 2;
-        target.parentNode.insertBefore(dragged, after ? target.nextSibling : target);
-        clearDropHints();
-        renumber();
-      });
-
-      list.addEventListener('dragend', () => {
-        if (dragged) dragged.classList.remove('is-dragging');
-        dragged = null;
-        clearDropHints();
-        list.querySelectorAll('[draggable="true"]').forEach((el) => el.removeAttribute('draggable'));
-      });
-    }
-
-  
-
-    // === Cadence + Owner pickers ===
+  <!-- ============ CONNECTIONS PICKER BEHAVIOR ============ -->
+  <script>
     (function () {
-      const CADENCES = ['One-time', 'Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Half-annually'];
-      const cadenceIcon = (c) => c === 'One-time' ? 'ph-calendar-dot' : 'ph-repeat';
-      const PEOPLE = [
-        { name: 'Adan Jones',       initials: 'AJ', color: '#7B61FF' },
-        { name: 'Maria Santos',     initials: 'MS', color: '#E0407B' },
-        { name: 'Olivia Doe',       initials: 'OD', color: '#1A73E8' },
-        { name: 'Henrik Andersson', initials: 'HA', color: '#0F9D58' },
-        { name: 'Emily Smith',      initials: 'ES', color: '#F4B400' },
-      ];
+      const fields = document.querySelectorAll('[data-conn-field]');
+      if (!fields.length) return;
 
-      let popEl = null;
-      let popTrigger = null;
-
-      function closePop() {
-        if (popEl) popEl.remove();
-        popEl = null;
-        popTrigger = null;
-      }
-
-      function openPop(triggerEl, html) {
-        if (popEl) closePop();
-        popEl = document.createElement('div');
-        popEl.className = 'md-meta-pop ai-pop';
-        popEl.innerHTML = html;
-        document.body.appendChild(popEl);
-        popTrigger = triggerEl;
-        const r = triggerEl.getBoundingClientRect();
-        popEl.style.top = (r.bottom + 4) + 'px';
-        popEl.style.left = r.left + 'px';
-        requestAnimationFrame(() => {
-          const pr = popEl.getBoundingClientRect();
-          if (pr.right > window.innerWidth - 8) popEl.style.left = (window.innerWidth - pr.width - 8) + 'px';
-          if (pr.bottom > window.innerHeight - 8) popEl.style.top = (r.top - pr.height - 4) + 'px';
+      const closeAll = (except) => {
+        document.querySelectorAll('[data-conn-field] .cn-menu:not([hidden])').forEach(menu => {
+          if (menu === except) return;
+          menu.setAttribute('hidden', '');
+          menu.closest('[data-conn-field]').querySelector('.cn-trigger')?.setAttribute('aria-expanded', 'false');
         });
-      }
+      };
 
-      function openCadencePop(triggerEl) {
-        const current = triggerEl.dataset.cadence || 'Weekly';
-        const html = CADENCES.map(c =>
-          `<button type="button" data-pick-cadence="${c}" aria-current="${c === current ? 'true' : 'false'}">
-            <i class="ph ${cadenceIcon(c)}"></i>${c}
-          </button>` + (c === 'One-time' ? '<hr>' : '')).join('');
-        openPop(triggerEl, html);
-      }
-      function openOwnerPop(triggerEl) {
-        const current = triggerEl.dataset.owner || 'TBD';
-        let html = PEOPLE.map(p =>
-          `<button type="button" data-pick-owner="${p.name}" data-initials="${p.initials}" data-color="${p.color}" aria-current="${p.name === current ? 'true' : 'false'}">
-            <span class="avatar avatar-xs" style="background: ${p.color}; color: #fff">${p.initials}</span>${p.name}
-          </button>`).join('');
-        html += '<hr>';
-        html += `<button type="button" data-pick-owner="TBD" aria-current="${current === 'TBD' ? 'true' : 'false'}">
-          <i class="ph ph-user"></i>TBD
-        </button>`;
-        openPop(triggerEl, html);
-      }
+      fields.forEach(field => {
+        const trigger   = field.querySelector('.cn-trigger');
+        const menu      = field.querySelector('.cn-menu');
+        const search    = field.querySelector('[data-conn-search]');
+        const optionsEl = field.querySelector('[data-conn-options]');
+        const empty     = field.querySelector('[data-conn-empty]');
+        const selected  = field.querySelector('[data-conn-selected]');
+        const hint      = trigger.querySelector('.cn-trigger-hint');
+        const hintText  = hint ? hint.textContent : '';
+        const mode      = field.dataset.connMode || 'multi';
+        let   options   = [...optionsEl.querySelectorAll('.dropdown-item[data-conn-option]')];
 
-      document.addEventListener('click', (e) => {
-        const cad = e.target.closest?.('.md-agenda-cadence');
-        if (cad) { e.stopPropagation(); openCadencePop(cad); return; }
-        const own = e.target.closest?.('.md-agenda-owner');
-        if (own) { e.stopPropagation(); openOwnerPop(own); return; }
-        const pickC = e.target.closest?.('[data-pick-cadence]');
-        if (pickC && popTrigger) {
+        const labelOf = (o) => o.querySelector('.dropdown-item-label').textContent.trim();
+
+        const renderChips = () => {
+          const chosen = options.filter(o => o.classList.contains('is-selected'));
+          selected.innerHTML = '';
+          chosen.forEach(o => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.appendChild(document.createTextNode(labelOf(o)));
+            if (o.hasAttribute('data-default')) { const d = document.createElement('span'); d.className = 'md-tag'; d.textContent = 'Default'; chip.appendChild(d); }
+            if (o.dataset.tag) { const tg = document.createElement('span'); tg.className = 'md-tag'; tg.textContent = o.dataset.tag; chip.appendChild(tg); }
+            const rm = document.createElement('button');
+            rm.className = 'chip-remove';
+            rm.type = 'button';
+            rm.setAttribute('aria-label', 'Remove');
+            rm.innerHTML = '<i class="ph ph-x"></i>';
+            rm.addEventListener('click', (e) => {
+              e.stopPropagation();
+              o.classList.remove('is-selected');
+              renderChips();
+            });
+            chip.appendChild(rm);
+            selected.appendChild(chip);
+          });
+          if (hint) hint.textContent = chosen.length ? (chosen.length + ' selected') : hintText;
+          const pill = field.querySelector('.cn-pill-recommended');
+          if (pill) pill.style.display = chosen.length ? 'none' : '';
+        };
+
+        const filter = (q) => {
+          const norm = q.trim().toLowerCase();
+          let visible = 0;
+          options.forEach(o => {
+            const match = labelOf(o).toLowerCase().includes(norm);
+            o.toggleAttribute('hidden', !match);
+            if (match) visible++;
+          });
+          if (empty) empty.toggleAttribute('hidden', visible !== 0);
+        };
+
+        const wireOption = (o) => {
+          o.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (mode === 'single') {
+              options.forEach(x => x.classList.remove('is-selected'));
+              o.classList.add('is-selected');
+              renderChips();
+              menu.setAttribute('hidden', '');
+              trigger.setAttribute('aria-expanded', 'false');
+            } else {
+              o.classList.toggle('is-selected');
+              renderChips();
+            }
+          });
+        };
+        options.forEach(wireOption);
+
+        // Render any options pre-marked is-selected (populated views)
+        renderChips();
+
+        trigger.addEventListener('click', (e) => {
           e.stopPropagation();
-          const val = pickC.dataset.pickCadence;
-          popTrigger.dataset.cadence = val;
-          popTrigger.textContent = val;
-          closePop();
-          return;
-        }
-        const pickO = e.target.closest?.('[data-pick-owner]');
-        if (pickO && popTrigger) {
-          e.stopPropagation();
-          const name = pickO.dataset.pickOwner;
-          popTrigger.dataset.owner = name;
-          if (name === 'TBD') {
-            popTrigger.classList.add('is-tbd');
-            popTrigger.innerHTML = `<span class="avatar avatar-xs"><i class="ph ph-user"></i></span><span class="md-agenda-owner-name">TBD</span>`;
-            popTrigger.setAttribute('aria-label', 'Assign owner');
-            popTrigger.removeAttribute('data-tooltip');
+          const isOpen = !menu.hasAttribute('hidden');
+          closeAll();
+          if (isOpen) {
+            menu.setAttribute('hidden', '');
+            trigger.setAttribute('aria-expanded', 'false');
           } else {
-            popTrigger.classList.remove('is-tbd');
-            const init = pickO.dataset.initials;
-            popTrigger.innerHTML = `<span class="avatar avatar-xs">${init}</span><span class="md-agenda-owner-name">${name}</span>`;
-            popTrigger.setAttribute('aria-label', `Owner: ${name}`);
-            popTrigger.removeAttribute('data-tooltip');
+            menu.removeAttribute('hidden');
+            trigger.setAttribute('aria-expanded', 'true');
+            if (search) { search.value = ''; filter(''); search.focus(); }
           }
-          closePop();
-          return;
-        }
+        });
+
+        // Keep clicks inside the menu from bubbling to the document close handler
+        menu.addEventListener('click', (e) => e.stopPropagation());
+        search?.addEventListener('input', () => filter(search.value));
+
+        // Slack: create a channel from the search text
+        const create = field.querySelector('[data-conn-create]');
+        create?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          let name = (search?.value || '').trim().replace(/^#+/, '');
+          if (!name) { search?.focus(); return; }
+          name = '#' + name.replace(/\s+/g, '-').toLowerCase();
+          if (options.some(o => labelOf(o).toLowerCase() === name.toLowerCase())) {
+            search.value = ''; filter(''); return;
+          }
+          const btn = document.createElement('button');
+          btn.className = 'dropdown-item is-selected';
+          btn.type = 'button';
+          btn.setAttribute('data-conn-option', '');
+          btn.innerHTML = '<i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label"></span></span>';
+          btn.querySelector('.dropdown-item-label').textContent = name;
+          optionsEl.appendChild(btn);
+          options.push(btn);
+          wireOption(btn);
+          search.value = '';
+          filter('');
+          renderChips();
+        });
+
+        // Not applicable (e.g. Slack) — disables the picker and clears any picks
+        const na = field.querySelector('[data-conn-na]');
+        na?.addEventListener('change', () => {
+          field.classList.toggle('is-na', na.checked);
+          if (na.checked) {
+            options.forEach(o => o.classList.remove('is-selected'));
+            renderChips();
+            menu.setAttribute('hidden', '');
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
       });
 
-      document.addEventListener('mousedown', (e) => {
-        if (!popEl) return;
-        if (popEl.contains(e.target)) return;
-        if (e.target.closest('.md-agenda-cadence, .md-agenda-owner')) return;
-        closePop();
-      });
+      // Click outside closes any open picker
+      document.addEventListener('click', () => closeAll());
+      // Escape closes an open picker before the global handler closes the modal
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePop();
-      });
-      window.addEventListener('scroll', () => { if (popEl) closePop(); }, true);
-    })();
-
-
-    // === Agenda archive confirmation modal handlers ===
-    (function () {
-      function closeArchiveModal() {
-        document.getElementById('archive-agenda-confirm')?.setAttribute('hidden', '');
-        window.__pendingArchive = null;
-      }
-      document.addEventListener('click', (e) => {
-        if (e.target.closest?.('[data-confirm-archive-agenda]')) {
-          e.preventDefault();
-          window.__pendingArchive?.commit?.();
-          closeArchiveModal();
-          return;
+        if (e.key !== 'Escape') return;
+        if (document.querySelector('[data-conn-field] .cn-menu:not([hidden])')) {
+          e.stopPropagation();
+          closeAll();
         }
-        if (e.target.closest?.('[data-not-covered-instead]')) {
-          e.preventDefault();
-          window.__pendingArchive?.cancelInstead?.();
-          closeArchiveModal();
-          return;
-        }
-        // Closing via overlay click / X / Cancel uses the framework's
-        // data-modal-close handler — which sets hidden but doesn't clear our
-        // pending ref. Watch for it via the hidden attribute changing.
-      });
-      // Reset pending ref when the modal becomes hidden (via any path).
-      const obs = new MutationObserver(() => {
-        const m = document.getElementById('archive-agenda-confirm');
-        if (m && m.hasAttribute('hidden')) window.__pendingArchive = null;
-      });
-      window.addEventListener('DOMContentLoaded', () => {
-        const m = document.getElementById('archive-agenda-confirm');
-        if (m) obs.observe(m, { attributes: true, attributeFilter: ['hidden'] });
-      });
+      }, true);
     })();
-
-
-    // data-agenda-link-prevent — Prevent placeholder agenda-link clicks from scrolling the page.
-    (function () {
-      document.addEventListener('click', (e) => {
-        const link = e.target.closest?.('a.agenda-link');
-        if (!link) return;
-        e.preventDefault();
-      });
-    })();
-  </script>
-  <!-- Agentation development toolbar — visual feedback for AI coding agents.
-       Loaded as ESM via esm.sh; React/ReactDOM are shared via an importmap so
-       Agentation and the host page see the same React instance. -->
-  <script type="importmap">
-  {
-    "imports": {
-      "react":            "https://esm.sh/react@18.3.1",
-      "react/jsx-runtime":"https://esm.sh/react@18.3.1/jsx-runtime",
-      "react-dom":        "https://esm.sh/react-dom@18.3.1",
-      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
-    }
-  }
-  </script>
-  <div id="agentation-root"></div>
-  <script type="module">
-    import React from "react";
-    import { createRoot } from "react-dom/client";
-    import { Agentation } from "https://esm.sh/*agentation@3.0.2";
-    createRoot(document.getElementById("agentation-root")).render(React.createElement(Agentation));
   </script>
 </body>
 </html>

@@ -361,9 +361,29 @@ body {
 .btn-icon { width: 14px; height: 14px; flex-shrink: 0; }
 .btn-xs .btn-icon { width: 12px; height: 12px; }
 
-/* Square icon-only button (no text) */
-.btn-icon-only            { width: 32px; padding: 0; }
+/* Icon-only button (no text) — fully rounded "pill" shape. */
+.btn-icon-only            { width: 32px; padding: 0; border-radius: var(--ic-radius-full); }
 .btn-icon-only.btn-xs     { width: 24px; }
+
+/* Ghost as icon-only: muted graphite icon on transparent bg, gray-150
+ * surface on hover. Distinct from text `.btn-ghost` which uses brand-blue;
+ * icon-only ghosts (kebabs, X buttons) stay quiet and neutral. */
+.btn-icon-only.btn-ghost {
+  color: var(--ic-palette-graphite-500);
+}
+.btn-icon-only.btn-ghost:hover {
+  background: var(--color-surface-muted);
+  color: var(--ic-palette-graphite-500);
+}
+
+/* Danger as icon-only: red icon on transparent bg, no fill. Reads as a
+ * destructive affordance without screaming "delete" in red until clicked. */
+.btn-icon-only.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+}
+.btn-icon-only.btn-danger:hover  { background: var(--color-danger-subtle); }
+.btn-icon-only.btn-danger:active { background: var(--color-danger-subtle); }
 .btn:active { transform: translateY(1px); }
 .btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
@@ -385,9 +405,11 @@ body {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
 }
-.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+/* Hover keeps the background transparent (clickable area unchanged) and
+ * signals interactivity with an underline instead. */
+.btn-ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .btn-danger {
   background: var(--color-danger);
@@ -517,8 +539,8 @@ textarea.input {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ic-space-1);
-  min-height: 40px;
-  padding: 4px var(--ic-space-2);
+  min-height: 32px;
+  padding: 2px var(--ic-space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--ic-radius-sm);
@@ -526,6 +548,8 @@ textarea.input {
   transition: border-color var(--ic-duration-fast) var(--ic-ease),
               box-shadow var(--ic-duration-fast) var(--ic-ease);
 }
+/* Chips inside the tag input shrink to fit the 32px row */
+.input-tags .chip { height: 24px; }
 .input-tags:focus-within {
   border-color: var(--color-border-focus);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
@@ -533,12 +557,12 @@ textarea.input {
 .input-tags-input {
   flex: 1;
   min-width: 80px;
-  height: 28px;
+  height: 24px;
   padding: 0 var(--ic-space-1);
   border: 0;
   outline: 0;
   background: transparent;
-  font: var(--type-body);
+  font: var(--type-body-sm);
   color: var(--color-text);
 }
 .input-tags-input::placeholder { color: var(--color-text-subtle); }
@@ -892,19 +916,69 @@ textarea.input {
 .alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
 .alert-info    .alert-icon { color: var(--color-accent); }
 
-/* ---------- Badge ---------- */
+/* ---------- Badge ----------
+ * Status pill. Read-only as <span>; interactive (editable) as <button> —
+ * picks up pointer cursor, hover dim, and focus ring automatically.
+ * Optional parts compose inside any variant:
+ *
+ *   <span class="badge badge-success">Active</span>                          read-only
+ *   <button class="badge badge-warning" type="button">Pending</button>       editable
+ *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
+ */
 .badge {
   display: inline-flex; align-items: center;
+  gap: var(--ic-space-1);
   font: var(--type-caption);
   padding: var(--ic-space-1) var(--ic-space-2);
   border-radius: var(--ic-radius-full);
-  background: var(--color-surface-muted);
+  /* Neutral follows the variant recipe: {hue}-100 fill + {hue}-150 stroke */
+  background: var(--ic-palette-gray-100);
   color: var(--color-text-muted);
+  border: 1px solid var(--ic-palette-gray-150);
 }
-.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
-.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
-.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
-.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+.badge-success { background: var(--color-success-subtle); color: var(--ic-palette-green-700); border-color: var(--ic-palette-green-150); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--ic-palette-yellow-700); border-color: var(--ic-palette-yellow-150); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); border-color: var(--ic-palette-red-150); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--ic-palette-blue-500); border-color: var(--ic-palette-blue-150); }
+
+/* Editable — same pill rendered as a <button>. Deletable pills (those that
+ * contain a .badge-remove) get the same hover so all interactive pills react. */
+button.badge,
+.badge:has(.badge-remove) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+button.badge:hover,
+.badge:has(.badge-remove):hover { filter: brightness(0.96); }
+button.badge:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* Leading icon — Phosphor <i> or inline svg */
+.badge-icon { font-size: 12px; width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Trailing remove × — clicking deletes the pill (delegated handler) */
+.badge-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--ic-radius-full);
+  opacity: 0.65;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.badge-remove:hover { opacity: 1; background: color-mix(in srgb, currentColor 16%, transparent); }
+.badge-remove .ph { font-size: 10px; }
 
 /* ---------- Tag ----------
  * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
@@ -935,6 +1009,15 @@ textarea.input {
 .tag-blue       { --tag-color: var(--ic-palette-blue-500); }
 .tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
 .tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
+
+/* Solid tags are interactive (click swaps status via a dropdown) — subtle
+ * hover dim signals it. Indicator style has its own hover below. */
+.tag:not(.tag-indicator) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+.tag:not(.tag-indicator):hover { filter: brightness(0.92); }
+
 
 /* Indicator style — colored dot + text on a muted gray pill */
 .tag-indicator {
@@ -989,8 +1072,8 @@ textarea.input {
 }
 .count-badge-secondary {
   background: var(--color-surface);
-  color: var(--color-danger);
-  border-color: var(--color-danger);
+  color: var(--ic-palette-graphite-500);
+  border-color: var(--color-border-strong);
 }
 
 /* ---------- Avatar ----------
@@ -1270,6 +1353,91 @@ a.avatar:focus-visible {
   border-color: var(--color-danger);
 }
 
+/* ---------- Slider ----------
+ * Native <input type="range"> in a flex row. The filled-track portion is a
+ * gradient driven by --slider-progress, kept in sync by the script block in
+ * example.html (also syncs value readouts / number fields).
+ *
+ *   <div class="slider">
+ *     <input class="slider-input" type="range" min="0" max="100" value="35" aria-label="Volume" />
+ *   </div>
+ *
+ * Variants compose via optional siblings around the range input:
+ *   icons        <i class="ph ph-minus slider-icon"></i> … <i class="ph ph-plus slider-icon"></i>
+ *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
+ *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
+ *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
+ *   input        <input class="input input-xs slider-field" type="number" />  ← JS-synced both ways
+ */
+.slider {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+}
+.slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 24px; /* generous touch target around the 2px track */
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+/* Track — filled portion dark, remainder light, split at --slider-progress */
+.slider-input::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: linear-gradient(to right,
+    var(--color-accent) var(--slider-progress, 50%),
+    var(--color-border-strong) var(--slider-progress, 50%));
+}
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -7px; /* centers the 16px thumb on the 2px track */
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-webkit-slider-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible { outline: none; }
+.slider-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+/* Firefox */
+.slider-input::-moz-range-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-border-strong);
+}
+.slider-input::-moz-range-progress {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+}
+.slider-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-moz-range-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Side adornments */
+.slider-icon  { font-size: 16px; color: var(--ic-palette-graphite-500); flex-shrink: 0; }
+.slider-label { font: var(--ic-weight-regular) var(--ic-text-xs)/1.5 var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; white-space: nowrap; }
+.slider-value { font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+/* Number field variant — fixed compact width, no spinners */
+.slider-field { width: 56px; text-align: center; -moz-appearance: textfield; appearance: textfield; flex-shrink: 0; }
+.slider-field::-webkit-outer-spin-button,
+.slider-field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* ---------- Modal ----------
  * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
  *
@@ -1362,7 +1530,6 @@ a.avatar:focus-visible {
   justify-content: flex-end;
   gap: var(--ic-space-2);
   padding: var(--ic-space-4) var(--ic-space-5);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Mobile — buttons stack full width */
@@ -1586,14 +1753,65 @@ a.avatar:focus-visible {
   overflow: auto;
 }
 
+/* ---------- Breadcrumbs ----------
+ * Path trail — usually the first row inside a page head, but works standalone.
+ * Parent crumbs are blue links (underline on hover); the current page is plain
+ * text and not interactive. Chevron separators come from the ::after on each
+ * non-last item, so markup stays flat:
+ *
+ *   <nav class="breadcrumbs" aria-label="Breadcrumb">
+ *     <a class="breadcrumb" href="#">Processes</a>
+ *     <a class="breadcrumb" href="#">Onboarding</a>
+ *     <span class="breadcrumb is-current" aria-current="page">Review step</span>
+ *   </nav>
+ */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Chevron separator after every crumb except the last */
+.breadcrumb:not(:last-child)::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background-color: var(--color-text-subtle);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+}
+/* Current page — plain text, no link affordance */
+.breadcrumb.is-current {
+  color: var(--color-text);
+  cursor: default;
+}
+
 /* ---------- Page head ----------
- * Page-level header. Title (+ optional count + subtitle) on the left, actions on the right.
+ * Page-level header. Title (+ optional breadcrumbs + count + subtitle) on
+ * the left, actions on the right. Breadcrumbs, when present, are the first
+ * row inside .page-head-main, above the title.
  *
  *   <div class="page-head">
  *     <div class="page-head-main">
+ *       <nav class="breadcrumbs" aria-label="Breadcrumb">          ← optional
+ *         <a class="breadcrumb" href="#">Processes</a>
+ *         <span class="breadcrumb is-current" aria-current="page">Onboarding</span>
+ *       </nav>
  *       <div class="page-head-title">
  *         <h1 class="page-head-heading">Processes</h1>
- *         <span class="page-head-count">12</span>
+ *         <span class="count-badge count-badge-lg count-badge-secondary">12</span>
  *       </div>
  *       <p class="page-head-subtitle">Optional subtitle.</p>
  *     </div>
@@ -1613,6 +1831,8 @@ a.avatar:focus-visible {
   margin-bottom: var(--ic-space-6);
 }
 .page-head-main { min-width: 0; }
+/* Breadcrumbs as the first row of a page head — small gap above the title */
+.page-head-main > .breadcrumbs { margin-bottom: var(--ic-space-2); }
 .page-head-title {
   display: flex;
   align-items: center;
@@ -1623,19 +1843,10 @@ a.avatar:focus-visible {
   color: var(--color-text);
   margin: 0;
 }
-.page-head-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 22px;
-  padding: 0 var(--ic-space-2);
-  border-radius: var(--ic-radius-full);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
-}
+/* Count next to the heading uses the secondary count-badge component
+ * directly — no separate .page-head-count rule. Markup:
+ *   <span class="count-badge count-badge-lg count-badge-secondary">12</span>
+ */
 .page-head-subtitle {
   font: var(--type-body-sm);
   color: var(--color-text-muted);
@@ -1744,9 +1955,18 @@ a.avatar:focus-visible {
  * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
  * is top; override with [data-placement="bottom"|"left"|"right"].
  *
- *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ * Two styles:
+ *   Compact (default) — dark pill, caption text, single line. For icon
+ *     buttons and short labels.
+ *   Regular — add [data-tooltip-style="regular"]. White surface, 13/20 body
+ *     text that wraps (max 240px), soft shadow, caret pointing at the
+ *     trigger. For longer explanatory copy.
  *
- * Renders via ::after so no extra DOM. Reveals on :hover and :focus-visible.
+ *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ *   <button class="btn" data-tooltip="Longer explanation…" data-tooltip-style="regular">Help</button>
+ *
+ * Renders via ::after (+ ::before for the regular caret) so no extra DOM.
+ * Reveals on :hover and :focus-visible.
  */
 [data-tooltip] { position: relative; }
 [data-tooltip]::after {
@@ -1787,6 +2007,77 @@ a.avatar:focus-visible {
   top: 50%;
   left: calc(100% + 6px);
   transform: translateY(-50%);
+}
+
+/* Regular style — white surface, wrapping body text, caret.
+ * Shadow matches Figma "Shadows/Level 4" (two centered layers). */
+[data-tooltip][data-tooltip-style="regular"]::after {
+  background: var(--color-surface);
+  color: var(--ic-palette-graphite-500);
+  font: var(--type-body-sm);
+  padding: var(--ic-space-4);
+  border-radius: var(--ic-radius-sm);
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: left;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24), 0 0 32px rgba(0, 0, 0, 0.12);
+  bottom: calc(100% + 12px);
+}
+/* Caret — rotated square; its shadowed half pokes out from under the bubble
+ * (::after paints above ::before, hiding the inner half). */
+[data-tooltip][data-tooltip-style="regular"]::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"]:hover::before,
+[data-tooltip][data-tooltip-style="regular"]:focus-visible::before { opacity: 1; }
+
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 12px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 12px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::before {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 8px);
+  left: auto;
+  transform: translateY(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::before {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 /* ---------- Toast ----------
@@ -2006,7 +2297,7 @@ a.avatar:focus-visible {
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.dropdown-item:hover  { background: var(--color-surface-muted); }
+.dropdown-item:hover  { background: var(--color-accent-subtle); }
 .dropdown-item:disabled,
 .dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 

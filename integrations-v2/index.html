@@ -2650,7 +2650,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .integration-card .tag-indicator         { cursor: default; }
     .integration-card .tag-indicator:hover   { background: transparent; }
     /* [hidden] override for elements that have explicit display values */
-    .page-head-actions[hidden], .page-view[hidden], .tag[hidden], .btn[hidden], .modal-body[hidden] { display: none; }
+    .page-head-actions[hidden], .page-view[hidden], .tag[hidden], .btn[hidden], .modal-body[hidden], .count-badge[hidden], .tab[hidden], .dropdown-item[hidden], .dropdown-empty[hidden] { display: none; }
 
     /* ---------- Filter dropdown (OKR page) ---------- */
     .filter-dropdown { position: relative; display: inline-block; }
@@ -2705,6 +2705,27 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
     }
     .read-only-mark { font-size: 16px; color: var(--color-text-subtle); }
+
+    /* ===== Tableau-import row variants (A–E) for comparison ===== */
+    /* Variant A — "Tableau" tag chip after the status pill */
+    .tableau-tag { background: var(--ic-palette-orange-100); color: var(--ic-palette-orange-700); font-weight: var(--ic-weight-medium); }
+    .tableau-tag .ph { font-size: 10px; margin-right: 3px; vertical-align: -1px; }
+
+    /* Variant B — Left-edge accent bar */
+    tr.tableau-row-variant-b td:first-child { box-shadow: inset 3px 0 0 var(--ic-palette-orange-500, #ea580c); }
+
+    /* Variant C — Subtle background tint */
+    tr.tableau-row-variant-c td { background: color-mix(in srgb, var(--ic-palette-orange-100) 35%, transparent) !important; }
+
+    /* Variant D — Small brand dot before title */
+    .tableau-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ic-palette-orange-500, #ea580c); flex-shrink: 0; }
+
+    /* Variant E — Italic muted title with lock prefix */
+    tr.tableau-row-variant-e .cell-title-text { color: var(--color-text-muted); font-style: italic; }
+    .tableau-lock-prefix { color: var(--color-text-subtle); font-size: 14px; flex-shrink: 0; }
+
+    /* Tiny variant identifier badge (prototype-only, helps user pick) */
+    .variant-id { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; background: var(--ic-palette-graphite-100); color: var(--ic-palette-graphite-700); font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans); margin-right: 6px; flex-shrink: 0; }
 
     /* ---------- OKR detail drawer ---------- */
     .okr-row-clickable { cursor: pointer; }
@@ -2809,28 +2830,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        Hosts: connection header card · connectors list · inline picker
        ============================================================ */
 
-    /* Connection header card — compact status pill, expands inline */
-    .tab-connection-card { border: 1px solid var(--color-border); border-radius: var(--ic-radius-md); background: var(--color-surface); margin-bottom: var(--ic-space-5); overflow: hidden; }
-    .tab-connection-card.is-stale { border-color: var(--color-warning, var(--color-border-strong)); }
-    .tab-connection-card.is-error  { border-color: var(--color-danger, var(--color-border-strong)); }
-    .tab-connection-pill { display: flex; align-items: center; gap: var(--ic-space-3); padding: var(--ic-space-3) var(--ic-space-4); }
-    .tab-connection-status { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); flex-shrink: 0; }
-    .is-stale .tab-connection-status { background: var(--color-warning, #d97706); }
-    .is-error .tab-connection-status { background: var(--color-danger, #dc2626); }
-    .tab-connection-text { font: var(--type-body-sm); color: var(--color-text); flex: 1; min-width: 0; }
-    .tab-connection-text strong { font-weight: var(--ic-weight-semibold); }
-    .tab-connection-text .muted { color: var(--color-text-muted); }
-    .tab-connection-actions { display: inline-flex; gap: var(--ic-space-2); flex-shrink: 0; }
-    .tab-connection-form { display: none; padding: var(--ic-space-4) var(--ic-space-4) var(--ic-space-5); border-top: 1px solid var(--color-border); background: var(--color-surface-muted, var(--color-surface)); }
-    .tab-connection-card.is-expanded .tab-connection-form { display: block; }
-    .tab-connection-card.is-first-time .tab-connection-form { display: block; border-top: 0; background: transparent; }
-    .tab-connection-card.is-first-time .tab-connection-pill { display: none; }
-    .tab-connection-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-3) var(--ic-space-4); margin-bottom: var(--ic-space-4); }
+    /* Connection credentials form — lives in the Manage side drawer (#drawer-tableau-connection) */
+    .tab-connection-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-3) var(--ic-space-4); margin-bottom: var(--ic-space-2); }
     .tab-connection-form-grid .field-wide { grid-column: 1 / -1; }
-    .tab-connection-form-footer { display: flex; justify-content: flex-end; gap: var(--ic-space-2); }
-    .tab-connection-banner { padding: var(--ic-space-3) var(--ic-space-4); font: var(--type-body-sm); display: flex; gap: var(--ic-space-2); align-items: center; }
-    .is-stale .tab-connection-banner { background: var(--color-warning-subtle, #fef3c7); color: var(--color-warning-strong, #92400e); }
-    .is-error .tab-connection-banner { background: var(--color-danger-subtle, #fee2e2); color: var(--color-danger-strong, #991b1b); }
+    .tab-connection-form-stack { display: flex; flex-direction: column; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3); }
 
     /* Connectors section */
     .connectors-section-head { display: flex; align-items: end; justify-content: space-between; margin-bottom: var(--ic-space-4); gap: var(--ic-space-3); }
@@ -2841,11 +2844,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .connectors-section-head .heading-block p { margin: 4px 0 0; color: var(--color-text-muted); font: var(--type-body-sm); }
 
     /* Inline connector picker (Add connector reveal) */
-    .add-connector-panel { display: none; border: 1px solid var(--color-border); border-radius: var(--ic-radius-md); background: var(--color-surface); padding: var(--ic-space-4); margin-bottom: var(--ic-space-4); }
-    .add-connector-panel.is-open { display: block; }
-    .add-connector-panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3); }
-    .add-connector-panel-head h3 { margin: 0; font: var(--type-h4); }
-    .add-connector-panel-head .muted { color: var(--color-text-muted); font: var(--type-body-sm); }
+    /* Two-section mapping (Objectives + Key Results) — Figma-aligned */
+    .mapping-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--ic-radius-md); padding: var(--ic-space-5); }
+    .mapping-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-5) var(--ic-space-6); align-items: start; }
+    .mapping-grid > .mapping-section + .mapping-section { border-top: 0; padding-top: 0; margin-top: 0; border-left: 1px solid var(--color-border); padding-left: var(--ic-space-6); }
+    @media (max-width: 960px) { .mapping-grid { grid-template-columns: 1fr; } .mapping-grid > .mapping-section + .mapping-section { border-left: 0; padding-left: 0; border-top: 1px solid var(--color-border); padding-top: var(--ic-space-5); } }
+    .mapping-card-divider { border: 0; border-top: 1px solid var(--color-border); margin: var(--ic-space-5) 0; }
+    .config-autosave-note { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 var(--ic-space-3); font: var(--type-caption); color: var(--color-text-muted); }
+    .config-autosave-note .ph { color: var(--color-success); font-size: 14px; }
+    .mapping-section { padding: 0; }
+    .mapping-section + .mapping-section { border-top: 1px solid var(--color-border); padding-top: var(--ic-space-5); margin-top: var(--ic-space-5); }
+    .mapping-section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); margin-bottom: var(--ic-space-4); flex-wrap: wrap; }
+    .mapping-section-title { margin: 0; font: var(--type-h4); font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    .mapping-sub-title { font: var(--type-body); font-weight: var(--ic-weight-semibold); color: var(--color-text); margin: var(--ic-space-4) 0 var(--ic-space-3); }
+    .field-mapping-band { background: var(--color-surface-muted, #f4f5f7); color: var(--color-text-muted); font: var(--type-caption); padding: var(--ic-space-2) var(--ic-space-3); border-radius: var(--ic-radius-sm); margin: var(--ic-space-4) 0 var(--ic-space-3); }
+    .field-mapping-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--ic-space-3); padding: 0 var(--ic-space-1) var(--ic-space-2); margin-top: var(--ic-space-3); }
+    .field-mapping-columns span { font: var(--type-caption); color: var(--color-text-muted); }
+    .field-mapping-columns span:nth-child(2) { grid-column: 2 / span 2; }
+    .kr-source-toggle { display: inline-flex; align-items: center; gap: var(--ic-space-2); cursor: pointer; font: var(--type-body-sm); color: var(--color-text); }
+    .input-select.is-disabled .input-select-trigger { pointer-events: none; background: var(--color-surface-muted, var(--color-surface)); color: var(--color-text-muted); cursor: not-allowed; }
+    .input-select.is-disabled .btn-icon { opacity: 0.4; }
+
+    /* New-connector flow — step sections inside the create view */
+    .create-step { margin-bottom: var(--ic-space-6); }
+    .create-step:last-child { margin-bottom: 0; }
+    .create-step-title { margin: 0 0 var(--ic-space-3); font: var(--ic-weight-semibold) var(--type-body); color: var(--color-text); }
+    [data-drawer-view="create"] .modal-body { padding-top: var(--ic-space-4); padding-bottom: var(--ic-space-5); }
     .add-connector-search { position: relative; margin-bottom: var(--ic-space-3); }
     .add-connector-search .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--color-text-subtle); }
     .add-connector-search input { padding-left: 36px; }
@@ -2866,10 +2890,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .entity-type-option input { margin: 2px 0 0; flex-shrink: 0; }
     .entity-type-option-label { font: var(--ic-weight-semibold) var(--type-body-sm); color: var(--color-text); }
     .entity-type-option-desc { font: var(--type-caption); color: var(--color-text-muted); margin-top: 2px; }
-    .add-connector-panel-footer { display: flex; justify-content: flex-end; gap: var(--ic-space-2); }
+
+    /* Empty state — no connectors */
+    .connectors-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: var(--ic-space-7) var(--ic-space-5); gap: var(--ic-space-3); }
+    .connectors-empty-illustration { width: 160px; height: 130px; margin-bottom: var(--ic-space-2); }
+    .connectors-empty-title { margin: 0; font: var(--type-body); font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    .connectors-empty-desc { margin: 0 0 var(--ic-space-2); font: var(--type-body-sm); color: var(--color-text-muted); max-width: 360px; }
 
     /* Connectors list — rows */
     .connector-list { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .connector-list:empty { display: none; }
+    .connector-list:not(:empty) ~ .connectors-empty { display: none; }
     .connector-row { display: grid; grid-template-columns: 1fr auto; gap: var(--ic-space-3) var(--ic-space-4); padding: var(--ic-space-4); border: 1px solid var(--color-border); border-radius: var(--ic-radius-md); background: var(--color-surface); cursor: pointer; transition: border-color var(--ic-duration-fast) var(--ic-ease), box-shadow var(--ic-duration-fast) var(--ic-ease); align-items: center; }
     .connector-row:hover { border-color: var(--color-border-strong); box-shadow: var(--ic-shadow-sm); }
     .connector-row[data-status="disabled"]    { opacity: 0.7; }
@@ -2877,8 +2908,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .connector-row-main { min-width: 0; }
     .connector-row-title { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; margin-bottom: 4px; }
     .connector-row-name { font: var(--ic-weight-semibold) var(--type-body); color: var(--color-text); margin: 0; }
-    .connector-row-view { font: var(--type-caption); color: var(--color-text-muted); margin: 0; }
-    .connector-row-view .ph { font-size: 12px; margin-right: 4px; vertical-align: -1px; }
+    .connector-row-view { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+    .connector-row-view .ph { font-size: 14px; margin-right: 4px; vertical-align: -1px; }
     .connector-row-meta { display: flex; align-items: center; gap: var(--ic-space-3); margin-top: var(--ic-space-2); font: var(--type-body-sm); color: var(--color-text-muted); flex-wrap: wrap; }
     .connector-row-meta-item { display: inline-flex; align-items: center; gap: 6px; }
     .connector-row-meta-item.is-failure { color: var(--color-danger, #dc2626); }
@@ -2899,11 +2930,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .connector-drawer-name { font: var(--type-h3); margin: 0; color: var(--color-text); }
     .connector-drawer-sub { display: flex; gap: var(--ic-space-3); margin-top: var(--ic-space-1); font: var(--type-body-sm); color: var(--color-text-muted); flex-wrap: wrap; }
     .connector-drawer-sub-item { display: inline-flex; align-items: center; gap: 4px; }
+    .connector-imported-link { color: var(--color-accent); text-decoration: none; transition: color var(--ic-duration-fast) var(--ic-ease); }
+    .connector-imported-link:hover { color: var(--color-accent-hover, var(--color-accent)); text-decoration: underline; }
     .connector-drawer-actions { display: inline-flex; align-items: center; gap: var(--ic-space-2); flex-shrink: 0; }
 
-    #drawer-tableau-settings [data-drawer-view="detail"] .tabs { margin: var(--ic-space-3) var(--ic-space-5) 0; padding: 0; }
+    #drawer-tableau-settings [data-drawer-view="detail"] .tabs { margin: var(--ic-space-3) 0 0; padding: 0; }
     #drawer-tableau-settings [data-drawer-view="detail"] .tab { padding-bottom: var(--ic-space-2); }
-    #drawer-tableau-settings [data-drawer-view="detail"] .modal-body { padding-top: var(--ic-space-4); }
+    #drawer-tableau-settings [data-drawer-view="detail"] .modal-body { padding: var(--ic-space-4) 0 var(--ic-space-5); }
+    #drawer-tableau-settings [data-drawer-view="detail"] .modal-footer { padding-left: 0; padding-right: 0; }
     .connector-tab-panel[hidden] { display: none; }
 
     /* Field mapping inside connector drawer */
@@ -2915,8 +2949,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .field-mapping-block.is-collapsible .field-mapping-block-head { cursor: pointer; user-select: none; }
     .field-mapping-block.is-collapsed .field-mapping-rows { display: none; }
     .field-mapping-rows { display: grid; gap: var(--ic-space-3); }
-    .field-mapping-row { display: grid; grid-template-columns: 140px 1fr; gap: var(--ic-space-3); align-items: start; }
-    .field-mapping-row.has-resolver { grid-template-columns: 140px 1fr auto; }
+    .field-mapping-rows { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .field-mapping-row { display: grid; grid-template-columns: 120px 20px 1fr; gap: var(--ic-space-3); align-items: start; min-width: 0; }
+    .field-mapping-label { font: var(--type-body-sm); color: var(--color-text); padding-top: 8px; }
+    .field-mapping-label .optional-mark { color: var(--color-text-muted); font-weight: var(--ic-weight-regular); margin-left: 2px; }
+    .field-mapping-arrow { display: block; color: var(--color-text-subtle); font-size: 14px; padding-top: 8px; text-align: center; user-select: none; }
     .field-mapping-label { font: var(--type-body-sm); color: var(--color-text); padding-top: 8px; }
     .field-mapping-label .required-mark { color: var(--color-danger, #dc2626); margin-left: 2px; }
     .field-mapping-input { min-width: 0; }
@@ -2951,6 +2988,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .run-stat.is-failed .run-stat-value { color: var(--color-danger, #dc2626); }
     .run-stat.is-skipped .run-stat-value { color: var(--color-warning-strong, #92400e); }
     .run-stat-label { font: var(--type-caption); color: var(--color-text-muted); display: block; margin-top: 2px; }
+    /* Sync runs — single expandable table */
+    .sync-runs-table { width: 100%; border: 1px solid var(--color-border); border-radius: 8px; border-collapse: separate; border-spacing: 0; overflow: hidden; }
+    .sync-runs-table tbody tr:last-child td { border-bottom: 0; }
+    .sync-runs-table thead th:first-child { border-top-left-radius: 8px; }
+    .sync-runs-table thead th:last-child { border-top-right-radius: 8px; }
+    .sync-runs-table th { font: var(--type-caption); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: var(--ic-space-2) var(--ic-space-3); text-align: left; border-bottom: 1px solid var(--color-border); background: var(--color-surface-muted, var(--color-surface)); }
+    .sync-runs-table td { padding: var(--ic-space-3); border-bottom: 1px solid var(--color-border); font: var(--type-body-sm); color: var(--color-text); vertical-align: middle; }
+    .sync-runs-table .sync-run-row { cursor: pointer; transition: background var(--ic-duration-fast) var(--ic-ease); }
+    .sync-runs-table .sync-run-row:hover td { background: var(--color-surface-muted, var(--color-surface)); }
+    .sync-runs-table .row-toggle { background: transparent; border: 0; padding: 0; width: 24px; height: 24px; display: inline-grid; place-items: center; cursor: pointer; color: var(--color-text-muted); }
+    .sync-runs-table .row-toggle .ph { font-size: 14px; transition: transform var(--ic-duration-fast) var(--ic-ease); }
+    .sync-runs-table .sync-run-row.is-open .row-toggle .ph { transform: rotate(90deg); }
+    .sync-runs-table .sync-run-status-cell { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+    .sync-runs-table strong.is-fail { color: var(--color-danger, #dc2626); }
+    .sync-runs-table .sync-run-detail-row td { background: var(--color-surface-muted, var(--color-surface)); padding: var(--ic-space-3) var(--ic-space-4) var(--ic-space-4); }
+
     .run-issues { margin-top: var(--ic-space-3); }
     .run-issues-block { margin-top: var(--ic-space-3); }
     .run-issues-block-head { display: flex; align-items: center; gap: var(--ic-space-2); cursor: pointer; user-select: none; padding: var(--ic-space-2) 0; font: var(--ic-weight-semibold) var(--type-body-sm); }
@@ -2972,9 +3025,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .prior-runs-head { padding: var(--ic-space-2) var(--ic-space-3); background: var(--color-surface-muted, var(--color-surface)); font: var(--type-caption); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
     .prior-run-row { display: grid; grid-template-columns: 16px 90px 1fr auto; gap: var(--ic-space-3); align-items: center; padding: var(--ic-space-3); border-top: 1px solid var(--color-border); cursor: pointer; font: var(--type-body-sm); transition: background var(--ic-duration-fast) var(--ic-ease); }
     .prior-run-row:hover { background: var(--color-surface-muted, var(--color-surface)); }
-    .prior-run-status { width: 8px; height: 8px; border-radius: 50%; }
+    .prior-run-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .prior-run-status.is-completed { background: var(--color-success); }
-    .prior-run-status.is-failed { background: var(--color-danger, #dc2626); }
+    .prior-run-status.is-issues    { background: var(--color-warning, #d97706); }
+    .prior-run-status.is-failed    { background: var(--color-danger, #dc2626); }
+    .prior-run-status.is-running   { background: var(--color-accent, #2557f6); box-shadow: 0 0 0 0 rgba(37, 87, 246, 0.6); animation: run-pulse 1.6s ease-out infinite; }
+    @keyframes run-pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 87, 246, 0.5); } 70% { box-shadow: 0 0 0 6px rgba(37, 87, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 87, 246, 0); } }
+    .sync-run-stuck-warn { display: inline-flex; align-items: center; gap: 4px; margin-left: var(--ic-space-2); padding: 2px 8px; border-radius: var(--ic-radius-sm); background: var(--color-warning-subtle, #fef3c7); color: var(--color-warning-strong, #92400e); font: var(--type-caption); }
+    .sync-run-stuck-warn .ph { font-size: 12px; }
+    .sync-run-row .is-fail { color: var(--color-danger, #dc2626); }
+    .sync-run-row .is-skip { color: var(--color-warning-strong, #92400e); }
+    .sync-run-row .is-muted-dash { color: var(--color-text-muted); }
     .prior-run-time { color: var(--color-text-muted); font: var(--type-caption); }
     .prior-run-counts { color: var(--color-text); display: flex; gap: var(--ic-space-3); flex-wrap: wrap; }
     .prior-run-counts strong { font-weight: var(--ic-weight-semibold); }
@@ -2999,12 +3060,113 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .drawer-back-btn:hover { background: var(--color-surface-muted, var(--color-surface)); border-color: var(--color-border-strong); }
     .drawer-back-btn .ph { font-size: 16px; }
 
+    /* Connect Tableau modal — numbered step heads */
+    .connect-step-title { display: flex; align-items: center; gap: var(--ic-space-3); margin: 0 0 var(--ic-space-3); font: var(--ic-weight-semibold) var(--type-body); color: var(--color-text); }
+    .connect-step-num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-muted); font: var(--ic-weight-semibold) 11px/1 var(--ic-font-sans); flex-shrink: 0; }
+
     /* Connect Tableau modal — OAuth handshake brand row */
     .oauth-brand { display: flex; align-items: center; justify-content: center; gap: var(--ic-space-4); margin: var(--ic-space-3) 0 var(--ic-space-5); }
     .oauth-brand-app { display: flex; flex-direction: column; align-items: center; gap: var(--ic-space-2); }
     .oauth-brand-label { font: var(--ic-weight-medium) var(--type-body-sm); color: var(--color-text); }
 
+    /* Toast — fixed top-right notifications */
+    .toast-region { position: fixed; top: var(--ic-space-4); right: var(--ic-space-4); z-index: 9999; display: flex; flex-direction: column; gap: var(--ic-space-2); max-width: 380px; pointer-events: none; }
+    .toast { display: flex; align-items: flex-start; gap: var(--ic-space-3); padding: var(--ic-space-3) var(--ic-space-4); border-radius: var(--ic-radius-md); background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text); font: var(--type-body-sm); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.15), 0 2px 6px -2px rgba(0,0,0,0.08); pointer-events: auto; min-width: 280px; max-width: 380px; transition: opacity 250ms ease, transform 250ms ease; }
+    .toast.is-entering, .toast.is-leaving { opacity: 0; transform: translateX(20%); }
+    .toast-icon { font-size: 18px; flex-shrink: 0; color: var(--color-success); margin-top: 1px; }
+    .toast-body { flex: 1; min-width: 0; }
+    .toast-title { display: block; font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); color: var(--color-text); margin: 0 0 2px; }
+    .toast-message { display: block; color: var(--color-text-muted); margin: 0; line-height: 1.4; }
+    .toast-close { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; padding: 0; cursor: pointer; color: var(--color-text-muted); border-radius: var(--ic-radius-sm); flex-shrink: 0; }
+    .toast-close:hover { color: var(--color-text); }
+    .toast-close .ph { font-size: 14px; }
+
     @media (max-width: 720px) { .shell-main { padding: var(--ic-space-5); } }
+
+    /* ---------- Annotation tool (dev tooling) ----------
+     * In-page batch annotation overlay. Enable by appending ?notes=1 to the URL.
+     * Dormant otherwise. Matching JS lives in the script block below.
+     * Selectors namespaced .annot-* so they can't collide with feature CSS. */
+    .annot-toolbar {
+      position: fixed; bottom: 16px; right: 16px;
+      z-index: 99999;
+      display: flex; gap: 6px; align-items: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      padding: var(--ic-space-1) var(--ic-space-2);
+      box-shadow: var(--ic-shadow-lg);
+      font: var(--type-body-sm);
+    }
+    .annot-toolbar button {
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      padding: 4px 10px;
+      border-radius: var(--ic-radius-sm);
+      cursor: pointer;
+      font: inherit;
+    }
+    .annot-toolbar button:disabled { opacity: 0.4; cursor: default; }
+    .annot-toolbar button.is-active {
+      background: var(--color-accent);
+      color: var(--ic-palette-white);
+      border-color: var(--color-accent);
+    }
+    .annot-toolbar .annot-count {
+      padding: 0 var(--ic-space-2);
+      color: var(--color-text-muted);
+      font: var(--type-caption);
+    }
+    .annot-mode,
+    .annot-mode * { cursor: crosshair !important; }
+    .annot-mode *:hover {
+      outline: 2px solid var(--color-accent) !important;
+      outline-offset: -2px;
+    }
+    .annot-pin {
+      position: absolute;
+      z-index: 99998;
+      width: 20px; height: 20px;
+      background: var(--color-accent);
+      color: var(--ic-palette-white);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font: 600 11px/1 var(--ic-font-sans);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
+    .annot-popover {
+      position: absolute;
+      z-index: 100000;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      padding: var(--ic-space-3);
+      box-shadow: var(--ic-shadow-xl);
+      width: 280px;
+      font: var(--type-body-sm);
+    }
+    .annot-popover textarea {
+      width: 100%;
+      min-height: 64px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-sm);
+      padding: 6px 8px;
+      font: inherit;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .annot-popover-meta { margin-bottom: 6px; }
+    .annot-popover-meta code {
+      font: var(--type-mono);
+      font-size: 11px;
+      background: var(--color-surface-muted);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .annot-popover-text { color: var(--color-text-muted); font-size: 11px; margin: 4px 0 6px; }
+    .annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -3103,8 +3265,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
-        <section data-section="communication">
-          <header class="section-head"><h2 class="h3">Communication</h2><span class="section-head-meta section-head-count" data-count-for="communication" hidden></span></header>
+        <section data-section="core">
+          <header class="section-head"><h2 class="h3">Core</h2><span class="section-head-meta section-head-count" data-count-for="core" hidden></span></header>
           <div class="integration-grid">
 
             <article class="card integration-card" data-status="connected">
@@ -3125,11 +3287,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary" data-modal-open="drawer-zoom">Configure</button></div>
             </article>
 
+            <article class="card integration-card" data-status="connected">
+              <div class="integration-head">
+                <div class="integration-logo" style="background: var(--ic-palette-red-100); color: var(--ic-palette-red-500)">G</div>
+                <div><p class="integration-title">Google Workspace</p><p class="integration-cat">Calendar & docs</p></div>
+              </div>
+              <p class="integration-desc">Bring calendars, Docs, and Sheets into Operationalize so context lives next to objectives and initiatives.</p>
+              <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary" data-modal-open="drawer-google">Configure</button></div>
+            </article>
+
           </div>
         </section>
 
         <section data-section="okrs" style="margin-top: var(--ic-space-7)">
-          <header class="section-head"><h2 class="h3">OKRs</h2><span class="section-head-meta section-head-count" data-count-for="okrs" hidden></span></header>
+          <header class="section-head"><h2 class="h3">OKR connectors</h2><span class="section-head-meta section-head-count" data-count-for="okrs" hidden></span></header>
           <div class="integration-grid">
 
             <article class="card integration-card" data-status="available" data-integration="tableau">
@@ -3150,30 +3321,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="integration-foot"><span class="tag tag-indicator tag-blue">Coming soon</span><button class="btn btn-sm btn-secondary" disabled>Notify me</button></div>
             </article>
 
-            <article class="card integration-card integration-card-cta">
-              <div class="integration-head">
-                <div class="integration-cta-icon"><i class="ph ph-plug"></i></div>
-                <p class="integration-title">Looking for another integration?</p>
-              </div>
-              <p class="integration-desc">Tell us what you'd like to connect to OKRs and we'll prioritize it on the roadmap.</p>
-              <div class="integration-foot integration-foot-end"><button class="btn btn-sm btn-secondary" type="button">Get in touch</button></div>
-            </article>
-
           </div>
         </section>
 
-        <section data-section="productivity" style="margin-top: var(--ic-space-7)">
-          <header class="section-head"><h2 class="h3">Productivity</h2><span class="section-head-meta section-head-count" data-count-for="productivity" hidden></span></header>
+        <section data-section="initiatives-processes" style="margin-top: var(--ic-space-7)">
+          <header class="section-head"><h2 class="h3">Initiatives and processes</h2><span class="section-head-meta section-head-count" data-count-for="initiatives-processes" hidden></span></header>
           <div class="integration-grid">
-
-            <article class="card integration-card" data-status="connected">
-              <div class="integration-head">
-                <div class="integration-logo" style="background: var(--ic-palette-red-100); color: var(--ic-palette-red-500)">G</div>
-                <div><p class="integration-title">Google Workspace</p><p class="integration-cat">Calendar & docs</p></div>
-              </div>
-              <p class="integration-desc">Bring calendars, Docs, and Sheets into Operationalize so context lives next to objectives and initiatives.</p>
-              <div class="integration-foot"><span class="tag tag-indicator tag-positive">Connected</span><button class="btn btn-sm btn-secondary" data-modal-open="drawer-google">Configure</button></div>
-            </article>
 
             <article class="card integration-card" data-status="available">
               <div class="integration-head">
@@ -3197,12 +3350,808 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </article>
             -->
 
-
           </div>
         </section>
       </section><!-- /page-view integrations -->
 
-      <!-- =================== Tableau settings sub-page =================== -->
+  <!-- TABLEAU-PAGE-START -->
+  <!-- Tableau settings — in-page sub-view (master connectors list + connector detail). Reached after the Connect modal flow and via the card's Configure button. -->
+  <section class="page-view" id="drawer-tableau-settings" data-page="integrations-tableau" hidden>
+
+      <!-- ============ LIST VIEW ============ -->
+      <div class="drawer-view" data-drawer-view="list">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="#">Admin Settings</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <a href="#" data-nav-page="integrations">Integrations</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <span class="breadcrumb-current">Tableau</span>
+        </nav>
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Tableau</h1>
+              <span class="count-badge count-badge-secondary count-badge-lg" id="connector-count-badge" style="margin-left: var(--ic-space-2)" title="1 connector" hidden>1</span>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-secondary" type="button" data-modal-open="drawer-tableau-connection">Manage</button>
+            <button class="btn btn-primary" type="button" id="add-connector-btn">Add connector</button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding-left: 0; padding-right: 0">
+
+          <!-- Connectors section — empty state -->
+          <section>
+            <div class="connector-list" id="connector-list"></div>
+
+            <div class="connectors-empty">
+              <svg class="connectors-empty-illustration" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Connecting lines -->
+                <path d="M80 48 V72 M40 82 V72 H120 V82" stroke="var(--color-accent, #2557f6)" stroke-width="1.5" stroke-linecap="round"/>
+                <!-- Top box (parent) -->
+                <rect x="60" y="14" width="40" height="34" rx="3" fill="var(--color-surface)" stroke="var(--color-accent, #2557f6)" stroke-width="1.5"/>
+                <rect x="60" y="36" width="40" height="12" rx="0" fill="var(--color-surface-muted, #eef0f4)"/>
+                <!-- Bottom-left box -->
+                <rect x="20" y="82" width="40" height="34" rx="3" fill="var(--color-surface)" stroke="var(--color-accent, #2557f6)" stroke-width="1.5"/>
+                <rect x="20" y="104" width="40" height="12" rx="0" fill="var(--color-surface-muted, #eef0f4)"/>
+                <!-- Bottom-right box -->
+                <rect x="100" y="82" width="40" height="34" rx="3" fill="var(--color-surface)" stroke="var(--color-accent, #2557f6)" stroke-width="1.5"/>
+                <rect x="100" y="104" width="40" height="12" rx="0" fill="var(--color-surface-muted, #eef0f4)"/>
+              </svg>
+              <h2 class="connectors-empty-title">No data synced yet</h2>
+              <p class="connectors-empty-desc">A stream pulls objectives or key results from a published Tableau data source and keeps them up to date here automatically. Add your first stream to see your Tableau OKRs in Operationalize.</p>
+              <button class="btn btn-primary" type="button" id="empty-add-connector-btn">Add your first stream</button>
+            </div>
+          </section>
+
+        </div><!-- /list modal-body -->
+      </div><!-- /list view -->
+
+      <!-- ============ DETAIL VIEW ============ -->
+      <div class="drawer-view" data-drawer-view="detail" hidden>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="#" data-nav-page="integrations">Integrations</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <a href="#" class="drawer-back">Tableau</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <span class="breadcrumb-current">Q2 OKRs &amp; KRs</span>
+        </nav>
+
+        <header class="modal-header" style="padding-left: 0; padding-right: 0">
+          <div class="connector-drawer-head">
+            <div class="connector-drawer-head-main">
+              <div class="connector-drawer-name-row">
+                <h1 class="h1" id="connector-drawer-name">Q2 OKRs &amp; KRs</h1>
+                <span class="tag tag-positive" id="connector-drawer-status">Active</span>
+              </div>
+              <div class="connector-drawer-sub">
+                <span class="connector-drawer-sub-item"><i class="ph ph-link-simple"></i><span id="connector-drawer-view"><code style="font-size: 12px">8b3c2f1e-4d5a-4e6b-9c8d-2f1a3b4c5d6e</code></span></span>
+                <span class="connector-drawer-sub-item"><i class="ph ph-clock"></i><span id="connector-drawer-last-sync">Synced 4h ago</span></span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+      <div class="tabs" role="tablist" id="connector-tabs">
+        <button class="tab is-active" role="tab" aria-selected="true" type="button" data-tab="mapping">Configuration</button>
+        <button class="tab" role="tab" aria-selected="false" type="button" data-tab="history">Sync history</button>
+        <button class="tab" role="tab" aria-selected="false" type="button" data-tab="settings" hidden>Settings</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- =================== CONFIGURATION TAB =================== -->
+        <div class="connector-tab-panel" data-tab-panel="mapping" id="configuration-panel">
+
+          <div class="mapping-card">
+
+            <!-- ============ GENERAL ============ -->
+            <section class="mapping-section">
+              <header class="mapping-section-head">
+                <h2 class="mapping-section-title">General</h2>
+              </header>
+              <div class="field-mapping-rows">
+                <div class="field-mapping-row">
+                  <span class="field-mapping-label">Stream name</span>
+                  <span class="field-mapping-arrow"></span>
+                  <div class="field-mapping-input">
+                    <input class="input" type="text" value="Engineering OKRs" style="width: 100%" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <hr class="mapping-card-divider" />
+
+            <div class="mapping-grid">
+
+              <!-- ============ OBJECTIVES SECTION ============ -->
+              <section class="mapping-section">
+                <header class="mapping-section-head">
+                  <h2 class="mapping-section-title">Objectives</h2>
+                </header>
+
+                <div class="field-mapping-rows">
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Tableau data source</span>
+                    <span class="field-mapping-arrow"></span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select has-search">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">eng_okr_tracker</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <div class="dropdown-search"><svg class="dropdown-search-icon"><use href="#i-search"/></svg><input type="search" class="dropdown-search-input" placeholder="Search data sources…" /></div>
+                          <div class="dropdown-items">
+                            <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>eng_okr_tracker</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>q2_okr_tracker</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>sales_2026_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>platform_reliability_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>customer_success_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>quality_quarterly_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>marketing_funnel_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>finance_q4_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>design_system_okrs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>security_compliance_okrs</button>
+                          </div>
+                          <div class="dropdown-empty" hidden>No data sources match.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="mapping-sub-title">Field mapping</h3>
+
+                <div class="field-mapping-rows">
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">ID</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">objective_id</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>objective_id</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Description</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">objective_title</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>objective_title</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Progress</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">obj_progress_pct</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>obj_progress_pct</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Parent key result</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">(Don't sync)</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>kr_id</button>
+                        </div>
+                      </div>
+                      <p class="field-mapping-hint">Connects objectives with higher-level key results they drive.</p>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Owner</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">owner_email</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>owner_email</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Cadence</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">timeframe</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>timeframe</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+              <!-- ============ KEY RESULTS SECTION ============ -->
+              <section class="mapping-section">
+                <header class="mapping-section-head">
+                  <h2 class="mapping-section-title">Key Results</h2>
+                </header>
+
+                <div class="field-mapping-rows">
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Tableau data source</span>
+                    <span class="field-mapping-arrow"></span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select has-search" id="config-kr-view-picker">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">eng_okr_tracker</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <div class="dropdown-search"><svg class="dropdown-search-icon"><use href="#i-search"/></svg><input type="search" class="dropdown-search-input" placeholder="Search data sources…" /></div>
+                          <div class="dropdown-items">
+                            <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>eng_okr_tracker</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>eng_krs_progress</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>eng_squad_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>platform_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>customer_success_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>sales_pipeline_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>marketing_growth_krs</button>
+                            <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>design_quality_krs</button>
+                          </div>
+                          <div class="dropdown-empty" hidden>No data sources match.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="mapping-sub-title">Field mapping</h3>
+
+                <div class="field-mapping-rows">
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">ID</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">kr_id</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>kr_id</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Objective ID</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">objective_id</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>objective_id</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Description</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">kr_title</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>kr_title</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Progress</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">kr_progress_pct</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>kr_progress_pct</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>(Don't sync)</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+            </div>
+
+          </div>
+
+          <!-- ============ DANGER ZONE ============ -->
+          <section class="mapping-section" style="margin-top: var(--ic-space-5)">
+            <header class="mapping-section-head">
+              <h2 class="mapping-section-title">Danger zone</h2>
+            </header>
+            <div class="danger-zone">
+              <div class="danger-zone-row">
+                <div class="danger-zone-text">
+                  <strong>Remove stream</strong>
+                  Removes this stream and its sync history. You'll choose whether to delete the OKRs it pulled from Tableau or keep them in Operationalize as a read-only record that no longer updates.
+                </div>
+                <button class="btn btn-sm btn-danger" type="button">Remove</button>
+              </div>
+            </div>
+          </section>
+
+        </div><!-- /configuration -->
+
+        <!-- =================== HISTORY TAB =================== -->
+        <div class="connector-tab-panel" data-tab-panel="history" hidden>
+
+          <table class="table sync-runs-table">
+            <thead>
+              <tr>
+                <th style="width: 32px"></th>
+                <th>Status</th>
+                <th>Counts</th>
+                <th>When</th>
+                <th style="text-align: right">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- Running — currently in progress, counters not yet committed -->
+              <tr class="sync-run-row" data-status="running">
+                <td><span style="display: inline-block; width: 24px"></span></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-running"></span>Running</span></td>
+                <td><span class="is-muted-dash">—</span></td>
+                <td>Started 1m ago</td>
+                <td style="text-align: right" class="is-muted-dash">—</td>
+              </tr>
+
+              <!-- Latest finished run — completed with issues (amber) — expanded by default -->
+              <tr class="sync-run-row is-open" data-status="issues">
+                <td><button class="row-toggle" type="button" aria-expanded="true" aria-label="Toggle details"><i class="ph ph-caret-right"></i></button></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-issues"></span>Completed with issues</span></td>
+                <td>89 processed · 86 updated · <strong class="is-fail">3 failed</strong> · <strong class="is-skip">2 skipped</strong></td>
+                <td>4h ago</td>
+                <td style="text-align: right">38s</td>
+              </tr>
+              <tr class="sync-run-detail-row">
+                <td colspan="5">
+                  <div class="run-issues">
+                    <div class="run-issues-block is-open">
+                      <div class="run-issues-block-head"><i class="ph ph-caret-right"></i><i class="ph ph-warning-circle" style="color: var(--color-warning, #d97706)"></i>Failed rows (3)</div>
+                      <div class="issues-table">
+                        <div class="issues-table-row issues-table-row-failed is-header"><span>Row</span><span>External ID</span><span>Reason</span></div>
+                        <div class="issues-table-row issues-table-row-failed"><span class="cell-row">23</span><span><code>KR-2310</code></span><span class="cell-reason">User not found by email: <code>john.dough@acme.com</code> (typo?)</span></div>
+                        <div class="issues-table-row issues-table-row-failed"><span class="cell-row">41</span><span><code>KR-2356</code></span><span class="cell-reason">Progress value out of range: <code>110</code> (expected 0–100)</span></div>
+                        <div class="issues-table-row issues-table-row-failed"><span class="cell-row">67</span><span><code>KR-2401</code></span><span class="cell-reason">Name can't be blank</span></div>
+                      </div>
+                    </div>
+                    <div class="run-issues-block is-open">
+                      <div class="run-issues-block-head"><i class="ph ph-caret-right"></i><i class="ph ph-skip-forward" style="color: var(--color-warning-strong, #92400e)"></i>Skipped rows (2)</div>
+                      <div class="issues-table">
+                        <div class="issues-table-row issues-table-row-skipped is-header"><span>Row</span><span>Field</span><span>Why</span></div>
+                        <div class="issues-table-row issues-table-row-skipped"><span class="cell-row">12</span><span><code>owner_email</code></span><span class="cell-reason">Could not resolve user — value was blank.</span></div>
+                        <div class="issues-table-row issues-table-row-skipped"><span class="cell-row">58</span><span><code>objective_id</code></span><span class="cell-reason">Missing required value — row dropped.</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Completed cleanly -->
+              <tr class="sync-run-row" data-status="completed">
+                <td><button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle details"><i class="ph ph-caret-right"></i></button></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-completed"></span>Completed</span></td>
+                <td>88 processed · 88 updated</td>
+                <td>1d ago</td>
+                <td style="text-align: right">31s</td>
+              </tr>
+              <tr class="sync-run-detail-row" hidden>
+                <td colspan="5">
+                  <div class="run-issues">
+                    <div class="issues-table"><div class="issues-table-empty">All rows synced cleanly. No failures or skips.</div></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="sync-run-row" data-status="completed">
+                <td><button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle details"><i class="ph ph-caret-right"></i></button></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-completed"></span>Completed</span></td>
+                <td>85 processed · 85 updated</td>
+                <td>2d ago</td>
+                <td style="text-align: right">28s</td>
+              </tr>
+              <tr class="sync-run-detail-row" hidden>
+                <td colspan="5">
+                  <div class="run-issues">
+                    <div class="issues-table"><div class="issues-table-empty">All rows synced cleanly. No failures or skips.</div></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Failed — job aborted, partial data lost per spec (counters all 0) -->
+              <tr class="sync-run-row" data-status="failed">
+                <td><button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle details"><i class="ph ph-caret-right"></i></button></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-failed"></span>Failed</span></td>
+                <td>Token refresh failed</td>
+                <td>3d ago</td>
+                <td style="text-align: right">4s</td>
+              </tr>
+              <tr class="sync-run-detail-row" hidden>
+                <td colspan="5">
+                  <div class="run-issues">
+                    <div class="run-issues-block is-open">
+                      <div class="run-issues-block-head"><i class="ph ph-warning-circle" style="color: var(--color-danger, #dc2626)"></i>Cycle failure</div>
+                      <div class="issues-table"><div class="issues-table-empty">Tableau OAuth token expired and automatic refresh failed after 3 retries. Partial sync data was discarded. Reconnect to resume syncs.</div></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="sync-run-row" data-status="completed">
+                <td><button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle details"><i class="ph ph-caret-right"></i></button></td>
+                <td><span class="sync-run-status-cell"><span class="prior-run-status is-completed"></span>Completed</span></td>
+                <td>84 processed · 4 created · 80 updated</td>
+                <td>4d ago</td>
+                <td style="text-align: right">35s</td>
+              </tr>
+              <tr class="sync-run-detail-row" hidden>
+                <td colspan="5">
+                  <div class="run-issues">
+                    <div class="issues-table"><div class="issues-table-empty">All rows synced cleanly. No failures or skips.</div></div>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+        </div><!-- /history -->
+
+        <!-- =================== SETTINGS TAB =================== -->
+        <div class="connector-tab-panel" data-tab-panel="settings" hidden>
+
+          <div class="settings-section">
+            <h3>Identity</h3>
+            <div class="field">
+              <label class="field-label" for="connector-settings-name">Connector name</label>
+              <input class="input" type="text" id="connector-settings-name" value="Engineering KRs" />
+              <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-info"></i>Display name shown in the connectors list. Doesn't affect what gets synced.</p>
+            </div>
+            <div class="okr-grid-2" style="margin-top: var(--ic-space-3)">
+              <div class="field">
+                <span class="field-label">Tableau view</span>
+                <div class="input" style="background: var(--color-surface-muted, var(--color-surface)); color: var(--color-text-muted); user-select: text">Engineering KRs — Progress</div>
+                <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-lock-simple"></i>Cannot change after creation.</p>
+              </div>
+              <div class="field">
+                <span class="field-label">Entity type</span>
+                <div class="input" style="background: var(--color-surface-muted, var(--color-surface)); color: var(--color-text-muted); user-select: text">Key Result</div>
+                <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-lock-simple"></i>Cannot change after creation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Status</h3>
+            <label class="dropdown-item" style="padding: var(--ic-space-2); cursor: pointer; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm)">
+              <span class="dropdown-item-text"><span class="dropdown-item-label">Connector active</span><span class="dropdown-item-description">Disable to pause sync runs without deleting mappings.</span></span>
+              <span class="switch" style="margin-left: auto"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+            </label>
+          </div>
+
+          <div class="settings-section">
+            <div class="danger-zone">
+              <h3>Danger zone</h3>
+              <div class="danger-zone-row">
+                <span class="danger-zone-text">
+                  <strong>Delete connector</strong>
+                  Removes this connector and its sync history. Any TopTeam records previously imported are kept but will no longer be updated.
+                </span>
+                <button class="btn btn-sm btn-danger" type="button">Delete connector</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /settings -->
+
+      </div><!-- /modal-body -->
+
+      </div><!-- /detail view -->
+
+      <!-- ============ CREATE VIEW (new connector — pick view + entity + map fields in one page) ============ -->
+      <div class="drawer-view" data-drawer-view="create" hidden>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="#" data-nav-page="integrations">Integrations</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <a href="#" class="drawer-back">Tableau</a>
+          <svg><use href="#i-chevron-right"/></svg>
+          <span class="breadcrumb-current">New Tableau stream</span>
+        </nav>
+
+        <header class="modal-header" style="padding-left: 0; padding-right: 0">
+          <div class="connector-drawer-head">
+            <div class="connector-drawer-head-main">
+              <div class="connector-drawer-name-row">
+                <h1 class="h1">New Tableau stream</h1>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="modal-body" style="padding-left: 0; padding-right: 0">
+
+          <div class="mapping-card">
+
+            <!-- ============ GENERAL ============ -->
+            <section class="mapping-section">
+              <header class="mapping-section-head">
+                <h2 class="mapping-section-title">General</h2>
+              </header>
+              <div class="field-mapping-rows">
+                <div class="field-mapping-row">
+                  <span class="field-mapping-label">Stream name</span>
+                  <span class="field-mapping-arrow"></span>
+                  <div class="field-mapping-input">
+                    <input class="input" type="text" id="create-connector-name" placeholder="Engineering OKRs" style="width: 100%" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <hr class="mapping-card-divider" />
+
+            <div class="mapping-grid">
+
+              <!-- ============ OBJECTIVES SECTION ============ -->
+              <section class="mapping-section">
+                <header class="mapping-section-head">
+                  <h2 class="mapping-section-title">Objectives</h2>
+                </header>
+
+                <div class="field-mapping-rows">
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Tableau data source</span>
+                    <span class="field-mapping-arrow"></span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button">
+                          <span class="input-select-value">A published data source from Tableau…</span>
+                          <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                        </button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q2 OKR Tracker</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Engineering KRs — Progress</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Sales 2026 OKRs</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Platform Reliability OKRs</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="mapping-sub-title">Field mapping</h3>
+
+                <div class="field-mapping-rows">
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">ID</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">ID of an objective</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>ID of an objective</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Description</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Description of an objective</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Description of an objective</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Progress</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Progress %</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Progress %</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Parent KR <span class="optional-mark">(optional)</span></span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">ID of a key result</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>ID of a key result</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                      <p class="field-mapping-hint">Connects objectives with higher-level key results they drive.</p>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Owner <span class="optional-mark">(optional)</span></span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Select an email of the OKR owner</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Select an email of the OKR owner</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Cadence <span class="optional-mark">(optional)</span></span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">A cadence of an OKR</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>A cadence of an OKR</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+              <!-- ============ KEY RESULTS SECTION ============ -->
+              <section class="mapping-section">
+                <header class="mapping-section-head">
+                  <h2 class="mapping-section-title">Key Results</h2>
+                </header>
+
+                <div class="field-mapping-rows">
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Tableau data source</span>
+                    <span class="field-mapping-arrow"></span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select" id="create-kr-view-picker">
+                        <button class="input-select-trigger" aria-expanded="false" type="button">
+                          <span class="input-select-value">A published data source from Tableau…</span>
+                          <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                        </button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Engineering KRs — Progress</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Customer Success KRs</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="mapping-sub-title">Field mapping</h3>
+
+                <div class="field-mapping-rows">
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">ID</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">ID of a key result</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>ID of a key result</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Objective ID <span class="optional-mark">(optional)</span></span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">ID of an objective</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>ID of an objective</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                      <p class="field-mapping-hint">Links key results to the objectives they quantify.</p>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Description</span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Description of a key result</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Description of a key result</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-mapping-row">
+                    <span class="field-mapping-label">Progress <span class="optional-mark">(optional)</span></span>
+                    <span class="field-mapping-arrow">→</span>
+                    <div class="field-mapping-input">
+                      <div class="input-select map-source-select">
+                        <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Progress %</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                        <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Progress %</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <footer class="modal-footer" style="padding-left: 0; padding-right: 0; justify-content: flex-start; gap: var(--ic-space-2)">
+          <button class="btn btn-primary" type="button" id="create-connector-save">Add stream</button>
+          <button class="btn btn-secondary drawer-back" type="button">Back to connectors</button>
+        </footer>
+      </div><!-- /create view -->
+
+  </section>
+  <!-- TABLEAU-PAGE-END -->
       <!-- =================== OKRs page =================== -->
       <section class="page-view" data-page="okrs" hidden>
 
@@ -3214,6 +4163,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
           <div class="page-head-actions">
             <button class="btn btn-sm btn-secondary">Export CSV</button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-secondary dropdown-trigger" aria-expanded="false" type="button">
+                <i class="ph ph-upload-simple"></i>Upload
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item" type="button" data-nav-page="integrations-tableau">
+                  <i class="ph ph-chart-bar"></i>
+                  <span class="dropdown-item-text">
+                    <span class="dropdown-item-label">Connect via Tableau</span>
+                    <span class="dropdown-item-description">Sync OKRs from a Tableau view</span>
+                  </span>
+                </button>
+                <button class="dropdown-item" type="button">
+                  <i class="ph ph-file-csv"></i>
+                  <span class="dropdown-item-text">
+                    <span class="dropdown-item-label">Import from CSV</span>
+                    <span class="dropdown-item-description">Upload a CSV file with OKR rows</span>
+                  </span>
+                </button>
+              </div>
+            </div>
             <button class="btn btn-sm btn-primary" disabled title="OKRs are imported from Tableau">Create OKR</button>
           </div>
         </div>
@@ -3540,14 +4511,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
               <!-- ===== Imported from Tableau (read-only) ===== -->
 
-              <tr data-level="0" data-source="tableau">
+              <!-- Variant A — "Tableau" tag chip after the status pill -->
+              <tr data-level="0" data-source="tableau" class="tableau-row-variant-a">
                 <td>
                   <div class="cell-title-row">
                     <span class="row-toggle-spacer"></span>
-                    <span class="source-mark" title="Imported from Tableau">T</span>
+                    <span class="variant-id" title="Variant A">A</span>
                     <div class="cell-title">
-                      <span class="cell-title-text">[Reliability] — Increase platform uptime to 99.95% SLA across all regions</span>
+                      <span class="cell-title-text">[Q2 Reliability] — Increase platform uptime to 99.95% SLA across all regions</span>
                       <span><span class="tag tag-positive">Signed-off</span></span>
+                      <span><span class="tag tableau-tag"><i class="ph ph-link-simple"></i>Tableau</span></span>
                     </div>
                   </div>
                 </td>
@@ -3570,13 +4543,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <td><div class="cell-actions"><i class="ph ph-lock-simple read-only-mark" title="Read-only · imported from Tableau"></i></div></td>
               </tr>
 
-              <tr data-level="0" data-source="tableau">
+              <!-- Variant B — Left-edge accent bar -->
+              <tr data-level="0" data-source="tableau" class="tableau-row-variant-b">
                 <td>
                   <div class="cell-title-row">
                     <span class="row-toggle-spacer"></span>
-                    <span class="source-mark" title="Imported from Tableau">T</span>
+                    <span class="variant-id" title="Variant B">B</span>
                     <div class="cell-title">
-                      <span class="cell-title-text">[Growth] — Reduce customer support ticket volume by 30% via self-serve workflows</span>
+                      <span class="cell-title-text">[Q2 Growth] — Reduce customer support ticket volume by 30% via self-serve workflows</span>
                       <span><span class="tag tag-warning">Pending sign-off</span></span>
                     </div>
                   </div>
@@ -3600,13 +4574,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <td><div class="cell-actions"><i class="ph ph-lock-simple read-only-mark" title="Read-only · imported from Tableau"></i></div></td>
               </tr>
 
-              <tr data-level="0" data-source="tableau">
+              <!-- Variant C — Subtle background tint -->
+              <tr data-level="0" data-source="tableau" class="tableau-row-variant-c">
                 <td>
                   <div class="cell-title-row">
                     <span class="row-toggle-spacer"></span>
-                    <span class="source-mark" title="Imported from Tableau">T</span>
+                    <span class="variant-id" title="Variant C">C</span>
                     <div class="cell-title">
-                      <span class="cell-title-text">[Revenue] — Achieve $5M ARR from enterprise segment by year-end</span>
+                      <span class="cell-title-text">[Q2 Revenue] — Achieve $5M ARR from enterprise segment by quarter-end</span>
                       <span><span class="tag tag-dark">Draft</span></span>
                     </div>
                   </div>
@@ -3630,13 +4605,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <td><div class="cell-actions"><i class="ph ph-lock-simple read-only-mark" title="Read-only · imported from Tableau"></i></div></td>
               </tr>
 
-              <tr data-level="0" data-source="tableau">
+              <!-- Variant D — Small orange brand dot -->
+              <tr data-level="0" data-source="tableau" class="tableau-row-variant-d">
                 <td>
                   <div class="cell-title-row">
                     <span class="row-toggle-spacer"></span>
-                    <span class="source-mark" title="Imported from Tableau">T</span>
+                    <span class="variant-id" title="Variant D">D</span>
+                    <span class="tableau-dot" title="Imported from Tableau"></span>
                     <div class="cell-title">
-                      <span class="cell-title-text">[Engineering] — Cut developer onboarding from 14 days to 5 days</span>
+                      <span class="cell-title-text">[Q2 Engineering] — Cut developer onboarding from 14 days to 5 days</span>
                       <span><span class="tag tag-positive">Signed-off</span></span>
                     </div>
                   </div>
@@ -3660,13 +4637,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <td><div class="cell-actions"><i class="ph ph-lock-simple read-only-mark" title="Read-only · imported from Tableau"></i></div></td>
               </tr>
 
-              <tr data-level="0" data-source="tableau">
+              <!-- Variant E — Italic muted title + lock icon prefix -->
+              <tr data-level="0" data-source="tableau" class="tableau-row-variant-e">
                 <td>
                   <div class="cell-title-row">
                     <span class="row-toggle-spacer"></span>
-                    <span class="source-mark" title="Imported from Tableau">T</span>
+                    <span class="variant-id" title="Variant E">E</span>
+                    <i class="ph ph-lock-simple tableau-lock-prefix" title="Imported from Tableau · read-only"></i>
                     <div class="cell-title">
-                      <span class="cell-title-text">[Security] — Achieve SOC 2 Type II compliance with a clean audit</span>
+                      <span class="cell-title-text">[Q2 Security] — Achieve SOC 2 Type II compliance with a clean audit</span>
                       <span><span class="tag tag-positive">Signed-off</span></span>
                     </div>
                   </div>
@@ -3860,618 +4839,103 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     </aside>
   </div>
 
-
-  <!-- Connect Tableau modal — Step 1: OAuth authorize · Step 2: Connected App credentials -->
+  <!-- Connect Tableau modal — single step: instructions + Connected App credentials -->
   <div class="modal-overlay" id="modal-tableau-connect" hidden>
-    <div class="modal" style="max-width: 520px">
+    <div class="modal" style="max-width: 620px">
       <header class="modal-header">
-        <h2 class="modal-title" id="connect-modal-title">Connect Tableau</h2>
+        <h2 class="modal-title">Connected app credentials</h2>
         <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
       </header>
 
-      <!-- Step 1: OAuth authorize -->
-      <div class="modal-body" data-connect-step="1">
-        <div class="oauth-brand">
-          <div class="oauth-brand-app">
-            <div class="integration-logo" style="background: var(--ic-palette-graphite-800); color: var(--ic-palette-white); width: 56px; height: 56px; font-size: 22px; border-radius: var(--ic-radius-md)">O</div>
-            <span class="oauth-brand-label">Operationalize</span>
-          </div>
-          <i class="ph ph-arrows-left-right" style="font-size: 20px; color: var(--color-text-subtle)"></i>
-          <div class="oauth-brand-app">
-            <div class="integration-logo" style="background: var(--ic-palette-orange-100); color: var(--ic-palette-orange-600); width: 56px; height: 56px; font-size: 22px; border-radius: var(--ic-radius-md)">T</div>
-            <span class="oauth-brand-label">Tableau</span>
-          </div>
-        </div>
+      <div class="modal-body">
 
-        <p class="body" style="text-align: center; margin: 0 0 var(--ic-space-2); font-weight: var(--ic-weight-semibold)">Authorize Operationalize on Tableau</p>
-        <p class="body-sm" style="text-align: center; margin: 0 0 var(--ic-space-5); color: var(--color-text-muted)">Sign in to your Tableau workspace and approve access. You'll be returned here to finish setup.</p>
-
-        <div class="alert alert-info" style="margin-bottom: var(--ic-space-4)">
-          <i class="ph ph-info alert-icon"></i>
-          <p class="alert-message">Operationalize will be able to read OKR data from selected views, sync rows as read-only OKRs or Key Results, and refresh on a schedule.</p>
-        </div>
-      </div>
-
-      <!-- Step 2: Connected App credentials -->
-      <div class="modal-body" data-connect-step="2" hidden>
-        <div class="alert alert-success" style="margin-bottom: var(--ic-space-4)">
-          <i class="ph ph-check-circle alert-icon"></i>
-          <p class="alert-message">Authorized as <strong>sync@acme.com</strong>. Now paste the Connected App credentials from your Tableau admin console.</p>
-        </div>
-
-        <div class="field" style="margin-bottom: var(--ic-space-3)">
-          <label class="field-label" for="connect-url">Tableau URL</label>
-          <input class="input" type="url" id="connect-url" placeholder="https://tableau.acme.com/#/site/finance/home" value="https://tableau.acme.com/#/site/finance/home" />
-          <p class="field-mapping-hint" style="margin-top: 4px"><i class="ph ph-info"></i>Any page URL from your Tableau site — the site name is extracted automatically.</p>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-          <div class="field">
-            <label class="field-label" for="connect-client-id">Client ID</label>
-            <input class="input" type="text" id="connect-client-id" placeholder="b3e5f…" />
-          </div>
-          <div class="field">
-            <label class="field-label" for="connect-secret-id">Secret ID</label>
-            <input class="input" type="text" id="connect-secret-id" placeholder="secret-key-1" />
+        <div class="connect-step">
+          <h3 class="connect-step-title"><span class="connect-step-num">1</span>Create a connected app in Tableau</h3>
+          <div class="alert alert-info">
+            <i class="ph ph-info alert-icon"></i>
+            <div class="alert-message">
+              <p style="margin: 0 0 var(--ic-space-2)">In Tableau, open <strong>Site-settings → Connected Apps</strong> and create a new connected app. Enable it and generate a secret key.</p>
+              <a href="#" style="color: var(--color-accent); text-decoration: none; font-weight: var(--ic-weight-medium)">Step-by-step guide</a>
+            </div>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-3)">
-          <div class="field">
-            <label class="field-label" for="connect-secret-value">Secret Value</label>
-            <input class="input" type="password" id="connect-secret-value" placeholder="Bk3$mJ…" />
-          </div>
-          <div class="field">
-            <label class="field-label" for="connect-user-email">User email</label>
-            <input class="input" type="email" id="connect-user-email" placeholder="sync@acme.com" />
+        <div class="connect-step" style="margin-top: var(--ic-space-5)">
+          <h3 class="connect-step-title"><span class="connect-step-num">2</span>Enter your connected app credentials</h3>
+          <div class="tab-connection-form-stack">
+            <div class="field">
+              <label class="field-label" for="connect-user-email">User email</label>
+              <input class="input" type="email" id="connect-user-email" placeholder="sync@acme.com" />
+              <span class="field-hint">The Tableau account whose access is used to run syncs.</span>
+            </div>
+            <div class="field">
+              <label class="field-label" for="connect-client-id">Client ID</label>
+              <input class="input" type="text" id="connect-client-id" placeholder="sync@acme.com" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="connect-secret-id">Secret ID</label>
+              <input class="input" type="text" id="connect-secret-id" placeholder="secret-key-1" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="connect-secret-value">Secret Value</label>
+              <input class="input" type="text" id="connect-secret-value" placeholder="secret-key-1" />
+            </div>
           </div>
         </div>
+
       </div>
 
       <footer class="modal-footer">
-        <button class="btn btn-secondary" data-connect-back type="button" style="margin-right: auto" hidden>Back</button>
         <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
-        <button class="btn btn-primary" data-connect-authorize type="button">Authorize on Tableau</button>
-        <button class="btn btn-primary" data-connect-finish type="button" hidden>Connect</button>
+        <button class="btn btn-primary" data-connect-finish type="button">Connect</button>
       </footer>
     </div>
   </div>
 
-  <!-- Tableau settings drawer — master (connection + connectors list) and detail (single connector) -->
-  <div class="drawer-overlay" id="drawer-tableau-settings" hidden>
+  <!-- Manage Tableau connection — credentials side drawer (opened from the Tableau page-head "Manage" button) -->
+  <div class="drawer-overlay" id="drawer-tableau-connection" hidden>
     <aside class="drawer drawer-regular">
-
-      <!-- ============ LIST VIEW ============ -->
-      <div class="drawer-view" data-drawer-view="list">
-        <header class="modal-header">
-          <div style="display: flex; align-items: center; gap: var(--ic-space-3)">
-            <div class="integration-logo" style="background: var(--ic-palette-orange-100); color: var(--ic-palette-orange-600); width: 32px; height: 32px; font-size: 16px">T</div>
-            <h2 class="modal-title">Tableau</h2>
-          </div>
-          <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
-        </header>
-        <div class="modal-body">
-
-          <!-- Connection header card -->
-          <div class="tab-connection-card" id="tab-connection-card">
-            <div class="tab-connection-pill">
-              <span class="tab-connection-status"></span>
-              <span class="tab-connection-text">
-                <strong>Connected</strong> to <strong>tableau.acme.com</strong>
-                <span class="muted">· finance site · as sync@acme.com</span>
-              </span>
-              <span class="tab-connection-actions">
-                <button class="btn btn-sm btn-secondary" type="button" id="tab-connection-toggle">Manage</button>
-              </span>
-            </div>
-            <div class="tab-connection-form">
-              <div class="alert alert-warning" style="margin-bottom: var(--ic-space-4)">
-                <i class="ph ph-warning alert-icon"></i>
-                <p class="alert-message">Only one Tableau connection is active per company. <strong>Saving replaces</strong> the current connection — existing connectors keep their setup but use the new credentials on the next sync.</p>
-              </div>
-              <div class="tab-connection-form-grid">
-                <div class="field field-wide">
-                  <label class="field-label" for="tab-url">Tableau URL</label>
-                  <input class="input" type="url" id="tab-url" value="https://tableau.acme.com/#/site/finance/home" />
-                  <p class="field-hint" style="margin: 4px 0 0; font: var(--type-caption); color: var(--color-text-muted)">Any page URL from your Tableau site — site name is extracted automatically.</p>
-                </div>
-                <div class="field">
-                  <label class="field-label" for="tab-client-id">Client ID</label>
-                  <input class="input" type="text" id="tab-client-id" value="b3e5fd92-7c41-4a8b-9c12-1f4e8a2b3c4d" />
-                </div>
-                <div class="field">
-                  <label class="field-label" for="tab-secret-id">Secret ID</label>
-                  <input class="input" type="text" id="tab-secret-id" value="secret-key-1" />
-                </div>
-                <div class="field">
-                  <label class="field-label" for="tab-secret-value">Secret Value</label>
-                  <input class="input" type="password" id="tab-secret-value" value="••••••••••••••••" />
-                </div>
-                <div class="field">
-                  <label class="field-label" for="tab-user-email">User email</label>
-                  <input class="input" type="email" id="tab-user-email" value="sync@acme.com" />
-                </div>
-              </div>
-              <div class="tab-connection-form-footer">
-                <button class="btn btn-sm btn-danger" type="button" style="margin-right: auto">Disconnect Tableau</button>
-                <button class="btn btn-sm btn-secondary" type="button" id="tab-connection-cancel">Cancel</button>
-                <button class="btn btn-sm btn-primary" type="button">Save & reconnect</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connectors section -->
-          <section style="margin-top: var(--ic-space-5)">
-            <div class="connectors-section-head">
-              <div class="heading-block">
-                <h2 class="h3">Connectors</h2>
-                <p>One connector per Tableau view. Each connector syncs into OKRs or Key Results on a schedule.</p>
-              </div>
-            </div>
-
-            <!-- Inline picker -->
-            <div class="add-connector-panel" id="add-connector-panel">
-              <div class="add-connector-panel-head">
-                <div>
-                  <h3>New connector</h3>
-                  <p class="muted" style="margin: 4px 0 0">Pick a Tableau view and choose what to sync into.</p>
-                </div>
-                <button class="modal-close" type="button" id="add-connector-close" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-              </div>
-
-              <p class="field-label" style="margin-bottom: var(--ic-space-2)">1. Choose a Tableau view</p>
-              <div class="add-connector-search">
-                <svg class="search-icon"><use href="#i-search"/></svg>
-                <input class="input" type="search" id="view-search" placeholder="Search 18 views…" />
-              </div>
-              <div class="view-list" role="listbox">
-                <label class="view-list-item is-selected">
-                  <input type="radio" name="view-pick" value="q2-okrs" checked />
-                  <div>
-                    <div class="view-list-item-name">Q2 OKR Tracker</div>
-                    <div class="view-list-item-path">/views/finance/q2-okr-tracker</div>
-                  </div>
-                </label>
-                <label class="view-list-item">
-                  <input type="radio" name="view-pick" value="eng-krs" />
-                  <div>
-                    <div class="view-list-item-name">Engineering KRs — Progress</div>
-                    <div class="view-list-item-path">/views/engineering/krs-progress</div>
-                  </div>
-                </label>
-                <label class="view-list-item">
-                  <input type="radio" name="view-pick" value="sales-okrs" />
-                  <div>
-                    <div class="view-list-item-name">Sales 2026 OKRs</div>
-                    <div class="view-list-item-path">/views/sales/2026-okrs</div>
-                  </div>
-                </label>
-                <label class="view-list-item">
-                  <input type="radio" name="view-pick" value="reliability" />
-                  <div>
-                    <div class="view-list-item-name">Platform Reliability OKRs</div>
-                    <div class="view-list-item-path">/views/platform/reliability-okrs</div>
-                  </div>
-                </label>
-                <label class="view-list-item">
-                  <input type="radio" name="view-pick" value="cs-krs" />
-                  <div>
-                    <div class="view-list-item-name">Customer Success KRs</div>
-                    <div class="view-list-item-path">/views/cs/key-results</div>
-                  </div>
-                </label>
-                <label class="view-list-item">
-                  <input type="radio" name="view-pick" value="quality" />
-                  <div>
-                    <div class="view-list-item-name">Quality Objectives — Quarterly</div>
-                    <div class="view-list-item-path">/views/quality/quarterly</div>
-                  </div>
-                </label>
-                <div class="view-list-overflow"><i class="ph ph-info" style="margin-right: 4px; vertical-align: -1px"></i>Showing 6 of 18 views.</div>
-              </div>
-
-              <p class="field-label" style="margin-bottom: var(--ic-space-2)">2. Sync into</p>
-              <div class="entity-type-choice">
-                <label class="entity-type-option is-selected">
-                  <input type="radio" name="entity-type" value="okr" checked />
-                  <div>
-                    <div class="entity-type-option-label">OKRs</div>
-                    <div class="entity-type-option-desc">Each row in the view becomes or updates an OKR.</div>
-                  </div>
-                </label>
-                <label class="entity-type-option">
-                  <input type="radio" name="entity-type" value="kr" />
-                  <div>
-                    <div class="entity-type-option-label">Key Results</div>
-                    <div class="entity-type-option-desc">Each row becomes a Key Result; must reference a parent OKR.</div>
-                  </div>
-                </label>
-              </div>
-
-              <div class="add-connector-panel-footer">
-                <button class="btn btn-sm btn-secondary" type="button" id="add-connector-cancel">Cancel</button>
-                <button class="btn btn-sm btn-primary" type="button" id="add-connector-save">Create connector</button>
-              </div>
-            </div>
-
-            <!-- Connectors list -->
-            <div class="connector-list" id="connector-list">
-
-              <article class="connector-row" data-status="active" data-connector-id="eng-krs">
-                <div class="connector-row-main">
-                  <div class="connector-row-title">
-                    <p class="connector-row-name">Engineering KRs</p>
-                    <span class="tag tag-entity-kr">Key Result</span>
-                    <span class="tag tag-positive">Active</span>
-                  </div>
-                  <p class="connector-row-view"><i class="ph ph-link-simple"></i>Engineering KRs — Progress · /views/engineering/krs-progress</p>
-                  <div class="connector-row-meta">
-                    <span class="connector-row-meta-item"><i class="ph ph-warning-circle"></i>Synced 4h ago with errors</span>
-                    <span class="connector-row-meta-item">89 processed · 86 updated · <strong class="is-fail">3 failed</strong></span>
-                  </div>
-                </div>
-                <div class="connector-row-actions">
-                  <span class="switch-inline">
-                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
-                  </span>
-                  <svg style="width: 16px; height: 16px; color: var(--color-text-subtle)"><use href="#i-chevron-right"/></svg>
-                </div>
-              </article>
-
-              <article class="connector-row" data-status="needs-mapping" data-connector-id="sales-okrs">
-                <div class="connector-row-main">
-                  <div class="connector-row-title">
-                    <p class="connector-row-name">Sales 2026 OKRs</p>
-                    <span class="tag tag-entity-okr">OKR</span>
-                    <span class="tag tag-light">Needs mapping</span>
-                  </div>
-                  <p class="connector-row-view"><i class="ph ph-link-simple"></i>Sales 2026 OKRs · /views/sales/2026-okrs</p>
-                  <div class="connector-row-meta">
-                    <span class="connector-row-meta-item"><i class="ph ph-clock"></i>Never synced — map fields to start</span>
-                  </div>
-                </div>
-                <div class="connector-row-actions">
-                  <span class="switch-inline">
-                    <span class="switch"><input type="checkbox" class="switch-input" /><span class="switch-track"></span></span>
-                  </span>
-                  <svg style="width: 16px; height: 16px; color: var(--color-text-subtle)"><use href="#i-chevron-right"/></svg>
-                </div>
-              </article>
-
-            </div>
-
-            <button class="btn btn-ghost add-connector-cta" type="button" id="add-connector-btn"><i class="ph ph-plus"></i>Add connector</button>
-          </section>
-
-        </div><!-- /list modal-body -->
-      </div><!-- /list view -->
-
-      <!-- ============ DETAIL VIEW ============ -->
-      <div class="drawer-view" data-drawer-view="detail" hidden>
-        <header class="modal-header">
-          <button class="drawer-back-btn" type="button" id="drawer-back-btn" aria-label="Back to connectors"><i class="ph ph-arrow-left"></i></button>
-          <div class="connector-drawer-head">
-            <div class="connector-drawer-head-main">
-              <div class="connector-drawer-name-row">
-                <h2 class="connector-drawer-name" id="connector-drawer-name">Engineering KRs</h2>
-                <span class="tag tag-entity-kr" id="connector-drawer-entity">Key Result</span>
-                <span class="tag tag-positive" id="connector-drawer-status">Active</span>
-              </div>
-              <div class="connector-drawer-sub">
-                <span class="connector-drawer-sub-item"><i class="ph ph-link-simple"></i><span id="connector-drawer-view">Engineering KRs — Progress · /views/engineering/krs-progress</span></span>
-                <span class="connector-drawer-sub-item"><i class="ph ph-clock"></i><span id="connector-drawer-last-sync">Synced 4h ago</span></span>
-              </div>
-            </div>
-            <div class="connector-drawer-actions">
-              <span class="switch-inline">
-                <span class="switch"><input type="checkbox" class="switch-input" checked id="connector-drawer-toggle" /><span class="switch-track"></span></span>
-              </span>
-              <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
-            </div>
-          </div>
-        </header>
-
-      <div class="tabs" role="tablist" id="connector-tabs">
-        <button class="tab is-active" role="tab" aria-selected="true" type="button" data-tab="mapping">Field mapping</button>
-        <button class="tab" role="tab" aria-selected="false" type="button" data-tab="history">Sync history</button>
-        <button class="tab" role="tab" aria-selected="false" type="button" data-tab="settings">Settings</button>
-      </div>
-
+      <header class="modal-header">
+        <h2 class="modal-title">Manage Tableau connection</h2>
+        <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
+      </header>
       <div class="modal-body">
-
-        <!-- =================== MAPPING TAB =================== -->
-        <div class="connector-tab-panel" data-tab-panel="mapping">
-
-          <div class="field-mapping-validation-banner" id="mapping-validation-banner" hidden>
-            <i class="ph ph-warning"></i>
-            <span><strong id="mapping-validation-count">0</strong> required fields are still unmapped.</span>
+        <div class="tab-connection-form-stack">
+          <div class="field">
+            <label class="field-label" for="tab-user-email">User email</label>
+            <input class="input" type="email" id="tab-user-email" value="sync@acme.com" />
+            <span class="field-hint">The Tableau account whose access is used to run syncs.</span>
           </div>
-
-          <button class="btn btn-sm btn-secondary field-mapping-suggest-btn" type="button"><i class="ph ph-sparkle" style="margin-right: 4px"></i>Suggest matches from column names</button>
-
-          <!-- Required block (Key Result mapping for "Engineering KRs") -->
-          <div class="field-mapping-block">
-            <div class="field-mapping-block-head">
-              <h3>Required</h3>
-              <span class="muted">5 of 5 mapped</span>
-            </div>
-            <div class="field-mapping-rows">
-
-              <!-- external_id -->
-              <div class="field-mapping-row">
-                <span class="field-mapping-label">KR external ID<span class="required-mark">*</span></span>
-                <div class="field-mapping-input">
-                  <div class="input-select map-source-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button">
-                      <span class="input-select-value">KR ID</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR ID</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>OKR ID</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR Name</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Progress %</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Owner Email</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Owner Name <span class="column-option-empty"><i class="ph ph-warning"></i>12 empty</span></button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Due Date</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- okr_external_id -->
-              <div class="field-mapping-row">
-                <span class="field-mapping-label">Parent OKR ID<span class="required-mark">*</span></span>
-                <div class="field-mapping-input">
-                  <div class="input-select map-source-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button">
-                      <span class="input-select-value">OKR ID</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR ID</button>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>OKR ID</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR Name</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Progress %</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Owner Email</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
-                    </div>
-                  </div>
-                  <p class="field-mapping-hint"><i class="ph ph-link"></i>Links each Key Result to its parent OKR.</p>
-                </div>
-              </div>
-
-              <!-- name -->
-              <div class="field-mapping-row">
-                <span class="field-mapping-label">Name<span class="required-mark">*</span></span>
-                <div class="field-mapping-input">
-                  <div class="input-select map-source-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button">
-                      <span class="input-select-value">KR Name</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR ID</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>OKR ID</button>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR Name</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- progress -->
-              <div class="field-mapping-row">
-                <span class="field-mapping-label">Progress<span class="required-mark">*</span></span>
-                <div class="field-mapping-input">
-                  <div class="input-select map-source-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button">
-                      <span class="input-select-value">Progress %</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>KR Name</button>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Progress %</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
-                    </div>
-                  </div>
-                  <p class="field-mapping-hint"><i class="ph ph-info"></i>Numeric values 0–100. Values outside that range fail the row.</p>
-                </div>
-              </div>
-
-              <!-- owner (with resolver) -->
-              <div class="field-mapping-row has-resolver">
-                <span class="field-mapping-label">Owner<span class="required-mark">*</span></span>
-                <div class="field-mapping-input">
-                  <div class="input-select map-source-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button">
-                      <span class="input-select-value">Owner Email</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Owner Email</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Owner Name <span class="column-option-empty"><i class="ph ph-warning"></i>12 empty</span></button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Don't sync</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="field-mapping-resolver">
-                  <div class="input-select map-resolver-select">
-                    <button class="input-select-trigger" aria-expanded="false" type="button" title="How to look up the user from this column">
-                      <span class="input-select-value">Match by email</span>
-                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <div class="dropdown-menu" hidden>
-                      <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Match by email</button>
-                      <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Match by full name</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+          <div class="field">
+            <label class="field-label" for="tab-client-id">Client ID</label>
+            <input class="input" type="text" id="tab-client-id" value="b3e5fd92-7c41-4a8b-9c12-1f4e8a2b3c4d" />
           </div>
-
-          <!-- Optional block (KR has none; for OKR view it would show start_date + description) -->
-          <div class="field-mapping-block is-collapsible is-collapsed" id="optional-fields-block">
-            <div class="field-mapping-block-head">
-              <h3><i class="ph ph-caret-right"></i>Optional fields</h3>
-              <span class="muted">Key Results have no optional fields. (For OKR connectors: start_date, description.)</span>
-            </div>
-            <div class="field-mapping-rows">
-              <!-- For a KR connector these are empty; included for layout completeness -->
-              <p class="muted" style="font: var(--type-body-sm); color: var(--color-text-muted); padding: var(--ic-space-3) 0">No optional fields for Key Result connectors.</p>
-            </div>
+          <div class="field">
+            <label class="field-label" for="tab-secret-id">Secret ID</label>
+            <input class="input" type="text" id="tab-secret-id" value="secret-key-1" />
           </div>
-
-        </div><!-- /mapping -->
-
-        <!-- =================== HISTORY TAB =================== -->
-        <div class="connector-tab-panel" data-tab-panel="history" hidden>
-
-          <!-- Latest run hero -->
-          <div class="run-hero is-failed">
-            <div class="run-hero-head">
-              <div class="run-hero-title">
-                <i class="ph ph-warning-circle" style="color: var(--color-danger, #dc2626); font-size: 18px"></i>
-                <h3>Completed with errors</h3>
-              </div>
-              <span class="run-hero-time">Started 4h ago · Finished 4h ago · Ran for 38s</span>
-            </div>
-            <div class="run-stats">
-              <div class="run-stat"><span class="run-stat-value">89</span><span class="run-stat-label">Processed</span></div>
-              <div class="run-stat"><span class="run-stat-value">0</span><span class="run-stat-label">Created</span></div>
-              <div class="run-stat"><span class="run-stat-value">86</span><span class="run-stat-label">Updated</span></div>
-              <div class="run-stat is-failed"><span class="run-stat-value">3</span><span class="run-stat-label">Failed</span></div>
-              <div class="run-stat is-skipped"><span class="run-stat-value">0</span><span class="run-stat-label">Skipped</span></div>
-            </div>
-
-            <div class="run-issues">
-
-              <div class="run-issues-block is-open">
-                <div class="run-issues-block-head"><i class="ph ph-caret-right"></i><i class="ph ph-warning-circle" style="color: var(--color-danger, #dc2626)"></i>Failed rows (3)</div>
-                <div class="issues-table">
-                  <div class="issues-table-row issues-table-row-failed is-header">
-                    <span>Row</span><span>External ID</span><span>Reason</span>
-                  </div>
-                  <div class="issues-table-row issues-table-row-failed">
-                    <span class="cell-row">23</span>
-                    <span><code>KR-2310</code></span>
-                    <span class="cell-reason">User not found by email: <code>john.dough@acme.com</code> (typo?)</span>
-                  </div>
-                  <div class="issues-table-row issues-table-row-failed">
-                    <span class="cell-row">41</span>
-                    <span><code>KR-2356</code></span>
-                    <span class="cell-reason">Progress value out of range: <code>110</code> (expected 0–100)</span>
-                  </div>
-                  <div class="issues-table-row issues-table-row-failed">
-                    <span class="cell-row">67</span>
-                    <span><code>KR-2401</code></span>
-                    <span class="cell-reason">Name can't be blank</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="run-issues-block">
-                <div class="run-issues-block-head"><i class="ph ph-caret-right"></i><i class="ph ph-skip-forward" style="color: var(--color-warning-strong, #92400e)"></i>Skipped rows (0)</div>
-                <div class="issues-table">
-                  <div class="issues-table-empty">No rows skipped in this run.</div>
-                </div>
-              </div>
-
-            </div>
+          <div class="field">
+            <label class="field-label" for="tab-secret-value">Secret Value</label>
+            <input class="input" type="password" id="tab-secret-value" value="••••••••••••••••" />
           </div>
+        </div>
 
-          <!-- Prior runs -->
-          <div class="prior-runs">
-            <div class="prior-runs-head">Prior runs</div>
-
-            <div class="prior-run-row">
-              <span class="prior-run-status is-completed"></span>
-              <span>Completed</span>
-              <span class="prior-run-counts">88 processed · 88 updated · <strong>0 failed</strong></span>
-              <span class="prior-run-time">1d ago · 31s</span>
-            </div>
-            <div class="prior-run-row">
-              <span class="prior-run-status is-completed"></span>
-              <span>Completed</span>
-              <span class="prior-run-counts">85 processed · 85 updated · <strong>0 failed</strong></span>
-              <span class="prior-run-time">2d ago · 28s</span>
-            </div>
-            <div class="prior-run-row">
-              <span class="prior-run-status is-failed"></span>
-              <span>Failed</span>
-              <span class="prior-run-counts">Token refresh failed · 0 rows processed</span>
-              <span class="prior-run-time">3d ago · 4s</span>
-            </div>
-            <div class="prior-run-row">
-              <span class="prior-run-status is-completed"></span>
-              <span>Completed</span>
-              <span class="prior-run-counts">84 processed · 4 created · 80 updated · <strong>0 failed</strong></span>
-              <span class="prior-run-time">4d ago · 35s</span>
-            </div>
+        <div class="alert alert-danger" style="margin-top: var(--ic-space-6); align-items: flex-start">
+          <i class="ph ph-warning alert-icon"></i>
+          <div class="alert-message" style="flex: 1">
+            <p style="margin: 0 0 var(--ic-space-2); font-weight: var(--ic-weight-semibold)">Disconnect Tableau</p>
+            <p style="margin: 0 0 var(--ic-space-3)">Disconnecting deactivates all connectors immediately. Existing imported OKRs remain but will no longer sync.</p>
+            <button class="btn btn-sm btn-danger" type="button">Disconnect Tableau</button>
           </div>
-
-        </div><!-- /history -->
-
-        <!-- =================== SETTINGS TAB =================== -->
-        <div class="connector-tab-panel" data-tab-panel="settings" hidden>
-
-          <div class="settings-section">
-            <h3>Identity</h3>
-            <div class="field">
-              <label class="field-label" for="connector-settings-name">Connector name</label>
-              <input class="input" type="text" id="connector-settings-name" value="Engineering KRs" />
-              <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-info"></i>Display name shown in the connectors list. Doesn't affect what gets synced.</p>
-            </div>
-            <div class="okr-grid-2" style="margin-top: var(--ic-space-3)">
-              <div class="field">
-                <span class="field-label">Tableau view</span>
-                <div class="input" style="background: var(--color-surface-muted, var(--color-surface)); color: var(--color-text-muted); user-select: text">Engineering KRs — Progress</div>
-                <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-lock-simple"></i>Cannot change after creation.</p>
-              </div>
-              <div class="field">
-                <span class="field-label">Entity type</span>
-                <div class="input" style="background: var(--color-surface-muted, var(--color-surface)); color: var(--color-text-muted); user-select: text">Key Result</div>
-                <p class="field-mapping-hint" style="margin-top: 6px"><i class="ph ph-lock-simple"></i>Cannot change after creation.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-section">
-            <h3>Status</h3>
-            <label class="dropdown-item" style="padding: var(--ic-space-2); cursor: pointer; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm)">
-              <span class="dropdown-item-text"><span class="dropdown-item-label">Connector active</span><span class="dropdown-item-description">Disable to pause sync runs without deleting mappings.</span></span>
-              <span class="switch" style="margin-left: auto"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
-            </label>
-          </div>
-
-          <div class="settings-section">
-            <div class="danger-zone">
-              <h3>Danger zone</h3>
-              <div class="danger-zone-row">
-                <span class="danger-zone-text">
-                  <strong>Delete connector</strong>
-                  Removes this connector and its sync history. Any TopTeam records previously imported are kept but will no longer be updated.
-                </span>
-                <button class="btn btn-sm btn-danger" type="button">Delete connector</button>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /settings -->
-
-      </div><!-- /modal-body -->
-
+        </div>
+      </div>
       <footer class="modal-footer">
-          <button class="btn btn-secondary drawer-back" type="button">Back</button>
-          <button class="btn btn-primary" data-modal-close type="button">Save changes</button>
-        </footer>
-      </div><!-- /detail view -->
-
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-primary" data-modal-close type="button">Save &amp; reconnect</button>
+      </footer>
     </aside>
   </div>
+
 
   <!-- OKR detail drawer -->
   <div class="drawer-overlay" id="drawer-okr-detail" hidden>
@@ -4989,140 +5453,107 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     })();
 
     // ============================================================
-    // Tableau settings page — connection card + add-connector + drawer
+    // Tableau settings page — connection drawer + add-connector + connectors
     // ============================================================
+    // The "Manage" button opens #drawer-tableau-connection via the generic
+    // [data-modal-open] handler — no dedicated JS needed here.
 
-    // Connection card — Manage button toggles expanded credentials form
+    // Add connector — inline create page (replaces the old side-drawer picker)
     (function () {
-      const card = document.getElementById('tab-connection-card');
-      const toggle = document.getElementById('tab-connection-toggle');
-      const cancel = document.getElementById('tab-connection-cancel');
-      if (!card || !toggle) return;
-      toggle.addEventListener('click', () => card.classList.toggle('is-expanded'));
-      cancel?.addEventListener('click', () => card.classList.remove('is-expanded'));
-    })();
-
-    // Add-connector inline picker — open, close, view selection, entity type selection
-    (function () {
-      const panel = document.getElementById('add-connector-panel');
       const openBtn = document.getElementById('add-connector-btn');
-      const closeBtn = document.getElementById('add-connector-close');
-      const cancelBtn = document.getElementById('add-connector-cancel');
-      if (!panel || !openBtn) return;
-      openBtn.addEventListener('click', () => {
-        panel.classList.add('is-open');
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      });
-      const close = () => panel.classList.remove('is-open');
-      closeBtn?.addEventListener('click', close);
-      cancelBtn?.addEventListener('click', close);
+      const createView = document.querySelector('[data-drawer-view="create"]');
+      if (!openBtn || !createView) return;
+      openBtn.addEventListener('click', () => window.__tableauSetView?.('create'));
+      document.getElementById('empty-add-connector-btn')?.addEventListener('click', () => window.__tableauSetView?.('create'));
 
-      // View picker — single-select highlighting
-      panel.querySelectorAll('.view-list-item').forEach(item => {
-        item.addEventListener('click', () => {
-          panel.querySelectorAll('.view-list-item').forEach(i => i.classList.remove('is-selected'));
-          item.classList.add('is-selected');
-          const radio = item.querySelector('input[type="radio"]');
-          if (radio) radio.checked = true;
+
+      // Wire each create-view input-select so dropdowns toggle/select
+      createView.querySelectorAll('.map-source-select, .map-resolver-select').forEach(sel => {
+        const trigger = sel.querySelector('.input-select-trigger');
+        const value = sel.querySelector('.input-select-value');
+        const menu = sel.querySelector('.dropdown-menu');
+        if (!trigger || !menu) return;
+        const items = menu.querySelectorAll('.dropdown-item');
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = trigger.getAttribute('aria-expanded') === 'true';
+          trigger.setAttribute('aria-expanded', String(!open));
+          menu.hidden = open;
+        });
+        items.forEach(item => {
+          item.addEventListener('click', () => {
+            value.textContent = (item.firstChild?.textContent || item.textContent).trim();
+            items.forEach(i => i.classList.toggle('is-selected', i === item));
+            trigger.setAttribute('aria-expanded', 'false');
+            menu.hidden = true;
+          });
+        });
+        document.addEventListener('click', (e) => {
+          if (sel.contains(e.target)) return;
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
         });
       });
 
-      // Entity type — single-select highlighting
-      panel.querySelectorAll('.entity-type-option').forEach(opt => {
-        opt.addEventListener('click', () => {
-          panel.querySelectorAll('.entity-type-option').forEach(o => o.classList.remove('is-selected'));
-          opt.classList.add('is-selected');
-          const radio = opt.querySelector('input[type="radio"]');
-          if (radio) radio.checked = true;
-        });
-      });
-
-      // Create connector — append a new row to the list in "needs-mapping" state, close picker
-      const saveBtn = document.getElementById('add-connector-save');
+      // Create connector — append a new combined-connector row, return to list view
+      const saveBtn = document.getElementById('create-connector-save');
       const list = document.getElementById('connector-list');
       saveBtn?.addEventListener('click', () => {
-        const selectedView = panel.querySelector('.view-list-item.is-selected');
-        const viewName = selectedView?.querySelector('.view-list-item-name')?.textContent.trim() || 'New view';
-        const viewPath = selectedView?.querySelector('.view-list-item-path')?.textContent.trim() || '';
-        const viewKey  = selectedView?.querySelector('input[type="radio"]')?.value || 'new-view';
-        const entityType = panel.querySelector('input[name="entity-type"]:checked')?.value || 'okr';
-        const isKR = entityType === 'kr';
         const escapeHtml = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        const nameInput = document.getElementById('create-connector-name');
+        const connectorName = (nameInput?.value || '').trim() || 'New connector';
+        // Demo UUID for the picked Objectives view (in a real impl, comes from the picker selection)
+        const objectivesViewId = '8b3c2f1e-4d5a-4e6b-9c8d-2f1a3b4c5d6e';
 
         const article = document.createElement('article');
         article.className = 'connector-row';
-        article.dataset.status = 'needs-mapping';
-        article.dataset.connectorId = viewKey + '-' + entityType;
+        article.dataset.status = 'active';
+        article.dataset.connectorId = connectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         article.innerHTML = `
           <div class="connector-row-main">
             <div class="connector-row-title">
-              <p class="connector-row-name">${escapeHtml(viewName)}</p>
-              <span class="tag ${isKR ? 'tag-entity-kr' : 'tag-entity-okr'}">${isKR ? 'Key Result' : 'OKR'}</span>
-              <span class="tag tag-light">Needs mapping</span>
+              <p class="connector-row-name">${escapeHtml(connectorName)}</p>
+              <span class="tag tag-positive">Active</span>
             </div>
-            <p class="connector-row-view"><i class="ph ph-link-simple"></i>${escapeHtml(viewName)} · ${escapeHtml(viewPath)}</p>
+            <p class="connector-row-view"><i class="ph ph-link-simple"></i><code style="font-size: 12px">${objectivesViewId}</code></p>
             <div class="connector-row-meta">
-              <span class="connector-row-meta-item"><i class="ph ph-clock"></i>Never synced — map fields to start</span>
+              <span class="connector-row-meta-item"><i class="ph ph-clock"></i>Synced 2m ago</span>
             </div>
           </div>
           <div class="connector-row-actions">
             <span class="switch-inline">
-              <span class="switch"><input type="checkbox" class="switch-input" /><span class="switch-track"></span></span>
+              <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
             </span>
             <svg style="width: 16px; height: 16px; color: var(--color-text-subtle)"><use href="#i-chevron-right"/></svg>
           </div>
         `;
         list.appendChild(article);
 
-        // Close picker & reset selection for next open
-        close();
-        const firstView = panel.querySelector('.view-list-item');
-        if (firstView) {
-          panel.querySelectorAll('.view-list-item').forEach(i => i.classList.remove('is-selected'));
-          firstView.classList.add('is-selected');
-          firstView.querySelector('input[type="radio"]').checked = true;
-        }
-        const okrOption = panel.querySelector('.entity-type-option');
-        if (okrOption) {
-          panel.querySelectorAll('.entity-type-option').forEach(o => o.classList.remove('is-selected'));
-          okrOption.classList.add('is-selected');
-          okrOption.querySelector('input[type="radio"]').checked = true;
-        }
+        // Reset the form input for next open
+        if (nameInput) nameInput.value = '';
 
-        // Update the integration card's connector count behind the drawer
+        // Update count badges (integration card + Tableau page heading)
+        const n = list.querySelectorAll('.connector-row').length;
         const intCard = document.querySelector('[data-integration="tableau"]');
         if (intCard && intCard.dataset.status === 'connected') {
-          const intTag = intCard.querySelector('.tag');
-          const n = list.querySelectorAll('.connector-row').length;
-          intTag.textContent = `Connected · ${n} connector${n === 1 ? '' : 's'}`;
+          intCard.querySelector('.tag').textContent = `Connected · ${n} connector${n === 1 ? '' : 's'}`;
         }
+        const badge = document.getElementById('connector-count-badge');
+        if (badge) { badge.textContent = String(n); badge.title = `${n} connector${n === 1 ? '' : 's'}`; }
 
-        // Bring the new row into view so the user sees it appear
-        article.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Back to list view
+        window.__tableauSetView?.('list');
+        setTimeout(() => article.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
       });
     })();
 
-    // Connect Tableau modal — step transitions + completion
+    // Connect Tableau modal — single-step completion
     (function () {
       const modal = document.getElementById('modal-tableau-connect');
       if (!modal) return;
-      const title = modal.querySelector('#connect-modal-title');
-      const setStep = (n) => {
-        modal.querySelectorAll('[data-connect-step]').forEach(p => {
-          p.hidden = parseInt(p.dataset.connectStep, 10) !== n;
-        });
-        title.textContent = n === 1 ? 'Connect Tableau' : 'Connected App credentials';
-        modal.querySelector('[data-connect-back]').hidden = n === 1;
-        modal.querySelector('[data-connect-authorize]').hidden = n !== 1;
-        modal.querySelector('[data-connect-finish]').hidden = n !== 2;
-      };
-
-      modal.querySelector('[data-connect-authorize]')?.addEventListener('click', () => setStep(2));
-      modal.querySelector('[data-connect-back]')?.addEventListener('click', () => setStep(1));
 
       modal.querySelector('[data-connect-finish]')?.addEventListener('click', () => {
         modal.hidden = true;
-        setStep(1); // reset for next open
 
         // Transition the Tableau integration card to connected state
         const card = document.querySelector('[data-integration="tableau"]');
@@ -5130,16 +5561,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           card.dataset.status = 'connected';
           const tag = card.querySelector('.tag');
           tag.className = 'tag tag-indicator tag-positive';
-          tag.textContent = 'Connected · 2 connectors';
+          tag.textContent = 'Connected · 1 connector';
           const btn = card.querySelector('.btn');
           btn.className = 'btn btn-sm btn-secondary';
           btn.textContent = 'Configure';
           delete btn.dataset.modalOpen;
-          btn.dataset.modalOpen = 'drawer-tableau-settings';
+          btn.dataset.navPage = 'integrations-tableau';
         }
 
-        // Land the user inside the new Tableau settings drawer
-        document.getElementById('drawer-tableau-settings')?.removeAttribute('hidden');
+        // Land the user on the in-page Tableau settings view
+        setActivePage('integrations-tableau');
+
+        // Notify success
+        window.showToast?.({
+          title: 'Connected to Tableau',
+          message: 'Credentials verified for site acme-corp. Add a sync to start pulling in OKR data from your data sources.'
+        });
       });
     })();
 
@@ -5149,10 +5586,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       if (!drawer) return;
       const listView   = drawer.querySelector('[data-drawer-view="list"]');
       const detailView = drawer.querySelector('[data-drawer-view="detail"]');
+      const createView = drawer.querySelector('[data-drawer-view="create"]');
       const setView = (key) => {
         listView.hidden   = key !== 'list';
         detailView.hidden = key !== 'detail';
+        if (createView) createView.hidden = key !== 'create';
+        document.querySelector('.shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
       };
+      // Expose for other handlers
+      window.__tableauSetView = setView;
       // Event delegation — works for both static rows and dynamically added connectors
       drawer.querySelector('#connector-list')?.addEventListener('click', (e) => {
         if (e.target.closest('.switch')) return;
@@ -5231,23 +5673,239 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
     })();
 
-    // Connector drawer — Optional fields block collapse/expand
-    (function () {
-      const block = document.getElementById('optional-fields-block');
-      if (!block) return;
-      const head = block.querySelector('.field-mapping-block-head');
-      head?.addEventListener('click', () => {
-        block.classList.toggle('is-collapsed');
-        const caret = head.querySelector('.ph-caret-right');
-        if (caret) caret.style.transform = block.classList.contains('is-collapsed') ? '' : 'rotate(90deg)';
-      });
-    })();
 
     // Run-issues blocks (Failed rows / Skipped rows) — collapse/expand
     (function () {
       document.querySelectorAll('.run-issues-block').forEach(block => {
         const head = block.querySelector('.run-issues-block-head');
         head?.addEventListener('click', () => block.classList.toggle('is-open'));
+      });
+    })();
+
+    // Sync-runs table — click a row to toggle its detail row
+    (function () {
+      document.querySelectorAll('.sync-runs-table .sync-run-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const detail = row.nextElementSibling;
+          if (!detail?.classList.contains('sync-run-detail-row')) return;
+          const open = row.classList.toggle('is-open');
+          detail.hidden = !open;
+          const tgl = row.querySelector('.row-toggle');
+          if (tgl) tgl.setAttribute('aria-expanded', String(open));
+        });
+      });
+    })();
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // Lets you click multiple UI elements, queue notes, then "Copy batch" to paste
+    // a single grouped payload into the chat. Notes clear on reload.
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        // Position below the element, clamped to viewport
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+
+    // Toast helper — spawn a top-right notification with auto-dismiss
+    (function () {
+      const region = document.createElement('div');
+      region.className = 'toast-region';
+      region.setAttribute('aria-live', 'polite');
+      document.body.appendChild(region);
+
+      window.showToast = function ({ title = '', message = '', timeout = 6000 } = {}) {
+        const t = document.createElement('div');
+        t.className = 'toast is-entering';
+        t.innerHTML = `
+          <i class="ph ph-check-circle toast-icon"></i>
+          <div class="toast-body">
+            <span class="toast-title"></span>
+            <span class="toast-message"></span>
+          </div>
+          <button class="toast-close" aria-label="Close" type="button"><i class="ph ph-x"></i></button>
+        `;
+        t.querySelector('.toast-title').textContent = title;
+        t.querySelector('.toast-message').textContent = message;
+        region.appendChild(t);
+        // entrance
+        requestAnimationFrame(() => t.classList.remove('is-entering'));
+        const dismiss = () => {
+          t.classList.add('is-leaving');
+          setTimeout(() => t.remove(), 250);
+        };
+        t.querySelector('.toast-close').addEventListener('click', dismiss);
+        if (timeout > 0) setTimeout(dismiss, timeout);
+      };
+    })();
+
+    // Searchable dropdown — filter items by typing in .dropdown-search-input
+    (function () {
+      document.querySelectorAll('.input-select.has-search').forEach(sel => {
+        const input = sel.querySelector('.dropdown-search-input');
+        const items = sel.querySelectorAll('.dropdown-item');
+        const empty = sel.querySelector('.dropdown-empty');
+        if (!input) return;
+        input.addEventListener('input', () => {
+          const q = input.value.trim().toLowerCase();
+          let visible = 0;
+          items.forEach(i => {
+            const label = (i.textContent || '').trim().toLowerCase();
+            const match = !q || label.includes(q);
+            i.hidden = !match;
+            if (match) visible++;
+          });
+          if (empty) empty.hidden = visible !== 0;
+        });
+        input.addEventListener('click', (e) => e.stopPropagation()); // don't close menu on focus
+      });
+    })();
+
+    // Auto-save toast — fires (debounced) when a Configuration field changes
+    (function () {
+      const panel = document.getElementById('configuration-panel');
+      if (!panel) return;
+      let timer = null;
+      const fire = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          window.showToast?.({ title: 'Changes saved', message: 'Your Tableau stream configuration is up to date.', timeout: 3000 });
+        }, 400);
+      };
+      // Text inputs
+      panel.addEventListener('input', (e) => { if (e.target.matches('input, textarea')) fire(); });
+      // Dropdown selections (item clicks inside an input-select menu)
+      panel.addEventListener('click', (e) => {
+        if (e.target.closest('.input-select .dropdown-item')) fire();
       });
     })();
   </script>

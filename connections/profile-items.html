@@ -2730,19 +2730,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .pf-tabs-wrap { margin-bottom: var(--ic-space-5); }
 
     /* ---------- Action items — mirrors the .ai-* card system from the RoB modal ---------- */
-    /* Inline filter checkboxes — sit on the right of the first section header,
-       in line with the h3 title */
-    .pf-ai-filters {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--ic-space-4);
-      margin-left: auto;
-    }
-    .pf-ai-filter {
-      font: var(--type-caption);
-      color: var(--color-text-muted);
-    }
-
     .pf-ai-list {
       display: flex;
       flex-direction: column;
@@ -2790,8 +2777,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .ai-item:hover { border-color: var(--color-border-strong, #CBD5E1); }
     .ai-item.is-done { background: var(--color-surface-muted); }
     .ai-item.is-done .ai-desc { text-decoration: line-through; color: var(--color-text-muted); }
-    /* Archived items get the same muted background as Done */
-    .ai-item.is-archived { background: var(--color-surface-muted); }
     .ai-meta-row {
       display: flex;
       align-items: center;
@@ -2949,40 +2934,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .ai-item.is-desc-focused .ai-desc-counter { display: block; }
     .ai-desc-counter.is-warning { color: var(--color-warning); }
     .ai-desc-counter.is-danger  { color: var(--color-danger); font-weight: var(--ic-weight-semibold); }
-
-    /* Archived expander — collapsible list of archived items with Restore action */
-    .ai-archived { margin-top: var(--ic-space-3); }
-    .ai-archived-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: 0;
-      padding: 4px 8px;
-      margin-left: -8px;
-      border-radius: var(--ic-radius-sm);
-      cursor: pointer;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
-      color: var(--color-text-muted);
-    }
-    .ai-archived-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .ai-archived-toggle .ph-archive { font-size: 14px; }
-    .ai-archived-chevron {
-      font-size: 12px;
-      transition: transform var(--ic-duration-fast) var(--ic-ease);
-    }
-    .ai-archived-toggle[aria-expanded="true"] .ai-archived-chevron {
-      transform: rotate(180deg);
-    }
-    .ai-archived-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ic-space-2);
-      margin-top: var(--ic-space-2);
-    }
-    .ai-archived-list[hidden] { display: none; }
-    .ai-archived-list .ai-item { background: var(--color-surface-muted); opacity: 0.8; }
-    .ai-archived-list .ai-item:hover { opacity: 1; }
 
     /* Popovers (status menu, kebab menu, comment thread, date input) */
     .ai-pop {
@@ -3611,56 +3562,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           source: mkSource('2025-12-31'),
           comments: [],
         },
-
-        // === Items archived from the RoB modal — surface here when "Show archived" is on ===
-        // Abbie's archived items
-        {
-          id: 'pf-ai-arch-1',
-          desc: 'Investigate training-platform downtime complaints from APAC team',
-          status: 'open',
-          due: '2026-01-22',
-          assignee: 'abbie-emejih',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [
-            { ts: '2026-01-21T14:30:00', author: 'abbie-emejih', text: 'Reassigned to IT — closing on our side.' },
-          ],
-        },
-        {
-          id: 'pf-ai-arch-2',
-          desc: 'Schedule onboarding session for the new contract trainers',
-          status: 'in-progress',
-          due: '2026-01-12',
-          assignee: 'abbie-emejih',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
-        // Team archived items (not Abbie's — hidden when "My action items" is checked)
-        {
-          id: 'pf-ai-arch-3',
-          desc: 'Spin up a follow-up channel for the data-pipeline migration',
-          status: 'open',
-          due: '2026-01-23',
-          assignee: 'keith-berlin',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-arch-4',
-          desc: 'Draft incident-response policy revision for review',
-          status: 'open',
-          due: '2026-01-15',
-          assignee: 'rick-lacroix',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
       ];
 
       let openPop = null;
@@ -3686,7 +3587,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         'cancelled':   'tag-dark',
       };
 
-      const renderItem = (item, opts = {}) => {
+      const renderItem = (item) => {
         const isClosed = CLOSED.has(item.status);
         const overdueClass = isOverdue(item) ? ' is-overdue' : '';
         const hasComment = item.comments.length > 0;
@@ -3701,14 +3602,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           : '';
 
         const node = document.createElement('article');
-        node.className = 'ai-item' + (isClosed ? ' is-done' : '') + (opts.archived ? ' is-archived' : '');
+        node.className = 'ai-item' + (isClosed ? ' is-done' : '');
         node.dataset.itemId = item.id;
         const person = PEOPLE[item.assignee] || { name: 'Unassigned', initials: '?', photo: null };
         node.innerHTML = `
           <div class="ai-meta-row">
-            ${opts.archived
-              ? `<span class="tag tag-light">Archived</span>`
-              : `<button class="tag tag-indicator ${STATUS_TAG[item.status]}" type="button" data-status="${item.status}" data-action="status">${STATUS[item.status].label}</button>`}
+            <button class="tag tag-indicator ${STATUS_TAG[item.status]}" type="button" data-status="${item.status}" data-action="status">${STATUS[item.status].label}</button>
             <span class="tag ${overdueClass ? 'is-overdue' : 'tag-light'}" data-action="due" role="button" tabindex="0" style="cursor:pointer">Due on ${fmtDate(item.due)}</span>
             ${carriedHTML}
             <span class="ai-assignee" title="Assignee: ${escapeHTML(person.name)}" aria-label="Assignee: ${escapeHTML(person.name)}">
@@ -3722,9 +3621,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${escapeHTML(commentTitle)}" aria-label="Notes">
               <i class="ph ph-chat-circle"></i>
             </button>
-            ${opts.archived
-              ? `<button class="ai-icon-btn" type="button" data-action="unarchive" title="Restore" aria-label="Restore"><i class="ph ph-arrow-counter-clockwise"></i></button>`
-              : `<button class="ai-icon-btn" type="button" data-action="archive" title="Archive" aria-label="Archive"><i class="ph ph-archive"></i></button>`}
+            <button class="ai-icon-btn" type="button" data-action="archive" title="Archive" aria-label="Archive">
+              <i class="ph ph-archive"></i>
+            </button>
           </div>
           <p class="ai-desc" data-action="desc" contenteditable="true" spellcheck="false">${escapeHTML(item.desc)}</p>
           <p class="ai-desc-counter" data-desc-counter>${item.desc.length}/${DESC_MAX}</p>
@@ -3735,63 +3634,47 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // Format a longer source-meeting date for the section header.
       const fmtSourceDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-      // Filter state — mineOnly narrows to current user, viewMode toggles
-      // between active and archived (mutually exclusive segments).
-      // Two filters live in the first section header (inline with the h3 title):
-      //   - mineOnly: narrows to items assigned to the profile owner
-      //   - showArchived: when true, includes archived items in the list
-      //     (rendered with Restore icon instead of Archive)
+      // "Show my action items only" filter — when on, items not assigned to
+      // the profile owner are hidden. Default off so the user sees the team
+      // context of every meeting, then can narrow to their own items.
       let mineOnly = false;
-      let showArchived = false;
 
       // Group items by source.date, emitting one section per meeting, newest first.
       const render = () => {
         container.innerHTML = '';
-
-        const scope = (pool) => mineOnly ? pool.filter(i => i.assignee === CURRENT_USER) : pool;
-        const pool = scope(items.filter(it => showArchived ? true : !it.archived));
-
-        // Group by meeting date
         const byDate = new Map();
-        pool.forEach(it => {
+        items.forEach(it => {
           const key = it.source.date;
           if (!byDate.has(key)) byDate.set(key, []);
           byDate.get(key).push(it);
         });
         const sortedDates = [...byDate.keys()].sort((a, b) => b.localeCompare(a));
-
-        // Empty state when the pool is empty
-        if (sortedDates.length === 0) {
-          const empty = document.createElement('p');
-          empty.style.cssText = 'padding: var(--ic-space-6); text-align: center; color: var(--color-text-muted); font: var(--type-body-sm);';
-          empty.textContent = mineOnly ? 'No items assigned to you.' : 'No items yet.';
-          container.appendChild(empty);
-          return;
-        }
-
         sortedDates.forEach((date, idx) => {
           const isCurrent = idx === 0;
           const groupItems = byDate.get(date);
-          const section_ = document.createElement('section');
-          section_.className = 'pf-ai-section' + (isCurrent ? '' : ' is-past');
-          section_.dataset.sectionDate = date;
-          // Only the topmost (current) section header carries the global filter
-          // checkboxes — they apply to every section below it.
-          const filtersHTML = isCurrent ? `
-            <div class="pf-ai-filters">
-              <label class="checkbox pf-ai-filter" title="Filter to only show items assigned to ${escapeHTML(PEOPLE[CURRENT_USER].name)}">
-                <input type="checkbox" class="checkbox-input" data-mine-only ${mineOnly ? 'checked' : ''} />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">My action items</span>
-              </label>
-              <label class="checkbox pf-ai-filter" title="Include archived items in the list">
-                <input type="checkbox" class="checkbox-input" data-show-archived ${showArchived ? 'checked' : ''} />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">Show archived</span>
-              </label>
-            </div>
+          // Apply the "mine only" filter — when off, every team item shows
+          const visibleItems = mineOnly
+            ? groupItems.filter(i => i.assignee === CURRENT_USER)
+            : groupItems;
+
+          // Skip section if the filter leaves it empty
+          if (visibleItems.length === 0) return;
+
+          const section = document.createElement('section');
+          section.className = 'pf-ai-section' + (isCurrent ? '' : ' is-past');
+          section.dataset.sectionDate = date;
+          // Only the topmost (current) section header carries the global
+          // "Show my action items only" toggle — it controls visibility for every section.
+          const toggleHTML = isCurrent ? `
+            <label class="checkbox pf-ai-show-completed" title="Filter the list to only show items assigned to ${escapeHTML(PEOPLE[CURRENT_USER].name)}">
+              <input type="checkbox" class="checkbox-input" data-mine-only ${mineOnly ? 'checked' : ''} />
+              <span class="checkbox-box">
+                <svg class="checkbox-mark"><use href="#i-check"/></svg>
+              </span>
+              <span class="checkbox-label">My action items</span>
+            </label>
           ` : '';
-          section_.innerHTML = `
+          section.innerHTML = `
             <header class="pf-ai-section-head">
               <h3 class="pf-ai-section-title">
                 <a href="${groupItems[0].source.href}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
@@ -3799,20 +3682,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <i class="ph ph-arrow-square-out" style="font-size: 14px; color: var(--color-text-muted);" aria-label="Open meeting"></i>
                 </a>
               </h3>
-              ${filtersHTML}
+              ${toggleHTML}
             </header>
           `;
-          // Wire the checkboxes if this section rendered them
-          section_.querySelector('[data-mine-only]')?.addEventListener('change', (e) => {
-            mineOnly = e.target.checked;
+          // Wire the global toggle if this section rendered it
+          const cb = section.querySelector('[data-mine-only]');
+          cb?.addEventListener('change', () => {
+            mineOnly = cb.checked;
             render();
           });
-          section_.querySelector('[data-show-archived]')?.addEventListener('change', (e) => {
-            showArchived = e.target.checked;
-            render();
-          });
-          groupItems.forEach(it => section_.appendChild(renderItem(it, { archived: !!it.archived })));
-          container.appendChild(section_);
+          visibleItems.forEach(it => section.appendChild(renderItem(it)));
+          container.appendChild(section);
         });
       };
 
@@ -3832,14 +3712,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           pendingArchiveId = item.id;
           document.getElementById('archive-ai-confirm')?.removeAttribute('hidden');
         }
-        if (action === 'unarchive') {
-          item.archived = false;
-          render();
-        }
       });
-
-      // Filter checkboxes live inside each render() pass on the first section
-      // header — see the render function for their event listeners.
 
       // Pending archive id + confirm-modal wiring (matches the RoB modal pattern)
       let pendingArchiveId = null;
@@ -3851,12 +3724,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           pendingArchiveId = null;
           return;
         }
-        // Confirm Archive — flags the item rather than deleting it so the
-        // user can later restore from the Archived expander.
+        // Confirm Archive
         if (e.target.closest('[data-confirm-archive-ai]')) {
           if (pendingArchiveId) {
-            const item = items.find(i => i.id === pendingArchiveId);
-            if (item) { item.archived = true; render(); }
+            const idx = items.findIndex(i => i.id === pendingArchiveId);
+            if (idx >= 0) { items.splice(idx, 1); render(); }
           }
           pendingArchiveId = null;
           archiveModal.setAttribute('hidden', '');

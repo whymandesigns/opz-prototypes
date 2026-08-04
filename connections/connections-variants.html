@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connections — design options</title>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <style>
+    /* === tokens.css (copied verbatim from index.html) === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --ic-palette-white: #FFFFFF;
+  --ic-palette-black: #000000;
+  --ic-palette-gray-100: #FCFCFC;
+  --ic-palette-gray-150: #F0F1F3;
+  --ic-palette-gray-200: #E0E1E5;
+  --ic-palette-gray-300: #CCCDD3;
+  --ic-palette-gray-400: #B3B5BC;
+  --ic-palette-gray-500: #999BA4;
+  --ic-palette-gray-600: #84888E;
+  --ic-palette-gray-700: #5F636A;
+  --ic-palette-gray-800: #3D4149;
+  --ic-palette-gray-900: #24272D;
+  --ic-palette-graphite-800: #262D3D;
+  --ic-palette-graphite-900: #191E28;
+  --ic-palette-red-500: #D42551;
+  --ic-palette-red-600: #A81D41;
+  --ic-palette-red-100: #FBEDF1;
+  --ic-palette-yellow-100: #FFF5E3;
+  --ic-palette-yellow-500: #E59C01;
+  --ic-palette-green-100: #EAFBF5;
+  --ic-palette-green-500: #00CC83;
+  --ic-palette-green-600: #03B080;
+  --ic-palette-green-700: #05947C;
+  --ic-palette-cyan-500: #25A9EF;
+  --ic-palette-blue-100: #EDF1FD;
+  --ic-palette-blue-500: #204ECF;
+  --ic-palette-blue-600: #183A9E;
+
+  --ic-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ic-text-xs:   0.75rem;
+  --ic-text-sm:   0.8125rem;
+  --ic-text-base: 0.875rem;
+  --ic-text-md:   1rem;
+  --ic-text-xl:   1.25rem;
+  --ic-text-2xl:  1.75rem;
+  --ic-lh-h2:       1.875rem;
+  --ic-lh-h3:       1.5rem;
+  --ic-lh-body-md:  1.375rem;
+  --ic-lh-body-sm:  1.25rem;
+  --ic-lh-body-xs:  1.125rem;
+  --ic-weight-regular:  400;
+  --ic-weight-medium:   500;
+  --ic-weight-semibold: 600;
+  --ic-weight-bold:     700;
+
+  --ic-space-1: 4px;
+  --ic-space-2: 8px;
+  --ic-space-3: 12px;
+  --ic-space-4: 16px;
+  --ic-space-5: 24px;
+  --ic-space-6: 32px;
+  --ic-space-8: 48px;
+
+  --ic-radius-sm: 4px;
+  --ic-radius-md: 8px;
+  --ic-radius-lg: 12px;
+  --ic-radius-full: 9999px;
+
+  --ic-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --ic-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.10);
+
+  --ic-z-dropdown: 100;
+  --ic-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ic-duration-fast: 120ms;
+
+  /* semantic */
+  --color-bg:             var(--ic-palette-gray-150);
+  --color-surface:        var(--ic-palette-white);
+  --color-surface-muted:  var(--ic-palette-gray-150);
+  --color-border:         var(--ic-palette-gray-200);
+  --color-border-strong:  var(--ic-palette-gray-300);
+  --color-border-focus:   var(--ic-palette-blue-500);
+  --color-text:           var(--ic-palette-graphite-900);
+  --color-text-muted:     var(--ic-palette-gray-700);
+  --color-text-subtle:    var(--ic-palette-gray-500);
+  --color-text-link:      var(--ic-palette-blue-500);
+  --color-accent:         var(--ic-palette-blue-500);
+  --color-accent-subtle:  var(--ic-palette-blue-100);
+  --color-danger:         var(--ic-palette-red-500);
+
+  --type-h2: var(--ic-weight-semibold) var(--ic-text-xl)/var(--ic-lh-h2) var(--ic-font-sans);
+  --type-body:     var(--ic-weight-regular) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  --type-body-sm:  var(--ic-weight-regular) var(--ic-text-sm)/var(--ic-lh-body-sm) var(--ic-font-sans);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Shared component styles (from index.html) ===== */
+.dropdown-menu {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-lg);
+  padding: var(--ic-space-2);
+  min-width: 200px;
+}
+.dropdown-item {
+  display: flex; align-items: center; gap: var(--ic-space-3);
+  width: 100%; padding: var(--ic-space-2) var(--ic-space-3);
+  border: 0; background: transparent; border-radius: var(--ic-radius-sm);
+  font: var(--type-body); color: var(--color-text);
+  text-align: left; cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.dropdown-item:hover { background: var(--color-accent-subtle); }
+.dropdown-item-icon { width: 16px; height: 16px; font-size: 16px; flex-shrink: 0; color: var(--color-text-muted); }
+.dropdown-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.dropdown-item-label { font: var(--type-body); color: var(--color-text); line-height: 1.3; }
+.dropdown-item-check { width: 16px; height: 16px; flex-shrink: 0; color: var(--color-text); opacity: 0; }
+.dropdown-item.is-selected .dropdown-item-check { opacity: 1; }
+.dropdown-item.is-selected .dropdown-item-label,
+.dropdown-item.is-selected { font-weight: var(--ic-weight-semibold); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: var(--ic-space-1);
+  height: 28px; padding: 0 var(--ic-space-3);
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--color-text);
+}
+.chip:has(.chip-remove) { padding-right: 2px; }
+.chip-remove {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; padding: 0; background: transparent; border-radius: var(--ic-radius-full);
+  cursor: pointer; color: var(--color-text-muted);
+}
+.chip-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.cm-checkbox { display: inline-flex; align-items: center; gap: var(--ic-space-2); cursor: pointer; font: var(--type-body-sm); color: var(--color-text); }
+.cm-checkbox input { width: 16px; height: 16px; accent-color: var(--color-accent); cursor: pointer; }
+
+.md-tag {
+  display: inline-flex; align-items: center; padding: 1px 8px;
+  background: var(--color-surface-muted); border-radius: var(--ic-radius-sm);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1.4 var(--ic-font-sans);
+  color: var(--color-text-muted);
+}
+.cm-section-title { font: var(--ic-weight-semibold) var(--ic-text-md)/1.5 var(--ic-font-sans); color: var(--color-text); margin: 0; }
+
+/* ===== Connections section header (shared) ===== */
+.cn-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); margin-bottom: var(--ic-space-4); }
+.cn-help-link {
+  display: inline-flex; align-items: center; gap: var(--ic-space-1);
+  border: 0; background: transparent; padding: 0;
+  font: var(--type-body-sm); color: var(--color-text-link); cursor: pointer; text-decoration: none;
+}
+.cn-help-link:hover { text-decoration: underline; }
+.cn-help-link .ph { font-size: 15px; }
+
+/* ===== Picker internals (shared across all variants) ===== */
+.cn-list  { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+.cn-field { position: relative; display: flex; flex-direction: column; gap: var(--ic-space-2); }
+
+.cn-trigger-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: var(--color-surface-muted); border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--color-text);
+}
+.cn-trigger-main { display: inline-flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+.cn-trigger-label { font: var(--ic-weight-semibold) var(--ic-text-base)/1.4 var(--ic-font-sans); color: var(--color-text); }
+.cn-trigger-hint  { font: var(--type-body-sm); color: var(--color-text-subtle); white-space: nowrap; }
+.cn-trigger-caret { color: var(--color-text-muted); font-size: 16px; transition: transform var(--ic-duration-fast) var(--ic-ease); }
+.cn-trigger[aria-expanded="true"] .cn-trigger-caret { transform: rotate(180deg); }
+
+.cn-pill { display: inline-flex; align-items: center; flex-shrink: 0; padding: 1px 8px; border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.5 var(--ic-font-sans); }
+.cn-pill-recommended { background: var(--color-accent-subtle); color: var(--color-accent); }
+
+.cn-menu { position: absolute; top: calc(100% + var(--ic-space-1)); left: 0; right: 0; z-index: var(--ic-z-dropdown); }
+.cn-menu[hidden] { display: none; }
+.cn-search { position: relative; margin-bottom: var(--ic-space-1); }
+.cn-search .ph { position: absolute; left: var(--ic-space-3); top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 15px; pointer-events: none; }
+.cn-search input { width: 100%; height: 32px; padding: 0 var(--ic-space-3) 0 30px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); font: var(--type-body-sm); color: var(--color-text); }
+.cn-search input:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.cn-options { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 224px; }
+.cn-options .dropdown-item[hidden] { display: none; }
+.cn-empty { padding: var(--ic-space-3); text-align: center; font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+.cn-create { border-top: 1px solid var(--color-border); margin-top: var(--ic-space-1); padding-top: var(--ic-space-1); }
+.cn-create .dropdown-item-icon { color: var(--color-accent); }
+
+.cn-selected { display: flex; flex-wrap: wrap; gap: var(--ic-space-2); }
+.cn-selected:empty { display: none; }
+.cn-na { align-self: flex-start; }
+.cn-field.is-na .cn-trigger { opacity: 0.55; pointer-events: none; }
+.cn-field.is-na .cn-trigger-icon { filter: grayscale(1); }
+.cn-field.is-na .cn-pill-recommended,
+.cn-field.is-na .cn-selected { display: none; }
+
+/* Base trigger = the card style (used by Option A "cards" + Option B "list") */
+.cn-trigger {
+  display: flex; align-items: center; gap: var(--ic-space-3);
+  width: 100%; padding: var(--ic-space-3);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md); cursor: pointer; text-align: left;
+  transition: border-color var(--ic-duration-fast) var(--ic-ease), box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.cn-trigger:hover { border-color: var(--color-border-strong); }
+.cn-trigger[aria-expanded="true"] { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+.cn-trigger-hint { margin-left: auto; }
+
+/* ===== Option B — Unified list (one container, hairline rows) ===== */
+.var-list { gap: 0; border: 1px solid var(--color-border); border-radius: var(--ic-radius-md); background: var(--color-surface); }
+.var-list .cn-field { gap: 0; }
+.var-list .cn-field + .cn-field { border-top: 1px solid var(--color-border); }
+.var-list .cn-trigger { border: 0; border-radius: 0; background: transparent; }
+.var-list .cn-trigger[aria-expanded="true"] { box-shadow: none; background: var(--color-surface-muted); }
+.var-list .cn-selected,
+.var-list .cn-na { padding: 0 var(--ic-space-3) var(--ic-space-3) 56px; }
+.var-list .cn-na { padding-top: 0; }
+
+/* ===== Option C — Form fields (label + select control) ===== */
+.var-form { gap: var(--ic-space-5); }
+.var-form .cn-field { gap: var(--ic-space-2); }
+.vf-label { display: flex; align-items: center; gap: var(--ic-space-2); }
+.vf-label .cn-trigger-icon { width: 24px; height: 24px; font-size: 15px; }
+.vf-na { margin-left: auto; color: var(--color-text-muted); }
+.cn-trigger.vf-select { justify-content: space-between; gap: var(--ic-space-2); height: 32px; padding: 0 var(--ic-space-2) 0 var(--ic-space-3); border-radius: var(--ic-radius-sm); }
+.cn-trigger.vf-select .cn-trigger-hint { margin-left: 0; }
+
+/* ===== Option D — Minimal inline (single line + ghost add) ===== */
+.var-inline { gap: var(--ic-space-4); }
+.var-inline .cn-field { gap: var(--ic-space-2); }
+.vi-row { display: flex; align-items: center; gap: var(--ic-space-3); }
+.vi-row .cn-trigger-icon { width: 28px; height: 28px; font-size: 16px; }
+.cn-trigger.vi-add { width: auto; margin-left: auto; border: 0; background: transparent; padding: var(--ic-space-1) var(--ic-space-2); border-radius: var(--ic-radius-sm); gap: var(--ic-space-1); }
+.cn-trigger.vi-add .cn-trigger-hint { margin-left: 0; color: var(--color-text-link); }
+.cn-trigger.vi-add:hover { background: var(--color-accent-subtle); }
+.cn-trigger.vi-add[aria-expanded="true"] { box-shadow: none; background: var(--color-accent-subtle); }
+.var-inline .cn-selected,
+.var-inline .cn-na { padding-left: 40px; }
+
+/* ===== Option E — Combobox (chips inside the field) ===== */
+.var-combobox { gap: var(--ic-space-5); }
+.var-combobox .cn-field { gap: var(--ic-space-2); }
+.vc-label { display: flex; align-items: center; gap: var(--ic-space-2); }
+.vc-label .cn-trigger-icon { width: 24px; height: 24px; font-size: 15px; }
+.cn-trigger.vc-box {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2);
+  width: 100%; min-height: 40px; padding: var(--ic-space-2) var(--ic-space-3);
+}
+.vc-box .cn-selected { display: contents; }
+.vc-box .cn-trigger-hint { margin-left: 0; }
+.vc-box .cn-trigger-caret { margin-left: auto; }
+.var-combobox .cn-field:has(.cn-selected .chip) .cn-trigger-hint { display: none; }
+
+/* ===== Option F — Icon tiles ===== */
+.var-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ic-space-3); align-items: start; }
+.cn-trigger.vt-trigger { position: relative; flex-direction: column; align-items: flex-start; gap: var(--ic-space-2); padding: var(--ic-space-4); }
+.vt-trigger .cn-trigger-main { flex-wrap: wrap; }
+.vt-trigger .cn-trigger-hint { margin-left: 0; }
+.vt-trigger .cn-trigger-caret { position: absolute; top: var(--ic-space-3); right: var(--ic-space-3); }
+.var-tiles .cn-menu { left: 0; right: auto; width: max(100%, 240px); }
+.var-tiles .cn-field:last-child .cn-menu { left: auto; right: 0; }
+.var-tiles .cn-selected { margin-top: var(--ic-space-2); }
+
+/* ===== Option G — Property rows (Linear / Notion) ===== */
+.var-property { gap: 0; }
+.var-property .cn-field { display: grid; grid-template-columns: 190px 1fr; align-items: center; column-gap: var(--ic-space-3); padding: var(--ic-space-1) 0; }
+.var-property .cn-field + .cn-field { border-top: 1px solid var(--color-border); }
+.vp-key { display: flex; align-items: center; gap: var(--ic-space-2); }
+.vp-key .cn-trigger-icon { width: 24px; height: 24px; font-size: 15px; background: transparent; border: 0; }
+.cn-trigger.vp-val { border: 0; background: transparent; border-radius: var(--ic-radius-sm); padding: var(--ic-space-2) var(--ic-space-3); justify-content: flex-start; gap: var(--ic-space-2); flex-wrap: wrap; min-height: 36px; }
+.cn-trigger.vp-val:hover { background: var(--color-surface-muted); }
+.cn-trigger.vp-val[aria-expanded="true"] { box-shadow: none; background: var(--color-surface-muted); }
+.vp-val .cn-selected { display: contents; }
+.vp-val .cn-trigger-hint { margin-left: 0; color: var(--color-text-subtle); }
+.vp-val .cn-trigger-caret { margin-left: auto; }
+.var-property .cn-field:has(.cn-selected .chip) .cn-trigger-hint { display: none; }
+.var-property .cn-menu { left: 190px; right: 0; }
+.var-property .cn-na { grid-column: 2; padding: 0 0 var(--ic-space-2) var(--ic-space-3); }
+
+/* ===== Option H — Pill launchers ===== */
+.var-pills { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: var(--ic-space-3); }
+.var-pills .cn-field { width: auto; }
+.cn-trigger.vh-pill { width: auto; gap: var(--ic-space-2); padding: var(--ic-space-2) var(--ic-space-3); border-radius: var(--ic-radius-full); }
+.vh-pill .cn-trigger-icon { width: 20px; height: 20px; font-size: 13px; background: transparent; border: 0; }
+.vh-pill .cn-trigger-hint { margin-left: 0; color: var(--color-text-link); }
+.vh-pill .cn-trigger-caret { font-size: 14px; }
+.var-pills .cn-selected { display: none; }
+.var-pills .cn-na { flex-basis: 100%; }
+
+/* =====================================================================
+   Option I — Command palette (⌘K-style unified search)
+   ===================================================================== */
+.cmd { --cmd-accent: var(--ic-palette-blue-500); }
+.cmd-bar {
+  display: flex; align-items: center; gap: var(--ic-space-3);
+  height: 52px; padding: 0 var(--ic-space-3) 0 var(--ic-space-4);
+  border: 1px solid var(--color-border); border-radius: var(--ic-radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--cmd-accent) 5%, var(--color-surface)), var(--color-surface));
+  box-shadow: var(--ic-shadow-sm);
+  transition: border-color .18s var(--ic-ease), box-shadow .22s var(--ic-ease);
+}
+.cmd-bar:focus-within {
+  border-color: var(--cmd-accent);
+  box-shadow: 0 0 0 4px var(--color-accent-subtle), 0 10px 30px color-mix(in srgb, var(--cmd-accent) 16%, transparent);
+}
+.cmd-bar > .ph { font-size: 20px; color: var(--cmd-accent); }
+.cmd-bar input { flex: 1; border: 0; background: transparent; outline: none; font: var(--ic-weight-medium) var(--ic-text-md)/1.4 var(--ic-font-sans); color: var(--color-text); }
+.cmd-bar input::placeholder { color: var(--color-text-subtle); font-weight: 400; }
+.cmd-kbd { font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--font-mono); color: var(--color-text-muted); background: var(--color-surface-muted); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); padding: 5px 8px; letter-spacing: .04em; }
+
+.cmd-filters { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2); margin-top: var(--ic-space-3); }
+.cmd-chip {
+  display: inline-flex; align-items: center; gap: var(--ic-space-1);
+  height: 28px; padding: 0 var(--ic-space-3); border-radius: var(--ic-radius-full);
+  border: 1px solid var(--color-border); background: var(--color-surface);
+  font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans); color: var(--color-text-muted);
+  cursor: pointer; transition: all .15s var(--ic-ease);
+}
+.cmd-chip:hover { border-color: var(--color-border-strong); color: var(--color-text); }
+.cmd-chip.is-active { background: var(--color-text); border-color: var(--color-text); color: var(--color-text-inverse, #fff); }
+.cmd-chip .cn-pill-recommended { padding: 0 6px; }
+.cmd-na { margin-left: auto; color: var(--color-text-muted); }
+
+.cmd-panel {
+  margin-top: var(--ic-space-3); border: 1px solid var(--color-border); border-radius: var(--ic-radius-lg);
+  background: var(--color-surface); box-shadow: var(--ic-shadow-lg); overflow: hidden;
+  transform-origin: top center; animation: cmd-pop .18s var(--ic-ease) both;
+}
+.cmd-panel[hidden] { display: none; }
+@keyframes cmd-pop { from { opacity: 0; transform: translateY(-6px) scale(.99); } to { opacity: 1; transform: none; } }
+.cmd-results { max-height: 320px; overflow-y: auto; padding: var(--ic-space-2); }
+.cmd-group + .cmd-group { margin-top: var(--ic-space-1); border-top: 1px solid var(--color-border); padding-top: var(--ic-space-1); }
+.cmd-group.is-dim { opacity: .45; pointer-events: none; }
+.cmd-group-head { display: flex; align-items: center; gap: var(--ic-space-2); padding: var(--ic-space-2) var(--ic-space-3) var(--ic-space-1); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.4 var(--ic-font-sans); text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-subtle); }
+.cmd-result {
+  display: flex; align-items: center; gap: var(--ic-space-3); width: 100%;
+  padding: var(--ic-space-2) var(--ic-space-3); border: 0; background: transparent; border-radius: var(--ic-radius-sm);
+  font: var(--type-body); color: var(--color-text); text-align: left; cursor: pointer;
+  animation: cmd-rise .26s var(--ic-ease) both;
+}
+@keyframes cmd-rise { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.cmd-result:hover { background: var(--color-accent-subtle); }
+.cmd-result-ico { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; color: var(--color-text-muted); flex-shrink: 0; }
+.cmd-result-label { flex: 1; min-width: 0; }
+.cmd-result-check { font-size: 16px; color: var(--cmd-accent); opacity: 0; transform: scale(.6); transition: all .15s var(--ic-ease); }
+.cmd-result.is-selected { background: color-mix(in srgb, var(--cmd-accent) 8%, transparent); font-weight: var(--ic-weight-semibold); }
+.cmd-result.is-selected .cmd-result-check { opacity: 1; transform: none; }
+.cmd-empty { padding: var(--ic-space-5); text-align: center; color: var(--color-text-muted); font: var(--type-body-sm); margin: 0; }
+
+.cmd-tray { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ic-space-3); margin-top: var(--ic-space-4); }
+.cmd-tray-empty { font: var(--type-body-sm); color: var(--color-text-subtle); margin: 0; }
+.cmd-tray-group { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2); }
+.cmd-tray-type { font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans); text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-subtle); }
+.cmd-tray .chip { animation: cmd-chip-pop .2s var(--ic-ease) both; }
+@keyframes cmd-chip-pop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
+
+/* =====================================================================
+   Option J — Brand-tinted cards with a live completion ring
+   ===================================================================== */
+.bc-head { display: flex; align-items: center; gap: var(--ic-space-4); margin-bottom: var(--ic-space-5); }
+.bc-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.bc-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.bc-ring circle { fill: none; stroke-width: 3.2; }
+.bc-ring-bg { stroke: var(--color-surface-muted); }
+.bc-ring-fg { stroke: var(--color-accent); stroke-linecap: round; stroke-dasharray: 100.53; stroke-dashoffset: 100.53; transition: stroke-dashoffset .5s var(--ic-ease); }
+.bc-ring-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: var(--ic-weight-bold) var(--ic-text-sm)/1 var(--ic-font-sans); color: var(--color-text); }
+.bc-head h3 { margin: 0; }
+.bc-sub { margin: 2px 0 0; font: var(--type-body-sm); color: var(--color-text-muted); }
+.bc-head .cn-help-link { margin-left: auto; }
+
+.var-brand { gap: var(--ic-space-3); }
+.bc-card {
+  position: relative; overflow: hidden; gap: 0;
+  border: 1px solid var(--color-border); border-radius: var(--ic-radius-lg);
+  background:
+    radial-gradient(130% 130% at 0% 0%, color-mix(in srgb, var(--bc) 12%, transparent), transparent 55%),
+    var(--color-surface);
+  transition: transform .18s var(--ic-ease), box-shadow .22s var(--ic-ease), border-color .18s var(--ic-ease);
+}
+.bc-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--bc); opacity: .85; }
+.bc-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--bc) 35%, var(--color-border)); box-shadow: 0 12px 30px color-mix(in srgb, var(--bc) 22%, rgba(0,0,0,.05)); }
+.cn-trigger.bc-trigger { border: 0; background: transparent; box-shadow: none !important; padding: var(--ic-space-4) var(--ic-space-4) var(--ic-space-4) var(--ic-space-5); }
+.bc-ico { width: 40px !important; height: 40px !important; font-size: 20px !important; background: color-mix(in srgb, var(--bc) 12%, var(--color-surface)) !important; border-color: color-mix(in srgb, var(--bc) 22%, var(--color-border)) !important; color: var(--bc) !important; }
+.bc-card .cn-selected, .bc-card .cn-na { padding: 0 var(--ic-space-4) var(--ic-space-4) var(--ic-space-5); }
+.bc-card .cn-na { padding-top: 0; }
+.bc-card .cn-pill-recommended { background: color-mix(in srgb, var(--bc) 14%, transparent); color: var(--bc); }
+
+/* =====================================================================
+   Option K — Editorial (display serif, numbered, restrained)
+   ===================================================================== */
+.var-editorial { gap: 0; }
+.cn-trigger.ed-row {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--ic-space-4);
+  border: 0; border-radius: 0; background: transparent; box-shadow: none !important;
+  padding: var(--ic-space-4) var(--ic-space-2); position: relative;
+}
+.var-editorial .cn-field + .cn-field .ed-row { border-top: 1px solid var(--color-border); }
+.ed-row::after { content: ''; position: absolute; left: var(--ic-space-2); right: var(--ic-space-2); bottom: -1px; height: 2px; background: var(--color-text); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ic-ease); }
+.ed-row:hover::after, .ed-row[aria-expanded="true"]::after { transform: scaleX(1); }
+.ed-num { font: 600 1.75rem/1 var(--font-display); font-optical-sizing: auto; color: var(--color-text-subtle); font-variant-numeric: tabular-nums; transition: color .2s var(--ic-ease); }
+.ed-row:hover .ed-num, .ed-row[aria-expanded="true"] .ed-num { color: var(--color-text); }
+.ed-main { display: flex; align-items: baseline; gap: var(--ic-space-3); min-width: 0; }
+.ed-label { font: 500 1.25rem/1.2 var(--font-display); font-optical-sizing: auto; color: var(--color-text); }
+.ed-hint { margin-left: auto; font: var(--ic-weight-regular) var(--ic-text-sm)/1.4 var(--font-mono); color: var(--color-text-subtle); }
+.ed-arrow { font-size: 18px; color: var(--color-text-subtle); transition: transform .25s var(--ic-ease), color .2s var(--ic-ease); }
+.ed-row:hover .ed-arrow, .ed-row[aria-expanded="true"] .ed-arrow { transform: translateX(4px); color: var(--color-text); }
+.var-editorial .cn-selected, .var-editorial .cn-na { padding: 0 var(--ic-space-2) var(--ic-space-4) calc(1.75rem + var(--ic-space-4) + var(--ic-space-2)); }
+.var-editorial .cn-na { padding-top: 0; }
+.var-editorial .cn-pill { font-family: var(--ic-font-sans); }
+
+/* ===== Page chrome for the comparison ===== */
+.wrap { max-width: 860px; margin: 0 auto; padding: var(--ic-space-8) var(--ic-space-5) 120px; }
+.page-head h1 { font: var(--type-h2); margin: 0 0 var(--ic-space-2); }
+.page-head p { font: var(--type-body); color: var(--color-text-muted); margin: 0 0 var(--ic-space-8); max-width: 60ch; }
+.demo { margin-bottom: var(--ic-space-8); }
+.demo-head { display: flex; align-items: baseline; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3); }
+.demo-num { font: var(--ic-weight-bold) var(--ic-text-xs)/1 var(--ic-font-sans); letter-spacing: .04em; text-transform: uppercase; color: var(--color-accent); background: var(--color-accent-subtle); padding: 4px 8px; border-radius: var(--ic-radius-full); }
+.demo-head h2 { font: var(--ic-weight-semibold) var(--ic-text-md)/1.4 var(--ic-font-sans); margin: 0; }
+.demo-head p { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+.demo-stage { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--ic-radius-lg); box-shadow: var(--ic-shadow-sm); padding: var(--ic-space-6); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Connections — design options</h1>
+      <p>Design directions for the empty-state Connections block. Same content in each (Slack + Recommended + Not applicable, Initiatives, Processes, and “Learn about connections”). Click any row to open its searchable dropdown — they’re all live. Options E–H are the newest. Tell me which one to ship into the modal.</p>
+    </div>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option I</span><h2>Command palette</h2><p>One search across everything — channels, initiatives &amp; processes — with grouped results and a connected tray. Press the bar (or ⌘K).</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cmd" data-cmd></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option J</span><h2>Brand cards + completion ring</h2><p>Each service carries its own colour, depth and hover lift; the ring fills as you connect.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="bc-head">
+            <div class="bc-ring" data-ring>
+              <svg viewBox="0 0 36 36"><circle class="bc-ring-bg" cx="18" cy="18" r="16"></circle><circle class="bc-ring-fg" cx="18" cy="18" r="16" data-ring-fg></circle></svg>
+              <span class="bc-ring-num" data-ring-num>0</span>
+            </div>
+            <div>
+              <h3 class="cm-section-title">Connections</h3>
+              <p class="bc-sub" data-ring-label>0 of 3 connected</p>
+            </div>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-brand" data-variant="brand" data-ring-scope></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option K</span><h2>Editorial</h2><p>Display serif, numbered, restrained — an animated underline on hover. Quiet confidence.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-editorial" data-variant="editorial"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option E</span><h2>Combobox</h2><p>A multiselect field — chosen items sit as chips inside the box.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-combobox" data-variant="combobox"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option F</span><h2>Icon tiles</h2><p>Three compact tiles side by side; each opens its own dropdown.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-tiles" data-variant="tiles"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option G</span><h2>Property rows</h2><p>Linear / Notion style — label on the left, value on the right.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-property" data-variant="property"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option H</span><h2>Pill launchers</h2><p>A compact button row; the pill shows a count once connected.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-pills" data-variant="pills"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option A</span><h2>Cards <span style="font-weight:400;color:var(--color-text-subtle)">(current)</span></h2></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list" data-variant="cards"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option B</span><h2>Unified list</h2><p>One container, hairline-divided rows — less boxy.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-list" data-variant="list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option C</span><h2>Form fields</h2><p>Labeled fields with a select control — matches the rest of the form.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-form" data-variant="form"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="demo-head"><span class="demo-num">Option D</span><h2>Minimal inline</h2><p>No boxes — a line per type with a ghost “add” that opens the dropdown.</p></div>
+      <div class="demo-stage">
+        <section>
+          <div class="cn-head">
+            <h3 class="cm-section-title">Connections</h3>
+            <a class="cn-help-link" href="#"><i class="ph ph-info"></i> Learn about connections</a>
+          </div>
+          <div class="cn-list var-inline" data-variant="inline"></div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---- Shared connection data ----
+    const TYPES = [
+      { name: 'Slack', icon: 'ph-slack-logo', iconColor: '#4a154b', brand: '#4A154B', hint: 'Add channels',
+        mode: 'multi', recommended: true, na: true, create: true, searchNoun: 'channels',
+        options: ['#eng-weekly-standup', '#platform-reliability', '#data-pipeline-migration', '#incident-response', '#release-planning', '#sre-oncall'] },
+      { name: 'Initiatives', icon: 'ph-rocket-launch', brand: '#3D2BD6', hint: 'Connect an initiative',
+        mode: 'single', searchNoun: 'initiatives',
+        options: ['Platform Reliability & Observability', 'Data Platform Modernization', 'Developer Experience Uplift', 'Cloud Cost Optimization'] },
+      { name: 'Processes', icon: 'ph-cpu', brand: '#B5530A', hint: 'Connect processes',
+        mode: 'multi', searchNoun: 'processes',
+        options: [ { label: 'Incident Response Review', tag: 'Sub-Activity' }, { label: 'Weekly Engineering Sync', tag: 'Activity' }, { label: 'Platform Engineering', tag: 'Focus Area' }, { label: 'Capacity Planning', tag: 'Activity' }, { label: 'Postmortem Review', tag: 'Sub-Activity' } ] },
+    ];
+
+    // ---- Markup builders ----
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const optionItem = (o) => {
+      const label = typeof o === 'string' ? o : o.label;
+      const tag = (typeof o === 'object' && o.tag) ? `<span class="md-tag">${o.tag}</span>` : '';
+      return `<button class="dropdown-item" type="button" data-conn-option><i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label">${esc(label)}</span></span>${tag}</button>`;
+    };
+    const menuHTML = (t) => `
+      <div class="cn-menu dropdown-menu" hidden>
+        <div class="cn-search"><i class="ph ph-magnifying-glass"></i><input type="text" placeholder="Search ${t.searchNoun}…" data-conn-search /></div>
+        <div class="cn-options" data-conn-options>${t.options.map(optionItem).join('')}</div>
+        <p class="cn-empty" data-conn-empty hidden>No ${t.searchNoun} match</p>
+        ${t.create ? `<div class="cn-create"><button class="dropdown-item" type="button" data-conn-create><i class="ph ph-plus-circle dropdown-item-icon"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Create new channel</span></span></button></div>` : ''}
+      </div>`;
+    const iconHTML = (t) => `<span class="cn-trigger-icon"${t.iconColor ? ` style="color:${t.iconColor}"` : ''}><i class="ph ${t.icon}"></i></span>`;
+    const pillHTML = (t) => t.recommended ? `<span class="cn-pill cn-pill-recommended">Recommended</span>` : '';
+
+    function fieldHTML(t, variant, idx) {
+      const attrs = `data-conn-field data-conn-mode="${t.mode}"`;
+      const naLabel = t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : '';
+      if (variant === 'brand') {
+        return `<div class="cn-field bc-card" ${attrs} style="--bc:${t.brand}">
+          <button class="cn-trigger bc-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="cn-trigger-icon bc-ico"><i class="ph ${t.icon}"></i></span>
+            <span class="cn-trigger-main"><span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}</span>
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${naLabel}
+        </div>`;
+      }
+      if (variant === 'editorial') {
+        const num = String((idx ?? 0) + 1).padStart(2, '0');
+        return `<div class="cn-field" ${attrs}>
+          <button class="cn-trigger ed-row" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="ed-num">${num}</span>
+            <span class="ed-main"><span class="ed-label">${t.name}</span>${pillHTML(t)}<span class="cn-trigger-hint ed-hint">${t.hint}</span></span>
+            <i class="ph ph-arrow-right ed-arrow"></i>
+          </button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${naLabel}
+        </div>`;
+      }
+      if (variant === 'cards' || variant === 'list') {
+        return `<div class="cn-field" ${attrs}>
+          <button class="cn-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+            ${iconHTML(t)}
+            <span class="cn-trigger-main"><span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}</span>
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}
+        </div>`;
+      }
+      if (variant === 'combobox') {
+        return `<div class="cn-field" ${attrs}>
+          <div class="vc-label">${iconHTML(t)}<span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}${t.na ? `<label class="cn-na cm-checkbox" style="margin-left:auto"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}</div>
+          <div class="cn-trigger vc-box" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+            <div class="cn-selected" data-conn-selected></div>
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </div>
+          ${menuHTML(t)}
+        </div>`;
+      }
+      if (variant === 'tiles') {
+        return `<div class="cn-field" ${attrs}>
+          <button class="cn-trigger vt-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+            ${iconHTML(t)}
+            <span class="cn-trigger-main"><span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}</span>
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}
+        </div>`;
+      }
+      if (variant === 'property') {
+        return `<div class="cn-field" ${attrs}>
+          <div class="vp-key">${iconHTML(t)}<span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}</div>
+          <div class="cn-trigger vp-val" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+            <div class="cn-selected" data-conn-selected></div>
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </div>
+          ${menuHTML(t)}
+          ${t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}
+        </div>`;
+      }
+      if (variant === 'pills') {
+        return `<div class="cn-field" ${attrs}>
+          <button class="cn-trigger vh-pill" type="button" aria-haspopup="listbox" aria-expanded="false">
+            ${iconHTML(t)}
+            <span class="cn-trigger-label">${t.name}</span>
+            ${pillHTML(t)}
+            <span class="cn-trigger-hint">${t.hint}</span>
+            <i class="ph ph-caret-down cn-trigger-caret"></i>
+          </button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}
+        </div>`;
+      }
+      if (variant === 'form') {
+        return `<div class="cn-field" ${attrs}>
+          <div class="vf-label">${iconHTML(t)}<span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}${t.na ? `<label class="cn-na cm-checkbox vf-na"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}</div>
+          <button class="cn-trigger vf-select" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="cn-trigger-hint">${t.hint}</span><i class="ph ph-caret-down cn-trigger-caret"></i></button>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+        </div>`;
+      }
+      if (variant === 'inline') {
+        return `<div class="cn-field" ${attrs}>
+          <div class="vi-row">${iconHTML(t)}<span class="cn-trigger-label">${t.name}</span>${pillHTML(t)}
+            <button class="cn-trigger vi-add" type="button" aria-haspopup="listbox" aria-expanded="false"><i class="ph ph-plus"></i><span class="cn-trigger-hint">${t.hint}</span><i class="ph ph-caret-down cn-trigger-caret"></i></button>
+          </div>
+          ${menuHTML(t)}
+          <div class="cn-selected" data-conn-selected></div>
+          ${t.na ? `<label class="cn-na cm-checkbox"><input type="checkbox" data-conn-na /> Not applicable</label>` : ''}
+        </div>`;
+      }
+    }
+
+    document.querySelectorAll('.cn-list[data-variant]').forEach(list => {
+      list.innerHTML = TYPES.map((t, i) => fieldHTML(t, list.dataset.variant, i)).join('');
+    });
+
+    // ---- Picker behavior (shared) ----
+    const closeAll = (except) => {
+      document.querySelectorAll('[data-conn-field] .cn-menu:not([hidden])').forEach(menu => {
+        if (menu === except) return;
+        menu.setAttribute('hidden', '');
+        menu.closest('[data-conn-field]').querySelector('.cn-trigger')?.setAttribute('aria-expanded', 'false');
+      });
+    };
+
+    document.querySelectorAll('[data-conn-field]').forEach(field => {
+      const trigger   = field.querySelector('.cn-trigger');
+      const menu      = field.querySelector('.cn-menu');
+      const search    = field.querySelector('[data-conn-search]');
+      const optionsEl = field.querySelector('[data-conn-options]');
+      const empty     = field.querySelector('[data-conn-empty]');
+      const selected  = field.querySelector('[data-conn-selected]');
+      const hint      = trigger.querySelector('.cn-trigger-hint');
+      const hintText  = hint ? hint.textContent : '';
+      const mode      = field.dataset.connMode || 'multi';
+      let   options   = [...optionsEl.querySelectorAll('.dropdown-item[data-conn-option]')];
+
+      const labelOf = (o) => o.querySelector('.dropdown-item-label').textContent.trim();
+
+      const renderChips = () => {
+        const chosen = options.filter(o => o.classList.contains('is-selected'));
+        selected.innerHTML = '';
+        chosen.forEach(o => {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.appendChild(document.createTextNode(labelOf(o)));
+          const rm = document.createElement('button');
+          rm.className = 'chip-remove'; rm.type = 'button'; rm.setAttribute('aria-label', 'Remove');
+          rm.innerHTML = '<i class="ph ph-x"></i>';
+          rm.addEventListener('click', (e) => { e.stopPropagation(); o.classList.remove('is-selected'); renderChips(); });
+          chip.appendChild(rm);
+          selected.appendChild(chip);
+        });
+        if (hint) hint.textContent = chosen.length ? (chosen.length + ' selected') : hintText;
+        const pill = field.querySelector('.cn-pill-recommended');
+        if (pill) pill.style.display = chosen.length ? 'none' : '';
+      };
+
+      const filter = (q) => {
+        const norm = q.trim().toLowerCase();
+        let visible = 0;
+        options.forEach(o => { const m = labelOf(o).toLowerCase().includes(norm); o.toggleAttribute('hidden', !m); if (m) visible++; });
+        if (empty) empty.toggleAttribute('hidden', visible !== 0);
+      };
+
+      const wireOption = (o) => {
+        o.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (mode === 'single') {
+            options.forEach(x => x.classList.remove('is-selected'));
+            o.classList.add('is-selected');
+            renderChips();
+            menu.setAttribute('hidden', ''); trigger.setAttribute('aria-expanded', 'false');
+          } else {
+            o.classList.toggle('is-selected'); renderChips();
+          }
+        });
+      };
+      options.forEach(wireOption);
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !menu.hasAttribute('hidden');
+        closeAll();
+        if (isOpen) { menu.setAttribute('hidden', ''); trigger.setAttribute('aria-expanded', 'false'); }
+        else { menu.removeAttribute('hidden'); trigger.setAttribute('aria-expanded', 'true'); if (search) { search.value = ''; filter(''); search.focus(); } }
+      });
+      menu.addEventListener('click', (e) => e.stopPropagation());
+      search?.addEventListener('input', () => filter(search.value));
+
+      const create = field.querySelector('[data-conn-create]');
+      create?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let name = (search?.value || '').trim().replace(/^#+/, '');
+        if (!name) { search?.focus(); return; }
+        name = '#' + name.replace(/\s+/g, '-').toLowerCase();
+        if (options.some(o => labelOf(o).toLowerCase() === name.toLowerCase())) { search.value = ''; filter(''); return; }
+        const btn = document.createElement('button');
+        btn.className = 'dropdown-item is-selected'; btn.type = 'button'; btn.setAttribute('data-conn-option', '');
+        btn.innerHTML = '<i class="ph ph-check dropdown-item-check"></i><span class="dropdown-item-text"><span class="dropdown-item-label"></span></span>';
+        btn.querySelector('.dropdown-item-label').textContent = name;
+        optionsEl.appendChild(btn); options.push(btn); wireOption(btn);
+        search.value = ''; filter(''); renderChips();
+      });
+
+      const na = field.querySelector('[data-conn-na]');
+      na?.addEventListener('change', () => {
+        field.classList.toggle('is-na', na.checked);
+        if (na.checked) {
+          options.forEach(o => o.classList.remove('is-selected'));
+          renderChips();
+          menu.setAttribute('hidden', ''); trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    document.addEventListener('click', () => closeAll());
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
+
+    // ---- Option I: command palette ----
+    document.querySelectorAll('[data-cmd]').forEach(root => {
+      const state = { Slack: new Set(), Initiatives: new Set(), Processes: new Set(), naSlack: false };
+      let activeFilter = 'All';
+      const flat = [];
+      TYPES.forEach(t => t.options.forEach(o => {
+        const label = typeof o === 'string' ? o : o.label;
+        const tag = typeof o === 'object' ? (o.tag || '') : '';
+        flat.push({ type: t.name, label, tag, icon: t.icon, iconColor: t.iconColor || '' });
+      }));
+
+      root.innerHTML = `
+        <div class="cmd-bar" data-cmd-bar>
+          <i class="ph ph-magnifying-glass"></i>
+          <input type="text" placeholder="Search channels, initiatives & processes…" data-cmd-input />
+          <span class="cmd-kbd">⌘K</span>
+        </div>
+        <div class="cmd-filters" data-cmd-filters></div>
+        <div class="cmd-panel" data-cmd-panel hidden><div class="cmd-results" data-cmd-results></div></div>
+        <div class="cmd-tray" data-cmd-tray></div>`;
+
+      const input = root.querySelector('[data-cmd-input]');
+      const panel = root.querySelector('[data-cmd-panel]');
+      const results = root.querySelector('[data-cmd-results]');
+      const tray = root.querySelector('[data-cmd-tray]');
+      const filtersEl = root.querySelector('[data-cmd-filters]');
+      const typeMode = (type) => TYPES.find(t => t.name === type).mode;
+
+      const renderFilters = () => {
+        const chips = ['All', ...TYPES.map(t => t.name)].map(name => {
+          const rec = (name === 'Slack') ? '<span class="cn-pill cn-pill-recommended">Recommended</span>' : '';
+          return `<button class="cmd-chip${activeFilter === name ? ' is-active' : ''}" type="button" data-filter="${name}">${name}${rec}</button>`;
+        }).join('');
+        filtersEl.innerHTML = chips + `<label class="cmd-na cm-checkbox"><input type="checkbox" data-cmd-na ${state.naSlack ? 'checked' : ''}/> Slack not applicable</label>`;
+      };
+
+      const renderResults = () => {
+        const q = input.value.trim().toLowerCase();
+        const groups = TYPES.filter(t => activeFilter === 'All' || t.name === activeFilter);
+        let html = '', i = 0;
+        groups.forEach(t => {
+          const matches = flat.filter(f => f.type === t.name && f.label.toLowerCase().includes(q));
+          if (!matches.length) return;
+          const dim = (t.name === 'Slack' && state.naSlack) ? ' is-dim' : '';
+          const rec = t.recommended ? '<span class="cn-pill cn-pill-recommended">Recommended</span>' : '';
+          html += `<div class="cmd-group${dim}"><div class="cmd-group-head">${t.name}${rec}</div>`;
+          matches.forEach(f => {
+            const sel = state[f.type].has(f.label) ? ' is-selected' : '';
+            const ico = f.iconColor ? ` style="color:${f.iconColor}"` : '';
+            html += `<button class="cmd-result${sel}" type="button" style="animation-delay:${i * 20}ms" data-type="${f.type}" data-label="${esc(f.label)}">
+              <span class="cmd-result-ico"${ico}><i class="ph ${f.icon}"></i></span>
+              <span class="cmd-result-label">${esc(f.label)}</span>
+              ${f.tag ? `<span class="md-tag">${f.tag}</span>` : ''}
+              <i class="ph ph-check cmd-result-check"></i>
+            </button>`;
+            i++;
+          });
+          html += '</div>';
+        });
+        results.innerHTML = html || `<p class="cmd-empty">No matches for “${esc(input.value)}”.</p>`;
+      };
+
+      const renderTray = () => {
+        let html = '';
+        TYPES.forEach(t => {
+          if (t.name === 'Slack' && state.naSlack) { html += `<span class="cmd-tray-group"><span class="cmd-tray-type">Slack</span><span class="md-tag">Not applicable</span></span>`; return; }
+          const items = [...state[t.name]];
+          if (!items.length) return;
+          html += `<span class="cmd-tray-group"><span class="cmd-tray-type">${t.name}</span>` +
+            items.map(l => `<span class="chip">${esc(l)}<button class="chip-remove" type="button" data-rm-type="${t.name}" data-rm-label="${esc(l)}" aria-label="Remove"><i class="ph ph-x"></i></button></span>`).join('') + `</span>`;
+        });
+        tray.innerHTML = html || `<p class="cmd-tray-empty">Nothing connected yet — search above to add channels, an initiative, or processes.</p>`;
+      };
+
+      const toggle = (type, label, el) => {
+        if (type === 'Slack' && state.naSlack) return;
+        const set = state[type];
+        if (typeMode(type) === 'single') {
+          const had = set.has(label); set.clear(); if (!had) set.add(label);
+          results.querySelectorAll(`.cmd-result[data-type="${type}"]`).forEach(r => r.classList.toggle('is-selected', set.has(r.dataset.label)));
+        } else {
+          set.has(label) ? set.delete(label) : set.add(label);
+          el?.classList.toggle('is-selected', set.has(label));
+        }
+        renderTray();
+      };
+
+      input.addEventListener('focus', () => { panel.hidden = false; });
+      input.addEventListener('input', () => { panel.hidden = false; renderResults(); });
+      root.querySelector('[data-cmd-bar]').addEventListener('click', () => input.focus());
+      results.addEventListener('click', (e) => { const r = e.target.closest('.cmd-result'); if (r) toggle(r.dataset.type, r.dataset.label, r); });
+      tray.addEventListener('click', (e) => { const rm = e.target.closest('[data-rm-type]'); if (!rm) return; state[rm.dataset.rmType].delete(rm.dataset.rmLabel); renderResults(); renderTray(); });
+      filtersEl.addEventListener('click', (e) => { const chip = e.target.closest('[data-filter]'); if (!chip) return; activeFilter = chip.dataset.filter; renderFilters(); renderResults(); });
+      filtersEl.addEventListener('change', (e) => { const na = e.target.closest('[data-cmd-na]'); if (!na) return; state.naSlack = na.checked; if (na.checked) state.Slack.clear(); renderResults(); renderTray(); });
+      document.addEventListener('click', (e) => { if (!root.contains(e.target)) panel.hidden = true; });
+      document.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); input.focus(); input.select(); } });
+
+      renderFilters(); renderResults(); renderTray();
+    });
+
+    // ---- Option J: completion ring ----
+    document.querySelectorAll('[data-ring]').forEach(ring => {
+      const scope = ring.closest('.demo').querySelector('[data-ring-scope]');
+      const fg = ring.querySelector('[data-ring-fg]');
+      const num = ring.querySelector('[data-ring-num]');
+      const label = ring.closest('.bc-head').querySelector('[data-ring-label]');
+      const CIRC = 100.53;
+      const update = () => {
+        const fields = [...scope.querySelectorAll('[data-conn-field]')];
+        const total = fields.length || 1;
+        const done = fields.filter(f => f.querySelector('[data-conn-selected] .chip')).length;
+        fg.style.strokeDashoffset = String(CIRC * (1 - done / total));
+        if (num) num.textContent = String(done);
+        if (label) label.textContent = `${done} of ${fields.length} connected`;
+      };
+      new MutationObserver(update).observe(scope, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+      update();
+    });
+  </script>
+</body>
+</html>

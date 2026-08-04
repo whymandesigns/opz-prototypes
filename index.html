@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Feature A — Team members</title>
-
+  <title>Feature directory — Operationalize</title>
   <style>
     /* === tokens.css === */
 /* Icarus Design Tokens
@@ -106,17 +105,11 @@
   --ic-palette-green-800: #046B5A;
   --ic-palette-green-900: #034539;
 
-  /* Cyan */
-  --ic-palette-cyan-100: #E6F6FE;
-  --ic-palette-cyan-150: #C8EBFD;
-  --ic-palette-cyan-200: #A1DDFB;
-  --ic-palette-cyan-300: #6ECAF5;
-  --ic-palette-cyan-400: #45B9F2;
+  /* Cyan — single shade. Pending removal: components currently using
+     cyan-500 (.tag-blue-light, .badge-info text, --color-info) will
+     migrate to a blue shade in the next pass, after which the ramp goes
+     away entirely. */
   --ic-palette-cyan-500: #25A9EF;
-  --ic-palette-cyan-600: #1B8AC5;
-  --ic-palette-cyan-700: #136B9B;
-  --ic-palette-cyan-800: #0E5078;
-  --ic-palette-cyan-900: #07334C;
 
   /* Blue */
   --ic-palette-blue-100: #EDF1FD;
@@ -283,7 +276,10 @@
   --color-danger-hover:   var(--ic-palette-red-600);
   --color-danger-subtle:  var(--ic-palette-red-100);
   --color-info:           var(--ic-palette-cyan-500);
-  --color-info-subtle:    var(--ic-palette-cyan-100);
+  /* --color-info-subtle is en route to blue. cyan-100 was retired in the
+     palette cleanup; backed by blue-100 until --color-info itself moves
+     to blue, at which point the cyan-500 reference above also goes. */
+  --color-info-subtle:    var(--ic-palette-blue-100);
 
   /* ---- Overlays ---- */
   --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
@@ -365,9 +361,29 @@ body {
 .btn-icon { width: 14px; height: 14px; flex-shrink: 0; }
 .btn-xs .btn-icon { width: 12px; height: 12px; }
 
-/* Square icon-only button (no text) */
-.btn-icon-only            { width: 32px; padding: 0; }
+/* Icon-only button (no text) — fully rounded "pill" shape. */
+.btn-icon-only            { width: 32px; padding: 0; border-radius: var(--ic-radius-full); }
 .btn-icon-only.btn-xs     { width: 24px; }
+
+/* Ghost as icon-only: muted graphite icon on transparent bg, gray-150
+ * surface on hover. Distinct from text `.btn-ghost` which uses brand-blue;
+ * icon-only ghosts (kebabs, X buttons) stay quiet and neutral. */
+.btn-icon-only.btn-ghost {
+  color: var(--ic-palette-graphite-500);
+}
+.btn-icon-only.btn-ghost:hover {
+  background: var(--color-surface-muted);
+  color: var(--ic-palette-graphite-500);
+}
+
+/* Danger as icon-only: red icon on transparent bg, no fill. Reads as a
+ * destructive affordance without screaming "delete" in red until clicked. */
+.btn-icon-only.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+}
+.btn-icon-only.btn-danger:hover  { background: var(--color-danger-subtle); }
+.btn-icon-only.btn-danger:active { background: var(--color-danger-subtle); }
 .btn:active { transform: translateY(1px); }
 .btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
@@ -389,9 +405,11 @@ body {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
 }
-.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+/* Hover keeps the background transparent (clickable area unchanged) and
+ * signals interactivity with an underline instead. */
+.btn-ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .btn-danger {
   background: var(--color-danger);
@@ -521,8 +539,8 @@ textarea.input {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ic-space-1);
-  min-height: 40px;
-  padding: 4px var(--ic-space-2);
+  min-height: 32px;
+  padding: 2px var(--ic-space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--ic-radius-sm);
@@ -530,6 +548,8 @@ textarea.input {
   transition: border-color var(--ic-duration-fast) var(--ic-ease),
               box-shadow var(--ic-duration-fast) var(--ic-ease);
 }
+/* Chips inside the tag input shrink to fit the 32px row */
+.input-tags .chip { height: 24px; }
 .input-tags:focus-within {
   border-color: var(--color-border-focus);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
@@ -537,12 +557,12 @@ textarea.input {
 .input-tags-input {
   flex: 1;
   min-width: 80px;
-  height: 28px;
+  height: 24px;
   padding: 0 var(--ic-space-1);
   border: 0;
   outline: 0;
   background: transparent;
-  font: var(--type-body);
+  font: var(--type-body-sm);
   color: var(--color-text);
 }
 .input-tags-input::placeholder { color: var(--color-text-subtle); }
@@ -811,6 +831,11 @@ textarea.input {
   flex-shrink: 0;
   text-transform: uppercase;
 }
+/* Size variants — for compact rows and comment threads */
+.cell-avatar-xs { width: 18px; height: 18px; font-size: 9px; }
+.cell-avatar-sm { width: 24px; height: 24px; font-size: 10px; }
+/* Colored variant — use with inline style="background:..." for per-person tint */
+.cell-avatar-color { color: #FFFFFF; font-weight: var(--ic-weight-semibold); }
 .cell-user-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cell-user-name { font: var(--ic-weight-medium) var(--ic-text-sm)/1.2 var(--ic-font-sans); color: var(--color-text); }
 .cell-user-role { font: var(--type-caption); color: var(--color-text-muted); }
@@ -891,19 +916,69 @@ textarea.input {
 .alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
 .alert-info    .alert-icon { color: var(--color-accent); }
 
-/* ---------- Badge ---------- */
+/* ---------- Badge ----------
+ * Status pill. Read-only as <span>; interactive (editable) as <button> —
+ * picks up pointer cursor, hover dim, and focus ring automatically.
+ * Optional parts compose inside any variant:
+ *
+ *   <span class="badge badge-success">Active</span>                          read-only
+ *   <button class="badge badge-warning" type="button">Pending</button>       editable
+ *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
+ */
 .badge {
   display: inline-flex; align-items: center;
+  gap: var(--ic-space-1);
   font: var(--type-caption);
   padding: var(--ic-space-1) var(--ic-space-2);
   border-radius: var(--ic-radius-full);
-  background: var(--color-surface-muted);
+  /* Neutral follows the variant recipe: {hue}-100 fill + {hue}-150 stroke */
+  background: var(--ic-palette-gray-100);
   color: var(--color-text-muted);
+  border: 1px solid var(--ic-palette-gray-150);
 }
-.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
-.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
-.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
-.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+.badge-success { background: var(--color-success-subtle); color: var(--ic-palette-green-700); border-color: var(--ic-palette-green-150); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--ic-palette-yellow-700); border-color: var(--ic-palette-yellow-150); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); border-color: var(--ic-palette-red-150); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--ic-palette-blue-500); border-color: var(--ic-palette-blue-150); }
+
+/* Editable — same pill rendered as a <button>. Deletable pills (those that
+ * contain a .badge-remove) get the same hover so all interactive pills react. */
+button.badge,
+.badge:has(.badge-remove) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+button.badge:hover,
+.badge:has(.badge-remove):hover { filter: brightness(0.96); }
+button.badge:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* Leading icon — Phosphor <i> or inline svg */
+.badge-icon { font-size: 12px; width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Trailing remove × — clicking deletes the pill (delegated handler) */
+.badge-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--ic-radius-full);
+  opacity: 0.65;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.badge-remove:hover { opacity: 1; background: color-mix(in srgb, currentColor 16%, transparent); }
+.badge-remove .ph { font-size: 10px; }
 
 /* ---------- Tag ----------
  * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
@@ -918,6 +993,7 @@ textarea.input {
   gap: var(--ic-space-1);
   height: 16px;
   padding: 0 var(--ic-space-2);
+  border: 0;
   border-radius: var(--ic-radius-sm);
   font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
   background: var(--tag-color);
@@ -934,9 +1010,18 @@ textarea.input {
 .tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
 .tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
 
-/* Indicator style — colored dot + text, ghost-button hover affordance */
+/* Solid tags are interactive (click swaps status via a dropdown) — subtle
+ * hover dim signals it. Indicator style has its own hover below. */
+.tag:not(.tag-indicator) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+.tag:not(.tag-indicator):hover { filter: brightness(0.92); }
+
+
+/* Indicator style — colored dot + text on a muted gray pill */
 .tag-indicator {
-  background: transparent;
+  background: var(--color-surface-muted);
   color: var(--color-text);
   padding: var(--ic-space-1) var(--ic-space-2);
   height: auto;
@@ -945,7 +1030,7 @@ textarea.input {
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.tag-indicator:hover { background: var(--color-surface-muted); }
+.tag-indicator:hover { background: var(--ic-palette-gray-200); }
 .tag-indicator::before {
   content: '';
   width: 8px;
@@ -987,8 +1072,90 @@ textarea.input {
 }
 .count-badge-secondary {
   background: var(--color-surface);
-  color: var(--color-danger);
-  border-color: var(--color-danger);
+  color: var(--ic-palette-graphite-500);
+  border-color: var(--color-border-strong);
+}
+
+/* ---------- Avatar ----------
+ * Squarish identity badge (4px corner radius). Three content types share
+ * the same root — the markup inside decides which renders:
+ *
+ *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
+ *   Initials:  <span class="avatar avatar-md">JD</span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><i class="ph ph-buildings"></i></span>
+ *
+ * Sizes (default = avatar-md / 32px):
+ *   .avatar-xs   16px
+ *   .avatar-sm   24px
+ *   .avatar-md   32px (default)
+ *   .avatar-lg   40px
+ *   .avatar-xl   80px
+ *   .avatar-2xl 120px
+ *
+ * Interactive: render as <button> or <a> instead of <span> — picks up
+ * pointer cursor, hover dim and focus-visible ring automatically.
+ */
+.avatar {
+  --avatar-size: 32px;
+  --avatar-text: var(--ic-text-sm);
+  --avatar-icon: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--ic-radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font: var(--ic-weight-semibold) var(--avatar-text)/1 var(--ic-font-sans);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.avatar-xs  { --avatar-size: 16px;  --avatar-text: var(--ic-text-xxs); --avatar-icon: 10px; }
+.avatar-sm  { --avatar-size: 24px;  --avatar-text: var(--ic-text-xs);  --avatar-icon: 14px; }
+.avatar-md  { --avatar-size: 32px;  --avatar-text: var(--ic-text-sm);  --avatar-icon: 16px; }
+.avatar-lg  { --avatar-size: 40px;  --avatar-text: var(--ic-text-base);--avatar-icon: 20px; }
+.avatar-xl  { --avatar-size: 80px;  --avatar-text: var(--ic-text-2xl); --avatar-icon: 36px; }
+.avatar-2xl { --avatar-size: 120px; --avatar-text: 42px;               --avatar-icon: 56px; }
+
+/* Photo content — image fills the avatar */
+.avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Icon content — Phosphor or inline SVG, sized by --avatar-icon */
+.avatar > .ph { font-size: var(--avatar-icon); }
+.avatar > svg { width: var(--avatar-icon); height: var(--avatar-icon); }
+
+/* Team / company variant — same neutral fill as initials; icon is the
+ * differentiator from people avatars. */
+.avatar-team {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* Interactive — applies when rendered as <button> or <a> */
+button.avatar,
+a.avatar {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter var(--ic-duration-fast) var(--ic-ease),
+              box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+button.avatar:hover,
+a.avatar:hover { filter: brightness(0.95); }
+button.avatar:focus-visible,
+a.avatar:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
 }
 
 /* ---------- Switch ----------
@@ -1186,6 +1353,91 @@ textarea.input {
   border-color: var(--color-danger);
 }
 
+/* ---------- Slider ----------
+ * Native <input type="range"> in a flex row. The filled-track portion is a
+ * gradient driven by --slider-progress, kept in sync by the script block in
+ * example.html (also syncs value readouts / number fields).
+ *
+ *   <div class="slider">
+ *     <input class="slider-input" type="range" min="0" max="100" value="35" aria-label="Volume" />
+ *   </div>
+ *
+ * Variants compose via optional siblings around the range input:
+ *   icons        <i class="ph ph-minus slider-icon"></i> … <i class="ph ph-plus slider-icon"></i>
+ *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
+ *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
+ *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
+ *   input        <input class="input input-xs slider-field" type="number" />  ← JS-synced both ways
+ */
+.slider {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+}
+.slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 24px; /* generous touch target around the 2px track */
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+/* Track — filled portion dark, remainder light, split at --slider-progress */
+.slider-input::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: linear-gradient(to right,
+    var(--color-accent) var(--slider-progress, 50%),
+    var(--color-border-strong) var(--slider-progress, 50%));
+}
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -7px; /* centers the 16px thumb on the 2px track */
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-webkit-slider-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible { outline: none; }
+.slider-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+/* Firefox */
+.slider-input::-moz-range-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-border-strong);
+}
+.slider-input::-moz-range-progress {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+}
+.slider-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-moz-range-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Side adornments */
+.slider-icon  { font-size: 16px; color: var(--ic-palette-graphite-500); flex-shrink: 0; }
+.slider-label { font: var(--ic-weight-regular) var(--ic-text-xs)/1.5 var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; white-space: nowrap; }
+.slider-value { font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+/* Number field variant — fixed compact width, no spinners */
+.slider-field { width: 56px; text-align: center; -moz-appearance: textfield; appearance: textfield; flex-shrink: 0; }
+.slider-field::-webkit-outer-spin-button,
+.slider-field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* ---------- Modal ----------
  * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
  *
@@ -1278,7 +1530,6 @@ textarea.input {
   justify-content: flex-end;
   gap: var(--ic-space-2);
   padding: var(--ic-space-4) var(--ic-space-5);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Mobile — buttons stack full width */
@@ -1502,14 +1753,65 @@ textarea.input {
   overflow: auto;
 }
 
+/* ---------- Breadcrumbs ----------
+ * Path trail — usually the first row inside a page head, but works standalone.
+ * Parent crumbs are blue links (underline on hover); the current page is plain
+ * text and not interactive. Chevron separators come from the ::after on each
+ * non-last item, so markup stays flat:
+ *
+ *   <nav class="breadcrumbs" aria-label="Breadcrumb">
+ *     <a class="breadcrumb" href="#">Processes</a>
+ *     <a class="breadcrumb" href="#">Onboarding</a>
+ *     <span class="breadcrumb is-current" aria-current="page">Review step</span>
+ *   </nav>
+ */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Chevron separator after every crumb except the last */
+.breadcrumb:not(:last-child)::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background-color: var(--color-text-subtle);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+}
+/* Current page — plain text, no link affordance */
+.breadcrumb.is-current {
+  color: var(--color-text);
+  cursor: default;
+}
+
 /* ---------- Page head ----------
- * Page-level header. Title (+ optional count + subtitle) on the left, actions on the right.
+ * Page-level header. Title (+ optional breadcrumbs + count + subtitle) on
+ * the left, actions on the right. Breadcrumbs, when present, are the first
+ * row inside .page-head-main, above the title.
  *
  *   <div class="page-head">
  *     <div class="page-head-main">
+ *       <nav class="breadcrumbs" aria-label="Breadcrumb">          ← optional
+ *         <a class="breadcrumb" href="#">Processes</a>
+ *         <span class="breadcrumb is-current" aria-current="page">Onboarding</span>
+ *       </nav>
  *       <div class="page-head-title">
  *         <h1 class="page-head-heading">Processes</h1>
- *         <span class="page-head-count">12</span>
+ *         <span class="count-badge count-badge-lg count-badge-secondary">12</span>
  *       </div>
  *       <p class="page-head-subtitle">Optional subtitle.</p>
  *     </div>
@@ -1529,6 +1831,8 @@ textarea.input {
   margin-bottom: var(--ic-space-6);
 }
 .page-head-main { min-width: 0; }
+/* Breadcrumbs as the first row of a page head — small gap above the title */
+.page-head-main > .breadcrumbs { margin-bottom: var(--ic-space-2); }
 .page-head-title {
   display: flex;
   align-items: center;
@@ -1539,19 +1843,10 @@ textarea.input {
   color: var(--color-text);
   margin: 0;
 }
-.page-head-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 22px;
-  padding: 0 var(--ic-space-2);
-  border-radius: var(--ic-radius-full);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
-}
+/* Count next to the heading uses the secondary count-badge component
+ * directly — no separate .page-head-count rule. Markup:
+ *   <span class="count-badge count-badge-lg count-badge-secondary">12</span>
+ */
 .page-head-subtitle {
   font: var(--type-body-sm);
   color: var(--color-text-muted);
@@ -1656,6 +1951,215 @@ textarea.input {
   border-radius: var(--ic-radius-sm);
 }
 
+/* ---------- Tooltip ----------
+ * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
+ * is top; override with [data-placement="bottom"|"left"|"right"].
+ *
+ * Two styles:
+ *   Compact (default) — dark pill, caption text, single line. For icon
+ *     buttons and short labels.
+ *   Regular — add [data-tooltip-style="regular"]. White surface, 13/20 body
+ *     text that wraps (max 240px), soft shadow, caret pointing at the
+ *     trigger. For longer explanatory copy.
+ *
+ *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ *   <button class="btn" data-tooltip="Longer explanation…" data-tooltip-style="regular">Help</button>
+ *
+ * Renders via ::after (+ ::before for the regular caret) so no extra DOM.
+ * Reveals on :hover and :focus-visible.
+ */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: var(--ic-palette-graphite-900);
+  color: var(--color-text-inverse);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  border-radius: var(--ic-radius-sm);
+  font: var(--type-caption);
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after { opacity: 1; }
+
+[data-tooltip][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+[data-tooltip][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 6px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 6px);
+  transform: translateY(-50%);
+}
+
+/* Regular style — white surface, wrapping body text, caret.
+ * Shadow matches Figma "Shadows/Level 4" (two centered layers). */
+[data-tooltip][data-tooltip-style="regular"]::after {
+  background: var(--color-surface);
+  color: var(--ic-palette-graphite-500);
+  font: var(--type-body-sm);
+  padding: var(--ic-space-4);
+  border-radius: var(--ic-radius-sm);
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: left;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24), 0 0 32px rgba(0, 0, 0, 0.12);
+  bottom: calc(100% + 12px);
+}
+/* Caret — rotated square; its shadowed half pokes out from under the bubble
+ * (::after paints above ::before, hiding the inner half). */
+[data-tooltip][data-tooltip-style="regular"]::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"]:hover::before,
+[data-tooltip][data-tooltip-style="regular"]:focus-visible::before { opacity: 1; }
+
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 12px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 12px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::before {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 8px);
+  left: auto;
+  transform: translateY(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::before {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* ---------- Toast ----------
+ * Floating notification anchored to the top-right corner. Spawn via the
+ * global `toast(...)` helper (see example.html). Three behaviors —
+ *   persistent → no auto-dismiss, shows close button
+ *   timed      → auto-dismisses after `timeout` ms (default 5000)
+ *   action     → shows an action button + close button
+ *
+ * Five color variants:
+ *   .toast-neutral · .toast-error · .toast-warning · .toast-success · .toast-info
+ *
+ *   <div class="toast-region" aria-live="polite"></div>     ← one per page
+ *   <div class="toast toast-success">
+ *     <i class="ph ph-check-circle toast-icon"></i>
+ *     <p class="toast-message">Saved.</p>
+ *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
+ *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *   </div>
+ */
+.toast-region {
+  position: fixed;
+  top: var(--ic-space-4);
+  right: var(--ic-space-4);
+  z-index: var(--ic-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ic-space-2);
+  max-width: 380px;
+  pointer-events: none;
+}
+.toast {
+  --toast-accent: var(--color-border-strong);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-3) var(--ic-space-4);
+  border-radius: var(--ic-radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font: var(--type-body-sm);
+  box-shadow: var(--ic-shadow-md);
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 380px;
+  transition: opacity var(--ic-duration-base) var(--ic-ease),
+              transform var(--ic-duration-base) var(--ic-ease);
+}
+.toast.is-entering { opacity: 0; transform: translateX(20%); }
+.toast.is-leaving  { opacity: 0; transform: translateX(20%); }
+
+.toast-icon { font-size: 18px; flex-shrink: 0; color: var(--toast-accent); margin-top: 1px; }
+.toast-message { flex: 1; min-width: 0; margin: 0; line-height: 1.4; }
+.toast-action { flex-shrink: 0; align-self: center; }
+.toast-close {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--ic-radius-sm);
+  flex-shrink: 0;
+  align-self: center;
+  transition: color var(--ic-duration-fast) var(--ic-ease);
+}
+.toast-close:hover { color: var(--color-text); }
+.toast-close .ph { font-size: 14px; }
+
+/* Color variants — set --toast-accent, icon color follows */
+.toast-neutral { --toast-accent: var(--color-border-strong); }
+.toast-neutral .toast-icon { color: var(--color-text-muted); }
+.toast-error   { --toast-accent: var(--color-danger);  background: var(--color-danger-subtle); }
+.toast-warning { --toast-accent: var(--color-warning); background: var(--color-warning-subtle); }
+.toast-success { --toast-accent: var(--color-success); background: var(--color-success-subtle); }
+.toast-info    { --toast-accent: var(--color-accent);  background: var(--color-accent-subtle); }
+
 /* ---------- Top bar ----------
  * Dark application chrome. 56px tall, graphite-800 background.
  * Brand on left, search in middle, avatar on right.
@@ -1742,7 +2246,9 @@ textarea.input {
   display: inline-flex; align-items: center; justify-content: center;
   font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);
   color: var(--ic-palette-graphite-800);
+  text-decoration: none;
 }
+.topbar-avatar:hover { background: var(--ic-palette-gray-400, #CBD5E1); color: var(--ic-palette-graphite-900); }
 .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 @media (max-width: 720px) {
@@ -1791,14 +2297,23 @@ textarea.input {
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.dropdown-item:hover  { background: var(--color-surface-muted); }
+.dropdown-item:hover  { background: var(--color-accent-subtle); }
 .dropdown-item:disabled,
 .dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+/* Hairline divider inside a menu — render as <hr class="dropdown-divider"> */
+.dropdown-divider {
+  height: 1px;
+  margin: var(--ic-space-1) 0;
+  background: var(--color-border);
+  border: 0;
+}
 
 /* Optional pieces inside an item */
 .dropdown-item-icon {
   width: 16px;
   height: 16px;
+  font-size: 16px; /* sizes Phosphor <i> icons; harmless for inline SVG */
   flex-shrink: 0;
   color: var(--color-text-muted);
 }
@@ -1929,168 +2444,335 @@ textarea.input {
 .body-sm { font: var(--type-body-sm); color: var(--color-text-muted); }
 .caption { font: var(--type-caption); color: var(--color-text-subtle); }
 
+/* ---------- Layout helpers ----------
+ * Tiny flex/grid primitives used across prototypes. `.page` lives in
+ * semantic.css (it's the content max-width wrapper). The three below are
+ * the everyday building blocks for stacking content vertically (`.stack`),
+ * placing items in a wrapping row (`.row`), or a two-column grid that
+ * collapses on narrow viewports (`.grid-2`).
+ */
+.stack  { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+.row    { display: flex; gap: var(--ic-space-3); align-items: center; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-5); }
+
+@media (max-width: 720px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Drawer parts ----------
+ * Mirrors the .modal-header/.modal-body/.modal-footer pattern, since drawers
+ * use the same three-section layout. (The drawer container itself lives above
+ * in the Modal/Drawer section.)
+ */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-5);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ic-space-5);
+  font: var(--type-body);
+  color: var(--color-text);
+}
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-4) var(--ic-space-5);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* The annotation tool's CSS lives in devtools.css — author tooling, not a
+ * user-facing UI primitive. See design.md §7 for the four-file inline order. */
+
+    /* === devtools.css === */
+/* devtools.css — author/dev tooling only.
+ *
+ * This file is auto-inlined into every prototype alongside the three-layer
+ * design system (tokens.css → semantic.css → components.css), but it is
+ * explicitly NOT part of that layer chain — nothing here is a user-facing
+ * UI primitive. Everything is dormant until the matching trigger fires
+ * (e.g. ?notes=1 in the URL for the annotation tool).
+ *
+ * Rules of thumb:
+ * - Reach for this file when adding something authors/devs use to *build*
+ *   prototypes (annotation overlays, grid debug toggles, coachmark editors,
+ *   responsive frame previewers).
+ * - Anything end users see (buttons, cards, alerts, status colors) belongs
+ *   in components.css.
+ * - Keep selectors namespaced (`.annot-*`, `.grid-debug-*`, …) so they
+ *   can't collide with feature CSS.
+ */
+
+/* ---------- Annotation tool ----------
+ * In-page batch annotation overlay. Enable on any prototype by appending
+ * ?notes=1 to the URL. The matching JS lives in the example.html script
+ * block (delegated handlers — copy that whole block into every prototype).
+ *
+ * Usage flow:
+ *   1. Click "Inspect" → cursor becomes crosshair, hovering outlines elements.
+ *   2. Click an element → numbered pin + popover with a textarea opens.
+ *   3. Type the note, Enter to save (Shift+Enter for newline, Esc cancels).
+ *   4. Repeat. "Copy batch" puts all notes onto the clipboard as one payload.
+ *   5. Paste back to your coding agent to execute all changes in a single turn.
+ *
+ * Notes clear on reload (no persistence). Selectors use the shortest readable
+ * form (#id > unique class > tag.class > parent path).
+ */
+.annot-toolbar {
+  position: fixed; bottom: 16px; right: 16px;
+  z-index: 99999;
+  display: flex; gap: 6px; align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  box-shadow: var(--ic-shadow-lg);
+  font: var(--type-body-sm);
+}
+.annot-toolbar button {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 10px;
+  border-radius: var(--ic-radius-sm);
+  cursor: pointer;
+  font: inherit;
+}
+.annot-toolbar button:disabled { opacity: 0.4; cursor: default; }
+.annot-toolbar button.is-active {
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-color: var(--color-accent);
+}
+.annot-toolbar .annot-count {
+  padding: 0 var(--ic-space-2);
+  color: var(--color-text-muted);
+  font: var(--type-caption);
+}
+.annot-mode,
+.annot-mode * { cursor: crosshair !important; }
+.annot-mode *:hover {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: -2px;
+}
+.annot-pin {
+  position: absolute;
+  z-index: 99998;
+  width: 20px; height: 20px;
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font: 600 11px/1 var(--ic-font-sans);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+.annot-popover {
+  position: absolute;
+  z-index: 100000;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-3);
+  box-shadow: var(--ic-shadow-xl);
+  width: 280px;
+  font: var(--type-body-sm);
+}
+.annot-popover textarea {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  padding: 6px 8px;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.annot-popover-meta { margin-bottom: 6px; }
+.annot-popover-meta code {
+  font: var(--type-mono);
+  font-size: 11px;
+  background: var(--color-surface-muted);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.annot-popover-text { color: var(--color-text-muted); font-size: 11px; margin: 4px 0 6px; }
+.annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
+
   </style>
-
-  <!-- Feature-A-only styles. Promote to components.css if reused elsewhere. -->
   <style>
-    .stack { display: flex; flex-direction: column; gap: var(--ic-space-4); }
-    .row   { display: flex; gap: var(--ic-space-3); align-items: center; }
-    .between { display: flex; justify-content: space-between; align-items: center; gap: var(--ic-space-4); }
-
-    .header {
-      display: flex; justify-content: space-between; align-items: end;
-      margin-bottom: var(--ic-space-7);
+    .toolbar { margin-top: var(--ic-space-5); }
+    .links { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--ic-space-4); margin-top: var(--ic-space-4); }
+    a.card { text-decoration: none; color: inherit; display: block; padding: 0; overflow: hidden; transition: background var(--ic-duration-fast) var(--ic-ease), border-color var(--ic-duration-fast) var(--ic-ease); }
+    a.card:hover { background: var(--color-surface-muted); border-color: var(--color-border-strong); }
+    .thumb {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1280 / 800;
+      object-fit: cover;
+      object-position: top;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-muted);
     }
-    .toolbar {
-      display: flex; gap: var(--ic-space-3); align-items: center;
-      margin-bottom: var(--ic-space-5);
-    }
-    .toolbar .input { flex: 1; }
-
-    /* Member row — feature-specific. Built from semantic tokens. */
-    .member {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      align-items: center;
-      gap: var(--ic-space-4);
-      padding: var(--ic-space-4) var(--ic-space-5);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-md);
-      transition: background var(--ic-duration-fast) var(--ic-ease);
-    }
-    .member:hover { background: var(--color-surface-muted); }
-
-    .avatar {
-      width: 40px; height: 40px;
-      border-radius: var(--ic-radius-full);
-      background: var(--color-brand-subtle);
-      color: var(--color-brand);
-      display: grid; place-items: center;
-      font: var(--ic-weight-semibold) var(--ic-text-base)/1 var(--ic-font-sans);
-    }
-
-    .member-name { font: var(--type-h4); margin: 0; color: var(--color-text); }
-    .member-email { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
-    .member-role  { font: var(--type-caption); color: var(--color-text-subtle); }
-
-    .invite-card { background: var(--color-surface-muted); border-style: dashed; }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: var(--ic-space-6);
-    }
-    @media (max-width: 720px) {
-      .grid-2 { grid-template-columns: 1fr; }
-      .member { grid-template-columns: auto 1fr; }
-      .member > :nth-child(3), .member > :nth-child(4) { grid-column: 2; }
-    }
+    .card-meta { padding: var(--ic-space-4); }
+    .arrow { float: right; color: var(--color-text-subtle); }
+    .folder { font: var(--type-mono); color: var(--color-text-subtle); display: block; margin-top: var(--ic-space-2); }
+    .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
+    .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .empty { display: none; }
+    .empty.is-visible { display: block; }
   </style>
 </head>
 <body>
-  <main class="page">
+  <main class="page stack" style="gap: var(--ic-space-5)">
 
-    <header class="header">
-      <div>
-        <h1 class="h1">Team members</h1>
-        <p class="body-sm">Manage who has access to this workspace.</p>
-      </div>
-      <div class="row">
-        <span class="badge">12 members</span>
-        <button class="btn btn-primary">Invite member</button>
-      </div>
+    <header style="margin-top: var(--ic-space-6)">
+      <a class="backlink" href="../">&larr; designmd home</a>
+      <h1 class="h1" style="margin-top: var(--ic-space-3)">Feature directory</h1>
+      <p class="body-sm">Every prototype in <code style="font: var(--type-mono); color: var(--color-text-muted)">features/</code>. One folder per feature, always <code style="font: var(--type-mono); color: var(--color-text-muted)">index.html</code> inside.</p>
     </header>
 
-    <section class="grid-2">
+    <div class="toolbar">
+      <input class="input" id="feature-search" type="search" placeholder="Search features&hellip;" aria-label="Search features" style="width: 100%; max-width: 1080px" />
+    </div>
 
-      <!-- Member list -->
-      <div class="stack">
-        <div class="toolbar">
-          <input class="input" type="search" placeholder="Search by name or email…" />
-          <button class="btn btn-secondary">Filter</button>
+    <!-- Add a card per feature. Keep alphabetical by folder name.
+         Refresh thumbnails with headless Chrome:
+         chrome --headless --window-size=1280,800 --screenshot=_thumbs/<name>.png http://localhost:4173/features/<name>/ -->
+    <section class="links" id="feature-list">
+      <a class="card" href="./action-items/">
+        <img class="thumb" src="./_thumbs/action-items.png" alt="Action items screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Action items <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">RoB meeting action items.</p>
+          <span class="folder">action-items/</span>
         </div>
-
-        <div class="stack" style="gap: var(--ic-space-2)">
-
-          <div class="member">
-            <div class="avatar">MV</div>
-            <div>
-              <p class="member-name">Matthew Vella</p>
-              <p class="member-email">matthew.vella@operationalize.com</p>
-            </div>
-            <span class="badge badge-success">Active</span>
-            <span class="member-role">Owner</span>
-          </div>
-
-          <div class="member">
-            <div class="avatar" style="background: var(--color-info-subtle); color: var(--color-info)">AS</div>
-            <div>
-              <p class="member-name">Anna Schmidt</p>
-              <p class="member-email">anna@example.com</p>
-            </div>
-            <span class="badge badge-success">Active</span>
-            <span class="member-role">Admin</span>
-          </div>
-
-          <div class="member">
-            <div class="avatar" style="background: var(--color-warning-subtle); color: var(--color-warning)">JP</div>
-            <div>
-              <p class="member-name">Jordan Park</p>
-              <p class="member-email">jordan@example.com</p>
-            </div>
-            <span class="badge badge-warning">Pending</span>
-            <span class="member-role">Member</span>
-          </div>
-
-          <div class="member">
-            <div class="avatar" style="background: var(--color-success-subtle); color: var(--color-success)">RK</div>
-            <div>
-              <p class="member-name">Rita Kowalski</p>
-              <p class="member-email">rita@example.com</p>
-            </div>
-            <span class="badge badge-success">Active</span>
-            <span class="member-role">Member</span>
-          </div>
-
-          <div class="member">
-            <div class="avatar" style="background: var(--color-danger-subtle); color: var(--color-danger)">DT</div>
-            <div>
-              <p class="member-name">Dimitri Tanaka</p>
-              <p class="member-email">dimitri@example.com</p>
-            </div>
-            <span class="badge badge-danger">Suspended</span>
-            <span class="member-role">Member</span>
-          </div>
-
+      </a>
+      <a class="card" href="./agenda-items/">
+        <img class="thumb" src="./_thumbs/agenda-items.png" alt="Agenda items screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Agenda items <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Agenda topics for meetings.</p>
+          <span class="folder">agenda-items/</span>
         </div>
-      </div>
+      </a>
+      <a class="card" href="./api-token-management/">
+        <img class="thumb" src="./_thumbs/api-token-management.png" alt="API token management screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">API token management <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Create, scope and revoke API tokens.</p>
+          <span class="folder">api-token-management/</span>
+        </div>
+      </a>
+      <a class="card" href="./connections/">
+        <img class="thumb" src="./_thumbs/connections.png" alt="Connections screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Connections <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">RoB meeting connections.</p>
+          <span class="folder">connections/</span>
+        </div>
+      </a>
 
-      <!-- Invite form -->
-      <aside>
-        <article class="card invite-card">
-          <h3 class="card-title">Invite a teammate</h3>
-          <p class="card-body" style="margin-bottom: var(--ic-space-5)">
-            They'll get an email with a link to join.
-          </p>
-          <form class="stack">
-            <label class="field">
-              <span class="field-label">Email</span>
-              <input class="input" type="email" placeholder="name@company.com" />
-            </label>
-            <label class="field">
-              <span class="field-label">Role</span>
-              <input class="input" value="Member" />
-            </label>
-            <div class="row" style="margin-top: var(--ic-space-2)">
-              <button class="btn btn-primary" type="submit">Send invite</button>
-              <button class="btn btn-ghost" type="button">Cancel</button>
-            </div>
-          </form>
-        </article>
-      </aside>
-
+      <a class="card" href="./csv-export/">
+        <img class="thumb" src="./_thumbs/csv-export.png" alt="CSV / XLSX import screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">CSV / XLSX import <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Bulk-import Initiatives from a spreadsheet.</p>
+          <span class="folder">csv-export/</span>
+        </div>
+      </a>
+      <a class="card" href="./dashboard/">
+        <img class="thumb" src="./_thumbs/dashboard.png" alt="Dashboard screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Dashboard <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Operationalize dashboard.</p>
+          <span class="folder">dashboard/</span>
+        </div>
+      </a>
+      <a class="card" href="./integrations/">
+        <img class="thumb" src="./_thumbs/integrations.png" alt="Integrations screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Integrations <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Integrations list, connect flow, status.</p>
+          <span class="folder">integrations/</span>
+        </div>
+      </a>
+      <a class="card" href="./integrations-v2/">
+        <img class="thumb" src="./_thumbs/integrations-v2.png" alt="Integrations v2 screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Integrations v2 <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Second iteration of the integrations flow.</p>
+          <span class="folder">integrations-v2/</span>
+        </div>
+      </a>
+      <a class="card" href="./loaders/">
+        <img class="thumb" src="./_thumbs/loaders.png" alt="Loaders screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Loaders <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Loading states and skeletons.</p>
+          <span class="folder">loaders/</span>
+        </div>
+      </a>
+      <a class="card" href="./meeting-details/">
+        <img class="thumb" src="./_thumbs/meeting-details.png" alt="Meeting details screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Meeting details <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Single meeting view.</p>
+          <span class="folder">meeting-details/</span>
+        </div>
+      </a>
+      <a class="card" href="./rob-flow/">
+        <img class="thumb" src="./_thumbs/rob-flow.png" alt="RoB flow screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">RoB flow <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Rhythm-of-business end-to-end flow.</p>
+          <span class="folder">rob-flow/</span>
+        </div>
+      </a>
+      <a class="card" href="./slide-integration/">
+        <img class="thumb" src="./_thumbs/slide-integration.png" alt="Slide integration screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Slide integration <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Presentation view for recurring business reviews.</p>
+          <span class="folder">slide-integration/</span>
+        </div>
+      </a>
     </section>
+
+    <p class="body-sm empty" id="feature-empty">No features match &ldquo;<span id="feature-empty-q"></span>&rdquo;.</p>
+
+    <p class="body-sm" style="margin-bottom: var(--ic-space-8)">Older experiments live in <a class="backlink" href="./archive/">archive/</a>.</p>
+
+    <script>
+      // Live filter — matches title, description and folder name.
+      (function () {
+        var input = document.getElementById('feature-search');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('#feature-list .card'));
+        var empty = document.getElementById('feature-empty');
+        var emptyQ = document.getElementById('feature-empty-q');
+        input.addEventListener('input', function () {
+          var q = input.value.trim().toLowerCase();
+          var shown = 0;
+          cards.forEach(function (c) {
+            var hit = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) shown++;
+          });
+          emptyQ.textContent = input.value.trim();
+          empty.classList.toggle('is-visible', shown === 0);
+        });
+      })();
+    </script>
+
   </main>
 </body>
 </html>

@@ -1,9 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Member Profile — Operationalize</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operationalize — Dashboard</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
   <style>
     /* === tokens.css === */
 /* Icarus Design Tokens
@@ -407,7 +410,9 @@ body {
   background: transparent;
   color: var(--color-accent);
 }
-.btn-ghost:hover { background: var(--color-accent-subtle); color: var(--color-accent); }
+/* Hover keeps the background transparent (clickable area unchanged) and
+ * signals interactivity with an underline instead. */
+.btn-ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .btn-danger {
   background: var(--color-danger);
@@ -914,19 +919,69 @@ textarea.input {
 .alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
 .alert-info    .alert-icon { color: var(--color-accent); }
 
-/* ---------- Badge ---------- */
+/* ---------- Badge ----------
+ * Status pill. Read-only as <span>; interactive (editable) as <button> —
+ * picks up pointer cursor, hover dim, and focus ring automatically.
+ * Optional parts compose inside any variant:
+ *
+ *   <span class="badge badge-success">Active</span>                          read-only
+ *   <button class="badge badge-warning" type="button">Pending</button>       editable
+ *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
+ */
 .badge {
   display: inline-flex; align-items: center;
+  gap: var(--ic-space-1);
   font: var(--type-caption);
   padding: var(--ic-space-1) var(--ic-space-2);
   border-radius: var(--ic-radius-full);
-  background: var(--color-surface-muted);
+  /* Neutral follows the variant recipe: {hue}-100 fill + {hue}-150 stroke */
+  background: var(--ic-palette-gray-100);
   color: var(--color-text-muted);
+  border: 1px solid var(--ic-palette-gray-150);
 }
-.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
-.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
-.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
-.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+.badge-success { background: var(--color-success-subtle); color: var(--ic-palette-green-700); border-color: var(--ic-palette-green-150); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--ic-palette-yellow-700); border-color: var(--ic-palette-yellow-150); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); border-color: var(--ic-palette-red-150); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--ic-palette-blue-500); border-color: var(--ic-palette-blue-150); }
+
+/* Editable — same pill rendered as a <button>. Deletable pills (those that
+ * contain a .badge-remove) get the same hover so all interactive pills react. */
+button.badge,
+.badge:has(.badge-remove) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+button.badge:hover,
+.badge:has(.badge-remove):hover { filter: brightness(0.96); }
+button.badge:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* Leading icon — Phosphor <i> or inline svg */
+.badge-icon { font-size: 12px; width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Trailing remove × — clicking deletes the pill (delegated handler) */
+.badge-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--ic-radius-full);
+  opacity: 0.65;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.badge-remove:hover { opacity: 1; background: color-mix(in srgb, currentColor 16%, transparent); }
+.badge-remove .ph { font-size: 10px; }
 
 /* ---------- Tag ----------
  * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
@@ -957,6 +1012,15 @@ textarea.input {
 .tag-blue       { --tag-color: var(--ic-palette-blue-500); }
 .tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
 .tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
+
+/* Solid tags are interactive (click swaps status via a dropdown) — subtle
+ * hover dim signals it. Indicator style has its own hover below. */
+.tag:not(.tag-indicator) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+.tag:not(.tag-indicator):hover { filter: brightness(0.92); }
+
 
 /* Indicator style — colored dot + text on a muted gray pill */
 .tag-indicator {
@@ -1469,7 +1533,6 @@ a.avatar:focus-visible {
   justify-content: flex-end;
   gap: var(--ic-space-2);
   padding: var(--ic-space-4) var(--ic-space-5);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Mobile — buttons stack full width */
@@ -2549,1511 +2612,1941 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
 
   </style>
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <style>
-    /* =====================================================
-       Profile page — prototype-specific styles
-       ===================================================== */
 
-    /* Make the design-system app-shell fill the viewport (it defaults to a 560px demo widget) */
-    .template-frame {
+  <!-- Icon symbols -->
+  <svg style="display:none">
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.18-6.84"/><path d="M21 3v6h-6"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-org" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m3.08 3.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m3.08-3.08l4.24-4.24M19.78 19.78l-4.24-4.24m-3.08-3.08l-4.24-4.24"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+    <symbol id="i-meetings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></symbol>
+    <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></symbol>
+  </svg>
+
+  <style>
+    /* Dashboard-specific overrides and layout */
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--ic-font-sans);
+      background: var(--color-surface);
+      color: var(--color-text);
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background: var(--color-bg);
       overflow: hidden;
     }
-    .template-frame .app-shell {
-      border: 0;
-      border-radius: 0;
-      height: auto;
-      flex: 1;
-    }
 
-    /* ---------- Profile card — extends .card with a two-column grid ---------- */
-    .pf-card {
-      margin-bottom: var(--ic-space-5);
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 300px;
-      gap: var(--ic-space-6);
-      border: 0;
-    }
-    .pf-card-main { min-width: 0; display: flex; gap: var(--ic-space-5); }
-    .pf-card-side { min-width: 0; display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .topbar { flex-shrink: 0; }
 
-    /* ---------- Avatar block ---------- */
-    .pf-avatar-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--ic-space-3);
-      flex-shrink: 0;
-    }
-    .pf-avatar-lg {
-      width: 96px; height: 96px;
-      border-radius: 50%;
-      background: var(--ic-palette-blue-500);
-      color: #FFF;
-      font: var(--ic-weight-semibold) 32px/1 var(--ic-font-sans);
+    /* Topbar notification button */
+    .topbar-icon-btn {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 4px var(--color-surface), 0 0 0 5px var(--color-border);
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: var(--ic-radius-full);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.85);
+      cursor: pointer;
+      font-size: 20px;
+      transition: background var(--ic-duration-fast) var(--ic-ease);
     }
-    .pf-avatar-image {
-      width: 96px; height: 96px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 0 0 4px var(--color-surface), 0 0 0 5px var(--color-border);
+    .topbar-icon-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+    .topbar-notif-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 15px;
+      height: 15px;
+      padding: 0 3px;
+      border-radius: var(--ic-radius-full);
+      background: var(--color-danger);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 15px;
+      text-align: center;
+      border: 2px solid var(--ic-palette-graphite-800);
+      box-sizing: content-box;
     }
 
-    /* ---------- Identity block ---------- */
-    .pf-identity { flex: 1; min-width: 0; }
-    .pf-name-row {
+    /* Main layout */
+    .dashboard { flex: 1; display: flex; min-height: 0; }
+    .sidenav { height: 100%; }
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-surface);
+      min-width: 0;
+      overflow-y: auto;
+    }
+    .content {
+      flex: 1;
+      padding: var(--ic-space-6) var(--ic-space-7);
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ---------- Welcome ---------- */
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ic-space-4);
+      margin-bottom: var(--ic-space-5);
+    }
+    .welcome-title { font: var(--type-h1); color: var(--color-text); }
+
+    /* ---------- Section scaffolding ---------- */
+    .dash-section { margin-bottom: var(--ic-space-6); }
+    .dash-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ic-space-3);
+      margin-bottom: var(--ic-space-3);
+    }
+    .dash-section-title {
       display: flex;
       align-items: center;
       gap: var(--ic-space-2);
-      margin-bottom: 2px;
+      font: var(--type-h3);
+      color: var(--color-text);
     }
-    .pf-name { font: var(--type-h2); margin: 0; }
-    .pf-role-line {
-      font: var(--type-body);
-      color: var(--color-text-muted);
-      margin: 0 0 var(--ic-space-4);
+    .dash-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font: var(--type-body-sm);
+      font-weight: 600;
+      color: var(--color-text-link);
+      text-decoration: none;
     }
+    .dash-link:hover { text-decoration: underline; }
+    .dash-link i { font-size: 14px; }
 
-    /* ---------- Meta row (Manager / Function / Role / Hire Date) ---------- */
-    .pf-meta {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--ic-space-4);
-      padding-top: var(--ic-space-4);
+    .dash-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-lg);
+      overflow: hidden;
+    }
+    .dash-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3) var(--ic-space-4);
       border-top: 1px solid var(--color-border);
     }
-    .pf-meta-cell { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .pf-meta-label {
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.2 var(--ic-font-sans);
-      color: var(--color-text-subtle);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .pf-meta-value {
-      font: var(--ic-weight-medium) var(--ic-text-sm)/1.3 var(--ic-font-sans);
-      color: var(--color-text);
-    }
-    .pf-person-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 8px 2px 2px;
-      border: 1px solid var(--color-border);
-      border-radius: 999px;
+    .dash-row:first-child { border-top: none; }
+
+    /* ---------- Planning cycle stepper ---------- */
+    .cycle-card {
       background: var(--color-surface);
-      color: var(--color-text);
-      text-decoration: none;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);
-      width: max-content;
-      max-width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-lg);
+      padding: var(--ic-space-4) var(--ic-space-5) var(--ic-space-5);
+      margin-bottom: var(--ic-space-5);
     }
-    .pf-person-chip:hover { background: var(--color-surface-muted); }
-    .pf-person-chip .pf-avatar-xs {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: var(--ic-palette-cyan-500);
-      color: #FFF;
-      display: inline-flex;
+    .cycle-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ic-space-4);
+      margin-bottom: var(--ic-space-5);
+    }
+    .cycle-head-title { font: var(--type-h4); font-weight: 600; color: var(--color-text); }
+    .cycle-head-meta { font: var(--type-body-sm); color: var(--color-text-muted); }
+    .cycle-head-meta strong { color: var(--color-text); font-weight: 600; }
+
+    .stepper { display: flex; }
+    .stepper-step {
+      flex: 1 1 0;
+      position: relative;
+      padding-right: var(--ic-space-3);
+    }
+    /* connector line runs from this node's centre to the next node */
+    .stepper-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 9px;
+      left: 10px;
+      width: 100%;
+      height: 2px;
+      background: var(--color-border-strong);
+    }
+    .stepper-step.is-done::after { background: var(--color-brand); }
+    .stepper-step.is-current::after {
+      background: linear-gradient(to right, var(--color-accent) 40%, var(--color-border-strong) 40%);
+    }
+    .stepper-node {
+      position: relative;
+      z-index: 1;
+      width: 20px;
+      height: 20px;
+      border-radius: var(--ic-radius-full);
+      display: flex;
       align-items: center;
       justify-content: center;
-      font: var(--ic-weight-semibold) 9px/1 var(--ic-font-sans);
-      flex-shrink: 0;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border-strong);
+      color: var(--color-text-subtle);
+      font-size: 11px;
+      font-weight: 700;
     }
-
-    /* ---------- Contacts + About sections ---------- */
-    .pf-section {
-      margin-top: var(--ic-space-5);
+    .stepper-step.is-done .stepper-node {
+      background: var(--color-brand);
+      border-color: var(--color-brand);
+      color: #fff;
     }
-    .pf-section-title {
-      font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans);
-      color: var(--color-text);
-      margin: 0 0 var(--ic-space-3);
+    .stepper-step.is-done .stepper-node i { font-size: 12px; }
+    .stepper-step.is-current .stepper-node {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
     }
-    .pf-contacts {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ic-space-2);
-    }
-    .pf-contact-row {
-      display: flex;
-      align-items: center;
-      gap: var(--ic-space-2);
+    .stepper-label {
+      margin-top: var(--ic-space-3);
       font: var(--type-body-sm);
-    }
-    .pf-contact-row .ph { color: var(--color-text-subtle); font-size: 16px; flex-shrink: 0; }
-    .pf-contact-row a { color: var(--color-text-link); text-decoration: none; }
-    .pf-contact-row a:hover { text-decoration: underline; }
-
-    .pf-about-body {
-      font: var(--type-body-sm);
+      font-weight: 600;
       color: var(--color-text);
-      line-height: 1.55;
-      margin: 0;
+      padding-right: var(--ic-space-2);
     }
+    .stepper-step.is-todo .stepper-label { color: var(--color-text-muted); font-weight: 500; }
+    .stepper-date { margin-top: 2px; font: var(--type-caption); color: var(--color-text-subtle); }
+    .stepper-step.is-current .stepper-date { color: var(--color-accent); font-weight: 600; }
 
-    /* ---------- Map embed ---------- */
-    .pf-map {
-      position: relative;
-      height: 160px;
-      border-radius: var(--ic-radius-md);
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-      background: #E8EEF4;
-    }
-    .pf-map-pin {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -100%);
-      color: var(--color-danger);
-      font-size: 28px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
-    }
-    .pf-map-overlay {
-      position: absolute;
-      bottom: 8px; left: 8px;
-      padding: 4px 8px;
-      background: rgba(255,255,255,0.92);
-      border-radius: 6px;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.3 var(--ic-font-sans);
-      color: var(--color-text);
-    }
-
-    /* Tab strip spacing for the profile page (.tabs is the design-system base) */
-    .pf-tabs-wrap { margin-bottom: var(--ic-space-5); }
-
-    /* ---------- Action items — mirrors the .ai-* card system from the RoB modal ---------- */
-    /* Inline filter checkboxes — sit on the right of the first section header,
-       in line with the h3 title */
-    .pf-ai-filters {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--ic-space-4);
-      margin-left: auto;
-    }
-    .pf-ai-filter {
-      font: var(--type-caption);
-      color: var(--color-text-muted);
-    }
-
-    .pf-ai-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ic-space-6);
-    }
-    .pf-ai-section { display: flex; flex-direction: column; gap: var(--ic-space-2); }
-    .pf-ai-section-head {
+    /* ---------- Join meeting banner ---------- */
+    .join-banner {
       display: flex;
       align-items: center;
-      gap: var(--ic-space-2);
-      padding-bottom: var(--ic-space-2);
-      border-bottom: 1px solid var(--color-border);
-      margin-bottom: var(--ic-space-1);
-    }
-    .pf-ai-show-completed {
-      margin-left: auto;
-      font: var(--type-caption);
-      color: var(--color-text-muted);
-    }
-    .pf-ai-section-title {
-      font: var(--type-h4);
-      color: var(--color-text);
-      margin: 0;
-    }
-    .pf-ai-section-sub {
-      font: var(--type-caption);
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-    .pf-ai-section-count {
-      margin-left: auto;
-      font: var(--type-caption);
-      color: var(--color-text-muted);
-      background: var(--color-surface-muted);
-      border-radius: 999px;
-      padding: 1px 8px;
-    }
-    .pf-ai-section.is-past .ai-item { opacity: 0.92; }
-    .ai-item {
+      gap: var(--ic-space-3);
       background: var(--color-surface);
       border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-md);
-      padding: var(--ic-space-2);
+      border-radius: var(--ic-radius-lg);
+      padding: var(--ic-space-3) var(--ic-space-4);
+      margin-bottom: var(--ic-space-6);
     }
-    .ai-item:hover { border-color: var(--color-border-strong, #CBD5E1); }
-    .ai-item.is-done { background: var(--color-surface-muted); }
-    .ai-item.is-done .ai-desc { text-decoration: line-through; color: var(--color-text-muted); }
-    /* Archived items get the same muted background as Done */
-    .ai-item.is-archived { background: var(--color-surface-muted); }
-    .ai-meta-row {
+    .join-banner-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--ic-radius-md);
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .join-banner-body { flex: 1; min-width: 0; }
+    .join-banner-title { font: var(--type-body); font-weight: 600; color: var(--color-text); }
+    .join-banner-meta { font: var(--type-body-sm); color: var(--color-text-muted); }
+
+    /* ---------- Two-column grid ---------- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: var(--ic-space-6);
+      align-items: start;
+    }
+    .dash-col { min-width: 0; }
+    .dash-col-right { display: flex; flex-direction: column; gap: var(--ic-space-6); }
+
+    /* ---------- Needs attention rows ---------- */
+    .na-row {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      gap: var(--ic-space-3);
+      align-items: center;
+      padding: var(--ic-space-3) var(--ic-space-4);
+      border-top: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .na-row:first-child { border-top: none; }
+    .na-row:hover { background: var(--color-surface-muted); }
+    .na-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--ic-radius-md);
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      font-size: 18px;
+    }
+    .na-body { min-width: 0; }
+    .na-title { font: var(--type-body); font-weight: 600; color: var(--color-text); }
+    .na-meta {
       display: flex;
       align-items: center;
       gap: var(--ic-space-2);
-      margin-bottom: 6px;
+      margin-top: 3px;
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
       flex-wrap: wrap;
     }
-    .ai-meta-row .ai-spacer { flex: 1; }
-
-    .ai-status {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--color-surface-muted);
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-pill, 999px);
-      padding: 2px 10px 2px 8px;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.4 var(--ic-font-sans);
-      color: var(--color-text);
-      cursor: pointer;
-    }
-    .ai-status[disabled] { cursor: not-allowed; opacity: 0.7; }
-    .ai-status::before {
-      content: ''; width: 8px; height: 8px; border-radius: 50%;
-      background: var(--ai-status-color, #94A3B8);
-    }
-    .ai-status[data-status="open"]        { --ai-status-color: #94A3B8; }
-    .ai-status[data-status="in-progress"] { --ai-status-color: var(--ic-palette-blue-500, #1A73E8); }
-    .ai-status[data-status="blocked"]     { --ai-status-color: var(--color-warning, #F4B400); }
-    .ai-status[data-status="done"]        { --ai-status-color: var(--color-success, #0F9D58); }
-    .ai-status[data-status="cancelled"]   { --ai-status-color: #64748B; }
-
-    .ai-due {
-      display: inline-flex; align-items: center;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.4 var(--ic-font-sans);
-      color: var(--color-text-muted);
-      padding: 2px 8px;
-      border-radius: var(--ic-radius-pill, 999px);
-      background: var(--color-surface-muted);
-      cursor: pointer;
-    }
-    .ai-due.is-overdue {
-      color: var(--color-danger, #C62828);
-      background: rgba(198, 40, 40, 0.08);
-    }
-
-    .ai-carried-pill {
-      position: relative;
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 1px 8px 1px 6px;
-      border-radius: var(--ic-radius-pill, 999px);
-      background: rgba(100, 116, 139, 0.12);
-      border: 1px solid rgba(100, 116, 139, 0.25);
-      color: var(--color-text-muted);
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.4 var(--ic-font-sans);
-      cursor: help;
-      flex-shrink: 0;
-    }
-    .ai-carried-pill .ph { font-size: 12px; }
-
-    /* Source meeting chip — replaces the assignee position since this page is
-       owned by the assignee. Click navigates to the source meeting. */
-    .ai-source-chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px 2px 6px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-pill, 999px);
-      background: var(--color-surface);
-      color: var(--color-text-muted);
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1.4 var(--ic-font-sans);
-      text-decoration: none;
-    }
-    .ai-source-chip:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .ai-source-chip .ph { font-size: 12px; }
-
-    .ai-icon-btn {
-      position: relative;
-      width: 24px; height: 24px;
-      border-radius: var(--ic-radius-sm);
-      border: 0;
-      background: transparent;
-      color: var(--color-text-muted);
-      cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 13px;
-      text-decoration: none;
-    }
-    .ai-icon-btn:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .ai-icon-btn.has-content::after {
-      content: '';
-      position: absolute;
-      top: 2px; right: 2px;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--color-danger);
-      border: 1.5px solid var(--color-surface);
-    }
-
-    /* Action item pills — match the RoB modal:
-       - Status: bold weight on the indicator chip
-       - Due: gray-150 base, gray-200 hover; overdue uses red-100 → red-150 */
-    .ai-item .tag-indicator[data-status] { font-weight: var(--ic-weight-semibold); }
-    .ai-item .tag.tag-light[data-action="due"] {
-      background: var(--color-surface-muted);
-      transition: background var(--ic-duration-fast) var(--ic-ease);
-    }
-    .ai-item .tag.tag-light[data-action="due"]:hover {
-      background: var(--ic-palette-gray-200);
-    }
-    /* Carried-over pill — soft yellow-100 fill with yellow-500 text */
-    .tag.ai-carried { background: var(--ic-palette-yellow-100); color: var(--ic-palette-yellow-500); }
-    /* Assignee chip — avatar + name, matches the .tag font size */
-    .ai-assignee {
+    .due {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      border: 0;
-      background: transparent;
-      padding: 0 4px 0 0;
-      font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
-      color: var(--color-text);
-      border-radius: var(--ic-radius-sm);
-    }
-    .ai-assignee-name { white-space: nowrap; }
-    .tag.is-overdue {
-      background: var(--color-danger-subtle);
-      color: var(--color-danger);
-      transition: background var(--ic-duration-fast) var(--ic-ease);
-    }
-    .ai-item .tag.is-overdue[data-action="due"]:hover {
-      background: var(--ic-palette-red-150);
-    }
-
-    .ai-desc {
       font: var(--type-body-sm);
-      color: var(--color-text);
-      line-height: 1.45;
-      margin: 0;
-      outline: none;
-      border-radius: var(--ic-radius-sm);
-      padding: 2px 4px;
-      margin-left: -4px;
-    }
-    .ai-desc[contenteditable="true"]:focus {
-      background: var(--color-surface-muted);
-      box-shadow: inset 0 0 0 1px var(--color-border-strong, #CBD5E1);
-    }
-    /* Character counter — shown when the description is focused */
-    .ai-desc-counter {
-      display: none;
-      font: var(--type-caption);
-      color: var(--color-text-subtle);
-      margin: 4px 0 0;
-      padding: 0 4px;
-      text-align: right;
-    }
-    .ai-item.is-desc-focused .ai-desc-counter { display: block; }
-    .ai-desc-counter.is-warning { color: var(--color-warning); }
-    .ai-desc-counter.is-danger  { color: var(--color-danger); font-weight: var(--ic-weight-semibold); }
-
-    /* Archived expander — collapsible list of archived items with Restore action */
-    .ai-archived { margin-top: var(--ic-space-3); }
-    .ai-archived-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: 0;
-      padding: 4px 8px;
-      margin-left: -8px;
-      border-radius: var(--ic-radius-sm);
-      cursor: pointer;
-      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+      font-weight: 500;
       color: var(--color-text-muted);
+      white-space: nowrap;
     }
-    .ai-archived-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .ai-archived-toggle .ph-archive { font-size: 14px; }
-    .ai-archived-chevron {
-      font-size: 12px;
-      transition: transform var(--ic-duration-fast) var(--ic-ease);
-    }
-    .ai-archived-toggle[aria-expanded="true"] .ai-archived-chevron {
-      transform: rotate(180deg);
-    }
-    .ai-archived-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ic-space-2);
-      margin-top: var(--ic-space-2);
-    }
-    .ai-archived-list[hidden] { display: none; }
-    .ai-archived-list .ai-item { background: var(--color-surface-muted); opacity: 0.8; }
-    .ai-archived-list .ai-item:hover { opacity: 1; }
+    .due-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .due-dot.is-danger { background: var(--color-danger); }
+    .due-dot.is-warning { background: var(--color-warning); }
 
-    /* Popovers (status menu, kebab menu, comment thread, date input) */
-    .ai-pop {
-      position: fixed;
-      z-index: 1000;
-      min-width: 180px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-md);
-      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
-      padding: 4px;
-    }
-    .ai-pop[hidden] { display: none; }
-    .ai-pop-item {
-      display: flex; align-items: center; gap: 8px;
-      width: 100%;
-      background: transparent;
-      border: 0;
-      padding: 6px 10px;
-      border-radius: var(--ic-radius-sm);
-      cursor: pointer;
-      font: var(--type-caption);
-      color: var(--color-text);
-      text-align: left;
-    }
-    .ai-pop-item:hover { background: var(--color-surface-muted); }
-    .ai-pop-item .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ai-dot-color, #94A3B8); flex-shrink: 0; }
-    .ai-pop-divider { height: 1px; background: var(--color-border); margin: 4px 0; }
-
-    /* Comment thread popover */
-    .ai-pop-thread { min-width: 320px; max-width: 380px; padding: var(--ic-space-3); }
-    .ai-pop-thread h4 {
-      font: var(--ic-weight-semibold) var(--ic-text-sm)/1.4 var(--ic-font-sans);
-      margin: 0 0 var(--ic-space-2);
-    }
-    .ai-comment-list {
-      list-style: none; margin: 0 0 var(--ic-space-3); padding: 0;
-      display: flex; flex-direction: column; gap: var(--ic-space-3);
-      max-height: 240px; overflow-y: auto;
-    }
-    .ai-comment-entry { display: flex; gap: 8px; }
-    .ai-comment-avatar {
-      width: 24px; height: 24px; border-radius: 50%;
-      color: #FFF; font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
-      display: inline-flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .ai-comment-body { flex: 1; min-width: 0; }
-    .ai-comment-meta { display: flex; gap: 6px; align-items: baseline; margin-bottom: 2px; }
-    .ai-comment-author { font: var(--ic-weight-semibold) var(--ic-text-xs)/1.3 var(--ic-font-sans); }
-    .ai-comment-ts { color: var(--color-text-subtle); font: var(--ic-weight-regular) var(--ic-text-xs)/1.3 var(--ic-font-sans); }
-    .ai-comment-text { font: var(--type-caption); color: var(--color-text); white-space: pre-wrap; word-wrap: break-word; }
-    .ai-pop-thread textarea {
-      width: 100%;
-      min-height: 64px;
-      resize: vertical;
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-sm);
-      padding: 6px 8px;
-      font: var(--type-caption);
-      color: var(--color-text);
-      background: var(--color-surface);
-      outline: none;
-    }
-    .ai-pop-thread textarea:focus { border-color: var(--ic-palette-blue-500, #1A73E8); }
-    .ai-pop-thread-actions { display: flex; justify-content: flex-end; gap: var(--ic-space-2); margin-top: var(--ic-space-2); }
-
-    /* Empty state for unimplemented tabs */
-    .pf-empty {
-      padding: var(--ic-space-6);
-      text-align: center;
-      border: 1px dashed var(--color-border);
-      border-radius: var(--ic-radius-md);
-      background: var(--color-surface);
-    }
-    .pf-empty-text {
-      font: var(--type-body-sm);
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-
-    /* ---------- Reports section ---------- */
-    .pf-reports-head { margin-bottom: var(--ic-space-3); }
-    .pf-reports-head h2 {
-      font: var(--type-h3);
-      margin: 0 0 4px;
-    }
-    .pf-reports-subtitle {
-      font: var(--type-body-sm);
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-    .pf-reports {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ic-space-3);
-    }
-    .pf-report-card {
+    /* ---------- Grouped list rows (initiatives / BAUs) ---------- */
+    .grp-row {
       display: flex;
       align-items: center;
       gap: var(--ic-space-3);
-      padding: var(--ic-space-4);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--ic-radius-md);
-      cursor: pointer;
+      padding: var(--ic-space-3) var(--ic-space-4);
+      border-top: 1px solid var(--color-border);
     }
-    .pf-report-card:hover { border-color: var(--color-border-strong); }
-    .pf-avatar-md {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--ic-palette-blue-500);
-      color: #FFF;
-      display: inline-flex;
+    .grp-row:first-child { border-top: none; }
+    .grp-chev {
+      display: flex;
       align-items: center;
       justify-content: center;
-      font: var(--ic-weight-semibold) 14px/1 var(--ic-font-sans);
+      width: 16px;
+      height: 16px;
+      border: 0;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 14px;
       flex-shrink: 0;
     }
-    .pf-report-meta { flex: 1; min-width: 0; }
-    .pf-report-name {
-      font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans);
+    .grp-row.is-child { padding-left: 44px; }
+    .grp-name { flex: 1; min-width: 0; font: var(--type-body); font-weight: 600; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .grp-row.is-child .grp-name { font-weight: 500; }
+    .grp-meta { display: flex; align-items: center; gap: var(--ic-space-3); flex-shrink: 0; }
+    .grp-date { font: var(--type-body-sm); color: var(--color-text-muted); width: 92px; text-align: right; font-variant-numeric: tabular-nums; }
+    .grp-state { font: var(--type-body-sm); font-weight: 500; color: var(--color-text-muted); }
+
+    /* ---------- Pending peer review ---------- */
+    .pr-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3) var(--ic-space-4);
+      border-top: 1px solid var(--color-border);
+    }
+    .pr-row:first-child { border-top: none; }
+    .pr-person { min-width: 0; flex: 1; }
+    .pr-name { font: var(--type-body); font-weight: 600; color: var(--color-text); }
+    .pr-role { font: var(--type-caption); color: var(--color-text-subtle); }
+    .pr-date { font: var(--type-body-sm); color: var(--color-text-muted); width: 72px; text-align: right; }
+
+    /* ---------- Today's schedule ---------- */
+    .week-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--ic-space-2);
+      margin-bottom: var(--ic-space-4);
+    }
+    .week-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
+    }
+    .week-day-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--ic-radius-full);
+      font: var(--type-body-sm);
+      font-weight: 600;
       color: var(--color-text);
     }
-    .pf-report-title {
-      font: var(--type-body-sm);
-      color: var(--color-text-muted);
-    }
-    .pf-report-card .ph-caret-right { color: var(--color-text-subtle); font-size: 18px; }
+    .week-day.is-active .week-day-num { background: var(--color-accent); color: #fff; }
+    .week-day:not(.is-active):hover .week-day-num { background: var(--color-surface-muted); }
 
-    /* Wider modal/page on big screens */
-    @media (max-width: 1100px) {
-      .pf-card { grid-template-columns: minmax(0, 1fr); }
-      .pf-card-side { order: -1; }
+    .sched-row {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: var(--ic-space-2);
+      margin-bottom: var(--ic-space-2);
     }
-    @media (max-width: 720px) {
-      .pf-card-main { flex-direction: column; }
-      .pf-meta { grid-template-columns: 1fr 1fr; }
+    .sched-time { font: var(--type-caption); color: var(--color-text-subtle); padding-top: 8px; }
+    .sched-card {
+      background: var(--color-surface-muted);
+      border-left: 3px solid var(--color-accent);
+      border-radius: var(--ic-radius-sm);
+      padding: 8px 10px;
+    }
+    .sched-card + .sched-card { margin-top: 6px; }
+    .sched-card.is-company { border-left-color: var(--color-brand); }
+    .sched-title { font: var(--type-body-sm); font-weight: 600; color: var(--color-text); }
+    .sched-meta { font: var(--type-caption); color: var(--color-text-subtle); margin-top: 2px; }
+
+    /* ---------- Upcoming meeting card ---------- */
+    .upcoming {
+      background: var(--ic-palette-blue-100, #EDF1FD);
+      border: 1px solid var(--color-accent);
+      border-radius: var(--ic-radius-lg);
+      padding: var(--ic-space-4);
+    }
+    .upcoming-eyebrow {
+      font: var(--type-caption);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+    }
+    .upcoming-title { font: var(--type-h4); font-weight: 600; color: var(--color-text); margin-top: var(--ic-space-2); }
+    .upcoming-meta { font: var(--type-body-sm); color: var(--color-text-muted); margin-top: 2px; }
+    .avatar-stack { display: flex; align-items: center; margin: var(--ic-space-3) 0; }
+    .avatar-stack .avatar { border: 2px solid var(--ic-palette-blue-100, #EDF1FD); margin-left: -8px; }
+    .avatar-stack .avatar:first-child { margin-left: 0; }
+    .avatar-stack .avatar-more {
+      margin-left: -8px;
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+    .upcoming-flags { display: flex; gap: var(--ic-space-4); margin-bottom: var(--ic-space-4); }
+    .upcoming-flag { display: inline-flex; align-items: center; gap: 6px; font: var(--type-body-sm); color: var(--color-text-muted); }
+    .upcoming-flag i { font-size: 15px; }
+    .upcoming-flag.is-yes i { color: var(--color-success); }
+    .upcoming-flag.is-no i { color: var(--color-danger); }
+    .upcoming-actions { display: flex; flex-direction: column; gap: var(--ic-space-2); }
+    .upcoming-actions .btn { width: 100%; justify-content: center; }
+
+    /* ---------- Recent activity ---------- */
+    .act-row {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3) 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .act-row:first-child { border-top: none; }
+    .act-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--ic-radius-full);
+      font-size: 14px;
+      margin-top: 1px;
+    }
+    .act-icon.is-info { background: var(--color-info-subtle); color: var(--color-info); }
+    .act-icon.is-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
+    .act-icon.is-danger { background: var(--color-danger-subtle); color: var(--color-danger); }
+    .act-icon.is-success { background: var(--color-success-subtle); color: var(--color-success); }
+    .act-text { font: var(--type-body-sm); color: var(--color-text); }
+    .act-text .kw-danger { color: var(--color-danger); font-weight: 600; }
+    .act-text .kw-link { color: var(--color-text-link); font-weight: 600; }
+    .act-time { font: var(--type-caption); color: var(--color-text-subtle); margin-top: 3px; }
+
+    /* ---------- Out this week ---------- */
+    .out-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3) 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .out-row:first-child { border-top: none; }
+    .out-person { flex: 1; min-width: 0; }
+    .out-name { font: var(--type-body-sm); font-weight: 600; color: var(--color-text); }
+    .out-role { font: var(--type-caption); color: var(--color-text-subtle); }
+    .out-date { font: var(--type-body-sm); color: var(--color-text-muted); white-space: nowrap; }
+
+    /* ---------- Time-off ---------- */
+    .to-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ic-space-3);
+      padding: var(--ic-space-3) 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .to-row:first-child { border-top: none; }
+    .to-title { font: var(--type-body-sm); font-weight: 600; color: var(--color-text); }
+    .to-sub { display: flex; align-items: center; gap: 5px; font: var(--type-caption); color: var(--color-text-subtle); margin-top: 2px; }
+    .to-sub i { font-size: 13px; }
+    .to-date { font: var(--type-body-sm); color: var(--color-text-muted); white-space: nowrap; text-align: right; }
+
+    /* ============ Responsive ============ */
+    .topbar-left { display: inline-flex; align-items: center; gap: var(--ic-space-3); flex-shrink: 0; min-width: 0; }
+    .topbar-hamburger { display: none; }
+    .sidenav-backdrop { display: none; }
+    .cycle-current { display: none; }
+
+    /* Tablet & down: sidenav becomes an off-canvas drawer, grid collapses to one column */
+    @media (max-width: 1024px) {
+      .topbar { gap: var(--ic-space-3); }
+      .topbar-search { width: 220px; }
+      .topbar-hamburger { display: inline-flex; }
+      .sidenav-toggle { display: none; }
+
+      .sidenav {
+        position: fixed;
+        top: 56px; left: 0; bottom: 0;
+        width: 260px;
+        z-index: 800;
+        transform: translateX(-100%);
+        transition: transform var(--ic-duration-base) var(--ic-ease);
+        box-shadow: var(--ic-shadow-lg);
+      }
+      .dashboard.nav-open .sidenav { transform: translateX(0); }
+
+      .sidenav-backdrop {
+        display: block;
+        position: fixed;
+        inset: 56px 0 0 0;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--ic-duration-base) var(--ic-ease),
+                    visibility var(--ic-duration-base) var(--ic-ease);
+        z-index: 799;
+      }
+      .dashboard.nav-open .sidenav-backdrop { opacity: 1; visibility: visible; }
+
+      .content { padding: var(--ic-space-5) var(--ic-space-4); }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .welcome-header { flex-wrap: wrap; }
+    }
+
+    /* Small viewports: collapse the stepper to a node-only strip + current-step caption */
+    @media (max-width: 640px) {
+      .stepper-label,
+      .stepper-date { display: none; }
+      .stepper-step:last-child { flex: 0 0 auto; }
+
+      .cycle-head { margin-bottom: var(--ic-space-4); }
+
+      .cycle-current {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--ic-space-2);
+        margin-top: var(--ic-space-4);
+        padding-top: var(--ic-space-4);
+        border-top: 1px solid var(--color-border);
+        font: var(--type-body-sm);
+        color: var(--color-text-muted);
+      }
+      .cycle-current-step {
+        font: var(--type-caption);
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--color-accent);
+      }
+      .cycle-current-name { font: var(--type-body); font-weight: 600; color: var(--color-text); }
+      .cycle-current .now { color: var(--color-accent); font-weight: 600; }
+    }
+
+    /* Phone: tighten chrome, hide search, let dense rows wrap */
+    @media (max-width: 560px) {
+      .topbar { padding: 0 var(--ic-space-4); }
+      .topbar-search { display: none; }
+      .welcome-title { font: var(--type-h2); }
+      .join-banner { flex-wrap: wrap; }
+      .join-banner .btn { width: 100%; }
+      .pr-row { flex-wrap: wrap; row-gap: var(--ic-space-2); }
+      .pr-date { width: auto; }
+      .pr-row .btn { margin-left: auto; }
+
+      /* Grouped rows stack: name on line 1, tags/avatar/date on a full line 2 */
+      .grp-row { flex-wrap: wrap; row-gap: 8px; }
+      .grp-name { flex: 1 1 auto; white-space: normal; }
+      .grp-meta { flex-basis: 100%; margin-left: 28px; }
+      .grp-row.is-child .grp-meta { margin-left: 0; }
+      .grp-date { width: auto; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Icon set -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
-      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
-      <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></symbol>
-      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
-      <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
-      <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
-      <symbol id="i-cycle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.18-6.84"/><path d="M21 3v6h-6"/></symbol>
-      <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
-      <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
-      <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
-      <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
-      <symbol id="i-org" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M12 7v3M12 10H6v7M12 10h6v7"/></symbol>
-      <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
-      <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4 1 1.1 1 1.8V18h6v-1.5c0-.7.5-1.4 1-1.8A7 7 0 0 0 12 2z"/></symbol>
-    </defs>
-  </svg>
-
-  <div class="template-frame">
-
-  <!-- TOPBAR -->
+  <!-- Top bar -->
   <header class="topbar">
-    <a class="topbar-brand" href="#">
+    <div class="topbar-left">
+      <button class="topbar-icon-btn topbar-hamburger" aria-label="Open menu" type="button"><i class="ph ph-list"></i></button>
+      <a class="topbar-brand" href="#">
       <svg class="topbar-brand-logo" width="170" height="28" viewBox="0 0 170 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6925 5.00513C11.5704 4.99755 11.4673 5.09285 11.4624 5.21506L11.3199 8.82092C11.3151 8.94296 11.4101 9.04543 11.5319 9.05404C11.8046 9.07331 12.0729 9.10838 12.3359 9.15832C12.4556 9.18105 12.5735 9.1067 12.6003 8.98783L13.3946 5.47129C13.4215 5.35225 13.3469 5.2337 13.2274 5.20915C12.7273 5.10639 12.2148 5.03755 11.6925 5.00513Z" fill="white"/><path d="M10.3897 5.00033C10.5112 4.99369 10.6133 5.08877 10.6181 5.21036L10.7609 8.8204C10.7657 8.94254 10.6705 9.04505 10.5486 9.05354C10.2758 9.07254 10.0074 9.10734 9.74432 9.15703C9.6247 9.17962 9.50695 9.10527 9.48012 8.98649L8.68264 5.45569C8.65561 5.33604 8.7311 5.21703 8.8514 5.19323C9.35276 5.09405 9.86636 5.02892 10.3897 5.00033Z" fill="white"/><path d="M7.58847 5.52244C7.70397 5.48484 7.82696 5.55023 7.86302 5.66626L8.93861 9.12776C8.97494 9.24467 8.90922 9.36851 8.79343 9.40815C8.53582 9.49634 8.28507 9.5993 8.04218 9.71601C7.93249 9.76871 7.7996 9.72736 7.74298 9.61962L6.05349 6.4046C5.99643 6.296 6.03858 6.16148 6.14865 6.10737C6.61125 5.87995 7.09212 5.68404 7.58847 5.52244Z" fill="white"/><path d="M5.01218 6.7527C5.11403 6.68657 5.24968 6.71793 5.31449 6.82064L7.25525 9.89609C7.32062 9.99969 7.2891 10.1364 7.18735 10.2046C6.96161 10.3559 6.74526 10.5201 6.53936 10.6962C6.44705 10.7751 6.30831 10.7694 6.2259 10.6802L3.75345 8.00296C3.6701 7.91271 3.67617 7.77161 3.76878 7.6909C4.15993 7.35 4.57537 7.03629 5.01218 6.7527Z" fill="white"/><path d="M3.14377 8.5954C3.05475 8.51312 2.91591 8.51778 2.83455 8.60765C2.48506 8.99368 2.16255 9.4046 1.86999 9.83744C1.80108 9.93939 1.83165 10.0775 1.93568 10.1432L5.02874 12.0963C5.13123 12.161 5.2664 12.1309 5.33529 12.0311C5.49018 11.8068 5.65795 11.5921 5.83754 11.3881C5.91865 11.2959 5.91392 11.1553 5.82376 11.072L3.14377 8.5954Z" fill="white"/><path d="M1.49729 10.8734C1.39011 10.817 1.25734 10.8573 1.20192 10.965C0.963642 11.428 0.757205 11.9101 0.585497 12.4084C0.545434 12.5247 0.610701 12.6501 0.728093 12.6866L4.23398 13.7766C4.34974 13.8126 4.47253 13.7485 4.51329 13.6343C4.60557 13.3757 4.71279 13.1241 4.83391 12.8807C4.88869 12.7707 4.84782 12.6358 4.73902 12.5785L1.49729 10.8734Z" fill="white"/><path d="M0.494446 13.5089C0.376194 13.4822 0.258268 13.5557 0.232794 13.6743C0.123741 14.1818 0.0496438 14.7024 0.0131471 15.2333C0.0047196 15.3558 0.100176 15.4599 0.222917 15.4648L3.90175 15.6103C4.0229 15.6151 4.12492 15.5213 4.13464 15.4005C4.15686 15.1241 4.19529 14.8523 4.24898 14.5861C4.27328 14.4656 4.19889 14.346 4.07905 14.3189L0.494446 13.5089Z" fill="white"/><path d="M0.210291 16.321C0.0892093 16.3258 -0.00566608 16.4272 0.000263525 16.5483C0.0263981 17.0819 0.0904871 17.6055 0.189887 18.1165C0.213358 18.2372 0.332522 18.3131 0.452388 18.286L4.05308 17.4722C4.17122 17.4455 4.2455 17.3287 4.22385 17.2095C4.17514 16.9413 4.14188 16.6677 4.125 16.3897C4.11755 16.2669 4.0147 16.1705 3.89181 16.1753L0.210291 16.321Z" fill="white"/><path d="M0.662998 19.119C0.547156 19.155 0.481772 19.2778 0.519099 19.3932C0.682854 19.8997 0.882286 20.3902 1.11443 20.8617C1.16859 20.9717 1.303 21.0137 1.4115 20.9567L4.68415 19.2355C4.79158 19.179 4.83301 19.0466 4.78085 18.937C4.66271 18.6888 4.55891 18.4324 4.47051 18.1689C4.4314 18.0524 4.30715 17.9859 4.18977 18.0224L0.662998 19.119Z" fill="white"/><path d="M1.83513 21.7058C1.73232 21.7707 1.70106 21.9067 1.76746 22.0086C2.05728 22.4533 2.37835 22.8758 2.72754 23.2729C2.8084 23.3649 2.94892 23.3706 3.03885 23.2874L5.75571 20.7763C5.84491 20.6938 5.85059 20.5551 5.77166 20.4627C5.59177 20.2523 5.42427 20.0309 5.27029 19.7998C5.20225 19.6977 5.0653 19.6659 4.96156 19.7314L1.83513 21.7058Z" fill="white"/><path d="M3.64398 23.9008C3.56141 23.9902 3.56648 24.1298 3.65715 24.2109C4.05164 24.5642 4.47175 24.8894 4.91433 25.1835C5.01622 25.2512 5.15324 25.2203 5.21854 25.1168L7.19314 21.9886C7.25803 21.8858 7.22753 21.7502 7.12726 21.6814C6.89753 21.524 6.67777 21.353 6.46912 21.1697C6.37698 21.0887 6.23655 21.0935 6.15333 21.1837L3.64398 23.9008Z" fill="white"/><path d="M5.96361 25.5511C5.9069 25.659 5.94811 25.7927 6.05697 25.8475C6.5284 26.0847 7.01922 26.2891 7.5264 26.4576C7.64215 26.4961 7.76595 26.4307 7.80216 26.3142L8.89888 22.7853C8.93505 22.6689 8.87006 22.5455 8.75499 22.5053C8.4906 22.4131 8.23352 22.3052 7.98484 22.1829C7.87491 22.1288 7.74073 22.1699 7.68373 22.2783L5.96361 25.5511Z" fill="white"/><path d="M8.63566 26.5354C8.6087 26.6546 8.68365 26.7734 8.80348 26.7976C9.31726 26.9017 9.84401 26.9699 10.381 26.9997C10.5026 27.0064 10.6048 26.9113 10.6096 26.7896L10.7553 23.106C10.7601 22.9839 10.665 22.8814 10.5432 22.8728C10.262 22.853 9.98549 22.8164 9.7146 22.7641C9.5947 22.7409 9.47633 22.8152 9.4494 22.9344L8.63566 26.5354Z" fill="white"/><path d="M11.4709 26.7849C11.4758 26.9072 11.579 27.0025 11.7011 26.9948C12.237 26.9611 12.7624 26.8891 13.2747 26.7815C13.3938 26.7565 13.4678 26.6382 13.441 26.5195L12.631 22.9331C12.604 22.8138 12.4855 22.7394 12.3655 22.7628C12.0948 22.8154 11.8184 22.8523 11.5373 22.8723C11.4156 22.881 11.3206 22.9835 11.3255 23.1054L11.4709 26.7849Z" fill="white"/><path d="M14.2708 26.2896C14.3071 26.4067 14.4319 26.472 14.548 26.4326C15.052 26.2611 15.5396 26.0541 16.0077 25.8146C16.1157 25.7593 16.1563 25.6263 16.0998 25.5189L14.3952 22.2756C14.3382 22.167 14.2039 22.126 14.0939 22.1802C13.8456 22.3027 13.5888 22.4107 13.3248 22.5031C13.2098 22.5433 13.145 22.6666 13.1811 22.783L14.2708 26.2896Z" fill="white"/><path d="M16.8377 25.0791C16.9033 25.183 17.0412 25.2136 17.1431 25.145C17.5813 24.8498 17.9972 24.524 18.3877 24.1705C18.4776 24.0891 18.4822 23.9502 18.3999 23.8611L15.9238 21.1804C15.8405 21.0902 15.7 21.0855 15.6079 21.1665C15.3996 21.3497 15.1803 21.5206 14.951 21.6781C14.8509 21.7468 14.8205 21.8824 14.8853 21.9851L16.8377 25.0791Z" fill="white"/><path d="M18.9971 23.2462C19.0874 23.3296 19.2285 23.3235 19.3091 23.2308C19.6536 22.8351 19.9702 22.4145 20.256 21.9722C20.3218 21.8703 20.2904 21.7349 20.1879 21.6701L17.114 19.7283C17.0102 19.6627 16.8732 19.6945 16.8051 19.7967C16.6514 20.0277 16.4842 20.249 16.3046 20.4593C16.2258 20.5517 16.2315 20.6904 16.3207 20.7728L18.9971 23.2462Z" fill="white"/><path d="M20.6049 20.9229C20.7137 20.9801 20.8484 20.9377 20.9023 20.8272C21.1308 20.3591 21.327 19.8725 21.4882 19.3701C21.5252 19.2547 21.4598 19.1323 21.3441 19.0963L17.8842 18.0205C17.7668 17.984 17.6426 18.0505 17.6035 18.1671C17.5153 18.4302 17.4117 18.6863 17.2938 18.9343C17.2417 19.0439 17.2832 19.1762 17.3906 19.2327L20.6049 20.9229Z" fill="white"/><path d="M21.5508 18.2685C21.6709 18.2956 21.7901 18.2195 21.8134 18.0987C21.911 17.5923 21.974 17.0736 21.9997 16.5451C22.0056 16.424 21.9108 16.3226 21.7897 16.3178L18.1816 16.1751C18.0587 16.1702 17.9558 16.2667 17.9484 16.3895C17.9316 16.667 17.8984 16.9402 17.8498 17.208C17.8282 17.3272 17.9025 17.4439 18.0206 17.4706L21.5508 18.2685Z" fill="white"/><path d="M21.7771 15.468C21.8999 15.4631 21.9953 15.3591 21.9869 15.2365C21.9509 14.7107 21.878 14.1949 21.7708 13.6919C21.7455 13.5732 21.6275 13.4995 21.5091 13.5262L17.9946 14.3205C17.8748 14.3476 17.8004 14.4672 17.8247 14.5876C17.8783 14.8534 17.9166 15.1248 17.9388 15.4007C17.9485 15.5216 18.0505 15.6154 18.1717 15.6106L21.7771 15.468Z" fill="white"/><path d="M21.2795 12.7091C21.3967 12.6726 21.462 12.5475 21.4222 12.4314C21.2532 11.9373 21.05 11.459 20.8155 10.9994C20.7604 10.8913 20.6273 10.8506 20.5199 10.9071L17.3358 12.5814C17.227 12.6386 17.1861 12.7734 17.2408 12.8835C17.3617 13.1266 17.4687 13.3778 17.5607 13.6361C17.6015 13.7503 17.7243 13.8145 17.8401 13.7785L21.2795 12.7091Z" fill="white"/><path d="M20.088 10.1786C20.1918 10.1131 20.2225 9.97549 20.1542 9.87356C19.8655 9.44286 19.5473 9.03367 19.2024 8.64888C19.1212 8.55829 18.9818 8.55327 18.8925 8.63583L16.2526 11.0754C16.1625 11.1587 16.1577 11.2992 16.2387 11.3914C16.418 11.5954 16.5856 11.81 16.7402 12.0342C16.8091 12.134 16.9443 12.1642 17.0469 12.0995L20.088 10.1786Z" fill="white"/><path d="M18.291 8.04211C18.3741 7.9522 18.3684 7.81172 18.2766 7.73081C17.8894 7.38964 17.4781 7.07525 17.0456 6.79054C16.9437 6.72348 16.8072 6.75458 16.7421 6.85774L14.8228 9.89922C14.7575 10.0028 14.7889 10.1394 14.8905 10.2076C15.116 10.359 15.332 10.5232 15.5377 10.6993C15.63 10.7783 15.7688 10.7727 15.8512 10.6834L18.291 8.04211Z" fill="white"/><path d="M16.0105 6.43642C16.0673 6.32832 16.0259 6.19442 15.9167 6.13982C15.4571 5.91008 14.9792 5.71154 14.4858 5.54698C14.37 5.50835 14.2461 5.57372 14.2098 5.69034L13.1414 9.13004C13.1051 9.24687 13.1707 9.37062 13.2863 9.41034C13.5437 9.49873 13.7942 9.60187 14.0369 9.71874C14.1466 9.77158 14.2796 9.73027 14.3363 9.62245L16.0105 6.43642Z" fill="white"/><path d="M31.6491 10.712C34.6731 10.712 36.6651 13.52 36.6651 16.952C36.6651 20.36 34.6731 23.192 31.6251 23.192H30.9291C29.9931 23.192 28.7931 22.592 28.1211 21.704V27.896H25.0251V10.904H28.1211V12.224C28.6731 11.408 29.8251 10.712 30.9051 10.712H31.6491ZM30.3531 13.376C28.9851 13.376 27.9051 14.864 27.9051 16.952C27.9051 19.04 28.9851 20.528 30.3531 20.528H31.1211C32.4171 20.528 33.5451 19.064 33.5451 16.952C33.5451 14.84 32.4171 13.376 31.1211 13.376H30.3531ZM38.3755 16.928C38.3755 13.04 40.9915 10.712 43.6795 10.712H44.5435C47.4955 10.712 49.6075 13.304 49.6075 16.568C49.6075 17.096 49.5835 17.384 49.5595 17.624H41.4715C41.6635 19.568 42.6235 20.624 43.7515 20.624H44.6155C45.6475 20.624 46.3915 19.856 46.5595 18.92H49.5595C49.2955 21.44 47.1355 23.192 44.5675 23.192H43.7515C40.6315 23.192 38.3755 20.576 38.3755 16.928ZM41.6155 15.44H46.5355C46.4875 14.12 45.5995 13.112 44.5675 13.112H43.7515C42.8635 13.112 41.9515 13.952 41.6155 15.44ZM57.318 13.496C55.878 13.496 55.062 14.888 55.062 16.304V23H51.966V10.904H55.062V12.488C55.542 11.48 56.382 10.904 57.51 10.904H58.998V13.496H57.318ZM64.0292 23.192C61.5332 23.192 59.9492 21.776 59.9492 19.64C59.9492 17.336 61.8452 16.136 64.1732 15.8L67.3172 15.344V15.08C67.3172 13.976 66.5972 13.184 65.7092 13.184H64.8692C63.9092 13.184 63.2372 13.784 63.1412 14.816H60.0212C60.2132 12.32 62.3972 10.712 64.8692 10.712H65.7092C68.6852 10.712 70.4132 12.728 70.4132 15.2V19.52C70.4132 20.336 70.8452 20.408 71.7572 20.408V23H69.6932C68.4932 23 67.7492 22.52 67.6772 21.416C67.0772 22.52 65.7092 23.192 64.0292 23.192ZM63.0932 19.52C63.0932 20.336 63.7412 20.84 64.6292 20.84C66.2372 20.84 67.3172 19.712 67.3172 18.08V17.552L65.0132 17.96C63.8612 18.176 63.0932 18.464 63.0932 19.52ZM74.3162 7.976L77.4122 6.68V10.904H80.6762V13.496H77.4122V19.088C77.4122 20.096 77.9162 20.408 78.6122 20.408H80.6042V23H77.7002C75.5882 23 74.3162 21.896 74.3162 19.424V13.496H72.0602V10.904H74.3162V7.976ZM82.6626 23V10.904H85.7586V23H82.6626ZM82.5666 6.2H85.8786V8.984H82.5666V6.2ZM93.4437 23.192C90.3717 23.192 88.0677 20.552 88.0677 16.952C88.0677 13.328 90.3717 10.712 93.4197 10.712H94.3797C97.4517 10.712 99.7317 13.328 99.7317 16.952C99.7317 20.576 97.4517 23.192 94.4037 23.192H93.4437ZM94.2837 20.528C95.5797 20.528 96.6117 18.968 96.6117 16.952C96.6117 14.936 95.5797 13.376 94.2597 13.376H93.5397C92.2197 13.376 91.1877 14.888 91.1877 16.952C91.1877 19.016 92.2197 20.528 93.5397 20.528H94.2837ZM102.033 23V10.904H105.129V12.512C105.729 11.504 106.977 10.712 108.129 10.712H109.137C111.225 10.712 112.977 12.68 112.977 15.344V23H109.881V15.848C109.881 14.552 109.185 13.472 108.081 13.472H107.313C106.041 13.472 105.129 14.816 105.129 16.544V23H102.033ZM119.253 23.192C116.757 23.192 115.173 21.776 115.173 19.64C115.173 17.336 117.069 16.136 119.397 15.8L122.541 15.344V15.08C122.541 13.976 121.821 13.184 120.933 13.184H120.093C119.133 13.184 118.461 13.784 118.365 14.816H115.245C115.437 12.32 117.621 10.712 120.093 10.712H120.933C123.909 10.712 125.637 12.728 125.637 15.2V19.52C125.637 20.336 126.069 20.408 126.981 20.408V23H124.917C123.717 23 122.973 22.52 122.901 21.416C122.301 22.52 120.933 23.192 119.253 23.192ZM118.317 19.52C118.317 20.336 118.965 20.84 119.853 20.84C121.461 20.84 122.541 19.712 122.541 18.08V17.552L120.237 17.96C119.085 18.176 118.317 18.464 118.317 19.52ZM128.693 23V6.2H131.789V23H128.693ZM134.722 23V10.904H137.818V23H134.722ZM134.626 6.2H137.938V8.984H134.626V6.2ZM140.031 23V20.408L146.103 13.496H140.415V10.904H149.631V13.496L143.607 20.408H149.991V23H140.031ZM151.312 16.928C151.312 13.04 153.928 10.712 156.616 10.712H157.48C160.432 10.712 162.544 13.304 162.544 16.568C162.544 17.096 162.52 17.384 162.496 17.624H154.408C154.6 19.568 155.56 20.624 156.688 20.624H157.552C158.584 20.624 159.328 19.856 159.496 18.92H162.496C162.232 21.44 160.072 23.192 157.504 23.192H156.688C153.568 23.192 151.312 20.576 151.312 16.928ZM154.552 15.44H159.472C159.424 14.12 158.536 13.112 157.504 13.112H156.688C155.8 13.112 154.888 13.952 154.552 15.44Z" fill="white"/></svg>
-    </a>
+      </a>
+    </div>
     <div class="topbar-actions">
       <div class="topbar-search">
         <svg class="search-icon"><use href="#i-search"/></svg>
         <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
       </div>
-      <a class="topbar-avatar" href="/features/action-items/profile-items.html" aria-label="Open profile">MV</a>
+      <button class="topbar-icon-btn" aria-label="Notifications" type="button">
+        <i class="ph ph-bell"></i>
+        <span class="topbar-notif-dot">1</span>
+      </button>
+      <button class="topbar-avatar" aria-label="Account"><img src="https://i.pravatar.cc/240?img=68" alt="Anton" /></button>
     </div>
   </header>
 
-  <!-- SHELL -->
-  <div class="app-shell">
-
-    <!-- SIDE NAV -->
+  <div class="dashboard">
+    <!-- Left Sidebar Navigation -->
     <aside class="sidenav">
-      <button class="sidenav-toggle" aria-label="Toggle navigation" type="button">
-        <svg><use href="#i-chevron-left"/></svg>
-      </button>
+      <button class="sidenav-toggle" aria-label="Toggle navigation" type="button"><svg><use href="#i-chevron-left"/></svg></button>
       <ul class="sidenav-list">
+        <li><a class="sidenav-item is-active" href="#"><svg class="sidenav-item-icon"><use href="#i-layout"/></svg><span class="sidenav-item-label">Overview</span></a></li>
         <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-cycle"/></svg><span class="sidenav-item-label">Processes</span></a></li>
         <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-rocket"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
-        <li><a class="sidenav-item" href="index.html"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+        <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-meetings"/></svg><span class="sidenav-item-label">Cadenced meetings</span></a></li>
         <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-target"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
-        <li><a class="sidenav-item is-active" href="#"><svg class="sidenav-item-icon"><use href="#i-users"/></svg><span class="sidenav-item-label">People</span></a></li>
-        <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-org"/></svg><span class="sidenav-item-label">Team</span></a></li>
+        <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-users"/></svg><span class="sidenav-item-label">People</span><span class="count-badge count-badge-sm">2</span></a></li>
+        <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-org"/></svg><span class="sidenav-item-label">Org structure</span></a></li>
+        <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-chart"/></svg><span class="sidenav-item-label">Performance reviews</span></a></li>
       </ul>
       <div class="sidenav-spacer"></div>
       <div class="sidenav-footer">
         <div class="sidenav-group">
-          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="false">
-            <svg class="sidenav-item-icon"><use href="#i-settings"/></svg>
-            <span class="sidenav-item-label">Admin Settings</span>
-            <svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg>
-          </button>
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="false"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
           <ul class="sidenav-sublist">
             <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Permissions</span></a></li>
             <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Settings</span></a></li>
             <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Integrations</span></a></li>
           </ul>
         </div>
-        <a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
+        <a class="sidenav-item sidenav-group-trigger" href="#"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></a>
       </div>
     </aside>
+    <div class="sidenav-backdrop"></div>
 
-    <!-- MAIN -->
-    <main class="app-shell-main" style="padding: var(--ic-space-7)">
+    <!-- Main Content -->
+    <div class="main-content">
 
-      <!-- PAGE HEAD -->
-      <div class="page-head">
-        <div class="page-head-main">
-          <div class="page-head-title">
-            <h1 class="page-head-heading">Member Profile</h1>
-            <span class="page-head-count">HR</span>
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Welcome -->
+        <div class="welcome-header">
+          <div class="welcome-title">Welcome Anton</div>
+          <button class="btn btn-secondary" type="button">Manage widgets</button>
+        </div>
+
+        <!-- Planning cycle stepper -->
+        <div class="cycle-card">
+          <div class="cycle-head">
+            <div class="cycle-head-title">Q3 Planning Cycle, 2026</div>
+            <div class="cycle-head-meta"><strong>Day 8 of 14</strong> · Jun 29 – Jul 12</div>
+          </div>
+          <div class="stepper">
+            <div class="stepper-step is-done">
+              <div class="stepper-node"><i class="ph ph-check"></i></div>
+              <div class="stepper-label">Set function OKRs</div>
+              <div class="stepper-date">Jun 29</div>
+            </div>
+            <div class="stepper-step is-done">
+              <div class="stepper-node"><i class="ph ph-check"></i></div>
+              <div class="stepper-label">Subfunction OKRs</div>
+              <div class="stepper-date">Jul 1</div>
+            </div>
+            <div class="stepper-step is-current">
+              <div class="stepper-node">3</div>
+              <div class="stepper-label">Partner alignment</div>
+              <div class="stepper-date">Now · Jul 6–8</div>
+            </div>
+            <div class="stepper-step is-todo">
+              <div class="stepper-node">4</div>
+              <div class="stepper-label">Brainstorm &amp; Prioritize projects</div>
+              <div class="stepper-date">Jul 9</div>
+            </div>
+            <div class="stepper-step is-todo">
+              <div class="stepper-node">5</div>
+              <div class="stepper-label">Finalize Initiatives &amp; BAUs</div>
+              <div class="stepper-date">Jul 11</div>
+            </div>
+            <div class="stepper-step is-todo">
+              <div class="stepper-node">6</div>
+              <div class="stepper-label">Release plan</div>
+              <div class="stepper-date">Jul 12</div>
+            </div>
+          </div>
+          <div class="cycle-current">
+            <span class="cycle-current-step">Step 3 of 6</span>
+            <span class="cycle-current-name">Partner alignment</span>
+            <span class="cycle-current-date"><span class="now">Now</span> · Jul 6–8</span>
           </div>
         </div>
-        <div class="page-head-actions">
-          <button class="btn btn-secondary" type="button">Edit Profile</button>
-          <button class="btn btn-primary" type="button">Give Recognition</button>
+
+        <!-- Join meeting banner -->
+        <div class="join-banner">
+          <div class="join-banner-icon"><i class="ph ph-video-camera"></i></div>
+          <div class="join-banner-body">
+            <div class="join-banner-title">OKR Team Review - Product Squad</div>
+            <div class="join-banner-meta">Today · 2:00 pm - 3:00 pm</div>
+          </div>
+          <button class="btn btn-primary" type="button">Join meeting</button>
+        </div>
+
+        <!-- Two-column grid -->
+        <div class="dashboard-grid">
+
+          <!-- LEFT COLUMN -->
+          <div class="dash-col">
+
+            <!-- Needs attention -->
+            <div class="dash-section">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Needs attention <span class="count-badge count-badge-secondary">4</span></div>
+              </div>
+              <div class="dash-card">
+                <div class="na-row">
+                  <div class="na-icon"><i class="ph ph-calendar-blank"></i></div>
+                  <div class="na-body">
+                    <div class="na-title">Complete prep for [RoB] [Initiative] MBO Initiative Sync</div>
+                    <div class="na-meta"><span class="tag tag-light">RoB</span> Attach deck · Review past action items</div>
+                  </div>
+                  <span class="due"><span class="due-dot is-danger"></span>due in 1 hr</span>
+                </div>
+                <div class="na-row">
+                  <div class="na-icon"><i class="ph ph-arrows-clockwise"></i></div>
+                  <div class="na-body">
+                    <div class="na-title">SEO Workstream</div>
+                    <div class="na-meta"><span class="tag tag-light">BAU</span> <span class="tag tag-light">Bi-weekly</span></div>
+                  </div>
+                  <span class="due"><span class="due-dot is-warning"></span>due in 2 days</span>
+                </div>
+                <div class="na-row">
+                  <div class="na-icon"><i class="ph ph-target"></i></div>
+                  <div class="na-body">
+                    <div class="na-title">Q2 2026</div>
+                    <div class="na-meta"><span class="tag tag-light">OKRs</span> <span class="tag tag-light">One-time</span></div>
+                  </div>
+                  <span class="due">in 5 days</span>
+                </div>
+                <div class="na-row">
+                  <div class="na-icon"><i class="ph ph-paper-plane-tilt"></i></div>
+                  <div class="na-body">
+                    <div class="na-title">Data Platform Migration</div>
+                    <div class="na-meta"><span class="tag tag-light">Initiative</span> <span class="tag tag-light">Monthly</span></div>
+                  </div>
+                  <span class="due">in 7 days</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- My initiatives -->
+            <div class="dash-section">
+              <div class="dash-section-head">
+                <div class="dash-section-title">My initiatives</div>
+                <a class="dash-link" href="#">View all (13) <i class="ph ph-caret-right"></i></a>
+              </div>
+              <div class="dash-card">
+                <div class="grp-row">
+                  <button class="grp-chev" type="button" aria-label="Collapse"><i class="ph ph-caret-down"></i></button>
+                  <span class="grp-name">Marketing Consulting</span>
+                  <div class="grp-meta">
+                    <span class="tag tag-light">Idea</span>
+                    <span class="tag tag-indicator tag-warning">At Risk</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=15" alt="" /></span>
+                    <span class="grp-date">8 Sep 2026</span>
+                  </div>
+                </div>
+                <div class="grp-row is-child">
+                  <span class="grp-name">Integrated AI Solutions</span>
+                  <div class="grp-meta">
+                    <span class="tag tag-light">Idea</span>
+                    <span class="tag tag-indicator tag-positive">On track</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=32" alt="" /></span>
+                    <span class="grp-date">12 Dec 2026</span>
+                  </div>
+                </div>
+                <div class="grp-row">
+                  <button class="grp-chev" type="button" aria-label="Collapse"><i class="ph ph-caret-down"></i></button>
+                  <span class="grp-name">Marketing Consulting</span>
+                  <div class="grp-meta">
+                    <span class="tag tag-light">Idea</span>
+                    <span class="tag tag-indicator tag-warning">At Risk</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span>
+                    <span class="grp-date">23 Sep 2026</span>
+                  </div>
+                </div>
+                <div class="grp-row is-child">
+                  <span class="grp-name">Integrated AI Solutions</span>
+                  <div class="grp-meta">
+                    <span class="tag tag-light">Idea</span>
+                    <span class="tag tag-indicator tag-positive">On track</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=52" alt="" /></span>
+                    <span class="grp-date">30 Sep 2026</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- My BAUs -->
+            <div class="dash-section">
+              <div class="dash-section-head">
+                <div class="dash-section-title">My BAUs</div>
+                <a class="dash-link" href="#">View all (8) <i class="ph ph-caret-right"></i></a>
+              </div>
+              <div class="dash-card">
+                <div class="grp-row">
+                  <button class="grp-chev" type="button" aria-label="Collapse"><i class="ph ph-caret-down"></i></button>
+                  <span class="grp-name">MS Initiatives Management</span>
+                  <div class="grp-meta">
+                    <span class="grp-state">Active</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=15" alt="" /></span>
+                  </div>
+                </div>
+                <div class="grp-row is-child">
+                  <span class="grp-name">Communications</span>
+                  <div class="grp-meta">
+                    <span class="grp-state">Paused</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=32" alt="" /></span>
+                  </div>
+                </div>
+                <div class="grp-row">
+                  <button class="grp-chev" type="button" aria-label="Collapse"><i class="ph ph-caret-down"></i></button>
+                  <span class="grp-name">Marketing Operations</span>
+                  <div class="grp-meta">
+                    <span class="grp-state">Active</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span>
+                  </div>
+                </div>
+                <div class="grp-row">
+                  <button class="grp-chev" type="button" aria-label="Collapse"><i class="ph ph-caret-down"></i></button>
+                  <span class="grp-name">Delivery</span>
+                  <div class="grp-meta">
+                    <span class="grp-state">Active</span>
+                    <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=52" alt="" /></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending peer review -->
+            <div class="dash-section">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Pending peer review</div>
+              </div>
+              <div class="dash-card">
+                <div class="pr-row">
+                  <span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span>
+                  <div class="pr-person">
+                    <div class="pr-name">Andre Shevchuk</div>
+                    <div class="pr-role">Product Designer</div>
+                  </div>
+                  <span class="tag tag-light">RACI Relationship</span>
+                  <span class="pr-date">Mar 2026</span>
+                  <button class="btn btn-secondary btn-xs" type="button">Give Feedback</button>
+                </div>
+                <div class="pr-row">
+                  <span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span>
+                  <div class="pr-person">
+                    <div class="pr-name">Alexander Traykov</div>
+                    <div class="pr-role">Product Designer</div>
+                  </div>
+                  <span class="tag tag-light">Org Unit</span>
+                  <span class="pr-date">Mar 2026</span>
+                  <button class="btn btn-secondary btn-xs" type="button">Give Feedback</button>
+                </div>
+                <div class="pr-row">
+                  <span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=51" alt="" /></span>
+                  <div class="pr-person">
+                    <div class="pr-name">Lucian Rome</div>
+                    <div class="pr-role">Product Designer</div>
+                  </div>
+                  <span class="tag tag-light">RACI Relationship</span>
+                  <span class="pr-date">Mar 2026</span>
+                  <button class="btn btn-secondary btn-xs" type="button">Give Feedback</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="dash-col-right">
+
+            <!-- Today's schedule -->
+            <div class="dash-section" style="margin-bottom:0">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Today's schedule</div>
+                <a class="dash-link" href="#">See calendar <i class="ph ph-caret-right"></i></a>
+              </div>
+              <div class="week-strip">
+                <button class="week-day" type="button"><span>Mon</span><span class="week-day-num">22</span></button>
+                <button class="week-day" type="button"><span>Tue</span><span class="week-day-num">23</span></button>
+                <button class="week-day is-active" type="button"><span>Wed</span><span class="week-day-num">24</span></button>
+                <button class="week-day" type="button"><span>Thu</span><span class="week-day-num">25</span></button>
+                <button class="week-day" type="button"><span>Fri</span><span class="week-day-num">26</span></button>
+              </div>
+              <div class="sched-row">
+                <div class="sched-time">10:00am</div>
+                <div>
+                  <div class="sched-card">
+                    <div class="sched-title">[RoB] [Initiative] MBO Initiative Sync</div>
+                    <div class="sched-meta">10:00am - 11:00am · Engineering</div>
+                  </div>
+                </div>
+              </div>
+              <div class="sched-row">
+                <div class="sched-time">12:00pm</div>
+                <div>
+                  <div class="sched-card">
+                    <div class="sched-title">[RoB] TSC Monthly Town Hall</div>
+                    <div class="sched-meta">12:00pm - 1:00pm · Engineering</div>
+                  </div>
+                </div>
+              </div>
+              <div class="sched-row">
+                <div class="sched-time">2:00pm</div>
+                <div>
+                  <div class="sched-card">
+                    <div class="sched-title">[RoB] [Initiative][Client] Skill Based Prioritization</div>
+                    <div class="sched-meta">2:00pm - 3:00pm · Engineering</div>
+                  </div>
+                </div>
+              </div>
+              <div class="sched-row">
+                <div class="sched-time">4:00pm</div>
+                <div>
+                  <div class="sched-card is-company">
+                    <div class="sched-title">All Hands Meeting</div>
+                    <div class="sched-meta">4:00pm - 5:30pm · Company Wide</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming meeting -->
+            <div class="upcoming">
+              <div class="upcoming-eyebrow">Upcoming meeting · in 1 hour</div>
+              <div class="upcoming-title">[RoB] [Initiative] MBO Initiative Sync</div>
+              <div class="upcoming-meta">10:00 am — 11:00 am · 7 attendees</div>
+              <div class="avatar-stack">
+                <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span>
+                <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=32" alt="" /></span>
+                <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span>
+                <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=51" alt="" /></span>
+                <span class="avatar avatar-sm avatar-more">+3</span>
+              </div>
+              <div class="upcoming-flags">
+                <span class="upcoming-flag is-yes"><i class="ph ph-check-circle"></i> Agenda topics</span>
+                <span class="upcoming-flag is-no"><i class="ph ph-x-circle"></i> Meeting deck</span>
+              </div>
+              <div class="upcoming-actions">
+                <button class="btn btn-secondary" type="button">Prep material</button>
+                <button class="btn btn-primary" type="button">Join meeting</button>
+              </div>
+            </div>
+
+            <!-- Recent activity -->
+            <div class="dash-section" style="margin-bottom:0">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Recent activity</div>
+              </div>
+              <div>
+                <div class="act-row">
+                  <div class="act-icon is-info"><i class="ph ph-info"></i></div>
+                  <div>
+                    <div class="act-text">Initiative <span class="kw-link">Lorem ipsum</span>'s end date is approaching (7 days)</div>
+                    <div class="act-time">Today</div>
+                  </div>
+                </div>
+                <div class="act-row">
+                  <div class="act-icon is-warning"><i class="ph ph-warning"></i></div>
+                  <div>
+                    <div class="act-text">Initiative <span class="kw-link">Lorem ipsum</span>'s status changed to <span class="kw-danger">Off track</span></div>
+                    <div class="act-time">Today</div>
+                  </div>
+                </div>
+                <div class="act-row">
+                  <div class="act-icon is-danger"><i class="ph ph-flag"></i></div>
+                  <div>
+                    <div class="act-text">OKR <span class="kw-link">Lorem ipsum</span> status is flagged <span class="kw-danger">red</span></div>
+                    <div class="act-time">Feb 3, 2022</div>
+                  </div>
+                </div>
+                <div class="act-row">
+                  <div class="act-icon is-success"><i class="ph ph-check-circle"></i></div>
+                  <div>
+                    <div class="act-text">OKR <span class="kw-link">Lorem ipsum</span> pending approval</div>
+                    <div class="act-time">Feb 3, 2022</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Out this week -->
+            <div class="dash-section" style="margin-bottom:0">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Out this week</div>
+              </div>
+              <div>
+                <div class="out-row">
+                  <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span>
+                  <div class="out-person">
+                    <div class="out-name">Andre Shevchuk</div>
+                    <div class="out-role">Product Designer</div>
+                  </div>
+                  <span class="out-date">14–18 Jul</span>
+                </div>
+                <div class="out-row">
+                  <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span>
+                  <div class="out-person">
+                    <div class="out-name">Andre Shevchuk</div>
+                    <div class="out-role">Product Designer</div>
+                  </div>
+                  <span class="out-date">13 Jul</span>
+                </div>
+                <div class="out-row">
+                  <span class="avatar avatar-sm"><img src="https://i.pravatar.cc/240?img=51" alt="" /></span>
+                  <div class="out-person">
+                    <div class="out-name">Andre Shevchuk</div>
+                    <div class="out-role">Product Designer</div>
+                  </div>
+                  <span class="out-date">16–18 Jul</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Time-off -->
+            <div class="dash-section" style="margin-bottom:0">
+              <div class="dash-section-head">
+                <div class="dash-section-title">Time-off</div>
+                <a class="dash-link" href="#">Request time-off <i class="ph ph-caret-right"></i></a>
+              </div>
+              <div>
+                <div class="to-row">
+                  <div>
+                    <div class="to-title">Scheduled OOO</div>
+                    <div class="to-sub"><i class="ph ph-user"></i> Personal time</div>
+                  </div>
+                  <span class="to-date">14–18 Jul</span>
+                </div>
+                <div class="to-row">
+                  <div>
+                    <div class="to-title">Scheduled OOO</div>
+                    <div class="to-sub"><i class="ph ph-cake"></i> Birthday time-off</div>
+                  </div>
+                  <span class="to-date">22 Jul</span>
+                </div>
+                <div class="to-row">
+                  <div class="to-title">Balance remaining</div>
+                  <span class="to-date">18 days</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-
-      <!-- PROFILE CARD -->
-      <section class="card pf-card">
-
-        <!-- LEFT (main) -->
-        <div>
-          <div class="pf-card-main">
-            <!-- Avatar -->
-            <div class="pf-avatar-block">
-              <div class="pf-avatar-lg" aria-label="Abbie Emejih avatar">AE</div>
-            </div>
-
-            <!-- Identity + meta + contacts + about -->
-            <div class="pf-identity">
-              <div class="pf-name-row">
-                <h2 class="pf-name">Abbie Emejih</h2>
-                <span class="badge badge-success">HR</span>
-              </div>
-              <p class="pf-role-line">Associate Director of Learning and Development</p>
-
-              <div class="pf-meta">
-                <div class="pf-meta-cell">
-                  <span class="pf-meta-label">Manager</span>
-                  <a class="pf-person-chip" href="#">
-                    <span class="pf-avatar-xs">ML</span>
-                    Michelle Lakes
-                  </a>
-                </div>
-                <div class="pf-meta-cell">
-                  <span class="pf-meta-label">Function</span>
-                  <span class="pf-meta-value">People</span>
-                </div>
-                <div class="pf-meta-cell">
-                  <span class="pf-meta-label">Role</span>
-                  <span class="pf-meta-value">Learning &amp; Development</span>
-                </div>
-                <div class="pf-meta-cell">
-                  <span class="pf-meta-label">Hire Date</span>
-                  <span class="pf-meta-value">Feb 5, 2020</span>
-                </div>
-              </div>
-
-              <div class="pf-section">
-                <h3 class="pf-section-title">Contacts</h3>
-                <div class="pf-contacts">
-                  <div class="pf-contact-row">
-                    <i class="ph ph-envelope-simple"></i>
-                    <a href="mailto:abbie.emejih@operationalize.com">abbie.emejih@operationalize.com</a>
-                  </div>
-                  <div class="pf-contact-row">
-                    <i class="ph ph-phone"></i>
-                    <a href="tel:+15554005871">+1 555 400 5871</a>
-                  </div>
-                  <div class="pf-contact-row">
-                    <i class="ph ph-device-mobile"></i>
-                    <a href="tel:+15558829130">+1 555 882 9130</a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pf-section">
-                <h3 class="pf-section-title">About</h3>
-                <p class="pf-about-body">
-                  I'm a transplant from Columbus, Ohio to Massachusetts and now Manhattan! I graduated from Otterbein University with a degree in Music Education and worked in several recruiting agencies before joining Operationalize. My partner and I are huge foodies and love exploring restaurants, museums, and parks. I must music and I'm always looking for good recommendations so feel free to fill me up! Our cat, Arthur, demands lots of attention and loves to steal all manner of string, ribbon, and shoelaces. Our dog, Roxy, feels strongly about squirrels, birds, and anyone who knocks on the door.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT (map) -->
-        <div class="pf-card-side">
-          <div class="pf-map" aria-label="Location map">
-            <svg width="100%" height="100%" viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-              <rect width="300" height="160" fill="#E8EEF4"/>
-              <path d="M0 120 Q 80 80 160 100 T 300 90 L 300 160 L 0 160 Z" fill="#D6E0EC"/>
-              <path d="M0 50 L 60 70 L 120 45 L 200 60 L 300 40" stroke="#FFF" stroke-width="3" fill="none"/>
-              <path d="M40 0 L 90 80 L 60 160" stroke="#FFF" stroke-width="2" fill="none" opacity="0.6"/>
-              <path d="M220 0 L 240 60 L 200 120 L 250 160" stroke="#FFF" stroke-width="2" fill="none" opacity="0.6"/>
-              <circle cx="150" cy="80" r="14" fill="rgba(198,40,40,0.18)"/>
-            </svg>
-            <i class="ph ph-map-pin-fill pf-map-pin"></i>
-            <span class="pf-map-overlay">Manhattan, NY</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- TABS -->
-      <nav class="tabs pf-tabs-wrap" role="tablist">
-        <button class="tab is-active" type="button" role="tab" aria-selected="true" data-tab="reporting">Reporting Relationships</button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="ones">1:1s</button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="history">Work History</button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="rob">RoB Meetings</button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-tab="ai">Action items</button>
-      </nav>
-
-      <!-- REPORTING RELATIONSHIPS -->
-      <section data-tab-panel="reporting">
-        <div class="pf-reports-head">
-          <h2>Reporting Relationships</h2>
-          <p class="pf-reports-subtitle">2 people report to Abbie Emejih who is the Associate Director of Learning and Development.</p>
-        </div>
-
-        <div class="pf-reports">
-          <article class="pf-report-card">
-            <div class="pf-avatar-md" style="background: #475569">ER</div>
-            <div class="pf-report-meta">
-              <div class="pf-report-name">Emiliano Rodriguez</div>
-              <div class="pf-report-title">Learning Specialist</div>
-            </div>
-            <i class="ph ph-caret-right"></i>
-          </article>
-          <article class="pf-report-card">
-            <div class="pf-avatar-md" style="background: #A855F7">ER</div>
-            <div class="pf-report-meta">
-              <div class="pf-report-name">Elena Reyes</div>
-              <div class="pf-report-title">L&amp;D Coordinator</div>
-            </div>
-            <i class="ph ph-caret-right"></i>
-          </article>
-        </div>
-      </section>
-
-      <!-- ACTION ITEMS — grouped by source meeting, newest first.
-           Shows the full history of items across her RoB meetings, including
-           ones that have carried forward week-to-week. -->
-      <section data-tab-panel="ai" hidden>
-        <div class="pf-ai-list" data-pf-ai-list></div>
-      </section>
-
-      <!-- Placeholder panels for the remaining tabs -->
-      <section data-tab-panel="ones" hidden>
-        <div class="pf-empty"><p class="pf-empty-text">1:1 history will appear here.</p></div>
-      </section>
-      <section data-tab-panel="history" hidden>
-        <div class="pf-empty"><p class="pf-empty-text">Work history will appear here.</p></div>
-      </section>
-      <section data-tab-panel="rob" hidden>
-        <div class="pf-empty"><p class="pf-empty-text">RoB meeting attendance will appear here.</p></div>
-      </section>
-
-    </main>
-  </div>
-
-  </div><!-- /.template-frame -->
-
-  <!-- Confirm modal — archiving an action item -->
-  <div class="modal-overlay" id="archive-ai-confirm" hidden style="z-index: 1000">
-    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="archive-ai-title-pf">
-      <header class="modal-header">
-        <h2 id="archive-ai-title-pf" class="modal-title">Archive this action item?</h2>
-        <button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="ph ph-x"></i></button>
-      </header>
-      <div class="modal-body" style="padding-top: var(--ic-space-3)">
-        <div style="display: flex; gap: var(--ic-space-3); align-items: flex-start">
-          <span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--ic-radius-full); background: var(--color-warning-subtle); color: var(--color-warning); display: inline-flex; align-items: center; justify-content: center;">
-            <i class="ph ph-archive" style="font-size: 18px"></i>
-          </span>
-          <p class="body" style="margin: 0">
-            The item will be removed from this meeting and won't carry forward to future occurrences. You can still see it in the meeting history.
-          </p>
-        </div>
-      </div>
-      <footer class="modal-footer">
-        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
-        <button class="btn btn-danger" type="button" data-confirm-archive-ai>Archive</button>
-      </footer>
     </div>
   </div>
-
   <script>
-    // Sidenav toggle
-    document.querySelector('.sidenav-toggle')?.addEventListener('click', () => {
-      document.querySelector('.sidenav')?.classList.toggle('is-compact');
-    });
-    document.querySelectorAll('.sidenav-group-trigger').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const open = btn.getAttribute('aria-expanded') === 'true';
-        btn.setAttribute('aria-expanded', String(!open));
-      });
+    const ramps = [
+      { name: 'Neutral',  tokens: ['white', 'black'] },
+      { name: 'Gray',     prefix: 'gray',     shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Zinc',     prefix: 'zinc',     shades: [100,200,300,400,500,600,700,800,900] },
+      { name: 'Graphite', prefix: 'graphite', shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Red',      prefix: 'red',      shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Orange',   prefix: 'orange',   shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Yellow',   prefix: 'yellow',   shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Green',    prefix: 'green',    shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Cyan',     prefix: 'cyan',     shades: [500] }, /* single-shade interim — see design.md §2 */
+      { name: 'Blue',     prefix: 'blue',     shades: [100,150,200,300,400,500,600,700,800,900] },
+      { name: 'Purple',   prefix: 'purple',   shades: [100,150,200,300,400,500,600,700,800,900] },
+    ];
+
+    // Apply indeterminate state to checkboxes marked with data-indeterminate
+    document.querySelectorAll('input[type=checkbox][data-indeterminate]').forEach(cb => {
+      cb.indeterminate = true;
     });
 
-    // Tabs — toggle active state + show the matching panel
-    document.querySelectorAll('.pf-tabs-wrap .tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const target = tab.dataset.tab;
-        document.querySelectorAll('.pf-tabs-wrap .tab').forEach(t => {
-          t.classList.remove('is-active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('is-active');
-        tab.setAttribute('aria-selected', 'true');
-        document.querySelectorAll('[data-tab-panel]').forEach(p => {
-          p.toggleAttribute('hidden', p.dataset.tabPanel !== target);
-        });
-      });
+    // Chase spinners — stagger each segment's fade around the ring.
+    document.querySelectorAll('.chase').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      paths.forEach((p, i) => { p.style.animationDelay = (i / paths.length * 1.1).toFixed(3) + 's'; });
+    });
+    document.querySelectorAll('.chase-cw').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      const n = paths.length;
+      paths.forEach((p, i) => { p.style.animationDelay = ((n - 1 - i) / n * 1.1).toFixed(3) + 's'; });
     });
 
-    // ====================================================================
-    // ACTION ITEMS — Abbie's view of items assigned to her across meetings.
-    // Editable: status, due date, description, threaded comments.
-    // ====================================================================
-    (() => {
-      const container = document.querySelector('[data-pf-ai-list]');
+    // Sliders — keep the filled-track gradient in sync with the value, plus
+    // any live readout (<output data-slider-output>) or number field
+    // (.slider-field, synced both ways).
+    document.querySelectorAll('.slider').forEach(slider => {
+      const range = slider.querySelector('.slider-input');
+      if (!range) return;
+      const out   = slider.querySelector('[data-slider-output]');
+      const field = slider.querySelector('.slider-field');
+      const update = () => {
+        const min = parseFloat(range.min) || 0;
+        const max = parseFloat(range.max) || 100;
+        const pct = ((range.value - min) / (max - min)) * 100;
+        range.style.setProperty('--slider-progress', pct + '%');
+        if (out) out.textContent = range.value;
+        if (field && field.value !== range.value) field.value = range.value;
+      };
+      range.addEventListener('input', update);
+      if (field) field.addEventListener('input', () => {
+        const v = parseFloat(field.value);
+        if (!Number.isNaN(v)) { range.value = v; update(); }
+      });
+      update();
+    });
+
+    // Toast — global helper that spawns a notification in the top-right region.
+    //   toast({ variant: 'success', message: 'Saved.' })
+    //   toast({ variant: 'error', message: '…', behavior: 'persistent' })
+    //   toast({ variant: 'neutral', message: '…', behavior: 'action', action: { label: 'Undo', onClick: () => {…} } })
+    window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+      let region = document.querySelector('.toast-region');
+      if (!region) {
+        region = document.createElement('div');
+        region.className = 'toast-region';
+        region.setAttribute('aria-live', 'polite');
+        region.setAttribute('aria-atomic', 'false');
+        document.body.appendChild(region);
+      }
+      const defaultIcon = { neutral: 'info', info: 'info', success: 'check-circle', warning: 'warning', error: 'warning-octagon' }[variant] || 'info';
+      const el = document.createElement('div');
+      el.className = `toast toast-${variant} is-entering`;
+      el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+      const actionHTML = behavior === 'action' && action ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>` : '';
+      el.innerHTML = `<i class="ph ph-${icon || defaultIcon} toast-icon"></i><p class="toast-message"></p>${actionHTML}${closeHTML}`;
+      el.querySelector('.toast-message').textContent = message;
+      region.appendChild(el);
+      // Trigger entrance transition on next frame
+      requestAnimationFrame(() => el.classList.remove('is-entering'));
+
+      const dismiss = () => {
+        if (!el.isConnected) return;
+        el.classList.add('is-leaving');
+        const cleanup = () => el.remove();
+        el.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 400); // fallback if transitionend doesn't fire
+      };
+
+      el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+      if (behavior === 'action' && action) {
+        el.querySelector('.toast-action').addEventListener('click', () => {
+          try { action.onClick?.(); } catch (e) { /* swallow */ }
+          dismiss();
+        });
+      }
+      if (behavior === 'timed') {
+        setTimeout(dismiss, timeout);
+      }
+      return { dismiss };
+    };
+
+    // Heading anchors — inject a hover-revealed "#" button next to every
+    // section heading. Clicking copies a direct link to that section so a
+    // reviewer can point at "use this component" by sharing the URL.
+    document.querySelectorAll('section[id] > h3.h3, section[id] > div > h3.h3, h2.section-head').forEach(heading => {
+      const section = heading.closest('section[id]');
+      if (!section) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'heading-anchor';
+      btn.textContent = '#';
+      btn.title = 'Copy link to this section';
+      btn.setAttribute('aria-label', `Copy link to ${heading.textContent.trim()}`);
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const url = `${window.location.origin}${window.location.pathname}#${section.id}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          if (window.toast) toast({ variant: 'success', message: `Link copied — ${section.id}`, timeout: 2400 });
+        } catch {
+          if (window.toast) toast({ variant: 'error', message: 'Copy failed — select the URL bar instead' });
+        }
+        history.replaceState(null, '', `#${section.id}`);
+      });
+      heading.appendChild(btn);
+    });
+
+    // Sidebar TOC — fixed vertical nav listing every section + subsection,
+    // with scroll-spy highlighting the section currently in view.
+    (function buildSidebarToc() {
+      const container = document.querySelector('.page-toc');
       if (!container) return;
-
-      const STATUS = {
-        'open':        { label: 'Open',        color: '#94A3B8' },
-        'in-progress': { label: 'In progress', color: '#1A73E8' },
-        'blocked':     { label: 'Blocked',     color: '#F4B400' },
-        'done':        { label: 'Done',        color: '#0F9D58' },
-        'cancelled':   { label: 'Cancelled',   color: '#64748B' },
-      };
-      const STATUS_ORDER = ['open', 'in-progress', 'blocked', 'done', 'cancelled'];
-      const CLOSED = new Set(['done', 'cancelled']);
-
-      const PEOPLE = {
-        'abbie-emejih':   { name: 'Abbie Emejih',   initials: 'AE', color: '#1A73E8', photo: 'https://i.pravatar.cc/64?u=abbie-emejih' },
-        'michelle-lakes': { name: 'Michelle Lakes', initials: 'ML', color: '#06B6D4', photo: 'https://i.pravatar.cc/64?u=michelle-lakes' },
-        'adan-jones':     { name: 'Adan Jones',     initials: 'AJ', color: '#475569', photo: 'https://i.pravatar.cc/64?u=adan-jones' },
-        'keith-berlin':   { name: 'Keith Berlin',   initials: 'KB', color: '#1A73E8', photo: 'https://i.pravatar.cc/64?u=keith-berlin' },
-        'rick-lacroix':   { name: 'Rick Lacroix',   initials: 'RL', color: '#0F9D58', photo: 'https://i.pravatar.cc/64?u=rick-lacroix' },
-        'tile-tampakas':  { name: 'Tile Tampakas',  initials: 'TT', color: '#F4B400', photo: 'https://i.pravatar.cc/64?u=tile-tampakas' },
-      };
-      const CURRENT_USER = 'abbie-emejih';
-      const TODAY = new Date('2026-01-21');
-      // Description length: soft warning at SOFT, hard cap at MAX.
-      const DESC_MAX = 200;
-      const DESC_SOFT = 150;
-
-      const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const fmtTime = (iso) => new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-      const escapeHTML = (s) => String(s ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-
-      // Helper for the seed below — each item is tagged with the meeting it came
-      // from. The render groups them by source.date into time-ordered sections.
-      const mkSource = (date) => ({
-        name: 'Engineering Weekly',
-        date,
-        href: `index.html#occurrence=${date}`,
-      });
-
-      // Seed — items across Abbie's recent RoB meetings. Most are assigned to
-      // her, but each meeting also has items owned by other attendees so the
-      // "Show my action items only" filter is meaningful.
-      const items = [
-        // === Engineering Weekly · Jan 21 (current week) ===
-        {
-          id: 'pf-ai-1',
-          desc: 'Roll out the new performance review templates for the Q1 cycle',
-          status: 'in-progress',
-          due: '2026-01-25',
-          assignee: 'abbie-emejih',
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [
-            { ts: '2026-01-19T14:00:00', author: 'abbie-emejih', text: 'Drafted the rubric — collecting team feedback this week.' },
-          ],
-        },
-        {
-          id: 'pf-ai-2',
-          desc: 'Update the onboarding curriculum for the new engineering hires starting Feb 2',
-          status: 'open',
-          due: '2026-02-03',
-          assignee: 'abbie-emejih',
-          carriedFrom: '2026-01-14',
-          source: mkSource('2026-01-21'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-jan21-other-1',
-          desc: 'Confirm cutover date for data-pipeline migration with the platform team',
-          status: 'in-progress',
-          due: '2026-01-23',
-          assignee: 'keith-berlin',
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-jan21-other-2',
-          desc: 'Refresh on-call rotation roster for Q1',
-          status: 'open',
-          due: '2026-01-30',
-          assignee: 'tile-tampakas',
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [],
-        },
-
-        // pf-ai-3 originated in the Jan 14 meeting but is still Blocked, so it
-        // rolls forward and shows up in the current (Jan 21) section with a
-        // "Carried over from Jan 14" indicator instead of staying in Jan 14.
-        {
-          id: 'pf-ai-3',
-          desc: 'Run a skills-gap analysis with team leads to inform Q1 training plan',
-          status: 'blocked',
-          due: '2026-01-27',
-          assignee: 'abbie-emejih',
-          carriedFrom: '2026-01-14',
-          source: mkSource('2026-01-21'),
-          comments: [
-            { ts: '2026-01-18T10:30:00', author: 'abbie-emejih', text: 'Waiting on the L&D vendor — sent a follow-up Friday.' },
-          ],
-        },
-
-        // === Engineering Weekly · Jan 14 ===
-        {
-          id: 'pf-ai-4',
-          desc: 'Finalize the Q4 learning budget summary for leadership review',
-          status: 'done',
-          due: '2026-01-14',
-          assignee: 'abbie-emejih',
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [
-            { ts: '2026-01-13T17:00:00', author: 'abbie-emejih', text: 'Submitted — see deck in #leadership.' },
-          ],
-        },
-        {
-          id: 'pf-ai-jan14-other-1',
-          desc: 'Migrate observability dashboard to the new Grafana instance',
-          status: 'done',
-          due: '2026-01-13',
-          assignee: 'keith-berlin',
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-jan14-other-2',
-          desc: 'Approve infra spend uplift for Q1',
-          status: 'done',
-          due: '2026-01-12',
-          assignee: 'adan-jones',
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
-
-        // === Engineering Weekly · Jan 7 ===
-        {
-          id: 'pf-ai-5',
-          desc: 'Refresh the 1:1 coaching playbook for engineering managers',
-          status: 'done',
-          due: '2026-01-10',
-          assignee: 'abbie-emejih',
-          carriedFrom: null,
-          source: mkSource('2026-01-07'),
-          comments: [
-            { ts: '2026-01-10T11:20:00', author: 'abbie-emejih', text: 'Published v2 in the L&D wiki.' },
-          ],
-        },
-        {
-          id: 'pf-ai-6',
-          desc: 'Audit the manager training enrollment pipeline',
-          status: 'done',
-          due: '2026-01-12',
-          assignee: 'abbie-emejih',
-          carriedFrom: null,
-          source: mkSource('2026-01-07'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-jan7-other',
-          desc: 'Roll out the new on-call paging policy team-wide',
-          status: 'done',
-          due: '2026-01-14',
-          assignee: 'tile-tampakas',
-          carriedFrom: null,
-          source: mkSource('2026-01-07'),
-          comments: [],
-        },
-
-        // === Engineering Weekly · Dec 31 (prior month, history) ===
-        {
-          id: 'pf-ai-7',
-          desc: 'Close out Q4 retro action items with each function lead',
-          status: 'done',
-          due: '2026-01-05',
-          assignee: 'abbie-emejih',
-          carriedFrom: null,
-          source: mkSource('2025-12-31'),
-          comments: [
-            { ts: '2026-01-05T16:00:00', author: 'abbie-emejih', text: 'All retros wrapped — themes summary forwarded to Adan.' },
-          ],
-        },
-        {
-          id: 'pf-ai-dec31-other',
-          desc: 'Review Q4 OKR scoring with the leadership team',
-          status: 'done',
-          due: '2026-01-02',
-          assignee: 'adan-jones',
-          carriedFrom: null,
-          source: mkSource('2025-12-31'),
-          comments: [],
-        },
-
-        // === Items archived from the RoB modal — surface here when "Show archived" is on ===
-        // Abbie's archived items
-        {
-          id: 'pf-ai-arch-1',
-          desc: 'Investigate training-platform downtime complaints from APAC team',
-          status: 'open',
-          due: '2026-01-22',
-          assignee: 'abbie-emejih',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [
-            { ts: '2026-01-21T14:30:00', author: 'abbie-emejih', text: 'Reassigned to IT — closing on our side.' },
-          ],
-        },
-        {
-          id: 'pf-ai-arch-2',
-          desc: 'Schedule onboarding session for the new contract trainers',
-          status: 'in-progress',
-          due: '2026-01-12',
-          assignee: 'abbie-emejih',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
-        // Team archived items (not Abbie's — hidden when "My action items" is checked)
-        {
-          id: 'pf-ai-arch-3',
-          desc: 'Spin up a follow-up channel for the data-pipeline migration',
-          status: 'open',
-          due: '2026-01-23',
-          assignee: 'keith-berlin',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-21'),
-          comments: [],
-        },
-        {
-          id: 'pf-ai-arch-4',
-          desc: 'Draft incident-response policy revision for review',
-          status: 'open',
-          due: '2026-01-15',
-          assignee: 'rick-lacroix',
-          archived: true,
-          carriedFrom: null,
-          source: mkSource('2026-01-14'),
-          comments: [],
-        },
-      ];
-
-      let openPop = null;
-      const closePop = () => { if (openPop) { openPop.remove(); openPop = null; } };
-      const showPop = (anchor, pop) => {
-        closePop();
-        document.body.appendChild(pop);
-        const r = anchor.getBoundingClientRect();
-        pop.style.top = (r.bottom + 4) + 'px';
-        pop.style.left = Math.min(r.left, window.innerWidth - pop.offsetWidth - 8) + 'px';
-        openPop = pop;
-      };
-
-      const isOverdue = (item) => !CLOSED.has(item.status) && new Date(item.due) < TODAY;
-      const findItem = (id) => items.find(i => i.id === id);
-
-      // DS tag-color mapping per status — drives the indicator dot color
-      const STATUS_TAG = {
-        'open':        'tag-light',
-        'in-progress': 'tag-blue',
-        'blocked':     'tag-warning',
-        'done':        'tag-positive',
-        'cancelled':   'tag-dark',
-      };
-
-      const renderItem = (item, opts = {}) => {
-        const isClosed = CLOSED.has(item.status);
-        const overdueClass = isOverdue(item) ? ' is-overdue' : '';
-        const hasComment = item.comments.length > 0;
-        const latest = hasComment ? item.comments[item.comments.length - 1] : null;
-        const commentTitle = hasComment
-          ? `${item.comments.length} note${item.comments.length === 1 ? '' : 's'} — latest: ${(latest.text || '').slice(0, 80)}`
-          : 'Add a note';
-
-        // Solid yellow "Carried over" pill — same treatment as the RoB modal
-        const carriedHTML = item.carriedFrom
-          ? `<span class="tag tag-warning ai-carried" title="Carried from ${fmtDate(item.carriedFrom)}" aria-label="Carried from ${fmtDate(item.carriedFrom)}">Carried over</span>`
-          : '';
-
-        const node = document.createElement('article');
-        node.className = 'ai-item' + (isClosed ? ' is-done' : '') + (opts.archived ? ' is-archived' : '');
-        node.dataset.itemId = item.id;
-        const person = PEOPLE[item.assignee] || { name: 'Unassigned', initials: '?', photo: null };
-        node.innerHTML = `
-          <div class="ai-meta-row">
-            ${opts.archived
-              ? `<span class="tag tag-light">Archived</span>`
-              : `<button class="tag tag-indicator ${STATUS_TAG[item.status]}" type="button" data-status="${item.status}" data-action="status">${STATUS[item.status].label}</button>`}
-            <span class="tag ${overdueClass ? 'is-overdue' : 'tag-light'}" data-action="due" role="button" tabindex="0" style="cursor:pointer">Due on ${fmtDate(item.due)}</span>
-            ${carriedHTML}
-            <span class="ai-assignee" title="Assignee: ${escapeHTML(person.name)}" aria-label="Assignee: ${escapeHTML(person.name)}">
-              <span class="avatar avatar-xs">${person.photo ? `<img src="${person.photo}" alt="${escapeHTML(person.name)}" />` : person.initials}</span>
-              <span class="ai-assignee-name">${escapeHTML(person.name)}</span>
-            </span>
-            <span class="ai-spacer"></span>
-            <a class="ai-icon-btn" href="${item.source.href}" title="Open ${escapeHTML(item.source.name)} · ${fmtDate(item.source.date)}" aria-label="Open source meeting">
-              <i class="ph ph-arrow-square-out"></i>
-            </a>
-            <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${escapeHTML(commentTitle)}" aria-label="Notes">
-              <i class="ph ph-chat-circle"></i>
-            </button>
-            ${opts.archived
-              ? `<button class="ai-icon-btn" type="button" data-action="unarchive" title="Restore" aria-label="Restore"><i class="ph ph-arrow-counter-clockwise"></i></button>`
-              : `<button class="ai-icon-btn" type="button" data-action="archive" title="Archive" aria-label="Archive"><i class="ph ph-archive"></i></button>`}
-          </div>
-          <p class="ai-desc" data-action="desc" contenteditable="true" spellcheck="false">${escapeHTML(item.desc)}</p>
-          <p class="ai-desc-counter" data-desc-counter>${item.desc.length}/${DESC_MAX}</p>
-        `;
-        return node;
-      };
-
-      // Format a longer source-meeting date for the section header.
-      const fmtSourceDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
-      // Filter state — mineOnly narrows to current user, viewMode toggles
-      // between active and archived (mutually exclusive segments).
-      // Two filters live in the first section header (inline with the h3 title):
-      //   - mineOnly: narrows to items assigned to the profile owner
-      //   - showArchived: when true, includes archived items in the list
-      //     (rendered with Restore icon instead of Archive)
-      let mineOnly = false;
-      let showArchived = false;
-
-      // Group items by source.date, emitting one section per meeting, newest first.
-      const render = () => {
-        container.innerHTML = '';
-
-        const scope = (pool) => mineOnly ? pool.filter(i => i.assignee === CURRENT_USER) : pool;
-        const pool = scope(items.filter(it => showArchived ? true : !it.archived));
-
-        // Group by meeting date
-        const byDate = new Map();
-        pool.forEach(it => {
-          const key = it.source.date;
-          if (!byDate.has(key)) byDate.set(key, []);
-          byDate.get(key).push(it);
+      document.querySelectorAll('main > section[id]').forEach(top => {
+        const sectionWrap = document.createElement('div');
+        sectionWrap.className = 'page-toc-section';
+        const label = document.createElement('div');
+        label.className = 'page-toc-section-label';
+        const topHeading = top.querySelector('h2.section-head');
+        // Strip the trailing "#" injected by the heading-anchor button
+        label.textContent = (topHeading?.firstChild?.textContent || top.id).trim();
+        sectionWrap.appendChild(label);
+        top.querySelectorAll(':scope > section[id]').forEach(sub => {
+          const heading = sub.querySelector('h3.h3');
+          if (!heading) return;
+          const a = document.createElement('a');
+          a.className = 'page-toc-item';
+          a.href = '#' + sub.id;
+          a.dataset.tocTarget = sub.id;
+          a.textContent = (heading.firstChild?.textContent || sub.id).trim();
+          sectionWrap.appendChild(a);
         });
-        const sortedDates = [...byDate.keys()].sort((a, b) => b.localeCompare(a));
-
-        // Empty state when the pool is empty
-        if (sortedDates.length === 0) {
-          const empty = document.createElement('p');
-          empty.style.cssText = 'padding: var(--ic-space-6); text-align: center; color: var(--color-text-muted); font: var(--type-body-sm);';
-          empty.textContent = mineOnly ? 'No items assigned to you.' : 'No items yet.';
-          container.appendChild(empty);
-          return;
-        }
-
-        sortedDates.forEach((date, idx) => {
-          const isCurrent = idx === 0;
-          const groupItems = byDate.get(date);
-          const section_ = document.createElement('section');
-          section_.className = 'pf-ai-section' + (isCurrent ? '' : ' is-past');
-          section_.dataset.sectionDate = date;
-          // Only the topmost (current) section header carries the global filter
-          // checkboxes — they apply to every section below it.
-          const filtersHTML = isCurrent ? `
-            <div class="pf-ai-filters">
-              <label class="checkbox pf-ai-filter" title="Filter to only show items assigned to ${escapeHTML(PEOPLE[CURRENT_USER].name)}">
-                <input type="checkbox" class="checkbox-input" data-mine-only ${mineOnly ? 'checked' : ''} />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">My action items</span>
-              </label>
-              <label class="checkbox pf-ai-filter" title="Include archived items in the list">
-                <input type="checkbox" class="checkbox-input" data-show-archived ${showArchived ? 'checked' : ''} />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">Show archived</span>
-              </label>
-            </div>
-          ` : '';
-          section_.innerHTML = `
-            <header class="pf-ai-section-head">
-              <h3 class="pf-ai-section-title">
-                <a href="${groupItems[0].source.href}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                  ${escapeHTML(groupItems[0].source.name)} · ${fmtSourceDate(date)}
-                  <i class="ph ph-arrow-square-out" style="font-size: 14px; color: var(--color-text-muted);" aria-label="Open meeting"></i>
-                </a>
-              </h3>
-              ${filtersHTML}
-            </header>
-          `;
-          // Wire the checkboxes if this section rendered them
-          section_.querySelector('[data-mine-only]')?.addEventListener('change', (e) => {
-            mineOnly = e.target.checked;
-            render();
-          });
-          section_.querySelector('[data-show-archived]')?.addEventListener('change', (e) => {
-            showArchived = e.target.checked;
-            render();
-          });
-          groupItems.forEach(it => section_.appendChild(renderItem(it, { archived: !!it.archived })));
-          container.appendChild(section_);
-        });
-      };
-
-      // Click delegation for all the actions
-      container.addEventListener('click', (e) => {
-        const node = e.target.closest('.ai-item');
-        if (!node) return;
-        const item = findItem(node.dataset.itemId);
-        if (!item) return;
-        const trigger = e.target.closest('[data-action]');
-        if (!trigger) return;
-        const action = trigger.dataset.action;
-        if (action === 'status')  openStatusPop(trigger, item);
-        if (action === 'due')     openDuePop(trigger, item);
-        if (action === 'comment') openCommentPop(trigger, item);
-        if (action === 'archive') {
-          pendingArchiveId = item.id;
-          document.getElementById('archive-ai-confirm')?.removeAttribute('hidden');
-        }
-        if (action === 'unarchive') {
-          item.archived = false;
-          render();
-        }
+        container.appendChild(sectionWrap);
       });
+      // Scroll-spy: highlight item whose section is most prominent in viewport
+      const items = container.querySelectorAll('.page-toc-item');
+      const idToItem = new Map([...items].map(i => [i.dataset.tocTarget, i]));
+      const setActive = id => {
+        items.forEach(i => i.classList.toggle('is-active', i.dataset.tocTarget === id));
+      };
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length === 0) return;
+        // Pick the one closest to the top of the viewport
+        visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        setActive(visible[0].target.id);
+      }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+      document.querySelectorAll('main > section[id] > section[id]').forEach(sec => observer.observe(sec));
 
-      // Filter checkboxes live inside each render() pass on the first section
-      // header — see the render function for their event listeners.
+      // Hamburger toggle (narrow viewports). Opens panel, closes on outside
+      // click or after a TOC item is clicked.
+      const toggle = document.querySelector('.page-toc-toggle');
+      const panel = document.querySelector('.page-toc');
+      if (toggle && panel) {
+        const setOpen = open => {
+          panel.classList.toggle('is-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+          toggle.setAttribute('aria-label', open ? 'Close table of contents' : 'Open table of contents');
+        };
+        toggle.addEventListener('click', e => {
+          e.stopPropagation();
+          setOpen(!panel.classList.contains('is-open'));
+        });
+        document.addEventListener('click', e => {
+          if (!panel.classList.contains('is-open')) return;
+          if (panel.contains(e.target) || toggle.contains(e.target)) return;
+          setOpen(false);
+        });
+        panel.addEventListener('click', e => {
+          if (e.target.closest('.page-toc-item')) setOpen(false);
+        });
+      }
+    })();
 
-      // Pending archive id + confirm-modal wiring (matches the RoB modal pattern)
-      let pendingArchiveId = null;
-      const archiveModal = document.getElementById('archive-ai-confirm');
-      archiveModal?.addEventListener('click', (e) => {
-        // Backdrop click or close X
-        if (e.target.closest('[data-modal-close]') || e.target === archiveModal) {
-          archiveModal.setAttribute('hidden', '');
-          pendingArchiveId = null;
-          return;
-        }
-        // Confirm Archive — flags the item rather than deleting it so the
-        // user can later restore from the Archived expander.
-        if (e.target.closest('[data-confirm-archive-ai]')) {
-          if (pendingArchiveId) {
-            const item = items.find(i => i.id === pendingArchiveId);
-            if (item) { item.archived = true; render(); }
-          }
-          pendingArchiveId = null;
-          archiveModal.setAttribute('hidden', '');
-        }
+    // Inline TOC — build a per-section list of links from each <section id>'s h3.
+    document.querySelectorAll('.toc[data-toc-for]').forEach(nav => {
+      const parent = document.getElementById(nav.dataset.tocFor);
+      if (!parent) return;
+      const items = parent.querySelectorAll(':scope > section[id]');
+      items.forEach(sec => {
+        const heading = sec.querySelector('h3.h3');
+        if (!heading) return;
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        // First text node only — skips the injected heading-anchor "#" button
+        a.textContent = (heading.firstChild?.textContent || heading.textContent).trim();
+        nav.appendChild(a);
+      });
+    });
+
+    // CTA linking — clone <button class="btn"> children from a [data-cta-source]
+    // master into every [data-cta-link] target with the same id. Lets the demo
+    // page-head act as the source of truth for action labels everywhere they
+    // appear (e.g. template-app-shell page-heads).
+    document.querySelectorAll('[data-cta-link]').forEach(target => {
+      const id = target.dataset.ctaLink;
+      const source = document.querySelector(`[data-cta-source="${id}"]`);
+      if (!source) return;
+      const clones = [...source.querySelectorAll(':scope > .btn')].map(b => b.cloneNode(true));
+      target.prepend(...clones);
+    });
+
+    // Modal + Drawer — open via [data-modal-open="id"], close via [data-modal-close], overlay click, or Escape.
+    // Selector covers both .modal-overlay and .drawer-overlay so a single handler runs both components.
+    (function wireOverlays() {
+      const OVERLAY_SELECTOR = '.modal-overlay, .drawer-overlay';
+      const close = (overlay) => { if (overlay) overlay.hidden = true; };
+      document.querySelectorAll('[data-modal-open]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          document.getElementById(trigger.dataset.modalOpen)?.removeAttribute('hidden');
+        });
+      });
+      document.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-modal-close]');
+        if (closeBtn) { close(closeBtn.closest(OVERLAY_SELECTOR)); return; }
+        const overlay = e.target.closest(OVERLAY_SELECTOR);
+        if (overlay && e.target === overlay) close(overlay);
       });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !archiveModal?.hasAttribute('hidden')) {
-          archiveModal.setAttribute('hidden', '');
-          pendingArchiveId = null;
-        }
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll(`${OVERLAY_SELECTOR}`).forEach(o => { if (!o.hidden) close(o); });
+      });
+    })();
+
+    // Single-select dropdowns — any menu whose items carry a .dropdown-item-check slot
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (!menu.querySelector('.dropdown-item-check')) return;
+      const items = menu.querySelectorAll('.dropdown-item');
+      items.forEach(item => item.addEventListener('click', () => {
+        items.forEach(i => i.classList.remove('is-selected'));
+        item.classList.add('is-selected');
+      }));
+    });
+
+    // Select (dropdown input) — toggle menu, sync chosen value into the trigger
+    document.querySelectorAll('.input-select').forEach(sel => {
+      const trigger = sel.querySelector('.input-select-trigger');
+      const menu = sel.querySelector('.dropdown-menu');
+      const value = sel.querySelector('.input-select-value');
+      if (!trigger || !menu) return;
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
       });
 
-      // Inline description edit + character-counter enforcement (200-char cap)
-      const updateDescCounter = (node, text) => {
-        const counter = node.querySelector('[data-desc-counter]');
-        if (!counter) return;
-        const n = text.length;
-        counter.textContent = `${n}/${DESC_MAX}`;
-        counter.classList.toggle('is-warning', n >= DESC_SOFT && n < DESC_MAX);
-        counter.classList.toggle('is-danger',  n >= DESC_MAX);
-      };
-      container.addEventListener('focusin', (e) => {
-        if (!e.target.matches('[data-action="desc"]')) return;
-        const node = e.target.closest('.ai-item');
-        if (!node) return;
-        node.classList.add('is-desc-focused');
-        updateDescCounter(node, e.target.textContent);
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          // Item text without the check icon
+          const label = (item.textContent || '').trim();
+          value.textContent = label;
+          value.classList.remove('input-select-placeholder');
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
       });
-      container.addEventListener('input', (e) => {
-        if (!e.target.matches('[data-action="desc"]')) return;
-        const node = e.target.closest('.ai-item');
-        if (!node) return;
-        let text = e.target.textContent;
-        if (text.length > DESC_MAX) {
-          text = text.slice(0, DESC_MAX);
-          e.target.textContent = text;
-          const range = document.createRange();
-          range.selectNodeContents(e.target);
-          range.collapse(false);
+    });
+
+    // Close any open select when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.input-select').forEach(sel => {
+        if (sel.contains(e.target)) return;
+        sel.querySelector('.input-select-trigger')?.setAttribute('aria-expanded', 'false');
+        const menu = sel.querySelector('.dropdown-menu');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Generic .dropdown — pairs .dropdown-trigger with .dropdown-menu
+    document.querySelectorAll('.dropdown').forEach(d => {
+      const trigger = d.querySelector('.dropdown-trigger');
+      const menu = d.querySelector('.dropdown-menu');
+      if (!trigger || !menu) return;
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+      // Item click closes the menu
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+    // Close any open generic dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.dropdown').forEach(d => {
+        if (d.contains(e.target)) return;
+        const trigger = d.querySelector('.dropdown-trigger');
+        const menu = d.querySelector('.dropdown-menu');
+        trigger?.setAttribute('aria-expanded', 'false');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Character counters — .field[data-char-limit] with one .field-hint as the readout
+    document.querySelectorAll('.field[data-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.charLimit, 10);
+      const input = field.querySelector('.input');
+      const counter = field.querySelector('.field-hint');
+      if (!input || !counter) return;
+      const update = () => {
+        const n = input.value.length;
+        counter.textContent = `${n} / ${max}`;
+        counter.classList.toggle('is-error', n >= max);
+      };
+      input.addEventListener('input', update);
+      update();
+    });
+
+    // Side navigation — toggle compact/expanded
+    document.querySelectorAll('.sidenav-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.sidenav').classList.toggle('is-compact');
+      });
+    });
+
+    // Side navigation — expand/collapse nested groups
+    document.querySelectorAll('.sidenav-group-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
+    // Tree tables — expand/collapse nested rows. Visibility derives from the
+    // stack of currently collapsed ancestor levels, so a deeply collapsed
+    // branch stays hidden even when an outer ancestor is re-expanded.
+    document.querySelectorAll('.table tbody').forEach(tbody => {
+      if (!tbody.querySelector('.row-toggle')) return;
+      const refresh = () => {
+        const collapsedAt = [];
+        [...tbody.children].forEach(row => {
+          const lvl = parseInt(row.dataset.level || '0', 10);
+          while (collapsedAt.length && collapsedAt[collapsedAt.length - 1] >= lvl) collapsedAt.pop();
+          row.hidden = collapsedAt.length > 0;
+          const t = row.querySelector('.row-toggle');
+          if (t && t.getAttribute('aria-expanded') === 'false') collapsedAt.push(lvl);
+        });
+      };
+      tbody.querySelectorAll('.row-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = btn.getAttribute('aria-expanded') !== 'false';
+          btn.setAttribute('aria-expanded', String(!open));
+          refresh();
+        });
+      });
+    });
+
+    // Side navigation routing (template only) — clicking an item shows the matching .page-view
+    document.querySelectorAll('#template-app-shell .sidenav-item[data-page]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = link.dataset.page;
+        const shell = link.closest('#template-app-shell');
+        // Toggle active class across all items in this template
+        shell.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+        link.classList.add('is-active');
+        // Show only the matching page-view
+        shell.querySelectorAll('.page-view').forEach(p => {
+          p.hidden = p.dataset.page !== name;
+        });
+        // Scroll the main area to top so the new page-head is visible
+        shell.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    });
+
+    // Rich text editors — toolbar commands + heading select + character counter
+    document.querySelectorAll('.editor').forEach(editor => {
+      const content = editor.querySelector('.editor-content');
+
+      // Generic execCommand buttons (bold, italic, lists)
+      editor.querySelectorAll('[data-cmd]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault()); // keep selection
+        btn.addEventListener('click', () => {
+          content.focus();
+          document.execCommand(btn.dataset.cmd, false, null);
+        });
+      });
+
+      // Inline code — wraps selection in <code>
+      editor.querySelectorAll('[data-cmd-code]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          content.focus();
           const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
+          if (!sel.rangeCount) return;
+          const text = sel.toString();
+          if (!text) return;
+          document.execCommand('insertHTML', false, `<code>${text}</code>`);
+        });
+      });
+
+      // Link prompt
+      editor.querySelectorAll('[data-cmd-link]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          const url = prompt('Enter URL');
+          if (!url) return;
+          content.focus();
+          document.execCommand('createLink', false, url);
+        });
+      });
+
+      // Heading select — formatBlock
+      editor.querySelectorAll('.editor-toolbar-select .dropdown-item[data-block]').forEach(item => {
+        item.addEventListener('click', () => {
+          content.focus();
+          document.execCommand('formatBlock', false, item.dataset.block);
+        });
+      });
+    });
+
+    // Editor character counters — count plain text, update sibling .editor-counter
+    document.querySelectorAll('.field[data-editor-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.editorCharLimit, 10);
+      const content = field.querySelector('.editor-content');
+      const text = field.querySelector('.editor-counter-text');
+      const tick = field.querySelector('.editor-counter-ok');
+      if (!content || !text) return;
+      const update = () => {
+        const len = content.textContent.length;
+        const left = max - len;
+        text.textContent = `${left} character${left === 1 ? '' : 's'} left`;
+        const valid = left >= 0;
+        text.parentElement.classList.toggle('is-error', !valid);
+        if (tick) tick.style.opacity = (len > 0 && valid) ? '1' : '0';
+      };
+      content.addEventListener('input', update);
+      update();
+    });
+
+    // Universal chip remove — clicking .chip-remove removes its parent .chip
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip-remove');
+      if (btn) btn.closest('.chip')?.remove();
+    });
+
+    // Alert dismiss — clicking .alert-close removes its parent .alert
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.alert-close');
+      if (btn) btn.closest('.alert')?.remove();
+    });
+
+    // Badge remove — clicking .badge-remove deletes its parent pill
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.badge-remove');
+      if (btn) btn.closest('.badge')?.remove();
+    });
+
+    // Tabs — click to activate. If a tab declares aria-controls, also toggle
+    // the matching tabpanel's visibility.
+    document.querySelectorAll('.tabs').forEach(tablist => {
+      const tabs = [...tablist.querySelectorAll('.tab')];
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+            const panelId = t.getAttribute('aria-controls');
+            if (panelId) {
+              const panel = document.getElementById(panelId);
+              if (panel) panel.hidden = !on;
+            }
+          });
+        });
+      });
+    });
+
+    // Tag inputs — Enter to add, Backspace on empty to remove last
+    document.querySelectorAll('.input-tags').forEach(wrap => {
+      const input = wrap.querySelector('.input-tags-input');
+
+      const addTag = (text) => {
+        const t = text.trim();
+        if (!t) return;
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `${t}<button class="chip-remove" aria-label="Remove" type="button"><svg><use href="#i-x"/></svg></button>`;
+        input.before(chip);
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          e.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        } else if (e.key === 'Backspace' && !input.value) {
+          const chips = wrap.querySelectorAll('.chip');
+          chips[chips.length - 1]?.remove();
         }
-        updateDescCounter(node, text);
-      });
-      container.addEventListener('focusout', (e) => {
-        if (!e.target.matches('[data-action="desc"]')) return;
-        const node = e.target.closest('.ai-item');
-        const item = findItem(node.dataset.itemId);
-        if (!item) return;
-        node.classList.remove('is-desc-focused');
-        const next = e.target.textContent.trim();
-        if (next && next !== item.desc) item.desc = next;
       });
 
-      // ---- Popovers ----
+      // Click anywhere in the wrap focuses the text input
+      wrap.addEventListener('click', (e) => {
+        if (e.target === wrap) input.focus();
+      });
+    });
 
-      const openStatusPop = (anchor, item) => {
-        const pop = document.createElement('div');
-        pop.className = 'ai-pop';
-        pop.innerHTML = STATUS_ORDER.map(s => `
-          <button class="ai-pop-item" type="button" data-set-status="${s}">
-            <span class="ai-dot" style="--ai-dot-color:${STATUS[s].color}"></span>${STATUS[s].label}
-          </button>
-        `).join('');
-        pop.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-set-status]');
-          if (!btn) return;
-          item.status = btn.dataset.setStatus;
-          closePop();
-          render();
-        });
-        showPop(anchor, pop);
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // In-page batch annotation overlay. Lets you click multiple UI elements,
+    // queue notes, then "Copy batch" to paste a single grouped payload into
+    // your coding agent. Notes clear on reload. CSS lives in components.css
+    // (`.annot-toolbar`, `.annot-pin`, `.annot-popover`, `.annot-mode`).
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
       };
 
-      const openDuePop = (anchor, item) => {
-        const pop = document.createElement('div');
-        pop.className = 'ai-pop';
-        pop.style.padding = '8px';
-        pop.innerHTML = `<input type="date" value="${item.due}" style="font: var(--type-caption); padding: 4px 8px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); color: var(--color-text); outline: none;" />`;
-        const input = pop.querySelector('input');
-        input.addEventListener('change', () => {
-          if (input.value) item.due = input.value;
-          closePop();
-          render();
-        });
-        showPop(anchor, pop);
-        setTimeout(() => input.focus(), 0);
-      };
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
 
-      const openCommentPop = (anchor, item) => {
-        const pop = document.createElement('div');
-        pop.className = 'ai-pop ai-pop-thread';
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
 
-        const renderThread = () => {
-          const list = pop.querySelector('[data-comment-list]');
-          const empty = pop.querySelector('[data-comment-empty]');
-          if (item.comments.length === 0) {
-            list.innerHTML = '';
-            empty.hidden = false;
-            return;
-          }
-          empty.hidden = true;
-          list.innerHTML = item.comments.map(c => {
-            const a = PEOPLE[c.author] || { name: c.author, initials: '??', color: '#94A3B8' };
-            return `
-              <li class="ai-comment-entry">
-                <span class="avatar avatar-sm">${a.photo ? `<img src="${a.photo}" alt="${escapeHTML(a.name)}" />` : a.initials}</span>
-                <div class="ai-comment-body">
-                  <div class="ai-comment-meta">
-                    <span class="ai-comment-author">${escapeHTML(a.name)}</span>
-                    <span class="ai-comment-ts">${fmtTime(c.ts)}</span>
-                  </div>
-                  <div class="ai-comment-text">${escapeHTML(c.text)}</div>
-                </div>
-              </li>
-            `;
-          }).join('');
-          list.scrollTop = list.scrollHeight;
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
         };
 
-        pop.innerHTML = `
-          <h4>Notes</h4>
-          <ul class="ai-comment-list" data-comment-list></ul>
-          <p data-comment-empty hidden style="font: var(--type-caption); color: var(--color-text-subtle); font-style: italic; margin: 0 0 var(--ic-space-2);">No notes yet.</p>
-          <textarea placeholder="Add a note…" data-comment-input></textarea>
-          <div class="ai-pop-thread-actions">
-            <button class="btn btn-secondary btn-xs" type="button" data-comment-cancel>Close</button>
-            <button class="btn btn-primary btn-xs" type="button" data-comment-post disabled>Save</button>
-          </div>
-        `;
-        renderThread();
-
-        const ta = pop.querySelector('[data-comment-input]');
-        const postBtn = pop.querySelector('[data-comment-post]');
-        const updatePost = () => { postBtn.disabled = ta.value.trim().length === 0; };
-        ta.addEventListener('input', updatePost);
-        ta.addEventListener('keydown', (e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !postBtn.disabled) {
-            e.preventDefault();
-            postBtn.click();
-          }
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
         });
-        pop.addEventListener('click', (e) => {
-          if (e.target.closest('[data-comment-cancel]')) { closePop(); return; }
-          if (e.target.closest('[data-comment-post]')) {
-            const text = ta.value.trim();
-            if (!text) return;
-            item.comments.push({ ts: new Date().toISOString(), author: CURRENT_USER, text });
-            ta.value = '';
-            updatePost();
-            renderThread();
-            // Bubble updated state to the card so the dot indicator appears immediately
-            const card = container.querySelector(`.ai-item[data-item-id="${item.id}"]`);
-            const btn = card?.querySelector('[data-action="comment"]');
-            btn?.classList.add('has-content');
-            ta.focus();
-          }
-        });
-        showPop(anchor, pop);
-        setTimeout(() => ta.focus(), 0);
-      };
+      }
 
-      const openKebabPop = (anchor, item) => {
-        const pop = document.createElement('div');
-        pop.className = 'ai-pop';
-        pop.innerHTML = `
-          <button class="ai-pop-item" type="button" data-kebab="edit-desc"><i class="ph ph-pencil-simple"></i>Edit description</button>
-          <div class="ai-pop-divider"></div>
-          <button class="ai-pop-item" type="button" data-kebab="archive"><i class="ph ph-archive"></i>Archive</button>
-        `;
-        pop.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-kebab]');
-          if (!btn) return;
-          const action = btn.dataset.kebab;
-          closePop();
-          if (action === 'edit-desc') {
-            anchor.closest('.ai-item').querySelector('[data-action="desc"]')?.focus();
-          } else if (action === 'archive') {
-            const idx = items.findIndex(i => i.id === item.id);
-            if (idx >= 0) { items.splice(idx, 1); render(); }
-          }
-        });
-        showPop(anchor, pop);
-      };
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
 
-      // Outside click / Escape close
-      document.addEventListener('click', (e) => {
-        if (!openPop) return;
-        if (openPop.contains(e.target)) return;
-        if (e.target.closest('[data-action]')) return;
-        closePop();
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
       });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
 
-      render();
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
     })();
+
+    const css = getComputedStyle(document.documentElement);
+    const root = document.getElementById('palette-root');
+
+    const swatch = (token) => {
+      const hex = css.getPropertyValue(token).trim().toUpperCase();
+      // Drop "--ic-palette-{ramp}-" so the label is just the shade ("100", "white").
+      // Full token shows on hover via the title attribute.
+      const short = token.replace(/^--ic-palette-([a-z]+-)?/, '');
+      return `
+        <div class="swatch-card" title="${token}">
+          <div class="swatch" style="background: var(${token})"></div>
+          <div class="swatch-label">
+            <code class="swatch-token">${short}</code>
+            <code class="swatch-hex">${hex}</code>
+          </div>
+        </div>`;
+    };
+
+    // Radii
+    const radii = ['none','sm','md','lg','xl'].map(k => `--ic-radius-${k}`);
+    const radiiRoot = document.getElementById('radii-root');
+    radii.forEach(token => {
+      const value = css.getPropertyValue(token).trim();
+      const display = token === '--ic-radius-full' ? 'pill' : value;
+      const card = document.createElement('div');
+      card.className = 'radius-card';
+      card.innerHTML = `
+        <div class="radius-shape" style="border-radius: var(${token})"></div>
+        <code class="radius-token">${token.replace('--ic-radius-', '')}</code>
+        <code class="radius-value">${display}</code>
+      `;
+      radiiRoot.appendChild(card);
+    });
+
+    ramps.forEach(ramp => {
+      const tokens = ramp.tokens
+        ? ramp.tokens.map(t => `--ic-palette-${t}`)
+        : ramp.shades.map(s => `--ic-palette-${ramp.prefix}-${s}`);
+      const row = document.createElement('div');
+      row.className = 'ramp';
+      row.innerHTML = `
+        <div class="ramp-name">${ramp.name}</div>
+        <div class="swatch-row">${tokens.map(swatch).join('')}</div>
+      `;
+      root.appendChild(row);
+    });
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // In-page batch annotation overlay. Lets you click multiple UI elements,
+    // queue notes, then "Copy batch" to paste a single grouped payload into
+    // your coding agent. Notes clear on reload. CSS lives in devtools.css
+    // (`.annot-toolbar`, `.annot-pin`, `.annot-popover`, `.annot-mode`).
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+  </script>
+
+  <script>
+    // Collapse/expand grouped list rows (initiatives / BAUs)
+    document.addEventListener('click', (e) => {
+      const chev = e.target.closest('.grp-chev');
+      if (!chev) return;
+      const row = chev.closest('.grp-row');
+      let n = row.nextElementSibling, collapsed = chev.classList.toggle('is-collapsed');
+      chev.querySelector('i')?.classList.toggle('ph-caret-right', collapsed);
+      chev.querySelector('i')?.classList.toggle('ph-caret-down', !collapsed);
+      while (n && n.classList.contains('grp-row') && n.classList.contains('is-child')) {
+        n.style.display = collapsed ? 'none' : '';
+        n = n.nextElementSibling;
+      }
+    });
+
+    // Responsive sidenav drawer (hamburger opens off-canvas nav on tablet/phone)
+    const dash = document.querySelector('.dashboard');
+    const closeNav = () => dash && dash.classList.remove('nav-open');
+    document.querySelector('.topbar-hamburger')?.addEventListener('click', () => dash?.classList.toggle('nav-open'));
+    document.querySelector('.sidenav-backdrop')?.addEventListener('click', closeNav);
+    document.querySelectorAll('.sidenav a.sidenav-item').forEach((a) => {
+      a.addEventListener('click', () => { if (window.matchMedia('(max-width: 1024px)').matches) closeNav(); });
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
   </script>
 </body>
 </html>

@@ -105,17 +105,11 @@
   --ic-palette-green-800: #046B5A;
   --ic-palette-green-900: #034539;
 
-  /* Cyan */
-  --ic-palette-cyan-100: #E6F6FE;
-  --ic-palette-cyan-150: #C8EBFD;
-  --ic-palette-cyan-200: #A1DDFB;
-  --ic-palette-cyan-300: #6ECAF5;
-  --ic-palette-cyan-400: #45B9F2;
+  /* Cyan — single shade. Pending removal: components currently using
+     cyan-500 (.tag-blue-light, .badge-info text, --color-info) will
+     migrate to a blue shade in the next pass, after which the ramp goes
+     away entirely. */
   --ic-palette-cyan-500: #25A9EF;
-  --ic-palette-cyan-600: #1B8AC5;
-  --ic-palette-cyan-700: #136B9B;
-  --ic-palette-cyan-800: #0E5078;
-  --ic-palette-cyan-900: #07334C;
 
   /* Blue */
   --ic-palette-blue-100: #EDF1FD;
@@ -282,7 +276,10 @@
   --color-danger-hover:   var(--ic-palette-red-600);
   --color-danger-subtle:  var(--ic-palette-red-100);
   --color-info:           var(--ic-palette-cyan-500);
-  --color-info-subtle:    var(--ic-palette-cyan-100);
+  /* --color-info-subtle is en route to blue. cyan-100 was retired in the
+     palette cleanup; backed by blue-100 until --color-info itself moves
+     to blue, at which point the cyan-500 reference above also goes. */
+  --color-info-subtle:    var(--ic-palette-blue-100);
 
   /* ---- Overlays ---- */
   --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
@@ -364,9 +361,29 @@ body {
 .btn-icon { width: 14px; height: 14px; flex-shrink: 0; }
 .btn-xs .btn-icon { width: 12px; height: 12px; }
 
-/* Square icon-only button (no text) */
-.btn-icon-only            { width: 32px; padding: 0; }
+/* Icon-only button (no text) — fully rounded "pill" shape. */
+.btn-icon-only            { width: 32px; padding: 0; border-radius: var(--ic-radius-full); }
 .btn-icon-only.btn-xs     { width: 24px; }
+
+/* Ghost as icon-only: muted graphite icon on transparent bg, gray-150
+ * surface on hover. Distinct from text `.btn-ghost` which uses brand-blue;
+ * icon-only ghosts (kebabs, X buttons) stay quiet and neutral. */
+.btn-icon-only.btn-ghost {
+  color: var(--ic-palette-graphite-500);
+}
+.btn-icon-only.btn-ghost:hover {
+  background: var(--color-surface-muted);
+  color: var(--ic-palette-graphite-500);
+}
+
+/* Danger as icon-only: red icon on transparent bg, no fill. Reads as a
+ * destructive affordance without screaming "delete" in red until clicked. */
+.btn-icon-only.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+}
+.btn-icon-only.btn-danger:hover  { background: var(--color-danger-subtle); }
+.btn-icon-only.btn-danger:active { background: var(--color-danger-subtle); }
 .btn:active { transform: translateY(1px); }
 .btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
@@ -388,9 +405,11 @@ body {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
 }
-.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+/* Hover keeps the background transparent (clickable area unchanged) and
+ * signals interactivity with an underline instead. */
+.btn-ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .btn-danger {
   background: var(--color-danger);
@@ -520,8 +539,8 @@ textarea.input {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ic-space-1);
-  min-height: 40px;
-  padding: 4px var(--ic-space-2);
+  min-height: 32px;
+  padding: 2px var(--ic-space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--ic-radius-sm);
@@ -529,6 +548,8 @@ textarea.input {
   transition: border-color var(--ic-duration-fast) var(--ic-ease),
               box-shadow var(--ic-duration-fast) var(--ic-ease);
 }
+/* Chips inside the tag input shrink to fit the 32px row */
+.input-tags .chip { height: 24px; }
 .input-tags:focus-within {
   border-color: var(--color-border-focus);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
@@ -536,12 +557,12 @@ textarea.input {
 .input-tags-input {
   flex: 1;
   min-width: 80px;
-  height: 28px;
+  height: 24px;
   padding: 0 var(--ic-space-1);
   border: 0;
   outline: 0;
   background: transparent;
-  font: var(--type-body);
+  font: var(--type-body-sm);
   color: var(--color-text);
 }
 .input-tags-input::placeholder { color: var(--color-text-subtle); }
@@ -810,11 +831,6 @@ textarea.input {
   flex-shrink: 0;
   text-transform: uppercase;
 }
-/* Size variants — for compact rows and comment threads */
-.cell-avatar-xs { width: 18px; height: 18px; font-size: 9px; }
-.cell-avatar-sm { width: 24px; height: 24px; font-size: 10px; }
-/* Colored variant — use with inline style="background:..." for per-person tint */
-.cell-avatar-color { color: #FFFFFF; font-weight: var(--ic-weight-semibold); }
 .cell-user-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cell-user-name { font: var(--ic-weight-medium) var(--ic-text-sm)/1.2 var(--ic-font-sans); color: var(--color-text); }
 .cell-user-role { font: var(--type-caption); color: var(--color-text-muted); }
@@ -895,19 +911,69 @@ textarea.input {
 .alert-info    { background: var(--color-accent-subtle);  border-color: color-mix(in srgb, var(--color-accent) 22%, transparent); }
 .alert-info    .alert-icon { color: var(--color-accent); }
 
-/* ---------- Badge ---------- */
+/* ---------- Badge ----------
+ * Status pill. Read-only as <span>; interactive (editable) as <button> —
+ * picks up pointer cursor, hover dim, and focus ring automatically.
+ * Optional parts compose inside any variant:
+ *
+ *   <span class="badge badge-success">Active</span>                          read-only
+ *   <button class="badge badge-warning" type="button">Pending</button>       editable
+ *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
+ */
 .badge {
   display: inline-flex; align-items: center;
+  gap: var(--ic-space-1);
   font: var(--type-caption);
   padding: var(--ic-space-1) var(--ic-space-2);
   border-radius: var(--ic-radius-full);
-  background: var(--color-surface-muted);
+  /* Neutral follows the variant recipe: {hue}-100 fill + {hue}-150 stroke */
+  background: var(--ic-palette-gray-100);
   color: var(--color-text-muted);
+  border: 1px solid var(--ic-palette-gray-150);
 }
-.badge-success { background: var(--color-success-subtle); color: var(--color-success); }
-.badge-warning { background: var(--color-warning-subtle); color: var(--color-warning); }
-.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
-.badge-info    { background: var(--color-info-subtle);    color: var(--color-info); }
+.badge-success { background: var(--color-success-subtle); color: var(--ic-palette-green-700); border-color: var(--ic-palette-green-150); }
+.badge-warning { background: var(--color-warning-subtle); color: var(--ic-palette-yellow-700); border-color: var(--ic-palette-yellow-150); }
+.badge-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); border-color: var(--ic-palette-red-150); }
+.badge-info    { background: var(--color-info-subtle);    color: var(--ic-palette-blue-500); border-color: var(--ic-palette-blue-150); }
+
+/* Editable — same pill rendered as a <button>. Deletable pills (those that
+ * contain a .badge-remove) get the same hover so all interactive pills react. */
+button.badge,
+.badge:has(.badge-remove) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+button.badge:hover,
+.badge:has(.badge-remove):hover { filter: brightness(0.96); }
+button.badge:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* Leading icon — Phosphor <i> or inline svg */
+.badge-icon { font-size: 12px; width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Trailing remove × — clicking deletes the pill (delegated handler) */
+.badge-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--ic-radius-full);
+  opacity: 0.65;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease),
+              background var(--ic-duration-fast) var(--ic-ease);
+}
+.badge-remove:hover { opacity: 1; background: color-mix(in srgb, currentColor 16%, transparent); }
+.badge-remove .ph { font-size: 10px; }
 
 /* ---------- Tag ----------
  * Status marker — distinct from .badge (soft pill). Two styles share one color hook (--tag-color):
@@ -922,7 +988,6 @@ textarea.input {
   gap: var(--ic-space-1);
   height: 16px;
   padding: 0 var(--ic-space-2);
-  border: 0;
   border-radius: var(--ic-radius-sm);
   font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
   background: var(--tag-color);
@@ -939,9 +1004,17 @@ textarea.input {
 .tag-blue-dark  { --tag-color: var(--ic-palette-blue-700); }
 .tag-light      { --tag-color: var(--ic-palette-gray-200);    --tag-text: var(--color-text); }
 
-/* Indicator style — colored dot + text on a muted gray pill */
+/* Solid tags are interactive (click swaps status via a dropdown) — subtle
+ * hover dim signals it. Indicator style has its own hover below. */
+.tag:not(.tag-indicator) {
+  cursor: pointer;
+  transition: filter var(--ic-duration-fast) var(--ic-ease);
+}
+.tag:not(.tag-indicator):hover { filter: brightness(0.92); }
+
+/* Indicator style — colored dot + text, ghost-button hover affordance */
 .tag-indicator {
-  background: var(--color-surface-muted);
+  background: transparent;
   color: var(--color-text);
   padding: var(--ic-space-1) var(--ic-space-2);
   height: auto;
@@ -950,7 +1023,7 @@ textarea.input {
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.tag-indicator:hover { background: var(--ic-palette-gray-200); }
+.tag-indicator:hover { background: var(--color-surface-muted); }
 .tag-indicator::before {
   content: '';
   width: 8px;
@@ -992,8 +1065,8 @@ textarea.input {
 }
 .count-badge-secondary {
   background: var(--color-surface);
-  color: var(--color-danger);
-  border-color: var(--color-danger);
+  color: var(--ic-palette-graphite-500);
+  border-color: var(--color-border-strong);
 }
 
 /* ---------- Avatar ----------
@@ -1273,6 +1346,91 @@ a.avatar:focus-visible {
   border-color: var(--color-danger);
 }
 
+/* ---------- Slider ----------
+ * Native <input type="range"> in a flex row. The filled-track portion is a
+ * gradient driven by --slider-progress, kept in sync by the script block in
+ * example.html (also syncs value readouts / number fields).
+ *
+ *   <div class="slider">
+ *     <input class="slider-input" type="range" min="0" max="100" value="35" aria-label="Volume" />
+ *   </div>
+ *
+ * Variants compose via optional siblings around the range input:
+ *   icons        <i class="ph ph-minus slider-icon"></i> … <i class="ph ph-plus slider-icon"></i>
+ *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
+ *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
+ *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
+ *   input        <input class="input input-xs slider-field" type="number" />  ← JS-synced both ways
+ */
+.slider {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+}
+.slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 24px; /* generous touch target around the 2px track */
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+/* Track — filled portion dark, remainder light, split at --slider-progress */
+.slider-input::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: linear-gradient(to right,
+    var(--color-accent) var(--slider-progress, 50%),
+    var(--color-border-strong) var(--slider-progress, 50%));
+}
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -7px; /* centers the 16px thumb on the 2px track */
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-webkit-slider-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible { outline: none; }
+.slider-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+/* Firefox */
+.slider-input::-moz-range-track {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-border-strong);
+}
+.slider-input::-moz-range-progress {
+  height: 2px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+}
+.slider-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.slider-input::-moz-range-thumb:hover { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+.slider-input:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Side adornments */
+.slider-icon  { font-size: 16px; color: var(--ic-palette-graphite-500); flex-shrink: 0; }
+.slider-label { font: var(--ic-weight-regular) var(--ic-text-xs)/1.5 var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; white-space: nowrap; }
+.slider-value { font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans); color: var(--ic-palette-graphite-500); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+/* Number field variant — fixed compact width, no spinners */
+.slider-field { width: 56px; text-align: center; -moz-appearance: textfield; appearance: textfield; flex-shrink: 0; }
+.slider-field::-webkit-outer-spin-button,
+.slider-field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* ---------- Modal ----------
  * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
  *
@@ -1365,7 +1523,6 @@ a.avatar:focus-visible {
   justify-content: flex-end;
   gap: var(--ic-space-2);
   padding: var(--ic-space-4) var(--ic-space-5);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Mobile — buttons stack full width */
@@ -1589,14 +1746,65 @@ a.avatar:focus-visible {
   overflow: auto;
 }
 
+/* ---------- Breadcrumbs ----------
+ * Path trail — usually the first row inside a page head, but works standalone.
+ * Parent crumbs are blue links (underline on hover); the current page is plain
+ * text and not interactive. Chevron separators come from the ::after on each
+ * non-last item, so markup stays flat:
+ *
+ *   <nav class="breadcrumbs" aria-label="Breadcrumb">
+ *     <a class="breadcrumb" href="#">Processes</a>
+ *     <a class="breadcrumb" href="#">Onboarding</a>
+ *     <span class="breadcrumb is-current" aria-current="page">Review step</span>
+ *   </nav>
+ */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ic-space-1);
+  font: var(--ic-weight-semibold) var(--ic-text-base)/var(--ic-lh-body-md) var(--ic-font-sans);
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Chevron separator after every crumb except the last */
+.breadcrumb:not(:last-child)::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background-color: var(--color-text-subtle);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>') center / contain no-repeat;
+}
+/* Current page — plain text, no link affordance */
+.breadcrumb.is-current {
+  color: var(--color-text);
+  cursor: default;
+}
+
 /* ---------- Page head ----------
- * Page-level header. Title (+ optional count + subtitle) on the left, actions on the right.
+ * Page-level header. Title (+ optional breadcrumbs + count + subtitle) on
+ * the left, actions on the right. Breadcrumbs, when present, are the first
+ * row inside .page-head-main, above the title.
  *
  *   <div class="page-head">
  *     <div class="page-head-main">
+ *       <nav class="breadcrumbs" aria-label="Breadcrumb">          ← optional
+ *         <a class="breadcrumb" href="#">Processes</a>
+ *         <span class="breadcrumb is-current" aria-current="page">Onboarding</span>
+ *       </nav>
  *       <div class="page-head-title">
  *         <h1 class="page-head-heading">Processes</h1>
- *         <span class="page-head-count">12</span>
+ *         <span class="count-badge count-badge-lg count-badge-secondary">12</span>
  *       </div>
  *       <p class="page-head-subtitle">Optional subtitle.</p>
  *     </div>
@@ -1616,6 +1824,8 @@ a.avatar:focus-visible {
   margin-bottom: var(--ic-space-6);
 }
 .page-head-main { min-width: 0; }
+/* Breadcrumbs as the first row of a page head — small gap above the title */
+.page-head-main > .breadcrumbs { margin-bottom: var(--ic-space-2); }
 .page-head-title {
   display: flex;
   align-items: center;
@@ -1626,19 +1836,10 @@ a.avatar:focus-visible {
   color: var(--color-text);
   margin: 0;
 }
-.page-head-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 22px;
-  padding: 0 var(--ic-space-2);
-  border-radius: var(--ic-radius-full);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
-}
+/* Count next to the heading uses the secondary count-badge component
+ * directly — no separate .page-head-count rule. Markup:
+ *   <span class="count-badge count-badge-lg count-badge-secondary">12</span>
+ */
 .page-head-subtitle {
   font: var(--type-body-sm);
   color: var(--color-text-muted);
@@ -1747,9 +1948,18 @@ a.avatar:focus-visible {
  * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
  * is top; override with [data-placement="bottom"|"left"|"right"].
  *
- *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ * Two styles:
+ *   Compact (default) — dark pill, caption text, single line. For icon
+ *     buttons and short labels.
+ *   Regular — add [data-tooltip-style="regular"]. White surface, 13/20 body
+ *     text that wraps (max 240px), soft shadow, caret pointing at the
+ *     trigger. For longer explanatory copy.
  *
- * Renders via ::after so no extra DOM. Reveals on :hover and :focus-visible.
+ *   <button class="btn" data-tooltip="Copied!" data-placement="bottom">Copy</button>
+ *   <button class="btn" data-tooltip="Longer explanation…" data-tooltip-style="regular">Help</button>
+ *
+ * Renders via ::after (+ ::before for the regular caret) so no extra DOM.
+ * Reveals on :hover and :focus-visible.
  */
 [data-tooltip] { position: relative; }
 [data-tooltip]::after {
@@ -1790,6 +2000,103 @@ a.avatar:focus-visible {
   top: 50%;
   left: calc(100% + 6px);
   transform: translateY(-50%);
+}
+
+/* Regular style — white surface, wrapping body text, caret.
+ * Shadow matches Figma "Shadows/Level 4" (two centered layers). */
+[data-tooltip][data-tooltip-style="regular"]::after {
+  background: var(--color-surface);
+  color: var(--ic-palette-graphite-500);
+  font: var(--type-body-sm);
+  padding: var(--ic-space-4);
+  border-radius: var(--ic-radius-sm);
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: left;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24), 0 0 32px rgba(0, 0, 0, 0.12);
+  bottom: calc(100% + 12px);
+}
+/* Caret — rotated square; its shadowed half pokes out from under the bubble
+ * (::after paints above ::before, hiding the inner half). */
+[data-tooltip][data-tooltip-style="regular"]::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--ic-z-toast);
+  transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+  /* Default placement: top */
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"]:hover::before,
+[data-tooltip][data-tooltip-style="regular"]:focus-visible::before { opacity: 1; }
+
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 12px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::after {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 12px);
+  left: auto;
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="left"]::before {
+  bottom: auto;
+  top: 50%;
+  right: calc(100% + 8px);
+  left: auto;
+  transform: translateY(-50%) rotate(45deg);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+[data-tooltip][data-tooltip-style="regular"][data-placement="right"]::before {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* ---------- Loaders ----------
+ * Chase spinner — the Operationalize logo mark (24 segments) fading in
+ * sequence. Copy the <svg class="chase …" viewBox="0 0 22 32"> block from
+ * example.html#loaders; per-segment delays are computed by the small JS
+ * snippet in the script block (i/n stagger), so markup carries no timing.
+ *
+ *   <svg class="chase size-md" viewBox="0 0 22 32">…24 paths…</svg>      counter-clockwise, blue
+ *   <svg class="chase-cw size-md" viewBox="0 0 22 32">…same paths…</svg> clockwise, graphite + blue flash
+ *
+ * Sizes: .size-sm 24px · .size-md 32px · .size-lg 48px
+ */
+.chase, .chase-cw { display: block; height: auto; }
+.chase path, .chase-cw path { fill: currentColor; }
+.chase { color: var(--color-accent); }
+.chase path { animation: ic-chase-fade 1.1s linear infinite; }
+.chase-cw { color: var(--ic-palette-graphite-300); }
+.chase-cw path { animation: ic-chase-fade-cw 1.1s linear infinite; }
+.chase.size-sm, .chase-cw.size-sm { width: 24px; }
+.chase.size-md, .chase-cw.size-md { width: 32px; }
+.chase.size-lg, .chase-cw.size-lg { width: 48px; }
+@keyframes ic-chase-fade { 0%, 100% { opacity: 0.15; } 12% { opacity: 1; } }
+@keyframes ic-chase-fade-cw { 0%, 100% { opacity: 0.15; } 12% { opacity: 1; color: var(--color-accent); } }
+@media (prefers-reduced-motion: reduce) {
+  .chase path, .chase-cw path { animation: none; opacity: 0.55; }
 }
 
 /* ---------- Toast ----------
@@ -1958,9 +2265,7 @@ a.avatar:focus-visible {
   display: inline-flex; align-items: center; justify-content: center;
   font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);
   color: var(--ic-palette-graphite-800);
-  text-decoration: none;
 }
-.topbar-avatar:hover { background: var(--ic-palette-gray-400, #CBD5E1); color: var(--ic-palette-graphite-900); }
 .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 @media (max-width: 720px) {
@@ -2009,7 +2314,7 @@ a.avatar:focus-visible {
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.dropdown-item:hover  { background: var(--color-surface-muted); }
+.dropdown-item:hover  { background: var(--color-accent-subtle); }
 .dropdown-item:disabled,
 .dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 
@@ -2155,6 +2460,170 @@ a.avatar:focus-visible {
 .body    { font: var(--type-body);    color: var(--color-text); }
 .body-sm { font: var(--type-body-sm); color: var(--color-text-muted); }
 .caption { font: var(--type-caption); color: var(--color-text-subtle); }
+
+/* ---------- Layout helpers ----------
+ * Tiny flex/grid primitives used across prototypes. `.page` lives in
+ * semantic.css (it's the content max-width wrapper). The three below are
+ * the everyday building blocks for stacking content vertically (`.stack`),
+ * placing items in a wrapping row (`.row`), or a two-column grid that
+ * collapses on narrow viewports (`.grid-2`).
+ */
+.stack  { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+.row    { display: flex; gap: var(--ic-space-3); align-items: center; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-5); }
+
+@media (max-width: 720px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Drawer parts ----------
+ * Mirrors the .modal-header/.modal-body/.modal-footer pattern, since drawers
+ * use the same three-section layout. (The drawer container itself lives above
+ * in the Modal/Drawer section.)
+ */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-3);
+  padding: var(--ic-space-5);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ic-space-5);
+  font: var(--type-body);
+  color: var(--color-text);
+}
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ic-space-2);
+  padding: var(--ic-space-4) var(--ic-space-5);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* The annotation tool's CSS lives in devtools.css — author tooling, not a
+ * user-facing UI primitive. See design.md §7 for the four-file inline order. */
+
+    /* === devtools.css === */
+/* devtools.css — author/dev tooling only.
+ *
+ * This file is auto-inlined into every prototype alongside the three-layer
+ * design system (tokens.css → semantic.css → components.css), but it is
+ * explicitly NOT part of that layer chain — nothing here is a user-facing
+ * UI primitive. Everything is dormant until the matching trigger fires
+ * (e.g. ?notes=1 in the URL for the annotation tool).
+ *
+ * Rules of thumb:
+ * - Reach for this file when adding something authors/devs use to *build*
+ *   prototypes (annotation overlays, grid debug toggles, coachmark editors,
+ *   responsive frame previewers).
+ * - Anything end users see (buttons, cards, alerts, status colors) belongs
+ *   in components.css.
+ * - Keep selectors namespaced (`.annot-*`, `.grid-debug-*`, …) so they
+ *   can't collide with feature CSS.
+ */
+
+/* ---------- Annotation tool ----------
+ * In-page batch annotation overlay. Enable on any prototype by appending
+ * ?notes=1 to the URL. The matching JS lives in the example.html script
+ * block (delegated handlers — copy that whole block into every prototype).
+ *
+ * Usage flow:
+ *   1. Click "Inspect" → cursor becomes crosshair, hovering outlines elements.
+ *   2. Click an element → numbered pin + popover with a textarea opens.
+ *   3. Type the note, Enter to save (Shift+Enter for newline, Esc cancels).
+ *   4. Repeat. "Copy batch" puts all notes onto the clipboard as one payload.
+ *   5. Paste back to your coding agent to execute all changes in a single turn.
+ *
+ * Notes clear on reload (no persistence). Selectors use the shortest readable
+ * form (#id > unique class > tag.class > parent path).
+ */
+.annot-toolbar {
+  position: fixed; bottom: 16px; right: 16px;
+  z-index: 99999;
+  display: flex; gap: 6px; align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-1) var(--ic-space-2);
+  box-shadow: var(--ic-shadow-lg);
+  font: var(--type-body-sm);
+}
+.annot-toolbar button {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 10px;
+  border-radius: var(--ic-radius-sm);
+  cursor: pointer;
+  font: inherit;
+}
+.annot-toolbar button:disabled { opacity: 0.4; cursor: default; }
+.annot-toolbar button.is-active {
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-color: var(--color-accent);
+}
+.annot-toolbar .annot-count {
+  padding: 0 var(--ic-space-2);
+  color: var(--color-text-muted);
+  font: var(--type-caption);
+}
+.annot-mode,
+.annot-mode * { cursor: crosshair !important; }
+.annot-mode *:hover {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: -2px;
+}
+.annot-pin {
+  position: absolute;
+  z-index: 99998;
+  width: 20px; height: 20px;
+  background: var(--color-accent);
+  color: var(--ic-palette-white);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font: 600 11px/1 var(--ic-font-sans);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+.annot-popover {
+  position: absolute;
+  z-index: 100000;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  padding: var(--ic-space-3);
+  box-shadow: var(--ic-shadow-xl);
+  width: 280px;
+  font: var(--type-body-sm);
+}
+.annot-popover textarea {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-sm);
+  padding: 6px 8px;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.annot-popover-meta { margin-bottom: 6px; }
+.annot-popover-meta code {
+  font: var(--type-mono);
+  font-size: 11px;
+  background: var(--color-surface-muted);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.annot-popover-text { color: var(--color-text-muted); font-size: 11px; margin: 4px 0 6px; }
+.annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
 
   </style>
   <style>
@@ -3248,6 +3717,88 @@ body { overflow: hidden; }
     /* ==========================================================
        Action items
        ========================================================== */
+    /* Review-state slot — holds either the "Reviewed" checkbox (before) or
+       the eye-chip viewers pill (after the current user has reviewed) */
+    .ai-review-slot { display: inline-flex; align-items: center; }
+    .ai-review-check {
+      font: var(--type-caption);
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+    .ai-review-check[hidden] { display: none; }
+
+    /* Viewers chip — 👁 count with a rich hover/focus tooltip listing viewers */
+    .ai-viewers {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: var(--ic-radius-sm);
+      background: transparent;
+      color: var(--color-text-muted);
+      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+      cursor: default;
+      outline: none;
+    }
+    .ai-viewers[hidden] { display: none; }
+    .ai-viewers:hover, .ai-viewers:focus-visible { background: var(--color-surface-muted); color: var(--color-text); }
+    .ai-viewers .ph-eye { font-size: 14px; }
+    .ai-viewers-tooltip {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 1100;
+      min-width: 220px;
+      max-width: 280px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+      padding: var(--ic-space-3);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-2px);
+      transition: opacity 120ms var(--ic-ease), transform 120ms var(--ic-ease);
+    }
+    .ai-viewers:hover .ai-viewers-tooltip,
+    .ai-viewers:focus-visible .ai-viewers-tooltip,
+    .ai-viewers.is-open .ai-viewers-tooltip {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .ai-viewers-title {
+      font: var(--ic-weight-semibold) var(--ic-text-sm)/1.4 var(--ic-font-sans);
+      color: var(--color-text);
+      margin: 0 0 var(--ic-space-2);
+    }
+    .ai-viewers-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ic-space-2);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .ai-viewers-entry {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: var(--type-caption);
+      color: var(--color-text);
+    }
+    .ai-viewers-name { flex: 1; min-width: 0; }
+    .ai-viewers-ts   { color: var(--color-text-subtle); }
+    .ai-viewers-empty {
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
+      font-style: italic;
+      margin: 0;
+    }
+
     .ai-section-head {
       display: flex;
       align-items: center;
@@ -3321,6 +3872,34 @@ body { overflow: hidden; }
     .ai-assignee[disabled] { cursor: default; }
     .ai-assignee[disabled]:hover { background: transparent; }
     .ai-assignee-name { white-space: nowrap; }
+    /* Not-a-participant warning — sits right after the assignee. Amber glyph,
+       amber-tinted hover; click opens the invite/reassign popover. */
+    .ai-warn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin-left: -2px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--color-warning);
+      cursor: pointer;
+      border-radius: var(--ic-radius-full);
+      transition: background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-warn:hover { background: var(--color-warning-subtle); }
+    .ai-warn .ph { font-size: 15px; }
+    /* Invite/reassign popover rows reuse .ai-pop; give the invite row an icon gutter */
+    .ai-pop-action { display: flex; align-items: center; gap: 8px; }
+    .ai-pop-action .ph { font-size: 15px; color: var(--color-text-muted); flex-shrink: 0; }
+    .ai-pop-note {
+      padding: 8px 12px 4px;
+      font: var(--ic-weight-regular) var(--ic-text-xs)/1.4 var(--ic-font-sans);
+      color: var(--color-text-muted);
+      max-width: 240px;
+    }
     /* Overdue due-date pill — red-100 fill with red-500 text (soft danger).
        Hovers to red-150 for an interactive cue, matching the gray-150→gray-200
        affordance on neutral pills. */
@@ -3357,6 +3936,19 @@ body { overflow: hidden; }
       background: var(--color-surface-muted);
       box-shadow: inset 0 0 0 1px var(--color-border-strong, #CBD5E1);
     }
+    /* Character counter — shown when the description is focused */
+    .ai-desc-counter {
+      display: none;
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
+      margin: 4px 0 0;
+      padding: 0 4px;
+      text-align: right;
+    }
+    .ai-item.is-desc-focused .ai-desc-counter,
+    .ai-item.is-editing .ai-desc-counter { display: block; }
+    .ai-desc-counter.is-warning { color: var(--color-warning); }
+    .ai-desc-counter.is-danger  { color: var(--color-danger); font-weight: var(--ic-weight-semibold); }
 
     /* Avatars use .avatar + .avatar-xs from the design system */
 
@@ -3561,12 +4153,50 @@ body { overflow: hidden; }
     }
     .ai-show-completed[hidden] { display: none; }
     /* Chevron mirrors the .md-toggle pattern — flips on expand */
-    .ai-show-completed .ph-caret-down {
+    .ai-show-completed .ph-caret-down,
+    .md-toggle .ph-caret-down {
       transition: transform var(--ic-duration-fast) var(--ic-ease);
     }
-    .ai-show-completed[aria-expanded="true"] .ph-caret-down {
+    .ai-show-completed[aria-expanded="true"] .ph-caret-down,
+    .md-toggle[aria-expanded="true"] .ph-caret-down {
       transform: rotate(180deg);
     }
+
+    /* Archived items — collapsible section that lives between the list and footer */
+    .ai-archived { margin-top: var(--ic-space-3); }
+    .ai-archived[hidden] { display: none; }
+    .ai-archived-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 0;
+      padding: 4px 8px;
+      margin-left: -8px;
+      border-radius: var(--ic-radius-sm);
+      cursor: pointer;
+      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+      color: var(--color-text-muted);
+    }
+    .ai-archived-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .ai-archived-toggle .ph-archive { font-size: 14px; }
+    .ai-archived-chevron {
+      font-size: 12px;
+      transition: transform var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-archived-toggle[aria-expanded="true"] .ai-archived-chevron {
+      transform: rotate(180deg);
+    }
+    .ai-archived-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ic-space-2);
+      margin-top: var(--ic-space-2);
+    }
+    .ai-archived-list[hidden] { display: none; }
+    /* Archived items look muted — emphasizes they're not active */
+    .ai-archived-list .ai-item { background: var(--color-surface-muted); opacity: 0.8; }
+    .ai-archived-list .ai-item:hover { opacity: 1; }
 
     .ai-empty {
       font: var(--type-body-sm);
@@ -4331,8 +4961,28 @@ body { overflow: hidden; }
             <!-- RESOURCES — Google Slides agenda (variant A) -->
             <section data-resource-section>
               <div class="md-section-head-row">
+                <button class="md-toggle" type="button" data-deck-toggle aria-expanded="true" style="margin-left: auto;">
+                  <span data-deck-toggle-label>Collapse</span>
+                  <i class="ph ph-caret-down"></i>
+                </button>
                 <div class="md-title-with-info">
                   <h3 class="md-section-title" style="margin: 0">Meeting deck</h3>
+                  <span class="ai-review-slot" data-review-slot="deck">
+                    <label class="checkbox ai-review-check" data-review-check hidden title="Mark as reviewed">
+                      <input type="checkbox" class="checkbox-input" />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                      <span class="checkbox-label">Reviewed</span>
+                    </label>
+                    <span class="ai-viewers" tabindex="0" data-deck-viewers hidden aria-label="Deck viewers">
+                      <i class="ph ph-eye"></i>
+                      <span data-deck-viewers-count>0</span>
+                      <div class="ai-viewers-tooltip" role="tooltip">
+                        <h5 class="ai-viewers-title">Viewed by</h5>
+                        <ul class="ai-viewers-list" data-deck-viewers-list></ul>
+                        <p class="ai-viewers-empty" data-deck-viewers-empty hidden>No one has viewed this yet.</p>
+                      </div>
+                    </span>
+                  </span>
                   <span class="md-info-icon-wrap" data-deck-info hidden>
                     <span class="md-info-icon" tabindex="0" aria-label="About the deck variables" aria-describedby="deck-vars-tooltip">
                       <i class="ph ph-info"></i>
@@ -4385,6 +5035,7 @@ body { overflow: hidden; }
                 </div>
               </div>
 
+              <div data-deck-body>
               <div class="alert alert-info md-deck-info" data-deck-info hidden>
                 <i class="ph ph-info alert-icon"></i>
                 <div class="alert-message md-deck-info-body">
@@ -4527,6 +5178,7 @@ body { overflow: hidden; }
 
                 </div>
               </div>
+              </div><!-- /data-deck-body -->
             </section>
 
             <div class="md-divider"></div>
@@ -4537,19 +5189,44 @@ body { overflow: hidden; }
                 <div class="ai-section-title">
                   <h3 class="md-section-title">Action items</h3>
                   <span class="ai-count" data-ai-count>0</span>
+                  <span class="ai-review-slot" data-review-slot="items">
+                    <label class="checkbox ai-review-check" data-review-check hidden title="Mark as reviewed">
+                      <input type="checkbox" class="checkbox-input" />
+                      <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                      <span class="checkbox-label">Reviewed</span>
+                    </label>
+                    <span class="ai-viewers" tabindex="0" data-ai-viewers hidden aria-label="Viewers">
+                      <i class="ph ph-eye"></i>
+                      <span data-ai-viewers-count>0</span>
+                      <div class="ai-viewers-tooltip" role="tooltip">
+                        <h5 class="ai-viewers-title">Viewed by</h5>
+                        <ul class="ai-viewers-list" data-ai-viewers-list></ul>
+                        <p class="ai-viewers-empty" data-ai-viewers-empty hidden>No one has viewed this yet.</p>
+                      </div>
+                    </span>
+                  </span>
                 </div>
-                <button class="ai-show-completed" type="button" data-ai-show-completed aria-expanded="false" hidden>
-                  <span data-ai-completed-label>Show all</span>
-                  <i class="ph ph-caret-down"></i>
-                </button>
               </div>
 
               <div class="ai-list" data-ai-list></div>
               <p class="ai-empty" data-ai-empty hidden>No action items yet.</p>
+              <!-- Archived expander — collapsible list of archived items with Restore action -->
+              <div class="ai-archived" data-ai-archived hidden>
+                <button class="ai-archived-toggle" type="button" data-ai-archived-toggle aria-expanded="false">
+                  <i class="ph ph-archive"></i>
+                  <span>Archived items (<span data-ai-archived-count>0</span>)</span>
+                  <i class="ph ph-caret-down ai-archived-chevron"></i>
+                </button>
+                <div class="ai-archived-list" data-ai-archived-list hidden></div>
+              </div>
 
               <div class="ai-footer">
                 <button class="btn btn-ghost btn-xs ai-add-btn" type="button" data-ai-add>
                   <i class="ph ph-plus btn-icon"></i> Add action item
+                </button>
+                <button class="ai-show-completed" type="button" data-ai-show-completed aria-expanded="false" hidden>
+                  <span data-ai-completed-label>Show all</span>
+                  <i class="ph ph-caret-down"></i>
                 </button>
               </div>
             </section>
@@ -5744,6 +6421,19 @@ body { overflow: hidden; }
       });
     }, true);
 
+    // Meeting deck — collapse/expand toggle
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-deck-toggle]');
+      if (!btn) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const next = !expanded;
+      btn.setAttribute('aria-expanded', String(next));
+      const label = btn.querySelector('[data-deck-toggle-label]');
+      if (label) label.textContent = next ? 'Collapse' : 'Expand';
+      const body = document.querySelector('[data-deck-body]');
+      if (body) body.toggleAttribute('hidden', !next);
+    });
+
     // Walkthrough hint: dismiss when the spotlighted event is clicked or close pressed
     const dismissHint = () => {
       const hint = document.getElementById('cal-hint');
@@ -5852,7 +6542,16 @@ body { overflow: hidden; }
       };
       const OWNER_ID = 'adan-jones';
 
+      // Who's actually on this RoB call. An assignee not in this set gets a
+      // "not a participant" warning on their item, with a quick invite/reassign.
+      // (tile-tampakas is intentionally left off to demo the warning.)
+      const PARTICIPANTS = new Set(['adan-jones', 'keith-berlin', 'rick-lacroix', 'collete-parker']);
+      const onCall = (id) => PARTICIPANTS.has(id);
+
       const TODAY = new Date('2026-01-21');
+      // Description length: soft warning at SOFT, hard cap at MAX.
+      const DESC_MAX = 200;
+      const DESC_SOFT = 150;
       const ymd = (d) => d.toISOString().slice(0, 10);
       const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const fmtTime = (iso) => new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
@@ -6049,6 +6748,107 @@ body { overflow: hidden; }
         '2026-01-28': 'Wednesday, January 28, 2026 · 2:30 PM – 3:30 PM',
       };
 
+      // Viewer records per occurrence — split by artifact (deck vs items).
+      // Each entry: { id: person key from PEOPLE, ts: ISO string of last view }
+      const viewersByOccurrence = {
+        '2026-01-21': {
+          deck: [
+            { id: 'keith-berlin',  ts: '2026-01-21T09:12:00' },
+            { id: 'rick-lacroix',  ts: '2026-01-20T18:44:00' },
+            { id: 'collete-parker',ts: '2026-01-20T17:03:00' },
+          ],
+          items: [
+            { id: 'keith-berlin',  ts: '2026-01-21T13:02:00' },
+            { id: 'adan-jones',    ts: '2026-01-21T11:45:00' },
+            { id: 'rick-lacroix',  ts: '2026-01-20T20:15:00' },
+            { id: 'tile-tampakas', ts: '2026-01-20T16:30:00' },
+          ],
+        },
+        '2026-01-14': {
+          deck:  [ { id: 'adan-jones',   ts: '2026-01-14T09:00:00' }, { id: 'keith-berlin', ts: '2026-01-14T08:55:00' } ],
+          items: [ { id: 'rick-lacroix', ts: '2026-01-19T10:22:00' }, { id: 'adan-jones',   ts: '2026-01-16T17:20:00' }, { id: 'keith-berlin', ts: '2026-01-15T09:00:00' } ],
+        },
+        '2026-01-07': { deck: [], items: [] },
+        '2025-12-31': { deck: [], items: [] },
+        '2026-01-28': { deck: [], items: [] },
+      };
+
+      // Human-readable relative time — used inside the viewers tooltip
+      const fmtRelative = (iso) => {
+        const then = new Date(iso).getTime();
+        const now = TODAY.getTime();
+        const diff = Math.max(0, now - then);
+        const day = 24 * 60 * 60 * 1000;
+        const days = Math.floor(diff / day);
+        if (days === 0) return 'today';
+        if (days === 1) return 'yesterday';
+        if (days < 7)   return `${days} days ago`;
+        if (days < 30)  return `${Math.floor(days / 7)}w ago`;
+        return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+
+      // Populate a viewers chip (deck or items). When the current user hasn't
+      // reviewed yet, show the "Reviewed" checkbox instead of the eye chip.
+      // Clicking the checkbox adds them to the viewers list and swaps the UI
+      // to the reviewed-state (eye + count with tooltip).
+      const renderViewers = (kind /* 'deck' | 'items' */) => {
+        const slot = document.querySelector(`[data-review-slot="${kind}"]`);
+        if (!slot) return;
+        const chip    = slot.querySelector('[data-deck-viewers], [data-ai-viewers]');
+        const check   = slot.querySelector('[data-review-check]');
+        const countEl = slot.querySelector('[data-deck-viewers-count], [data-ai-viewers-count]');
+        const listEl  = slot.querySelector('[data-deck-viewers-list], [data-ai-viewers-list]');
+        const emptyEl = slot.querySelector('[data-deck-viewers-empty], [data-ai-viewers-empty]');
+
+        const list = (viewersByOccurrence[activeOccurrence]?.[kind] || [])
+          .slice()
+          .sort((a, b) => (a.ts < b.ts ? 1 : -1));
+        const hasCurrentUser = list.some(v => v.id === currentUser);
+
+        // State A — current user hasn't reviewed → show the checkbox
+        if (!hasCurrentUser) {
+          check.hidden = false;
+          chip.hidden = true;
+          check.querySelector('input').checked = false;
+          return;
+        }
+
+        // State B — current user has reviewed → show the eye chip + tooltip
+        check.hidden = true;
+        chip.hidden = false;
+        countEl.textContent = list.length;
+        emptyEl.hidden = true;
+        listEl.innerHTML = list.map(v => {
+          const p = PEOPLE[v.id] || { name: v.id, initials: '??' };
+          const avatar = p.photo
+            ? `<img src="${p.photo}" alt="${escapeHTML(p.name)}" />`
+            : escapeHTML(p.initials);
+          return `
+            <li class="ai-viewers-entry">
+              <span class="avatar avatar-xs">${avatar}</span>
+              <span class="ai-viewers-name">${escapeHTML(p.name)}</span>
+              <span class="ai-viewers-ts">${fmtRelative(v.ts)}</span>
+            </li>
+          `;
+        }).join('');
+      };
+
+      // Wire the "Reviewed" checkboxes — clicking adds the current user to the
+      // viewers list for that artifact and swaps the slot to the eye chip.
+      document.querySelectorAll('[data-review-slot]').forEach(slot => {
+        const kind = slot.dataset.reviewSlot;
+        const check = slot.querySelector('[data-review-check] input');
+        check?.addEventListener('change', () => {
+          if (!check.checked) return;
+          const pool = viewersByOccurrence[activeOccurrence] || (viewersByOccurrence[activeOccurrence] = { deck: [], items: [] });
+          if (!pool[kind]) pool[kind] = [];
+          if (!pool[kind].some(v => v.id === currentUser)) {
+            pool[kind].push({ id: currentUser, ts: new Date().toISOString() });
+          }
+          renderViewers(kind);
+        });
+      });
+
       const setOccurrence = (date) => {
         activeOccurrence = date;
         items = initOccurrence(date);
@@ -6060,6 +6860,8 @@ body { overflow: hidden; }
         showCompleted = true; // reset to default (show everything) when switching occurrences
         closePop();
         render();
+        renderViewers('deck');
+        renderViewers('items');
       };
 
       // Hook into the meeting-detail open trigger to switch occurrence before show.
@@ -6095,14 +6897,16 @@ body { overflow: hidden; }
       // Item id pending archive confirmation; cleared once the modal closes
       let pendingArchiveId = null;
 
-      // Wire the "Archive" confirm button — runs the actual removal
+      // Wire the "Archive" confirm button — flags the item as archived
+      // (kept in the list so it can be restored later via the Archived expander)
       document.getElementById('archive-ai-confirm')?.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-confirm-archive-ai]');
         if (!btn) return;
         if (pendingArchiveId) {
-          const idx = items.findIndex(i => i.id === pendingArchiveId);
-          if (idx >= 0) {
-            items.splice(idx, 1);
+          const item = items.find(i => i.id === pendingArchiveId);
+          if (item) {
+            item.archived = true;
+            recordHistory(item, 'archived', '', 'true');
             render();
           }
         }
@@ -6171,10 +6975,15 @@ body { overflow: hidden; }
           return;
         }
 
-        const visible = items.filter(it => showCompleted || !isClosed(it.status));
-        const openCount = items.filter(it => !isClosed(it.status)).length;
-        const doneCount = items.filter(it => isClosed(it.status)).length;
-        const totalCount = items.length;
+        // Split active vs archived — archived items live in the collapsible
+        // expander below the list so they remain accessible + restorable.
+        const activeItems = items.filter(it => !it.archived);
+        const archivedItems = items.filter(it => it.archived);
+
+        const visible = activeItems.filter(it => showCompleted || !isClosed(it.status));
+        const openCount = activeItems.filter(it => !isClosed(it.status)).length;
+        const doneCount = activeItems.filter(it => isClosed(it.status)).length;
+        const totalCount = activeItems.length;
         const visibleCount = visible.length;
 
         countEl.textContent = `${visibleCount}/${totalCount}`;
@@ -6196,9 +7005,23 @@ body { overflow: hidden; }
         // Stable sort preserves the original seed order within each bucket.
         const sortedVisible = [...visible].sort((a, b) => Number(isClosed(a.status)) - Number(isClosed(b.status)));
         sortedVisible.forEach(item => list.appendChild(renderItem(item)));
+
+        // Render the Archived expander (visible only when there's at least one)
+        const archivedWrap = section.querySelector('[data-ai-archived]');
+        const archivedList = section.querySelector('[data-ai-archived-list]');
+        const archivedCount = section.querySelector('[data-ai-archived-count]');
+        if (archivedItems.length > 0) {
+          archivedWrap.hidden = false;
+          archivedCount.textContent = archivedItems.length;
+          archivedList.innerHTML = '';
+          archivedItems.forEach(it => archivedList.appendChild(renderItem(it, { archived: true })));
+        } else {
+          archivedWrap.hidden = true;
+          archivedList.innerHTML = '';
+        }
       };
 
-      const renderItem = (item) => {
+      const renderItem = (item, opts = {}) => {
         const node = document.createElement('article');
         node.className = 'ai-item' + (isClosed(item.status) ? ' is-done' : '');
         node.dataset.itemId = item.id;
@@ -6248,15 +7071,21 @@ body { overflow: hidden; }
               <span class="avatar avatar-xs">${person.photo ? `<img src="${person.photo}" alt="${escapeHTML(person.name)}" />` : person.initials}</span>
               <span class="ai-assignee-name">${escapeHTML(person.name)}</span>
             </button>
+            ${(!isClosed(item.status) && item.assignee !== 'system' && !onCall(item.assignee))
+              ? `<button class="ai-warn" type="button" data-action="not-participant" data-tooltip="${escapeHTML(person.name)} isn't a participant of this RoB" data-tooltip-style="regular" data-placement="bottom" aria-label="${escapeHTML(person.name)} isn't a participant of this RoB — invite or reassign">
+                  <i class="ph ph-warning"></i>
+                </button>`
+              : ''}
             <span class="ai-spacer"></span>
             <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${commentTitle}" ${editableComment ? '' : 'disabled'} aria-label="Comment">
               <i class="ph ph-chat-circle"></i>
             </button>
-            <button class="ai-icon-btn ai-kebab" type="button" data-action="archive" ${canManage() ? '' : 'disabled'} title="Archive" aria-label="Archive">
-              <i class="ph ph-archive"></i>
-            </button>
+            ${opts.archived
+              ? `<button class="ai-icon-btn ai-kebab" type="button" data-action="unarchive" ${canManage() ? '' : 'disabled'} title="Restore" aria-label="Restore"><i class="ph ph-arrow-counter-clockwise"></i></button>`
+              : `<button class="ai-icon-btn ai-kebab" type="button" data-action="archive" ${canManage() ? '' : 'disabled'} title="Archive" aria-label="Archive"><i class="ph ph-archive"></i></button>`}
           </div>
           <p class="ai-desc" data-action="desc" ${editableDesc ? 'contenteditable="true" spellcheck="false"' : ''}>${escapeHTML(item.desc)}</p>
+          <p class="ai-desc-counter" data-desc-counter>${item.desc.length}/${DESC_MAX}</p>
         `;
         return node;
       };
@@ -6278,6 +7107,7 @@ body { overflow: hidden; }
         const action = trigger.dataset.action;
 
         if (action === 'status' && canEdit(item, 'status')) openStatusPop(trigger, item);
+        else if (action === 'not-participant') openNotParticipantPop(trigger, item);
         else if (action === 'assignee' && canEdit(item, 'assignee')) openAssigneePop(trigger, item);
         else if (action === 'due' && canEdit(item, 'due')) openDuePop(trigger, item);
         else if (action === 'comment') openCommentPop(trigger, item);
@@ -6288,6 +7118,27 @@ body { overflow: hidden; }
         }
       });
 
+      // Archived list — handle Restore clicks + the expander toggle
+      const archivedWrap = section.querySelector('[data-ai-archived]');
+      const archivedList = section.querySelector('[data-ai-archived-list]');
+      const archivedToggle = section.querySelector('[data-ai-archived-toggle]');
+      archivedToggle?.addEventListener('click', () => {
+        const open = archivedToggle.getAttribute('aria-expanded') === 'true';
+        archivedToggle.setAttribute('aria-expanded', String(!open));
+        archivedList.toggleAttribute('hidden', open);
+      });
+      archivedList?.addEventListener('click', (e) => {
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        const trigger = e.target.closest('[data-action="unarchive"]');
+        if (!trigger || !canManage()) return;
+        const item = findItem(node.dataset.itemId);
+        if (!item) return;
+        item.archived = false;
+        recordHistory(item, 'archived', 'true', 'false');
+        render();
+      });
+
       // Inline edits (description only — comment is popover-edited)
       list.addEventListener('focusout', (e) => {
         const node = e.target.closest('.ai-item');
@@ -6295,6 +7146,7 @@ body { overflow: hidden; }
         const item = findItem(node.dataset.itemId);
         if (!item) return;
         if (e.target.matches('[data-action="desc"]') && canEdit(item, 'desc')) {
+          node.classList.remove('is-desc-focused');
           const next = e.target.textContent.trim();
           if (next !== item.desc) {
             recordHistory(item, 'description', item.desc, next);
@@ -6302,6 +7154,42 @@ body { overflow: hidden; }
             render();
           }
         }
+      });
+
+      // Description character-counter — show on focus, update + enforce 200-char cap on input
+      const updateDescCounter = (node, text) => {
+        const counter = node.querySelector('[data-desc-counter]');
+        if (!counter) return;
+        const n = text.length;
+        counter.textContent = `${n}/${DESC_MAX}`;
+        counter.classList.toggle('is-warning', n >= DESC_SOFT && n < DESC_MAX);
+        counter.classList.toggle('is-danger',  n >= DESC_MAX);
+      };
+      list.addEventListener('focusin', (e) => {
+        if (!e.target.matches('[data-action="desc"]')) return;
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        node.classList.add('is-desc-focused');
+        updateDescCounter(node, e.target.textContent);
+      });
+      list.addEventListener('input', (e) => {
+        if (!e.target.matches('[data-action="desc"]')) return;
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        let text = e.target.textContent;
+        if (text.length > DESC_MAX) {
+          // Truncate to the hard cap, preserving caret at the end
+          text = text.slice(0, DESC_MAX);
+          e.target.textContent = text;
+          // Move caret to end
+          const range = document.createRange();
+          range.selectNodeContents(e.target);
+          range.collapse(false);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        updateDescCounter(node, text);
       });
 
       // Status popover
@@ -6336,6 +7224,44 @@ body { overflow: hidden; }
       })[s];
 
       // Assignee popover
+      // Not-a-participant popover — the assignee isn't on this RoB call.
+      // Offers inviting them (they're a known active user) or reassigning.
+      const openNotParticipantPop = (anchor, item) => {
+        const person = PEOPLE[item.assignee];
+        const canInvite = canManage(); // only the owner manages the roster
+        const pop = document.createElement('div');
+        pop.className = 'ai-pop';
+        pop.innerHTML = `
+          <p class="ai-pop-note"><strong>${escapeHTML(person.name)}</strong> is assigned this item but isn't a participant of this RoB.</p>
+          ${canInvite
+            ? `<button class="ai-pop-item ai-pop-action" type="button" data-np="invite">
+                 <i class="ph ph-user-plus"></i>Invite to this RoB
+               </button>`
+            : ''}
+          <button class="ai-pop-item ai-pop-action" type="button" data-np="reassign">
+            <i class="ph ph-arrows-clockwise"></i>Reassign&hellip;
+          </button>
+        `;
+        pop.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-np]');
+          if (!btn) return;
+          if (btn.dataset.np === 'invite') {
+            PARTICIPANTS.add(item.assignee);
+            recordHistory(item, 'RoB participant', 'not invited', PEOPLE[item.assignee].name + ' invited');
+            closePop();
+            render();
+          } else {
+            // Reopen the assignee picker anchored to this item's assignee button.
+            // Defer so this click finishes bubbling (the outside-click handler
+            // would otherwise close the picker the instant it opens).
+            const assigneeBtn = anchor.closest('.ai-meta-row')?.querySelector('[data-action="assignee"]');
+            closePop();
+            if (assigneeBtn && canEdit(item, 'assignee')) setTimeout(() => openAssigneePop(assigneeBtn, item), 0);
+          }
+        });
+        showPop(anchor, pop);
+      };
+
       const openAssigneePop = (anchor, item) => {
         const pop = document.createElement('div');
         pop.className = 'ai-pop';
@@ -6546,7 +7472,8 @@ body { overflow: hidden; }
         node.className = 'ai-item is-editing';
         node.dataset.itemId = draft.id;
         node.innerHTML = `
-          <input type="text" class="ai-edit-input" data-draft="desc" placeholder="What needs to happen?" style="width: 100%;" />
+          <input type="text" class="ai-edit-input" data-draft="desc" placeholder="What needs to happen?" style="width: 100%;" maxlength="${DESC_MAX}" />
+          <p class="ai-desc-counter" data-desc-counter>0/${DESC_MAX}</p>
           <div class="ai-edit-row">
             <select class="ai-edit-input" data-draft="status">
               ${STATUS_ORDER.map(s => `<option value="${s}" ${s === 'open' ? 'selected' : ''}>${STATUS[s].label}</option>`).join('')}
@@ -6564,7 +7491,10 @@ body { overflow: hidden; }
         `;
         list.appendChild(node);
         empty.hidden = true;
-        node.querySelector('[data-draft="desc"]').focus();
+        // Live counter on the draft input (maxlength enforces the cap natively)
+        const draftDesc = node.querySelector('[data-draft="desc"]');
+        draftDesc.addEventListener('input', () => updateDescCounter(node, draftDesc.value));
+        draftDesc.focus();
 
         node.addEventListener('click', (e) => {
           if (e.target.closest('[data-draft-cancel]')) {
@@ -6630,6 +7560,8 @@ body { overflow: hidden; }
       };
 
       render();
+      renderViewers('deck');
+      renderViewers('items');
     })();
   </script>
 
