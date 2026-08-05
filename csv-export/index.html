@@ -3589,12 +3589,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="imp-progress-wrap">
           <div class="imp-spinner imp-spinner-brand"></div>
           <h1 class="imp-progress-title">Importing your changes…</h1>
-          <p class="imp-progress-sub">Applying valid rows — error rows are skipped. You can close this tab; we'll finish in the background.</p>
+          <p class="imp-progress-sub">Applying valid rows — error rows are skipped. Large imports can take up to a minute. You don't have to wait — close this and keep working, and we'll finish in the background.</p>
           <div class="imp-bar"><div class="imp-bar-fill imp-bar-fill-brand" id="imp-commit-bar"></div></div>
           <div class="imp-progress-pct" id="imp-commit-pct">0%</div>
           <div class="imp-commit-tally">
             <div class="imp-tally"><span class="imp-tally-num" id="imp-tally-create">0</span><span class="imp-tally-label">created</span></div>
             <div class="imp-tally"><span class="imp-tally-num" id="imp-tally-update">0</span><span class="imp-tally-label">updated</span></div>
+          </div>
+          <div style="margin-top: var(--ic-space-7)">
+            <button class="btn btn-secondary" type="button" data-commit-background><i class="ph ph-arrow-line-down"></i>Close and keep importing</button>
           </div>
         </div>
       </section>
@@ -5394,8 +5397,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     // Open / close the takeover flow
     function openFlow(){ flow.hidden=false; if(frame) frame.style.display='none'; document.body.style.overflow='hidden'; }
     function openAt(step){ openFlow(); gotoStep(step); }
-    document.querySelectorAll('[data-import-open]').forEach(b=> b.addEventListener('click', ()=> openAt('upload')));
-    function closeFlow(){ flow.hidden=true; if(frame) frame.style.display=''; document.body.style.overflow=''; stopValidating(); stopCommit(); }
+    document.querySelectorAll('[data-import-open]').forEach(b=> b.addEventListener('click', ()=>{ document.getElementById('imp-resume-banner').hidden=true; openAt('upload'); }));
+    function closeFlow(){ if(commitTimer){ backgroundCommit(); return; } flow.hidden=true; if(frame) frame.style.display=''; document.body.style.overflow=''; stopValidating(); }
     document.querySelectorAll('[data-import-close]').forEach(b=> b.addEventListener('click', closeFlow));
 
     // ===== Upload step =====
@@ -5452,23 +5455,59 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const commitPct = document.getElementById('imp-commit-pct');
     const tallyCreate = document.getElementById('imp-tally-create');
     const tallyUpdate = document.getElementById('imp-tally-update');
+    let commitBackground = false, commitCreated = 0, commitUpdated = 0, commitTotal = 0, commitPctVal = 0, commitRowsDone = 0;
+    const COMMIT_DURATION = 60000; // ~1 minute, like a real bulk import
     function stopCommit(){ if(commitTimer){ clearInterval(commitTimer); commitTimer=null; } }
     function startCommit(){
       const guardOn = document.getElementById('imp-guard').checked;
-      const created = guardOn ? 0 : COUNTS.create;
-      const updated = COUNTS.update;
-      const total = created + updated;
-      let pct = 0;
-      commitBar.style.width='0%'; commitPct.textContent='0% · 0 of '+total+' rows';
+      commitCreated = guardOn ? 0 : COUNTS.create;
+      commitUpdated = COUNTS.update;
+      commitTotal = commitCreated + commitUpdated;
+      commitPctVal = 0; commitRowsDone = 0;
+      commitBar.style.width='0%'; commitPct.textContent='0% · 0 of '+commitTotal+' rows';
       tallyCreate.textContent='0'; tallyUpdate.textContent='0';
+      const started = Date.now();
+      stopCommit();
       commitTimer = setInterval(()=>{
-        pct = Math.min(100, pct + 5);
-        commitBar.style.width = pct+'%';
-        commitPct.textContent = pct+'% · '+Math.round(total*pct/100)+' of '+total+' rows';
-        tallyCreate.textContent = Math.round(created*pct/100);
-        tallyUpdate.textContent = Math.round(updated*pct/100);
-        if(pct>=100){ stopCommit(); showResult(created, updated); }
-      }, 110);
+        commitPctVal = Math.min(100, Math.round((Date.now()-started)/COMMIT_DURATION*100));
+        commitRowsDone = Math.round(commitTotal*commitPctVal/100);
+        commitBar.style.width = commitPctVal+'%';
+        commitPct.textContent = commitPctVal+'% · '+commitRowsDone+' of '+commitTotal+' rows';
+        tallyCreate.textContent = Math.round(commitCreated*commitPctVal/100);
+        tallyUpdate.textContent = Math.round(commitUpdated*commitPctVal/100);
+        if(commitBackground) updateCommitBanner();
+        if(commitPctVal>=100){ stopCommit(); finishCommit(); }
+      }, 500);
+    }
+    // Close the modal but keep the import running; surface a live banner on the list
+    function backgroundCommit(){
+      commitBackground = true;
+      flow.hidden=true; if(frame) frame.style.display=''; document.body.style.overflow='';
+      const b=document.getElementById('imp-resume-banner');
+      b.hidden=false; b.className='imp-resume is-committing';
+      b.querySelector('.imp-resume-spinner').style.display='';
+      const btn=document.getElementById('imp-resume-btn');
+      btn.textContent='View';
+      btn.onclick=()=>{ b.hidden=true; commitBackground=false; openFlow(); gotoStep('commit'); };
+      updateCommitBanner();
+    }
+    function updateCommitBanner(){
+      const b=document.getElementById('imp-resume-banner');
+      if(b.hidden) return;
+      document.getElementById('imp-resume-text').innerHTML = '<b>Importing…</b> committing '+commitRowsDone+' of '+commitTotal+' rows · '+commitPctVal+'%';
+    }
+    function finishCommit(){
+      showResult(commitCreated, commitUpdated);
+      if(commitBackground){
+        commitBackground = false;
+        const b=document.getElementById('imp-resume-banner');
+        b.hidden=false; b.className='imp-resume is-ready';
+        b.querySelector('.imp-resume-spinner').style.display='none';
+        document.getElementById('imp-resume-text').innerHTML = '<b>Import complete</b> · '+(commitCreated+commitUpdated)+' rows imported · '+COUNTS.error+' skipped';
+        const btn=document.getElementById('imp-resume-btn');
+        btn.textContent='View results';
+        btn.onclick=()=>{ b.hidden=true; openFlow(); gotoStep('done'); };
+      }
     }
     function showResult(created, updated){
       const guardOn = document.getElementById('imp-guard').checked;
@@ -5482,6 +5521,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       gotoStep('done');
     }
     cta.addEventListener('click', ()=>{ gotoStep('commit'); startCommit(); });
+    document.querySelectorAll('[data-commit-background]').forEach(b=> b.addEventListener('click', backgroundCommit));
 
     // Result actions
     document.querySelectorAll('[data-result]').forEach(b=> b.addEventListener('click', ()=>{
