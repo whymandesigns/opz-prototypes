@@ -887,6 +887,348 @@ textarea.input {
 .cell-dot.is-warning { background: var(--color-warning); }
 .cell-dot.is-danger  { background: var(--color-danger); }
 
+/* ---------- Table · Sheet variant ----------
+ * Airtable/Linear-style editable spreadsheet. Grid lines on every cell,
+ * sticky header + sticky "#" gutter, compact rows, and a generic per-cell
+ * state machine reused by six cell primitives. Toggle against .table-wide:
+ * both are <table class="table …"> so a prototype can swap the modifier.
+ *
+ *   <div class="table-scroll">
+ *     <table class="table table-sheet" data-sheet>
+ *       <thead><tr>
+ *         <th class="sheet-gutter">#</th>
+ *         <th class="sheet-col" data-col="name"><button class="th-sort">Name</button><span class="th-tools">…</span></th>
+ *         …
+ *       </tr></thead>
+ *       <tbody>
+ *         <tr data-level="0">
+ *           <td class="sheet-gutter"><span class="sheet-rownum">1</span></td>
+ *           <td class="sheet-cell" data-type="text" data-variant="name" tabindex="-1"> … </td>
+ *           …
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ * Cell state = classes on the <td class="sheet-cell">:
+ *   (default) · .is-empty · :hover · .is-selected · .is-editing ·
+ *   .is-saving · .is-saved · .is-error · .is-readonly · .is-skeleton
+ * Behaviour (select / edit / commit / cancel / arrow-nav / save sim) is
+ * driven by the [data-sheet] JS module; see design.md §Sheet.
+ */
+.table-sheet {
+  border-collapse: separate;
+  border-spacing: 0;
+  font: var(--type-body-sm);
+  table-layout: fixed;
+}
+.table-sheet thead th {
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font: var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);
+  color: var(--color-text-muted);
+  vertical-align: middle;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.table-sheet thead th:last-child { border-right: 0; }
+.table-sheet tbody td {
+  padding: 0;
+  height: 28px;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  vertical-align: middle;
+  white-space: nowrap;
+  background: var(--color-surface);
+}
+.table-sheet tbody td:last-child { border-right: 0; }
+.table-sheet tbody tr:last-child td { border-bottom: 0; }
+
+/* Header cell inner — label + hover tools (menu, resize) */
+.sheet-col-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  padding: 0 var(--ic-space-3);
+  height: 34px;
+  position: relative;
+}
+.sheet-col .th-sort { flex: 1; min-width: 0; }
+.sheet-col .th-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+}
+.sheet-col:hover .th-tools,
+.sheet-col.is-sorted .th-tools,
+.sheet-col.is-filtered .th-tools { opacity: 1; }
+.th-menu {
+  width: 20px; height: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  color: var(--color-text-subtle); border-radius: var(--ic-radius-sm);
+}
+.th-menu:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.th-menu .ph { font-size: 13px; }
+/* Sort direction arrow */
+.sheet-col .th-sort .th-arrow { font-size: 11px; opacity: 0; }
+.sheet-col.is-sorted .th-sort { color: var(--color-text); }
+.sheet-col.is-sorted .th-sort .th-arrow { opacity: 1; }
+.sheet-col.is-desc .th-sort .th-arrow { transform: rotate(180deg); }
+/* Filtered marker */
+.sheet-col.is-filtered .sheet-col-inner::after {
+  content: ""; width: 6px; height: 6px; border-radius: var(--ic-radius-full);
+  background: var(--color-accent); flex-shrink: 0;
+}
+/* Column resize handle */
+.th-resize {
+  position: absolute; top: 0; right: -3px; width: 6px; height: 100%;
+  cursor: col-resize; z-index: 1;
+}
+.th-resize::after {
+  content: ""; position: absolute; top: 6px; bottom: 6px; left: 2px; width: 2px;
+  background: transparent; border-radius: 1px;
+}
+.th-resize:hover::after, .th-resize.is-dragging::after { background: var(--color-border-focus); }
+
+/* Sticky gutter — row number column, pinned on horizontal scroll */
+.sheet-gutter {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  width: 44px;
+  text-align: center;
+  color: var(--color-text-subtle);
+  font: var(--ic-weight-regular) var(--ic-text-xs)/1 var(--ic-font-sans);
+  background: var(--color-surface-muted);
+}
+/* Keep the gutter its own gray-150 region even under row hover / selection
+ * (specificity 0,3,1 beats the hover/selected row rules at 0,2,3). */
+.table-scroll .table.table-sheet .sheet-gutter { background: var(--color-surface-muted); }
+.table-sheet thead .sheet-gutter { z-index: 4; }
+/* Stacking order inside a .table-scroll wrapper. The base rule
+ * `.table-scroll .table thead th { z-index: 1 }` (specificity 0,2,2) would
+ * otherwise flatten every header to z-index 1 — collapsing the header/gutter
+ * layering and letting later-in-DOM headers paint over the pinned `#`. These
+ * scroll-scoped rules (specificity 0,3,2) win and set the true order:
+ * header `#` (5) > other headers (4) > body gutter (3) > body cells (auto). */
+.table-scroll .table.table-sheet thead th { z-index: 4; }
+.table-scroll .table.table-sheet thead .sheet-gutter,
+.table-scroll .table.table-sheet thead .sheet-toggle { z-index: 5; }
+.sheet-rownum { display: inline-block; }
+
+/* Expand/collapse toggle column — pinned directly after the # gutter (left = its
+ * 44px width). Holds a caret on parent rows and a collapse/expand-all control in
+ * the header. It carries the pinned-region separator on its right edge. */
+.sheet-toggle {
+  position: sticky;
+  left: 44px;
+  z-index: 3;
+  width: 30px;
+  text-align: center;
+  background: var(--color-surface-muted);
+  box-shadow: inset -1px 0 0 var(--color-border);
+}
+/* Keep the toggle column gray-150 too, even under row hover / selection. */
+.table-scroll .table.table-sheet .sheet-toggle { background: var(--color-surface-muted); }
+.table-sheet thead .sheet-toggle { z-index: 4; }
+.sheet-toggle .row-toggle { margin: 0 auto; }
+/* Collapse / expand-all control — two stacked carets (⌄ over ⌃) */
+.sheet-collapse-all {
+  width: 20px; height: 20px; margin: 0 auto;
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  color: var(--color-text-subtle); border-radius: var(--ic-radius-sm);
+}
+.sheet-collapse-all:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.sheet-collapse-all .ph { font-size: 9px; line-height: 0.55; }
+
+/* ---- Row states ---- */
+.table-sheet tbody tr:hover td { background: var(--color-surface-muted); }
+.table-sheet tbody tr.is-selected td { background: var(--color-accent-subtle); }
+.table-sheet tbody tr.is-selected .sheet-gutter { color: var(--color-text); }
+/* blue left rail on the first data cell of a selected row */
+.table-sheet tbody tr.is-selected td.sheet-cell:first-of-type { box-shadow: inset 2px 0 0 var(--color-border-focus); }
+
+/* Range selection (T13) — rectangular multi-cell highlight, no per-cell ring */
+.table-sheet tbody td.sheet-cell.is-range { background: var(--color-accent-subtle); }
+.table-sheet tbody tr.is-selected td.sheet-cell.is-range { background: var(--color-accent-subtle); }
+
+/* ---- Generic cell wrapper + state machine ---- */
+.sheet-cell {
+  position: relative;
+  cursor: default;
+  outline: none;
+  transition: box-shadow var(--ic-duration-fast) var(--ic-ease);
+}
+.sheet-cell-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-2);
+  padding: 0 var(--ic-space-3);
+  min-height: 28px;
+  overflow: hidden;
+}
+.sheet-cell[data-align="center"] .sheet-cell-inner { justify-content: center; }
+/* Selected / focused cell — inset blue ring drawn over grid lines */
+.table-sheet tbody td.sheet-cell.is-selected {
+  box-shadow: inset 0 0 0 2px var(--color-border-focus);
+  background: var(--color-surface);
+  z-index: 1;
+}
+.table-sheet tbody tr.is-selected td.sheet-cell.is-selected { background: var(--color-surface); }
+/* Editing — clean white field, stronger ring */
+.table-sheet tbody td.sheet-cell.is-editing {
+  box-shadow: inset 0 0 0 2px var(--color-border-focus);
+  background: var(--color-surface);
+  z-index: 2;
+  white-space: normal;
+}
+/* Empty — faint add affordance, revealed on hover/selection */
+.sheet-cell.is-empty .sheet-empty {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--color-text-subtle);
+  opacity: 0;
+  transition: opacity var(--ic-duration-fast) var(--ic-ease);
+}
+.sheet-cell.is-empty:hover .sheet-empty,
+.sheet-cell.is-empty.is-selected .sheet-empty { opacity: 1; }
+.sheet-empty .ph { font-size: 14px; }
+/* Saving / saved / error affordances (top-right corner marker) */
+.sheet-cell .sheet-status {
+  position: absolute; top: 3px; right: 4px;
+  width: 12px; height: 12px;
+  display: none; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1;
+}
+.sheet-cell.is-saving .sheet-status,
+.sheet-cell.is-saved  .sheet-status,
+.sheet-cell.is-error  .sheet-status { display: inline-flex; }
+.sheet-cell.is-saving .sheet-status { color: var(--color-text-subtle); }
+.sheet-cell.is-saved  .sheet-status { color: var(--color-success); }
+.sheet-cell.is-error  .sheet-status { color: var(--color-danger); }
+.sheet-cell.is-saving .sheet-status .ph { animation: sheet-spin 0.6s linear infinite; }
+.table-sheet tbody td.sheet-cell.is-error {
+  box-shadow: inset 0 0 0 2px var(--color-danger);
+}
+.sheet-cell.is-error .sheet-error-msg {
+  position: absolute; left: 0; top: calc(100% - 1px); z-index: 5;
+  background: var(--color-danger); color: var(--color-text-inverse);
+  font: var(--ic-weight-regular) var(--ic-text-xs)/1.3 var(--ic-font-sans);
+  padding: 2px var(--ic-space-2); border-radius: 0 0 var(--ic-radius-sm) var(--ic-radius-sm);
+  white-space: nowrap;
+}
+/* Read-only / disabled */
+.sheet-cell.is-readonly { cursor: not-allowed; }
+.sheet-cell.is-readonly .sheet-cell-inner { color: var(--color-text-subtle); }
+/* Loading skeleton */
+.sheet-cell.is-skeleton .sheet-cell-inner::before {
+  content: ""; height: 10px; width: 60%; border-radius: var(--ic-radius-full);
+  background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-surface-sunken) 37%, var(--color-surface-muted) 63%);
+  background-size: 400% 100%;
+  animation: sheet-shimmer 1.4s ease infinite;
+}
+@keyframes sheet-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+@keyframes sheet-spin { to { transform: rotate(360deg); } }
+
+/* ---- Inline editors (text input + popover), injected by the JS module ---- */
+.sheet-input {
+  width: 100%; border: 0; outline: none; background: transparent;
+  font: inherit; color: var(--color-text); padding: 0;
+  resize: none; line-height: 1.4;
+}
+.sheet-pop {
+  position: absolute; z-index: var(--ic-z-overlay);
+  min-width: 200px; max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-md, 0 8px 24px rgba(0,0,0,0.12));
+  padding: var(--ic-space-2);
+}
+.sheet-pop-search {
+  width: 100%; box-sizing: border-box; margin-bottom: var(--ic-space-2);
+  padding: var(--ic-space-2) var(--ic-space-3);
+  border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm);
+  font: var(--type-body-sm); color: var(--color-text); background: var(--color-surface);
+  outline: none;
+}
+.sheet-pop-search:focus { border-color: var(--color-border-focus); }
+.sheet-pop-list { max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; }
+.sheet-opt {
+  display: flex; align-items: center; gap: var(--ic-space-2);
+  width: 100%; text-align: left;
+  padding: var(--ic-space-2) var(--ic-space-3);
+  background: transparent; border: 0; border-radius: var(--ic-radius-sm);
+  font: var(--type-body-sm); color: var(--color-text); cursor: pointer;
+}
+.sheet-opt:hover, .sheet-opt.is-active { background: var(--color-surface-muted); }
+.sheet-opt .ph-check { margin-left: auto; color: var(--color-accent); font-size: 14px; }
+.sheet-opt.is-empty-note { color: var(--color-text-subtle); cursor: default; }
+.sheet-opt.is-empty-note:hover { background: transparent; }
+
+/* ---- Cell primitives ---- */
+/* Text · Name variant — hierarchy (toggle/spacer + indent + add-child) */
+.sheet-tree { display: flex; align-items: center; gap: var(--ic-space-1); min-width: 0; flex: 1; }
+.sheet-cell[data-level="1"] .sheet-tree { padding-left: var(--ic-space-4); }
+.sheet-cell[data-level="2"] .sheet-tree { padding-left: calc(var(--ic-space-4) * 2); }
+.sheet-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheet-cell[data-level="0"] .sheet-name { font-weight: var(--ic-weight-medium); }
+.sheet-addchild {
+  width: 20px; height: 20px; flex-shrink: 0; margin-left: auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  color: var(--color-text-subtle); border-radius: var(--ic-radius-sm);
+  opacity: 0; transition: opacity var(--ic-duration-fast) var(--ic-ease);
+}
+.sheet-cell:hover .sheet-addchild, .sheet-cell.is-selected .sheet-addchild { opacity: 1; }
+.sheet-addchild:hover { background: var(--color-surface-muted); color: var(--color-text); }
+.sheet-addchild .ph { font-size: 13px; }
+/* Text · Description variant — truncate with ellipsis */
+.sheet-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-text); }
+.sheet-cell[data-variant="muted"] .sheet-text { color: var(--color-text-muted); }
+
+/* Person picker */
+.sheet-person { display: inline-flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+.sheet-avatar {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-surface-sunken);
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--ic-weight-medium) 9px/1 var(--ic-font-sans);
+  color: var(--color-text-muted); text-transform: uppercase;
+}
+.sheet-person-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Date · roadmap dot + rob time (reuses .cell-dot) */
+.sheet-date { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+
+/* Multi-select tags */
+.sheet-tags { display: inline-flex; align-items: center; gap: var(--ic-space-1); min-width: 0; overflow: hidden; }
+.sheet-tags-more { font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans); color: var(--color-text-subtle); flex-shrink: 0; }
+
+/* Link / reference */
+.sheet-link {
+  display: inline-flex; align-items: center; gap: 4px; min-width: 0;
+  color: var(--color-text-link); text-decoration: none;
+}
+.sheet-link:hover { text-decoration: underline; }
+.sheet-link-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheet-link .ph-arrow-square-out { font-size: 12px; flex-shrink: 0; }
+
+/* ---- Table-level empty + toolbar ---- */
+.sheet-empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--ic-space-3); padding: var(--ic-space-8);
+  color: var(--color-text-muted); text-align: center;
+}
+.sheet-empty-state .ph { font-size: 32px; color: var(--color-text-subtle); }
+
 /* ---------- Alert ----------
  * Horizontal block with: icon · message · optional CTAs · optional close button.
  *
@@ -2791,15 +3133,39 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .imp-wrap { max-width: 1180px; margin: 0 auto; padding: var(--ic-space-7); }
 
     .imp-head { margin-bottom: var(--ic-space-5); }
+    .imp-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ic-space-4); }
+    .imp-head-row .imp-head-main { min-width: 0; }
+    .imp-head-row .imp-dl-errors { flex: none; margin-left: 0; }
     .imp-head-title { font: var(--type-h2); color: var(--color-text); margin: 0 0 var(--ic-space-1); }
     .imp-head-sub { font: var(--type-body); color: var(--color-text-muted); margin: 0; }
 
     /* Segmented summary counts (also act as filters) */
-    .imp-seg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ic-space-2) var(--ic-space-5); margin-bottom: var(--ic-space-5); }
+    .imp-seg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ic-space-2) var(--ic-space-5); margin-top: var(--ic-space-5); margin-bottom: var(--ic-space-3); }
     .imp-filter { user-select: none; }
     .imp-filter .count-badge { margin-left: var(--ic-space-1); }
     .imp-filter.is-muted { opacity: .45; }
     .imp-filter.is-muted .count-badge { text-decoration: line-through; }
+    .imp-dl-errors { margin-left: auto; }
+    .imp-dl-errors[hidden] { display: none; }
+
+    /* Confirmation dialog before commit */
+    .imp-confirm { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(15,18,25,.45); padding: var(--ic-space-6); }
+    .imp-confirm[hidden] { display: none; }
+    .imp-confirm-card { width: 100%; max-width: 440px; background: var(--color-surface); border-radius: var(--ic-radius-lg); box-shadow: 0 20px 60px rgba(0,0,0,.3); padding: var(--ic-space-7); text-align: center; }
+    .imp-confirm-icon { font-size: 40px; color: var(--color-brand); line-height: 1; margin-bottom: var(--ic-space-3); }
+    .imp-confirm-title { font: var(--type-h3); color: var(--color-text); margin: 0 0 var(--ic-space-2); }
+    .imp-confirm-sub { font: var(--type-body); color: var(--color-text-muted); margin: 0 0 var(--ic-space-5); }
+    .imp-confirm-list { list-style: none; margin: 0 auto var(--ic-space-4); padding: 0; text-align: left; display: flex; flex-direction: column; gap: var(--ic-space-3); max-width: 300px; }
+    .imp-confirm-list li { display: flex; align-items: center; gap: var(--ic-space-3); font: var(--type-body); color: var(--color-text); }
+    .imp-confirm-list b { font-weight: var(--ic-weight-semibold); min-width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+    .imp-cf-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; flex: none; }
+    .imp-cf-dot.c { background: var(--color-brand); }
+    .imp-cf-dot.u { background: var(--color-accent); }
+    .imp-cf-dot.n { background: var(--color-text-subtle); }
+    .imp-cf-dot.e { background: var(--color-danger); }
+    .imp-confirm-note { display: flex; gap: var(--ic-space-2); align-items: flex-start; text-align: left; font: var(--type-body-sm); color: var(--color-text-muted); background: var(--color-surface-muted); padding: var(--ic-space-3); border-radius: var(--ic-radius-md); margin: 0 0 var(--ic-space-5); }
+    .imp-confirm-note i { color: var(--color-accent); margin-top: 1px; flex: none; }
+    .imp-confirm-actions { display: flex; gap: var(--ic-space-3); justify-content: flex-end; }
 
     /* Legend / notes */
     .imp-notes {
@@ -2832,7 +3198,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .col-rownum { width: 56px; color: var(--color-text-subtle); font: var(--type-mono); font-size: var(--ic-text-xs); }
     .col-caret { width: 40px; text-align: right; color: var(--color-text-subtle); }
     .imp-caret { transition: transform var(--ic-duration-fast); display: inline-block; }
-    .imp-row.is-open .imp-caret { transform: rotate(90deg); }
+    .imp-row.is-open .imp-caret { transform: rotate(180deg); }
+    /* Preview reuses the design-system sheet variant (.table-sheet), read-only (NB-32) */
+    .imp-sheet { width: 100%; min-width: 1254px; }
+    .imp-sheet-scroll { border: 0; border-radius: 0; max-height: 440px; }
+    .imp-sheet .imp-date { color: var(--color-text-muted); }
+    .imp-sheet .imp-health { display: inline-flex; align-items: center; gap: 7px; }
+    .imp-health-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+    .imp-health-dot.h-none { background: var(--color-text-subtle); }
+    .imp-health-dot.h-ontrack { background: var(--color-success); }
+    .imp-health-dot.h-offtrack { background: var(--color-danger); }
+    .imp-health-dot.h-atrisk { background: var(--color-warning); }
+    .imp-detail-meta { display: flex; flex-direction: column; gap: var(--ic-space-2); margin-bottom: var(--ic-space-4); }
+    .imp-detail-alert { background: var(--color-surface); border-color: var(--color-border); margin-bottom: var(--ic-space-4); }
+    .imp-detail-row { display: flex; gap: var(--ic-space-3); font: var(--type-body-sm); align-items: baseline; }
+    .imp-detail-label { color: var(--color-text-subtle); min-width: 140px; font-weight: var(--ic-weight-medium); flex: none; }
+    .imp-sheet .tag { cursor: default; }
+    .imp-sheet .tag:not(.tag-indicator):hover { filter: none; }
+    .imp-sheet tbody td { padding: 7px var(--ic-space-3); height: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; font: var(--type-body-sm); }
+    .imp-sheet .imp-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); }
+    .imp-sheet .imp-name-sub { display: none; }
+    .imp-sheet .imp-summary { font: var(--type-body-sm); }
+    .imp-sheet .imp-desc { color: var(--color-text-muted); }
+    .imp-sheet .imp-owner-err { display: inline-flex; align-items: center; gap: 4px; color: var(--color-danger); }
+    .imp-sheet .tag-indicator { cursor: default; }
+    .imp-sheet .tag-indicator:hover { background: transparent; }
+    .imp-sheet thead th.sheet-gutter, .imp-sheet tbody td.sheet-gutter { padding: 0; }
+    .imp-sheet .sheet-gutter { background: var(--color-surface-muted); }
+    .imp-sheet .imp-row { cursor: pointer; }
+    .imp-sheet .imp-row:hover > td, .imp-sheet .imp-row.is-open > td { background: var(--color-surface-muted); }
+    .imp-sheet .imp-detail > td { padding: 0; background: var(--color-bg); }
+    .imp-sheet td.col-caret { text-align: center; color: var(--color-text-subtle); width: 44px; }
 
     .imp-name { font: var(--type-body); font-weight: var(--ic-weight-medium); color: var(--color-text); }
     .imp-name-sub { display: block; font: var(--type-body-sm); color: var(--color-text-subtle); }
@@ -2859,8 +3255,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .imp-detail[hidden] { display: none; }
     .imp-detail-inner { padding: var(--ic-space-4) var(--ic-space-5) var(--ic-space-5) 76px; }
     .imp-diff { width: 100%; max-width: 720px; border-collapse: collapse; }
-    .imp-diff th { text-align: left; font: var(--type-body-sm); color: var(--color-text-subtle); font-weight: var(--ic-weight-medium); padding: var(--ic-space-2) var(--ic-space-3); border-bottom: 1px solid var(--color-border); }
-    .imp-diff td { padding: var(--ic-space-2) var(--ic-space-3); border-bottom: 1px solid var(--color-border); font: var(--type-body-sm); vertical-align: top; }
+    .imp-detail-inner .imp-diff th { text-align: left; font: var(--type-body-sm); color: var(--color-text-muted); font-weight: var(--ic-weight-medium); padding: 0 var(--ic-space-4); height: 32px; border-bottom: 1px solid var(--color-border); white-space: nowrap; vertical-align: middle; background: transparent; }
+    .imp-detail-inner .imp-diff td { padding: 0 var(--ic-space-4); height: 32px; border-bottom: 1px solid var(--color-border); border-right: 0; font: var(--type-body-sm); vertical-align: middle; white-space: normal; background: transparent; }
+    .imp-detail-inner .imp-diff-summary th { color: var(--color-text); font-weight: var(--ic-weight-semibold); }
     .imp-diff-field { color: var(--color-text-muted); width: 180px; }
     .diff-remove { color: var(--color-danger); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--color-danger) 60%, transparent); }
     .diff-add { color: var(--color-brand-active); font-weight: var(--ic-weight-medium); }
@@ -3466,7 +3863,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
           <li class="stepper-step" data-step-ind="preview"><span class="stepper-num">3</span><span class="stepper-label">Preview</span></li>
           <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
-          <li class="stepper-step" data-step-ind="commit"><span class="stepper-num">4</span><span class="stepper-label">Commit</span></li>
+          <li class="stepper-step" data-step-ind="confirm"><span class="stepper-num">4</span><span class="stepper-label">Confirm</span></li>
+          <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
+          <li class="stepper-step" data-step-ind="commit"><span class="stepper-num">5</span><span class="stepper-label">Commit</span></li>
         </ol>
       </div>
       <button class="imp-close" type="button" data-import-close aria-label="Close import"><i class="ph ph-x"></i></button>
@@ -3487,11 +3886,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="imp-helpers">
             <button class="imp-helper" type="button" data-helper="template">
               <i class="ph ph-file-arrow-down"></i>
-              <span><span class="imp-helper-title">Download template</span><span class="imp-helper-sub">Blank file with the right columns</span></span>
+              <span><span class="imp-helper-title">Download template</span><span class="imp-helper-sub">Start with a blank file that already has the right columns</span></span>
             </button>
             <button class="imp-helper" type="button" data-helper="export">
               <i class="ph ph-download-simple"></i>
-              <span><span class="imp-helper-title">Export current Initiatives</span><span class="imp-helper-sub">Edit them in Excel, then upload the file back</span></span>
+              <span><span class="imp-helper-title">Export current Initiatives</span><span class="imp-helper-sub">Export current list, edit and re-upload the file</span></span>
             </button>
           </div>
 
@@ -3510,6 +3909,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="imp-file-name">Q3-planning-initiatives.xlsx</div>
               <div class="imp-file-sub">1.2 MB · <span class="imp-file-ok"><i class="ph ph-check-circle"></i>460 rows detected</span></div>
             </div>
+            <button class="btn btn-primary btn-xs" type="button" id="imp-file-validate">Validate file</button>
             <button class="imp-file-remove" type="button" id="imp-file-remove" aria-label="Remove file"><i class="ph ph-x"></i></button>
           </div>
         </div>
@@ -3537,22 +3937,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <section class="imp-panel" data-step-panel="preview" hidden>
         <div class="imp-wrap">
 
-          <div class="imp-head">
-            <h1 class="imp-head-title">Review changes before importing</h1>
-            <p class="imp-head-sub">Nothing has been saved yet. Review what will change, then import the valid rows. <b>Blank cells are left unchanged.</b></p>
+          <div class="imp-head imp-head-row">
+            <div class="imp-head-main">
+              <h1 class="imp-head-title">Review changes before importing</h1>
+            </div>
+            <button class="btn btn-secondary imp-dl-errors" type="button" id="imp-dl-errors" data-download-errors>Download file with notes</button>
           </div>
 
           <!-- Variant banner (concurrency / empty states) -->
           <div id="imp-preview-banner" hidden></div>
-
-          <!-- Segmented counts (click to filter) -->
-          <div class="imp-seg" role="group" aria-label="Filter rows by outcome">
-            <label class="checkbox imp-filter" data-filter="all"><input type="checkbox" class="checkbox-input" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Showing All</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="all">500</span></label>
-            <label class="checkbox imp-filter" data-filter="create"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Create</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="create">312</span></label>
-            <label class="checkbox imp-filter" data-filter="update"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Update</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="update">148</span></label>
-            <label class="checkbox imp-filter" data-filter="unchanged"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Unchanged</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="unchanged">27</span></label>
-            <label class="checkbox imp-filter" data-filter="error"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Errors</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="error">13</span></label>
-          </div>
 
           <!-- Callout banners: hierarchy + side effects -->
           <div class="alert alert-info" role="note" style="margin-bottom: var(--ic-space-3)">
@@ -3564,27 +3957,58 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <p class="alert-message"><b>1 row propagates Business Lines to children.</b> "Support Automation" has <code style="font: var(--type-mono)">Propagate Business Lines: TRUE</code> — this will also update <b>34 child records outside this file</b>.</p>
           </div>
 
+          <!-- Segmented counts (click to filter) — directly above the table -->
+          <div class="imp-seg" role="group" aria-label="Filter rows by outcome">
+            <label class="checkbox imp-filter" data-filter="all"><input type="checkbox" class="checkbox-input" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Showing All</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="all">500</span></label>
+            <label class="checkbox imp-filter" data-filter="create"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Create</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="create">312</span></label>
+            <label class="checkbox imp-filter" data-filter="update"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Update</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="update">148</span></label>
+            <label class="checkbox imp-filter" data-filter="unchanged"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Unchanged</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="unchanged">27</span></label>
+            <label class="checkbox imp-filter" data-filter="error"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Errors</span><span class="count-badge count-badge-lg count-badge-secondary" data-count="error">13</span></label>
+          </div>
+
           <!-- Table -->
           <div class="imp-table-card">
-            <table class="imp-table">
+            <div class="table-scroll imp-sheet-scroll">
+            <table class="table table-sheet imp-sheet">
               <thead>
                 <tr>
-                  <th class="col-rownum">Row</th>
-                  <th>Status</th>
-                  <th>Initiative</th>
-                  <th>Summary of changes</th>
-                  <th class="col-caret" aria-label="Expand"></th>
+                  <th class="sheet-gutter">#</th>
+                  <th class="sheet-col" style="width:116px"><span class="sheet-col-inner">Changelog</span></th>
+                  <th class="sheet-col" style="width:200px"><span class="sheet-col-inner">Name</span></th>
+                  <th class="sheet-col" style="width:220px"><span class="sheet-col-inner">Description</span></th>
+                  <th class="sheet-col" style="width:130px"><span class="sheet-col-inner">Status</span></th>
+                  <th class="sheet-col" style="width:120px"><span class="sheet-col-inner">Health</span></th>
+                  <th class="sheet-col" style="width:160px"><span class="sheet-col-inner">Accountability</span></th>
+                  <th class="sheet-col" style="width:110px"><span class="sheet-col-inner">Start date</span></th>
+                  <th class="sheet-col" style="width:110px"><span class="sheet-col-inner">End date</span></th>
+                  <th class="sheet-col" style="width:44px" aria-label="Expand"><span class="sheet-col-inner"></span></th>
                 </tr>
               </thead>
               <tbody id="imp-tbody"><!-- rendered by JS --></tbody>
             </table>
-            <div class="imp-table-foot" id="imp-table-foot">Showing 20 of 500 rows · sorted to match your spreadsheet</div>
+            </div>
           </div>
 
         </div>
       </section>
 
       <!-- ===== COMMIT PANEL ===== -->
+      <!-- ===== CONFIRM PANEL ===== -->
+      <section class="imp-panel" data-step-panel="confirm" hidden>
+        <div class="imp-center" style="text-align:center">
+          <div class="imp-confirm-icon"><i class="ph ph-seal-check"></i></div>
+          <h1 class="imp-head-title">Apply these changes?</h1>
+          <p class="imp-head-sub">This writes to your live Initiatives. Here's what will happen:</p>
+          <ul class="imp-confirm-list">
+            <li><span class="imp-cf-dot c"></span><b id="imp-cf-create">312</b> Initiatives created</li>
+            <li><span class="imp-cf-dot u"></span><b id="imp-cf-update">148</b> Initiatives updated</li>
+            <li><span class="imp-cf-dot n"></span><b id="imp-cf-unchanged">27</b> left unchanged</li>
+            <li><span class="imp-cf-dot e"></span><b id="imp-cf-error">13</b> error rows skipped</li>
+          </ul>
+          <p class="imp-confirm-note"><i class="ph ph-bell-slash"></i> We'll send you one import digest instead of 460 per-record notifications.</p>
+        </div>
+      </section>
+
       <section class="imp-panel" data-step-panel="commit" hidden>
         <div class="imp-progress-wrap">
           <div class="imp-spinner imp-spinner-brand"></div>
@@ -3617,10 +4041,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
 
           <div class="imp-result-actions">
-            <button class="btn btn-secondary" type="button" data-result="report"><i class="ph ph-file-arrow-down"></i>Download error report (13 rows)</button>
             <button class="btn btn-secondary" type="button" data-result="view"><i class="ph ph-arrow-square-out"></i>View affected Initiatives</button>
           </div>
-          <p class="imp-result-caption">The error report is your original file with <b>Import Status</b> and <b>Import Errors</b> columns added and successful rows removed — so re-uploading it can't double-apply.</p>
 
           <div class="imp-result-note">
             <i class="ph ph-bell-slash"></i>
@@ -3645,7 +4067,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <footer class="imp-footer">
       <!-- Upload footer -->
       <div class="imp-foot-row" data-foot="upload" hidden>
-        <span class="imp-guard-note">CSV or XLSX · up to 5,000 rows · 10 MB</span>
+        <span></span>
         <div class="imp-footer-right">
           <button class="btn btn-secondary" type="button" data-import-close>Cancel</button>
           <button class="btn btn-primary" type="button" id="imp-validate-cta" disabled>Validate file</button>
@@ -3653,14 +4075,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </div>
       <!-- Preview footer -->
       <div class="imp-foot-row" data-foot="preview" hidden>
-        <div class="imp-footer-left">
-          <label class="checkbox"><input type="checkbox" class="checkbox-input" id="imp-guard"><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span><span class="checkbox-label">Don't create new Initiatives</span></label>
-          <span class="imp-skip-note" id="imp-skip-note" hidden><i class="ph ph-arrow-bend-down-right"></i> 312 new rows will be skipped</span>
-        </div>
+        <span class="imp-guard-note">Nothing is saved until you import. Blank cells are left unchanged.</span>
         <div class="imp-footer-right">
-          <span class="imp-guard-note">13 error rows will be excluded</span>
           <button class="btn btn-secondary" type="button" data-import-close>Cancel</button>
-          <button class="btn btn-primary" type="button" id="imp-commit-cta">Import 460 rows</button>
+          <button class="btn btn-primary" type="button" id="imp-commit-cta">Next</button>
+        </div>
+      </div>
+      <!-- Confirm footer -->
+      <div class="imp-foot-row" data-foot="confirm" hidden>
+        <span class="imp-guard-note">Nothing is saved until you accept.</span>
+        <div class="imp-footer-right">
+          <button class="btn btn-secondary" type="button" data-confirm-back>Go back</button>
+          <button class="btn btn-primary" type="button" id="imp-confirm-accept">Import 460 rows</button>
         </div>
       </div>
       <!-- Result footer -->
@@ -5232,44 +5658,60 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const TOTAL = 500;
 
     const ROWS = [
-      { row:2, status:'create', name:'EMEA Market Expansion', type:'Initiative', ext:'EXP-EMEA', summary:'New initiative (new parent in file)',
-        fields:[{f:'Owner',val:'David Chen'},{f:'Function',val:'Sales / EMEA'},{f:'Status',val:'On Track'},{f:'Target date',val:'Dec 2025'}] },
-      { row:3, status:'create', name:'Localization Platform', type:'Project', ext:'LOC-PLAT', summary:'New project · parent created in this file',
+      { row:2, status:'create', name:'EMEA Market Expansion', type:'Initiative', ext:'EXP-EMEA', owner:'David Chen', desc:'Expand go-to-market into EMEA regions.', summary:'New initiative (new parent in file)',
+        fields:[{f:'Owner',val:'David Chen'},{f:'Function',val:'Sales / EMEA'},{f:'Status',val:'On Track'},{f:'End date',val:'Dec 2025'}] },
+      { row:3, status:'create', name:'Localization Platform', type:'Project', ext:'LOC-PLAT', owner:'Priya Nair', desc:'Shared platform for translating product surfaces.', summary:'New project · parent created in this file',
         fields:[{f:'Parent',val:'EMEA Market Expansion (new)'},{f:'Owner',val:'Priya Nair'},{f:'Status',val:'Planning'}] },
-      { row:4, status:'update', name:'Marketing Consulting', type:'Initiative', ext:'#4821', summary:'3 fields changed',
-        fields:[{f:'Status',prev:'On Track',next:'At Risk'},{f:'Owner',prev:'Maria Santos',next:'David Chen'},{f:'Target date',prev:'Oct 25, 2024',clear:true}] },
-      { row:5, status:'unchanged', name:'Brand refresh', type:'Project', ext:'#4822', summary:'No changes' },
-      { row:6, status:'error', name:'Pipeline Revamp', type:'Initiative', ext:'#4830',
+      { row:4, status:'update', name:'Marketing Consulting', type:'Initiative', ext:'#4821', owner:'David Chen', desc:'Outsourced marketing strategy engagements.', summary:'3 fields changed',
+        fields:[{f:'Status',prev:'On Track',next:'At Risk'},{f:'Owner',prev:'Maria Santos',next:'David Chen'},{f:'End date',prev:'Oct 25, 2024',clear:true}] },
+      { row:5, status:'unchanged', name:'Brand refresh', type:'Project', ext:'#4822', owner:'Maria Santos', desc:'Refresh brand identity and visual system.', summary:'No changes' },
+      { row:6, status:'error', name:'Pipeline Revamp', type:'Initiative', ext:'#4830', owner:'jsmith@acme.co', ownerMissing:true, desc:'Rebuild the sales pipeline stages.',
         error:{ msg:'Owner email not found', badVal:'jsmith@acme.co', suggestion:'We never auto-invite users. Check the address or add this person to the workspace first, then upload the file again.' } },
-      { row:7, status:'update', name:'Data Warehouse Migration', type:'Project', ext:'#4791', summary:'Reparented · 2 fields changed',
+      { row:7, status:'update', name:'Data Warehouse Migration', type:'Project', ext:'#4791', owner:'Wei Chen', desc:'Migrate analytics data to the new warehouse.', summary:'Reparented · 2 fields changed',
         fields:[{f:'Health',prev:'On Track',next:'At Risk'},{f:'Business Lines',add:true,next:'Finance'},{f:'Parent',prev:'Data Platform',next:'Technology / Platform'}] },
-      { row:8, status:'error', name:'Q3 OKR Sync', type:'Initiative', ext:'#4805',
+      { row:8, status:'error', name:'Q3 OKR Sync', type:'Initiative', ext:'#4805', owner:'Sara Kim', desc:'Align Q3 OKRs across teams.',
         error:{ msg:'Invalid Status value', badVal:'on-track!', suggestion:'Did you mean <b>On Track</b>? Valid values: On Track, At Risk, Off Track, Done.' } },
-      { row:9, status:'create', name:'Customer Health Scoring', type:'Project', ext:'CHS-01', summary:'New project',
+      { row:9, status:'create', name:'Customer Health Scoring', type:'Project', ext:'CHS-01', owner:'Lena Park', desc:'Model account health from usage signals.', summary:'New project',
         fields:[{f:'Owner',val:'Lena Park'},{f:'Function',val:'Customer Success'},{f:'Status',val:'Planning'}] },
-      { row:10, status:'update', name:'Support Automation', type:'Project', ext:'#4712', summary:'1 field changed', sfx:'Propagates to 34 children',
+      { row:10, status:'update', name:'Support Automation', type:'Project', ext:'#4712', owner:'Tom Reyes', desc:'Automate tier-1 support responses.', summary:'1 field changed', sfx:'Propagates to 34 children',
         fields:[{f:'Slack channel',prev:'#support',next:'#cx-support'}] },
-      { row:11, status:'unchanged', name:'Onboarding Redesign', type:'Project', ext:'#4688', summary:'No changes' },
-      { row:12, status:'error', name:'Pricing Experiment', type:'Initiative', ext:'#5590',
+      { row:11, status:'unchanged', name:'Onboarding Redesign', type:'Project', ext:'#4688', owner:'Ana Duarte', desc:'Rework the new-customer onboarding flow.', summary:'No changes' },
+      { row:12, status:'error', name:'Pricing Experiment', type:'Initiative', ext:'#5590', owner:'Marco Rossi', desc:'Test new pricing tiers with cohorts.',
         error:{ msg:'Duplicate ID in file (also on row 18)', badVal:'ID 5590', suggestion:'The same ID appears twice. Remove or merge one row — ambiguous intent beats last-write-wins, so we won’t guess which should win.' } },
-      { row:13, status:'update', name:'Partner Portal', type:'Project', ext:'#4650', summary:'2 fields changed',
+      { row:13, status:'update', name:'Partner Portal', type:'Project', ext:'#4650', owner:'Ana Duarte', desc:'Unified partner & reseller portal.', summary:'2 fields changed',
         fields:[{f:'Owner',prev:'Tom Reyes',next:'Ana Duarte'},{f:'Description',prev:'Legacy partner access',next:'Unified partner & reseller portal'}] },
-      { row:14, status:'create', name:'Security Hardening', type:'Project', ext:'SEC-H', summary:'New project',
+      { row:14, status:'create', name:'Security Hardening', type:'Project', ext:'SEC-H', owner:'Raj Patel', desc:'Close gaps from the Q2 security audit.', summary:'New project',
         fields:[{f:'Owner',val:'Raj Patel'},{f:'Status',val:'In Progress'}] },
-      { row:15, status:'update', name:'Mobile App v2', type:'Project', ext:'#4599', summary:'1 field changed',
+      { row:15, status:'update', name:'Mobile App v2', type:'Project', ext:'#4599', owner:'Nina Petrov', desc:'Next-gen mobile app rebuild.', summary:'1 field changed',
         fields:[{f:'Status',prev:'Planning',next:'In Progress'}] },
-      { row:16, status:'error', name:'Legacy Sunset', type:'Project', ext:'#4501',
+      { row:16, status:'error', name:'Legacy Sunset', type:'Project', ext:'#4501', owner:'James Park', desc:'Decommission legacy infrastructure.',
         error:{ msg:'You don’t have edit access to this org unit', badVal:'Org: Infrastructure', suggestion:'Ask an Infrastructure admin to import this row, or request edit access. Permissions are checked per row.' } },
-      { row:17, status:'unchanged', name:'Billing Revamp', type:'Initiative', ext:'#4490', summary:'No changes' },
-      { row:18, status:'error', name:'Pricing Experiment (Q4)', type:'Initiative', ext:'#5590',
+      { row:17, status:'unchanged', name:'Billing Revamp', type:'Initiative', ext:'#4490', owner:'Elena Cruz', desc:'Overhaul the billing and invoicing system.', summary:'No changes' },
+      { row:18, status:'error', name:'Pricing Experiment (Q4)', type:'Initiative', ext:'#5590', owner:'Marco Rossi', desc:'Q4 pricing experiment variant.',
         error:{ msg:'Duplicate ID in file (also on row 12)', badVal:'ID 5590', suggestion:'The same ID appears twice. Remove or merge one row so the intent is unambiguous.' } },
-      { row:19, status:'update', name:'Analytics Rollout', type:'Project', ext:'#4455', summary:'Reparented · 1 field changed',
+      { row:19, status:'update', name:'Analytics Rollout', type:'Project', ext:'#4455', owner:'Wei Chen', desc:'Roll out product analytics org-wide.', summary:'Reparented · 1 field changed',
         fields:[{f:'Function',prev:'Data',next:'Technology / Data / Analytics'}] },
-      { row:20, status:'create', name:'Field Enablement', type:'Project', ext:'FE-01', summary:'New project',
+      { row:20, status:'create', name:'Field Enablement', type:'Project', ext:'FE-01', owner:'Sofia Marín', desc:'Enablement content for field sales.', summary:'New project',
         fields:[{f:'Owner',val:'Sofia Marín'},{f:'Status',val:'Planning'}] },
-      { row:21, status:'update', name:'Churn Reduction', type:'Initiative', ext:'#4402', summary:'2 fields changed',
+      { row:21, status:'update', name:'Churn Reduction', type:'Initiative', ext:'#4402', owner:'Lena Park', desc:'Reduce logo churn in mid-market.', summary:'2 fields changed',
         fields:[{f:'Status',prev:'At Risk',next:'On Track'},{f:'Owner',add:true,next:'Lena Park'}] }
     ];
+    const TAGVAR = { create:'tag-positive', update:'tag-blue', unchanged:'tag-dark', error:'tag-negative' };
+    const WSVAR = { 'Idea':'tag-light', 'Definition':'tag-blue-light', 'Execution':'tag-blue', 'Complete':'tag-positive', 'On hold':'tag-warning' };
+    const HVAR = { 'Not active':'h-none', 'On track':'h-ontrack', 'Off track':'h-offtrack', 'At risk':'h-atrisk' };
+    // [workflow status, start date, end date, health] keyed by row number
+    const META = {
+      2:['Execution','Jan 6, 2025','Dec 19, 2025','On track'], 3:['Idea','Feb 3, 2025','Aug 29, 2025','Not active'],
+      4:['Execution','Sep 8, 2024','Jun 30, 2025','At risk'], 5:['Complete','Mar 1, 2024','Nov 15, 2024','On track'],
+      6:['Definition','Apr 1, 2025','Oct 31, 2025','Not active'], 7:['Execution','Jan 20, 2025','Jun 30, 2025','At risk'],
+      8:['Idea','Jul 1, 2025','Sep 30, 2025','Not active'], 9:['Definition','Feb 10, 2025','Jul 18, 2025','On track'],
+      10:['Execution','Nov 4, 2024','May 2, 2025','On track'], 11:['Complete','Jun 1, 2024','Dec 20, 2024','On track'],
+      12:['On hold','Mar 15, 2025','Sep 12, 2025','Off track'], 13:['Execution','Jan 13, 2025','Aug 8, 2025','On track'],
+      14:['Execution','Feb 24, 2025','May 30, 2025','At risk'], 15:['Definition','Apr 7, 2025','Nov 21, 2025','On track'],
+      16:['On hold','Jan 2, 2025','Mar 28, 2025','Off track'], 17:['Complete','May 6, 2024','Jan 31, 2025','On track'],
+      18:['Idea','Oct 1, 2025','Dec 19, 2025','Not active'], 19:['Execution','Feb 17, 2025','Jul 25, 2025','On track'],
+      20:['Idea','Mar 3, 2025','Jun 27, 2025','Not active'], 21:['Execution','Jan 27, 2025','Aug 15, 2025','On track']
+    };
 
     const tbody = document.getElementById('imp-tbody');
     if(!tbody) return;
@@ -5277,17 +5719,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const esc = s => (s==null?'':String(s)).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
     function detailHTML(r){
+      const sfxBadge = r.sfx ? ' <span class="imp-badge-sfx">'+esc(r.sfx)+'</span>' : '';
+      const sumRow = cols => r.summary ? '<tr class="imp-diff-summary"><th colspan="'+cols+'">'+esc(r.summary)+sfxBadge+'</th></tr>' : '';
       if(r.status==='update'){
         const rows = r.fields.map(f=>{
           const prev = f.add ? '<span class="diff-none">—</span>' : '<span class="diff-remove">'+esc(f.prev)+'</span>';
           const next = f.clear ? '<span class="diff-clear">— (cleared)</span>' : '<span class="diff-add">'+esc(f.next)+'</span>';
           return '<tr><td class="imp-diff-field">'+esc(f.f)+'</td><td>'+prev+'</td><td>'+next+'</td></tr>';
         }).join('');
-        return '<table class="imp-diff"><thead><tr><th>Field</th><th>Previous</th><th>New</th></tr></thead><tbody>'+rows+'</tbody></table>';
+        return '<table class="imp-diff"><thead>'+sumRow(3)+'<tr><th>Field</th><th>Previous</th><th>New</th></tr></thead><tbody>'+rows+'</tbody></table>';
       }
       if(r.status==='create'){
         const rows = r.fields.map(f=>'<tr><td class="imp-diff-field">'+esc(f.f)+'</td><td><span class="diff-add">'+esc(f.val)+'</span></td></tr>').join('');
-        return '<table class="imp-diff"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>'+rows+'</tbody></table>';
+        return '<table class="imp-diff"><thead>'+sumRow(2)+'<tr><th>Field</th><th>Value</th></tr></thead><tbody>'+rows+'</tbody></table>';
       }
       if(r.status==='error'){
         const v = r.error.badVal ? ' <span class="imp-err-val">'+esc(r.error.badVal)+'</span>' : '';
@@ -5306,17 +5750,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         ? '<span class="imp-summary is-error">'+esc(r.error.msg)+'</span>'
         : '<span class="imp-summary">'+esc(r.summary)+'</span>';
       if(r.sfx) summary += '<span class="imp-badge-sfx">'+esc(r.sfx)+'</span>';
+      const accountability = r.ownerMissing
+        ? '<span class="imp-owner-err"><i class="ph ph-warning-circle"></i>'+esc(r.owner)+' · not found</span>'
+        : '<span class="imp-owner">'+esc(r.owner||'—')+'</span>';
+      const m = META[r.row] || ['','','',''];
+      const statusCell = m[0] ? '<span class="tag '+(WSVAR[m[0]]||'tag-light')+'">'+esc(m[0])+'</span>' : '';
+      const healthCell = m[3] ? '<span class="imp-health"><span class="imp-health-dot '+(HVAR[m[3]]||'h-none')+'"></span>'+esc(m[3])+'</span>' : '';
       tr.innerHTML =
-        '<td class="col-rownum">'+r.row+'</td>'+
-        '<td><span class="imp-status st-'+r.status+'">'+LABEL[r.status]+'</span></td>'+
-        '<td><span class="imp-name">'+esc(r.name)+'</span><span class="imp-name-sub">'+sub+'</span></td>'+
-        '<td>'+summary+'</td>'+
-        '<td class="col-caret">'+(expandable?'<i class="ph ph-caret-right imp-caret"></i>':'')+'</td>';
+        '<td class="sheet-gutter">'+r.row+'</td>'+
+        '<td><span class="tag tag-indicator '+TAGVAR[r.status]+'">'+LABEL[r.status]+'</span></td>'+
+        '<td><span class="imp-name">'+esc(r.name)+'</span></td>'+
+        '<td><span class="imp-desc">'+esc(r.desc||'')+'</span></td>'+
+        '<td>'+statusCell+'</td>'+
+        '<td>'+healthCell+'</td>'+
+        '<td>'+accountability+'</td>'+
+        '<td><span class="imp-date">'+esc(m[1])+'</span></td>'+
+        '<td><span class="imp-date">'+esc(m[2])+'</span></td>'+
+        '<td class="col-caret">'+(expandable?'<i class="ph ph-caret-down imp-caret"></i>':'')+'</td>';
       tbody.appendChild(tr);
       if(expandable){
         const dt = document.createElement('tr');
         dt.className='imp-detail'; dt.hidden=true;
-        dt.innerHTML='<td colspan="5"><div class="imp-detail-inner">'+detailHTML(r)+'</div></td>';
+        dt.innerHTML='<td colspan="10"><div class="imp-detail-inner">'+detailHTML(r)+'</div></td>';
         tbody.appendChild(dt);
         tr.addEventListener('click', ()=>{
           const open = dt.hidden; dt.hidden=!open; tr.classList.toggle('is-open', open);
@@ -5342,8 +5797,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if(dt && dt.classList.contains('imp-detail')) dt.classList.toggle('is-hidden', !match);
         if(match) shown++;
       });
-      if(showAll){ foot.textContent = 'Showing '+shown+' of '+countOf('all')+' rows · sorted to match your spreadsheet'; }
-      else { const tot = checkedCats.reduce((s,c)=> s+countOf(c), 0); foot.textContent = 'Showing '+shown+' of '+tot+' rows'; }
+      if(foot){
+        if(showAll){ foot.textContent = 'Showing '+shown+' of '+countOf('all')+' rows · sorted to match your spreadsheet'; }
+        else { const tot = checkedCats.reduce((s,c)=> s+countOf(c), 0); foot.textContent = 'Showing '+shown+' of '+tot+' rows'; }
+      }
     }
     function setFilter(cat){
       if(cat==='all'){ allInput.checked=true; catInputs.forEach(i=> i.checked=false); }
@@ -5360,23 +5817,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       applyFilter();
     }));
 
-    // Guard checkbox
-    const guard = document.getElementById('imp-guard');
     const cta = document.getElementById('imp-commit-cta');
-    const skipNote = document.getElementById('imp-skip-note');
-    const createSeg = document.querySelector('.imp-filter[data-filter="create"]');
-    guard.addEventListener('change', ()=>{
-      const on = guard.checked;
-      cta.textContent = 'Import '+(on ? COUNTS.update : COUNTS.create+COUNTS.update)+' rows';
-      skipNote.hidden = !on;
-      createSeg.classList.toggle('is-muted', on);
-      tbody.querySelectorAll('.imp-row[data-status="create"]').forEach(tr=> tr.classList.toggle('is-skipped', on));
-    });
 
     // ===== State machine =====
     const flow = document.getElementById('import-flow');
     const frame = document.querySelector('.template-frame');
-    const ORDER = ['upload','validating','preview','commit','done'];
+    const ORDER = ['upload','validating','preview','confirm','commit','done'];
     function showPanel(panel, foot, indicator){
       flow.querySelectorAll('[data-step-panel]').forEach(p=> p.hidden = p.dataset.stepPanel !== panel);
       flow.querySelectorAll('[data-foot]').forEach(f=> f.hidden = f.dataset.foot !== foot);
@@ -5413,6 +5859,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     ['dragleave','drop'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.remove('is-drag'); }));
     dropzone.addEventListener('drop', stageFile);
     document.getElementById('imp-file-remove').addEventListener('click', unstageFile);
+    document.getElementById('imp-file-validate').addEventListener('click', ()=>{ gotoStep('validating'); startValidating(); });
 
     // Helper actions (toast stubs)
     document.querySelectorAll('[data-helper]').forEach(b=> b.addEventListener('click', ()=>{
@@ -5459,8 +5906,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const COMMIT_DURATION = 60000; // ~1 minute, like a real bulk import
     function stopCommit(){ if(commitTimer){ clearInterval(commitTimer); commitTimer=null; } }
     function startCommit(){
-      const guardOn = document.getElementById('imp-guard').checked;
-      commitCreated = guardOn ? 0 : COUNTS.create;
+      commitCreated = COUNTS.create;
       commitUpdated = COUNTS.update;
       commitTotal = commitCreated + commitUpdated;
       commitPctVal = 0; commitRowsDone = 0;
@@ -5510,17 +5956,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       }
     }
     function showResult(created, updated){
-      const guardOn = document.getElementById('imp-guard').checked;
       document.getElementById('imp-res-create').textContent = created;
       document.getElementById('imp-res-update').textContent = updated;
-      document.getElementById('imp-stat-create').classList.toggle('is-dim', created===0);
       const total = created + updated;
-      const newSkip = guardOn ? COUNTS.create : 0;
       document.getElementById('imp-result-sub').textContent =
-        total+' rows imported · '+(newSkip ? newSkip+' new + ' : '')+COUNTS.error+' error rows skipped · '+COUNTS.unchanged+' unchanged.';
+        total+' rows imported · '+COUNTS.error+' error rows skipped · '+COUNTS.unchanged+' unchanged.';
       gotoStep('done');
     }
-    cta.addEventListener('click', ()=>{ gotoStep('commit'); startCommit(); });
+    // Confirmation step before committing (NB-34) — a step in the flow, not a modal
+    function goConfirm(){
+      document.getElementById('imp-cf-create').textContent = countOf('create');
+      document.getElementById('imp-cf-update').textContent = countOf('update');
+      document.getElementById('imp-cf-unchanged').textContent = countOf('unchanged');
+      document.getElementById('imp-cf-error').textContent = countOf('error');
+      document.getElementById('imp-confirm-accept').textContent = 'Import '+(countOf('create')+countOf('update'))+' rows';
+      gotoStep('confirm');
+    }
+    cta.addEventListener('click', goConfirm);
+    document.getElementById('imp-confirm-accept').addEventListener('click', ()=>{ gotoStep('commit'); startCommit(); });
+    document.querySelectorAll('[data-confirm-back]').forEach(b=> b.addEventListener('click', ()=> gotoStep('preview')));
     document.querySelectorAll('[data-commit-background]').forEach(b=> b.addEventListener('click', backgroundCommit));
 
     // Result actions
@@ -5529,13 +5983,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       else { toast('Opening Initiatives filtered to the imported records'); closeFlow(); }
     }));
     document.querySelectorAll('[data-restart]').forEach(b=> b.addEventListener('click', ()=>{ unstageFile(); gotoStep('upload'); }));
+    document.querySelectorAll('[data-download-errors]').forEach(b=> b.addEventListener('click', ()=> toast('Downloaded a copy of your file with error notes — fix the flagged rows and re-upload')));
 
     // ===== Preview variant modes (concurrency + empty states) =====
     function setCount(k,v){ const el=document.querySelector('[data-count="'+k+'"]'); if(el) el.textContent=v; }
     function setPreviewMode(mode){
       const banner=document.getElementById('imp-preview-banner');
       banner.hidden=true; banner.className=''; banner.innerHTML='';
-      cta.disabled=false; cta.textContent='Import 460 rows';
+      cta.disabled=false; cta.textContent='Next';
       setCount('all',500); setCount('create',312); setCount('update',148); setCount('unchanged',27); setCount('error',13);
       tbody.querySelectorAll('.imp-row').forEach(tr=>{ tr.classList.remove('is-hidden'); const dt=tr.nextElementSibling; if(dt&&dt.classList.contains('imp-detail')) dt.classList.remove('is-hidden'); });
       setFilter('all');
@@ -5552,7 +6007,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       } else if(mode==='permission'){
         banner.hidden=false; banner.className='alert alert-warning';
         banner.innerHTML='<i class="ph ph-lock alert-icon"></i><p class="alert-message"><b>8 rows can’t be imported.</b> You don’t have edit permission on their org units, so they’ll be skipped. Ask an admin or request access.</p>';
-        cta.textContent='Import 452 rows';
+        cta.textContent='Next';
       } else if(mode==='stale'){
         banner.hidden=false; banner.className='alert alert-warning';
         banner.innerHTML='<i class="ph ph-clock-countdown alert-icon"></i><p class="alert-message"><b>This preview is 18 minutes old.</b> Data may have changed since you validated — re-validate to be safe.</p><div class="alert-actions"><button class="btn btn-xs btn-primary" type="button" data-revalidate>Re-validate</button></div>';
@@ -5561,6 +6016,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         banner.innerHTML='<i class="ph ph-warning-octagon alert-icon"></i><p class="alert-message"><b>3 records changed since you previewed.</b> Importing now would overwrite newer edits made in the UI. Re-validate to see the latest.</p><div class="alert-actions"><button class="btn btn-xs btn-primary" type="button" data-revalidate>Re-validate</button></div>';
       }
       banner.querySelectorAll('[data-revalidate]').forEach(x=> x.addEventListener('click', ()=>{ gotoStep('validating'); startValidating(); }));
+      const errCount = countOf('error');
+      const dl = document.getElementById('imp-dl-errors');
+      if(dl){ dl.hidden = errCount===0; }
     }
 
     // ===== Message panel (empty & failure states) =====
