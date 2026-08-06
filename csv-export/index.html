@@ -3482,9 +3482,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <p class="page-head-subtitle">Track initiatives, projects and tasks across the org.</p>
           </div>
           <div class="page-head-actions">
-            <button class="btn btn-secondary" data-import-open><i class="ph ph-upload-simple"></i>Import</button>
             <button class="btn btn-secondary"><i class="ph ph-funnel"></i>Filter</button>
-            <button class="btn btn-primary"><i class="ph ph-download-simple"></i>Export CSV</button>
+            <div class="dropdown" id="csv-menu">
+              <button class="btn btn-primary dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><i class="ph ph-file-csv"></i>Manage CSV<i class="ph ph-caret-down"></i></button>
+              <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item" type="button" data-csv-export><i class="ph ph-download-simple dropdown-item-icon"></i>Export CSV</button>
+                <button class="dropdown-item" type="button" data-import-open><i class="ph ph-upload-simple dropdown-item-icon"></i>Import CSV</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -5844,6 +5849,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     function openFlow(){ flow.hidden=false; if(frame) frame.style.display='none'; document.body.style.overflow='hidden'; }
     function openAt(step){ openFlow(); gotoStep(step); }
     document.querySelectorAll('[data-import-open]').forEach(b=> b.addEventListener('click', ()=>{ document.getElementById('imp-resume-banner').hidden=true; openAt('upload'); }));
+
+    // "Manage CSV" dropdown in the page head
+    const csvMenu = document.getElementById('csv-menu');
+    if(csvMenu){
+      const trigger = csvMenu.querySelector('.dropdown-trigger');
+      const menu = csvMenu.querySelector('.dropdown-menu');
+      const closeMenu = ()=>{ menu.hidden = true; trigger.setAttribute('aria-expanded','false'); };
+      trigger.addEventListener('click', e=>{ e.stopPropagation(); const willOpen = menu.hidden; menu.hidden = !willOpen; trigger.setAttribute('aria-expanded', String(willOpen)); });
+      document.addEventListener('click', e=>{ if(!csvMenu.contains(e.target)) closeMenu(); });
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMenu(); });
+      csvMenu.querySelector('[data-csv-export]').addEventListener('click', ()=>{ closeMenu(); toast('Exported 500 Initiatives to CSV'); });
+      csvMenu.querySelector('[data-import-open]').addEventListener('click', closeMenu);
+    }
     function closeFlow(){ if(commitTimer){ backgroundCommit(); return; } flow.hidden=true; if(frame) frame.style.display=''; document.body.style.overflow=''; stopValidating(); }
     document.querySelectorAll('[data-import-close]').forEach(b=> b.addEventListener('click', closeFlow));
 
