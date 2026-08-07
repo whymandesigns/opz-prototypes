@@ -3145,8 +3145,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .imp-filter .count-badge { margin-left: var(--ic-space-1); }
     .imp-filter.is-muted { opacity: .45; }
     .imp-filter.is-muted .count-badge { text-decoration: line-through; }
+    #csv-menu .dropdown-menu { min-width: 240px; }
     .imp-dl-errors { margin-left: auto; }
     .imp-dl-errors[hidden] { display: none; }
+    #imp-errors-alert[hidden] { display: none; }
+    .imp-inline-link { display: inline; border: 0; background: none; padding: 0; margin: 0; font: inherit; color: var(--color-text-link); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+    .imp-inline-link:hover { text-decoration: none; }
 
     /* Confirmation dialog before commit */
     .imp-confirm { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(15,18,25,.45); padding: var(--ic-space-6); }
@@ -3300,6 +3304,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .imp-dropzone-sub { font: var(--type-body-sm); color: var(--color-text-muted); }
     .imp-dropzone-sub b { color: var(--color-accent); }
     .imp-dropzone-constraint { font: var(--type-body-sm); color: var(--color-text-subtle); margin-top: var(--ic-space-3); }
+    .imp-dropzone.is-error { border-color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 5%, var(--color-surface)); }
+    .imp-dropzone-error { display: flex; align-items: center; gap: var(--ic-space-2); margin-top: var(--ic-space-3); color: var(--color-danger); font: var(--type-body-sm); font-weight: var(--ic-weight-medium); }
+    .imp-dropzone-error[hidden] { display: none; }
     .imp-file { display: flex; align-items: center; gap: var(--ic-space-3); padding: var(--ic-space-4); border: 1px solid var(--color-border); border-radius: var(--ic-radius-lg); background: var(--color-surface); }
     .imp-file[hidden] { display: none; }
     .imp-file-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--ic-radius-sm); background: var(--color-success-subtle); color: var(--color-brand-active); font-size: 20px; flex: none; }
@@ -3468,7 +3475,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="imp-resume" id="imp-resume-banner" hidden>
           <span class="imp-resume-spinner"></span>
           <span class="imp-resume-text" id="imp-resume-text"></span>
-          <button class="btn btn-xs btn-primary" type="button" id="imp-resume-btn">Resume</button>
+          <button class="btn btn-xs btn-secondary" type="button" id="imp-resume-btn">Resume</button>
           <button class="imp-resume-close" type="button" aria-label="Dismiss"><i class="ph ph-x"></i></button>
         </div>
 
@@ -3484,10 +3491,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="page-head-actions">
             <button class="btn btn-secondary"><i class="ph ph-funnel"></i>Filter</button>
             <div class="dropdown" id="csv-menu">
-              <button class="btn btn-primary dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><i class="ph ph-file-csv"></i>Manage CSV<i class="ph ph-caret-down"></i></button>
+              <button class="btn btn-primary dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><i class="ph ph-file-csv"></i>Import/Export<i class="ph ph-caret-down"></i></button>
               <div class="dropdown-menu dropdown-menu-end" hidden>
-                <button class="dropdown-item" type="button" data-csv-export><i class="ph ph-download-simple dropdown-item-icon"></i>Export CSV</button>
-                <button class="dropdown-item" type="button" data-import-open><i class="ph ph-upload-simple dropdown-item-icon"></i>Import CSV</button>
+                <button class="dropdown-item" type="button" data-import-open><i class="ph ph-upload-simple dropdown-item-icon"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Import</span><span class="dropdown-item-description">From Sheets, CSV, or XLSX</span></span></button>
+                <button class="dropdown-item" type="button" data-csv-export><i class="ph ph-download-simple dropdown-item-icon"></i><span class="dropdown-item-text"><span class="dropdown-item-label">Export</span><span class="dropdown-item-description">Download as CSV or XLSX</span></span></button>
               </div>
             </div>
           </div>
@@ -3859,8 +3866,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     <!-- Context bar + step indicator -->
     <div class="imp-contextbar">
+      <span class="imp-context-title">Import Initiatives</span>
       <div style="display:flex; align-items:center; gap: var(--ic-space-5)">
-        <span class="imp-context-title">Import Initiatives</span>
         <ol class="stepper">
           <li class="stepper-step is-current" data-step-ind="upload"><span class="stepper-num">1</span><span class="stepper-label">Upload</span></li>
           <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
@@ -3872,8 +3879,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
           <li class="stepper-step" data-step-ind="commit"><span class="stepper-num">5</span><span class="stepper-label">Commit</span></li>
         </ol>
+        <button class="imp-close" type="button" data-import-close aria-label="Close import"><i class="ph ph-x"></i></button>
       </div>
-      <button class="imp-close" type="button" data-import-close aria-label="Close import"><i class="ph ph-x"></i></button>
     </div>
 
     <!-- Body -->
@@ -3917,6 +3924,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <button class="btn btn-primary btn-xs" type="button" id="imp-file-validate">Validate file</button>
             <button class="imp-file-remove" type="button" id="imp-file-remove" aria-label="Remove file"><i class="ph ph-x"></i></button>
           </div>
+
+          <p class="imp-dropzone-error" id="imp-dz-error" hidden>Upload a file to validate.</p>
         </div>
       </section>
 
@@ -3946,11 +3955,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="imp-head-main">
               <h1 class="imp-head-title">Review changes before importing</h1>
             </div>
-            <button class="btn btn-secondary imp-dl-errors" type="button" id="imp-dl-errors" data-download-errors>Download file with notes</button>
+            <button class="btn btn-secondary" type="button" data-download-errors>Download file with notes</button>
           </div>
 
           <!-- Variant banner (concurrency / empty states) -->
           <div id="imp-preview-banner" hidden></div>
+
+          <!-- Errors summary — the most important callout -->
+          <div class="alert alert-danger" role="note" id="imp-errors-alert" style="margin-bottom: var(--ic-space-3)">
+            <i class="ph ph-warning-octagon alert-icon"></i>
+            <p class="alert-message"><b><span id="imp-err-count">13</span> rows have errors and will be skipped.</b> Everything else still imports. Common issues: invalid Status value, owner email not found, and duplicate IDs. <button type="button" class="imp-inline-link" data-download-errors>Download the file with notes</button> to fix and re-upload.</p>
+          </div>
 
           <!-- Callout banners: hierarchy + side effects -->
           <div class="alert alert-info" role="note" style="margin-bottom: var(--ic-space-3)">
@@ -4075,7 +4090,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <span></span>
         <div class="imp-footer-right">
           <button class="btn btn-secondary" type="button" data-import-close>Cancel</button>
-          <button class="btn btn-primary" type="button" id="imp-validate-cta" disabled>Validate file</button>
+          <button class="btn btn-primary" type="button" id="imp-validate-cta">Validate file</button>
         </div>
       </div>
       <!-- Preview footer -->
@@ -5869,8 +5884,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const dropzone = document.getElementById('imp-dropzone');
     const fileChip = document.getElementById('imp-file');
     const validateCta = document.getElementById('imp-validate-cta');
-    function stageFile(){ fileChip.hidden=false; dropzone.style.display='none'; validateCta.disabled=false; }
-    function unstageFile(){ fileChip.hidden=true; dropzone.style.display=''; validateCta.disabled=true; }
+    function clearDzError(){ dropzone.classList.remove('is-error'); document.getElementById('imp-dz-error').hidden = true; }
+    function stageFile(){ fileChip.hidden=false; dropzone.style.display='none'; clearDzError(); }
+    function unstageFile(){ fileChip.hidden=true; dropzone.style.display=''; }
     dropzone.addEventListener('click', stageFile);
     dropzone.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); stageFile(); } });
     ['dragover','dragenter'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.add('is-drag'); }));
@@ -5912,7 +5928,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if(pct>=100){ stopValidating(); CHECKS.forEach(c=> setCheck(c,'done')); setTimeout(()=>{ setPreviewMode('normal'); gotoStep('preview'); }, 450); }
       }, 120);
     }
-    validateCta.addEventListener('click', ()=>{ gotoStep('validating'); startValidating(); });
+    validateCta.addEventListener('click', ()=>{
+      if(fileChip.hidden){ dropzone.classList.add('is-error'); document.getElementById('imp-dz-error').hidden = false; return; }
+      gotoStep('validating'); startValidating();
+    });
 
     // ===== Commit step =====
     let commitTimer = null;
@@ -5921,7 +5940,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const tallyCreate = document.getElementById('imp-tally-create');
     const tallyUpdate = document.getElementById('imp-tally-update');
     let commitBackground = false, commitCreated = 0, commitUpdated = 0, commitTotal = 0, commitPctVal = 0, commitRowsDone = 0;
-    const COMMIT_DURATION = 60000; // ~1 minute, like a real bulk import
+    const COMMIT_DURATION = 30000; // ~30 seconds
     function stopCommit(){ if(commitTimer){ clearInterval(commitTimer); commitTimer=null; } }
     function startCommit(){
       commitCreated = COUNTS.create;
@@ -6035,8 +6054,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       }
       banner.querySelectorAll('[data-revalidate]').forEach(x=> x.addEventListener('click', ()=>{ gotoStep('validating'); startValidating(); }));
       const errCount = countOf('error');
-      const dl = document.getElementById('imp-dl-errors');
-      if(dl){ dl.hidden = errCount===0; }
+      const errCountEl = document.getElementById('imp-err-count');
+      if(errCountEl) errCountEl.textContent = errCount;
+      const errAlert = document.getElementById('imp-errors-alert');
+      if(errAlert) errAlert.hidden = (mode === 'allInvalid' || mode === 'nothingChanged' || errCount === 0);
     }
 
     // ===== Message panel (empty & failure states) =====
