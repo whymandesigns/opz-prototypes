@@ -2625,7 +2625,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     }
     .card-meta { padding: var(--ic-space-4); }
     .arrow { float: right; color: var(--color-text-subtle); }
-    .folder { font: var(--type-mono); color: var(--color-text-subtle); display: block; margin-top: var(--ic-space-2); }
+    .folder { display: none; }
+    .updated { font: var(--type-body-sm); color: var(--color-text-subtle); display: block; margin-top: var(--ic-space-2); }
     .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
     .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
     .empty { display: none; }
@@ -2753,6 +2754,48 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <p class="body-sm" style="margin-bottom: var(--ic-space-8)">Older experiments live in <a class="backlink" href="./archive/">archive/</a>.</p>
 
     <script>
+      // Per-feature last-updated dates -> relative "Updated N ago" + newest-first sort.
+      (function () {
+        var UPDATED = {
+          'action-items/': '2026-07-10',
+          'agenda-items/': '2026-07-06',
+          'api-token-management/': '2026-07-06',
+          'connections/': '2026-07-06',
+          'csv-export/': '2026-08-06',
+          'dashboard/': '2026-07-07',
+          'integrations/': '2026-07-06',
+          'integrations-v2/': '2026-07-06',
+          'loaders/': '2026-07-06',
+          'meeting-details/': '2026-07-06',
+          'rob-flow/': '2026-07-06',
+          'slide-integration/': '2026-07-06'
+        };
+        function relTime(iso) {
+          var days = Math.floor((Date.now() - new Date(iso + 'T00:00:00').getTime()) / 86400000);
+          if (days <= 0) return 'today';
+          if (days === 1) return 'yesterday';
+          if (days < 7) return days + ' days ago';
+          if (days < 30) { var w = Math.floor(days / 7); return w + (w === 1 ? ' week ago' : ' weeks ago'); }
+          if (days < 365) { var m = Math.floor(days / 30); return m + (m === 1 ? ' month ago' : ' months ago'); }
+          var y = Math.floor(days / 365); return y + (y === 1 ? ' year ago' : ' years ago');
+        }
+        var list = document.getElementById('feature-list');
+        var cards = Array.prototype.slice.call(list.querySelectorAll('.card'));
+        cards.forEach(function (c) {
+          var folderEl = c.querySelector('.folder');
+          var date = folderEl ? (UPDATED[folderEl.textContent.trim()] || '') : '';
+          c.dataset.updated = date;
+          if (date) {
+            var span = document.createElement('span');
+            span.className = 'updated';
+            span.textContent = 'Updated ' + relTime(date);
+            c.querySelector('.card-meta').appendChild(span);
+          }
+        });
+        cards.sort(function (a, b) { return (b.dataset.updated || '').localeCompare(a.dataset.updated || ''); });
+        cards.forEach(function (c) { list.appendChild(c); });
+      })();
+
       // Live filter — matches title, description and folder name.
       (function () {
         var input = document.getElementById('feature-search');
