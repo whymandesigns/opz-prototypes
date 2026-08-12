@@ -2755,8 +2755,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     <script>
       // Per-feature last-updated dates -> relative "Updated N ago" + newest-first sort.
+      // Live source: the latest commit touching each folder on the deployed branch,
+      // read from the GitHub API. FALLBACK dates are only used offline / when the API
+      // is unreachable or rate-limited. Results are cached in localStorage for 1 hour
+      // so repeat visits don't burn through GitHub's 60 req/hr unauthenticated limit.
       (function () {
-        var UPDATED = {
+        var REPO = 'whymandesigns/opz-prototypes';
+        var CACHE_TTL = 3600000; // 1 hour
+        var FALLBACK = {
           'action-items/': '2026-07-10',
           'agenda-items/': '2026-07-06',
           'api-token-management/': '2026-07-06',
@@ -2770,8 +2776,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           'rob-flow/': '2026-07-06',
           'slide-integration/': '2026-07-06'
         };
-        function relTime(iso) {
-          var days = Math.floor((Date.now() - new Date(iso + 'T00:00:00').getTime()) / 86400000);
+        function relTime(v) {
+          if (!v) return '';
+          var days = Math.floor((Date.now() - new Date(v).getTime()) / 86400000);
           if (days <= 0) return 'today';
           if (days === 1) return 'yesterday';
           if (days < 7) return days + ' days ago';
@@ -2781,19 +2788,64 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }
         var list = document.getElementById('feature-list');
         var cards = Array.prototype.slice.call(list.querySelectorAll('.card'));
+
+        function render(c, iso) {
+          c.dataset.updated = iso || '';
+          if (!iso) return;
+          if (!c._updSpan) {
+            c._updSpan = document.createElement('span');
+            c._updSpan.className = 'updated';
+            c.querySelector('.card-meta').appendChild(c._updSpan);
+          }
+          c._updSpan.textContent = 'Updated ' + relTime(iso);
+        }
+        function sortCards() {
+          cards.sort(function (a, b) {
+            return new Date(b.dataset.updated || 0) - new Date(a.dataset.updated || 0);
+          });
+          cards.forEach(function (c) { list.appendChild(c); });
+        }
+
+        // 1) Immediate render from fallback / cache so nothing is blank.
         cards.forEach(function (c) {
           var folderEl = c.querySelector('.folder');
-          var date = folderEl ? (UPDATED[folderEl.textContent.trim()] || '') : '';
-          c.dataset.updated = date;
-          if (date) {
-            var span = document.createElement('span');
-            span.className = 'updated';
-            span.textContent = 'Updated ' + relTime(date);
-            c.querySelector('.card-meta').appendChild(span);
-          }
+          var folder = folderEl ? folderEl.textContent.trim() : '';
+          var iso = FALLBACK[folder] || '';
+          try {
+            var cached = JSON.parse(localStorage.getItem('fu:' + folder) || 'null');
+            if (cached && cached.d) iso = cached.d;
+          } catch (e) {}
+          render(c, iso);
         });
-        cards.sort(function (a, b) { return (b.dataset.updated || '').localeCompare(a.dataset.updated || ''); });
-        cards.forEach(function (c) { list.appendChild(c); });
+        sortCards();
+
+        // 2) Refresh from GitHub (latest commit per folder on the default branch).
+        function fetchDate(folder) {
+          try {
+            var cached = JSON.parse(localStorage.getItem('fu:' + folder) || 'null');
+            if (cached && (Date.now() - cached.f) < CACHE_TTL) return Promise.resolve(cached.d);
+          } catch (e) {}
+          var path = folder.replace(/\/+$/, '');
+          var url = 'https://api.github.com/repos/' + REPO + '/commits?path=' +
+            encodeURIComponent(path) + '&per_page=1';
+          return fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(function (j) {
+              var commit = j && j[0] && j[0].commit;
+              var d = commit && (commit.committer || commit.author) && (commit.committer || commit.author).date;
+              if (!d) throw new Error('no date');
+              try { localStorage.setItem('fu:' + folder, JSON.stringify({ d: d, f: Date.now() })); } catch (e) {}
+              return d;
+            });
+        }
+        Promise.all(cards.map(function (c) {
+          var folderEl = c.querySelector('.folder');
+          var folder = folderEl ? folderEl.textContent.trim() : '';
+          if (!folder) return Promise.resolve();
+          return fetchDate(folder)
+            .then(function (d) { render(c, d); })
+            .catch(function () { /* keep fallback/cache */ });
+        })).then(sortCards);
       })();
 
       // Live filter — matches title, description and folder name.
