@@ -3579,6 +3579,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     .cb-empty { font: var(--type-body-sm); color: var(--color-text-subtle); padding: var(--ic-space-4); border: 1px dashed var(--color-border); border-radius: var(--ic-radius-sm); text-align: center; }
 
+    /* The system's .dropzone fills with --color-surface-sunken (gray-200,
+       #E0E1E5) — a heavy slab of grey once it's sitting inside a white .card,
+       where it reads as a disabled region rather than a drop target. Dropped
+       to the card's own surface so only the dashed border defines it; hover
+       and .is-dragover still come from the component. designmd is off-limits
+       for this project, so it's overridden here rather than at source —
+       another entry on the running list of system gaps in this file. */
+    .cb-step .dropzone { background: var(--color-surface); }
+    .cb-step .dropzone:hover { background: var(--color-surface-muted); }
+
     /* Review step — a definition list, not a table: it's one record, not rows. */
     .cb-summary { display: grid; grid-template-columns: 200px 1fr; gap: var(--ic-space-3) var(--ic-space-4); }
     .cb-summary dt { font: var(--type-body-sm); color: var(--color-text-subtle); }
@@ -4688,10 +4698,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="card">
               <h2 class="cb-section-title">Questions</h2>
               <p class="cb-section-hint">Free-text prompts alongside the rated competencies. Optional — leave empty to skip.</p>
-              <div class="alert alert-info" role="alert" style="margin-bottom: var(--ic-space-4)">
-                <svg class="icon alert-icon"><use href="#i-info"/></svg>
-                <p class="alert-message">Questions aren't part of the v2.1 CSV format — there's no column that carries them. Treat this as a proposed addition that needs backend support.</p>
-              </div>
 
               <p class="field-label" style="margin-bottom: var(--ic-space-2)">Review questions <span class="field-hint">— asked of reviewers</span></p>
               <div id="cb-review-qs"></div>
@@ -6429,7 +6435,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (!STATE.pairs.length) warn.push('No participants — this cycle would launch empty.');
         if (section.querySelector('[data-vis="reviewee"] input:checked')?.value === 'never')
           warn.push('Reviewees will never see their own results.');
-        if (qCount) warn.push('Questions aren\'t supported by the v2.1 CSV format — they need backend work before this launches for real.');
 
         $('#cb-launch-warnings').innerHTML = warn.map(w => `
           <div class="alert alert-warning" role="alert" style="margin-bottom: var(--ic-space-3)">
