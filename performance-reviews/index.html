@@ -3395,7 +3395,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .assessments-table .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .assessments-table .cell-user-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* "My Reports" (#pr-panel-all) is the one table here with two person
+    /* The "My Reports" table (.reports-panel — rendered on both the Assessments
+       hub and Team results) is the one here with two person
        columns side by side — at default table-layout (auto), each column
        sizes to its own content, and the two people's name+role pairs alone
        want ~550px combined. That total (~1076px) blew past the available
@@ -3404,19 +3405,46 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        percentage columns make it size to the container instead of its
        content — the ellipsis rules above still truncate long names/roles,
        so nothing is lost, it just clips instead of pushing the table wider. */
-    #pr-panel-all .assessments-table { table-layout: fixed; }
-    #pr-panel-all .assessments-table col.col-person { width: 23%; }
-    #pr-panel-all .assessments-table col.col-status { width: 11%; }
-    #pr-panel-all .assessments-table col.col-relationship { width: 14%; }
-    #pr-panel-all .assessments-table col.col-due { width: 10%; }
-    #pr-panel-all .assessments-table col.col-cycle { width: 10%; }
-    #pr-panel-all .assessments-table col.col-actions { width: 9%; }
+    .reports-panel .assessments-table { table-layout: fixed; }
+    /* Actions widened from 9% to 15% for the "View breakdown" label — at 9% the
+       button was 108px inside a 97px cell and spilled into Review Cycle. The
+       extra came off the two person columns and Relationship, which truncate. */
+    .reports-panel .assessments-table col.col-person { width: 20%; }
+    .reports-panel .assessments-table col.col-status { width: 10%; }
+    .reports-panel .assessments-table col.col-relationship { width: 13%; }
+    .reports-panel .assessments-table col.col-due { width: 10%; }
+    .reports-panel .assessments-table col.col-cycle { width: 11%; }
+    .reports-panel .assessments-table col.col-actions { width: 16%; }
+    /* Fixed layout lets a cell's content paint over its neighbour — the
+       "Peer Feedback" tag was landing on top of the date once Relationship
+       gave up width. Clipping keeps columns honest at any window size.
+       The Actions cell is excluded: the disabled button's tooltip is an
+       absolutely-positioned ::after inside that cell, so clipping it swallowed
+       the tooltip entirely. Nothing in that column can overflow anyway — it's
+       a single button in a column sized to fit it. */
+    .reports-panel .assessments-table tbody td:not(:last-child) { overflow: hidden; }
+
+    /* A disabled button is not hit-testable, so :hover never matches it and its
+       tooltip could never fire. The tooltip moves to a wrapper that IS
+       hoverable; inline-flex keeps it hugging the button so the pill still
+       points at the right thing. */
+    .tt-wrap { display: inline-flex; }
+
+    /* Breathing room under a toolbar before the table it controls. */
+    .toolbar { margin-bottom: var(--ic-space-4); }
+
+    /* Below roughly 1200px even 15% is narrower than the label, so the button
+       wraps to two lines rather than overflowing its cell. Ugly-but-legible
+       beats spilling across the neighbouring column. */
+    .reports-panel .cell-actions .btn,
+    .tr-reviews-table .cell-actions .btn { white-space: normal; height: auto; min-height: 24px; }
 
     /* Pending / Completed share the same 4-column shape (one person column,
        narrower than My Reports' two side by side) — same fixed-layout fix,
        different ratios so Actions has room for "Skip" + "Assess" side by side. */
     #pr-panel-pending .assessments-table,
-    #pr-panel-completed .assessments-table { table-layout: fixed; }
+    #pr-panel-completed .assessments-table,
+    #pr-panel-skipped .assessments-table { table-layout: fixed; }
 
     /* Assessment modal (Figma: node 33986:135941) — from/to header + a
        repeating competency-group pattern. Groups use a left accent bar
@@ -3532,7 +3560,52 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        The admin flow that replaces v2.1's "engineer runs a script". Designed
        fresh — Figma has no builder screens (its only builder reference is a
        pasted screenshot of the off-brand v2.0 prototype). `cb-` = cycle builder. */
+    /* Subtitles hidden prototype-wide. Kept in the markup rather than deleted —
+       they still describe each page's intent for anyone reading the source, and
+       restoring them is a one-line change. */
+    .page-head-subtitle { display: none; }
+    /* With the subtitle gone, page-head-main is just the title, so centre the
+       actions against it instead of the system's bottom-edge alignment, which
+       was tuned for a two-line block. */
+    .page-head { align-items: center; }
+    /* Except where a breadcrumb sits above the title (the builder): centring
+       against the whole stack floats the actions up into the gap between crumb
+       and title (measured 15px high). Offsetting them by the breadcrumb's own
+       block — its 22px line plus the 8px margin the system puts under it —
+       re-centres them on the title's row exactly. Bottom-aligning instead
+       overshoots, because the h1's box is 42px tall against a 24px stepper. */
+    .page-head:has(.breadcrumbs) .page-head-actions { margin-top: 30px; }
+
+    /* Struck-through tab label. Scoped to the label span, not the whole tab, so
+       the count badge stays uncrossed. */
+    .tab-struck { text-decoration: line-through; }
+
+    /* My direct reports' other two tabs. Fixed layout for the same reason as every
+       other table here — content-sized columns overflow the container. */
+    .tr-reviews-table, .tr-goals-table { table-layout: fixed; }
+    /* Team names are long ("Engineering, Platform Team") and .tag is a
+       fixed-height pill, so let the cell wrap rather than clip the tag. */
+    .tr-reviews-table .tag { height: auto; white-space: normal; }
+    /* The question/answer cell is the content, not metadata — it wraps instead
+       of truncating, and the answer sheds .cell-meta-sub's icon-row layout. */
+    .tr-goals-table .cell-meta-title { font: var(--type-body-sm); color: var(--color-text); }
+    .tr-goals-table .cell-meta-sub { display: block; color: var(--color-text-muted); }
+
     .cb-body { max-width: 880px; }
+
+    /* Compact stepper — only the current step is labelled, so the control reads
+       as "where am I" rather than a full table of contents, and stays narrow
+       enough to sit in the page head next to the heading. Numbers/checks still
+       carry the rest of the progress. Labels are kept in the DOM (not removed)
+       so the step names stay available to screen readers. */
+    #cb-stepper { flex-wrap: nowrap; }
+    #cb-stepper .stepper-step:not(.is-current) .stepper-label {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
     .cb-step { display: flex; flex-direction: column; gap: var(--ic-space-4); }
     .cb-step[hidden] { display: none; }
     .cb-section-title { font: var(--type-h4); margin: 0 0 var(--ic-space-1); }
@@ -3596,6 +3669,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-summary-list { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
 
     .cb-footer { display: flex; align-items: center; justify-content: space-between; margin-top: var(--ic-space-2); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+
+    /* ===== Review cycle list =====
+       .table-scroll's `overflow: auto` clips the row kebab menus — an absolutely
+       positioned .dropdown-menu-end on the last row escapes the wrapper's box
+       and gets cut off (measured: 73px lost). Scrolling isn't needed at this row
+       count, so the wrapper is un-clipped instead. Safe only because the table
+       below can't outgrow its container: fixed layout + percentage columns +
+       truncation, so nothing forces horizontal overflow. */
+    #rc-table-wrap { overflow: visible; }
+    #rc-table-wrap .table { table-layout: fixed; }
+    #rc-table-wrap .cell-title-text,
+    #rc-table-wrap .cell-user-name,
+    #rc-table-wrap .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Zebra fill would otherwise square off the wrapper's rounded corners now
+       that it no longer clips its children. */
+    #rc-table-wrap .table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--ic-radius-sm); }
+    #rc-table-wrap .table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--ic-radius-sm); }
   </style>
 </head>
 <body>
@@ -4004,8 +4094,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <li>
           <div class="sidenav-group">
             <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-performance-2"/></svg><span class="sidenav-item-label">Performance reviews</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
+            <!-- One entry per role (PLAN.md § Roles), ordered narrowest scope
+                 outward — your own work, then your team, then the whole org:
+                   My assessments    → Reviewer · assessments assigned to you
+                   My direct reports → Manager  · how your report chain is faring
+                   Review cycle      → Admin    · set up cycles and templates
+                 Kept flat: .sidenav-sublist supports a single level, so
+                 Templates lives inside the admin section rather than as a
+                 fourth sibling that would break the one-item-per-role read. -->
             <ul class="sidenav-sublist">
-              <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="my-assessments"><span class="sidenav-item-label">Assessments</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="my-assessments"><span class="sidenav-item-label">My assessments</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="team-results"><span class="sidenav-item-label">My direct reports</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="review-cycles"><span class="sidenav-item-label">Review cycle</span></a></li>
             </ul>
           </div>
         </li>
@@ -4031,16 +4131,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
-              <h1 class="page-head-heading">Assessments</h1>
+              <h1 class="page-head-heading">My assessments</h1>
             </div>
             <p class="page-head-subtitle">Assessments where you're the reviewer.</p>
           </div>
-          <!-- Admin-only entry to the builder. Real app gates this on the
-               'Administer Performance Reviews' permission (v2.1); this
-               prototype always shows it since there's no auth to model. -->
-          <div class="page-head-actions">
-            <button class="btn btn-primary" type="button" id="cb-open"><svg class="btn-icon"><use href="#i-plus"/></svg>New assessment cycle</button>
-          </div>
+          <!-- No actions here: creating a cycle is an admin job and lives on the
+               Review cycle page. This page is the reviewer's own worklist. -->
         </div>
 
         <!-- Hub body — rendered by the state machine below. "populated" (Figma:
@@ -4049,16 +4145,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              in via the ?states=1 switcher. -->
         <div id="pr-hub-body">
           <div class="tabs" role="tablist">
-            <button class="tab is-active" role="tab" aria-selected="true" aria-controls="pr-panel-all" type="button" data-panel="all">My Reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">4</span></button>
+            <button class="tab is-active" role="tab" aria-selected="true" aria-controls="pr-panel-all" type="button" data-panel="all"><span class="tab-struck">My Reports</span> <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">4</span></button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-pending" type="button" data-panel="pending">Pending <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">2</span></button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-completed" type="button" data-panel="completed">Completed <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">3</span></button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-skipped" type="button" data-panel="skipped">Skipped <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">1</span></button>
           </div>
 
           <!-- My Reports — oversight of every assessment in flight across the
                team, regardless of who's reviewing. Not filtered per-tab
                (unlike the old shared-table approach): each tab below is its
                own dataset scoped to the logged-in manager specifically. -->
-          <div class="table-scroll" id="pr-panel-all" role="tabpanel" aria-labelledby="pr-panel-all" style="margin-top: var(--ic-space-4)">
+          <div class="table-scroll reports-panel" id="pr-panel-all" role="tabpanel" aria-labelledby="pr-panel-all" style="margin-top: var(--ic-space-4)">
             <table class="table table-wide assessments-table">
               <colgroup>
                 <col class="col-person" /><col class="col-person" /><col class="col-status" />
@@ -4099,7 +4196,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" disabled data-tooltip="This review hasn't been completed yet — nothing to view." data-placement="left">View</button></div></td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4124,7 +4221,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" disabled data-tooltip="This review hasn't been completed yet — nothing to view." data-placement="left">View</button></div></td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4149,7 +4246,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4174,7 +4271,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -4210,7 +4307,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>Jul 6, 2023</td>
-                  <td><div class="cell-actions"><button class="link-action" type="button">Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4227,7 +4324,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <!-- Both rows open the same static "Give Assessment" content (Figma only
                        specs Ezekiel Flores's data) — same reuse-one-instance pattern as the
                        My Reports "View" modal above. -->
-                  <td><div class="cell-actions"><button class="link-action" type="button">Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -4265,7 +4362,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Direct Report</span></span></td>
                   <td>May 12, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4279,7 +4376,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Teammate</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>May 20, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4293,7 +4390,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>Jun 2, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Skipped — assessments the manager declined rather than filled in.
+               "Skip" on the Pending tab lands a row here. Same shape as Pending
+               and Completed; Assess stays available because skipping isn't
+               final — the legacy tool surfaces these to managers as "Includes
+               1 skipped", so they're tracked, not discarded. -->
+          <div class="table-scroll" id="pr-panel-skipped" role="tabpanel" aria-labelledby="pr-panel-skipped" style="margin-top: var(--ic-space-4)" hidden>
+            <table class="table table-wide assessments-table">
+              <colgroup>
+                <col style="width: 42%" /><col style="width: 20%" /><col style="width: 16%" /><col style="width: 22%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Feedback Receiver</th>
+                  <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
+                  <th>Date Skipped</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">TB</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Tomas Berg</span>
+                        <span class="cell-user-role">QA Engineer</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="rel-tags"><span class="tag tag-light">Teammate</span></span></td>
+                  <td>May 28, 2025</td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -4312,12 +4446,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </div>
           </div>
         </template>
+      </section>
 
-        <!-- Assessment modal (Figma: node 33986:135941) — opened by any row's
-             "View" button on My Reports, regardless of status. All 4 rows
-             share this one instance; see the memory note on why content
-             isn't per-row. -->
-        <div class="modal-overlay" id="assessment-modal" hidden>
+      <!-- Assessment modal (Figma: node 33986:135941) — opened by a completed
+           row's "View" button, from either the Assessments hub or Team results.
+           A sibling of the page-views, not a child of one: nested inside
+           my-assessments it could only ever open while that view was showing,
+           so the copy on Team results would toggle a modal inside a hidden
+           section and appear to do nothing. All rows share this one instance;
+           see the memory note on why content isn't per-row. -->
+      <div class="modal-overlay" id="assessment-modal" hidden>
           <div class="modal modal-lg">
             <header class="modal-header">
               <h2 class="modal-title">Assessment</h2>
@@ -4434,8 +4572,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
-      </section>
-
       <!-- Give Assessment — per-competency review flow (Figma node
            33986:143742). Opened from My Assessments → Pending → Assess.
            Kept as a sibling page-view rather than a hub tab, since it
@@ -4547,6 +4683,387 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </section>
 
+      <!-- Review cycle — the admin landing page. Shell for now: page head plus
+           the CTA into the builder. The body is where the list of existing
+           cycles goes (status, window, participant count, progress), which is
+           the natural next screen. -->
+      <section class="page-view" data-page="review-cycles" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Review cycle</h1>
+            </div>
+            <p class="page-head-subtitle">Create and manage assessment cycles.</p>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" type="button" id="rc-new"><svg class="btn-icon"><use href="#i-plus"/></svg>New review cycle</button>
+          </div>
+        </div>
+
+        <div class="table-scroll" id="rc-table-wrap">
+          <table class="table table-wide">
+            <colgroup>
+              <col style="width: 36%" /><col style="width: 30%" /><col style="width: 22%" /><col style="width: 12%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Created by</th>
+                <th>Date created</th>
+                <th style="text-align: right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title-text">H2 2026 — Engineering</span></td>
+                <td>
+                  <div class="cell-user">
+                    <span class="cell-avatar">MV</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name">Matt Vella</span>
+                      <span class="cell-user-role">People Ops</span>
+                    </div>
+                  </div>
+                </td>
+                <td>Aug 19, 2026</td>
+                <td>
+                  <div class="cell-actions">
+                    <div class="dropdown">
+                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                      <div class="dropdown-menu dropdown-menu-end" hidden>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="cell-title-text">Newcomer Review — Jun 2026</span></td>
+                <td>
+                  <div class="cell-user">
+                    <span class="cell-avatar">KR</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name">Katherine Rozakis</span>
+                      <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
+                    </div>
+                  </div>
+                </td>
+                <td>Jun 2, 2026</td>
+                <td>
+                  <div class="cell-actions">
+                    <div class="dropdown">
+                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                      <div class="dropdown-menu dropdown-menu-end" hidden>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="cell-title-text">Q1 2026 — Company-wide</span></td>
+                <td>
+                  <div class="cell-user">
+                    <span class="cell-avatar">CH</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name">Camilla Herrere</span>
+                      <span class="cell-user-role">People Ops</span>
+                    </div>
+                  </div>
+                </td>
+                <td>Jan 12, 2026</td>
+                <td>
+                  <div class="cell-actions">
+                    <div class="dropdown">
+                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                      <div class="dropdown-menu dropdown-menu-end" hidden>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- My direct reports — the manager surface (PLAN.md § Manager views). Shell
+           for now; the roster table and per-person breakdown are next up. -->
+      <section class="page-view" data-page="team-results" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">My direct reports</h1>
+            </div>
+            <p class="page-head-subtitle">How your team is faring this cycle.</p>
+          </div>
+        </div>
+
+        <!-- Tabs driven by the shared block's generic .tabs handler, which keys
+             off aria-controls. No custom wiring needed here (unlike the hub,
+             whose tabs are re-rendered by the state machine). -->
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-reports-panel" type="button">My reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reviews-panel" type="button">Individual reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-goals-panel" type="button">Individual goals <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+        </div>
+
+        <div id="tr-reports-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
+          <div class="toolbar" id="tr-reports-toolbar">
+            <div class="input-icon input-icon-left toolbar-search">
+              <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
+              <input class="input" type="search" id="tr-reports-search" placeholder="Search by reviewer or reviewee" />
+            </div>
+            <div class="toolbar-end">
+              <div class="input-select is-auto" id="tr-cycle-select">
+                <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">All cycles</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+                <div class="dropdown-menu dropdown-menu-end" hidden>
+                  <button class="dropdown-item" type="button" data-cycle="all"><svg class="dropdown-item-check"><use href="#i-check"/></svg>All cycles</button>
+                  <button class="dropdown-item" type="button" data-cycle="Q1 2026"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q1 2026</button>
+                  <button class="dropdown-item" type="button" data-cycle="Q4 2025"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q4 2025</button>
+                  <button class="dropdown-item" type="button" data-cycle="Q3 2025"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q3 2025</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-scroll reports-panel">
+            <table class="table table-wide assessments-table">
+              <colgroup>
+                <col class="col-person" /><col class="col-person" /><col class="col-status" />
+                <col class="col-relationship" /><col class="col-due" /><col class="col-cycle" /><col class="col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>About</th>
+                  <th>Status</th>
+                  <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
+                  <th>Due by</th>
+                  <th>Review Cycle</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">SK</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Sara Kahlau</span>
+                        <span class="cell-user-role">Senior Director, Innovation &amp; Experience consulting</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">TU</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">TJ Urglavitch</span>
+                        <span class="cell-user-role">Senior Manager of Cloud Services</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
+                  <td><span class="tag tag-light">Peer Feedback</span></td>
+                  <td>Jun 6, 2025</td>
+                  <td>Q1 2026</td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">KR</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Katherine Rozakis</span>
+                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">DA</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Dilan Appathurai</span>
+                        <span class="cell-user-role">Director, Quality Assurance</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
+                  <td><span class="tag tag-light">Peer Feedback</span></td>
+                  <td>Jun 6, 2025</td>
+                  <td>Q1 2026</td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">EF</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Ezekiel Flores</span>
+                        <span class="cell-user-role">Product Design Lead</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">MK</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Matt Kelch</span>
+                        <span class="cell-user-role">Engineering Manager</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
+                  <td><span class="tag tag-light">Peer Feedback</span></td>
+                  <td>Jun 6, 2025</td>
+                  <td>Q4 2025</td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">KR</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Katherine Rozakis</span>
+                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">DA</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Dilan Appathurai</span>
+                        <span class="cell-user-role">Director, Quality Assurance</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
+                  <td><span class="tag tag-light">Peer Feedback</span></td>
+                  <td>Jun 6, 2025</td>
+                  <td>Q3 2025</td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Individual reviews (Figma node 33498:103163) — every reviewer→reviewee
+             pair in the cycle. The design also carries a filter row (date,
+             reviewer, reviewee, team) and pagination; both left out for now
+             since neither would do anything yet. -->
+        <div class="table-scroll" id="tr-reviews-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
+          <table class="table table-wide assessments-table tr-reviews-table">
+            <colgroup>
+              <col style="width: 13%" /><col style="width: 25%" /><col style="width: 25%" /><col style="width: 22%" /><col style="width: 15%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th><button class="th-sort" type="button">Review date</button></th>
+                <th><button class="th-sort" type="button">Reviewer</button></th>
+                <th><button class="th-sort" type="button">Reviewee</button></th>
+                <th>Team</th>
+                <th style="text-align: right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Jun 6, 2025</td>
+                <td><div class="cell-user"><span class="cell-avatar">AS</span><div class="cell-user-meta"><span class="cell-user-name">Anastasia Shevchuk</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td><div class="cell-user"><span class="cell-avatar">TU</span><div class="cell-user-meta"><span class="cell-user-name">TJ Urglavitch</span><span class="cell-user-role">Senior Manager of Cloud Services</span></div></div></td>
+                <td><span class="tag tag-light">Engineering, Platform Team</span></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+              </tr>
+              <tr>
+                <td>Jun 6, 2025</td>
+                <td><div class="cell-user"><span class="cell-avatar">AT</span><div class="cell-user-meta"><span class="cell-user-name">Alexander Traykov</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td><div class="cell-user"><span class="cell-avatar">DA</span><div class="cell-user-meta"><span class="cell-user-name">Dilan Appathurai</span><span class="cell-user-role">Director, Quality Assurance</span></div></div></td>
+                <td><span class="tag tag-light">Engineering, Platform Team</span></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+              </tr>
+              <tr>
+                <td>Jun 6, 2025</td>
+                <td><div class="cell-user"><span class="cell-avatar">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lucie Karaskova</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td><div class="cell-user"><span class="cell-avatar">MK</span><div class="cell-user-meta"><span class="cell-user-name">Matt Kelch</span><span class="cell-user-role">Engineering Manager</span></div></div></td>
+                <td><span class="tag tag-light">Engineering, Platform Team</span></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+              </tr>
+              <tr>
+                <td>Jun 6, 2025</td>
+                <td><div class="cell-user"><span class="cell-avatar">LV</span><div class="cell-user-meta"><span class="cell-user-name">Lubos Volkov</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
+                <td><div class="cell-user"><span class="cell-avatar">SK</span><div class="cell-user-meta"><span class="cell-user-name">Sara Kahlau</span><span class="cell-user-role">Senior Director, Innovation &amp; Experience</span></div></div></td>
+                <td><span class="tag tag-light">Engineering, Web Team</span></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+              </tr>
+              <tr>
+                <td>Jun 6, 2025</td>
+                <td><div class="cell-user"><span class="cell-avatar">MT</span><div class="cell-user-meta"><span class="cell-user-name">Mateusz Tatara</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td><div class="cell-user"><span class="cell-avatar">EF</span><div class="cell-user-meta"><span class="cell-user-name">Ezekiel Flores</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
+                <td><span class="tag tag-light">Design</span></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Individual goals (Figma node 33540:160274) — the reviewee's own
+             answers to the cycle's Goal Questions, which is where the builder's
+             step-3 "Goal questions" end up. Question + answer share one cell,
+             matching the design. Filters/pagination omitted as above. -->
+        <div class="table-scroll" id="tr-goals-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
+          <table class="table table-wide assessments-table tr-goals-table">
+            <colgroup>
+              <col style="width: 24%" /><col style="width: 12%" /><col style="width: 12%" /><col style="width: 52%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th><button class="th-sort" type="button">Author</button></th>
+                <th><button class="th-sort" type="button">Date</button></th>
+                <th>Review</th>
+                <th>Question / Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="cell-user"><span class="cell-avatar">AS</span><div class="cell-user-meta"><span class="cell-user-name">Anastasia Shevchuk</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td>Jun 6, 2025</td>
+                <td>Q1</td>
+                <td><div class="cell-meta"><span class="cell-meta-title">What are your main goals for the next 12 months?</span><span class="cell-meta-sub">Grow into the technical lead role and ship the new billing service end-to-end.</span></div></td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="cell-avatar">AT</span><div class="cell-user-meta"><span class="cell-user-name">Alexander Traykov</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td>Jun 6, 2025</td>
+                <td>Q1</td>
+                <td><div class="cell-meta"><span class="cell-meta-title">What support do you need from your manager?</span><span class="cell-meta-sub">More regular 1:1s and clearer prioritisation from leadership.</span></div></td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="cell-avatar">MT</span><div class="cell-user-meta"><span class="cell-user-name">Mateusz Tatara</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td>Jun 6, 2025</td>
+                <td>Q1</td>
+                <td><div class="cell-meta"><span class="cell-meta-title">Which technical skill do you most want to grow?</span><span class="cell-meta-sub">Deepen my distributed-systems and performance-profiling skills.</span></div></td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="cell-avatar">LV</span><div class="cell-user-meta"><span class="cell-user-name">Lubos Volkov</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
+                <td>Jun 6, 2025</td>
+                <td>Q1</td>
+                <td><div class="cell-meta"><span class="cell-meta-title">What are your main goals for the next 12 months?</span><span class="cell-meta-sub">Take the design system to full adoption across every product surface.</span></div></td>
+              </tr>
+              <tr>
+                <td><div class="cell-user"><span class="cell-avatar">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lucie Karaskova</span><span class="cell-user-role">Product Designer</span></div></div></td>
+                <td>Jun 6, 2025</td>
+                <td>Q1</td>
+                <td><div class="cell-meta"><span class="cell-meta-title">What support do you need from your manager?</span><span class="cell-meta-sub">More regular 1:1s and clearer prioritisation from leadership.</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- ============================================================
            ASSESSMENT BUILDER — 5-step wizard (PLAN.md, Phase 1)
            The admin flow that replaces v2.1's "raise a ticket, an engineer
@@ -4562,27 +5079,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" id="cb-back-link">Assessments</a>
+              <a class="breadcrumb" href="#" id="cb-back-link">Review cycle</a>
               <span class="breadcrumb is-current" aria-current="page">New assessment cycle</span>
             </nav>
             <div class="page-head-title">
               <h1 class="page-head-heading">New assessment cycle</h1>
             </div>
           </div>
+          <!-- Stepper lives in the page head, pinned right. Only the current
+               step keeps its label (see #cb-stepper CSS) so the whole control
+               stays narrow enough to sit beside the heading. -->
+          <div class="page-head-actions">
+            <ol class="stepper" id="cb-stepper">
+              <li class="stepper-step is-current" data-step="1"><span class="stepper-num">1</span><span class="stepper-label">Setup</span></li>
+              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
+              <li class="stepper-step" data-step="2"><span class="stepper-num">2</span><span class="stepper-label">Competencies</span></li>
+              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
+              <li class="stepper-step" data-step="3"><span class="stepper-num">3</span><span class="stepper-label">Scale &amp; questions</span></li>
+              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
+              <li class="stepper-step" data-step="4"><span class="stepper-num">4</span><span class="stepper-label">Participants</span></li>
+              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
+              <li class="stepper-step" data-step="5"><span class="stepper-num">5</span><span class="stepper-label">Review</span></li>
+            </ol>
+          </div>
         </div>
 
         <div class="cb-body">
-          <ol class="stepper" id="cb-stepper" style="margin-bottom: var(--ic-space-6)">
-            <li class="stepper-step is-current" data-step="1"><span class="stepper-num">1</span><span class="stepper-label">Setup</span></li>
-            <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-            <li class="stepper-step" data-step="2"><span class="stepper-num">2</span><span class="stepper-label">Competencies</span></li>
-            <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-            <li class="stepper-step" data-step="3"><span class="stepper-num">3</span><span class="stepper-label">Scale &amp; questions</span></li>
-            <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-            <li class="stepper-step" data-step="4"><span class="stepper-num">4</span><span class="stepper-label">Participants</span></li>
-            <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-            <li class="stepper-step" data-step="5"><span class="stepper-num">5</span><span class="stepper-label">Review</span></li>
-          </ol>
 
           <!-- ---------- STEP 1 · Setup ---------- -->
           <div class="cb-step" data-step="1">
@@ -6065,6 +6587,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           e.preventDefault();
           sidenav.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
           link.classList.add('is-active');
+          // Most nav items are decorative in this prototype (Processes, OKRs,
+          // …) — only the ones with a matching .page-view actually navigate.
+          // Without this guard an unbuilt item would blank the content area.
+          if (document.querySelector(`.page-view[data-page="${link.dataset.page}"]`)) {
+            window.showPrPage?.(link.dataset.page);
+          }
           main?.scrollTo({ top: 0, behavior: 'instant' });
         });
       });
@@ -6072,6 +6600,63 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
+    // ===== My reports toolbar (My direct reports) — search + cycle filter =====
+    // Both filters apply together, so narrowing by cycle then typing behaves the
+    // way a user expects. The shared .input-select handler already opens/closes
+    // the menu and syncs the trigger label; this only adds the filtering.
+    (function () {
+      const panel  = document.getElementById('tr-reports-panel');
+      const search = document.getElementById('tr-reports-search');
+      const select = document.getElementById('tr-cycle-select');
+      if (!panel || !search || !select) return;
+
+      const rows = [...panel.querySelectorAll('tbody tr')];
+      const badge = document.querySelector('.tab[aria-controls="tr-reports-panel"] [data-tab-count]');
+      let cycle = 'all';
+
+      // Cycle lives in the 6th column; the people are in the first two.
+      const cycleOf  = row => row.children[5]?.textContent.trim() ?? '';
+      const personOf = row => [...row.querySelectorAll('.cell-user-name, .cell-user-role')]
+        .map(el => el.textContent).join(' ').toLowerCase();
+
+      const apply = () => {
+        const q = search.value.trim().toLowerCase();
+        let shown = 0;
+        rows.forEach(row => {
+          const hit = (!q || personOf(row).includes(q)) && (cycle === 'all' || cycleOf(row) === cycle);
+          row.hidden = !hit;
+          if (hit) shown++;
+        });
+        // Badge tracks what's visible, not the underlying total.
+        if (badge) badge.textContent = shown;
+
+        // Filtering to nothing would otherwise leave a bare header.
+        const body = panel.querySelector('tbody');
+        body.querySelector('[data-empty-row]')?.remove();
+        if (!shown) {
+          const cols = panel.querySelectorAll('thead th').length;
+          body.insertAdjacentHTML('beforeend',
+            `<tr data-empty-row><td colspan="${cols}" style="text-align: center; color: var(--color-text-subtle)">No assessments match this search.</td></tr>`);
+        }
+      };
+
+      search.addEventListener('input', apply);
+      select.querySelectorAll('[data-cycle]').forEach(item => {
+        item.addEventListener('click', () => { cycle = item.dataset.cycle; apply(); });
+      });
+    })();
+
+    // Team results tab badges — derived from each panel's row count rather than
+    // typed into the markup, so they can't drift out of step with the tables
+    // (the hub's counts were hardcoded until Skip started moving rows).
+    (function () {
+      document.querySelectorAll('[data-tab-count]').forEach(badge => {
+        const id = badge.closest('.tab')?.getAttribute('aria-controls');
+        const panel = id && document.getElementById(id);
+        if (panel) badge.textContent = panel.querySelectorAll('tbody tr').length;
+      });
+    })();
+
     // ===== Give Assessment page-view (Figma node 33986:143742) =====
     // Swaps between the top-level .page-view sections inside .app-shell-main
     // (my-assessments · assessment-flow · cycle-builder). Deliberately not a
@@ -6080,6 +6665,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const main = document.querySelector('.app-shell-main');
       const showPage = (name) => {
         document.querySelectorAll('.page-view').forEach(p => { p.hidden = p.dataset.page !== name; });
+        // Keep the sidenav honest no matter what triggered the move — nav
+        // click, page-head button, or breadcrumb. Views with no nav item of
+        // their own (assessment-flow) leave the highlight where it is, so
+        // "Assessments" stays lit while you're inside a review it launched.
+        const navItem = document.querySelector(`.sidenav-item[data-page="${name}"]`);
+        if (navItem) {
+          document.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+          navItem.classList.add('is-active');
+        }
         main?.scrollTo({ top: 0, behavior: 'instant' });
       };
 
@@ -6141,7 +6735,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     // it and writes back to it, so the review step can't drift out of sync
     // with what was actually picked.
     (function () {
-      const section = document.querySelector('[data-page="cycle-builder"]');
+      // Must be scoped to .page-view: the sidenav's "Review cycle" link carries
+      // the same data-page value and sits earlier in the DOM, so a bare
+      // [data-page="cycle-builder"] selector matches the nav anchor instead and
+      // every $() lookup below silently comes back null.
+      const section = document.querySelector('.page-view[data-page="cycle-builder"]');
       if (!section) return;
 
       // Library seeded with the v2.1 spec's own sample set, so the prototype
@@ -6465,9 +7063,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       $('#cb-next').addEventListener('click', () => {
         if (STATE.step < LAST) { goToStep(STATE.step + 1); return; }
+        // Launching returns to the cycle list — the wizard is done, so leaving
+        // the user parked on step 5 would be a dead end. Read the name before
+        // navigating; the toast region is fixed-position so it outlives the
+        // page switch and lands on the list.
+        const name = $('#cb-name').value.trim() || 'Cycle';
+        const created = STATE.pairs.length;
+        window.showPrPage?.('review-cycles');
         if (window.toast) toast({
           variant: 'success',
-          message: `“${$('#cb-name').value || 'Cycle'}” launched — ${STATE.pairs.length} assessments created.`
+          message: `“${name}” launched — ${created} assessment${created === 1 ? '' : 's'} created.`
         });
       });
       $('#cb-prev').addEventListener('click', () => goToStep(Math.max(1, STATE.step - 1)));
@@ -6479,14 +7084,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       }));
 
       /* ---------- Entry / exit ---------- */
+      // "New" always starts clean. (Re-entering via the sidenav deliberately
+      // does not, so navigating away mid-wizard doesn't discard the form.)
       const open = () => {
         goToStep(1);
         window.showPrPage?.('cycle-builder');
       };
-      document.getElementById('cb-open')?.addEventListener('click', open);
+      // The Review cycle page's CTA is the only way in. Bound with
+      // getElementById because it lives outside the builder's own section.
+      document.getElementById('rc-new')?.addEventListener('click', open);
+
+      // Breadcrumb points at the builder's parent in the IA (Review cycle),
+      // not at whichever page you happened to arrive from.
       $('#cb-back-link').addEventListener('click', (e) => {
         e.preventDefault();
-        window.showPrPage?.('my-assessments');
+        window.showPrPage?.('review-cycles');
       });
 
       renderLibrary();
@@ -6542,6 +7154,56 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         hub.querySelectorAll('[data-assess-open]').forEach(trigger => {
           trigger.addEventListener('click', () => window.showAssessPage?.());
         });
+        // Skip moves the row from Pending into Skipped.
+        hub.querySelectorAll('[data-skip]').forEach(btn => {
+          btn.addEventListener('click', () => skipRow(btn));
+        });
+        refreshPanels();   // counts derive from the rows, not hand-set markup
+      };
+
+      /* Tab badges + empty rows, recomputed from whatever each tbody actually
+         holds. Before Skip could move rows the counts were hardcoded, which
+         would have drifted the moment one did. */
+      const EMPTY_TEXT = {
+        all:       'No assessments in flight.',
+        pending:   'Nothing pending — you’re all caught up.',
+        completed: 'Nothing completed yet.',
+        skipped:   'Nothing skipped.'
+      };
+      const refreshPanels = () => {
+        Object.keys(EMPTY_TEXT).forEach(key => {
+          const panel = hub.querySelector(`#pr-panel-${key}`);
+          if (!panel) return;
+          const body = panel.querySelector('tbody');
+          body.querySelector('[data-empty-row]')?.remove();
+          const rows = body.querySelectorAll('tr').length;
+
+          const badge = hub.querySelector(`.tab[data-panel="${key}"] .count-badge`);
+          if (badge) badge.textContent = rows;
+
+          if (!rows) {
+            const cols = panel.querySelectorAll('thead th').length;
+            body.insertAdjacentHTML('beforeend',
+              `<tr data-empty-row><td colspan="${cols}" style="text-align: center; color: var(--color-text-subtle)">${EMPTY_TEXT[key]}</td></tr>`);
+          }
+        });
+      };
+
+      const skipRow = (btn) => {
+        const row = btn.closest('tr');
+        const target = hub.querySelector('#pr-panel-skipped tbody');
+        if (!row || !target) return;
+        const name = row.querySelector('.cell-user-name')?.textContent ?? 'this person';
+
+        // Pending's third column is "Date Received"; in Skipped the same slot is
+        // "Date Skipped", so it becomes the date the skip happened.
+        row.children[2].textContent = new Date().toLocaleDateString('en-US',
+          { month: 'short', day: 'numeric', year: 'numeric' });
+        btn.remove();            // Skip is gone; Assess stays — skipping isn't final
+        target.appendChild(row); // the Assess button keeps its existing listener
+
+        refreshPanels();
+        if (window.toast) toast({ variant: 'neutral', message: `Skipped the assessment for ${name}.` });
       };
 
       const STATES = {

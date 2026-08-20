@@ -36,7 +36,12 @@ from the prototype where they're genuinely good.
 - Competency rows as cards with name + description + a destructive action.
 - `required` badges on questions.
 
-### What the prototype has that v2.1 does NOT (deliberately dropped)
+### What the prototype has that v2.1 does NOT
+
+> ⚠️ **Reversed 2026-08-19.** These were dropped in Phase 1 as v2.0-only, then
+> deliberately reinstated for Phase 2 on Matt's call. See *Roles* and
+> *Templates* below. Kept visible here so the reintroduction reads as a decision
+> rather than drift.
 
 - **Templates + Base Template inheritance** and the `inherited` badge
 - **Regular / Newcomer** template variants
@@ -44,10 +49,10 @@ from the prototype where they're genuinely good.
 
 ## Locked decisions
 
-- **Reuse model: persistent library, no inheritance.** Competency groups,
-  competencies and rating scales persist and are reusable across cycles; the
-  wizard picks from them or creates new ones inline. No template/inheritance
-  concept — v2.1 dropped it and it's the prototype's most complex machinery.
+- ~~**Reuse model: persistent library, no inheritance.**~~ **Superseded
+  2026-08-19** — templates are in. The library still exists underneath
+  (individual competencies are shared across templates); templates sit *on top*
+  of it as named, taggable bundles. See *Templates* below.
 - **Questions ARE included** — Review Questions (asked of reviewers) and Goal
   Questions, each with a `required` flag. ⚠️ **This extends beyond v2.1**: no CSV
   column carries questions, so this is a *proposed* capability needing backend
@@ -119,6 +124,87 @@ Entry: **Assessments** hub → `New assessment cycle`. A 5-step `.stepper`.
 - Relationship types are shown as derived but hardcoded per mock row (no org data).
 - No persistence: library "saves" live in-page only.
 
+## Roles (added 2026-08-19)
+
+Three roles, plus one surface the three don't name.
+
+| Role | Scope | Spec backing |
+|---|---|---|
+| **Admin** | Builds templates, runs cycles, sees everything | **Strong.** v2.1: *"All assessments are always visible to users with the special permission 'Administer Performance Reviews'."* The Admin page is v2.1's own stated future. |
+| **Reviewer** | Gives assessments on assigned pairs | **Strong.** v2.1: *"anyone can review anyone."* |
+| **Manager** | Sees how their team is faring; reads what peers said | **Access: yes. Analysis: no.** v2.0: *"Managers can access assessments and peer feedbacks for their reports."* v2.1 date-gates it via `Available_for_managers_on` → *"the direct manager and all managers up the reporting chain."* The roll-up/analytics layer is net-new. |
+
+**Reviewer is not a permission.** Relationship type is derived *per pair*, so the
+same person is reviewer in one row and reviewee in another. It's a hat worn per
+assessment, not a role held — so it must not gate navigation the way Admin does.
+
+**Manager scope = report chain.** The legacy tool confirms the mechanic: an
+`Enable admin view` toggle with *"By default only people in your report chain are
+shown."* Same model here — manager sees their chain, admin toggles to all.
+
+**The unnamed fourth surface: reviewee receiving results.** Date-gated by
+`Available_for_reviewee_on`, plus self-assessment (`Self` is a relationship
+type). "My Results" was removed from the nav on 2026-08-19; if roles are being
+formalised this needs a decision rather than staying dropped.
+
+## Templates (added 2026-08-19)
+
+Reinstated from v2.0 / the legacy tool. **Rationale:** v2.1's free-form model is
+maximally flexible but unusable at scale — with no templates an admin
+hand-assigns `Competency_IDs` per row for hundreds of pairs, which is exactly why
+launching still needs a CSV and an engineer. v2.1's own sample already varies
+competency sets per pair (Michael gets 6, Alice and Jack get 4), so per-pair
+variation is the reality; templates are how it gets managed. **This also resolves
+open question 1.**
+
+Structure, per the reference:
+
+- A template is a **named bundle of competencies + questions**, drawn from the
+  shared library.
+- **Tags/labels** on each: `base` (merged into every other template) and
+  `universal` (no per-cycle-type variants).
+- **Base Template** — *"define global values or culture areas all team members
+  are evaluated on. Items here are combined with each employee's role-specific
+  template."* Its items show an `inherited` badge in child templates, and can be
+  hidden/revealed (`Show 4 inherited`) but not deleted from the child.
+- **Role templates** — Design, Engineering, Management, Marketing, etc.
+- **Variants** — non-universal templates split `Regular` / `Newcomer`, each with
+  its own competency subset (Engineering Newcomer drops System Design and
+  Mentorship).
+- Templates carry **questions** too (review + goal, each with `required` and
+  `inherited` flags) — which is where the questions already built into the wizard
+  belong.
+
+**Cycle mechanic:** each reviewee resolves to Base + their role template (+
+variant). That's what replaces per-row competency picking.
+
+## Manager views (added 2026-08-19)
+
+Deliberately **lightweight** — a roll-up, not an analytics product.
+
+**1. Team roster** (`Review results`)
+- Cycle selector · `Summarized` / `Detailed` toggle · `Enable admin view`
+- Rating-scale legend
+- Row per reviewee: avatar/name/role/team · **Overall performance** (score +
+  radial) · **Best performing in** (top 3 competencies + scores) · **Worst
+  performing in** (bottom 3) · **Reviews** (`2 / 4 completed`, plus skipped
+  count) · **Answers** (`3 / 3`) · **View Breakdown**
+
+**2. Individual breakdown**
+- Person header: name, role · team · cycle, overall score + label
+- **Competency scores** — card per competency: score, radial, label, and the
+  peer comments attributed by name (`Carla Ruiz · 5 "Great collaboration…"`), or
+  an explicit *No comments.*
+- **Competency trend** — score across recent cycles (bar chart)
+- **Notes** — manager's own private notes (`Add note`)
+
+⚠️ **Beyond spec, needs flagging in-UI:** averaged scores, best/worst ranking,
+cross-cycle trend, and manager notes have no basis in either doc. The trend also
+assumes competencies are stable across cycles, which templates make likely but
+nothing guarantees. Attribution of comments to named peers is the most sensitive
+piece — v2.1's visibility model is per-pair dates and says nothing about
+surfacing who said what.
+
 ## Build sequence
 
 - **Phase 1** — the 5-step wizard, happy path only, populated states
@@ -128,10 +214,33 @@ Entry: **Assessments** hub → `New assessment cycle`. A 5-step `.stepper`.
 - **Phase 3** — the library as a browsable screen in its own right (`Competencies`
   nav item), if it earns a place beyond inline management
 
+### Phase 2 order (roles · templates · manager views)
+
+1. **Templates list** — `Admin / Review Templates`: table + tags, New/Edit/Delete.
+   First because it unblocks the wizard's competency step and settles open Q1.
+2. **Template editor** — competencies (with `inherited` badges + show/hide) and
+   questions; variant tabs for non-universal templates.
+3. **Wire into the wizard** — step 2 picks templates instead of loose
+   competencies; Base auto-applies.
+4. **Manager roster** — the roll-up table.
+5. **Manager breakdown** — competency cards, peer comments, trend, notes.
+
 ## Open questions
 
-1. Per-pair competency/scale variation — first-class flow, or override-only?
+1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
+   (Base + role template + variant, resolved per reviewee).
 2. Do questions survive contact with the backend, or stay a design proposal?
 3. Should a launched cycle be editable after the fact, or immutable?
 4. Does the library need archive-vs-delete? (Past assessments reference
    competencies by ID, so hard delete would orphan them.)
+5. **Does the reviewee get a results surface?** ("My Results" was removed from the
+   nav; the three roles don't name the reviewee-as-reader.)
+6. **How is a role template bound to a person?** By org unit (v2.0 cascaded down
+   nested units), by job title, or assigned per cycle? Determines whether the
+   admin picks templates or the system resolves them.
+7. **Are peer comments attributed or anonymous to the manager?** The reference
+   shows names; v2.1 says nothing, and v2.0's Peer Feedback was a separate
+   always-on channel. Highest-sensitivity open item.
+8. **Does editing a template affect cycles already launched?** Templates are
+   mutable, assessments reference competencies by ID — same orphaning risk as 4,
+   one level up.
