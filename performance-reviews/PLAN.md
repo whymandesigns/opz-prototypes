@@ -340,6 +340,42 @@ while the 5-step wizard keeps working; step 3 is the cut-over.
 4. **Manager roster** — the roll-up table.
 5. **Manager breakdown** — competency cards, peer comments, trend, notes.
 
+## NB-59 revisions (2026-08-21)
+
+Five sub-issues landed together. Two of them **reverse decisions recorded above**,
+so they're noted here rather than left to look like drift.
+
+| Issue | Change |
+|---|---|
+| NB-62 | `Create cycle` CTA and the Cycles tab move to **My direct reports** — the manager owns launching, and can launch whenever. |
+| NB-63 | `Review cycle` → **Templates** (sidebar + page head), tab strip dropped; it only holds templates now. |
+| NB-64 | Step 1's **cycle type selector removed** ("that's part of the templates"); each template row now shows its rating scale; the "What reviewers will see" card removed as duplicative. |
+| NB-65 | Step 3's **reviewee team dropdown removed** — "not needed". |
+| NB-66 | Page-head divider suppressed when a page-level tab strip follows it, kept otherwise. |
+
+### ⚠️ Consequence: nothing resolves a template per participant any more
+
+NB-64 removed the cycle type and NB-65 removed the team. Those were the **only two
+inputs** to per-participant resolution, so with both gone:
+
+- `tplForTeam()` is deleted, along with the Participants table's Team and
+  Template columns and the *No match* launch warning.
+- The Review step no longer reports `3 → Engineering · 0 → Design`; it states
+  that every participant is assessed on all selected templates.
+- **Newcomer variants are unreachable from the cycle flow.** `compsFor()` now
+  always resolves to a template's `regular` set. The variants still exist and are
+  still editable in the template editor, but no cycle can select one.
+
+This supersedes the "many templates per cycle, each participant resolves to one"
+decision above. It's a coherent simpler model — a cycle's templates apply to
+everyone in it — but two things need a decision before this ships further:
+
+1. **How does a Newcomer cycle happen?** Either the cycle picks the variant, or
+   "newcomer" becomes a property of the person (tenure), resolved per participant.
+2. **What does selecting two templates mean** if everyone gets both? Today it
+   unions their competencies, which may not be intended for a cycle spanning
+   Engineering and Design.
+
 ## Open questions
 
 1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
