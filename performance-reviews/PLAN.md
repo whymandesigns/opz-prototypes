@@ -326,8 +326,17 @@ while the 5-step wizard keeps working; step 3 is the cut-over.
    tags, New / Edit / Delete.
 2. **Template editor** — lift today's steps 2 and 3 (competency picker with
    `inherited` badges, scale editor, question lists) + name, tags, variant tabs.
-3. **Cut the wizard to 4 steps** — 1 Setup (+ cycle type) → 2 Template (chosen,
-   read-only) → 3 Participants → 4 Review. Only once the editor owns that state.
+3. ~~**Cut the wizard to 4 steps**~~ — **done 2026-08-20.** 1 Setup (+ cycle
+   type) → 2 Templates (multi-select + resolved preview) → 3 Participants
+   (+ team, showing which template each resolves to) → 4 Review. The old steps
+   2 and 3 are gone; competencies, scale and questions now live only in the
+   template editor, so the two competency libraries that briefly disagreed are
+   one again.
+   - Participants carry a **team**; `tplForTeam()` matches it to a template
+     **by name** — the stand-in for real org data (open question 6).
+   - A participant on a team no selected template covers is flagged inline as
+     *No match* and raises a launch warning. That is the closest thing this
+     flow has to a launch blocker, and it is surfaced rather than silent.
 4. **Manager roster** — the roll-up table.
 5. **Manager breakdown** — competency cards, peer comments, trend, notes.
 
