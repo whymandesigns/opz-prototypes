@@ -372,9 +372,49 @@ everyone in it — but two things need a decision before this ships further:
 
 1. **How does a Newcomer cycle happen?** Either the cycle picks the variant, or
    "newcomer" becomes a property of the person (tenure), resolved per participant.
-2. **What does selecting two templates mean** if everyone gets both? Today it
-   unions their competencies, which may not be intended for a cycle spanning
-   Engineering and Design.
+   **Still open after NB-67.**
+2. ~~**What does selecting two templates mean** if everyone gets both?~~ —
+   **resolved by NB-67**: one template per cycle. See below.
+
+## NB-67 — the cycle form (2026-08-21)
+
+"Lets minimize the cycle creation flow. No need for all these steps." The
+four-step wizard became **one form with three numbered sections**:
+
+| | Section | Holds |
+|---|---|---|
+| 1 | Review template | Cycle name · template picker · read-only competencies + rating scale for the picked template |
+| 2 | Schedule | Start date · End date · visibility to the reviewee · visibility to managers |
+| 3 | Participants | Reviewer / Reviewee rows, add-a-pair, CSV upload |
+
+What went, and why:
+
+- **The steps.** Nothing in the form depends on an earlier answer — a cycle is a
+  name, a template, a schedule and a list of people — so paging only hid the
+  whole from the person filling it in.
+- **The stepper** in the page head, and the compact-label CSS that made it fit.
+- **The Review & launch step.** The form is short enough to be its own summary.
+  Its blocking checks moved next to the Launch button as a validation read-out
+  (no name / no template / no participants / end before start); its *soft*
+  warnings were dropped — "reviewees never see their results" is a choice, and
+  it now reads directly off Section 2.
+
+### The template picker answers open question 2
+
+**One template per cycle**, chosen from a dropdown, labelled `Engineering
+(extends Base Template)`. Multi-select had nothing left to resolve against once
+NB-64 and NB-65 removed cycle type and team, so a set of templates could only
+ever mean "union everything" — which was the ambiguity. Picking one is the
+honest model.
+
+Selecting a template reveals a read-only block: competencies grouped
+General / Skills (unioned with the Base Template's, which always apply), the
+rating scale as swatches with labels, and the open-question count. It answers
+"what will reviewers actually score?" without making any of it editable here —
+that stays in Templates.
+
+Newcomer variants are **still unreachable** (question 1 above): with no cycle
+type, `compsFor()` resolves to `regular`.
 
 ## Open questions
 

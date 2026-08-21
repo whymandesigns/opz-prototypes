@@ -3681,9 +3681,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .tr-goals-table .cell-meta-title { font: var(--type-body-sm); color: var(--color-text); white-space: normal; }
     .tr-goals-table .cell-meta-sub { display: block; color: var(--color-text-muted); white-space: normal; }
 
-    /* 16px between stacked cards. The wizard's cards get this from .cb-step;
-       the template editor's are direct children of .cb-body, so the gap lives
-       here and covers both. */
+    /* 16px between stacked cards. Both the cycle form's sections and the
+       template editor's cards are direct children of .cb-body, so one gap
+       there covers both. */
     /* NB-66: a tab strip already draws a dividing line, so the page-head rule
        underneath it doubles up. Kept wherever there are no tabs. Two selectors
        because the hub's tabs sit inside #pr-hub-body rather than being an
@@ -3701,21 +3701,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     .cb-body { max-width: 880px; display: flex; flex-direction: column; gap: var(--ic-space-4); }
 
-    /* Compact stepper — only the current step is labelled, so the control reads
-       as "where am I" rather than a full table of contents, and stays narrow
-       enough to sit in the page head next to the heading. Numbers/checks still
-       carry the rest of the progress. Labels are kept in the DOM (not removed)
-       so the step names stay available to screen readers. */
-    #cb-stepper { flex-wrap: nowrap; }
-    #cb-stepper .stepper-step:not(.is-current) .stepper-label {
-      position: absolute;
-      width: 1px; height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
+    /* Numbered section head — designmd has a .stepper for progress through a
+       flow, but nothing for "section 3 of a form you can see all of", which is
+       what NB-67 turned the wizard into. Local, and small enough to stay so. */
+    .cb-sec-head { display: flex; align-items: flex-start; gap: var(--ic-space-3); margin-bottom: var(--ic-space-4); }
+    .cb-sec-titles { flex: 1; min-width: 0; }
+    .cb-sec-head .cb-section-hint { margin-bottom: 0; }
+    .cb-sec-num {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px;
+      border-radius: var(--ic-radius-full);
+      background: var(--color-accent-subtle);
+      color: var(--color-accent);
+      font: var(--type-body-sm);
+      font-weight: var(--ic-weight-semibold);
     }
-    .cb-step { display: flex; flex-direction: column; gap: var(--ic-space-4); }
-    .cb-step[hidden] { display: none; }
+    /* Live read-out of what launching would create, kept in the section head so
+       it stays visible while the table below is scrolled or edited. */
+    .cb-sec-aside { flex-shrink: 0; font: var(--type-body-sm); color: var(--color-text-subtle); }
     .cb-section-title { font: var(--type-h4); margin: 0 0 var(--ic-space-1); }
     .cb-section-hint { font: var(--type-body-sm); color: var(--color-text-subtle); margin: 0 0 var(--ic-space-4); }
     .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-4); }
@@ -3767,16 +3771,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        and .is-dragover still come from the component. designmd is off-limits
        for this project, so it's overridden here rather than at source —
        another entry on the running list of system gaps in this file. */
-    .cb-step .dropzone { background: var(--color-surface); }
-    .cb-step .dropzone:hover { background: var(--color-surface-muted); }
+    .cb-body .dropzone { background: var(--color-surface); }
+    .cb-body .dropzone:hover { background: var(--color-surface-muted); }
 
     /* Review step — a definition list, not a table: it's one record, not rows. */
-    .cb-summary { display: grid; grid-template-columns: 200px 1fr; gap: var(--ic-space-3) var(--ic-space-4); }
-    .cb-summary dt { font: var(--type-body-sm); color: var(--color-text-subtle); }
-    .cb-summary dd { font: var(--type-body-sm); margin: 0; }
-    .cb-summary-list { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
+    /* Read-only summary of the picked template: what reviewers will score and
+       the scale they'll score it on. Reuses the template editor's .cb-preview-*
+       swatch pair for the scale legend rather than cloning it. */
+    .cb-detail { margin-top: var(--ic-space-4); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .cb-detail-label { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); margin: 0 0 var(--ic-space-2); }
+    .cb-detail-group { display: flex; align-items: baseline; gap: var(--ic-space-3); margin-bottom: var(--ic-space-2); }
+    .cb-detail-group:last-of-type { margin-bottom: 0; }
+    .cb-detail-group-name { flex-shrink: 0; width: 60px; font: var(--type-caption); color: var(--color-text-muted); }
+    .cb-detail-tags { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
+    .cb-detail-scale { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-4); }
 
-    .cb-footer { display: flex; align-items: center; justify-content: space-between; padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .cb-footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--ic-space-4); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .cb-footer-hint { font: var(--type-body-sm); color: var(--color-danger); margin: 0; }
 
     /* ===== Review cycle list =====
        .table-scroll's `overflow: auto` clips the row kebab menus — an absolutely
@@ -5328,6 +5339,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            Performance…Leadership, sc1–sc5) so the prototype demonstrates
            the exact shape the script consumes today.
            ============================================================ -->
+      <!-- ===== New assessment cycle =====
+           NB-67 collapsed the four-step wizard into one form with three
+           numbered sections. The steps were carrying no weight: a cycle is a
+           name, a template, a schedule and a list of people, and none of those
+           depend on an earlier answer, so paging through them only hid the
+           whole from the person filling it in. The separate Review step went
+           with them — the form is short enough to be its own summary, so
+           validation lives next to the Launch button instead. -->
       <section class="page-view" data-page="cycle-builder" hidden>
         <div class="page-head">
           <div class="page-head-main">
@@ -5339,137 +5358,136 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <h1 class="page-head-heading">New assessment cycle</h1>
             </div>
           </div>
-          <!-- Stepper lives in the page head, pinned right. Only the current
-               step keeps its label (see #cb-stepper CSS) so the whole control
-               stays narrow enough to sit beside the heading. -->
-          <div class="page-head-actions">
-            <ol class="stepper" id="cb-stepper">
-              <li class="stepper-step is-current" data-step="1"><span class="stepper-num">1</span><span class="stepper-label">Setup</span></li>
-              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="2"><span class="stepper-num">2</span><span class="stepper-label">Templates</span></li>
-              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="3"><span class="stepper-num">3</span><span class="stepper-label">Participants</span></li>
-              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="4"><span class="stepper-num">4</span><span class="stepper-label">Review</span></li>
-            </ol>
-          </div>
         </div>
 
         <div class="cb-body">
 
-          <!-- ---------- STEP 1 · Setup ---------- -->
-          <div class="cb-step" data-step="1">
-            <div class="card">
-              <h2 class="cb-section-title">Cycle details</h2>
-              <p class="cb-section-hint">Names this cycle and sets the window every assessment runs in.</p>
+          <!-- ---------- 1 · Review template ---------- -->
+          <div class="card">
+            <div class="cb-sec-head">
+              <span class="cb-sec-num">1</span>
+              <div class="cb-sec-titles">
+                <h2 class="cb-section-title">Review template</h2>
+                <p class="cb-section-hint">The template decides which competencies reviewers score. Manage them under Templates.</p>
+              </div>
+            </div>
+
+            <label class="field">
+              <span class="field-label">Cycle name</span>
+              <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 Performance Review" value="H2 2026 — Engineering" />
+            </label>
+
+            <!-- One template per cycle. NB-64 and NB-65 removed cycle type and
+                 participant team — the two facts that used to decide which of
+                 several templates a given person got — so a multi-select had
+                 nothing left to resolve against. -->
+            <div class="field" style="margin-top: var(--ic-space-4)">
+              <span class="field-label">Template</span>
+              <div class="input-select" id="cb-tpl-select">
+                <button class="input-select-trigger" aria-expanded="false" type="button">
+                  <span class="input-select-value input-select-placeholder" id="cb-tpl-value">Choose a template…</span>
+                  <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden id="cb-tpl-menu"></div>
+              </div>
+            </div>
+
+            <!-- Filled by renderTplDetail() once a template is picked. -->
+            <div id="cb-tpl-detail"></div>
+
+            <p class="field-hint" style="margin-top: var(--ic-space-3)">Need a different set of competencies? <a class="breadcrumb" href="#" id="cb-tpl-manage">Manage templates</a></p>
+          </div>
+
+          <!-- ---------- 2 · Schedule ---------- -->
+          <div class="card">
+            <div class="cb-sec-head">
+              <span class="cb-sec-num">2</span>
+              <div class="cb-sec-titles">
+                <h2 class="cb-section-title">Schedule</h2>
+                <p class="cb-section-hint">When the cycle runs, and when the collected feedback becomes visible.</p>
+              </div>
+            </div>
+
+            <div class="cb-grid">
               <label class="field">
-                <span class="field-label">Cycle name</span>
-                <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 — Engineering" value="H2 2026 — Engineering" />
+                <span class="field-label">Start date</span>
+                <input class="input" id="cb-starts" type="date" value="2026-09-02" />
               </label>
-              <div class="cb-grid" style="margin-top: var(--ic-space-4)">
-                <label class="field">
-                  <span class="field-label">Starts on</span>
-                  <input class="input" id="cb-starts" type="date" value="2026-09-02" />
-                </label>
-                <label class="field">
-                  <span class="field-label">Ends on</span>
-                  <input class="input" id="cb-ends" type="date" value="2026-09-15" />
-                </label>
+              <label class="field">
+                <span class="field-label">End date</span>
+                <input class="input" id="cb-ends" type="date" value="2026-09-15" />
+              </label>
+            </div>
+
+            <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to the reviewee</p>
+            <div class="cb-vis" data-vis="reviewee">
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="submit" /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
+              </div>
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="date" checked /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
+                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to reviewee from" />
+              </div>
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
               </div>
             </div>
 
-            <div class="card">
-              <h2 class="cb-section-title">Who can see the results</h2>
-              <p class="cb-section-hint">Set once for the whole cycle — individual pairs can be overridden in step 4.</p>
-
-              <p class="field-label" style="margin-bottom: var(--ic-space-2)">Visible to the reviewee</p>
-              <div class="cb-vis" data-vis="reviewee">
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="submit" /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
-                </div>
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="date" checked /><span class="radio-circle"></span><span class="radio-label">On a specific date</span></label>
-                  <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to reviewee from" />
-                </div>
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
-                </div>
+            <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to managers</p>
+            <div class="cb-vis" data-vis="managers">
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="submit" checked /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
               </div>
-
-              <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to managers</p>
-              <div class="cb-vis" data-vis="managers">
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="submit" checked /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
-                </div>
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="date" /><span class="radio-circle"></span><span class="radio-label">On a specific date</span></label>
-                  <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to managers from" hidden />
-                </div>
-                <div class="cb-vis-option">
-                  <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
-                </div>
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="date" /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
+                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to managers from" hidden />
+              </div>
+              <div class="cb-vis-option">
+                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
               </div>
             </div>
           </div>
 
-          <!-- ---------- STEP 2 · Competencies ---------- -->
-          <!-- ---------- STEP 2 · Templates ----------
-               Replaces the old steps 2 and 3. Competencies, scale and questions
-               are authored once in Review cycle → Templates; a cycle picks them
-               rather than redefining them. Multi-select because one cycle can
-               span teams (PLAN.md: many templates per cycle). -->
-          <div class="cb-step" data-step="2" hidden>
-            <div class="card">
-              <h2 class="cb-section-title">Templates <span class="count-badge count-badge-secondary" id="cb-tpl-count">0</span></h2>
-              <p class="cb-section-hint">Pick which templates this cycle uses. Every participant is assessed on the selected templates, plus the Base Template.</p>
-              <div id="cb-tpl-list"></div>
-              <p class="field-hint" style="margin-top: var(--ic-space-3)">Need a different set of competencies? <a class="breadcrumb" href="#" id="cb-tpl-manage">Manage templates</a></p>
-            </div>
-          </div>
-          <div class="cb-step" data-step="3" hidden>
-            <div class="card">
-              <h2 class="cb-section-title">Participants <span class="count-badge count-badge-secondary" id="cb-pair-count">0</span></h2>
-              <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
-
-              <div class="cb-row" style="margin-bottom: var(--ic-space-4)">
-                <label class="field">
-                  <span class="field-label">Reviewer</span>
-                  <input class="input" id="cb-new-reviewer" type="email" placeholder="reviewer@toptal.com" />
-                </label>
-                <label class="field">
-                  <span class="field-label">Reviewee</span>
-                  <input class="input" id="cb-new-reviewee" type="email" placeholder="reviewee@toptal.com" />
-                </label>
-                <button class="btn btn-secondary" type="button" id="cb-add-pair">Add pair</button>
+          <!-- ---------- 3 · Participants ---------- -->
+          <div class="card">
+            <div class="cb-sec-head">
+              <span class="cb-sec-num">3</span>
+              <div class="cb-sec-titles">
+                <h2 class="cb-section-title">Participants</h2>
+                <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
               </div>
-
-              <div class="dropzone-field" data-dropzone>
-                <label class="dropzone">
-                  <input class="dropzone-input" type="file" accept=".csv" aria-label="Upload Participants.csv" id="cb-csv-input" />
-                  <svg class="icon icon-24 dropzone-icon"><use href="#i-upload"/></svg>
-                  <p class="dropzone-title">Or upload Participants.csv</p>
-                  <p class="dropzone-hint">Reviewer, Reviewee, Starts_on, Ends_on — one row per assessment</p>
-                </label>
-              </div>
-
-              <div id="cb-pairs-wrap" style="margin-top: var(--ic-space-4)"></div>
+              <span class="cb-sec-aside" id="cb-pair-count">0 assessments will be created</span>
             </div>
+
+            <div class="cb-row" style="margin-bottom: var(--ic-space-4)">
+              <label class="field">
+                <span class="field-label">Reviewer</span>
+                <input class="input" id="cb-new-reviewer" type="email" placeholder="reviewer@toptal.com" />
+              </label>
+              <label class="field">
+                <span class="field-label">Reviewee</span>
+                <input class="input" id="cb-new-reviewee" type="email" placeholder="reviewee@toptal.com" />
+              </label>
+              <button class="btn btn-secondary" type="button" id="cb-add-pair">Add pair</button>
+            </div>
+
+            <div class="dropzone-field" data-dropzone>
+              <label class="dropzone">
+                <input class="dropzone-input" type="file" accept=".csv" aria-label="Upload Participants.csv" id="cb-csv-input" />
+                <svg class="icon icon-24 dropzone-icon"><use href="#i-upload"/></svg>
+                <p class="dropzone-title">Or upload Participants.csv</p>
+                <p class="dropzone-hint">Reviewer, Reviewee, Starts_on, Ends_on — one row per assessment</p>
+              </label>
+            </div>
+
+            <div id="cb-pairs-wrap" style="margin-top: var(--ic-space-4)"></div>
           </div>
 
-          <!-- ---------- STEP 4 · Review & launch ---------- -->
-          <div class="cb-step" data-step="4" hidden>
-            <div class="card">
-              <h2 class="cb-section-title">Review &amp; launch</h2>
-              <p class="cb-section-hint">This is the moment that replaces filing a ticket and waiting for a script to run.</p>
-              <dl class="cb-summary" id="cb-summary"></dl>
-            </div>
-            <div id="cb-launch-warnings"></div>
-          </div>
-
+          <!-- Validation reads out beside the button rather than blocking a
+               step, so what is missing is visible while the form is editable. -->
           <div class="cb-footer">
-            <button class="btn btn-secondary" type="button" id="cb-prev" hidden>Back</button>
-            <span></span>
-            <button class="btn btn-primary" type="button" id="cb-next">Next</button>
+            <p class="cb-footer-hint" id="cb-launch-hint"></p>
+            <button class="btn btn-primary" type="button" id="cb-launch">Launch cycle</button>
           </div>
         </div>
       </section>
@@ -6863,7 +6881,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       ];
       const baseTpl = () => TEMPLATES.find(t => t.base);
       const compById = id => LIB.find(c => c.id === id);
-      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES };
+      // groups: NB-67's cycle form groups a template's competencies by the
+      // same General / Skills split this editor uses, rather than inventing one.
+      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS };
 
       // Working copy — edits apply on Save, so Cancel genuinely discards.
       let draft = null, variant = 'regular';
@@ -7481,11 +7501,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
-    // ===== Assessment builder wizard (PLAN.md, Phase 1) =====
+    // ===== New assessment cycle form (NB-67) =====
     // Admin flow replacing v2.1's "raise a ticket → engineer runs a script".
-    // One STATE object is the single source of truth; each step renders from
-    // it and writes back to it, so the review step can't drift out of sync
-    // with what was actually picked.
+    // One STATE object is the single source of truth, so the participant count
+    // and the launch validation can't drift from what was actually picked.
+    // Was a four-step wizard until NB-67; the steps were paging through
+    // independent answers, so they became three sections of one form.
     (function () {
       // Must be scoped to .page-view: the sidenav's "Review cycle" link carries
       // the same data-page value and sits earlier in the DOM, so a bare
@@ -7499,22 +7520,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 
       /* ---------- Cycle state ----------
-         The wizard no longer owns competencies, scales or questions — those are
-         template properties now, authored in Review cycle → Templates. A cycle
-         records which templates it uses and what type it is; everything a
-         reviewer sees is resolved from those two facts. */
-      const tplList = () => window.PR_TPL?.list ?? [];
-      const baseTpl = () => tplList().find(t => t.base);
+         The form doesn't own competencies, scales or questions — those are
+         template properties, authored in Templates. A cycle records which
+         template it uses; everything a reviewer sees is resolved from that. */
+      const tplList  = () => window.PR_TPL?.list ?? [];
+      const baseTpl  = () => tplList().find(t => t.base);
       const pickable = () => tplList().filter(t => !t.base);   // Base always applies
-      const compName = id => window.PR_TPL?.comp(id)?.n ?? id;
+      const compById = id => window.PR_TPL?.comp(id);
+      const groups   = () => window.PR_TPL?.groups ?? [];
 
       const STATE = {
-        step: 1,
-        // NB-64 removed the cycle-type selector ("that's part of the templates"),
-        // so nothing in this flow chooses a variant any more. Non-universal
-        // templates resolve to their Regular set. See PLAN.md — Newcomer
-        // variants are currently unreachable from the cycle flow.
-        templateIds: ['eng'],
+        // NB-67 made this one template rather than a set. NB-64 and NB-65 had
+        // already removed cycle type and participant team — the two facts that
+        // decided which of several templates a given person got — so a
+        // multi-select had nothing left to resolve against.
+        // Starts empty: the whole point of the picker is that the competencies
+        // and rating scale appear once a template is chosen.
+        templateId: null,
         pairs: [
           { reviewer: 'alice@toptal.com',   reviewee: 'john@toptal.com', rels: ['Peer'] },
           { reviewer: 'jack@toptal.com',    reviewee: 'john@toptal.com', rels: ['Teammate'] },
@@ -7522,48 +7544,91 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         ]
       };
 
-      // A template's competencies depend on the cycle type: universal templates
-      // have one set, the rest split Regular / Newcomer.
+      // Non-universal templates split Regular / Newcomer. Nothing in this flow
+      // selects a variant since NB-64 removed cycle type, so they resolve to
+      // Regular — see PLAN.md, Newcomer variants are unreachable from here.
       const compsFor = t => t.universal ? (t.variants.all ?? []) : (t.variants.regular ?? []);
-      const chosen = () => pickable().filter(t => STATE.templateIds.includes(t.id));
+      const chosen   = () => pickable().find(t => t.id === STATE.templateId) ?? null;
 
-      /* ---------- Step 2 · templates ---------- */
-      const renderTemplates = () => {
-        const list = pickable();
-        $('#cb-tpl-list').innerHTML = list.length ? list.map(t => {
-          const comps = compsFor(t);
-          const scale = window.PR_TPL?.scales?.[t.scaleId];
-          return `<label class="cb-comp-row">
-            <span class="checkbox"><input type="checkbox" class="checkbox-input" data-tpl="${t.id}" ${STATE.templateIds.includes(t.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
-            <span class="cb-comp-meta">
-              <span class="cb-comp-name">${esc(t.name)}</span>
-              <span class="cb-comp-desc">${comps.length} ${comps.length === 1 ? 'competency' : 'competencies'} · ${esc(comps.map(compName).join(', ')) || '—'}</span>
-              ${scale ? `<span class="cb-tpl-scale">${esc(scale.name)}${scale.rows.map(r =>
-                  `<span class="cb-tpl-swatch" style="background: ${esc(r.color)}" title="${esc(r.value)} · ${esc(r.label)}"></span>`).join('')}</span>` : ''}
-            </span>
-          </label>`;
-        }).join('') : '<p class="cb-empty">No templates yet — create one first.</p>';
-        $('#cb-tpl-count').textContent = STATE.templateIds.length;
+      /* ---------- Section 1 · template picker ---------- */
+      const renderTplMenu = () => {
+        const base = baseTpl();
+        $('#cb-tpl-menu').innerHTML = pickable().map(t => `
+          <button class="dropdown-item${t.id === STATE.templateId ? ' is-selected' : ''}" type="button" data-tpl="${t.id}">
+            <svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(t.name)}${base ? ` (extends ${esc(base.name)})` : ''}
+          </button>`).join('') || '<p class="dropdown-item" style="color: var(--color-text-subtle)">No templates yet — create one first.</p>';
       };
 
-      section.addEventListener('change', e => {
-        const cb = e.target.closest('[data-tpl]');
-        if (!cb) return;
-        const id = cb.dataset.tpl;
-        cb.checked
-          ? (!STATE.templateIds.includes(id) && STATE.templateIds.push(id))
-          : STATE.templateIds.splice(STATE.templateIds.indexOf(id), 1);
-        $('#cb-tpl-count').textContent = STATE.templateIds.length;
+      // Competencies, rating scale and open questions for the picked template,
+      // unioned with the Base Template since that always applies. Rendered as
+      // one read-only block: it answers "what will reviewers actually score?"
+      // without making any of it editable here.
+      const renderTplDetail = () => {
+        const t = chosen();
+        const wrap = $('#cb-tpl-detail');
+        if (!t) {
+          wrap.innerHTML = '<p class="cb-empty" style="margin-top: var(--ic-space-4)">Pick a template to see the competencies and rating scale reviewers will use.</p>';
+          return;
+        }
+
+        const base   = baseTpl();
+        const inherit = base ? compsFor(base) : [];
+        const own     = compsFor(t);
+        const ids     = [...new Set([...inherit, ...own])];
+        const scale   = window.PR_TPL?.scales?.[t.scaleId];
+        const qCount  = [base, t].filter(Boolean)
+          .reduce((n, x) => n + (x.reviewQs?.length ?? 0) + (x.goalQs?.length ?? 0), 0);
+
+        // Grouped by the shared library's General / Skills split rather than
+        // listed flat, so "which skills does this cycle actually test?" reads
+        // off the block directly.
+        const byGroup = groups().map(g => ({
+          name: g.name,
+          items: ids.map(compById).filter(c => c && c.g === g.id)
+        })).filter(g => g.items.length);
+
+        wrap.innerHTML = `
+          <div class="cb-detail">
+            <p class="cb-detail-label">Competencies from this template (${ids.length})</p>
+            ${byGroup.map(g => `<div class="cb-detail-group">
+              <span class="cb-detail-group-name">${esc(g.name)}</span>
+              <div class="cb-detail-tags">${g.items.map(c =>
+                `<span class="tag tag-light"${inherit.includes(c.id) && !own.includes(c.id) ? ' title="Inherited from the Base Template"' : ''}>${esc(c.n)}</span>`).join('')}</div>
+            </div>`).join('')}
+            ${scale ? `<p class="cb-detail-label" style="margin-top: var(--ic-space-4)">Rating scale · ${esc(scale.name)}</p>
+              <div class="cb-detail-scale">${scale.rows.map(r =>
+                `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('')}</div>` : ''}
+            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${base ? ` · ${inherit.length} competencies come from ${esc(base.name)}, which always applies` : ''}.</p>
+          </div>`;
+      };
+
+      // The shared .input-select handler binds menu items at load, and these
+      // are rendered after it runs — so selection is wired here instead. It
+      // still owns opening/closing the menu and the outside-click dismiss.
+      $('#cb-tpl-menu').addEventListener('click', e => {
+        const item = e.target.closest('[data-tpl]');
+        if (!item) return;
+        STATE.templateId = item.dataset.tpl;
+        const t = chosen();
+        const base = baseTpl();
+        const value = $('#cb-tpl-value');
+        value.textContent = t ? `${t.name}${base ? ` (extends ${base.name})` : ''}` : 'Choose a template…';
+        value.classList.toggle('input-select-placeholder', !t);
+        renderTplMenu();
+        renderTplDetail();
+        validate();
       });
 
       $('#cb-tpl-manage').addEventListener('click', e => {
         e.preventDefault();
         window.showPrPage?.('review-cycles');   // Templates is the whole page now
       });
-      /* ---------- Step 4 · participants ---------- */
+
+      /* ---------- Section 3 · participants ---------- */
       const renderPairs = () => {
-        $('#cb-pair-count').textContent = STATE.pairs.length;
-        $('#cb-pairs-wrap').innerHTML = STATE.pairs.length ? `
+        const n = STATE.pairs.length;
+        $('#cb-pair-count').textContent = `${n} assessment${n === 1 ? '' : 's'} will be created`;
+        $('#cb-pairs-wrap').innerHTML = n ? `
           <div class="table-scroll">
             <table class="table table-wide">
               <colgroup><col style="width: 38%" /><col style="width: 38%" /><col style="width: 16%" /><col style="width: 8%" /></colgroup>
@@ -7578,6 +7643,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </tbody>
             </table>
           </div>` : '<p class="cb-empty">No participants yet — add a pair above or upload a CSV.</p>';
+        validate();
       };
 
       $('#cb-add-pair').addEventListener('click', () => {
@@ -7623,72 +7689,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (window.toast) toast({ variant: 'success', message: `${added.length} participants imported from CSV.` });
       });
 
-      /* ---------- Step 5 · summary ---------- */
-      const visLabel = (which) => {
-        const wrap = section.querySelector(`[data-vis="${which}"]`);
-        const mode = wrap.querySelector('input:checked')?.value;
-        if (mode === 'never')  return '<strong>Never</strong> — results stay hidden';
-        if (mode === 'submit') return 'As soon as it\'s submitted';
-        return 'From ' + esc(wrap.querySelector('.cb-vis-date').value || '—');
+      /* ---------- Launch ----------
+         The wizard's Review step is gone, so its checks moved here. Only the
+         three that would make a cycle meaningless are blocking; the soft
+         warnings it also showed (e.g. reviewees never seeing their results)
+         are choices, not mistakes, and now read off the Schedule section. */
+      const validate = () => {
+        const problem =
+          !$('#cb-name').value.trim() ? 'Give the review cycle a name.'
+          : !chosen()                 ? 'Choose a review template.'
+          : !STATE.pairs.length       ? 'Add at least one participant.'
+          : $('#cb-ends').value && $('#cb-starts').value > $('#cb-ends').value
+                                      ? 'The end date is before the start date.'
+          : '';
+        $('#cb-launch-hint').textContent = problem;
+        $('#cb-launch').disabled = !!problem;
+        return !problem;
       };
 
-      const renderSummary = () => {
-        const base = baseTpl();
-        const picked = chosen();
-        const allComps = new Set([...(base ? compsFor(base) : []), ...picked.flatMap(compsFor)]);
-        const qCount = [base, ...picked].filter(Boolean)
-          .reduce((n, t) => n + (t.reviewQs?.length ?? 0) + (t.goalQs?.length ?? 0), 0);
+      section.addEventListener('input', e => {
+        if (e.target.closest('#cb-name, #cb-starts, #cb-ends')) validate();
+      });
 
-        $('#cb-summary').innerHTML = `
-          <dt>Cycle name</dt><dd>${esc($('#cb-name').value || '—')}</dd>
-          <dt>Assessment window</dt><dd>${esc($('#cb-starts').value)} → ${esc($('#cb-ends').value)}</dd>
-          <dt>Templates</dt><dd><div class="cb-summary-list">${
-            picked.length ? picked.map(t => `<span class="tag tag-light">${esc(t.name)}</span>`).join('')
-                          : '<span class="cb-empty">None selected</span>'}</div>
-            <span class="field-hint">${base ? `Plus ${esc(base.name)}, which always applies. ` : ''}${allComps.size} competencies in total · ${qCount} question${qCount === 1 ? '' : 's'}</span></dd>
-          <dt>Participants</dt><dd>${STATE.pairs.length} assessment${STATE.pairs.length === 1 ? '' : 's'}
-            <span class="field-hint">Every participant is assessed on all selected templates — NB-65 removed the per-person team, so there is no longer a rule mapping a participant to one of them.</span></dd>
-          <dt>Visible to reviewee</dt><dd>${visLabel('reviewee')}</dd>
-          <dt>Visible to managers</dt><dd>${visLabel('managers')}</dd>`;
-
-        const warn = [];
-        if (!picked.length) warn.push('No templates selected — reviewers would only get the Base Template.');
-        if (!STATE.pairs.length) warn.push('No participants — this cycle would launch empty.');
-        if (section.querySelector('[data-vis="reviewee"] input:checked')?.value === 'never')
-          warn.push('Reviewees will never see their own results.');
-
-        $('#cb-launch-warnings').innerHTML = warn.map(w => `
-          <div class="alert alert-warning" role="alert" style="margin-bottom: var(--ic-space-3)">
-            <svg class="icon alert-icon"><use href="#i-warning"/></svg>
-            <p class="alert-message">${w}</p>
-          </div>`).join('');
-      };
-
-      /* ---------- Step navigation ---------- */
-      const LAST = 4;
-      const goToStep = (n) => {
-        STATE.step = n;
-        $$('.cb-step').forEach(p => { p.hidden = Number(p.dataset.step) !== n; });
-        $$('#cb-stepper .stepper-step').forEach(li => {
-          const s = Number(li.dataset.step);
-          li.classList.toggle('is-current', s === n);
-          li.classList.toggle('is-complete', s < n);
-          // .is-complete swaps the number for a check, so the marker has to
-          // be rewritten, not just restyled.
-          li.querySelector('.stepper-num').innerHTML =
-            s < n ? '<svg class="icon"><use href="#i-check"/></svg>' : String(s);
-        });
-        $('#cb-prev').hidden = n === 1;
-        $('#cb-next').textContent = n === LAST ? 'Launch cycle' : 'Next';
-        if (n === 2) renderTemplates();   // cycle type may have changed on step 1
-        if (n === LAST) renderSummary();
-        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
-      };
-
-      $('#cb-next').addEventListener('click', () => {
-        if (STATE.step < LAST) { goToStep(STATE.step + 1); return; }
-        // Launching returns to the cycle list — the wizard is done, so leaving
-        // the user parked on step 5 would be a dead end. Read the name before
+      $('#cb-launch').addEventListener('click', () => {
+        if (!validate()) return;
+        // Launching returns to the cycle list — the form is done, so leaving
+        // the user parked on it would be a dead end. Read the name before
         // navigating; the toast region is fixed-position so it outlives the
         // page switch and lands on the list.
         const name = $('#cb-name').value.trim() || 'Cycle';
@@ -7700,34 +7726,31 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           message: `“${name}” launched — ${created} assessment${created === 1 ? '' : 's'} created.`
         });
       });
-      $('#cb-prev').addEventListener('click', () => goToStep(Math.max(1, STATE.step - 1)));
 
-      // Visibility rows: only the "specific date" option carries a date field.
+      // Visibility rows: only the "from a date" option carries a date field.
       $$('.cb-vis').forEach(wrap => wrap.addEventListener('change', () => {
         wrap.querySelector('.cb-vis-date').hidden =
           wrap.querySelector('input:checked')?.value !== 'date';
       }));
 
       /* ---------- Entry / exit ---------- */
-      // "New" always starts clean. (Re-entering via the sidenav deliberately
-      // does not, so navigating away mid-wizard doesn't discard the form.)
-      const open = () => {
-        goToStep(1);
+      // The Create cycle CTA is the only way in. Bound with getElementById
+      // because it lives outside the form's own section.
+      document.getElementById('rc-new')?.addEventListener('click', () => {
         window.showPrPage?.('cycle-builder');
-      };
-      // The Review cycle page's CTA is the only way in. Bound with
-      // getElementById because it lives outside the builder's own section.
-      document.getElementById('rc-new')?.addEventListener('click', open);
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      });
 
-      // NB-62 moved cycle creation to the manager, so the builder's parent is
-      // My direct reports now — and Back lands on its Cycles tab.
+      // NB-62 moved cycle creation to the manager, so this form's parent is
+      // My direct reports now — and the breadcrumb lands on its Cycles tab.
       $('#cb-back-link').addEventListener('click', (e) => {
         e.preventDefault();
         window.showPrPage?.('team-results');
         document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.click();
       });
 
-      renderTemplates();
+      renderTplMenu();
+      renderTplDetail();
       renderPairs();
     })();
   </script>
