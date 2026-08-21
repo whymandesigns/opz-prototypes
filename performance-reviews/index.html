@@ -3406,15 +3406,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        content — the ellipsis rules above still truncate long names/roles,
        so nothing is lost, it just clips instead of pushing the table wider. */
     .reports-panel .assessments-table { table-layout: fixed; }
-    /* Actions widened from 9% to 15% for the "View breakdown" label — at 9% the
-       button was 108px inside a 97px cell and spilled into Review Cycle. The
-       extra came off the two person columns and Relationship, which truncate. */
-    .reports-panel .assessments-table col.col-person { width: 20%; }
-    .reports-panel .assessments-table col.col-status { width: 10%; }
-    .reports-panel .assessments-table col.col-relationship { width: 13%; }
+    /* Actions sized for a one-line "View" (~50px + cell padding). It was briefly
+       widened to 16% to fit "View breakdown", which starved the person and
+       Relationship columns; the shorter label gave that width back. */
+    .reports-panel .assessments-table col.col-person { width: 23%; }
+    .reports-panel .assessments-table col.col-status { width: 11%; }
+    .reports-panel .assessments-table col.col-relationship { width: 14%; }
     .reports-panel .assessments-table col.col-due { width: 10%; }
     .reports-panel .assessments-table col.col-cycle { width: 11%; }
-    .reports-panel .assessments-table col.col-actions { width: 16%; }
+    .reports-panel .assessments-table col.col-actions { width: 8%; }
     /* Fixed layout lets a cell's content paint over its neighbour — the
        "Peer Feedback" tag was landing on top of the date once Relationship
        gave up width. Clipping keeps columns honest at any window size.
@@ -3448,6 +3448,61 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .te-inherited-tag { flex-shrink: 0; }
     #te-variant-tabs[hidden] { display: none; }
 
+    /* ===== Manager overview =====
+       designmd has no donut/ring component, so this is local: a circle with
+       pathLength="100" so stroke-dasharray reads as a percentage. */
+    .mv-ring { transform: rotate(-90deg); flex-shrink: 0; }
+    .mv-ring circle { fill: none; stroke-width: 4; stroke-linecap: round; }
+    .mv-ring .mv-ring-track { stroke: var(--color-border); }
+
+    .mv-meta { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+    .mv-legend { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-4); margin-top: var(--ic-space-3); }
+    .mv-legend-item { display: inline-flex; align-items: center; gap: var(--ic-space-2); font: var(--type-caption); color: var(--color-text-muted); }
+    .mv-legend-swatch { width: 10px; height: 10px; border-radius: var(--ic-radius-sm); flex-shrink: 0; }
+
+    /* Both roll-up tables are wider than the container, so they scroll rather
+       than squeezing columns to illegibility. */
+    .mv-table { min-width: 1040px; }
+    .mv-table tbody td { white-space: normal; vertical-align: top; }
+    .mv-overall { display: flex; align-items: center; gap: var(--ic-space-2); }
+    .mv-score { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 22px; padding: 0 var(--ic-space-2); border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans); color: var(--ic-palette-white); }
+    /* Name + score share one inline box: as separate flex children the score
+       was pushed to its own line whenever a long name wrapped. */
+    .mv-comp { display: flex; align-items: flex-start; gap: var(--ic-space-2); font: var(--type-body-sm); color: var(--color-text); }
+    .mv-comp + .mv-comp { margin-top: var(--ic-space-2); }
+    .mv-comp-text { min-width: 0; }
+    .mv-comp-score { color: var(--color-text-muted); }
+    /* The Reviews cell is a button; it should read as text with an affordance,
+       not as a chunky control sitting in a table cell. */
+    .mv-reviews-btn { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; cursor: pointer;
+      font: var(--type-body-sm); color: var(--color-text); }
+    .mv-reviews-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .mv-reviews-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: var(--ic-radius-sm); }
+    .mv-rev-group { margin-bottom: var(--ic-space-5); }
+    .mv-rev-group:last-child { margin-bottom: 0; }
+    .mv-rev-head { display: flex; align-items: center; gap: var(--ic-space-2); margin: 0 0 var(--ic-space-3); font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); }
+    .mv-rev-row { display: flex; align-items: center; gap: var(--ic-space-3); padding: var(--ic-space-3) 0; border-top: 1px solid var(--color-border); }
+    .mv-rev-row:first-of-type { border-top: 0; }
+    .mv-rev-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .mv-rev-name { font: var(--type-body-sm); }
+    .mv-rev-when { font: var(--type-caption); color: var(--color-text-subtle); }
+
+    .mv-reviews { font: var(--type-body-sm); }
+    .mv-reviews-sub { font: var(--type-caption); color: var(--color-text-subtle); display: block; margin-top: 2px; }
+    .mv-reviews-sub.is-flagged { color: var(--color-warning-text, var(--color-text-muted)); }
+
+    /* Detailed matrix — one column per competency. */
+    .mv-detail-table { min-width: 1820px; }
+    .mv-detail-table th, .mv-detail-table td { white-space: nowrap; text-align: center; }
+    .mv-detail-table tbody td:first-child { white-space: normal; min-width: 210px; }
+    .mv-detail-table thead th:first-child,
+    .mv-detail-table tbody td:first-child { text-align: left; }
+    .mv-comp-head { font-size: var(--ic-text-xxs); }
+    /* Circular chips so a row scans as a heat strip. */
+    .mv-cell { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans); color: var(--ic-palette-white); }
+    .mv-cell-na { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
+    .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
+
     /* Templates list */
     .tpl-name { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
     /* components.css sets `white-space: nowrap` on every .table cell, which
@@ -3470,8 +3525,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* Below roughly 1200px even 15% is narrower than the label, so the button
        wraps to two lines rather than overflowing its cell. Ugly-but-legible
        beats spilling across the neighbouring column. */
-    .reports-panel .cell-actions .btn,
-    .tr-reviews-table .cell-actions .btn { white-space: normal; height: auto; min-height: 24px; }
+    /* Action buttons stay on one line. "View breakdown" needed ~140px of column
+       to avoid wrapping, which these dense tables can't spare, so the label is
+       short and the guarantee is explicit. */
+    .cell-actions .btn { white-space: nowrap; }
 
     /* Pending / Completed share the same 4-column shape (one person column,
        narrower than My Reports' two side by side) — same fixed-layout fix,
@@ -3609,10 +3666,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        re-centres them on the title's row exactly. Bottom-aligning instead
        overshoots, because the h1's box is 42px tall against a 24px stepper. */
     .page-head:has(.breadcrumbs) .page-head-actions { margin-top: 30px; }
-
-    /* Struck-through tab label. Scoped to the label span, not the whole tab, so
-       the count badge stays uncrossed. */
-    .tab-struck { text-decoration: line-through; }
 
     /* My direct reports' other two tabs. Fixed layout for the same reason as every
        other table here — content-sized columns overflow the container. */
@@ -4185,143 +4238,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              in via the ?states=1 switcher. -->
         <div id="pr-hub-body">
           <div class="tabs" role="tablist">
-            <button class="tab is-active" role="tab" aria-selected="true" aria-controls="pr-panel-all" type="button" data-panel="all"><span class="tab-struck">My Reports</span> <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">4</span></button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-pending" type="button" data-panel="pending">Pending <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">2</span></button>
+            <button class="tab is-active" role="tab" aria-selected="true" aria-controls="pr-panel-pending" type="button" data-panel="pending">Pending <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">2</span></button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-completed" type="button" data-panel="completed">Completed <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">3</span></button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="pr-panel-skipped" type="button" data-panel="skipped">Skipped <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)">1</span></button>
-          </div>
-
-          <!-- My Reports — oversight of every assessment in flight across the
-               team, regardless of who's reviewing. Not filtered per-tab
-               (unlike the old shared-table approach): each tab below is its
-               own dataset scoped to the logged-in manager specifically. -->
-          <div class="table-scroll reports-panel" id="pr-panel-all" role="tabpanel" aria-labelledby="pr-panel-all" style="margin-top: var(--ic-space-4)">
-            <table class="table table-wide assessments-table">
-              <colgroup>
-                <col class="col-person" /><col class="col-person" /><col class="col-status" />
-                <col class="col-relationship" /><col class="col-due" /><col class="col-cycle" /><col class="col-actions" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>From</th>
-                  <th>About</th>
-                  <th>Status</th>
-                  <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
-                  <th>Due by</th>
-                  <th>Review Cycle</th>
-                  <th style="text-align: right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">SK</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Sara Kahlau</span>
-                        <span class="cell-user-role">Senior Director, Innovation &amp; Experience consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">TU</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">TJ Urglavitch</span>
-                        <span class="cell-user-role">Senior Manager of Cloud Services</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">KR</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Katherine Rozakis</span>
-                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">DA</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Dilan Appathurai</span>
-                        <span class="cell-user-role">Director, Quality Assurance</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">EF</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Ezekiel Flores</span>
-                        <span class="cell-user-role">Product Design Lead</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">MK</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Matt Kelch</span>
-                        <span class="cell-user-role">Engineering Manager</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">KR</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Katherine Rozakis</span>
-                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">DA</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Dilan Appathurai</span>
-                        <span class="cell-user-role">Director, Quality Assurance</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
-                </tr>
-              </tbody>
-            </table>
           </div>
 
           <!-- Pending — assessments where the logged-in manager IS the
                reviewer and hasn't filled them in yet (Figma: node
                33986:143234). Distinct dataset and column set from My
                Reports — not a status filter of it. -->
-          <div class="table-scroll" id="pr-panel-pending" role="tabpanel" aria-labelledby="pr-panel-pending" style="margin-top: var(--ic-space-4)" hidden>
+          <div class="table-scroll" id="pr-panel-pending" role="tabpanel" aria-labelledby="pr-panel-pending" style="margin-top: var(--ic-space-4)">
             <table class="table table-wide assessments-table">
               <colgroup>
                 <col style="width: 42%" /><col style="width: 20%" /><col style="width: 16%" /><col style="width: 22%" />
@@ -4402,7 +4328,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Direct Report</span></span></td>
                   <td>May 12, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4416,7 +4342,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Teammate</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>May 20, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -4430,7 +4356,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>Jun 2, 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -4495,6 +4421,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            so the copy on Team results would toggle a modal inside a hidden
            section and appear to do nothing. All rows share this one instance;
            see the memory note on why content isn't per-row. -->
+      <!-- Who has reviewed whom, opened from the Reviews cell on My direct
+           reports. Sibling of the page-views, not a child of one. -->
+      <div class="modal-overlay" id="mv-reviews-modal" hidden>
+        <div class="modal modal-md">
+          <header class="modal-header">
+            <h2 class="modal-title" id="mv-reviews-title">Reviews</h2>
+            <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
+          </header>
+          <div class="modal-body" id="mv-reviews-body"></div>
+        </div>
+      </div>
+
       <div class="modal-overlay" id="assessment-modal" hidden>
           <div class="modal modal-lg">
             <header class="modal-header">
@@ -4942,12 +4880,70 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              off aria-controls. No custom wiring needed here (unlike the hub,
              whose tabs are re-rendered by the state machine). -->
         <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-reports-panel" type="button">My reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-overview-panel" type="button">Overview <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <!-- Hidden, not deleted: the panel and its table stay in place so this
+               is a one-attribute change to bring back. Overview covers the same
+               ground with more signal. (`hidden` works here because .tab sets no
+               explicit display — unlike .btn, which needs .btn[hidden].) -->
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reports-panel" type="button" hidden>My reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reviews-panel" type="button">Individual reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="tr-goals-panel" type="button">Individual goals <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
         </div>
 
-        <div id="tr-reports-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
+        <!-- Overview — the manager roll-up (reference: Manager / Review results).
+             Two views over one dataset: Summarised (overall + best/worst) and
+             Detailed (every competency as a column, grouped, with column
+             averages). Ring colours and the legend derive from the shared rating
+             scale, so editing a template's scale re-colours this view too. -->
+        <div id="tr-overview-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
+          <div class="toolbar">
+            <div class="input-select is-auto" id="tr-cycle-picker">
+              <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Active Regular Review: Aug 1, 2026</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
+              <div class="dropdown-menu" hidden>
+                <button class="dropdown-item" type="button" data-cycle-id="aug26"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Active Regular Review: Aug 1, 2026</button>
+                <button class="dropdown-item" type="button" data-cycle-id="jun26"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Newcomer Review: Jun 20, 2026</button>
+              </div>
+            </div>
+            <label class="checkbox">
+              <input type="checkbox" class="checkbox-input" id="tr-admin-view" />
+              <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
+              <span class="checkbox-label">Enable admin view</span>
+            </label>
+            <div class="toolbar-end">
+              <div class="segmented" id="tr-view-switch">
+                <button class="segmented-item is-active" type="button" data-mv-view="summary">Summarised</button>
+                <button class="segmented-item" type="button" data-mv-view="detail">Detailed</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="mv-meta" id="tr-cycle-meta"></p>
+          <div class="mv-legend" id="tr-legend"></div>
+
+          <div class="table-scroll" id="tr-summary-wrap" style="margin-top: var(--ic-space-4)">
+            <table class="table table-wide mv-table">
+              <colgroup>
+                <col style="width: 20%" /><col style="width: 12%" /><col style="width: 21%" /><col style="width: 21%" /><col style="width: 12%" /><col style="width: 6%" /><col style="width: 8%" />
+              </colgroup>
+              <thead>
+                <tr><th>Reviewee</th><th>Overall</th><th>Best performing in</th><th>Worst performing in</th><th>Reviews</th><th>Answers</th><th style="text-align: right">Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="table-scroll" id="tr-detail-wrap" style="margin-top: var(--ic-space-4)" hidden>
+            <table class="table table-wide mv-detail-table">
+              <thead>
+                <tr id="tr-detail-heads"></tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot><tr id="tr-detail-foot"></tr></tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div id="tr-reports-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
           <div class="toolbar" id="tr-reports-toolbar">
             <div class="input-icon input-icon-left toolbar-search">
               <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
@@ -5006,7 +5002,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1 2026</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View</button></span></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -5031,7 +5027,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q1 2026</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View breakdown</button></span></div></td>
+                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View</button></span></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -5056,7 +5052,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q4 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
                 <tr>
                   <td>
@@ -5081,7 +5077,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="tag tag-light">Peer Feedback</span></td>
                   <td>Jun 6, 2025</td>
                   <td>Q3 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -5095,7 +5091,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="table-scroll" id="tr-reviews-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
           <table class="table table-wide assessments-table tr-reviews-table">
             <colgroup>
-              <col style="width: 13%" /><col style="width: 25%" /><col style="width: 25%" /><col style="width: 22%" /><col style="width: 15%" />
+              <col style="width: 13%" /><col style="width: 26%" /><col style="width: 26%" /><col style="width: 25%" /><col style="width: 10%" />
             </colgroup>
             <thead>
               <tr>
@@ -5112,35 +5108,35 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <td><div class="cell-user"><span class="cell-avatar">AS</span><div class="cell-user-meta"><span class="cell-user-name">Anastasia Shevchuk</span><span class="cell-user-role">Product Designer</span></div></div></td>
                 <td><div class="cell-user"><span class="cell-avatar">TU</span><div class="cell-user-meta"><span class="cell-user-name">TJ Urglavitch</span><span class="cell-user-role">Senior Manager of Cloud Services</span></div></div></td>
                 <td><span class="tag tag-light">Engineering, Platform Team</span></td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
               </tr>
               <tr>
                 <td>Jun 6, 2025</td>
                 <td><div class="cell-user"><span class="cell-avatar">AT</span><div class="cell-user-meta"><span class="cell-user-name">Alexander Traykov</span><span class="cell-user-role">Product Designer</span></div></div></td>
                 <td><div class="cell-user"><span class="cell-avatar">DA</span><div class="cell-user-meta"><span class="cell-user-name">Dilan Appathurai</span><span class="cell-user-role">Director, Quality Assurance</span></div></div></td>
                 <td><span class="tag tag-light">Engineering, Platform Team</span></td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
               </tr>
               <tr>
                 <td>Jun 6, 2025</td>
                 <td><div class="cell-user"><span class="cell-avatar">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lucie Karaskova</span><span class="cell-user-role">Product Designer</span></div></div></td>
                 <td><div class="cell-user"><span class="cell-avatar">MK</span><div class="cell-user-meta"><span class="cell-user-name">Matt Kelch</span><span class="cell-user-role">Engineering Manager</span></div></div></td>
                 <td><span class="tag tag-light">Engineering, Platform Team</span></td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
               </tr>
               <tr>
                 <td>Jun 6, 2025</td>
                 <td><div class="cell-user"><span class="cell-avatar">LV</span><div class="cell-user-meta"><span class="cell-user-name">Lubos Volkov</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
                 <td><div class="cell-user"><span class="cell-avatar">SK</span><div class="cell-user-meta"><span class="cell-user-name">Sara Kahlau</span><span class="cell-user-role">Senior Director, Innovation &amp; Experience</span></div></div></td>
                 <td><span class="tag tag-light">Engineering, Web Team</span></td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
               </tr>
               <tr>
                 <td>Jun 6, 2025</td>
                 <td><div class="cell-user"><span class="cell-avatar">MT</span><div class="cell-user-meta"><span class="cell-user-name">Mateusz Tatara</span><span class="cell-user-role">Product Designer</span></div></div></td>
                 <td><div class="cell-user"><span class="cell-avatar">EF</span><div class="cell-user-meta"><span class="cell-user-name">Ezekiel Flores</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
                 <td><span class="tag tag-light">Design</span></td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View breakdown</button></div></td>
+                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
               </tr>
             </tbody>
           </table>
@@ -5333,13 +5329,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <ol class="stepper" id="cb-stepper">
               <li class="stepper-step is-current" data-step="1"><span class="stepper-num">1</span><span class="stepper-label">Setup</span></li>
               <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="2"><span class="stepper-num">2</span><span class="stepper-label">Competencies</span></li>
+              <li class="stepper-step" data-step="2"><span class="stepper-num">2</span><span class="stepper-label">Templates</span></li>
               <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="3"><span class="stepper-num">3</span><span class="stepper-label">Scale &amp; questions</span></li>
+              <li class="stepper-step" data-step="3"><span class="stepper-num">3</span><span class="stepper-label">Participants</span></li>
               <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="4"><span class="stepper-num">4</span><span class="stepper-label">Participants</span></li>
-              <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
-              <li class="stepper-step" data-step="5"><span class="stepper-num">5</span><span class="stepper-label">Review</span></li>
+              <li class="stepper-step" data-step="4"><span class="stepper-num">4</span><span class="stepper-label">Review</span></li>
             </ol>
           </div>
         </div>
@@ -5354,6 +5348,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <label class="field">
                 <span class="field-label">Cycle name</span>
                 <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 — Engineering" value="H2 2026 — Engineering" />
+              </label>
+              <label class="field" style="margin-top: var(--ic-space-4); max-width: 260px">
+                <span class="field-label">Cycle type</span>
+                <select class="input" id="cb-type">
+                  <option value="regular">Regular</option>
+                  <option value="newcomer">Newcomer</option>
+                </select>
+                <span class="field-hint">Chooses which variant of each template applies.</span>
               </label>
               <div class="cb-grid" style="margin-top: var(--ic-space-4)">
                 <label class="field">
@@ -5402,77 +5404,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
 
           <!-- ---------- STEP 2 · Competencies ---------- -->
+          <!-- ---------- STEP 2 · Templates ----------
+               Replaces the old steps 2 and 3. Competencies, scale and questions
+               are authored once in Review cycle → Templates; a cycle picks them
+               rather than redefining them. Multi-select because one cycle can
+               span teams (PLAN.md: many templates per cycle). -->
           <div class="cb-step" data-step="2" hidden>
             <div class="card">
-              <h2 class="cb-section-title">Competencies <span class="count-badge count-badge-secondary" id="cb-comp-count">0</span></h2>
-              <p class="cb-section-hint">Pick what people are assessed on. Every competency you select is rated <em>and</em> commented on by each reviewer — all are mandatory.</p>
-
-              <div id="cb-comp-library"></div>
-
-              <div class="cb-comp-new">
-                <p class="field-label" style="margin-bottom: var(--ic-space-2)">Add a new competency</p>
-                <div class="cb-row">
-                  <label class="field">
-                    <span class="field-label">Name</span>
-                    <input class="input" id="cb-new-comp-name" type="text" placeholder="e.g. Ownership" />
-                  </label>
-                  <label class="field">
-                    <span class="field-label">Description</span>
-                    <input class="input" id="cb-new-comp-desc" type="text" placeholder="What good looks like" />
-                  </label>
-                  <label class="field" style="flex: 0 0 160px">
-                    <span class="field-label">Group</span>
-                    <select class="input" id="cb-new-comp-group"></select>
-                  </label>
-                  <button class="btn btn-secondary" type="button" id="cb-add-comp">Add</button>
-                </div>
-                <p class="field-hint" style="margin-top: var(--ic-space-2)">Added competencies join the library and can be reused by future cycles.</p>
-              </div>
+              <h2 class="cb-section-title">Templates <span class="count-badge count-badge-secondary" id="cb-tpl-count">0</span></h2>
+              <p class="cb-section-hint">Pick which templates this cycle uses. Each participant is assessed on the template matching their team, plus the Base Template.</p>
+              <div id="cb-tpl-list"></div>
+              <p class="field-hint" style="margin-top: var(--ic-space-3)">Need a different set of competencies? <a class="breadcrumb" href="#" id="cb-tpl-manage">Manage templates</a></p>
             </div>
 
             <div class="card">
-              <h2 class="cb-section-title">Groups</h2>
-              <p class="cb-section-hint">Groups organise competencies in the reviewer's form — e.g. Soft Skills, Hard Skills.</p>
-              <div class="cb-row">
-                <label class="field">
-                  <span class="field-label">Group name</span>
-                  <input class="input" id="cb-new-group-name" type="text" placeholder="e.g. Leadership" />
-                </label>
-                <button class="btn btn-secondary" type="button" id="cb-add-group">Add group</button>
-              </div>
+              <h2 class="cb-section-title">What reviewers will see</h2>
+              <p class="cb-section-hint">Resolved from the templates above and this cycle's type.</p>
+              <div id="cb-tpl-preview"></div>
             </div>
           </div>
-
-          <!-- ---------- STEP 3 · Scale & questions ---------- -->
           <div class="cb-step" data-step="3" hidden>
-            <div class="card">
-              <h2 class="cb-section-title">Rating scale</h2>
-              <p class="cb-section-hint">The scale every competency is rated on. v2.1 made this configurable — 2.0 had it hard-coded to 1–3.</p>
-              <label class="field" style="max-width: 320px">
-                <span class="field-label">Use a saved scale</span>
-                <select class="input" id="cb-scale-select"></select>
-              </label>
-              <div id="cb-scale-rows" style="margin-top: var(--ic-space-4)"></div>
-              <button class="btn btn-secondary btn-xs" type="button" id="cb-add-scale-row" style="margin-top: var(--ic-space-2)"><svg class="btn-icon"><use href="#i-plus"/></svg>Add level</button>
-              <div class="cb-preview" id="cb-scale-preview"></div>
-            </div>
-
-            <div class="card">
-              <h2 class="cb-section-title">Questions</h2>
-              <p class="cb-section-hint">Free-text prompts alongside the rated competencies. Optional — leave empty to skip.</p>
-
-              <p class="field-label" style="margin-bottom: var(--ic-space-2)">Review questions <span class="field-hint">— asked of reviewers</span></p>
-              <div id="cb-review-qs"></div>
-              <button class="btn btn-secondary btn-xs" type="button" data-add-q="review"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
-
-              <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Goal questions <span class="field-hint">— answered by the reviewee about themselves</span></p>
-              <div id="cb-goal-qs"></div>
-              <button class="btn btn-secondary btn-xs" type="button" data-add-q="goal"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
-            </div>
-          </div>
-
-          <!-- ---------- STEP 4 · Participants ---------- -->
-          <div class="cb-step" data-step="4" hidden>
             <div class="card">
               <h2 class="cb-section-title">Participants <span class="count-badge count-badge-secondary" id="cb-pair-count">0</span></h2>
               <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
@@ -5486,6 +5437,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <span class="field-label">Reviewee</span>
                   <input class="input" id="cb-new-reviewee" type="email" placeholder="reviewee@toptal.com" />
                 </label>
+                <label class="field" style="flex: 0 0 150px">
+                  <span class="field-label">Reviewee's team</span>
+                  <select class="input" id="cb-new-team"></select>
+                </label>
                 <button class="btn btn-secondary" type="button" id="cb-add-pair">Add pair</button>
               </div>
 
@@ -5494,7 +5449,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <input class="dropzone-input" type="file" accept=".csv" aria-label="Upload Participants.csv" id="cb-csv-input" />
                   <svg class="icon icon-24 dropzone-icon"><use href="#i-upload"/></svg>
                   <p class="dropzone-title">Or upload Participants.csv</p>
-                  <p class="dropzone-hint">Reviewer, Reviewee, Starts_on, Ends_on — one row per assessment</p>
+                  <p class="dropzone-hint">Reviewer, Reviewee, Team, Starts_on, Ends_on — one row per assessment</p>
                 </label>
               </div>
 
@@ -5502,8 +5457,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </div>
           </div>
 
-          <!-- ---------- STEP 5 · Review & launch ---------- -->
-          <div class="cb-step" data-step="5" hidden>
+          <!-- ---------- STEP 4 · Review & launch ---------- -->
+          <div class="cb-step" data-step="4" hidden>
             <div class="card">
               <h2 class="cb-section-title">Review &amp; launch</h2>
               <p class="cb-section-hint">This is the moment that replaces filing a ticket and waiting for a script to run.</p>
@@ -6909,7 +6864,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       ];
       const baseTpl = () => TEMPLATES.find(t => t.base);
       const compById = id => LIB.find(c => c.id === id);
-      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl };
+      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES };
 
       // Working copy — edits apply on Save, so Cancel genuinely discards.
       let draft = null, variant = 'regular';
@@ -7129,6 +7084,207 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         leave();
         if (window.toast) toast({ variant: 'success', message: `“${name}” saved.` });
       });
+    })();
+
+    // ===== Manager overview (reference: Manager / Review results) =====
+    // One score matrix per person drives BOTH views — overall, best/worst and
+    // the detailed grid are all derived from it, so Summarised and Detailed
+    // can't disagree. Figures are the reference's own.
+    (function () {
+      const panel = document.getElementById('tr-overview-panel');
+      if (!panel || !window.PR_TPL) return;
+      const $ = sel => panel.querySelector(sel);
+      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+      // Bands come from the shared rating scale, so editing it in a template
+      // re-colours this whole view rather than drifting from it.
+      const SCALE = window.PR_TPL.scales['sc-5pt'].rows;
+      const colorFor = v => SCALE[Math.min(SCALE.length, Math.max(1, Math.round(v))) - 1].color;
+
+      const CYCLES = {
+        aug26: { range: 'Aug 1, 2026 – Sep 15, 2026', status: 'active' },
+        jun26: { range: 'Jun 20, 2026 – Jul 31, 2026', status: 'closed' }
+      };
+      const COMP_COLS = [
+        { g: 'General', items: [['adapt','Adaptability'], ['collab','Collaboration & Teamwork'], ['comms','Communication'], ['own','Ownership & Accountability']] },
+        { g: 'Skills',  items: [['cq','Code Quality'], ['dsys','Design Systems'], ['mentor','Mentorship'], ['solve','Problem Solving'],
+                                ['proto','Prototyping'], ['sysd','System Design'], ['techp','Technical Proficiency'], ['ux','UX & Interaction'], ['visual','Visual Design']] }
+      ];
+      const FLAT = COMP_COLS.flatMap(g => g.items);
+
+      // `chain` = in the manager's report chain. Elena is Design, so she only
+      // appears once admin view is on — which is what makes that toggle mean
+      // something. Missing scores = competency not in that person's template.
+      const PEOPLE = {
+        aug26: [
+          { n: 'Alice Chen', r: 'Senior Software Engineer', t: 'Engineering, Platform Team', chain: true, rev: [{ n: 'Alice Chen', rel: 'Self', st: 'submitted', d: 'Aug 4' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Aug 6' }, { n: 'Dmitri Petrov', rel: 'Peer', st: 'pending' }, { n: 'Carla Ruiz', rel: 'Teammate', st: 'pending' }], ansDone: 3, ansOf: 3,
+            s: { adapt: 5, collab: 5, comms: 4, own: 4.5, cq: 4, mentor: 4, solve: 4.5, sysd: 4.5, techp: 5 } },
+          { n: 'Bob Martins', r: 'Software Engineer', t: 'Engineering, Web Team', chain: true, rev: [{ n: 'Bob Martins', rel: 'Self', st: 'submitted', d: 'Aug 3' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Aug 7' }, { n: 'Carla Ruiz', rel: 'Teammate', st: 'submitted', d: 'Aug 9' }, { n: 'Alice Chen', rel: 'Peer', st: 'pending' }, { n: 'Dmitri Petrov', rel: 'RACI Member', st: 'pending' }], ansDone: 3, ansOf: 3,
+            s: { adapt: 3.3, collab: 3.3, comms: 3.3, own: 3.5, cq: 2.7, mentor: 3.7, solve: 3, sysd: 2.7, techp: 3 } },
+          { n: 'Carla Ruiz', r: 'Software Engineer', t: 'Engineering, Web Team', chain: true, rev: [{ n: 'Carla Ruiz', rel: 'Self', st: 'submitted', d: 'Aug 5' }, { n: 'Matt Vella', rel: 'Manager', st: 'pending' }, { n: 'Bob Martins', rel: 'Teammate', st: 'pending' }, { n: 'Alice Chen', rel: 'Peer', st: 'pending' }, { n: 'Elena Park', rel: 'RACI Member', st: 'pending' }], ansDone: 1, ansOf: 3,
+            s: { collab: 4, comms: 3, cq: 4, mentor: 3, solve: 3, sysd: 3, techp: 3 } },
+          { n: 'Dmitri Petrov', r: 'Senior Software Engineer', t: 'Engineering, Platform Team', chain: true, rev: [{ n: 'Dmitri Petrov', rel: 'Self', st: 'submitted', d: 'Aug 2' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Aug 8' }, { n: 'Alice Chen', rel: 'Peer', st: 'submitted', d: 'Aug 11' }, { n: 'Tomas Berg', rel: 'Teammate', st: 'skipped' }, { n: 'Carla Ruiz', rel: 'RACI Member', st: 'pending' }], ansDone: 2, ansOf: 3,
+            s: { adapt: 5, collab: 3.5, comms: 4.3, own: 4.5, cq: 3.7, mentor: 3.7, solve: 4, sysd: 3.3, techp: 4.3 } },
+          { n: 'Elena Park', r: 'Product Designer', t: 'Design', chain: false, rev: [{ n: 'Elena Park', rel: 'Self', st: 'submitted', d: 'Aug 4' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Aug 6' }, { n: 'Ezekiel Flores', rel: 'Peer', st: 'submitted', d: 'Aug 10' }, { n: 'Priya Nair', rel: 'Teammate', st: 'pending' }, { n: 'Aiko Tanaka', rel: 'RACI Member', st: 'pending' }], ansDone: 0, ansOf: 2,
+            s: { adapt: 4.3, collab: 4.7, comms: 4, own: 4.5, dsys: 4.3, proto: 4.3, ux: 5, visual: 4 } }
+        ],
+        jun26: [
+          { n: 'Carla Ruiz', r: 'Software Engineer', t: 'Engineering, Web Team', chain: true, rev: [{ n: 'Carla Ruiz', rel: 'Self', st: 'submitted', d: 'Jun 24' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Jun 28' }, { n: 'Bob Martins', rel: 'Teammate', st: 'pending' }], ansDone: 3, ansOf: 3,
+            s: { collab: 3.3, comms: 3.5, cq: 3, mentor: 2.7, solve: 3, sysd: 2.5 } },
+          { n: 'Bob Martins', r: 'Software Engineer', t: 'Engineering, Web Team', chain: true, rev: [{ n: 'Bob Martins', rel: 'Self', st: 'submitted', d: 'Jun 23' }, { n: 'Matt Vella', rel: 'Manager', st: 'submitted', d: 'Jun 27' }, { n: 'Carla Ruiz', rel: 'Teammate', st: 'skipped' }], ansDone: 2, ansOf: 3,
+            s: { adapt: 3, comms: 3, cq: 2.5, mentor: 3.3, solve: 2.8, sysd: 2.3 } }
+        ]
+      };
+
+      // Counts derive from the reviewer list, so the summary figures and the
+      // modal's names can never disagree. Deriving also surfaced a contradiction
+      // in the reference data — a row reading "3 / 3 completed" while also
+      // reporting a skipped review, which can't both be true.
+      const subs  = p => p.rev.filter(r => r.st === 'submitted');
+      const pends = p => p.rev.filter(r => r.st === 'pending');
+      const skips = p => p.rev.filter(r => r.st === 'skipped');
+
+      const avg = ns => ns.length ? Math.round((ns.reduce((a, b) => a + b, 0) / ns.length) * 10) / 10 : null;
+      const overallOf = p => avg(Object.values(p.s));
+      // Ties resolve by name for determinism, so tie order may differ from the
+      // reference's arbitrary ordering.
+      const ranked = p => FLAT.filter(([id]) => p.s[id] != null).map(([id, name]) => [name, p.s[id]])
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+      let cycle = 'aug26', view = 'summary';
+      const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
+      const rowsNow = () => PEOPLE[cycle].filter(p => $('#tr-admin-view').checked || p.chain);
+
+      const ring = (score, size) => {
+        const pct = Math.max(0, Math.min(100, (score / SCALE.length) * 100));
+        return `<svg class="mv-ring" width="${size}" height="${size}" viewBox="0 0 36 36" aria-hidden="true">
+          <circle class="mv-ring-track" cx="18" cy="18" r="15.9155"></circle>
+          <circle cx="18" cy="18" r="15.9155" pathLength="100" stroke="${esc(colorFor(score))}" stroke-dasharray="${pct} 100"></circle>
+        </svg>`;
+      };
+      // One renderer for both views: name, title and team in a single cell.
+      const person = p => `<div class="cell-user"><span class="cell-avatar">${esc(initials(p.n))}</span>
+        <div class="cell-user-meta"><span class="cell-user-name">${esc(p.n)}</span>
+          <span class="cell-user-role">${esc(p.r)}</span><span class="cell-user-role">${esc(p.t)}</span></div></div>`;
+      // Clickable in both views — a bare count can't say *who* is outstanding,
+      // which is the thing a manager chasing a cycle actually needs.
+      const reviewsCell = (p, terse) => {
+        const nSkip = skips(p).length;
+        const label = terse
+          ? `${subs(p).length} / ${p.rev.length}`
+          : `${subs(p).length} / ${p.rev.length} completed<span class="mv-reviews-sub${nSkip ? ' is-flagged' : ''}">${
+              nSkip ? `Includes ${nSkip} skipped` : 'No skipped reviews'}</span>`;
+        return `<button class="mv-reviews-btn" type="button" data-mv-reviews="${esc(p.n)}" aria-label="See who has reviewed ${esc(p.n)}">${label}</button>`;
+      };
+      const btn = p => `<div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-mv-breakdown="${esc(p.n)}">View</button></div>`;
+
+      const renderSummary = rows => {
+        $('#tr-summary-wrap tbody').innerHTML = rows.map(p => {
+          const o = overallOf(p);
+          const comps = list => list.map(([name, v]) =>
+            `<span class="mv-comp">${ring(v, 16)}<span class="mv-comp-text">${esc(name)} <span class="mv-comp-score">${v}</span></span></span>`).join('');
+          return `<tr><td>${person(p)}</td>
+            <td><span class="mv-overall">${ring(o, 38)}<span class="mv-score" style="background: ${esc(colorFor(o))}">${o}</span></span></td>
+            <td>${comps(ranked(p).slice(0, 3))}</td>
+            <td>${comps(ranked(p).slice(-3).reverse())}</td>
+            <td>${reviewsCell(p)}</td><td>${p.ansDone} / ${p.ansOf}</td><td>${btn(p)}</td></tr>`;
+        }).join('');
+      };
+
+      const renderDetail = rows => {
+        // Single header row. Competencies keep their General-then-Skills order
+        // from COMP_COLS, so the grouping still holds — it just isn't labelled.
+        $('#tr-detail-heads').innerHTML = '<th>Reviewee</th>' +
+          FLAT.map(([, n]) => `<th class="mv-comp-head">${esc(n)}</th>`).join('') +
+          '<th>Average</th><th>Reviews</th><th>Answers</th><th style="text-align: right">Actions</th>';
+
+        $('#tr-detail-wrap tbody').innerHTML = rows.map(p => {
+          const o = overallOf(p);
+          // A competency the template never included is an explicit gap, not a
+          // zero — a blank cell would read as a low score.
+          const cells = FLAT.map(([id]) => p.s[id] == null
+            ? '<td><span class="mv-cell mv-cell-na" title="Not assessed">–</span></td>'
+            : `<td><span class="mv-cell" style="background: ${esc(colorFor(p.s[id]))}">${p.s[id]}</span></td>`).join('');
+          return `<tr><td>${person(p)}</td>${cells}
+            <td><span class="mv-cell" style="background: ${esc(colorFor(o))}">${o}</span></td>
+            <td>${reviewsCell(p, true)}</td><td>${p.ansDone} / ${p.ansOf}</td><td>${btn(p)}</td></tr>`;
+        }).join('');
+
+        // Averages track what's on screen, so admin view and cycle changes
+        // recompute rather than showing a stale total.
+        const cols = FLAT.map(([id]) => avg(rows.map(p => p.s[id]).filter(v => v != null)));
+        $('#tr-detail-foot').innerHTML =
+          `<th>Average across ${rows.length} ${rows.length === 1 ? 'person' : 'people'}</th>` +
+          cols.map(a => `<th>${a == null ? '–' : a}</th>`).join('') +
+          `<th>${avg(rows.map(overallOf)) ?? '–'}</th><th></th><th></th><th></th>`;
+      };
+
+      const render = () => {
+        const c = CYCLES[cycle], rows = rowsNow(), detail = view === 'detail';
+        $('#tr-cycle-meta').innerHTML = `${esc(c.range)} · <strong>${esc(c.status)}</strong>`;
+        $('#tr-summary-wrap').hidden = detail;
+        $('#tr-detail-wrap').hidden = !detail;
+        detail ? renderDetail(rows) : renderSummary(rows);
+        const badge = document.querySelector('.tab[aria-controls="tr-overview-panel"] [data-tab-count]');
+        if (badge) badge.textContent = rows.length;
+      };
+
+      $('#tr-legend').innerHTML = SCALE.map(r =>
+        `<span class="mv-legend-item"><span class="mv-legend-swatch" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('');
+
+      /* ---------- Who has reviewed whom ---------- */
+      const REV_GROUPS = [
+        { st: 'submitted', title: 'Submitted',        tag: 'tag-positive' },
+        { st: 'pending',   title: 'Yet to submit',    tag: 'tag-warning'  },
+        { st: 'skipped',   title: 'Skipped',          tag: 'tag-light'    }
+      ];
+      const openReviews = (name) => {
+        const p = PEOPLE[cycle].find(x => x.n === name);
+        if (!p) return;
+        document.getElementById('mv-reviews-title').textContent = `Reviews for ${p.n}`;
+        document.getElementById('mv-reviews-body').innerHTML = REV_GROUPS.map(g => {
+          const list = p.rev.filter(r => r.st === g.st);
+          // Empty groups are dropped rather than shown as "0" — three headings
+          // with nothing under two of them is noise.
+          if (!list.length) return '';
+          return `<div class="mv-rev-group">
+            <p class="mv-rev-head">${g.title} <span class="count-badge count-badge-sm count-badge-secondary">${list.length}</span></p>
+            ${list.map(r => `<div class="mv-rev-row">
+              <span class="cell-avatar">${esc(initials(r.n))}</span>
+              <span class="mv-rev-meta">
+                <span class="mv-rev-name">${esc(r.n)}</span>
+                ${r.d ? `<span class="mv-rev-when">Submitted ${esc(r.d)}</span>` : ''}
+              </span>
+              <span class="tag tag-light">${esc(r.rel)}</span>
+              <span class="tag tag-indicator ${g.tag}">${g.title}</span>
+            </div>`).join('')}
+          </div>`;
+        }).join('');
+        document.getElementById('mv-reviews-modal').removeAttribute('hidden');
+      };
+      panel.addEventListener('click', e => {
+        const b = e.target.closest('[data-mv-reviews]');
+        if (b) openReviews(b.dataset.mvReviews);
+      });
+
+      $('#tr-view-switch').querySelectorAll('[data-mv-view]').forEach(b => b.addEventListener('click', () => {
+        view = b.dataset.mvView;
+        $('#tr-view-switch').querySelectorAll('[data-mv-view]').forEach(x => x.classList.toggle('is-active', x === b));
+        render();
+      }));
+      $('#tr-cycle-picker').querySelectorAll('[data-cycle-id]').forEach(it =>
+        it.addEventListener('click', () => { cycle = it.dataset.cycleId; render(); }));
+      $('#tr-admin-view').addEventListener('change', render);
+
+      // The dedicated breakdown screen (competency cards, peer comments, trend,
+      // notes) is the next build; pointing this at the single-assessment modal
+      // would show one review where an aggregate is expected.
+      panel.addEventListener('click', e => {
+        const b = e.target.closest('[data-mv-breakdown]');
+        if (b && window.toast) toast({ variant: 'neutral', message: `Breakdown for ${b.dataset.mvBreakdown} — screen not built yet.` });
+      });
+
+      render();
     })();
 
     // Templates list — rendered from the same model the editor writes to, so a
@@ -7353,214 +7509,124 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const section = document.querySelector('.page-view[data-page="cycle-builder"]');
       if (!section) return;
 
-      // Library seeded with the v2.1 spec's own sample set, so the prototype
-      // demonstrates the exact data the launch script consumes today.
-      const GROUPS = [
-        { id: 'gr1', name: 'Soft Skills' },
-        { id: 'gr2', name: 'Hard Skills' }
-      ];
-      const COMPETENCIES = [
-        { id: 'c1', name: 'Performance',         group: 'gr2', desc: 'Consistently delivers quality work and achieves goals within agreed timelines.' },
-        { id: 'c2', name: 'Attitude',            group: 'gr1', desc: 'Demonstrates a positive, constructive mindset; open to feedback and collaboration.' },
-        { id: 'c3', name: 'Communication',       group: 'gr1', desc: 'Shares ideas and information clearly, both verbally and in writing.' },
-        { id: 'c4', name: 'Technical Knowledge', group: 'gr2', desc: 'Applies the appropriate technical skills and expertise to solve problems.' },
-        { id: 'c5', name: 'Accountability',      group: 'gr1', desc: 'Takes ownership of work and accepts responsibility for outcomes.' },
-        { id: 'c6', name: 'Leadership',          group: 'gr1', desc: 'Guides and motivates others and contributes to team direction.' }
-      ];
-      const SCALES = {
-        'sc-5pt': { name: '5-point standard', rows: [
-          { value: 1, label: 'Unacceptable',        color: '#FF0000' },
-          { value: 2, label: 'Needs Improvement',   color: '#AA4411' },
-          { value: 3, label: 'Meets Expectations',  color: '#9999BB' },
-          { value: 4, label: 'Exceeds Expectations',color: '#77AA77' },
-          { value: 5, label: 'Outstanding',         color: '#33CC33' }
-        ]},
-        'sc-3pt': { name: '3-point (legacy 2.0)', rows: [
-          { value: 1, label: 'Needs Improvement', color: '#AA4411' },
-          { value: 2, label: 'On Track',          color: '#9999BB' },
-          { value: 3, label: 'Overperforming',    color: '#33CC33' }
-        ]}
-      };
+      const $  = sel => section.querySelector(sel);
+      const $$ = sel => [...section.querySelectorAll(sel)];
+      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+      /* ---------- Cycle state ----------
+         The wizard no longer owns competencies, scales or questions — those are
+         template properties now, authored in Review cycle → Templates. A cycle
+         records which templates it uses and what type it is; everything a
+         reviewer sees is resolved from those two facts. */
+      const TEAMS = ['Engineering', 'Design', 'Management', 'Marketing'];
+      const tplList = () => window.PR_TPL?.list ?? [];
+      const baseTpl = () => tplList().find(t => t.base);
+      const pickable = () => tplList().filter(t => !t.base);   // Base always applies
+      const compName = id => window.PR_TPL?.comp(id)?.n ?? id;
 
       const STATE = {
         step: 1,
-        selected: new Set(['c1', 'c2', 'c3', 'c4']),   // spec sample's starting four
-        scaleId: 'sc-5pt',
-        scaleRows: SCALES['sc-5pt'].rows.map(r => ({ ...r })),
-        reviewQs: [{ text: "What are this person's key strengths?", required: true }],
-        goalQs:   [{ text: 'What are your main goals for the next 12 months?', required: true }],
+        type: 'regular',
+        templateIds: ['eng'],
         pairs: [
-          { reviewer: 'alice@toptal.com',   reviewee: 'john@toptal.com', rels: ['Peer'] },
-          { reviewer: 'jack@toptal.com',    reviewee: 'john@toptal.com', rels: ['Teammate'] },
-          { reviewer: 'michael@toptal.com', reviewee: 'john@toptal.com', rels: ['Manager'] }
+          { reviewer: 'alice@toptal.com',   reviewee: 'john@toptal.com', team: 'Engineering', rels: ['Peer'] },
+          { reviewer: 'jack@toptal.com',    reviewee: 'john@toptal.com', team: 'Engineering', rels: ['Teammate'] },
+          { reviewer: 'michael@toptal.com', reviewee: 'john@toptal.com', team: 'Engineering', rels: ['Manager'] }
         ]
       };
 
-      const $  = (sel) => section.querySelector(sel);
-      const $$ = (sel) => [...section.querySelectorAll(sel)];
-      const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
-      const groupName = (id) => GROUPS.find(g => g.id === id)?.name ?? 'Ungrouped';
+      // A template's competencies depend on the cycle type: universal templates
+      // have one set, the rest split Regular / Newcomer.
+      const compsFor = t => t.universal ? (t.variants.all ?? []) : (t.variants[STATE.type] ?? []);
+      const chosen = () => pickable().filter(t => STATE.templateIds.includes(t.id));
+      // Which template covers a given team. Name match is the stand-in for real
+      // org data — see PLAN.md open question 6.
+      const tplForTeam = team => chosen().find(t => t.name.toLowerCase() === String(team).toLowerCase());
 
-      /* ---------- Step 2 · competency library ---------- */
-      const renderLibrary = () => {
-        // Ungrouped is a real bucket, not an error: Competency_Group_ID is
-        // optional in Competencies.csv.
-        const buckets = [...GROUPS.map(g => g.id), null].filter(gid =>
-          COMPETENCIES.some(c => (c.group ?? null) === gid));
-
-        $('#cb-comp-library').innerHTML = buckets.map(gid => `
-          <div class="cb-group">
-            <div class="cb-group-head"><span class="cb-group-name">${esc(gid ? groupName(gid) : 'Ungrouped')}</span></div>
-            ${COMPETENCIES.filter(c => (c.group ?? null) === gid).map(c => `
-              <label class="cb-comp-row">
-                <span class="checkbox"><input type="checkbox" class="checkbox-input" data-comp="${c.id}" ${STATE.selected.has(c.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
-                <span class="cb-comp-meta">
-                  <span class="cb-comp-name">${esc(c.name)}</span>
-                  <span class="cb-comp-desc">${esc(c.desc)}</span>
-                </span>
-              </label>`).join('')}
-          </div>`).join('');
-
-        $('#cb-comp-count').textContent = STATE.selected.size;
-        $('#cb-new-comp-group').innerHTML =
-          GROUPS.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join('') +
-          '<option value="">No group</option>';
+      /* ---------- Step 2 · templates ---------- */
+      const renderTemplates = () => {
+        const list = pickable();
+        $('#cb-tpl-list').innerHTML = list.length ? list.map(t => {
+          const comps = compsFor(t);
+          const variant = t.universal ? 'universal' : STATE.type;
+          return `<label class="cb-comp-row">
+            <span class="checkbox"><input type="checkbox" class="checkbox-input" data-tpl="${t.id}" ${STATE.templateIds.includes(t.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
+            <span class="cb-comp-meta">
+              <span class="cb-comp-name">${esc(t.name)} <span class="tag tag-light">${esc(variant)}</span></span>
+              <span class="cb-comp-desc">${comps.length} ${comps.length === 1 ? 'competency' : 'competencies'} · ${esc(comps.map(compName).join(', ')) || '—'}</span>
+            </span>
+          </label>`;
+        }).join('') : '<p class="cb-empty">No templates yet — create one first.</p>';
+        $('#cb-tpl-count').textContent = STATE.templateIds.length;
+        renderTplPreview();
       };
 
-      section.addEventListener('change', (e) => {
-        const cb = e.target.closest('[data-comp]');
+      // Shows the resolved result rather than restating the picks: Base plus
+      // each chosen template, which is what a reviewer actually gets.
+      const renderTplPreview = () => {
+        const base = baseTpl();
+        const rows = [];
+        if (base) rows.push([`${base.name} (always applies)`, compsFor(base)]);
+        chosen().forEach(t => rows.push([t.name, compsFor(t)]));
+        const qCount = [base, ...chosen()].filter(Boolean)
+          .reduce((n, t) => n + (t.reviewQs?.length ?? 0) + (t.goalQs?.length ?? 0), 0);
+        const scale = window.PR_TPL?.scales?.[(chosen()[0] ?? base)?.scaleId ?? 'sc-5pt'];
+
+        $('#cb-tpl-preview').innerHTML = STATE.templateIds.length ? `
+          ${rows.map(([name, comps]) => `<div class="cb-group">
+            <div class="cb-group-head"><span class="cb-group-name">${esc(name)}</span><span class="tag tag-light">${comps.length}</span></div>
+            <p class="cb-section-hint" style="margin: 0">${esc(comps.map(compName).join(', ')) || '—'}</p>
+          </div>`).join('')}
+          <p class="field-hint">Rating scale: <strong>${esc(scale?.name ?? '—')}</strong> · ${qCount} question${qCount === 1 ? '' : 's'}</p>`
+          : '<p class="cb-empty">Pick at least one template to see what reviewers get.</p>';
+      };
+
+      section.addEventListener('change', e => {
+        const cb = e.target.closest('[data-tpl]');
         if (!cb) return;
-        cb.checked ? STATE.selected.add(cb.dataset.comp) : STATE.selected.delete(cb.dataset.comp);
-        $('#cb-comp-count').textContent = STATE.selected.size;
+        const id = cb.dataset.tpl;
+        cb.checked
+          ? (!STATE.templateIds.includes(id) && STATE.templateIds.push(id))
+          : STATE.templateIds.splice(STATE.templateIds.indexOf(id), 1);
+        $('#cb-tpl-count').textContent = STATE.templateIds.length;
+        renderTplPreview();
       });
 
-      $('#cb-add-comp').addEventListener('click', () => {
-        const name = $('#cb-new-comp-name').value.trim();
-        if (!name) { $('#cb-new-comp-name').focus(); return; }
-        const id = 'c' + (COMPETENCIES.length + 1) + '-' + name.toLowerCase().replace(/\W+/g, '-');
-        COMPETENCIES.push({
-          id, name,
-          desc: $('#cb-new-comp-desc').value.trim() || 'No description yet.',
-          group: $('#cb-new-comp-group').value || null
-        });
-        STATE.selected.add(id);                       // just-added is always wanted
-        $('#cb-new-comp-name').value = '';
-        $('#cb-new-comp-desc').value = '';
-        renderLibrary();
-        if (window.toast) toast({ variant: 'success', message: `“${name}” added to the library.`, timeout: 2400 });
+      $('#cb-type').addEventListener('change', e => {
+        STATE.type = e.target.value;
+        renderTemplates();   // variant switch changes every template's competencies
       });
 
-      $('#cb-add-group').addEventListener('click', () => {
-        const name = $('#cb-new-group-name').value.trim();
-        if (!name) { $('#cb-new-group-name').focus(); return; }
-        GROUPS.push({ id: 'gr' + (GROUPS.length + 1), name });
-        $('#cb-new-group-name').value = '';
-        renderLibrary();
-        if (window.toast) toast({ variant: 'success', message: `Group “${name}” added.`, timeout: 2400 });
+      $('#cb-tpl-manage').addEventListener('click', e => {
+        e.preventDefault();
+        window.showPrPage?.('review-cycles');
+        document.querySelector('[data-rc-tab="templates"]')?.click();
       });
-
-      /* ---------- Step 3 · rating scale ---------- */
-      const renderScale = () => {
-        $('#cb-scale-select').innerHTML = Object.entries(SCALES)
-          .map(([id, s]) => `<option value="${id}" ${id === STATE.scaleId ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
-
-        $('#cb-scale-rows').innerHTML = STATE.scaleRows.map((r, i) => `
-          <div class="cb-scale-row" data-row="${i}">
-            <input class="input input-xs" type="number" value="${r.value}" data-field="value" aria-label="Value" />
-            <input class="input input-xs" type="text" value="${esc(r.label)}" data-field="label" aria-label="Label" />
-            <input class="cb-swatch" type="color" value="${r.color}" data-field="color" aria-label="Colour" />
-            <button class="btn btn-xs btn-ghost btn-icon-only" type="button" data-del-row="${i}" aria-label="Remove level"><svg class="icon"><use href="#i-trash"/></svg></button>
-          </div>`).join('');
-
-        $('#cb-scale-preview').innerHTML =
-          '<span class="cb-preview-item" style="font-weight: var(--ic-weight-semibold)">Reviewer sees:</span>' +
-          STATE.scaleRows.map(r =>
-            `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('');
-      };
-
-      $('#cb-scale-select').addEventListener('change', (e) => {
-        STATE.scaleId = e.target.value;
-        STATE.scaleRows = SCALES[STATE.scaleId].rows.map(r => ({ ...r }));
-        renderScale();
-      });
-
-      $('#cb-add-scale-row').addEventListener('click', () => {
-        const next = STATE.scaleRows.length
-          ? Math.max(...STATE.scaleRows.map(r => Number(r.value) || 0)) + 1 : 1;
-        STATE.scaleRows.push({ value: next, label: '', color: '#9999BB' });
-        renderScale();
-      });
-
-      section.addEventListener('input', (e) => {
-        const field = e.target.dataset.field;
-        const row = e.target.closest('[data-row]');
-        if (!field || !row) return;
-        STATE.scaleRows[Number(row.dataset.row)][field] = e.target.value;
-        if (field !== 'color') return;    // colour is the only field the preview shows live
-        renderScale();
-      });
-
-      section.addEventListener('click', (e) => {
-        const del = e.target.closest('[data-del-row]');
-        if (!del) return;
-        STATE.scaleRows.splice(Number(del.dataset.delRow), 1);
-        renderScale();
-      });
-
-      /* ---------- Step 3 · questions ---------- */
-      const qListFor = (kind) => kind === 'review' ? STATE.reviewQs : STATE.goalQs;
-      const renderQs = (kind) => {
-        const list = qListFor(kind);
-        const host = $(kind === 'review' ? '#cb-review-qs' : '#cb-goal-qs');
-        host.innerHTML = list.length ? list.map((q, i) => `
-          <div class="cb-q-row" data-q="${kind}" data-i="${i}">
-            <input class="input" type="text" value="${esc(q.text)}" data-q-text placeholder="Type a question…" />
-            <label class="cb-q-required"><span class="switch"><input type="checkbox" class="switch-input" data-q-req ${q.required ? 'checked' : ''} /><span class="switch-track"></span></span>Required</label>
-            <button class="btn btn-xs btn-ghost btn-icon-only" type="button" data-q-del aria-label="Remove question"><svg class="icon"><use href="#i-trash"/></svg></button>
-          </div>`).join('') : '<p class="cb-empty">No questions — reviewers will only rate and comment on competencies.</p>';
-      };
-      const renderAllQs = () => { renderQs('review'); renderQs('goal'); };
-
-      $$('[data-add-q]').forEach(btn => btn.addEventListener('click', () => {
-        qListFor(btn.dataset.addQ).push({ text: '', required: false });
-        renderQs(btn.dataset.addQ);
-      }));
-
-      section.addEventListener('click', (e) => {
-        const del = e.target.closest('[data-q-del]');
-        if (!del) return;
-        const row = del.closest('[data-q]');
-        qListFor(row.dataset.q).splice(Number(row.dataset.i), 1);
-        renderQs(row.dataset.q);
-      });
-
-      section.addEventListener('input', (e) => {
-        if (!e.target.matches('[data-q-text]')) return;
-        const row = e.target.closest('[data-q]');
-        qListFor(row.dataset.q)[Number(row.dataset.i)].text = e.target.value;
-      });
-      section.addEventListener('change', (e) => {
-        if (!e.target.matches('[data-q-req]')) return;
-        const row = e.target.closest('[data-q]');
-        qListFor(row.dataset.q)[Number(row.dataset.i)].required = e.target.checked;
-      });
-
       /* ---------- Step 4 · participants ---------- */
       const renderPairs = () => {
         $('#cb-pair-count').textContent = STATE.pairs.length;
+        $('#cb-new-team').innerHTML = TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
         $('#cb-pairs-wrap').innerHTML = STATE.pairs.length ? `
           <div class="table-scroll">
             <table class="table table-wide">
-              <colgroup><col style="width: 32%" /><col style="width: 32%" /><col style="width: 26%" /><col style="width: 10%" /></colgroup>
-              <thead><tr><th>Reviewer</th><th>Reviewee</th><th>Relationship</th><th style="text-align: right">Actions</th></tr></thead>
+              <colgroup><col style="width: 26%" /><col style="width: 26%" /><col style="width: 16%" /><col style="width: 24%" /><col style="width: 8%" /></colgroup>
+              <thead><tr><th>Reviewer</th><th>Reviewee</th><th>Team</th><th>Template</th><th style="text-align: right">Actions</th></tr></thead>
               <tbody>
-                ${STATE.pairs.map((p, i) => `
-                  <tr>
+                ${STATE.pairs.map((p, i) => {
+                  const t = tplForTeam(p.team);
+                  // No matching template means this row would launch with only
+                  // Base — worth flagging here rather than at launch.
+                  const cell = t
+                    ? `<span class="tag tag-light">${esc(t.name)}</span>`
+                    : `<span class="tag tag-indicator tag-warning" data-tooltip="No selected template covers this team — they would only get the Base Template" data-placement="left">No match</span>`;
+                  return `<tr>
                     <td>${esc(p.reviewer)}</td>
                     <td>${esc(p.reviewee)}</td>
-                    <td><span class="rel-tags">${p.rels.map(r => `<span class="tag tag-light">${esc(r)}</span>`).join('')}</span></td>
+                    <td>${esc(p.team)}</td>
+                    <td>${cell}</td>
                     <td><div class="cell-actions"><button class="btn btn-xs btn-ghost btn-icon-only" type="button" data-del-pair="${i}" aria-label="Remove pair"><svg class="icon"><use href="#i-trash"/></svg></button></div></td>
-                  </tr>`).join('')}
+                  </tr>`;
+                }).join('')}
               </tbody>
             </table>
           </div>` : '<p class="cb-empty">No participants yet — add a pair above or upload a CSV.</p>';
@@ -7583,7 +7649,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }
         // Relationship is derived from org structure in the real system; with
         // no org data here, new manual rows get the catch-all type.
-        STATE.pairs.push({ reviewer, reviewee, rels: ['Custom'] });
+        STATE.pairs.push({ reviewer, reviewee, team: $('#cb-new-team').value, rels: ['Custom'] });
         $('#cb-new-reviewer').value = '';
         $('#cb-new-reviewee').value = '';
         renderPairs();
@@ -7601,8 +7667,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       $('#cb-csv-input').addEventListener('change', (e) => {
         if (!e.target.files?.length) return;
         const added = [
-          { reviewer: 'dana@toptal.com',  reviewee: 'john@toptal.com', rels: ['RACI Member'] },
-          { reviewer: 'priya@toptal.com', reviewee: 'john@toptal.com', rels: ['Direct Report'] }
+          { reviewer: 'dana@toptal.com',  reviewee: 'john@toptal.com', team: 'Engineering', rels: ['RACI Member'] },
+          { reviewer: 'priya@toptal.com', reviewee: 'elena@toptal.com', team: 'Design', rels: ['Direct Report'] }
         ].filter(n => !STATE.pairs.some(p => p.reviewer === n.reviewer && p.reviewee === n.reviewee));
         STATE.pairs.push(...added);
         renderPairs();
@@ -7619,29 +7685,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
 
       const renderSummary = () => {
-        const comps = COMPETENCIES.filter(c => STATE.selected.has(c.id));
-        const groupsUsed = new Set(comps.map(c => c.group ?? null));
-        const qCount = STATE.reviewQs.filter(q => q.text.trim()).length
-                     + STATE.goalQs.filter(q => q.text.trim()).length;
+        const base = baseTpl();
+        const picked = chosen();
+        const allComps = new Set([...(base ? compsFor(base) : []), ...picked.flatMap(compsFor)]);
+        const qCount = [base, ...picked].filter(Boolean)
+          .reduce((n, t) => n + (t.reviewQs?.length ?? 0) + (t.goalQs?.length ?? 0), 0);
+        const unmatched = STATE.pairs.filter(p => !tplForTeam(p.team));
 
         $('#cb-summary').innerHTML = `
           <dt>Cycle name</dt><dd>${esc($('#cb-name').value || '—')}</dd>
+          <dt>Type</dt><dd>${STATE.type === 'newcomer' ? 'Newcomer' : 'Regular'}</dd>
           <dt>Assessment window</dt><dd>${esc($('#cb-starts').value)} → ${esc($('#cb-ends').value)}</dd>
-          <dt>Competencies</dt><dd><div class="cb-summary-list">${
-            comps.length ? comps.map(c => `<span class="tag tag-light">${esc(c.name)}</span>`).join('')
-                         : '<span class="cb-empty">None selected</span>'}</div>
-            <span class="field-hint">${comps.length} across ${groupsUsed.size} group${groupsUsed.size === 1 ? '' : 's'} · each rated and commented on</span></dd>
-          <dt>Rating scale</dt><dd>${esc(SCALES[STATE.scaleId]?.name ?? 'Custom')} — ${STATE.scaleRows.length} levels</dd>
-          <dt>Questions</dt><dd>${qCount} question${qCount === 1 ? '' : 's'}</dd>
-          <dt>Participants</dt><dd>${STATE.pairs.length} assessment${STATE.pairs.length === 1 ? '' : 's'}</dd>
+          <dt>Templates</dt><dd><div class="cb-summary-list">${
+            picked.length ? picked.map(t => `<span class="tag tag-light">${esc(t.name)}</span>`).join('')
+                          : '<span class="cb-empty">None selected</span>'}</div>
+            <span class="field-hint">${base ? `Plus ${esc(base.name)}, which always applies. ` : ''}${allComps.size} competencies in total · ${qCount} question${qCount === 1 ? '' : 's'}</span></dd>
+          <dt>Participants</dt><dd>${STATE.pairs.length} assessment${STATE.pairs.length === 1 ? '' : 's'}
+            <span class="field-hint">${
+              // A mixed cycle has no single answer to "what are they assessed
+              // on", so the resolution is spelled out per template.
+              picked.map(t => {
+                const n = STATE.pairs.filter(p => tplForTeam(p.team)?.id === t.id).length;
+                return `${n} → ${esc(t.name)}`;
+              }).join(' · ') || 'No template resolved'}</span></dd>
           <dt>Visible to reviewee</dt><dd>${visLabel('reviewee')}</dd>
           <dt>Visible to managers</dt><dd>${visLabel('managers')}</dd>`;
 
-        // Surface the things that are quietly consequential rather than
-        // letting them ride into a launch unremarked.
         const warn = [];
-        if (!comps.length) warn.push('No competencies selected — reviewers would have nothing to assess.');
+        if (!picked.length) warn.push('No templates selected — reviewers would only get the Base Template.');
         if (!STATE.pairs.length) warn.push('No participants — this cycle would launch empty.');
+        if (unmatched.length) warn.push(`${unmatched.length} participant${unmatched.length === 1 ? '' : 's'} on a team no selected template covers (${
+          [...new Set(unmatched.map(p => p.team))].join(', ')}) — they would be assessed on the Base Template alone.`);
         if (section.querySelector('[data-vis="reviewee"] input:checked')?.value === 'never')
           warn.push('Reviewees will never see their own results.');
 
@@ -7653,7 +7727,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
 
       /* ---------- Step navigation ---------- */
-      const LAST = 5;
+      const LAST = 4;
       const goToStep = (n) => {
         STATE.step = n;
         $$('.cb-step').forEach(p => { p.hidden = Number(p.dataset.step) !== n; });
@@ -7668,6 +7742,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
         $('#cb-prev').hidden = n === 1;
         $('#cb-next').textContent = n === LAST ? 'Launch cycle' : 'Next';
+        if (n === 2) renderTemplates();   // cycle type may have changed on step 1
         if (n === LAST) renderSummary();
         document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
       };
@@ -7712,9 +7787,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         window.showPrPage?.('review-cycles');
       });
 
-      renderLibrary();
-      renderScale();
-      renderAllQs();
+      renderTemplates();
       renderPairs();
     })();
   </script>
@@ -7776,7 +7849,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          holds. Before Skip could move rows the counts were hardcoded, which
          would have drifted the moment one did. */
       const EMPTY_TEXT = {
-        all:       'No assessments in flight.',
         pending:   'Nothing pending — you’re all caught up.',
         completed: 'Nothing completed yet.',
         skipped:   'Nothing skipped.'
