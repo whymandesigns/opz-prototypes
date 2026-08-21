@@ -176,7 +176,110 @@ Structure, per the reference:
   belong.
 
 **Cycle mechanic:** each reviewee resolves to Base + their role template (+
-variant). That's what replaces per-row competency picking.
+variant). That's what replaces per-row competency picking. ⚠️ *How* the role
+template is chosen — once per cycle or per participant — is still open; see
+*Splitting templates out of the cycle wizard* below.
+
+## Splitting templates out of the cycle wizard (added 2026-08-20)
+
+Matt's call: **the template builder is a separate flow.** An admin creates
+templates; a *different* act picks one and runs a cycle. Today's 5-step wizard
+conflates the two — steps 2 and 3 are template authoring wearing a wizard's
+clothes, which is why the same competencies have to be re-picked for every cycle.
+
+### The split
+
+| Today (5 steps) | Moves to |
+|---|---|
+| 1 · Setup — name, window, visibility | **Cycle** |
+| 2 · Competencies | **Template** |
+| 3 · Scale & questions | **Template** |
+| 4 · Participants | **Cycle** |
+| 5 · Review | **Cycle** |
+
+**Template = what is being assessed.** Competencies (+ groups), rating scale,
+review questions, goal questions. Reusable, versioned by editing, tagged.
+
+**Cycle = who, when, and who may see it.** Name, type, window, visibility,
+template selection, participants.
+
+### Template builder
+
+Lives on the **Review cycle** page (the admin surface) as a second tab —
+`Cycles` | `Templates` — rather than a fourth nav item, keeping the
+one-item-per-role read. Matches the reference's `Admin / Review Templates`
+breadcrumb.
+
+- **List:** Name (+ `base` / `universal` tags) · competencies summary (per
+  variant where present) · Edit / Delete · `New review template`.
+- **Editor:** name, tags, variant tabs (`Custom` / `Regular` / `Newcomer`),
+  competency picker with `inherited` badges + `Show N inherited`, the rating
+  scale editor, and the two question lists — i.e. today's steps 2 and 3, lifted
+  wholesale.
+
+### Cycle wizard, after the split
+
+4 steps: **1 Setup → 2 Template → 3 Participants → 4 Review**
+
+Step 1 gains a **cycle type** (`Regular` / `Newcomer`). That is what resolves a
+template's variant, and it explains the legacy tool's cycle names ("Active
+Regular Review: Aug 1, 2026", "Newcomer Review: Jun 20, 2026"). Without it,
+variants have nothing to select them.
+
+Step 2 shows the chosen template read-only — competencies grouped, scale
+preview, questions — so the admin can see what they are committing to without
+being able to edit it mid-launch. Editing is a template action, not a cycle one.
+
+### ⚠️ Unresolved: one template per cycle, or one per participant?
+
+Matt's wording is "selecting **one of** the templates" — one per cycle. That is
+much simpler, and Base + template + variant fully determines the assessment.
+
+But the reference cuts the other way: its cycle *"Active Regular Review: Aug 1,
+2026"* spans **Engineering (Platform), Engineering (Web) and Design** in one
+roster (Elena Park, Product Designer). A single template can't produce that. And
+v2.1 carries `Competency_IDs` **per row**, so per-participant sets are the format's
+native shape — see open question 6.
+
+Three options:
+
+1. **One template per cycle.** Simplest; mixed-team reviews mean running one
+   cycle per team. Matches Matt's words, contradicts the reference.
+2. **Template per participant row**, auto-suggested from the person's team and
+   overridable. Exactly mirrors `Competency_IDs` per row. Most build.
+3. **Cycle selects N templates; each participant resolves to one** by team.
+   Closest to v2.0's org-unit cascade; the middle cost.
+
+**Decided 2026-08-20: (3) — many templates per cycle.** The cycle selects a set
+of templates; each participant resolves to one of them (by team), plus Base. This
+reproduces the reference's mixed Engineering + Design roster, keeps the admin's
+choice at cycle level rather than row level, and leaves (2)'s per-row override as
+a later addition if it's ever needed.
+
+Consequences to build against:
+- Step 2 of the wizard is a **multi-select** of templates, not a single pick.
+- The review step must show *which* template each participant resolved to, since
+  a mixed cycle no longer has one answer.
+- A participant whose team matches **no** selected template is an error state the
+  wizard has to surface — the closest thing to a launch blocker in this flow.
+
+### Migration risk (this is a refactor, not an addition)
+
+Steps 2 and 3 are working code with real state — `STATE.selected`,
+`STATE.scaleRows`, `STATE.reviewQs`, `STATE.goalQs`, plus `renderLibrary()`,
+`renderScale()`, `renderQs()` and the inline add/remove handlers. Moving them
+means:
+
+- The library (`GROUPS`, `COMPETENCIES`, `SCALES`) stops being wizard-local and
+  becomes template-scoped data with a `TEMPLATES` collection over it.
+- The review step's summary currently reads competencies/scale/questions straight
+  off `STATE`; it must read them off the resolved template instead.
+- The stepper drops from 5 to 4, so `LAST`, `goToStep()` and the step markup all
+  shift — and the compact page-head stepper's labels change with them.
+
+Sequence it as: build the Templates list + editor alongside the existing wizard,
+then cut the wizard down once the editor owns that state. Not the reverse — the
+wizard is the only working demo of the flow right now.
 
 ## Manager views (added 2026-08-19)
 
@@ -216,12 +319,15 @@ surfacing who said what.
 
 ### Phase 2 order (roles · templates · manager views)
 
-1. **Templates list** — `Admin / Review Templates`: table + tags, New/Edit/Delete.
-   First because it unblocks the wizard's competency step and settles open Q1.
-2. **Template editor** — competencies (with `inherited` badges + show/hide) and
-   questions; variant tabs for non-universal templates.
-3. **Wire into the wizard** — step 2 picks templates instead of loose
-   competencies; Base auto-applies.
+Revised 2026-08-20 for the template/cycle split. Steps 1–2 add the new surface
+while the 5-step wizard keeps working; step 3 is the cut-over.
+
+1. **Templates list** — `Cycles` | `Templates` tabs on Review cycle: table +
+   tags, New / Edit / Delete.
+2. **Template editor** — lift today's steps 2 and 3 (competency picker with
+   `inherited` badges, scale editor, question lists) + name, tags, variant tabs.
+3. **Cut the wizard to 4 steps** — 1 Setup (+ cycle type) → 2 Template (chosen,
+   read-only) → 3 Participants → 4 Review. Only once the editor owns that state.
 4. **Manager roster** — the roll-up table.
 5. **Manager breakdown** — competency cards, peer comments, trend, notes.
 
@@ -235,9 +341,12 @@ surfacing who said what.
    competencies by ID, so hard delete would orphan them.)
 5. **Does the reviewee get a results surface?** ("My Results" was removed from the
    nav; the three roles don't name the reviewee-as-reader.)
-6. **How is a role template bound to a person?** By org unit (v2.0 cascaded down
-   nested units), by job title, or assigned per cycle? Determines whether the
-   admin picks templates or the system resolves them.
+6. ~~How is a role template bound to a person?~~ — **partly resolved
+   2026-08-20**: a cycle carries *many* templates and each participant resolves
+   to one. Still open: what the resolution keys on. Team is the assumption here
+   (the reference's roster shows a Team column); v2.0 cascaded by **org unit**
+   and also varied definitions by **job level**, neither of which this prototype
+   models.
 7. **Are peer comments attributed or anonymous to the manager?** The reference
    shows names; v2.1 says nothing, and v2.0's Peer Feedback was a separate
    always-on channel. Highest-sensitivity open item.

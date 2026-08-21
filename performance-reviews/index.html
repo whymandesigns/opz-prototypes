@@ -3430,6 +3430,40 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        points at the right thing. */
     .tt-wrap { display: inline-flex; }
 
+    /* designmd gap: .btn sets an explicit `display: flex`, which outranks the UA
+       stylesheet's `[hidden] { display: none }` — so the `hidden` attribute is
+       inert on every button in the system. It silently affected the wizard's
+       Back button on step 1 and both CTAs on this page. Fixed locally; worth
+       fixing at source, since `hidden` is the obvious way to hide a button. */
+    .btn[hidden] { display: none; }
+
+    /* Template editor — reuses the wizard's .cb-* control styles; only the
+       pieces the wizard has no equivalent for are defined here. */
+    .te-universal { margin-top: var(--ic-space-4); }
+    .te-inherited-row { display: flex; align-items: flex-start; gap: var(--ic-space-3); padding: var(--ic-space-3); border: 1px dashed var(--color-border); border-radius: var(--ic-radius-sm); margin-bottom: var(--ic-space-2); background: var(--color-surface-muted); }
+    .te-inherited-row:last-child { margin-bottom: 0; }
+    .te-inherited-row .cb-comp-meta { flex: 1; min-width: 0; }
+    /* Inherited items are read-only here — the affordance has to be absent, not
+       just disabled, or it reads as a broken control. */
+    .te-inherited-tag { flex-shrink: 0; }
+    #te-variant-tabs[hidden] { display: none; }
+
+    /* Templates list */
+    .tpl-name { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
+    /* components.css sets `white-space: nowrap` on every .table cell, which
+       assumes short content. A comma-separated competency list isn't short: at
+       nowrap it ran 482px inside a 371px cell and — because this wrapper is
+       overflow:visible so the kebabs can escape — spilled across the Actions
+       column. Lists wrap; rows just get taller. */
+    .tpl-comps { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; white-space: normal; }
+    .tpl-comps + .tpl-comps { margin-top: 2px; }
+    .tpl-variant { font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    /* Same reason as the cycles table: row kebabs are absolutely positioned and
+       .table-scroll's overflow would clip them. Safe because these tables can't
+       outgrow their container. */
+    #rc-tpl-wrap { overflow: visible; }
+    #rc-tpl-wrap .table { table-layout: fixed; }
+
     /* Breathing room under a toolbar before the table it controls. */
     .toolbar { margin-bottom: var(--ic-space-4); }
 
@@ -3588,10 +3622,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .tr-reviews-table .tag { height: auto; white-space: normal; }
     /* The question/answer cell is the content, not metadata — it wraps instead
        of truncating, and the answer sheds .cell-meta-sub's icon-row layout. */
-    .tr-goals-table .cell-meta-title { font: var(--type-body-sm); color: var(--color-text); }
-    .tr-goals-table .cell-meta-sub { display: block; color: var(--color-text-muted); }
+    /* Same nowrap inheritance as the templates list — the question/answer text
+       is the content of this table, so it wraps rather than running out of its
+       cell. Date column widened a little too; "Jun 6, 2025" was 8px over. */
+    .tr-goals-table .cell-meta-title { font: var(--type-body-sm); color: var(--color-text); white-space: normal; }
+    .tr-goals-table .cell-meta-sub { display: block; color: var(--color-text-muted); white-space: normal; }
 
-    .cb-body { max-width: 880px; }
+    /* 16px between stacked cards. The wizard's cards get this from .cb-step;
+       the template editor's are direct children of .cb-body, so the gap lives
+       here and covers both. */
+    .cb-body { max-width: 880px; display: flex; flex-direction: column; gap: var(--ic-space-4); }
 
     /* Compact stepper — only the current step is labelled, so the control reads
        as "where am I" rather than a full table of contents, and stays narrow
@@ -3668,7 +3708,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-summary dd { font: var(--type-body-sm); margin: 0; }
     .cb-summary-list { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
 
-    .cb-footer { display: flex; align-items: center; justify-content: space-between; margin-top: var(--ic-space-2); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .cb-footer { display: flex; align-items: center; justify-content: space-between; padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
     /* ===== Review cycle list =====
        .table-scroll's `overflow: auto` clips the row kebab menus — an absolutely
@@ -4695,11 +4735,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </div>
             <p class="page-head-subtitle">Create and manage assessment cycles.</p>
           </div>
+          <!-- One CTA per tab rather than one that changes meaning — the two
+               create different things, and a button whose action depends on
+               hidden state is the kind of thing that gets misclicked. -->
           <div class="page-head-actions">
-            <button class="btn btn-primary" type="button" id="rc-new"><svg class="btn-icon"><use href="#i-plus"/></svg>New review cycle</button>
+            <button class="btn btn-primary" type="button" id="rc-new">Create cycle</button>
+            <button class="btn btn-primary" type="button" id="rc-new-template" hidden>Create template</button>
           </div>
         </div>
 
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="rc-cycles-panel" type="button" data-rc-tab="cycles">Cycles <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="rc-templates-panel" type="button" data-rc-tab="templates">Templates <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+        </div>
+
+        <div id="rc-cycles-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
         <div class="table-scroll" id="rc-table-wrap">
           <table class="table table-wide">
             <colgroup>
@@ -4788,6 +4838,91 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </tr>
             </tbody>
           </table>
+        </div>
+        </div>
+
+        <!-- Templates (reference: Admin / Review Templates). A template is what
+             is assessed — competencies, scale, questions — authored separately
+             from running a cycle. Base merges into every other template, so it
+             has no Delete. Actions use the kebab for consistency with the Cycles
+             tab; the reference's inline red Delete has no design-system
+             equivalent. Editor is the next build step (PLAN.md § Phase 2). -->
+        <div id="rc-templates-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
+          <div class="table-scroll" id="rc-tpl-wrap">
+            <table class="table table-wide">
+              <colgroup>
+                <col style="width: 30%" /><col style="width: 58%" /><col style="width: 12%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Competencies</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="tpl-name"><span class="cell-title-text">Base Template</span><span class="rel-tags"><span class="tag tag-light">base</span><span class="tag tag-light">universal</span></span></div></td>
+                  <td><p class="tpl-comps">Adaptability, Collaboration &amp; Teamwork, Communication, Ownership &amp; Accountability</p></td>
+                  <td>
+                    <div class="cell-actions">
+                      <div class="dropdown">
+                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                        <div class="dropdown-menu dropdown-menu-end" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div class="tpl-name"><span class="cell-title-text">Design</span><span class="rel-tags"><span class="tag tag-light">universal</span></span></div></td>
+                  <td><p class="tpl-comps">Design Systems, Prototyping, UX &amp; Interaction, Visual Design</p></td>
+                  <td>
+                    <div class="cell-actions">
+                      <div class="dropdown">
+                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                        <div class="dropdown-menu dropdown-menu-end" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div class="tpl-name"><span class="cell-title-text">Engineering</span></div></td>
+                  <td><p class="tpl-comps"><span class="tpl-variant">Regular:</span> Code Quality, Mentorship, Problem Solving, System Design, Technical Proficiency</p><p class="tpl-comps"><span class="tpl-variant">Newcomer:</span> Code Quality, Problem Solving, Technical Proficiency</p></td>
+                  <td>
+                    <div class="cell-actions">
+                      <div class="dropdown">
+                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                        <div class="dropdown-menu dropdown-menu-end" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div class="tpl-name"><span class="cell-title-text">Management</span></div></td>
+                  <td><p class="tpl-comps"><span class="tpl-variant">Regular:</span> Delivery &amp; Execution, Leadership, People Development, Strategic Thinking</p><p class="tpl-comps"><span class="tpl-variant">Newcomer:</span> Delivery &amp; Execution, Leadership</p></td>
+                  <td>
+                    <div class="cell-actions">
+                      <div class="dropdown">
+                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                        <div class="dropdown-menu dropdown-menu-end" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -5018,7 +5153,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="table-scroll" id="tr-goals-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
           <table class="table table-wide assessments-table tr-goals-table">
             <colgroup>
-              <col style="width: 24%" /><col style="width: 12%" /><col style="width: 12%" /><col style="width: 52%" />
+              <col style="width: 24%" /><col style="width: 14%" /><col style="width: 10%" /><col style="width: 52%" />
             </colgroup>
             <thead>
               <tr>
@@ -5061,6 +5196,111 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TEMPLATE EDITOR (PLAN.md § Splitting templates out of the cycle
+           wizard). Owns what today's wizard steps 2 and 3 own — competencies,
+           rating scale, questions — but as a reusable named bundle rather than
+           per-cycle choices. Built alongside the wizard deliberately: the
+           wizard is the only working demo of the flow, so it keeps working
+           until this screen owns the state (Phase 2 step 3 cuts it to 4 steps).
+           Reuses the wizard's .cb-* control styles rather than cloning them.
+           ============================================================ -->
+      <section class="page-view" data-page="template-editor" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <a class="breadcrumb" href="#" id="te-back">Review cycle</a>
+              <span class="breadcrumb is-current" aria-current="page" id="te-crumb">Template</span>
+            </nav>
+            <div class="page-head-title">
+              <h1 class="page-head-heading" id="te-heading">Template</h1>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-secondary" type="button" id="te-cancel">Cancel</button>
+            <button class="btn btn-primary" type="button" id="te-save">Save template</button>
+          </div>
+        </div>
+
+        <div class="cb-body">
+          <div class="card">
+            <h2 class="cb-section-title">Details</h2>
+            <p class="cb-section-hint" id="te-type-hint">A template defines what people are assessed on. Cycles pick templates; they don't define competencies themselves.</p>
+            <label class="field">
+              <span class="field-label">Template name</span>
+              <input class="input" id="te-name" type="text" placeholder="e.g. Engineering" />
+            </label>
+            <label class="checkbox te-universal">
+              <input type="checkbox" class="checkbox-input" id="te-universal" />
+              <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
+              <span class="checkbox-label">Universal — one competency set, no Regular / Newcomer split</span>
+            </label>
+          </div>
+
+          <div class="card">
+            <h2 class="cb-section-title">Competencies <span class="count-badge count-badge-secondary" id="te-comp-count">0</span></h2>
+            <p class="cb-section-hint">Picked from the shared library. Items from the Base Template are inherited by every template and can only be changed there.</p>
+
+            <!-- Variant tabs — hidden entirely when the template is universal. -->
+            <div class="tabs" id="te-variant-tabs" role="tablist" style="margin-bottom: var(--ic-space-4)">
+              <button class="tab is-active" role="tab" aria-selected="true" type="button" data-variant="regular">Regular</button>
+              <button class="tab" role="tab" aria-selected="false" type="button" data-variant="newcomer">Newcomer</button>
+            </div>
+
+            <div id="te-inherited-wrap">
+              <button class="link-action" type="button" id="te-inherited-toggle" aria-expanded="false">Show inherited</button>
+              <div id="te-inherited-list" hidden style="margin-top: var(--ic-space-3)"></div>
+            </div>
+
+            <div id="te-library" style="margin-top: var(--ic-space-4)"></div>
+
+            <div class="cb-comp-new">
+              <p class="field-label" style="margin-bottom: var(--ic-space-2)">Add a new competency to the library</p>
+              <div class="cb-row">
+                <label class="field">
+                  <span class="field-label">Name</span>
+                  <input class="input" id="te-new-comp-name" type="text" placeholder="e.g. Facilitation" />
+                </label>
+                <label class="field">
+                  <span class="field-label">Description</span>
+                  <input class="input" id="te-new-comp-desc" type="text" placeholder="What good looks like" />
+                </label>
+                <label class="field" style="flex: 0 0 140px">
+                  <span class="field-label">Group</span>
+                  <select class="input" id="te-new-comp-group"></select>
+                </label>
+                <button class="btn btn-secondary" type="button" id="te-add-comp">Add</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="cb-section-title">Rating scale</h2>
+            <p class="cb-section-hint">The scale every competency in this template is rated on.</p>
+            <label class="field" style="max-width: 320px">
+              <span class="field-label">Use a saved scale</span>
+              <select class="input" id="te-scale-select"></select>
+            </label>
+            <div id="te-scale-rows" style="margin-top: var(--ic-space-4)"></div>
+            <button class="btn btn-secondary btn-xs" type="button" id="te-add-scale-row" style="margin-top: var(--ic-space-2)"><svg class="btn-icon"><use href="#i-plus"/></svg>Add level</button>
+            <div class="cb-preview" id="te-scale-preview"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="cb-section-title">Questions</h2>
+            <p class="cb-section-hint">Free-text prompts alongside the rated competencies. Base Template questions are inherited.</p>
+
+            <p class="field-label" style="margin-bottom: var(--ic-space-2)">Review questions <span class="field-hint">— asked of reviewers</span></p>
+            <div id="te-review-qs"></div>
+            <button class="btn btn-secondary btn-xs" type="button" data-te-add-q="review"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
+
+            <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Goal questions <span class="field-hint">— answered by the reviewee about themselves</span></p>
+            <div id="te-goal-qs"></div>
+            <button class="btn btn-secondary btn-xs" type="button" data-te-add-q="goal"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
+          </div>
         </div>
       </section>
 
@@ -6600,6 +6840,377 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
+    // ===== Template editor (PLAN.md § Splitting templates out of the wizard) =====
+    // Owns competencies + scale + questions as a reusable bundle. Deliberately
+    // separate from the wizard's step 2/3 code, which still runs until the
+    // wizard is cut down — this screen is what survives that cut.
+    (function () {
+      const section = document.querySelector('.page-view[data-page="template-editor"]');
+      if (!section) return;
+      const $ = sel => section.querySelector(sel);
+      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+      /* ---------- Shared library ----------
+         Groups follow v2.0's General / Skills split, which is what the Give
+         Assessment form already renders — not v2.1's Soft/Hard, which would
+         disagree with a screen that's already built. */
+      const GROUPS = [{ id: 'general', name: 'General' }, { id: 'skills', name: 'Skills' }];
+      const LIB = [
+        { id: 'adapt',  g: 'general', n: 'Adaptability',              d: 'Adjusts effectively to changing priorities and contexts.' },
+        { id: 'collab', g: 'general', n: 'Collaboration & Teamwork',  d: 'Works effectively with others toward shared goals.' },
+        { id: 'comms',  g: 'general', n: 'Communication',             d: 'Communicates clearly and openly with the right audience.' },
+        { id: 'own',    g: 'general', n: 'Ownership & Accountability',d: 'Takes responsibility for outcomes end-to-end.' },
+        { id: 'dsys',   g: 'skills',  n: 'Design Systems',            d: 'Builds and applies shared design foundations.' },
+        { id: 'proto',  g: 'skills',  n: 'Prototyping',               d: 'Tests ideas quickly at the right fidelity.' },
+        { id: 'ux',     g: 'skills',  n: 'UX & Interaction',          d: 'Designs flows that are clear and usable.' },
+        { id: 'visual', g: 'skills',  n: 'Visual Design',             d: 'Applies craft in type, layout and colour.' },
+        { id: 'cq',     g: 'skills',  n: 'Code Quality',              d: 'Writes clean, maintainable, well-tested code.' },
+        { id: 'mentor', g: 'skills',  n: 'Mentorship',                d: 'Grows others through coaching and feedback.' },
+        { id: 'solve',  g: 'skills',  n: 'Problem Solving',           d: 'Breaks down and resolves complex problems effectively.' },
+        { id: 'sysd',   g: 'skills',  n: 'System Design',             d: 'Designs robust, scalable systems and makes sound trade-offs.' },
+        { id: 'techp',  g: 'skills',  n: 'Technical Proficiency',     d: 'Demonstrates strong, current technical skills.' },
+        { id: 'deliv',  g: 'skills',  n: 'Delivery & Execution',      d: 'Ships outcomes predictably and at pace.' },
+        { id: 'lead',   g: 'skills',  n: 'Leadership',                d: 'Sets direction and brings people with them.' },
+        { id: 'people', g: 'skills',  n: 'People Development',        d: 'Grows the people they are responsible for.' },
+        { id: 'strat',  g: 'skills',  n: 'Strategic Thinking',        d: 'Connects day-to-day work to longer-term goals.' }
+      ];
+      const SCALES = {
+        'sc-5pt': { name: '5-point standard', rows: [
+          { value: 1, label: 'Unacceptable',         color: '#FF0000' },
+          { value: 2, label: 'Needs Improvement',    color: '#AA4411' },
+          { value: 3, label: 'Meets Expectations',   color: '#9999BB' },
+          { value: 4, label: 'Exceeds Expectations', color: '#77AA77' },
+          { value: 5, label: 'Outstanding',          color: '#33CC33' } ] },
+        'sc-3pt': { name: '3-point (legacy 2.0)', rows: [
+          { value: 1, label: 'Needs Improvement', color: '#AA4411' },
+          { value: 2, label: 'On Track',          color: '#9999BB' },
+          { value: 3, label: 'Overperforming',    color: '#33CC33' } ] }
+      };
+
+      // Seeded from the reference's four templates.
+      const TEMPLATES = window.PR_TEMPLATES = [
+        { id: 'base', name: 'Base Template', base: true, universal: true,
+          variants: { all: ['adapt', 'collab', 'comms', 'own'] }, scaleId: 'sc-5pt',
+          reviewQs: [{ t: "What are this person's key strengths?", req: true },
+                     { t: 'What is one area where this person could improve?', req: true }],
+          goalQs:   [{ t: 'What are your main goals for the next 12 months?', req: true },
+                     { t: 'What support do you need from your manager?', req: false }] },
+        { id: 'design', name: 'Design', universal: true,
+          variants: { all: ['dsys', 'proto', 'ux', 'visual'] }, scaleId: 'sc-5pt',
+          reviewQs: [], goalQs: [] },
+        { id: 'eng', name: 'Engineering', universal: false,
+          variants: { regular: ['cq', 'mentor', 'solve', 'sysd', 'techp'],
+                      newcomer: ['cq', 'solve', 'techp'] }, scaleId: 'sc-5pt',
+          reviewQs: [], goalQs: [{ t: 'Which technical skill do you most want to grow?', req: false }] },
+        { id: 'mgmt', name: 'Management', universal: false,
+          variants: { regular: ['deliv', 'lead', 'people', 'strat'],
+                      newcomer: ['deliv', 'lead'] }, scaleId: 'sc-5pt',
+          reviewQs: [], goalQs: [] }
+      ];
+      const baseTpl = () => TEMPLATES.find(t => t.base);
+      const compById = id => LIB.find(c => c.id === id);
+      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl };
+
+      // Working copy — edits apply on Save, so Cancel genuinely discards.
+      let draft = null, variant = 'regular';
+      const variantKey = () => draft.universal ? 'all' : variant;
+      const selected = () => draft.variants[variantKey()] ||= [];
+
+      /* ---------- Competencies ---------- */
+      // Base items are inherited by every other template; showing them as
+      // pickable would imply they can be removed here, which they can't.
+      const inheritedIds = () => draft.base ? [] : baseTpl().variants.all;
+
+      const renderInherited = () => {
+        const ids = inheritedIds();
+        const wrap = $('#te-inherited-wrap');
+        wrap.hidden = !ids.length;
+        if (!ids.length) return;
+        const toggle = $('#te-inherited-toggle');
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.textContent = `${open ? 'Hide' : 'Show'} ${ids.length} inherited`;
+        $('#te-inherited-list').hidden = !open;
+        $('#te-inherited-list').innerHTML = ids.map(id => {
+          const c = compById(id);
+          return `<div class="te-inherited-row">
+            <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
+            <span class="tag tag-light te-inherited-tag">inherited</span>
+          </div>`;
+        }).join('');
+      };
+
+      const renderLibrary = () => {
+        const inh = inheritedIds();
+        const sel = selected();
+        $('#te-library').innerHTML = GROUPS.map(g => {
+          // Inherited competencies are listed above, not repeated as choices.
+          const items = LIB.filter(c => c.g === g.id && !inh.includes(c.id));
+          if (!items.length) return '';
+          return `<div class="cb-group">
+            <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span></div>
+            ${items.map(c => `<label class="cb-comp-row">
+              <span class="checkbox"><input type="checkbox" class="checkbox-input" data-te-comp="${c.id}" ${sel.includes(c.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
+              <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
+            </label>`).join('')}
+          </div>`;
+        }).join('');
+        // Count is what the reviewer will actually see: inherited + picked.
+        $('#te-comp-count').textContent = sel.length + inh.length;
+        $('#te-new-comp-group').innerHTML = GROUPS.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join('');
+      };
+
+      section.addEventListener('change', e => {
+        const cb = e.target.closest('[data-te-comp]');
+        if (!cb) return;
+        const sel = selected(), id = cb.dataset.teComp;
+        cb.checked ? (!sel.includes(id) && sel.push(id)) : sel.splice(sel.indexOf(id), 1);
+        $('#te-comp-count').textContent = sel.length + inheritedIds().length;
+      });
+
+      $('#te-inherited-toggle').addEventListener('click', e => {
+        const t = e.currentTarget;
+        t.setAttribute('aria-expanded', String(t.getAttribute('aria-expanded') !== 'true'));
+        renderInherited();
+      });
+
+      $('#te-add-comp').addEventListener('click', () => {
+        const n = $('#te-new-comp-name').value.trim();
+        if (!n) { $('#te-new-comp-name').focus(); return; }
+        const id = 'c-' + n.toLowerCase().replace(/\W+/g, '-');
+        if (!compById(id)) LIB.push({ id, g: $('#te-new-comp-group').value, n, d: $('#te-new-comp-desc').value.trim() || 'No description yet.' });
+        if (!selected().includes(id)) selected().push(id);
+        $('#te-new-comp-name').value = ''; $('#te-new-comp-desc').value = '';
+        renderLibrary();
+        if (window.toast) toast({ variant: 'success', message: `“${n}” added to the library.`, timeout: 2400 });
+      });
+
+      /* ---------- Variant tabs ---------- */
+      const renderVariantTabs = () => {
+        const tabs = $('#te-variant-tabs');
+        tabs.hidden = !!draft.universal;
+        tabs.querySelectorAll('[data-variant]').forEach(t => {
+          const on = t.dataset.variant === variant;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-selected', String(on));
+        });
+      };
+      $('#te-variant-tabs').querySelectorAll('[data-variant]').forEach(t =>
+        t.addEventListener('click', () => { variant = t.dataset.variant; renderVariantTabs(); renderLibrary(); }));
+
+      $('#te-universal').addEventListener('change', e => {
+        draft.universal = e.target.checked;
+        // Collapsing two variants into one would silently drop a set, so carry
+        // the currently-shown variant across rather than guessing.
+        if (draft.universal) draft.variants.all = [...selected()];
+        else { const from = draft.variants.all || []; draft.variants.regular ||= [...from]; draft.variants.newcomer ||= [...from]; }
+        renderVariantTabs(); renderLibrary();
+      });
+
+      /* ---------- Rating scale ---------- */
+      const renderScale = () => {
+        $('#te-scale-select').innerHTML = Object.entries(SCALES)
+          .map(([id, s]) => `<option value="${id}" ${id === draft.scaleId ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
+        $('#te-scale-rows').innerHTML = draft.scaleRows.map((r, i) => `
+          <div class="cb-scale-row" data-te-row="${i}">
+            <input class="input input-xs" type="number" value="${r.value}" data-te-field="value" aria-label="Value" />
+            <input class="input input-xs" type="text" value="${esc(r.label)}" data-te-field="label" aria-label="Label" />
+            <input class="cb-swatch" type="color" value="${r.color}" data-te-field="color" aria-label="Colour" />
+            <button class="btn btn-xs btn-ghost btn-icon-only" type="button" data-te-del-row="${i}" aria-label="Remove level"><svg class="icon"><use href="#i-trash"/></svg></button>
+          </div>`).join('');
+        $('#te-scale-preview').innerHTML = '<span class="cb-preview-item" style="font-weight: var(--ic-weight-semibold)">Reviewer sees:</span>' +
+          draft.scaleRows.map(r => `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('');
+      };
+      $('#te-scale-select').addEventListener('change', e => {
+        draft.scaleId = e.target.value;
+        draft.scaleRows = SCALES[draft.scaleId].rows.map(r => ({ ...r }));
+        renderScale();
+      });
+      $('#te-add-scale-row').addEventListener('click', () => {
+        const next = draft.scaleRows.length ? Math.max(...draft.scaleRows.map(r => Number(r.value) || 0)) + 1 : 1;
+        draft.scaleRows.push({ value: next, label: '', color: '#9999BB' });
+        renderScale();
+      });
+      section.addEventListener('input', e => {
+        const f = e.target.dataset.teField, row = e.target.closest('[data-te-row]');
+        if (!f || !row) return;
+        draft.scaleRows[Number(row.dataset.teRow)][f] = e.target.value;
+        if (f === 'color') renderScale();
+      });
+      section.addEventListener('click', e => {
+        const d = e.target.closest('[data-te-del-row]');
+        if (!d) return;
+        draft.scaleRows.splice(Number(d.dataset.teDelRow), 1);
+        renderScale();
+      });
+
+      /* ---------- Questions ---------- */
+      const qList = kind => kind === 'review' ? draft.reviewQs : draft.goalQs;
+      const inheritedQs = kind => draft.base ? [] : (kind === 'review' ? baseTpl().reviewQs : baseTpl().goalQs);
+      const renderQs = kind => {
+        const host = $(kind === 'review' ? '#te-review-qs' : '#te-goal-qs');
+        const inh = inheritedQs(kind).map(q => `
+          <div class="cb-q-row">
+            <input class="input" type="text" value="${esc(q.t)}" disabled />
+            <span class="tag tag-light">inherited</span>
+          </div>`).join('');
+        const own = qList(kind).map((q, i) => `
+          <div class="cb-q-row" data-te-q="${kind}" data-te-i="${i}">
+            <input class="input" type="text" value="${esc(q.t)}" data-te-q-text placeholder="Type a question…" />
+            <label class="cb-q-required"><span class="switch"><input type="checkbox" class="switch-input" data-te-q-req ${q.req ? 'checked' : ''} /><span class="switch-track"></span></span>Required</label>
+            <button class="btn btn-xs btn-ghost btn-icon-only" type="button" data-te-q-del aria-label="Remove question"><svg class="icon"><use href="#i-trash"/></svg></button>
+          </div>`).join('');
+        host.innerHTML = (inh + own) || '<p class="cb-empty">No questions.</p>';
+      };
+      const renderAllQs = () => { renderQs('review'); renderQs('goal'); };
+
+      section.querySelectorAll('[data-te-add-q]').forEach(b => b.addEventListener('click', () => {
+        qList(b.dataset.teAddQ).push({ t: '', req: false });
+        renderQs(b.dataset.teAddQ);
+      }));
+      section.addEventListener('click', e => {
+        const d = e.target.closest('[data-te-q-del]');
+        if (!d) return;
+        const row = d.closest('[data-te-q]');
+        qList(row.dataset.teQ).splice(Number(row.dataset.teI), 1);
+        renderQs(row.dataset.teQ);
+      });
+      section.addEventListener('input', e => {
+        if (!e.target.matches('[data-te-q-text]')) return;
+        const row = e.target.closest('[data-te-q]');
+        qList(row.dataset.teQ)[Number(row.dataset.teI)].t = e.target.value;
+      });
+      section.addEventListener('change', e => {
+        if (!e.target.matches('[data-te-q-req]')) return;
+        const row = e.target.closest('[data-te-q]');
+        qList(row.dataset.teQ)[Number(row.dataset.teI)].req = e.target.checked;
+      });
+
+      /* ---------- Open / save ---------- */
+      const render = () => {
+        $('#te-name').value = draft.name;
+        $('#te-universal').checked = !!draft.universal;
+        $('#te-universal').disabled = !!draft.base;   // Base is universal by definition
+        $('#te-crumb').textContent = draft.name || 'New template';
+        $('#te-heading').textContent = draft.id ? `Edit ${draft.name}` : 'New review template';
+        $('#te-type-hint').textContent = draft.base
+          ? 'Base Template — these competencies and questions are inherited by every other template.'
+          : 'A template defines what people are assessed on. Cycles pick templates; they don\'t define competencies themselves.';
+        renderVariantTabs(); renderInherited(); renderLibrary(); renderScale(); renderAllQs();
+      };
+
+      const open = (id) => {
+        const src = TEMPLATES.find(t => t.id === id);
+        // structuredClone keeps the draft fully detached, so Cancel discards
+        // nested edits (scale rows, question objects) too — not just the top level.
+        draft = src ? structuredClone(src)
+                    : { id: '', name: '', universal: true, variants: { all: [] }, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
+        draft.scaleRows = draft.scaleRows || SCALES[draft.scaleId].rows.map(r => ({ ...r }));
+        variant = 'regular';
+        render();
+        window.showPrPage?.('template-editor');
+      };
+      window.openTemplateEditor = open;
+
+      const leave = () => {
+        window.showPrPage?.('review-cycles');
+        document.querySelector('[data-rc-tab="templates"]')?.click();
+      };
+      $('#te-cancel').addEventListener('click', leave);
+      $('#te-back').addEventListener('click', e => { e.preventDefault(); leave(); });
+
+      $('#te-save').addEventListener('click', () => {
+        const name = $('#te-name').value.trim();
+        if (!name) { $('#te-name').focus(); if (window.toast) toast({ variant: 'error', message: 'Give the template a name.' }); return; }
+        draft.name = name;
+        const i = TEMPLATES.findIndex(t => t.id === draft.id);
+        if (i > -1) TEMPLATES[i] = draft;
+        else { draft.id = 'tpl-' + name.toLowerCase().replace(/\W+/g, '-'); TEMPLATES.push(draft); }
+        window.renderTemplateList?.();
+        leave();
+        if (window.toast) toast({ variant: 'success', message: `“${name}” saved.` });
+      });
+    })();
+
+    // Templates list — rendered from the same model the editor writes to, so a
+    // save is reflected here without a reload. Was static markup until the
+    // editor existed to change it.
+    (function () {
+      const wrap = document.getElementById('rc-tpl-wrap');
+      if (!wrap || !window.PR_TPL) return;
+      const api = window.PR_TPL;
+      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+      const names = ids => (ids || []).map(id => api.comp(id)?.n).filter(Boolean).join(', ') || '—';
+
+      const render = () => {
+        wrap.querySelector('tbody').innerHTML = api.list.map(t => {
+          const tags = [t.base && 'base', t.universal && 'universal'].filter(Boolean);
+          // Own competencies only — inherited ones belong to Base's own row.
+          const comps = t.universal
+            ? `<p class="tpl-comps">${esc(names(t.variants.all))}</p>`
+            : ['regular', 'newcomer'].map(v =>
+                `<p class="tpl-comps"><span class="tpl-variant">${v[0].toUpperCase() + v.slice(1)}:</span> ${esc(names(t.variants[v]))}</p>`).join('');
+          // Base has no Delete: every other template inherits from it.
+          const del = t.base ? '' :
+            `<button class="dropdown-item dropdown-item-danger" type="button" data-tpl-del="${t.id}"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>`;
+          return `<tr>
+            <td><div class="tpl-name"><span class="cell-title-text">${esc(t.name)}</span>${
+              tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div></td>
+            <td>${comps}</td>
+            <td><div class="cell-actions"><div class="dropdown">
+              <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item" type="button" data-tpl-edit="${t.id}"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>${del}
+              </div>
+            </div></div></td>
+          </tr>`;
+        }).join('');
+
+        // Kebabs are re-created on every render, so their open/close is wired
+        // here rather than relying on the shared load-time .dropdown handler.
+        wrap.querySelectorAll('.dropdown').forEach(d => {
+          const trigger = d.querySelector('.dropdown-trigger'), menu = d.querySelector('.dropdown-menu');
+          trigger.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = trigger.getAttribute('aria-expanded') === 'true';
+            wrap.querySelectorAll('.dropdown-menu').forEach(m => m.hidden = true);
+            trigger.setAttribute('aria-expanded', String(!open));
+            menu.hidden = open;
+          });
+        });
+        const badge = document.querySelector('.tab[aria-controls="rc-templates-panel"] [data-tab-count]');
+        if (badge) badge.textContent = api.list.length;
+      };
+      window.renderTemplateList = render;
+
+      wrap.addEventListener('click', e => {
+        const edit = e.target.closest('[data-tpl-edit]');
+        if (edit) { window.openTemplateEditor?.(edit.dataset.tplEdit); return; }
+        const del = e.target.closest('[data-tpl-del]');
+        if (!del) return;
+        const i = api.list.findIndex(t => t.id === del.dataset.tplDel);
+        if (i < 0) return;
+        const [gone] = api.list.splice(i, 1);
+        render();
+        if (window.toast) toast({ variant: 'neutral', message: `“${gone.name}” deleted.` });
+      });
+
+      document.getElementById('rc-new-template')?.addEventListener('click', () => window.openTemplateEditor?.(null));
+      render();
+    })();
+
+    // Review cycle tabs — swap which CTA the page head shows. Cycles and
+    // Templates create different things, so the button changes rather than
+    // meaning two things depending on hidden state.
+    (function () {
+      const tabs = document.querySelectorAll('[data-rc-tab]');
+      const ctas = { cycles: document.getElementById('rc-new'), templates: document.getElementById('rc-new-template') };
+      if (!tabs.length || !ctas.cycles || !ctas.templates) return;
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        const key = tab.dataset.rcTab;
+        Object.entries(ctas).forEach(([k, btn]) => { btn.hidden = k !== key; });
+      }));
+    })();
+
     // ===== My reports toolbar (My direct reports) — search + cycle filter =====
     // Both filters apply together, so narrowing by cycle then typing behaves the
     // way a user expects. The shared .input-select handler already opens/closes
