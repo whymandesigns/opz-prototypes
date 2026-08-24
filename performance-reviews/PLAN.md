@@ -399,6 +399,18 @@ What went, and why:
   warnings were dropped — "reviewees never see their results" is a choice, and
   it now reads directly off Section 2.
 
+### Revisions after review
+
+- **Visibility is two options, not three.** NB-67 asked to keep "as soon as it's
+  submitted"; on seeing it built, it went. It was a third way of saying "from
+  today", so the choice is now *when?* rather than *which kind of when?* —
+  **From a date** (the default) or **Never**.
+- **The "N assessments will be created" read-out** in the Participants head was
+  removed; the table already says how many rows there are.
+- **Removing a participant toasts with Undo**, restoring the row at its original
+  index. There's no confirm step before the delete, so the recovery sits after
+  it rather than a dialog asking first.
+
 ### The template picker answers open question 2
 
 **One template per cycle**, chosen from a dropdown, labelled `Engineering
@@ -415,6 +427,45 @@ that stays in Templates.
 
 Newcomer variants are **still unreachable** (question 1 above): with no cycle
 type, `compsFor()` resolves to `regular`.
+
+## Template model, extended (2026-08-24)
+
+Design review on the built screens pushed three changes into the template model
+itself. All three are in the editor; everything that renders templates reads
+from the same source, so the cycle form follows automatically.
+
+**Description.** Optional, 180 chars, shown as a sub-line under the name in the
+Templates list. Says who a template is for and when to reach for it — the name
+already identifies it.
+
+**Inherits from.** Inheritance used to be hardwired: *every non-Base template
+inherits Base*. No control could express that, so a template with no parent was
+impossible. It's now an explicit `parentId`:
+
+- Resolution walks the whole chain, not one level — competencies, questions and
+  the counts that derive from them.
+- The three seeded templates point at Base, so nothing regressed; **new
+  templates default to no parent**.
+- Base can't have one (it's the root); a template can't pick itself or one of
+  its own descendants, so the picker can't build a loop. The walk carries a
+  `seen` guard anyway, since saved data could.
+- A deleted parent resolves to no parent and clears the stored link.
+
+**Custom competency groups.** `GROUPS` was a fixed General / Skills pair (from
+v2.0). Admins can now add their own — a Contractor group with its own skills.
+The Group control is a combobox: typing filters the list, and a query matching
+nothing offers to create it. Two deliberate constraints:
+
+- A group is only committed when Add resolves it with a competency. The library
+  skips empty groups, so one created by browsing would be invisible.
+- Re-typing an existing name reuses that group rather than duplicating it.
+
+Each group header carries a plus that points the shared add row at that group,
+rather than an inline form per group — one control, one code path.
+
+**Not carried through:** the Give Assessment screen's General / Skills section
+headers are static markup from the Figma build, not driven by `GROUPS`, so a
+custom group won't appear on the reviewer side yet.
 
 ## Open questions
 

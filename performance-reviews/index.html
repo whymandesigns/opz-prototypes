@@ -3437,6 +3437,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        fixing at source, since `hidden` is the obvious way to hide a button. */
     .btn[hidden] { display: none; }
 
+    /* Filter row at the top of a menu — designmd's dropdown has a header and a
+       divider but no search field, so this is the one local part of the group
+       combobox. */
+    .te-group-search .input { width: 100%; }
+    #te-group-menu { min-width: 240px; }
+    #te-group-options { display: flex; flex-direction: column; gap: 2px; max-height: 200px; overflow-y: auto; }
+
+    /* No :disabled state exists for .input-select-trigger in designmd; Base's
+       parent picker needs one. Matches the local .btn:disabled treatment. */
+    .input-select-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+    .input-select-trigger:disabled:hover { border-color: var(--color-border); }
+
+    /* "optional" beside a field label — quieter than the label, so the field
+       reads as skippable without a second line of hint text. */
+    .te-optional { font: var(--type-caption); color: var(--color-text-subtle); font-weight: var(--ic-weight-regular); }
+    /* Description under a template's name in the list. .table td is nowrap
+       system-wide, same as .tpl-comps, so wrapping is re-enabled here. */
+    .tpl-desc { font: var(--type-caption); color: var(--color-text-muted); margin: var(--ic-space-1) 0 0; white-space: normal; }
+
     /* Template editor — reuses the wizard's .cb-* control styles; only the
        pieces the wizard has no equivalent for are defined here. */
     .te-universal { margin-top: var(--ic-space-4); }
@@ -3693,6 +3712,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .page-head:has(+ .tabs),
     .page-head:has(+ * > .tabs) { border-bottom: 0; margin-bottom: var(--ic-space-4); }
 
+    /* Undo below the message, not beside it. designmd's .toast is one flex row
+       (icon · message · action · close), which puts a button of unpredictable
+       width in the middle of the row and squeezes the text. Re-laid out as a
+       grid so the action gets its own line under the message, aligned to the
+       text rather than the icon. Local, and only for toasts that carry an
+       action — a plain toast keeps the component's own single-row layout. */
+    .toast:has(.toast-action) {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: start;
+      column-gap: var(--ic-space-3);
+      row-gap: var(--ic-space-2);
+    }
+    .toast:has(.toast-action) .toast-icon    { grid-area: 1 / 1; }
+    .toast:has(.toast-action) .toast-message { grid-area: 1 / 2; }
+    .toast:has(.toast-action) .toast-close   { grid-area: 1 / 3; }
+    .toast:has(.toast-action) .toast-action  { grid-area: 2 / 2; justify-self: start; align-self: start; }
+
     /* NB-64: each template row carries its rating scale, as swatches so the
        shape of the scale reads at a glance without spelling out every label. */
     .cb-tpl-scale { display: inline-flex; align-items: center; gap: var(--ic-space-1); margin-top: var(--ic-space-1); font: var(--type-caption); color: var(--color-text-subtle); }
@@ -3717,9 +3754,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       font: var(--type-body-sm);
       font-weight: var(--ic-weight-semibold);
     }
-    /* Live read-out of what launching would create, kept in the section head so
-       it stays visible while the table below is scrolled or edited. */
-    .cb-sec-aside { flex-shrink: 0; font: var(--type-body-sm); color: var(--color-text-subtle); }
     .cb-section-title { font: var(--type-h4); margin: 0 0 var(--ic-space-1); }
     .cb-section-hint { font: var(--type-body-sm); color: var(--color-text-subtle); margin: 0 0 var(--ic-space-4); }
     .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-4); }
@@ -3729,7 +3763,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* Visibility — v2.1 gates results behind a date per pair, where a *blank*
        date means "never visible". A bare empty date field makes the most
        destructive option the accidental default, so each rule is an explicit
-       radio choice and "Never" has to be picked on purpose. */
+       radio choice and "Never" has to be picked on purpose. Two options only:
+       "as soon as it's submitted" was a third way of saying "from today", and
+       dropping it makes the choice "when?" rather than "which kind of when?". */
     .cb-vis { display: flex; flex-direction: column; gap: var(--ic-space-3); }
     .cb-vis-option { display: flex; align-items: center; gap: var(--ic-space-3); }
     .cb-vis-option .radio { flex-shrink: 0; }
@@ -3741,6 +3777,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-group { margin-bottom: var(--ic-space-4); }
     .cb-group:last-child { margin-bottom: 0; }
     .cb-group-head { display: flex; align-items: center; gap: var(--ic-space-2); margin-bottom: var(--ic-space-2); }
+    /* Pinned right, and quiet until the group is hovered — a plus on every
+       header at full strength would compete with the competencies themselves. */
+    .cb-group-add { margin-left: auto; opacity: 0; transition: opacity var(--ic-duration-fast) var(--ic-ease); }
+    .cb-group:hover .cb-group-add,
+    .cb-group-add:focus-visible { opacity: 1; }
     .cb-group-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); }
     .cb-comp-row { display: flex; align-items: flex-start; gap: var(--ic-space-3); padding: var(--ic-space-3); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); margin-bottom: var(--ic-space-2); cursor: pointer; }
     .cb-comp-row:last-child { margin-bottom: 0; }
@@ -5236,7 +5277,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" id="te-back">Review cycle</a>
+              <a class="breadcrumb" href="#" id="te-back">Templates</a>
               <span class="breadcrumb is-current" aria-current="page" id="te-crumb">Template</span>
             </nav>
             <div class="page-head-title">
@@ -5257,6 +5298,27 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <span class="field-label">Template name</span>
               <input class="input" id="te-name" type="text" placeholder="e.g. Engineering" />
             </label>
+            <!-- Optional: a template is identifiable by its name, so this says
+                 who it's for and when to reach for it rather than repeating it. -->
+            <label class="field" id="te-desc-field" data-char-limit="180" style="margin-top: var(--ic-space-4)">
+              <span class="field-label">Description <span class="te-optional">optional</span></span>
+              <textarea class="input" id="te-desc" rows="3" maxlength="180" placeholder="Who is this template for, and when should an admin pick it?"></textarea>
+              <span class="field-hint"></span>
+            </label>
+            <!-- Inheritance is an explicit link now. It used to be hardwired
+                 ("every non-Base template inherits Base"), which no control
+                 could express — so a template with no parent was impossible. -->
+            <div class="field" id="te-parent-field" style="margin-top: var(--ic-space-4)">
+              <span class="field-label">Inherits from</span>
+              <div class="input-select" id="te-parent-select">
+                <button class="input-select-trigger" aria-expanded="false" type="button">
+                  <span class="input-select-value" id="te-parent-value">No parent template</span>
+                  <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden id="te-parent-menu"></div>
+              </div>
+              <span class="field-hint" id="te-parent-hint"></span>
+            </div>
             <label class="checkbox te-universal">
               <input type="checkbox" class="checkbox-input" id="te-universal" />
               <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
@@ -5266,7 +5328,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
           <div class="card">
             <h2 class="cb-section-title">Competencies <span class="count-badge count-badge-secondary" id="te-comp-count">0</span></h2>
-            <p class="cb-section-hint">Picked from the shared library. Items from the Base Template are inherited by every template and can only be changed there.</p>
+            <p class="cb-section-hint">Picked from the shared library. Anything inherited from a parent template is listed above and can only be changed there.</p>
 
             <!-- Variant tabs — hidden entirely when the template is universal. -->
             <div class="tabs" id="te-variant-tabs" role="tablist" style="margin-bottom: var(--ic-space-4)">
@@ -5292,10 +5354,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <span class="field-label">Description</span>
                   <input class="input" id="te-new-comp-desc" type="text" placeholder="What good looks like" />
                 </label>
-                <label class="field" style="flex: 0 0 140px">
+                <!-- Combobox, not a select: one control that both picks an
+                     existing group and names a new one. Typing filters the
+                     list, and a query that matches nothing offers to create it
+                     — so there's no separate "add group" mode to find. A group
+                     only exists once something is in it (the library skips
+                     empty ones), so the group and its first competency are
+                     created together. -->
+                <div class="field" style="flex: 0 0 190px">
                   <span class="field-label">Group</span>
-                  <select class="input" id="te-new-comp-group"></select>
-                </label>
+                  <div class="input-select" id="te-group-select">
+                    <button class="input-select-trigger" aria-expanded="false" type="button">
+                      <span class="input-select-value" id="te-group-value">General</span>
+                      <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden id="te-group-menu">
+                      <div class="te-group-search">
+                        <input class="input input-xs" id="te-group-filter" type="text" placeholder="Select or add a group…" aria-label="Filter or name a group" />
+                      </div>
+                      <hr class="dropdown-divider" />
+                      <div id="te-group-options"></div>
+                    </div>
+                  </div>
+                </div>
                 <button class="btn btn-secondary" type="button" id="te-add-comp">Add</button>
               </div>
             </div>
@@ -5309,7 +5390,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <select class="input" id="te-scale-select"></select>
             </label>
             <div id="te-scale-rows" style="margin-top: var(--ic-space-4)"></div>
-            <button class="btn btn-secondary btn-xs" type="button" id="te-add-scale-row" style="margin-top: var(--ic-space-2)"><svg class="btn-icon"><use href="#i-plus"/></svg>Add level</button>
+            <button class="btn btn-ghost btn-xs" type="button" id="te-add-scale-row" style="margin-top: var(--ic-space-2)"><svg class="btn-icon"><use href="#i-plus"/></svg>Add level</button>
             <div class="cb-preview" id="te-scale-preview"></div>
           </div>
 
@@ -5319,11 +5400,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
             <p class="field-label" style="margin-bottom: var(--ic-space-2)">Review questions <span class="field-hint">— asked of reviewers</span></p>
             <div id="te-review-qs"></div>
-            <button class="btn btn-secondary btn-xs" type="button" data-te-add-q="review"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
+            <button class="btn btn-ghost btn-xs" type="button" data-te-add-q="review"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
 
             <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Goal questions <span class="field-hint">— answered by the reviewee about themselves</span></p>
             <div id="te-goal-qs"></div>
-            <button class="btn btn-secondary btn-xs" type="button" data-te-add-q="goal"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
+            <button class="btn btn-ghost btn-xs" type="button" data-te-add-q="goal"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
           </div>
         </div>
       </section>
@@ -5422,9 +5503,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to the reviewee</p>
             <div class="cb-vis" data-vis="reviewee">
               <div class="cb-vis-option">
-                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="submit" /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
-              </div>
-              <div class="cb-vis-option">
                 <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="date" checked /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
                 <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to reviewee from" />
               </div>
@@ -5436,11 +5514,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to managers</p>
             <div class="cb-vis" data-vis="managers">
               <div class="cb-vis-option">
-                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="submit" checked /><span class="radio-circle"></span><span class="radio-label">As soon as it's submitted</span></label>
-              </div>
-              <div class="cb-vis-option">
-                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="date" /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
-                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to managers from" hidden />
+                <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="date" checked /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
+                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to managers from" />
               </div>
               <div class="cb-vis-option">
                 <label class="radio"><input type="radio" name="cb-vis-managers" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
@@ -5456,7 +5531,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <h2 class="cb-section-title">Participants</h2>
                 <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
               </div>
-              <span class="cb-sec-aside" id="cb-pair-count">0 assessments will be created</span>
             </div>
 
             <div class="cb-row" style="margin-bottom: var(--ic-space-4)">
@@ -6826,6 +6900,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          Groups follow v2.0's General / Skills split, which is what the Give
          Assessment form already renders — not v2.1's Soft/Hard, which would
          disagree with a screen that's already built. */
+      // Seeded with v2.0's General / Skills split, but admins can add their own
+      // (e.g. a Contractor group with its own skills) — so this grows at runtime
+      // rather than being a fixed pair. Everything that renders groups reads it.
       const GROUPS = [{ id: 'general', name: 'General' }, { id: 'skills', name: 'Skills' }];
       const LIB = [
         { id: 'adapt',  g: 'general', n: 'Adaptability',              d: 'Adjusts effectively to changing priorities and contexts.' },
@@ -6862,28 +6939,50 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // Seeded from the reference's four templates.
       const TEMPLATES = window.PR_TEMPLATES = [
         { id: 'base', name: 'Base Template', base: true, universal: true,
+          parentId: null,
+          desc: 'Applies to every cycle. Its competencies and questions are inherited by all other templates.',
           variants: { all: ['adapt', 'collab', 'comms', 'own'] }, scaleId: 'sc-5pt',
           reviewQs: [{ t: "What are this person's key strengths?", req: true },
                      { t: 'What is one area where this person could improve?', req: true }],
           goalQs:   [{ t: 'What are your main goals for the next 12 months?', req: true },
                      { t: 'What support do you need from your manager?', req: false }] },
         { id: 'design', name: 'Design', universal: true,
+          parentId: 'base',
+          desc: 'Product and brand designers. Craft-led competencies; no tenure split.',
           variants: { all: ['dsys', 'proto', 'ux', 'visual'] }, scaleId: 'sc-5pt',
           reviewQs: [], goalQs: [] },
         { id: 'eng', name: 'Engineering', universal: false,
+          parentId: 'base',
+          desc: 'Individual contributors across engineering. Newcomers are scored on a shorter set.',
           variants: { regular: ['cq', 'mentor', 'solve', 'sysd', 'techp'],
                       newcomer: ['cq', 'solve', 'techp'] }, scaleId: 'sc-5pt',
           reviewQs: [], goalQs: [{ t: 'Which technical skill do you most want to grow?', req: false }] },
         { id: 'mgmt', name: 'Management', universal: false,
+          parentId: 'base',
+          desc: 'Anyone with direct reports, whatever their function.',
           variants: { regular: ['deliv', 'lead', 'people', 'strat'],
                       newcomer: ['deliv', 'lead'] }, scaleId: 'sc-5pt',
           reviewQs: [], goalQs: [] }
       ];
       const baseTpl = () => TEMPLATES.find(t => t.base);
       const compById = id => LIB.find(c => c.id === id);
+      const byId = id => TEMPLATES.find(t => t.id === id);
+      // A template's own competencies. Non-universal templates split
+      // Regular / Newcomer; a child inherits the Regular set (nothing selects
+      // a variant outside this editor — see PLAN.md).
+      const ownComps = t => t ? (t.universal ? (t.variants.all ?? []) : (t.variants.regular ?? [])) : [];
+      // Ancestors, nearest first. `seen` guards against a cycle: the parent
+      // picker refuses to create one, but seed or saved data still could.
+      const chainOf = (t) => {
+        const out = [], seen = new Set(t ? [t.id] : []);
+        let p = t && t.parentId ? byId(t.parentId) : null;
+        while (p && !seen.has(p.id)) { seen.add(p.id); out.push(p); p = p.parentId ? byId(p.parentId) : null; }
+        return out;
+      };
       // groups: NB-67's cycle form groups a template's competencies by the
       // same General / Skills split this editor uses, rather than inventing one.
-      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS };
+      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS,
+                        chain: chainOf, own: ownComps };
 
       // Working copy — edits apply on Save, so Cancel genuinely discards.
       let draft = null, variant = 'regular';
@@ -6891,9 +6990,50 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const selected = () => draft.variants[variantKey()] ||= [];
 
       /* ---------- Competencies ---------- */
-      // Base items are inherited by every other template; showing them as
-      // pickable would imply they can be removed here, which they can't.
-      const inheritedIds = () => draft.base ? [] : baseTpl().variants.all;
+      // Inherited from the parent chain. Showing these as pickable would imply
+      // they can be removed here, which they can't — they belong to the parent.
+      // Was hardcoded to Base until the "Inherits from" link existed.
+      const inheritedIds = () => [...new Set(chainOf(draft).flatMap(ownComps))];
+
+      /* ---------- Inherits from ---------- */
+      // Anything but itself and its own descendants — picking one of those
+      // would make a loop, and the walk above would then have to break it.
+      const parentOptions = () => TEMPLATES.filter(t =>
+        t.id !== draft.id && !chainOf(t).some(p => p.id === draft.id));
+
+      const renderParent = () => {
+        let parent = draft.parentId ? byId(draft.parentId) : null;
+        // The parent may have been deleted since this template was saved.
+        // Clear the link rather than leave it pointing at nothing.
+        if (draft.parentId && !parent) { draft.parentId = null; parent = null; }
+        const trigger = $('#te-parent-select .input-select-trigger');
+        // Base is the root of every chain that has one; giving it a parent
+        // would invert the model rather than extend it.
+        trigger.disabled = !!draft.base;
+        $('#te-parent-value').textContent = parent ? parent.name : 'No parent template';
+        $('#te-parent-menu').innerHTML = [
+          `<button class="dropdown-item${!draft.parentId ? ' is-selected' : ''}" type="button" data-te-parent=""><svg class="dropdown-item-check"><use href="#i-check"/></svg>No parent template</button>`,
+          ...parentOptions().map(t =>
+            `<button class="dropdown-item${t.id === draft.parentId ? ' is-selected' : ''}" type="button" data-te-parent="${t.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(t.name)}</button>`)
+        ].join('');
+        const n = inheritedIds().length;
+        $('#te-parent-hint').textContent = draft.base
+          ? 'The Base Template sits at the root — it inherits from nothing.'
+          : parent
+            ? `Inherits ${n} ${n === 1 ? 'competency' : 'competencies'} and its questions from ${parent.name}.`
+            : 'Nothing is inherited — this template stands on its own.';
+      };
+
+      // Items are rendered after the shared .input-select handler binds, so
+      // selection is wired here; that handler still owns open/close.
+      $('#te-parent-menu').addEventListener('click', e => {
+        const item = e.target.closest('[data-te-parent]');
+        if (!item) return;
+        draft.parentId = item.dataset.teParent || null;
+        $('#te-parent-select .input-select-trigger').setAttribute('aria-expanded', 'false');
+        $('#te-parent-menu').hidden = true;
+        renderParent(); renderInherited(); renderLibrary();
+      });
 
       const renderInherited = () => {
         const ids = inheritedIds();
@@ -6921,7 +7061,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const items = LIB.filter(c => c.g === g.id && !inh.includes(c.id));
           if (!items.length) return '';
           return `<div class="cb-group">
-            <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span></div>
+            <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span>
+              <button class="btn btn-icon-only btn-ghost btn-xs cb-group-add" type="button" data-add-to-group="${g.id}" data-tooltip="Add a competency to ${esc(g.name)}" aria-label="Add a competency to ${esc(g.name)}"><svg class="icon"><use href="#i-plus"/></svg></button>
+            </div>
             ${items.map(c => `<label class="cb-comp-row">
               <span class="checkbox"><input type="checkbox" class="checkbox-input" data-te-comp="${c.id}" ${sel.includes(c.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
               <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
@@ -6930,7 +7072,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }).join('');
         // Count is what the reviewer will actually see: inherited + picked.
         $('#te-comp-count').textContent = sel.length + inh.length;
-        $('#te-new-comp-group').innerHTML = GROUPS.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join('');
+        // The group choice survives re-renders, so adding one competency to a
+        // new group doesn't bounce the picker back for the next one.
+        syncGroupTrigger();
+        if (groupMenuOpen()) renderGroupMenu();
       };
 
       section.addEventListener('change', e => {
@@ -6947,15 +7092,114 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         renderInherited();
       });
 
+      /* ---------- Group combobox ----------
+         `id: null` means "a group by this name, not created yet" — it only
+         becomes a real group when Add resolves it, so browsing the list never
+         leaves empty groups behind. */
+      let groupChoice = { id: GROUPS[0].id, name: GROUPS[0].name };
+
+      const groupMenuOpen = () => !$('#te-group-menu').hidden;
+      const closeGroupMenu = () => {
+        $('#te-group-menu').hidden = true;
+        $('#te-group-select .input-select-trigger').setAttribute('aria-expanded', 'false');
+      };
+
+      const syncGroupTrigger = () => {
+        $('#te-group-value').textContent = groupChoice.id
+          ? groupChoice.name
+          : `${groupChoice.name} (new)`;
+      };
+
+      // Filtered list, plus a create row whenever the query names something
+      // that doesn't exist yet. An exact match never offers a duplicate.
+      const renderGroupMenu = () => {
+        const q = $('#te-group-filter').value.trim();
+        const ql = q.toLowerCase();
+        const hits = GROUPS.filter(g => !ql || g.name.toLowerCase().includes(ql));
+        const exact = GROUPS.some(g => g.name.toLowerCase() === ql);
+        $('#te-group-options').innerHTML = [
+          ...hits.map(g => `<button class="dropdown-item${g.id === groupChoice.id ? ' is-selected' : ''}" type="button" data-group-pick="${g.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(g.name)}</button>`),
+          q && !exact ? `<button class="dropdown-item" type="button" data-group-create="${esc(q)}"><svg class="dropdown-item-icon"><use href="#i-plus"/></svg>Create \u201c${esc(q)}\u201d</button>` : '',
+          !hits.length && !q ? '<p class="dropdown-item" style="color: var(--color-text-subtle)">No groups yet.</p>' : ''
+        ].join('');
+      };
+
+      // The shared .input-select handler opens/closes the menu; this adds only
+      // what it can't know about — clearing and focusing the filter on open.
+      $('#te-group-select .input-select-trigger').addEventListener('click', () => {
+        if (!groupMenuOpen()) return;
+        $('#te-group-filter').value = '';
+        renderGroupMenu();
+        $('#te-group-filter').focus();
+      });
+
+      $('#te-group-filter').addEventListener('input', renderGroupMenu);
+      $('#te-group-filter').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); closeGroupMenu(); return; }
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        // Enter takes the first row: the top hit, or the create row when the
+        // query matches nothing.
+        $('#te-group-options').querySelector('[data-group-pick], [data-group-create]')?.click();
+      });
+
+      $('#te-group-menu').addEventListener('click', e => {
+        const pick = e.target.closest('[data-group-pick]');
+        const make = e.target.closest('[data-group-create]');
+        if (!pick && !make) return;
+        groupChoice = pick
+          ? { id: pick.dataset.groupPick, name: GROUPS.find(g => g.id === pick.dataset.groupPick).name }
+          : { id: null, name: make.dataset.groupCreate };
+        syncGroupTrigger();
+        closeGroupMenu();
+        $('#te-new-comp-name').focus();
+      });
+
+      // Per-group shortcut: rather than an add form inside every group, the
+      // plus points the one add row at that group and puts the cursor in it —
+      // same control, one less decision.
+      $('#te-library').addEventListener('click', e => {
+        const btn = e.target.closest('[data-add-to-group]');
+        if (!btn) return;
+        const g = GROUPS.find(x => x.id === btn.dataset.addToGroup);
+        if (!g) return;
+        groupChoice = { id: g.id, name: g.name };
+        syncGroupTrigger();
+        closeGroupMenu();
+        $('.cb-comp-new')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        $('#te-new-comp-name').focus();
+      });
+
       $('#te-add-comp').addEventListener('click', () => {
         const n = $('#te-new-comp-name').value.trim();
         if (!n) { $('#te-new-comp-name').focus(); return; }
+
+        // Resolve the group: a pending name becomes a real group now, reusing
+        // an existing one of the same name rather than making a duplicate.
+        let g = groupChoice.id;
+        let newGroup = null;
+        if (!g) {
+          const gn = groupChoice.name.trim();
+          const gid = 'g-' + gn.toLowerCase().replace(/\W+/g, '-');
+          const existing = GROUPS.find(x => x.id === gid || x.name.toLowerCase() === gn.toLowerCase());
+          if (existing) g = existing.id;
+          else { GROUPS.push(newGroup = { id: gid, name: gn }); g = gid; }
+          groupChoice = { id: g, name: GROUPS.find(x => x.id === g).name };
+        }
+
         const id = 'c-' + n.toLowerCase().replace(/\W+/g, '-');
-        if (!compById(id)) LIB.push({ id, g: $('#te-new-comp-group').value, n, d: $('#te-new-comp-desc').value.trim() || 'No description yet.' });
+        if (!compById(id)) LIB.push({ id, g, n, d: $('#te-new-comp-desc').value.trim() || 'No description yet.' });
         if (!selected().includes(id)) selected().push(id);
         $('#te-new-comp-name').value = ''; $('#te-new-comp-desc').value = '';
         renderLibrary();
-        if (window.toast) toast({ variant: 'success', message: `“${n}” added to the library.`, timeout: 2400 });
+        // The cycle form groups a template's competencies by the same list.
+        window.renderCycleTemplatePicker?.();
+        if (window.toast) toast({
+          variant: 'success',
+          message: newGroup ? `“${n}” added to a new ${newGroup.name} group.`
+                            : `“${n}” added to the library.`,
+          timeout: 2400
+        });
       });
 
       /* ---------- Variant tabs ---------- */
@@ -7019,7 +7263,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       /* ---------- Questions ---------- */
       const qList = kind => kind === 'review' ? draft.reviewQs : draft.goalQs;
-      const inheritedQs = kind => draft.base ? [] : (kind === 'review' ? baseTpl().reviewQs : baseTpl().goalQs);
+      // Questions follow the same chain as competencies — the parent hint in
+      // Details promises both, so they can't resolve differently.
+      const inheritedQs = kind => chainOf(draft).flatMap(p =>
+        (kind === 'review' ? p.reviewQs : p.goalQs) ?? []);
       const renderQs = kind => {
         const host = $(kind === 'review' ? '#te-review-qs' : '#te-goal-qs');
         const inh = inheritedQs(kind).map(q => `
@@ -7062,6 +7309,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       /* ---------- Open / save ---------- */
       const render = () => {
         $('#te-name').value = draft.name;
+        $('#te-desc').value = draft.desc || '';
+        // The shared .field[data-char-limit] counter only listens for 'input',
+        // so a programmatic value would leave it reading the previous template.
+        $('#te-desc').dispatchEvent(new Event('input', { bubbles: true }));
         $('#te-universal').checked = !!draft.universal;
         $('#te-universal').disabled = !!draft.base;   // Base is universal by definition
         $('#te-crumb').textContent = draft.name || 'New template';
@@ -7069,7 +7320,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#te-type-hint').textContent = draft.base
           ? 'Base Template — these competencies and questions are inherited by every other template.'
           : 'A template defines what people are assessed on. Cycles pick templates; they don\'t define competencies themselves.';
-        renderVariantTabs(); renderInherited(); renderLibrary(); renderScale(); renderAllQs();
+        renderParent(); renderVariantTabs(); renderInherited(); renderLibrary(); renderScale(); renderAllQs();
       };
 
       const open = (id) => {
@@ -7077,7 +7328,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // structuredClone keeps the draft fully detached, so Cancel discards
         // nested edits (scale rows, question objects) too — not just the top level.
         draft = src ? structuredClone(src)
-                    : { id: '', name: '', universal: true, variants: { all: [] }, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
+                    : { id: '', name: '', desc: '', parentId: null, universal: true, variants: { all: [] }, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
         draft.scaleRows = draft.scaleRows || SCALES[draft.scaleId].rows.map(r => ({ ...r }));
         variant = 'regular';
         render();
@@ -7095,10 +7346,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const name = $('#te-name').value.trim();
         if (!name) { $('#te-name').focus(); if (window.toast) toast({ variant: 'error', message: 'Give the template a name.' }); return; }
         draft.name = name;
+        draft.desc = $('#te-desc').value.trim();
         const i = TEMPLATES.findIndex(t => t.id === draft.id);
         if (i > -1) TEMPLATES[i] = draft;
         else { draft.id = 'tpl-' + name.toLowerCase().replace(/\W+/g, '-'); TEMPLATES.push(draft); }
         window.renderTemplateList?.();
+        window.renderCycleTemplatePicker?.();
         leave();
         if (window.toast) toast({ variant: 'success', message: `“${name}” saved.` });
       });
@@ -7328,7 +7581,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             `<button class="dropdown-item dropdown-item-danger" type="button" data-tpl-del="${t.id}"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>`;
           return `<tr>
             <td><div class="tpl-name"><span class="cell-title-text">${esc(t.name)}</span>${
-              tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div></td>
+              tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div>${
+              t.desc ? `<p class="tpl-desc">${esc(t.desc)}</p>` : ''}</td>
             <td>${comps}</td>
             <td><div class="cell-actions"><div class="dropdown">
               <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
@@ -7365,6 +7619,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (i < 0) return;
         const [gone] = api.list.splice(i, 1);
         render();
+        window.renderCycleTemplatePicker?.();
         if (window.toast) toast({ variant: 'neutral', message: `“${gone.name}” deleted.` });
       });
 
@@ -7524,8 +7779,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          template properties, authored in Templates. A cycle records which
          template it uses; everything a reviewer sees is resolved from that. */
       const tplList  = () => window.PR_TPL?.list ?? [];
-      const baseTpl  = () => tplList().find(t => t.base);
-      const pickable = () => tplList().filter(t => !t.base);   // Base always applies
+      // Base is a foundation other templates inherit from, not something a
+      // cycle picks directly. It reaches a cycle by being in the chain.
+      const pickable = () => tplList().filter(t => !t.base);
+      const chainOf  = t => window.PR_TPL?.chain(t) ?? [];
+      const parentOf = t => chainOf(t)[0] ?? null;
       const compById = id => window.PR_TPL?.comp(id);
       const groups   = () => window.PR_TPL?.groups ?? [];
 
@@ -7547,15 +7805,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // Non-universal templates split Regular / Newcomer. Nothing in this flow
       // selects a variant since NB-64 removed cycle type, so they resolve to
       // Regular — see PLAN.md, Newcomer variants are unreachable from here.
-      const compsFor = t => t.universal ? (t.variants.all ?? []) : (t.variants.regular ?? []);
+      const compsFor = t => window.PR_TPL?.own(t) ?? [];
       const chosen   = () => pickable().find(t => t.id === STATE.templateId) ?? null;
 
       /* ---------- Section 1 · template picker ---------- */
+      const tplLabel = t => {
+        const p = parentOf(t);
+        return `${t.name}${p ? ` (extends ${p.name})` : ''}`;
+      };
+
+      const syncTplTrigger = () => {
+        const t = chosen();
+        const value = $('#cb-tpl-value');
+        value.textContent = t ? tplLabel(t) : 'Choose a template…';
+        value.classList.toggle('input-select-placeholder', !t);
+      };
+
       const renderTplMenu = () => {
-        const base = baseTpl();
         $('#cb-tpl-menu').innerHTML = pickable().map(t => `
           <button class="dropdown-item${t.id === STATE.templateId ? ' is-selected' : ''}" type="button" data-tpl="${t.id}">
-            <svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(t.name)}${base ? ` (extends ${esc(base.name)})` : ''}
+            <svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(tplLabel(t))}
           </button>`).join('') || '<p class="dropdown-item" style="color: var(--color-text-subtle)">No templates yet — create one first.</p>';
       };
 
@@ -7571,12 +7840,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           return;
         }
 
-        const base   = baseTpl();
-        const inherit = base ? compsFor(base) : [];
+        const chain   = chainOf(t);
+        const inherit = [...new Set(chain.flatMap(compsFor))];
         const own     = compsFor(t);
         const ids     = [...new Set([...inherit, ...own])];
         const scale   = window.PR_TPL?.scales?.[t.scaleId];
-        const qCount  = [base, t].filter(Boolean)
+        const qCount  = [t, ...chain]
           .reduce((n, x) => n + (x.reviewQs?.length ?? 0) + (x.goalQs?.length ?? 0), 0);
 
         // Grouped by the shared library's General / Skills split rather than
@@ -7598,7 +7867,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             ${scale ? `<p class="cb-detail-label" style="margin-top: var(--ic-space-4)">Rating scale · ${esc(scale.name)}</p>
               <div class="cb-detail-scale">${scale.rows.map(r =>
                 `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('')}</div>` : ''}
-            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${base ? ` · ${inherit.length} competencies come from ${esc(base.name)}, which always applies` : ''}.</p>
+            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${chain.length ? ` · ${inherit.length} inherited from ${esc(chain.map(x => x.name).join(' → '))}` : ' · nothing inherited'}.</p>
           </div>`;
       };
 
@@ -7609,11 +7878,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const item = e.target.closest('[data-tpl]');
         if (!item) return;
         STATE.templateId = item.dataset.tpl;
-        const t = chosen();
-        const base = baseTpl();
-        const value = $('#cb-tpl-value');
-        value.textContent = t ? `${t.name}${base ? ` (extends ${base.name})` : ''}` : 'Choose a template…';
-        value.classList.toggle('input-select-placeholder', !t);
+        syncTplTrigger();
         renderTplMenu();
         renderTplDetail();
         validate();
@@ -7627,7 +7892,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       /* ---------- Section 3 · participants ---------- */
       const renderPairs = () => {
         const n = STATE.pairs.length;
-        $('#cb-pair-count').textContent = `${n} assessment${n === 1 ? '' : 's'} will be created`;
         $('#cb-pairs-wrap').innerHTML = n ? `
           <div class="table-scroll">
             <table class="table table-wide">
@@ -7669,11 +7933,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         renderPairs();
       });
 
+      // Removing a row is one click with no confirm step, so the toast carries
+      // the undo rather than a dialog asking first — the row comes back at its
+      // original index, so undo restores the order too, not just the row.
       section.addEventListener('click', (e) => {
         const del = e.target.closest('[data-del-pair]');
         if (!del) return;
-        STATE.pairs.splice(Number(del.dataset.delPair), 1);
+        const at = Number(del.dataset.delPair);
+        const [gone] = STATE.pairs.splice(at, 1);
         renderPairs();
+        if (!gone || !window.toast) return;
+        // behavior:'action' has no timer of its own, and an undo that never
+        // expires just accumulates on screen — so it gets one explicitly.
+        const t = toast({
+          variant: 'neutral',
+          behavior: 'action',
+          message: `Removed ${gone.reviewer} → ${gone.reviewee}`,
+          action: { label: 'Undo', onClick: () => {
+            STATE.pairs.splice(Math.min(at, STATE.pairs.length), 0, gone);
+            renderPairs();
+          } }
+        });
+        setTimeout(() => t.dismiss(), 8000);
       });
 
       // CSV upload is simulated — no parser. The shared dropzone module fakes
@@ -7748,6 +8029,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         window.showPrPage?.('team-results');
         document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.click();
       });
+
+      // Saving a template can rename it or move it in the hierarchy, so the
+      // editor calls this the same way it refreshes the templates list.
+      window.renderCycleTemplatePicker = () => {
+        // A template that was deleted can't stay picked.
+        if (STATE.templateId && !chosen()) STATE.templateId = null;
+        renderTplMenu(); syncTplTrigger(); renderTplDetail(); validate();
+      };
 
       renderTplMenu();
       renderTplDetail();
