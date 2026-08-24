@@ -484,6 +484,14 @@ records an **exclusion** rather than editing the parent:
 - Rationale: a parent is a starting point, not a contract. Base still owns the
   competency; a child simply doesn't use it.
 
+**The library shows only what's picked.** Each group lists its selected
+competencies and offers **Show N unselected** / **Hide unselected** beside the
+group name. The library is long and most of it isn't in any one template, so
+what's picked leads and the rest is one click away. Unticking a row removes it
+immediately when its group is collapsed — otherwise the list disagreed with its
+own heading until some later re-render. The reveal state is per group and lives
+outside the draft: it's a view preference, not part of the template.
+
 **Not carried through:** the Give Assessment screen's section headers are static
 markup from the Figma build, not driven by `GROUPS`, so it still shows v2.0's
 General / Skills split and won't show a custom group either. Worth wiring if the

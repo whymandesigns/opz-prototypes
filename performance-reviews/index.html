@@ -3814,6 +3814,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-group { margin-bottom: var(--ic-space-4); }
     .cb-group:last-child { margin-bottom: 0; }
     .cb-group-head { display: flex; align-items: center; gap: var(--ic-space-2); margin-bottom: var(--ic-space-2); }
+    /* Sits with the group name, before the plus that .cb-group-add pins right. */
+    .cb-group-toggle { flex-shrink: 0; }
+
     /* Pinned right, always visible, and blue. designmd deliberately makes
        icon-only ghosts neutral graphite (kebabs, X buttons stay quiet), but
        this one is an action rather than a control, so it takes the accent —
@@ -7095,6 +7098,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
 
 
+      // Groups whose unpicked competencies are currently revealed. Kept out of
+      // the draft: it's a view preference, not part of the template.
+      const revealed = new Set();
+
       const renderLibrary = () => {
         const inh = inheritedIds();
         const ex  = excludes();
@@ -7102,13 +7109,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#te-library').innerHTML = GROUPS.map(g => {
           const items = LIB.filter(c => c.g === g.id);
           if (!items.length) return '';
+          // The library is a long list and most of it isn't in any one
+          // template, so what's picked leads and the rest is one click away.
+          const isOn = c => inh.includes(c.id) ? !ex.includes(c.id) : sel.includes(c.id);
+          const off = items.filter(c => !isOn(c));
+          const open = revealed.has(g.id);
+          const visible = open ? items : items.filter(isOn);
           return `<div class="cb-group">
             <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span>
+              ${off.length ? `<button class="link-action cb-group-toggle" type="button" data-toggle-group="${g.id}">${open ? 'Hide unselected' : `Show ${off.length} unselected`}</button>` : ''}
               <button class="btn btn-icon-only btn-ghost btn-xs cb-group-add" type="button" data-add-to-group="${g.id}" data-tooltip="Add a competency to ${esc(g.name)}" aria-label="Add a competency to ${esc(g.name)}"><svg class="icon"><use href="#i-plus"/></svg></button>
             </div>
-            ${items.map(c => {
+            ${visible.length ? '' : '<p class="cb-empty">Nothing picked from this group yet.</p>'}
+            ${visible.map(c => {
               const isInh = inh.includes(c.id);
-              const on = isInh ? !ex.includes(c.id) : sel.includes(c.id);
+              const on = isOn(c);
               return `<label class="cb-comp-row${isInh ? ' is-inherited' : ''}">
               <span class="checkbox"><input type="checkbox" class="checkbox-input" data-te-comp="${c.id}" ${on ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
               <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
@@ -7135,6 +7150,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#te-comp-count').textContent = effective().length;
         // The Details hint counts what's been dropped, so it has to move too.
         renderParent();
+
+        // A row that's just been unticked doesn't belong on screen while its
+        // group is showing only what's selected — leaving it there until some
+        // later re-render made the list disagree with its own heading. The
+        // group's link picks up the focus the vanishing checkbox gives up, and
+        // its count says where the row went.
+        const group = compById(id)?.g;
+        if (group && !cb.checked && !revealed.has(group)) {
+          renderLibrary();
+          $(`[data-toggle-group="${group}"]`)?.focus();
+        }
       });
 
 
@@ -7205,6 +7231,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // plus points the one add row at that group and puts the cursor in it —
       // same control, one less decision.
       $('#te-library').addEventListener('click', e => {
+        const tg = e.target.closest('[data-toggle-group]');
+        if (tg) {
+          const id = tg.dataset.toggleGroup;
+          revealed.has(id) ? revealed.delete(id) : revealed.add(id);
+          renderLibrary();
+          // Re-renders replace the button, so focus has to be put back on the
+          // new one or a keyboard user is dropped to the top of the page.
+          $(`[data-toggle-group="${id}"]`)?.focus();
+          return;
+        }
         const btn = e.target.closest('[data-add-to-group]');
         if (!btn) return;
         const g = GROUPS.find(x => x.id === btn.dataset.addToGroup);
