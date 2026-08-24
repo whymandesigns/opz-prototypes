@@ -340,6 +340,133 @@ while the 5-step wizard keeps working; step 3 is the cut-over.
 4. **Manager roster** — the roll-up table.
 5. **Manager breakdown** — competency cards, peer comments, trend, notes.
 
+## NB-59 revisions (2026-08-21)
+
+Five sub-issues landed together. Two of them **reverse decisions recorded above**,
+so they're noted here rather than left to look like drift.
+
+| Issue | Change |
+|---|---|
+| NB-62 | `Create cycle` CTA and the Cycles tab move to **My direct reports** — the manager owns launching, and can launch whenever. |
+| NB-63 | `Review cycle` → **Templates** (sidebar + page head), tab strip dropped; it only holds templates now. |
+| NB-64 | Step 1's **cycle type selector removed** ("that's part of the templates"); each template row now shows its rating scale; the "What reviewers will see" card removed as duplicative. |
+| NB-65 | Step 3's **reviewee team dropdown removed** — "not needed". |
+| NB-66 | Page-head divider suppressed when a page-level tab strip follows it, kept otherwise. |
+
+### ⚠️ Consequence: nothing resolves a template per participant any more
+
+NB-64 removed the cycle type and NB-65 removed the team. Those were the **only two
+inputs** to per-participant resolution, so with both gone:
+
+- `tplForTeam()` is deleted, along with the Participants table's Team and
+  Template columns and the *No match* launch warning.
+- The Review step no longer reports `3 → Engineering · 0 → Design`; it states
+  that every participant is assessed on all selected templates.
+- **Newcomer variants are unreachable from the cycle flow.** `compsFor()` now
+  always resolves to a template's `regular` set. The variants still exist and are
+  still editable in the template editor, but no cycle can select one.
+
+This supersedes the "many templates per cycle, each participant resolves to one"
+decision above. It's a coherent simpler model — a cycle's templates apply to
+everyone in it — but two things need a decision before this ships further:
+
+1. **How does a Newcomer cycle happen?** Either the cycle picks the variant, or
+   "newcomer" becomes a property of the person (tenure), resolved per participant.
+   **Still open after NB-67.**
+2. ~~**What does selecting two templates mean** if everyone gets both?~~ —
+   **resolved by NB-67**: one template per cycle. See below.
+
+## NB-67 — the cycle form (2026-08-21)
+
+"Lets minimize the cycle creation flow. No need for all these steps." The
+four-step wizard became **one form with three numbered sections**:
+
+| | Section | Holds |
+|---|---|---|
+| 1 | Review template | Cycle name · template picker · read-only competencies + rating scale for the picked template |
+| 2 | Schedule | Start date · End date · visibility to the reviewee · visibility to managers |
+| 3 | Participants | Reviewer / Reviewee rows, add-a-pair, CSV upload |
+
+What went, and why:
+
+- **The steps.** Nothing in the form depends on an earlier answer — a cycle is a
+  name, a template, a schedule and a list of people — so paging only hid the
+  whole from the person filling it in.
+- **The stepper** in the page head, and the compact-label CSS that made it fit.
+- **The Review & launch step.** The form is short enough to be its own summary.
+  Its blocking checks moved next to the Launch button as a validation read-out
+  (no name / no template / no participants / end before start); its *soft*
+  warnings were dropped — "reviewees never see their results" is a choice, and
+  it now reads directly off Section 2.
+
+### Revisions after review
+
+- **Visibility is two options, not three.** NB-67 asked to keep "as soon as it's
+  submitted"; on seeing it built, it went. It was a third way of saying "from
+  today", so the choice is now *when?* rather than *which kind of when?* —
+  **From a date** (the default) or **Never**.
+- **The "N assessments will be created" read-out** in the Participants head was
+  removed; the table already says how many rows there are.
+- **Removing a participant toasts with Undo**, restoring the row at its original
+  index. There's no confirm step before the delete, so the recovery sits after
+  it rather than a dialog asking first.
+
+### The template picker answers open question 2
+
+**One template per cycle**, chosen from a dropdown, labelled `Engineering
+(extends Base Template)`. Multi-select had nothing left to resolve against once
+NB-64 and NB-65 removed cycle type and team, so a set of templates could only
+ever mean "union everything" — which was the ambiguity. Picking one is the
+honest model.
+
+Selecting a template reveals a read-only block: competencies grouped
+General / Skills (unioned with the Base Template's, which always apply), the
+rating scale as swatches with labels, and the open-question count. It answers
+"what will reviewers actually score?" without making any of it editable here —
+that stays in Templates.
+
+Newcomer variants are **still unreachable** (question 1 above): with no cycle
+type, `compsFor()` resolves to `regular`.
+
+## Template model, extended (2026-08-24)
+
+Design review on the built screens pushed three changes into the template model
+itself. All three are in the editor; everything that renders templates reads
+from the same source, so the cycle form follows automatically.
+
+**Description.** Optional, 180 chars, shown as a sub-line under the name in the
+Templates list. Says who a template is for and when to reach for it — the name
+already identifies it.
+
+**Inherits from.** Inheritance used to be hardwired: *every non-Base template
+inherits Base*. No control could express that, so a template with no parent was
+impossible. It's now an explicit `parentId`:
+
+- Resolution walks the whole chain, not one level — competencies, questions and
+  the counts that derive from them.
+- The three seeded templates point at Base, so nothing regressed; **new
+  templates default to no parent**.
+- Base can't have one (it's the root); a template can't pick itself or one of
+  its own descendants, so the picker can't build a loop. The walk carries a
+  `seen` guard anyway, since saved data could.
+- A deleted parent resolves to no parent and clears the stored link.
+
+**Custom competency groups.** `GROUPS` was a fixed General / Skills pair (from
+v2.0). Admins can now add their own — a Contractor group with its own skills.
+The Group control is a combobox: typing filters the list, and a query matching
+nothing offers to create it. Two deliberate constraints:
+
+- A group is only committed when Add resolves it with a competency. The library
+  skips empty groups, so one created by browsing would be invisible.
+- Re-typing an existing name reuses that group rather than duplicating it.
+
+Each group header carries a plus that points the shared add row at that group,
+rather than an inline form per group — one control, one code path.
+
+**Not carried through:** the Give Assessment screen's General / Skills section
+headers are static markup from the Figma build, not driven by `GROUPS`, so a
+custom group won't appear on the reviewer side yet.
+
 ## Open questions
 
 1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
