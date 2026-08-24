@@ -451,8 +451,16 @@ impossible. It's now an explicit `parentId`:
   `seen` guard anyway, since saved data could.
 - A deleted parent resolves to no parent and clears the stored link.
 
-**Custom competency groups.** `GROUPS` was a fixed General / Skills pair (from
-v2.0). Admins can now add their own — a Contractor group with its own skills.
+**Competency groups: General / Hard skills / Soft skills.** v2.0 had one
+undifferentiated *Skills* bucket, which said nothing about whether a competency
+was a craft or a behaviour. The seeded set is now v2.1's split — the 13 former
+Skills items were re-filed as 7 hard (Design Systems, Prototyping, UX &
+Interaction, Visual Design, Code Quality, System Design, Technical Proficiency)
+and 6 soft (Mentorship, Problem Solving, Delivery & Execution, Leadership,
+People Development, Strategic Thinking).
+
+**Custom competency groups.** The set is no longer fixed at all — admins can add
+their own — a Contractor group with its own skills.
 The Group control is a combobox: typing filters the list, and a query matching
 nothing offers to create it. Two deliberate constraints:
 
@@ -463,9 +471,55 @@ nothing offers to create it. Two deliberate constraints:
 Each group header carries a plus that points the shared add row at that group,
 rather than an inline form per group — one control, one code path.
 
-**Not carried through:** the Give Assessment screen's General / Skills section
-headers are static markup from the Figma build, not driven by `GROUPS`, so a
-custom group won't appear on the reviewer side yet.
+**Inheritance is editable, not read-only.** Inherited competencies used to sit
+in a separate collapsible list above the library, unticked-able. They now sit
+*in* the library, ticked and badged `inherited`, and can be unticked — which
+records an **exclusion** rather than editing the parent:
+
+- `excludes` is keyed by variant, like the `variants` it modifies, so Regular
+  can drop something Newcomer keeps.
+- Resolution everywhere is *(inherited − excluded) ∪ own*. The cycle form reads
+  the same rule through `PR_TPL.excluded()`, so it can't disagree with the
+  editor.
+- Rationale: a parent is a starting point, not a contract. Base still owns the
+  competency; a child simply doesn't use it.
+
+**Not carried through:** the Give Assessment screen's section headers are static
+markup from the Figma build, not driven by `GROUPS`, so it still shows v2.0's
+General / Skills split and won't show a custom group either. Worth wiring if the
+reviewer side should reflect the new grouping.
+
+## Naming (2026-08-24)
+
+| Was | Now | Note |
+|---|---|---|
+| My direct reports | **Review cycles** | sidebar, page head and the cycle form's breadcrumb |
+| Overview (tab) | **Reviews** | the manager roll-up |
+| Review template (section 1) | **Cycle setup** | it holds the cycle name too |
+| 5-point standard / 3-point (legacy 2.0) | **5-point** / **3-point** | |
+
+⚠️ *Review cycles* is the name NB-63 took **away** from the admin page (renamed
+to Templates). Reusing it for the manager surface is deliberate, but the two are
+easy to confuse when reading those tickets back. The page's own tabs are now
+Reviews · Individual reviews · Individual goals · Cycles, so "review" carries
+three meanings in one strip — worth a second look if it reads ambiguously.
+
+## Detailed matrix — grouped, with group averages
+
+The manager's Detailed view had thirteen unlabelled competency columns, giving
+no clue which skill sat in which group. It now renders a group band across the
+top spanning that group's competencies plus an **Avg** column at its right edge.
+
+- **Columns derive from the shared library**, not a frozen list — the old
+  hardcoded `General / Skills` would have kept showing v2.0's split and would
+  never pick up a custom group. Only competencies somebody was scored on get a
+  column; an "Other" bucket catches a score whose competency has left the
+  library.
+- The footer's group average is computed **across every score in the group**,
+  not as the mean of the per-person averages — otherwise someone scored on one
+  competency would weigh as much as someone scored on five.
+- The final column is **Overall**, not "Average", now that "average" means
+  something more specific in the same table.
 
 ## Open questions
 

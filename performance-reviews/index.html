@@ -3452,16 +3452,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* "optional" beside a field label — quieter than the label, so the field
        reads as skippable without a second line of hint text. */
     .te-optional { font: var(--type-caption); color: var(--color-text-subtle); font-weight: var(--ic-weight-regular); }
-    /* Description under a template's name in the list. .table td is nowrap
-       system-wide, same as .tpl-comps, so wrapping is re-enabled here. */
-    .tpl-desc { font: var(--type-caption); color: var(--color-text-muted); margin: var(--ic-space-1) 0 0; white-space: normal; }
+    /* Template description — its own column, so no top margin. .table td is
+       nowrap system-wide, same as .tpl-comps, so wrapping is re-enabled here. */
+    .tpl-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; white-space: normal; }
+    .tpl-desc-empty { color: var(--color-text-subtle); }
 
     /* Template editor — reuses the wizard's .cb-* control styles; only the
        pieces the wizard has no equivalent for are defined here. */
-    .te-universal { margin-top: var(--ic-space-4); }
-    .te-inherited-row { display: flex; align-items: flex-start; gap: var(--ic-space-3); padding: var(--ic-space-3); border: 1px dashed var(--color-border); border-radius: var(--ic-radius-sm); margin-bottom: var(--ic-space-2); background: var(--color-surface-muted); }
-    .te-inherited-row:last-child { margin-bottom: 0; }
-    .te-inherited-row .cb-comp-meta { flex: 1; min-width: 0; }
+    .te-universal { margin-bottom: var(--ic-space-4); }
+    /* Inherited rows live in the library now, marked rather than separated.
+       The meta grows so the badge can sit at the end of the row. */
+    .cb-comp-row .cb-comp-meta { flex: 1; min-width: 0; }
+    .cb-comp-row.is-inherited { border-style: dashed; }
     /* Inherited items are read-only here — the affordance has to be absent, not
        just disabled, or it reads as a broken control. */
     .te-inherited-tag { flex-shrink: 0; }
@@ -3510,8 +3512,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-reviews-sub { font: var(--type-caption); color: var(--color-text-subtle); display: block; margin-top: 2px; }
     .mv-reviews-sub.is-flagged { color: var(--color-warning-text, var(--color-text-muted)); }
 
-    /* Detailed matrix — one column per competency. */
-    .mv-detail-table { min-width: 1820px; }
+    /* Detailed matrix — one column per competency, grouped, with each group's
+       average pinned to its right edge. */
+    .mv-detail-table { min-width: 2000px; }
+    /* Group band across the top. The rule down the left of each group is what
+       makes the bands readable once the eye is deep in the grid. */
+    .mv-group-head { text-align: center; font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); background: var(--color-surface-muted); border-left: 1px solid var(--color-border); }
+    .mv-detail-table th.is-group-start,
+    .mv-detail-table td.is-group-start { border-left: 1px solid var(--color-border); }
+    /* The group's own average reads as a summary, not another competency. */
+    .mv-avg-head { color: var(--color-text); font-weight: var(--ic-weight-semibold); }
+    .mv-detail-table .mv-avg-cell { background: var(--color-surface-muted); }
     .mv-detail-table th, .mv-detail-table td { white-space: nowrap; text-align: center; }
     .mv-detail-table tbody td:first-child { white-space: normal; min-width: 210px; }
     .mv-detail-table thead th:first-child,
@@ -3523,6 +3534,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
     /* Templates list */
+    /* Relationship tag clusters. The class was used in six places but never
+       styled, so the tags sat flush against each other — bare inline spans have
+       no gap of their own. One rule covers every table that shows them. */
+    .rel-tags,
+    .tpl-comp-tags { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2); }
+
+    /* Variant label above its own tag cluster, so Regular and Newcomer read as
+       two blocks rather than one run-on list. Stacked rather than side by side:
+       an inline label eats ~70px of a column that the tags need, which forced
+       them single-file in narrower windows. */
+    .tpl-comp-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ic-space-1); }
+    .tpl-comp-row + .tpl-comp-row { margin-top: var(--ic-space-3); }
+
     .tpl-name { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
     /* components.css sets `white-space: nowrap` on every .table cell, which
        assumes short content. A comma-separated competency list isn't short: at
@@ -3686,7 +3710,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        overshoots, because the h1's box is 42px tall against a 24px stepper. */
     .page-head:has(.breadcrumbs) .page-head-actions { margin-top: 30px; }
 
-    /* My direct reports' other two tabs. Fixed layout for the same reason as every
+    /* Review cycles' other two tabs. Fixed layout for the same reason as every
        other table here — content-sized columns overflow the container. */
     .tr-reviews-table, .tr-goals-table { table-layout: fixed; }
     /* Team names are long ("Engineering, Platform Team") and .tag is a
@@ -3777,11 +3801,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-group { margin-bottom: var(--ic-space-4); }
     .cb-group:last-child { margin-bottom: 0; }
     .cb-group-head { display: flex; align-items: center; gap: var(--ic-space-2); margin-bottom: var(--ic-space-2); }
-    /* Pinned right, and quiet until the group is hovered — a plus on every
-       header at full strength would compete with the competencies themselves. */
-    .cb-group-add { margin-left: auto; opacity: 0; transition: opacity var(--ic-duration-fast) var(--ic-ease); }
-    .cb-group:hover .cb-group-add,
-    .cb-group-add:focus-visible { opacity: 1; }
+    /* Pinned right, always visible, and blue. designmd deliberately makes
+       icon-only ghosts neutral graphite (kebabs, X buttons stay quiet), but
+       this one is an action rather than a control, so it takes the accent —
+       including on hover, where the icon-only ghost rule would reset it.
+       Both selectors carry all three classes: designmd's rule is (0,2,0), so a
+       bare .cb-group-add would lose to it on specificity, not source order. */
+    .cb-group-add { margin-left: auto; }
+    .btn-icon-only.btn-ghost.cb-group-add { color: var(--color-accent); }
+    .btn-icon-only.btn-ghost.cb-group-add:hover { color: var(--color-accent); background: var(--color-accent-subtle); }
     .cb-group-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); }
     .cb-comp-row { display: flex; align-items: flex-start; gap: var(--ic-space-3); padding: var(--ic-space-3); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); margin-bottom: var(--ic-space-2); cursor: pointer; }
     .cb-comp-row:last-child { margin-bottom: 0; }
@@ -3828,7 +3856,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-detail-scale { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-4); }
 
     .cb-footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--ic-space-4); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
-    .cb-footer-hint { font: var(--type-body-sm); color: var(--color-danger); margin: 0; }
+    /* designmd has .field-hint.is-error for the message but no error state on
+       the control itself, so the border is local. Covers the select trigger
+       too, which isn't an .input. */
+    .input.is-error,
+    .input-select-trigger.is-error { border-color: var(--color-danger); }
+    .input.is-error:focus-visible,
+    .input-select-trigger.is-error:focus-visible { box-shadow: 0 0 0 3px var(--color-danger-subtle); }
 
     /* ===== Review cycle list =====
        .table-scroll's `overflow: auto` clips the row kebab menus — an absolutely
@@ -4257,14 +4291,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <!-- One entry per role (PLAN.md § Roles), ordered narrowest scope
                  outward — your own work, then your team, then the whole org:
                    My assessments    → Reviewer · assessments assigned to you
-                   My direct reports → Manager  · how your report chain is faring
+                   Review cycles → Manager  · how your report chain is faring
                    Review cycle      → Admin    · set up cycles and templates
                  Kept flat: .sidenav-sublist supports a single level, so
                  Templates lives inside the admin section rather than as a
                  fourth sibling that would break the one-item-per-role read. -->
             <ul class="sidenav-sublist">
               <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="my-assessments"><span class="sidenav-item-label">My assessments</span></a></li>
-              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="team-results"><span class="sidenav-item-label">My direct reports</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="team-results"><span class="sidenav-item-label">Review cycles</span></a></li>
               <li><a class="sidenav-item sidenav-subitem" href="#" data-page="review-cycles"><span class="sidenav-item-label">Templates</span></a></li>
             </ul>
           </div>
@@ -4758,88 +4792,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="table-scroll" id="rc-tpl-wrap">
             <table class="table table-wide">
               <colgroup>
-                <col style="width: 30%" /><col style="width: 58%" /><col style="width: 12%" />
+                <col style="width: 22%" /><col style="width: 26%" /><col style="width: 40%" /><col style="width: 12%" />
               </colgroup>
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Description</th>
                   <th>Competencies</th>
                   <th style="text-align: right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><div class="tpl-name"><span class="cell-title-text">Base Template</span><span class="rel-tags"><span class="tag tag-light">base</span><span class="tag tag-light">universal</span></span></div></td>
-                  <td><p class="tpl-comps">Adaptability, Collaboration &amp; Teamwork, Communication, Ownership &amp; Accountability</p></td>
-                  <td>
-                    <div class="cell-actions">
-                      <div class="dropdown">
-                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                        <div class="dropdown-menu dropdown-menu-end" hidden>
-                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><div class="tpl-name"><span class="cell-title-text">Design</span><span class="rel-tags"><span class="tag tag-light">universal</span></span></div></td>
-                  <td><p class="tpl-comps">Design Systems, Prototyping, UX &amp; Interaction, Visual Design</p></td>
-                  <td>
-                    <div class="cell-actions">
-                      <div class="dropdown">
-                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                        <div class="dropdown-menu dropdown-menu-end" hidden>
-                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><div class="tpl-name"><span class="cell-title-text">Engineering</span></div></td>
-                  <td><p class="tpl-comps"><span class="tpl-variant">Regular:</span> Code Quality, Mentorship, Problem Solving, System Design, Technical Proficiency</p><p class="tpl-comps"><span class="tpl-variant">Newcomer:</span> Code Quality, Problem Solving, Technical Proficiency</p></td>
-                  <td>
-                    <div class="cell-actions">
-                      <div class="dropdown">
-                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                        <div class="dropdown-menu dropdown-menu-end" hidden>
-                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><div class="tpl-name"><span class="cell-title-text">Management</span></div></td>
-                  <td><p class="tpl-comps"><span class="tpl-variant">Regular:</span> Delivery &amp; Execution, Leadership, People Development, Strategic Thinking</p><p class="tpl-comps"><span class="tpl-variant">Newcomer:</span> Delivery &amp; Execution, Leadership</p></td>
-                  <td>
-                    <div class="cell-actions">
-                      <div class="dropdown">
-                        <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                        <div class="dropdown-menu dropdown-menu-end" hidden>
-                          <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                          <button class="dropdown-item dropdown-item-danger" type="button"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+              <!-- Filled from the shared template model by the templates-list
+                   render(); the rows that used to sit here were a second,
+                   drifting copy of the same seed data. -->
+              <tbody></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- My direct reports — the manager surface (PLAN.md § Manager views). Shell
+      <!-- Review cycles — the manager surface (PLAN.md § Manager views). Shell
            for now; the roster table and per-person breakdown are next up. -->
       <section class="page-view" data-page="team-results" hidden>
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
-              <h1 class="page-head-heading">My direct reports</h1>
+              <h1 class="page-head-heading">Review cycles</h1>
             </div>
             <p class="page-head-subtitle">How your team is faring this cycle.</p>
           </div>
@@ -4855,9 +4833,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              off aria-controls. No custom wiring needed here (unlike the hub,
              whose tabs are re-rendered by the state machine). -->
         <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-overview-panel" type="button">Overview <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-overview-panel" type="button">Reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
           <!-- Hidden, not deleted: the panel and its table stay in place so this
-               is a one-attribute change to bring back. Overview covers the same
+               is a one-attribute change to bring back. Reviews covers the same
                ground with more signal. (`hidden` works here because .tab sets no
                explicit display — unlike .btn, which needs .btn[hidden].) -->
           <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reports-panel" type="button" hidden>My reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
@@ -4867,7 +4845,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <button class="tab" role="tab" aria-selected="false" aria-controls="rc-cycles-panel" type="button">Cycles <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
         </div>
 
-        <!-- Overview — the manager roll-up (reference: Manager / Review results).
+        <!-- Reviews — the manager roll-up (reference: Manager / Review results).
              Two views over one dataset: Summarised (overall + best/worst) and
              Detailed (every competency as a column, grouped, with column
              averages). Ring colours and the legend derive from the shared rating
@@ -4894,8 +4872,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </div>
           </div>
 
-          <p class="mv-meta" id="tr-cycle-meta"></p>
-          <div class="mv-legend" id="tr-legend"></div>
+          <!-- Hidden: the cycle picker above already names the cycle, and its
+               dates aren't what this view is for. Still rendered, so unhiding
+               is a one-attribute change. -->
+          <p class="mv-meta" id="tr-cycle-meta" hidden></p>
 
           <div class="table-scroll" id="tr-summary-wrap" style="margin-top: var(--ic-space-4)">
             <table class="table table-wide mv-table">
@@ -4913,11 +4893,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <table class="table table-wide mv-detail-table">
               <thead>
                 <tr id="tr-detail-heads"></tr>
+                <tr id="tr-detail-subheads"></tr>
               </thead>
               <tbody></tbody>
               <tfoot><tr id="tr-detail-foot"></tr></tfoot>
             </table>
           </div>
+
+          <!-- Below the tables, not above: it's a key for reading the swatches,
+               so it's referred to while looking at them rather than before. One
+               legend for both views, since Summarised and Detailed share the
+               scale — hence it sits outside either wrap. -->
+          <div class="mv-legend" id="tr-legend"></div>
         </div>
 
         <div id="tr-reports-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
@@ -5319,16 +5306,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </div>
               <span class="field-hint" id="te-parent-hint"></span>
             </div>
+          </div>
+
+          <div class="card">
+            <h2 class="cb-section-title">Competencies <span class="count-badge count-badge-secondary" id="te-comp-count">0</span></h2>
+            <p class="cb-section-hint">Picked from the shared library. Anything inherited from a parent template arrives ticked — untick it to drop it from this template.</p>
+
+            <!-- Sits with the tabs it governs rather than in Details: ticking
+                 it is what makes those tabs appear or disappear. -->
             <label class="checkbox te-universal">
               <input type="checkbox" class="checkbox-input" id="te-universal" />
               <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
               <span class="checkbox-label">Universal — one competency set, no Regular / Newcomer split</span>
             </label>
-          </div>
-
-          <div class="card">
-            <h2 class="cb-section-title">Competencies <span class="count-badge count-badge-secondary" id="te-comp-count">0</span></h2>
-            <p class="cb-section-hint">Picked from the shared library. Anything inherited from a parent template is listed above and can only be changed there.</p>
 
             <!-- Variant tabs — hidden entirely when the template is universal. -->
             <div class="tabs" id="te-variant-tabs" role="tablist" style="margin-bottom: var(--ic-space-4)">
@@ -5336,10 +5326,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <button class="tab" role="tab" aria-selected="false" type="button" data-variant="newcomer">Newcomer</button>
             </div>
 
-            <div id="te-inherited-wrap">
-              <button class="link-action" type="button" id="te-inherited-toggle" aria-expanded="false">Show inherited</button>
-              <div id="te-inherited-list" hidden style="margin-top: var(--ic-space-3)"></div>
-            </div>
 
             <div id="te-library" style="margin-top: var(--ic-space-4)"></div>
 
@@ -5432,7 +5418,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" id="cb-back-link">My direct reports</a>
+              <a class="breadcrumb" href="#" id="cb-back-link">Review cycles</a>
               <span class="breadcrumb is-current" aria-current="page">New assessment cycle</span>
             </nav>
             <div class="page-head-title">
@@ -5448,14 +5434,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="cb-sec-head">
               <span class="cb-sec-num">1</span>
               <div class="cb-sec-titles">
-                <h2 class="cb-section-title">Review template</h2>
-                <p class="cb-section-hint">The template decides which competencies reviewers score. Manage them under Templates.</p>
+                <h2 class="cb-section-title">Cycle setup</h2>
+                <p class="cb-section-hint">Name this cycle and pick the template it runs on — the template decides which competencies reviewers score.</p>
               </div>
             </div>
 
             <label class="field">
               <span class="field-label">Cycle name</span>
               <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 Performance Review" value="H2 2026 — Engineering" />
+              <span class="field-hint" id="cb-err-name" hidden></span>
             </label>
 
             <!-- One template per cycle. NB-64 and NB-65 removed cycle type and
@@ -5472,6 +5459,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <div class="dropdown-menu" hidden id="cb-tpl-menu"></div>
               </div>
             </div>
+
+            <span class="field-hint" id="cb-err-tpl" hidden></span>
 
             <!-- Filled by renderTplDetail() once a template is picked. -->
             <div id="cb-tpl-detail"></div>
@@ -5499,15 +5488,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <input class="input" id="cb-ends" type="date" value="2026-09-15" />
               </label>
             </div>
+            <span class="field-hint" id="cb-err-dates" hidden></span>
 
             <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Visible to the reviewee</p>
             <div class="cb-vis" data-vis="reviewee">
               <div class="cb-vis-option">
-                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="date" checked /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
-                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to reviewee from" />
+                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="date" /><span class="radio-circle"></span><span class="radio-label">From a date</span></label>
+                <input class="input cb-vis-date" type="date" value="2026-09-30" aria-label="Visible to reviewee from" hidden />
               </div>
+              <!-- Reviewees default to Never; managers still default to a date.
+                   Withholding is the safer starting point for the person being
+                   assessed — releasing results is a deliberate act. -->
               <div class="cb-vis-option">
-                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="never" /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
+                <label class="radio"><input type="radio" name="cb-vis-reviewee" class="radio-input" value="never" checked /><span class="radio-circle"></span><span class="radio-label">Never — results stay hidden from them</span></label>
               </div>
             </div>
 
@@ -5533,6 +5526,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </div>
             </div>
 
+            <span class="field-hint" id="cb-err-pairs" style="margin-bottom: var(--ic-space-3)" hidden></span>
+
             <div class="cb-row" style="margin-bottom: var(--ic-space-4)">
               <label class="field">
                 <span class="field-label">Reviewer</span>
@@ -5557,10 +5552,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div id="cb-pairs-wrap" style="margin-top: var(--ic-space-4)"></div>
           </div>
 
-          <!-- Validation reads out beside the button rather than blocking a
-               step, so what is missing is visible while the form is editable. -->
+          <!-- Launch is always clickable. A disabled button with a standing
+               "you're missing X" line makes the form nag before the person has
+               finished with it; pressing Launch is the moment they've declared
+               themselves done, so that's when problems are worth raising —
+               against the fields that own them. -->
           <div class="cb-footer">
-            <p class="cb-footer-hint" id="cb-launch-hint"></p>
             <button class="btn btn-primary" type="button" id="cb-launch">Launch cycle</button>
           </div>
         </div>
@@ -6897,40 +6894,46 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 
       /* ---------- Shared library ----------
-         Groups follow v2.0's General / Skills split, which is what the Give
-         Assessment form already renders — not v2.1's Soft/Hard, which would
-         disagree with a screen that's already built. */
-      // Seeded with v2.0's General / Skills split, but admins can add their own
-      // (e.g. a Contractor group with its own skills) — so this grows at runtime
-      // rather than being a fixed pair. Everything that renders groups reads it.
-      const GROUPS = [{ id: 'general', name: 'General' }, { id: 'skills', name: 'Skills' }];
+         v2.1's split: General, then Hard skills / Soft skills. v2.0 had one
+         undifferentiated "Skills" bucket, which said nothing about whether a
+         competency was a craft or a behaviour. Note the Give Assessment screen
+         still renders v2.0's General / Skills headers — that markup came from
+         Figma and isn't driven by this list (see PLAN.md). */
+      // Seeded from v2.1, but admins can add their own (e.g. a Contractor group
+      // with its own skills) — so this grows at runtime rather than being a
+      // fixed set. Everything that renders groups reads it.
+      const GROUPS = [
+        { id: 'general', name: 'General' },
+        { id: 'hard',    name: 'Hard skills' },
+        { id: 'soft',    name: 'Soft skills' }
+      ];
       const LIB = [
         { id: 'adapt',  g: 'general', n: 'Adaptability',              d: 'Adjusts effectively to changing priorities and contexts.' },
         { id: 'collab', g: 'general', n: 'Collaboration & Teamwork',  d: 'Works effectively with others toward shared goals.' },
         { id: 'comms',  g: 'general', n: 'Communication',             d: 'Communicates clearly and openly with the right audience.' },
         { id: 'own',    g: 'general', n: 'Ownership & Accountability',d: 'Takes responsibility for outcomes end-to-end.' },
-        { id: 'dsys',   g: 'skills',  n: 'Design Systems',            d: 'Builds and applies shared design foundations.' },
-        { id: 'proto',  g: 'skills',  n: 'Prototyping',               d: 'Tests ideas quickly at the right fidelity.' },
-        { id: 'ux',     g: 'skills',  n: 'UX & Interaction',          d: 'Designs flows that are clear and usable.' },
-        { id: 'visual', g: 'skills',  n: 'Visual Design',             d: 'Applies craft in type, layout and colour.' },
-        { id: 'cq',     g: 'skills',  n: 'Code Quality',              d: 'Writes clean, maintainable, well-tested code.' },
-        { id: 'mentor', g: 'skills',  n: 'Mentorship',                d: 'Grows others through coaching and feedback.' },
-        { id: 'solve',  g: 'skills',  n: 'Problem Solving',           d: 'Breaks down and resolves complex problems effectively.' },
-        { id: 'sysd',   g: 'skills',  n: 'System Design',             d: 'Designs robust, scalable systems and makes sound trade-offs.' },
-        { id: 'techp',  g: 'skills',  n: 'Technical Proficiency',     d: 'Demonstrates strong, current technical skills.' },
-        { id: 'deliv',  g: 'skills',  n: 'Delivery & Execution',      d: 'Ships outcomes predictably and at pace.' },
-        { id: 'lead',   g: 'skills',  n: 'Leadership',                d: 'Sets direction and brings people with them.' },
-        { id: 'people', g: 'skills',  n: 'People Development',        d: 'Grows the people they are responsible for.' },
-        { id: 'strat',  g: 'skills',  n: 'Strategic Thinking',        d: 'Connects day-to-day work to longer-term goals.' }
+        { id: 'dsys',   g: 'hard',    n: 'Design Systems',            d: 'Builds and applies shared design foundations.' },
+        { id: 'proto',  g: 'hard',    n: 'Prototyping',               d: 'Tests ideas quickly at the right fidelity.' },
+        { id: 'ux',     g: 'hard',    n: 'UX & Interaction',          d: 'Designs flows that are clear and usable.' },
+        { id: 'visual', g: 'hard',    n: 'Visual Design',             d: 'Applies craft in type, layout and colour.' },
+        { id: 'cq',     g: 'hard',    n: 'Code Quality',              d: 'Writes clean, maintainable, well-tested code.' },
+        { id: 'mentor', g: 'soft',    n: 'Mentorship',                d: 'Grows others through coaching and feedback.' },
+        { id: 'solve',  g: 'soft',    n: 'Problem Solving',           d: 'Breaks down and resolves complex problems effectively.' },
+        { id: 'sysd',   g: 'hard',    n: 'System Design',             d: 'Designs robust, scalable systems and makes sound trade-offs.' },
+        { id: 'techp',  g: 'hard',    n: 'Technical Proficiency',     d: 'Demonstrates strong, current technical skills.' },
+        { id: 'deliv',  g: 'soft',    n: 'Delivery & Execution',      d: 'Ships outcomes predictably and at pace.' },
+        { id: 'lead',   g: 'soft',    n: 'Leadership',                d: 'Sets direction and brings people with them.' },
+        { id: 'people', g: 'soft',    n: 'People Development',        d: 'Grows the people they are responsible for.' },
+        { id: 'strat',  g: 'soft',    n: 'Strategic Thinking',        d: 'Connects day-to-day work to longer-term goals.' }
       ];
       const SCALES = {
-        'sc-5pt': { name: '5-point standard', rows: [
+        'sc-5pt': { name: '5-point', rows: [
           { value: 1, label: 'Unacceptable',         color: '#FF0000' },
           { value: 2, label: 'Needs Improvement',    color: '#AA4411' },
           { value: 3, label: 'Meets Expectations',   color: '#9999BB' },
           { value: 4, label: 'Exceeds Expectations', color: '#77AA77' },
           { value: 5, label: 'Outstanding',          color: '#33CC33' } ] },
-        'sc-3pt': { name: '3-point (legacy 2.0)', rows: [
+        'sc-3pt': { name: '3-point', rows: [
           { value: 1, label: 'Needs Improvement', color: '#AA4411' },
           { value: 2, label: 'On Track',          color: '#9999BB' },
           { value: 3, label: 'Overperforming',    color: '#33CC33' } ] }
@@ -6981,19 +6984,51 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
       // groups: NB-67's cycle form groups a template's competencies by the
       // same General / Skills split this editor uses, rather than inventing one.
+      // A template's variant key outside the editor: nothing selects a variant
+      // in the cycle flow, so non-universal templates resolve to Regular.
+      const ownKey = t => (t && t.universal) ? 'all' : 'regular';
+      // Inherited competencies this template has dropped.
+      const excludedComps = t => (t && t.excludes && t.excludes[ownKey(t)]) || [];
       window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS,
-                        chain: chainOf, own: ownComps };
+                        chain: chainOf, own: ownComps, excluded: excludedComps };
 
       // Working copy — edits apply on Save, so Cancel genuinely discards.
       let draft = null, variant = 'regular';
       const variantKey = () => draft.universal ? 'all' : variant;
-      const selected = () => draft.variants[variantKey()] ||= [];
+      // A competency set that has never been authored starts fully selected:
+      // building a template is mostly deciding what doesn't apply, not ticking
+      // seventeen boxes. Keyed on the variant being *absent* rather than empty,
+      // so deliberately clearing a set isn't undone on the next render.
+      // Inherited items are left out — they aren't this template's to own.
+      const selected = () => {
+        const k = variantKey();
+        if (!(k in draft.variants)) {
+          const inh = inheritedIds();
+          draft.variants[k] = LIB.map(c => c.id).filter(id => !inh.includes(id));
+        }
+        return draft.variants[k];
+      };
 
       /* ---------- Competencies ---------- */
-      // Inherited from the parent chain. Showing these as pickable would imply
-      // they can be removed here, which they can't — they belong to the parent.
-      // Was hardcoded to Base until the "Inherits from" link existed.
+      // Inherited from the parent chain. These sit in the library alongside
+      // everything else, ticked and badged, rather than in a read-only list of
+      // their own: a parent is a starting point, not a contract, so a template
+      // can drop one it doesn't need.
       const inheritedIds = () => [...new Set(chainOf(draft).flatMap(ownComps))];
+
+      // Unticking an inherited competency records an exclusion rather than
+      // editing the parent — per variant, at the same granularity as the sets
+      // it modifies, so Regular and Newcomer can differ here too.
+      const excludes = () => {
+        draft.excludes ||= {};
+        return draft.excludes[variantKey()] ||= [];
+      };
+      // What this template actually contributes: everything inherited that it
+      // hasn't dropped, plus everything it picked itself.
+      const effective = () => {
+        const ex = excludes();
+        return [...new Set([...inheritedIds().filter(id => !ex.includes(id)), ...selected()])];
+      };
 
       /* ---------- Inherits from ---------- */
       // Anything but itself and its own descendants — picking one of those
@@ -7017,10 +7052,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             `<button class="dropdown-item${t.id === draft.parentId ? ' is-selected' : ''}" type="button" data-te-parent="${t.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(t.name)}</button>`)
         ].join('');
         const n = inheritedIds().length;
+        const dropped = draft.excludes?.[variantKey()]?.length ?? 0;
         $('#te-parent-hint').textContent = draft.base
           ? 'The Base Template sits at the root — it inherits from nothing.'
           : parent
-            ? `Inherits ${n} ${n === 1 ? 'competency' : 'competencies'} and its questions from ${parent.name}.`
+            ? `Inherits ${n} ${n === 1 ? 'competency' : 'competencies'} and its questions from ${parent.name}${dropped ? ` · ${dropped} dropped below` : ''}.`
             : 'Nothing is inherited — this template stands on its own.';
       };
 
@@ -7032,46 +7068,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         draft.parentId = item.dataset.teParent || null;
         $('#te-parent-select .input-select-trigger').setAttribute('aria-expanded', 'false');
         $('#te-parent-menu').hidden = true;
-        renderParent(); renderInherited(); renderLibrary();
+        renderParent(); renderLibrary();
       });
 
-      const renderInherited = () => {
-        const ids = inheritedIds();
-        const wrap = $('#te-inherited-wrap');
-        wrap.hidden = !ids.length;
-        if (!ids.length) return;
-        const toggle = $('#te-inherited-toggle');
-        const open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.textContent = `${open ? 'Hide' : 'Show'} ${ids.length} inherited`;
-        $('#te-inherited-list').hidden = !open;
-        $('#te-inherited-list').innerHTML = ids.map(id => {
-          const c = compById(id);
-          return `<div class="te-inherited-row">
-            <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
-            <span class="tag tag-light te-inherited-tag">inherited</span>
-          </div>`;
-        }).join('');
-      };
 
       const renderLibrary = () => {
         const inh = inheritedIds();
+        const ex  = excludes();
         const sel = selected();
         $('#te-library').innerHTML = GROUPS.map(g => {
-          // Inherited competencies are listed above, not repeated as choices.
-          const items = LIB.filter(c => c.g === g.id && !inh.includes(c.id));
+          const items = LIB.filter(c => c.g === g.id);
           if (!items.length) return '';
           return `<div class="cb-group">
             <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span>
               <button class="btn btn-icon-only btn-ghost btn-xs cb-group-add" type="button" data-add-to-group="${g.id}" data-tooltip="Add a competency to ${esc(g.name)}" aria-label="Add a competency to ${esc(g.name)}"><svg class="icon"><use href="#i-plus"/></svg></button>
             </div>
-            ${items.map(c => `<label class="cb-comp-row">
-              <span class="checkbox"><input type="checkbox" class="checkbox-input" data-te-comp="${c.id}" ${sel.includes(c.id) ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
+            ${items.map(c => {
+              const isInh = inh.includes(c.id);
+              const on = isInh ? !ex.includes(c.id) : sel.includes(c.id);
+              return `<label class="cb-comp-row${isInh ? ' is-inherited' : ''}">
+              <span class="checkbox"><input type="checkbox" class="checkbox-input" data-te-comp="${c.id}" ${on ? 'checked' : ''} /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span></span>
               <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
-            </label>`).join('')}
+              ${isInh ? '<span class="tag tag-light te-inherited-tag">inherited</span>' : ''}
+            </label>`; }).join('')}
           </div>`;
         }).join('');
-        // Count is what the reviewer will actually see: inherited + picked.
-        $('#te-comp-count').textContent = sel.length + inh.length;
+        $('#te-comp-count').textContent = effective().length;
         // The group choice survives re-renders, so adding one competency to a
         // new group doesn't bounce the picker back for the next one.
         syncGroupTrigger();
@@ -7081,16 +7103,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       section.addEventListener('change', e => {
         const cb = e.target.closest('[data-te-comp]');
         if (!cb) return;
-        const sel = selected(), id = cb.dataset.teComp;
-        cb.checked ? (!sel.includes(id) && sel.push(id)) : sel.splice(sel.indexOf(id), 1);
-        $('#te-comp-count').textContent = sel.length + inheritedIds().length;
+        const id = cb.dataset.teComp;
+        // Same control, two meanings: an inherited row toggles an exclusion,
+        // any other row toggles this template's own selection.
+        const list = inheritedIds().includes(id) ? excludes() : selected();
+        const wants = inheritedIds().includes(id) ? !cb.checked : cb.checked;
+        wants ? (!list.includes(id) && list.push(id)) : list.splice(list.indexOf(id), 1);
+        $('#te-comp-count').textContent = effective().length;
+        // The Details hint counts what's been dropped, so it has to move too.
+        renderParent();
       });
 
-      $('#te-inherited-toggle').addEventListener('click', e => {
-        const t = e.currentTarget;
-        t.setAttribute('aria-expanded', String(t.getAttribute('aria-expanded') !== 'true'));
-        renderInherited();
-      });
 
       /* ---------- Group combobox ----------
          `id: null` means "a group by this name, not created yet" — it only
@@ -7288,12 +7311,35 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         qList(b.dataset.teAddQ).push({ t: '', req: false });
         renderQs(b.dataset.teAddQ);
       }));
+      // Same recovery as removing a participant from a cycle: one click, no
+      // confirm, undo in the toast — and the question comes back at its
+      // original index, so the order is restored with it.
       section.addEventListener('click', e => {
         const d = e.target.closest('[data-te-q-del]');
         if (!d) return;
         const row = d.closest('[data-te-q]');
-        qList(row.dataset.teQ).splice(Number(row.dataset.teI), 1);
-        renderQs(row.dataset.teQ);
+        const kind = row.dataset.teQ;
+        const at = Number(row.dataset.teI);
+        const [gone] = qList(kind).splice(at, 1);
+        renderQs(kind);
+        if (!gone || !window.toast) return;
+        // An unnamed question has no text to quote, so the toast names the
+        // kind instead of showing empty quotes.
+        const label = gone.t.trim()
+          ? `Removed “${gone.t.trim()}”`
+          : `Removed a blank ${kind === 'review' ? 'review' : 'goal'} question`;
+        // behavior:'action' has no timer of its own — see the participants
+        // toast for why one is added here.
+        const t = toast({
+          variant: 'neutral',
+          behavior: 'action',
+          message: label,
+          action: { label: 'Undo', onClick: () => {
+            qList(kind).splice(Math.min(at, qList(kind).length), 0, gone);
+            renderQs(kind);
+          } }
+        });
+        setTimeout(() => t.dismiss(), 8000);
       });
       section.addEventListener('input', e => {
         if (!e.target.matches('[data-te-q-text]')) return;
@@ -7320,7 +7366,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#te-type-hint').textContent = draft.base
           ? 'Base Template — these competencies and questions are inherited by every other template.'
           : 'A template defines what people are assessed on. Cycles pick templates; they don\'t define competencies themselves.';
-        renderParent(); renderVariantTabs(); renderInherited(); renderLibrary(); renderScale(); renderAllQs();
+        renderParent(); renderVariantTabs(); renderLibrary(); renderScale(); renderAllQs();
       };
 
       const open = (id) => {
@@ -7328,7 +7374,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // structuredClone keeps the draft fully detached, so Cancel discards
         // nested edits (scale rows, question objects) too — not just the top level.
         draft = src ? structuredClone(src)
-                    : { id: '', name: '', desc: '', parentId: null, universal: true, variants: { all: [] }, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
+                    : { id: '', name: '', desc: '', parentId: null, universal: true, variants: {}, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
         draft.scaleRows = draft.scaleRows || SCALES[draft.scaleId].rows.map(r => ({ ...r }));
         variant = 'regular';
         render();
@@ -7376,12 +7422,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         aug26: { range: 'Aug 1, 2026 – Sep 15, 2026', status: 'active' },
         jun26: { range: 'Jun 20, 2026 – Jul 31, 2026', status: 'closed' }
       };
-      const COMP_COLS = [
-        { g: 'General', items: [['adapt','Adaptability'], ['collab','Collaboration & Teamwork'], ['comms','Communication'], ['own','Ownership & Accountability']] },
-        { g: 'Skills',  items: [['cq','Code Quality'], ['dsys','Design Systems'], ['mentor','Mentorship'], ['solve','Problem Solving'],
-                                ['proto','Prototyping'], ['sysd','System Design'], ['techp','Technical Proficiency'], ['ux','UX & Interaction'], ['visual','Visual Design']] }
-      ];
-      const FLAT = COMP_COLS.flatMap(g => g.items);
+      // Columns are derived from the shared library rather than frozen here, so
+      // the matrix carries whatever grouping the template builder is using —
+      // including groups an admin adds. Only competencies somebody was actually
+      // scored on get a column; the rest would be a screen of dashes.
+      const compName = id => window.PR_TPL?.comp(id)?.n ?? id;
+      const compGroup = id => window.PR_TPL?.comp(id)?.g ?? null;
+      const groupCols = rows => {
+        const scored = [...new Set(rows.flatMap(p => Object.keys(p.s)))];
+        const cols = (window.PR_TPL?.groups ?? []).map(g => ({
+          name: g.name,
+          items: scored.filter(id => compGroup(id) === g.id)
+            .map(id => [id, compName(id)])
+            .sort((a, b) => a[1].localeCompare(b[1]))
+        })).filter(g => g.items.length);
+        // A score for a competency no longer in the library still needs a home.
+        const orphans = scored.filter(id => !cols.some(g => g.items.some(([i]) => i === id)));
+        if (orphans.length) cols.push({ name: 'Other', items: orphans.map(id => [id, compName(id)]) });
+        return cols;
+      };
 
       // `chain` = in the manager's report chain. Elena is Design, so she only
       // appears once admin view is on — which is what makes that toggle mean
@@ -7419,7 +7478,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const overallOf = p => avg(Object.values(p.s));
       // Ties resolve by name for determinism, so tie order may differ from the
       // reference's arbitrary ordering.
-      const ranked = p => FLAT.filter(([id]) => p.s[id] != null).map(([id, name]) => [name, p.s[id]])
+      const ranked = p => Object.keys(p.s).filter(id => p.s[id] != null)
+        .map(id => [compName(id), p.s[id]])
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
       let cycle = 'aug26', view = 'summary';
@@ -7463,30 +7523,52 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
 
       const renderDetail = rows => {
-        // Single header row. Competencies keep their General-then-Skills order
-        // from COMP_COLS, so the grouping still holds — it just isn't labelled.
-        $('#tr-detail-heads').innerHTML = '<th>Reviewee</th>' +
-          FLAT.map(([, n]) => `<th class="mv-comp-head">${esc(n)}</th>`).join('') +
-          '<th>Average</th><th>Reviews</th><th>Answers</th><th style="text-align: right">Actions</th>';
+        const gs = groupCols(rows);
+        const chip = (v, cls = '') => v == null
+          // A competency the template never included is an explicit gap, not a
+          // zero — a blank cell would read as a low score.
+          ? `<span class="mv-cell mv-cell-na${cls}" title="Not assessed">–</span>`
+          : `<span class="mv-cell${cls}" style="background: ${esc(colorFor(v))}">${v}</span>`;
+
+        // Two header rows: groups spanning their own competencies plus that
+        // group's average, then the competency names underneath. Thirteen
+        // unlabelled columns gave no clue which skill belonged to which group,
+        // which is the thing a manager is reading the matrix for.
+        $('#tr-detail-heads').innerHTML = '<th rowspan="2">Reviewee</th>' +
+          gs.map(g => `<th class="mv-group-head" colspan="${g.items.length + 1}">${esc(g.name)}</th>`).join('') +
+          '<th rowspan="2">Overall</th><th rowspan="2">Reviews</th><th rowspan="2">Answers</th>' +
+          '<th rowspan="2" style="text-align: right">Actions</th>';
+
+        $('#tr-detail-subheads').innerHTML = gs.map(g =>
+          g.items.map(([, n], i) => `<th class="mv-comp-head${i === 0 ? ' is-group-start' : ''}">${esc(n)}</th>`).join('') +
+          '<th class="mv-comp-head mv-avg-head">Avg</th>').join('');
 
         $('#tr-detail-wrap tbody').innerHTML = rows.map(p => {
           const o = overallOf(p);
-          // A competency the template never included is an explicit gap, not a
-          // zero — a blank cell would read as a low score.
-          const cells = FLAT.map(([id]) => p.s[id] == null
-            ? '<td><span class="mv-cell mv-cell-na" title="Not assessed">–</span></td>'
-            : `<td><span class="mv-cell" style="background: ${esc(colorFor(p.s[id]))}">${p.s[id]}</span></td>`).join('');
+          const cells = gs.map(g => {
+            const groupAvg = avg(g.items.map(([id]) => p.s[id]).filter(v => v != null));
+            return g.items.map(([id], i) => `<td${i === 0 ? ' class="is-group-start"' : ''}>${chip(p.s[id])}</td>`).join('') +
+              `<td class="mv-avg-cell">${chip(groupAvg)}</td>`;
+          }).join('');
           return `<tr><td>${person(p)}</td>${cells}
-            <td><span class="mv-cell" style="background: ${esc(colorFor(o))}">${o}</span></td>
+            <td>${chip(o)}</td>
             <td>${reviewsCell(p, true)}</td><td>${p.ansDone} / ${p.ansOf}</td><td>${btn(p)}</td></tr>`;
         }).join('');
 
         // Averages track what's on screen, so admin view and cycle changes
-        // recompute rather than showing a stale total.
-        const cols = FLAT.map(([id]) => avg(rows.map(p => p.s[id]).filter(v => v != null)));
+        // recompute rather than showing a stale total. The group column
+        // averages every score in that group across everyone shown — not the
+        // mean of the per-person averages, which would weight a person with one
+        // scored competency the same as one with five.
+        const foot = gs.map(g =>
+          g.items.map(([id], i) => {
+            const a = avg(rows.map(p => p.s[id]).filter(v => v != null));
+            return `<th${i === 0 ? ' class="is-group-start"' : ''}>${a == null ? '–' : a}</th>`;
+          }).join('') +
+          `<th class="mv-avg-cell">${avg(rows.flatMap(p => g.items.map(([id]) => p.s[id]).filter(v => v != null))) ?? '–'}</th>`
+        ).join('');
         $('#tr-detail-foot').innerHTML =
-          `<th>Average across ${rows.length} ${rows.length === 1 ? 'person' : 'people'}</th>` +
-          cols.map(a => `<th>${a == null ? '–' : a}</th>`).join('') +
+          `<th>Average across ${rows.length} ${rows.length === 1 ? 'person' : 'people'}</th>` + foot +
           `<th>${avg(rows.map(overallOf)) ?? '–'}</th><th></th><th></th><th></th>`;
       };
 
@@ -7566,23 +7648,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       if (!wrap || !window.PR_TPL) return;
       const api = window.PR_TPL;
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
-      const names = ids => (ids || []).map(id => api.comp(id)?.n).filter(Boolean).join(', ') || '—';
+      // One tag per competency rather than a comma-joined sentence: at four or
+      // more names the prose ran together and the ampersands inside names
+      // ("Collaboration & Teamwork") read as separators.
+      const compTags = ids => {
+        const out = (ids || []).map(id => api.comp(id)?.n).filter(Boolean)
+          .map(n => `<span class="tag tag-light">${esc(n)}</span>`).join('');
+        return out || '<span class="tpl-comps">—</span>';
+      };
 
       const render = () => {
         wrap.querySelector('tbody').innerHTML = api.list.map(t => {
           const tags = [t.base && 'base', t.universal && 'universal'].filter(Boolean);
           // Own competencies only — inherited ones belong to Base's own row.
           const comps = t.universal
-            ? `<p class="tpl-comps">${esc(names(t.variants.all))}</p>`
+            ? `<div class="tpl-comp-tags">${compTags(t.variants.all)}</div>`
             : ['regular', 'newcomer'].map(v =>
-                `<p class="tpl-comps"><span class="tpl-variant">${v[0].toUpperCase() + v.slice(1)}:</span> ${esc(names(t.variants[v]))}</p>`).join('');
+                `<div class="tpl-comp-row"><span class="tpl-variant">${v[0].toUpperCase() + v.slice(1)}:</span><div class="tpl-comp-tags">${compTags(t.variants[v])}</div></div>`).join('');
           // Base has no Delete: every other template inherits from it.
           const del = t.base ? '' :
             `<button class="dropdown-item dropdown-item-danger" type="button" data-tpl-del="${t.id}"><svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete</button>`;
           return `<tr>
             <td><div class="tpl-name"><span class="cell-title-text">${esc(t.name)}</span>${
-              tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div>${
-              t.desc ? `<p class="tpl-desc">${esc(t.desc)}</p>` : ''}</td>
+              tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div></td>
+            <td>${t.desc ? `<p class="tpl-desc">${esc(t.desc)}</p>` : '<span class="tpl-desc-empty">—</span>'}</td>
             <td>${comps}</td>
             <td><div class="cell-actions"><div class="dropdown">
               <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
@@ -7627,7 +7716,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       render();
     })();
 
-    // ===== My reports toolbar (My direct reports) — search + cycle filter =====
+    // ===== My reports toolbar (Review cycles) — search + cycle filter =====
     // Both filters apply together, so narrowing by cycle then typing behaves the
     // way a user expects. The shared .input-select handler already opens/closes
     // the menu and syncs the trigger label; this only adds the filtering.
@@ -7835,13 +7924,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const renderTplDetail = () => {
         const t = chosen();
         const wrap = $('#cb-tpl-detail');
-        if (!t) {
-          wrap.innerHTML = '<p class="cb-empty" style="margin-top: var(--ic-space-4)">Pick a template to see the competencies and rating scale reviewers will use.</p>';
-          return;
-        }
+        // Nothing at all until a template is picked. A placeholder here just
+        // restated the empty select right above it.
+        if (!t) { wrap.innerHTML = ''; return; }
 
         const chain   = chainOf(t);
-        const inherit = [...new Set(chain.flatMap(compsFor))];
+        // A template can drop something it inherits, so the chain's set is
+        // filtered by this template's exclusions before it counts.
+        const dropped = window.PR_TPL?.excluded(t) ?? [];
+        const inherit = [...new Set(chain.flatMap(compsFor))].filter(id => !dropped.includes(id));
         const own     = compsFor(t);
         const ids     = [...new Set([...inherit, ...own])];
         const scale   = window.PR_TPL?.scales?.[t.scaleId];
@@ -7867,7 +7958,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             ${scale ? `<p class="cb-detail-label" style="margin-top: var(--ic-space-4)">Rating scale · ${esc(scale.name)}</p>
               <div class="cb-detail-scale">${scale.rows.map(r =>
                 `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('')}</div>` : ''}
-            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${chain.length ? ` · ${inherit.length} inherited from ${esc(chain.map(x => x.name).join(' → '))}` : ' · nothing inherited'}.</p>
+            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${chain.length ? ` · ${inherit.length} inherited from ${esc(chain.map(x => x.name).join(' → '))}${dropped.length ? `, ${dropped.length} dropped` : ''}` : ' · nothing inherited'}.</p>
           </div>`;
       };
 
@@ -7881,7 +7972,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         syncTplTrigger();
         renderTplMenu();
         renderTplDetail();
-        validate();
+        clearErrors();
       });
 
       $('#cb-tpl-manage').addEventListener('click', e => {
@@ -7907,7 +7998,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </tbody>
             </table>
           </div>` : '<p class="cb-empty">No participants yet — add a pair above or upload a CSV.</p>';
-        validate();
+        clearErrors();
       };
 
       $('#cb-add-pair').addEventListener('click', () => {
@@ -7972,28 +8063,67 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       /* ---------- Launch ----------
          The wizard's Review step is gone, so its checks moved here. Only the
-         three that would make a cycle meaningless are blocking; the soft
-         warnings it also showed (e.g. reviewees never seeing their results)
-         are choices, not mistakes, and now read off the Schedule section. */
-      const validate = () => {
-        const problem =
-          !$('#cb-name').value.trim() ? 'Give the review cycle a name.'
-          : !chosen()                 ? 'Choose a review template.'
-          : !STATE.pairs.length       ? 'Add at least one participant.'
-          : $('#cb-ends').value && $('#cb-starts').value > $('#cb-ends').value
-                                      ? 'The end date is before the start date.'
-          : '';
-        $('#cb-launch-hint').textContent = problem;
-        $('#cb-launch').disabled = !!problem;
-        return !problem;
+         four that would make a cycle meaningless are raised; the soft warnings
+         it also showed (e.g. reviewees never seeing their results) are choices,
+         not mistakes, and read off the Schedule section.
+
+         Nothing is checked until Launch is pressed — that's the moment the
+         person declares themselves done. Each problem then attaches to the
+         field that owns it rather than to the button, so the fix is where the
+         message is. */
+      const CHECKS = [
+        { err: '#cb-err-name', ctl: '#cb-name',
+          bad: () => !$('#cb-name').value.trim(),
+          msg: 'Give the review cycle a name.' },
+        { err: '#cb-err-tpl', ctl: '#cb-tpl-select .input-select-trigger',
+          bad: () => !chosen(),
+          msg: 'Pick a template — it decides what reviewers score.' },
+        { err: '#cb-err-dates', ctl: '#cb-ends',
+          bad: () => $('#cb-starts').value && $('#cb-ends').value && $('#cb-starts').value > $('#cb-ends').value,
+          msg: 'The end date is before the start date.' },
+        { err: '#cb-err-pairs', ctl: '#cb-new-reviewer',
+          bad: () => !STATE.pairs.length,
+          msg: 'Add at least one participant — this cycle would launch empty.' }
+      ];
+
+      const clearErrors = () => {
+        CHECKS.forEach(c => {
+          const el = $(c.err);
+          if (el) { el.hidden = true; el.textContent = ''; el.classList.remove('is-error'); }
+          $(c.ctl)?.classList.remove('is-error');
+        });
       };
 
-      section.addEventListener('input', e => {
-        if (e.target.closest('#cb-name, #cb-starts, #cb-ends')) validate();
-      });
+      const report = () => {
+        clearErrors();
+        const bad = CHECKS.filter(c => c.bad());
+        bad.forEach(c => {
+          const el = $(c.err);
+          el.textContent = c.msg;
+          el.hidden = false;
+          el.classList.add('is-error');
+          $(c.ctl)?.classList.add('is-error');
+        });
+        if (!bad.length) return true;
+        // The offending field can be a screen away from the button, so the
+        // first one is brought to the person rather than the other way round.
+        const first = $(bad[0].ctl);
+        first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        first?.focus?.({ preventScroll: true });
+        if (window.toast) toast({
+          variant: 'error',
+          message: bad.length === 1 ? bad[0].msg : `${bad.length} things need fixing before this can launch.`
+        });
+        return false;
+      };
+
+      // Editing anything clears the lot: a message that outlives the problem it
+      // described is worse than no message.
+      section.addEventListener('input', clearErrors);
+      section.addEventListener('change', clearErrors);
 
       $('#cb-launch').addEventListener('click', () => {
-        if (!validate()) return;
+        if (!report()) return;
         // Launching returns to the cycle list — the form is done, so leaving
         // the user parked on it would be a dead end. Read the name before
         // navigating; the toast region is fixed-position so it outlives the
@@ -8023,7 +8153,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
 
       // NB-62 moved cycle creation to the manager, so this form's parent is
-      // My direct reports now — and the breadcrumb lands on its Cycles tab.
+      // Review cycles now — and the breadcrumb lands on its Cycles tab.
       $('#cb-back-link').addEventListener('click', (e) => {
         e.preventDefault();
         window.showPrPage?.('team-results');
@@ -8035,7 +8165,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       window.renderCycleTemplatePicker = () => {
         // A template that was deleted can't stay picked.
         if (STATE.templateId && !chosen()) STATE.templateId = null;
-        renderTplMenu(); syncTplTrigger(); renderTplDetail(); validate();
+        renderTplMenu(); syncTplTrigger(); renderTplDetail(); clearErrors();
       };
 
       renderTplMenu();
