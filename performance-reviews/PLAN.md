@@ -520,6 +520,16 @@ top spanning that group's competencies plus an **Avg** column at its right edge.
   competency would weigh as much as someone scored on five.
 - The final column is **Overall**, not "Average", now that "average" means
   something more specific in the same table.
+- The per-group Avg cells take their row's own colour. Tinting them fought the
+  table's row striping — the same grey sat visibly on a white row and vanished
+  into a striped one, so the column read as a rendering fault. The header and
+  the group band carry the distinction instead.
+
+**Answers open a modal**, like the Reviews cell beside them. It lists every open
+question with its answer, and keeps unanswered ones visible as *Not answered
+yet* — the gap is why a manager opens the cell. `ansDone` / `ansOf` were
+separate fields that could disagree with what the modal listed, so both counts
+now derive from the answer list itself.
 
 ## Open questions
 
