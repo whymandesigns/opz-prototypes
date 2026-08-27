@@ -3546,6 +3546,47 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-cell-na { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
     .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
+    /* ===== Breakdown ===== */
+    .bd-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--ic-space-4); align-items: start; }
+    /* The side column is commentary on the left one, so below ~1100px it goes
+       under rather than squeezing both into unreadable widths. */
+    @media (max-width: 1100px) { .bd-layout { grid-template-columns: minmax(0, 1fr); } }
+    .bd-side { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+
+    .bd-overall { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+    .bd-overall-band { font: var(--type-body-sm); color: var(--color-text-muted); }
+
+    .bd-comp { margin-top: var(--ic-space-3); }
+    .bd-comp-head { display: flex; align-items: center; gap: var(--ic-space-2); }
+    .bd-comp-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); flex: 1; min-width: 0; }
+    .bd-comp-band { font: var(--type-caption); color: var(--color-text-muted); flex-shrink: 0; }
+
+    /* One reviewer's comment: who, what they scored, what they said. */
+    /* No flex-wrap: a long comment should wrap inside its own column, not drop
+       to a new line and leave its author stranded above it. */
+    .bd-quote { display: flex; align-items: baseline; gap: var(--ic-space-2);
+      font: var(--type-body-sm); color: var(--color-text-muted); margin: var(--ic-space-3) 0 0; }
+    .bd-quote-text { flex: 1; min-width: 0; }
+    .bd-quote + .bd-quote { margin-top: var(--ic-space-2); }
+    .bd-quote-by { font-weight: var(--ic-weight-semibold); color: var(--color-text); flex-shrink: 0; }
+    .bd-quote-score { flex-shrink: 0; }
+    .bd-quote.is-empty { color: var(--color-text-subtle); font-style: italic; }
+
+    /* No chart component in designmd, so this is local: bars sized as a
+       percentage of the scale's top score, coloured by the same band scale the
+       tables use. */
+    .bd-trend { display: flex; align-items: flex-end; gap: var(--ic-space-3); height: 140px; margin-top: var(--ic-space-3); }
+    .bd-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: var(--ic-space-1); }
+    .bd-trend-value { font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans); color: var(--color-text); }
+    .bd-trend-bar { width: 100%; max-width: 44px; border-radius: var(--ic-radius-sm) var(--ic-radius-sm) 0 0; min-height: 4px; }
+    .bd-trend-label { font: var(--type-caption); color: var(--color-text-subtle); text-align: center; }
+
+    .bd-notes-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3); }
+    .bd-notes-head .cb-section-title { margin: 0; }
+    .bd-note-actions { display: flex; justify-content: flex-end; gap: var(--ic-space-2); margin-top: var(--ic-space-2); }
+    .bd-note { padding: var(--ic-space-3) 0; border-top: 1px solid var(--color-border); }
+    .bd-note-text { font: var(--type-body-sm); color: var(--color-text); margin: 0; white-space: pre-wrap; }
+
     /* Templates list */
     /* Relationship tag clusters. The class was used in six places but never
        styled, so the tags sat flush against each other — bare inline spans have
@@ -3591,7 +3632,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        until dates ran into the action buttons. A floor lets .table-scroll do
        what it's for and scroll instead. Pending only: Completed and Skipped
        still have four columns and fit. */
-    #pr-panel-pending .assessments-table { min-width: 700px; }
+    #pr-panel-pending .assessments-table { min-width: 880px; }
+    /* Completed and Skipped went to five columns with the cycle name too. */
+    #pr-panel-completed .assessments-table,
+    #pr-panel-skipped .assessments-table { min-width: 760px; }
     /* Same reason: cycle names are long, so the table scrolls rather than
        squeezing them into a column that can't hold them. */
     .tr-goals-table { min-width: 760px; }
@@ -4404,12 +4448,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="table-scroll" id="pr-panel-pending" role="tabpanel" aria-labelledby="pr-panel-pending" style="margin-top: var(--ic-space-4)">
             <table class="table table-wide assessments-table">
               <colgroup>
-                <col style="width: 34%" /><col style="width: 18%" /><col style="width: 14%" /><col style="width: 16%" /><col style="width: 18%" />
+                <col style="width: 24%" /><col style="width: 15%" /><col style="width: 21%" /><col style="width: 13%" /><col style="width: 13%" /><col style="width: 14%" />
               </colgroup>
               <thead>
                 <tr>
                   <th><button class="th-sort" type="button">Team Member</button></th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
+                  <th>Review cycle</th>
                   <th><button class="th-sort" type="button">Date Received</button></th>
                   <th><button class="th-sort" type="button">Due</button></th>
                   <th style="text-align: right"><span class="sr-only">Actions</span></th>
@@ -4427,6 +4472,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
+                  <td>H2 2026 — Company-wide</td>
                   <td>Aug 12, 2026</td>
                   <td data-due="2026-09-02"><span class="assess-due">Sep 2, 2026</span></td>
                   <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
@@ -4442,6 +4488,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
+                  <td>H2 2026 — Company-wide</td>
                   <td>Aug 3, 2026</td>
                   <td data-due="2026-08-21"><span class="assess-due">Aug 21, 2026</span></td>
                   <!-- Both rows open the same static "Give Assessment" content (Figma only
@@ -4462,12 +4509,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="table-scroll" id="pr-panel-completed" role="tabpanel" aria-labelledby="pr-panel-completed" style="margin-top: var(--ic-space-4)" hidden>
             <table class="table table-wide assessments-table">
               <colgroup>
-                <col style="width: 42%" /><col style="width: 20%" /><col style="width: 16%" /><col style="width: 22%" />
+                <col style="width: 30%" /><col style="width: 17%" /><col style="width: 25%" /><col style="width: 15%" /><col style="width: 13%" />
               </colgroup>
               <thead>
                 <tr>
                   <th>Team Member</th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
+                  <th>Review cycle</th>
                   <th>Completed by</th>
                   <th style="text-align: right"><span class="sr-only">Actions</span></th>
                 </tr>
@@ -4484,7 +4532,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Direct Report</span></span></td>
-                  <td>May 12, 2025</td>
+                  <td>Q1 2026 — Company-wide</td>
+                  <td>Feb 18, 2026</td>
                   <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
                 <tr>
@@ -4498,7 +4547,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Teammate</span><span class="tag tag-light">Org Unit</span></span></td>
-                  <td>May 20, 2025</td>
+                  <td>Q1 2026 — Company-wide</td>
+                  <td>Feb 20, 2026</td>
                   <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
                 <tr>
@@ -4512,7 +4562,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
-                  <td>Jun 2, 2025</td>
+                  <td>Newcomer Review — Jun 2026</td>
+                  <td>Jun 26, 2026</td>
                   <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
                 </tr>
               </tbody>
@@ -4527,12 +4578,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="table-scroll" id="pr-panel-skipped" role="tabpanel" aria-labelledby="pr-panel-skipped" style="margin-top: var(--ic-space-4)" hidden>
             <table class="table table-wide assessments-table">
               <colgroup>
-                <col style="width: 42%" /><col style="width: 20%" /><col style="width: 16%" /><col style="width: 22%" />
+                <col style="width: 30%" /><col style="width: 17%" /><col style="width: 25%" /><col style="width: 15%" /><col style="width: 13%" />
               </colgroup>
               <thead>
                 <tr>
                   <th>Team Member</th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
+                  <th>Review cycle</th>
                   <th>Date Skipped</th>
                   <th style="text-align: right"><span class="sr-only">Actions</span></th>
                 </tr>
@@ -4549,7 +4601,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </td>
                   <td><span class="rel-tags"><span class="tag tag-light">Teammate</span></span></td>
-                  <td>May 28, 2025</td>
+                  <td>Q1 2026 — Company-wide</td>
+                  <td>Feb 24, 2026</td>
                   <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
               </tbody>
@@ -5252,6 +5305,31 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
               </tr>
               <tr>
+                <td><span class="cell-title-text" title="H2 2026 — Company-wide">H2 2026 — Company-wide</span></td>
+                <td><span class="tag tag-indicator tag-positive">Active</span></td>
+                <td>
+                  <div class="cell-user">
+                    <span class="cell-avatar">CH</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name" title="Camilla Herrere">Camilla Herrere</span>
+                      <span class="cell-user-role">People Ops</span>
+                    </div>
+                  </div>
+                </td>
+                <td>Aug 10, 2026</td>
+                <td>
+                  <div class="cell-actions">
+                    <div class="dropdown">
+                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+                      <div class="dropdown-menu dropdown-menu-end" hidden>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
                 <td><span class="cell-title-text" title="Q4 2026 — Company-wide">Q4 2026 — Company-wide</span></td>
                 <td><span class="tag tag-indicator tag-blue">Scheduled</span></td>
                 <td>
@@ -5520,6 +5598,70 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            whole from the person filling it in. The separate Review step went
            with them — the form is short enough to be its own summary, so
            validation lives next to the Launch button instead. -->
+
+      <!-- ===== Breakdown — one reviewee, one cycle =====
+           Reference: perf-review-proto-1 /reviews/4/roles/25. Every competency
+           they were scored on, worst-to-best inverted (best first), each with
+           the peer comments behind that score. Reached from the View button in
+           Reviews; the page-view is a sibling so it can open from either the
+           summarised or detailed table. Everything on it is derived from the
+           same PEOPLE data those tables read, so the two can't disagree. -->
+      <section class="page-view" data-page="breakdown" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <a class="breadcrumb" href="#" id="bd-back">Review cycles</a>
+              <span class="breadcrumb is-current" aria-current="page">Breakdown</span>
+            </nav>
+            <div class="page-head-title">
+              <h1 class="page-head-heading" id="bd-name">Breakdown</h1>
+            </div>
+            <p class="page-head-subtitle" id="bd-meta"></p>
+          </div>
+          <div class="page-head-actions">
+            <span class="bd-overall" id="bd-overall"></span>
+          </div>
+        </div>
+
+        <div class="bd-layout">
+          <div>
+            <h2 class="cb-section-title" id="bd-scores-title">Competency scores</h2>
+            <p class="cb-section-hint">Each score is the average of what every reviewer gave, with their comments underneath.</p>
+            <div id="bd-feedback-state"></div>
+            <div id="bd-scores"></div>
+          </div>
+
+          <aside class="bd-side">
+            <div class="card">
+              <h2 class="cb-section-title">Competency trend</h2>
+              <!-- Derived from the cycles this person actually appears in, so a
+                   first-timer gets an honest empty state rather than a chart
+                   with one bar pretending to be a trend. -->
+              <div id="bd-trend"></div>
+            </div>
+
+            <div class="card">
+              <div class="bd-notes-head">
+                <h2 class="cb-section-title">Notes</h2>
+                <button class="btn btn-secondary btn-xs" type="button" id="bd-add-note">Add note</button>
+              </div>
+              <p class="field-hint">Private to you — not shared with the reviewee.</p>
+              <div id="bd-note-form" hidden>
+                <label class="field" style="margin-top: var(--ic-space-3)">
+                  <span class="field-label">Note</span>
+                  <textarea class="input" id="bd-note-text" rows="3" placeholder="What do you want to remember before the next conversation?"></textarea>
+                </label>
+                <div class="bd-note-actions">
+                  <button class="btn btn-secondary btn-xs" type="button" id="bd-note-cancel">Cancel</button>
+                  <button class="btn btn-primary btn-xs" type="button" id="bd-note-save">Save note</button>
+                </div>
+              </div>
+              <div id="bd-notes"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
       <section class="page-view" data-page="cycle-builder" hidden>
         <div class="page-head">
           <div class="page-head-main">
@@ -7811,12 +7953,176 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         it.addEventListener('click', () => { cycle = it.dataset.cycleId; render(); }));
       $('#tr-admin-view').addEventListener('change', render);
 
-      // The dedicated breakdown screen (competency cards, peer comments, trend,
-      // notes) is the next build; pointing this at the single-assessment modal
-      // would show one review where an aggregate is expected.
+
+      /* ---------- Breakdown ----------
+         One reviewee in one cycle. Derived from the same PEOPLE rows the two
+         tables above read — scores, band labels, reviewer names and the cycle
+         all come from there, so this screen can't contradict the row you
+         clicked to reach it. */
+
+      // Comments are the one thing the tables don't already hold. Rather than
+      // author 5 people × 9 competencies by hand, they're drawn from a pool and
+      // attributed to that person's *actual submitted* reviewers, so nobody is
+      // quoted who hasn't reviewed. The pick is keyed off the names, not
+      // random, so the same person always shows the same comments.
+      const COMMENT_POOL = [
+        'Consistently strong here — a real asset to the team.',
+        'Great collaboration across teams.',
+        'Reliable and thorough; I trust their work.',
+        'Sets a great example for others.',
+        'Noticeably improved this cycle. Keep it up.',
+        'Would like to see this applied outside their immediate team.',
+        'Handles disagreement well and keeps the discussion moving.',
+        'Room to push further — the foundation is clearly there.'
+      ];
+      const hash = str => [...str].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
+
+      const commentsFor = (p, compId) => {
+        // Self-assessments aren't peer feedback, and a pending reviewer has
+        // nothing to quote.
+        const voices = p.rev.filter(r => r.st === 'submitted' && r.rel !== 'Self');
+        if (!voices.length) return [];
+        const seed = hash(p.n + compId);
+        // Mostly commented, occasionally not — a silent competency is a real
+        // state worth showing, but a third of them silent read as missing data.
+        const count = seed % 4 === 0 ? 0 : 1 + (seed % 2);
+        return Array.from({ length: Math.min(count, voices.length) }, (_, i) => {
+          const who = voices[(seed + i) % voices.length];
+          // An individual score sits within a point of the average, and inside
+          // the scale — it's one voice, not the mean.
+          const base = p.s[compId];
+          const off = [(seed + i) % 3] - 1;
+          return { by: who.n, v: Math.max(1, Math.min(SCALE.length, Math.round(base) + off)),
+                   t: COMMENT_POOL[(seed + i * 3) % COMMENT_POOL.length] };
+        });
+      };
+
+      const bandOf = v => SCALE[Math.min(SCALE.length, Math.max(1, Math.round(v))) - 1].label;
+      const NOTES = {};   // per person, this session only
+
+      const renderNotes = (name) => {
+        const list = NOTES[name] || [];
+        document.getElementById('bd-notes').innerHTML = list.length
+          ? list.map(n => `<div class="bd-note"><p class="bd-note-text">${esc(n)}</p></div>`).join('')
+          : '<p class="cb-empty" style="margin-top: var(--ic-space-3)">No notes yet.</p>';
+      };
+
+      const renderTrend = (p) => {
+        // A person's overall in every cycle they appear in, oldest first.
+        const points = Object.keys(CYCLES)
+          .map(k => ({ k, label: CYCLES[k].range.split(' – ')[0], p: PEOPLE[k].find(x => x.n === p.n) }))
+          .filter(x => x.p)
+          .map(x => ({ label: x.label, v: overallOf(x.p) }))
+          .reverse();
+        const wrap = document.getElementById('bd-trend');
+        if (points.length < 2) {
+          wrap.innerHTML = `<p class="cb-empty">${points.length
+            ? 'First cycle on record — no trend to show yet.'
+            : 'Not scored in any cycle yet.'}</p>`;
+          return;
+        }
+        const max = SCALE.length;
+        wrap.innerHTML = `<div class="bd-trend">${points.map(pt => `
+          <div class="bd-trend-col">
+            <span class="bd-trend-value">${pt.v}</span>
+            <div class="bd-trend-bar" style="height: ${Math.round((pt.v / max) * 100)}%; background: ${esc(colorFor(pt.v))}"></div>
+            <span class="bd-trend-label">${esc(pt.label)}</span>
+          </div>`).join('')}</div>`;
+      };
+
+      const openBreakdown = (name) => {
+        const p = PEOPLE[cycle].find(x => x.n === name);
+        if (!p) return;
+        const c = CYCLES[cycle];
+        const o = overallOf(p);
+
+        document.getElementById('bd-name').textContent = p.n;
+        const cycleLabel = document.querySelector('#tr-cycle-picker .input-select-value')?.textContent.trim();
+        document.getElementById('bd-meta').textContent =
+          `${p.r} · ${p.t} · ${cycleLabel || c.range}`;
+        document.getElementById('bd-overall').innerHTML =
+          `${ring(o, 34)}<span class="mv-score" style="background: ${esc(colorFor(o))}">${o}</span>
+           <span class="bd-overall-band">overall · ${esc(bandOf(o))}</span>`;
+
+        // Best first — the same ranking the summary table's "best performing
+        // in" column uses, just not truncated to three.
+        const rows = Object.keys(p.s).filter(id => p.s[id] != null)
+          .sort((a, b) => p.s[b] - p.s[a] || compName(a).localeCompare(compName(b)));
+
+        document.getElementById('bd-scores-title').innerHTML =
+          `Competency scores <span class="count-badge count-badge-secondary">${rows.length}</span>`;
+
+        // Where a person is early in the cycle, "No comments." on all nine rows
+        // reads as broken rather than as early. Said once, with the actual
+        // numbers, it reads as what it is — and it names whose scores these are,
+        // since an average over only a self-assessment is a self-assessment.
+        const voices = p.rev.filter(r => r.st === 'submitted' && r.rel !== 'Self');
+        const selfIn = p.rev.some(r => r.rel === 'Self' && r.st === 'submitted');
+        document.getElementById('bd-feedback-state').innerHTML = voices.length ? '' : `
+          <div class="alert alert-info" role="status" style="margin-top: var(--ic-space-3)">
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message">No peer assessments submitted yet — ${subs(p).length} of ${p.rev.length} reviewers have responded.${
+              selfIn ? ' The scores below are their own self-assessment.' : ''}</p>
+          </div>`;
+
+        document.getElementById('bd-scores').innerHTML = rows.map(id => {
+          const v = p.s[id];
+          const cs = commentsFor(p, id);
+          return `<div class="card bd-comp">
+            <div class="bd-comp-head">
+              ${ring(v, 26)}
+              <span class="mv-score" style="background: ${esc(colorFor(v))}">${v}</span>
+              <span class="bd-comp-name">${esc(compName(id))}</span>
+              <span class="bd-comp-band">${esc(bandOf(v))}</span>
+            </div>
+            ${cs.length ? cs.map(x => `<p class="bd-quote">
+                <span class="bd-quote-by">${esc(x.by)}</span>
+                <span class="mv-score bd-quote-score" style="background: ${esc(colorFor(x.v))}">${x.v}</span>
+                <span class="bd-quote-text">${esc(x.t)}</span>
+              </p>`).join('')
+            // Worth saying explicitly: a score with no comment behind it is a
+            // different thing from a score you simply haven't opened.
+            : '<p class="bd-quote is-empty">No comments.</p>'}
+          </div>`;
+        }).join('');
+
+        renderTrend(p);
+        renderNotes(p.n);
+        document.getElementById('bd-note-form').hidden = true;
+        window.showPrPage?.('breakdown');
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+      window.prOpenBreakdown = openBreakdown;
+
+      // Notes — session-only, enough to show the interaction.
+      document.getElementById('bd-add-note').addEventListener('click', () => {
+        const form = document.getElementById('bd-note-form');
+        form.hidden = false;
+        document.getElementById('bd-note-text').focus();
+      });
+      document.getElementById('bd-note-cancel').addEventListener('click', () => {
+        document.getElementById('bd-note-form').hidden = true;
+        document.getElementById('bd-note-text').value = '';
+      });
+      document.getElementById('bd-note-save').addEventListener('click', () => {
+        const t = document.getElementById('bd-note-text').value.trim();
+        const name = document.getElementById('bd-name').textContent;
+        if (!t) { document.getElementById('bd-note-text').focus(); return; }
+        (NOTES[name] ||= []).push(t);
+        document.getElementById('bd-note-text').value = '';
+        document.getElementById('bd-note-form').hidden = true;
+        renderNotes(name);
+        if (window.toast) toast({ variant: 'success', message: 'Note saved.', timeout: 2400 });
+      });
+      document.getElementById('bd-back').addEventListener('click', e => {
+        e.preventDefault();
+        window.showPrPage?.('team-results');
+        document.querySelector('.tab[aria-controls="tr-overview-panel"]')?.click();
+      });
+
       panel.addEventListener('click', e => {
         const b = e.target.closest('[data-mv-breakdown]');
-        if (b && window.toast) toast({ variant: 'neutral', message: `Breakdown for ${b.dataset.mvBreakdown} — screen not built yet.` });
+        if (b) openBreakdown(b.dataset.mvBreakdown);
       });
 
       render();
