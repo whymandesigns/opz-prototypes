@@ -560,6 +560,35 @@ yet* — the gap is why a manager opens the cell. `ansDone` / `ansOf` were
 separate fields that could disagree with what the modal listed, so both counts
 now derive from the answer list itself.
 
+## Breakdown screen (2026-08-27)
+
+The manager's `View` button toasted "screen not built yet" since the manager
+views landed. It now opens a per-reviewee breakdown for the selected cycle —
+reference: `perf-review-proto-1 /reviews/4/roles/25`. Competency cards
+best-first with the peer comments behind each score, plus a trend chart and
+private notes.
+
+**Derived, not duplicated.** Scores, band labels, reviewer names and the cycle
+all come from the same `PEOPLE` rows the Reviews tables read, so the breakdown
+can't contradict the row that was clicked to reach it. Reachable from both the
+Summarised and Detailed tables.
+
+**Comments** are the one thing those rows don't hold. They're drawn from a pool
+and attributed only to that person's *submitted, non-self* reviewers, keyed off
+a hash of name + competency so a person always shows the same comments. Nobody
+is quoted who hasn't reviewed.
+
+Two states the reference has no equivalent for, both reachable in the seed data:
+
+- **One cycle only** → no trend. Alice appears in a single cycle; one bar
+  pretending to be a trend is worse than saying "First cycle on record".
+- **No peer assessments yet** → one callout, not nine "No comments." rows.
+  Carla is 1 of 5 submitted and that one is her self-assessment, so the callout
+  says so: an average over a lone self-assessment *is* a self-assessment, and
+  the screen shouldn't present it as team feedback.
+
+Notes are session-only — enough to show the interaction, with an empty state.
+
 ## Open questions
 
 1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
