@@ -497,6 +497,27 @@ markup from the Figma build, not driven by `GROUPS`, so it still shows v2.0's
 General / Skills split and won't show a custom group either. Worth wiring if the
 reviewer side should reflect the new grouping.
 
+## Templates are archived, never deleted (2026-08-26)
+
+A running cycle is tied to its template and resolves competencies, questions and
+rating scale through it. Deleting one mid-cycle would leave those assessments
+pointing at nothing, so the templates list offers **Edit** and **Archive** only —
+no Delete.
+
+- Archiving sets a flag. The template leaves the list and the cycle form's
+  picker; the record stays, so an existing cycle's reference still resolves.
+- A template picked for a *draft* cycle and then archived is un-picked, and
+  Launch blocks until another is chosen. A cycle that already launched is
+  untouched.
+- Archived templates are still **inherited from** — archiving stops a template
+  being chosen for new cycles, not being a parent.
+- Archived templates **stay listed**, tagged `archived`, with Restore in the same
+  menu. They were hidden at first; that's what made archiving the Base Template
+  dangerous, since Base feeds every other template and a hidden-but-still-
+  applying Base would have been unreachable to see or edit. Listed and
+  reversible, the exception isn't needed — **every template can be archived,
+  Base included.** (A status filter is the next thing this needs at scale.)
+
 ## Naming (2026-08-24)
 
 | Was | Now | Note |
