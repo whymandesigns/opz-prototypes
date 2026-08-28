@@ -3508,6 +3508,52 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-rev-name { font: var(--type-body-sm); }
     .mv-rev-when { font: var(--type-caption); color: var(--color-text-subtle); }
 
+    /* designmd caps .modal with calc(100vh - var(--ic-space-9)), but the space
+       scale has no --ic-space-9 — the calc is invalid, so the cap is dropped
+       and any modal taller than the viewport grows off the top of the screen
+       (this one does). Capped here; .modal-body already scrolls. Reported
+       rather than fixed in designmd. */
+    .modal { max-height: calc(100vh - var(--ic-space-6)); }
+
+    /* One assessment — Figma node 33986:136076. Who reviewed whom across the
+       top, then a card per competency group: the group and its brief, then a
+       bordered row per competency with the score and what was written. */
+    .mv-as-people { display: flex; align-items: flex-start; gap: var(--ic-space-5); margin-bottom: var(--ic-space-4); }
+    .mv-as-side { flex: 1 1 0; min-width: 0; }
+    .mv-as-side-label { font: var(--type-h4); color: var(--color-text); margin: 0 0 var(--ic-space-2); }
+    .mv-as-person { display: flex; align-items: flex-start; gap: var(--ic-space-4); }
+    .mv-as-person-meta { min-width: 0; }
+    .mv-as-name { display: block; font: var(--type-h4); color: var(--color-text); }
+    .mv-as-role { display: block; font: var(--type-body-sm); color: var(--color-text-muted); }
+    .mv-as-scores { display: flex; flex-direction: column; gap: var(--ic-space-1); margin-top: var(--ic-space-2); }
+    .mv-as-score-row { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
+    .mv-as-score-label { font: var(--type-body-sm); color: var(--color-text-muted); }
+    /* Sits level with the avatars, not with the From / To labels above them. */
+    .mv-as-arrow { flex: none; margin-top: 42px; color: var(--color-text-subtle); }
+    .mv-as-meta { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0 0 var(--ic-space-5); }
+    /* Two people side by side need the width; below that they stack and the
+       arrow turns to keep pointing at the person being reviewed. */
+    @media (max-width: 620px) {
+      .mv-as-people { flex-direction: column; gap: var(--ic-space-4); }
+      .mv-as-arrow { margin: 0 0 0 8px; transform: rotate(90deg); }
+    }
+
+    .mv-as-group { background: var(--color-surface); border-radius: var(--ic-radius-md);
+      border-left: 4px solid var(--color-accent); box-shadow: var(--ic-shadow-md); overflow: hidden;
+      padding: var(--ic-space-4) var(--ic-space-5) var(--ic-space-5); }
+    .mv-as-group + .mv-as-group { margin-top: var(--ic-space-5); }
+    .mv-as-group-name { font: var(--type-h4); color: var(--color-text); margin: 0 0 var(--ic-space-1); }
+    .mv-as-group-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+    .mv-as-rows { display: flex; flex-direction: column; gap: var(--ic-space-4); margin-top: var(--ic-space-4); }
+    .mv-as-row { border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm);
+      padding: var(--ic-space-2) var(--ic-space-4); }
+    .mv-as-comp { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; margin-bottom: var(--ic-space-2); }
+    .mv-as-comp-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); color: var(--color-accent); }
+    .mv-as-quote { display: flex; align-items: flex-start; gap: var(--ic-space-2); }
+    .mv-as-quote .icon { margin-top: 3px; color: var(--color-text-subtle); }
+    .mv-as-quote-text { font: var(--type-body-sm); color: var(--color-text); margin: 0; }
+    .mv-as-quote-text.is-empty { color: var(--color-text-subtle); font-style: italic; }
+
     /* Answers modal — question above its answer, divided per question. */
     .mv-ans-meta { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0 0 var(--ic-space-4); }
     .mv-ans-row { padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
@@ -3546,6 +3592,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-cell-na { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
     .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
+    /* A table cell that navigates. Reads as the row's title, not a button —
+       .btn would put a control where a name belongs. */
+    .cell-title-link { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0;
+      font: var(--type-body-sm); color: var(--color-text);
+      cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-title-link:hover { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+    .cyc-due.is-overdue { color: var(--color-danger); }
+
+    .cell-title-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: var(--ic-radius-sm); }
+
+    /* ===== Cycle detail ===== */
+    .cd-table { table-layout: fixed; min-width: 880px; }
+    /* designmd ships no disabled .btn style, so a disabled button is
+       indistinguishable from a live one. aria-disabled rather than the disabled
+       attribute on purpose: a genuinely disabled button is not focusable, and
+       the whole point of this one is the tooltip saying why it is dead — which
+       keyboard users would never reach. */
+    .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+    .cd-when { font: var(--type-caption); color: var(--color-text-subtle); margin-left: var(--ic-space-2); }
+
     /* ===== Breakdown ===== */
     .bd-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--ic-space-4); align-items: start; }
     /* The side column is commentary on the left one, so below ~1100px it goes
@@ -3555,6 +3621,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     .bd-overall { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
     .bd-overall-band { font: var(--type-body-sm); color: var(--color-text-muted); }
+
+    /* One cycle's worth of answers, in a stack of them. */
+    .bd-goal-cycle { padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .bd-goal-cycle:first-child { padding-top: 0; border-top: 0; }
+    .bd-goal-cycle + .bd-goal-cycle { margin-top: var(--ic-space-4); }
+    .bd-goal-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3); }
+    .bd-goal-cycle-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); margin: 0; }
+    .bd-goal-count { font: var(--type-caption); color: var(--color-text-subtle); flex-shrink: 0; }
+    .bd-goal-cycle .mv-ans-row:first-of-type { padding-top: 0; border-top: 0; }
+
+    /* The panels below carry no top margin of their own (unlike the cycle
+       detail's, which set one inline), so the gap lives on the strip. */
+    #bd-scope { margin-bottom: var(--ic-space-4); }
+
+    /* Competency × cycle. Row headers are text, cells are chips — so the
+       leftmost column reads as a list and the rest as a heat strip. */
+    .bd-mx { table-layout: fixed; min-width: 720px; }
+    .bd-mx th, .bd-mx td { text-align: center; white-space: nowrap; }
+    .bd-mx thead th:first-child,
+    .bd-mx tbody th { text-align: left; font-weight: var(--ic-weight-regular); color: var(--color-text); }
+    .bd-mx tbody th { overflow: hidden; text-overflow: ellipsis; }
+    .bd-mx-overall th, .bd-mx-overall td { background: var(--color-surface-muted); }
+    .bd-mx-overall th { font-weight: var(--ic-weight-semibold); }
+    .bd-mx-group th { font: var(--type-caption); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    /* Two different absences: a dot for "wasn't in that cycle", a dash for "was,
+       but not assessed on this". A blank would say neither. */
+    .bd-mx-gap { color: var(--color-text-subtle); }
+    .bd-mx-change { font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans); }
+    .bd-mx-change.is-up { color: var(--ic-palette-green-600); }
+    .bd-mx-change.is-down { color: var(--color-danger); }
+    .bd-mx-change.is-flat { color: var(--color-text-subtle); }
 
     .bd-comp { margin-top: var(--ic-space-3); }
     .bd-comp-head { display: flex; align-items: center; gap: var(--ic-space-2); }
@@ -3618,6 +3715,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     /* Breathing room under a toolbar before the table it controls. */
     .toolbar { margin-bottom: var(--ic-space-4); }
+    /* .toolbar is display:flex in components.css, which outranks the UA
+       [hidden] rule — same trap as .btn[hidden]. */
+    .toolbar[hidden] { display: none; }
 
     /* Below roughly 1200px even 15% is narrower than the label, so the button
        wraps to two lines rather than overflowing its cell. Ugly-but-legible
@@ -4643,6 +4743,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
 
+      <!-- One reviewer's assessment of one reviewee. Opened from a Peer reviews
+           row, where the row *is* that assessment. -->
+      <div class="modal-overlay" id="mv-assess-modal" hidden>
+        <div class="modal modal-lg">
+          <header class="modal-header">
+            <h2 class="modal-title" id="mv-assess-title">Assessment</h2>
+            <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
+          </header>
+          <div class="modal-body" id="mv-assess-body"></div>
+        </div>
+      </div>
+
       <div class="modal-overlay" id="mv-answers-modal" hidden>
         <div class="modal modal-md">
           <header class="modal-header">
@@ -4937,83 +5049,84 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       <!-- Review cycles — the manager surface (PLAN.md § Manager views). Shell
            for now; the roster table and per-person breakdown are next up. -->
+      <!-- ===== Review cycles — the list =====
+           Just the cycles. Everything that used to be a sibling tab here was a
+           *result* about people, which belongs to one cycle — so it moved into
+           the cycle, reached by clicking its name. See PLAN.md. -->
+      <!-- ===== Review cycles =====
+           Reviewee-first, cycle-scoped. A manager does both jobs here: runs
+           cycles (the Cycles tab) and watches how their people are doing in one
+           (the report tabs). The cycle is a *scope*, not a place — one picker
+           above the tabs, so there is one set of report tables rather than one
+           per cycle page. -->
       <section class="page-view" data-page="team-results" hidden>
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
               <h1 class="page-head-heading">Review cycles</h1>
             </div>
-            <p class="page-head-subtitle">How your team is faring this cycle.</p>
+            <p class="page-head-subtitle">How your reports are doing, cycle by cycle.</p>
           </div>
-          <!-- NB-62: the manager owns launching a cycle, so the CTA lives here
-               rather than on the admin Templates page. Always available — not
-               scoped to the Cycles tab — so a cycle can be launched whenever. -->
           <div class="page-head-actions">
             <button class="btn btn-primary" type="button" id="rc-new">Create cycle</button>
           </div>
         </div>
 
-        <!-- Tabs driven by the shared block's generic .tabs handler, which keys
-             off aria-controls. No custom wiring needed here (unlike the hub,
-             whose tabs are re-rendered by the state machine). -->
         <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-overview-panel" type="button">Reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <!-- Hidden, not deleted: the panel and its table stay in place so this
-               is a one-attribute change to bring back. Reviews covers the same
-               ground with more signal. (`hidden` works here because .tab sets no
-               explicit display — unlike .btn, which needs .btn[hidden].) -->
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reports-panel" type="button" hidden>My reports <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-reviews-panel" type="button">Peer reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-goals-panel" type="button">Individual goals <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <!-- NB-62: cycles live with the manager, who launches them. -->
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-summary-panel" type="button">Report summarised <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-detail-panel" type="button">Report detailed <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="cd-peer-panel" type="button">Peer reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="rc-cycles-panel" type="button">Cycles <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <!-- Parked. The Report tables already carry an Answers column that
+               opens the same content per person, so a whole tab for it repeated
+               the roll-up a row at a time. Panel and renderer stay in place, so
+               bringing it back is removing this `hidden` — and the intended home
+               is a column in the report tables rather than a tab of its own. -->
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-goals-panel" type="button" hidden>Individual goals <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
         </div>
 
-        <!-- Reviews — the manager roll-up (reference: Manager / Review results).
-             Two views over one dataset: Summarised (overall + best/worst) and
-             Detailed (every competency as a column, grouped, with column
-             averages). Ring colours and the legend derive from the shared rating
-             scale, so editing a template's scale re-colours this view too. -->
-        <div id="tr-overview-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
-          <div class="toolbar">
-            <div class="input-select is-auto" id="tr-cycle-picker">
-              <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">Active Regular Review: Aug 1, 2026</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
-              <div class="dropdown-menu" hidden>
-                <button class="dropdown-item" type="button" data-cycle-id="aug26"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Active Regular Review: Aug 1, 2026</button>
-                <button class="dropdown-item" type="button" data-cycle-id="jun26"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Newcomer Review: Jun 20, 2026</button>
-              </div>
-            </div>
-            <label class="checkbox">
-              <input type="checkbox" class="checkbox-input" id="tr-admin-view" />
-              <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
-              <span class="checkbox-label">Enable admin view</span>
-            </label>
-            <div class="toolbar-end">
-              <div class="segmented" id="tr-view-switch">
-                <button class="segmented-item is-active" type="button" data-mv-view="summary">Summarised</button>
-                <button class="segmented-item" type="button" data-mv-view="detail">Detailed</button>
-              </div>
-            </div>
+        <!-- Under the tabs, because it acts on the table below rather than on
+             the page: search narrows the rows, the picker scopes which cycle
+             they come from. Hidden on the Cycles tab — a cycle picker while
+             looking at the list of cycles would be nonsense. The cycle's own
+             facts live in that list's columns rather than being restated here. -->
+        <div class="toolbar" id="rc-toolbar" style="margin-top: var(--ic-space-4)">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
+            <input class="input" type="search" id="rc-search" placeholder="Search a reviewee…" aria-label="Search reviewees" />
           </div>
+          <div class="input-select is-auto" id="rc-cycle-picker">
+            <button class="input-select-trigger" aria-expanded="false" type="button">
+              <span class="input-select-value">Choose a cycle…</span>
+              <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="dropdown-menu" hidden></div>
+          </div>
+          <div class="toolbar-end">
+            <button class="btn btn-secondary" type="button" id="rc-filter"><svg class="btn-icon"><use href="#i-funnel"/></svg>Filter</button>
+          </div>
+        </div>
 
-          <!-- Hidden: the cycle picker above already names the cycle, and its
-               dates aren't what this view is for. Still rendered, so unhiding
-               is a one-attribute change. -->
-          <p class="mv-meta" id="tr-cycle-meta" hidden></p>
-
-          <div class="table-scroll" id="tr-summary-wrap" style="margin-top: var(--ic-space-4)">
+        <div id="tr-summary-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
+          <div class="table-scroll" id="tr-summary-wrap">
             <table class="table table-wide mv-table">
               <colgroup>
                 <col style="width: 20%" /><col style="width: 12%" /><col style="width: 21%" /><col style="width: 21%" /><col style="width: 12%" /><col style="width: 6%" /><col style="width: 8%" />
               </colgroup>
               <thead>
-                <tr><th>Reviewee</th><th>Overall</th><th>Best performing in</th><th>Worst performing in</th><th>Reviews</th><th>Answers</th><th style="text-align: right">Actions</th></tr>
+                <tr><th>Reviewee</th><th>Overall</th><th>Best performing in</th><th>Worst performing in</th><th>Reviews</th><th>Goals</th><th style="text-align: right">Actions</th></tr>
               </thead>
               <tbody></tbody>
             </table>
           </div>
+          <!-- Below the table, not above: it's a key for reading the swatches,
+               so it's referred to while looking at them. Both report tabs get
+               one, filled from the same SCALE — one source, two mounts. -->
+          <div class="mv-legend" data-legend></div>
+        </div>
 
-          <div class="table-scroll" id="tr-detail-wrap" style="margin-top: var(--ic-space-4)" hidden>
+        <div id="tr-detail-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
+          <div class="table-scroll" id="tr-detail-wrap">
             <table class="table table-wide mv-detail-table">
               <thead>
                 <tr id="tr-detail-heads"></tr>
@@ -5023,229 +5136,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <tfoot><tr id="tr-detail-foot"></tr></tfoot>
             </table>
           </div>
-
-          <!-- Below the tables, not above: it's a key for reading the swatches,
-               so it's referred to while looking at them rather than before. One
-               legend for both views, since Summarised and Detailed share the
-               scale — hence it sits outside either wrap. -->
-          <div class="mv-legend" id="tr-legend"></div>
+          <div class="mv-legend" data-legend></div>
         </div>
 
-        <div id="tr-reports-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
-          <div class="toolbar" id="tr-reports-toolbar">
-            <div class="input-icon input-icon-left toolbar-search">
-              <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
-              <input class="input" type="search" id="tr-reports-search" placeholder="Search by reviewer or reviewee" />
-            </div>
-            <div class="toolbar-end">
-              <div class="input-select is-auto" id="tr-cycle-select">
-                <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value">All cycles</span><svg class="btn-icon"><use href="#i-chevron-down"/></svg></button>
-                <div class="dropdown-menu dropdown-menu-end" hidden>
-                  <button class="dropdown-item" type="button" data-cycle="all"><svg class="dropdown-item-check"><use href="#i-check"/></svg>All cycles</button>
-                  <button class="dropdown-item" type="button" data-cycle="Q1 2026"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q1 2026</button>
-                  <button class="dropdown-item" type="button" data-cycle="Q4 2025"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q4 2025</button>
-                  <button class="dropdown-item" type="button" data-cycle="Q3 2025"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Q3 2025</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="table-scroll reports-panel">
-            <table class="table table-wide assessments-table">
-              <colgroup>
-                <col class="col-person" /><col class="col-person" /><col class="col-status" />
-                <col class="col-relationship" /><col class="col-due" /><col class="col-cycle" /><col class="col-actions" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>From</th>
-                  <th>About</th>
-                  <th>Status</th>
-                  <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
-                  <th>Due by</th>
-                  <th>Review Cycle</th>
-                  <th style="text-align: right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">SK</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Sara Kahlau</span>
-                        <span class="cell-user-role">Senior Director, Innovation &amp; Experience consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">TU</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">TJ Urglavitch</span>
-                        <span class="cell-user-role">Senior Manager of Cloud Services</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1 2026</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View</button></span></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">KR</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Katherine Rozakis</span>
-                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">DA</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Dilan Appathurai</span>
-                        <span class="cell-user-role">Director, Quality Assurance</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-warning">Pending</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q1 2026</td>
-                  <td><div class="cell-actions"><span class="tt-wrap" data-tooltip="Not completed yet — nothing to view" data-placement="left"><button class="btn btn-secondary btn-xs" type="button" disabled>View</button></span></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">EF</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Ezekiel Flores</span>
-                        <span class="cell-user-role">Product Design Lead</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">MK</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Matt Kelch</span>
-                        <span class="cell-user-role">Engineering Manager</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q4 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">KR</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Katherine Rozakis</span>
-                        <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="cell-user">
-                      <span class="cell-avatar">DA</span>
-                      <div class="cell-user-meta">
-                        <span class="cell-user-name">Dilan Appathurai</span>
-                        <span class="cell-user-role">Director, Quality Assurance</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="tag tag-indicator tag-positive">Completed</span></td>
-                  <td><span class="tag tag-light">Peer Feedback</span></td>
-                  <td>Jun 6, 2025</td>
-                  <td>Q3 2025</td>
-                  <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <!-- Peer reviews (Figma node 33498:103163) — every reviewer→reviewee
-             pair in the cycle. The design also carries a filter row (date,
-             reviewer, reviewee, team) and pagination; both left out for now
-             since neither would do anything yet. -->
-        <div class="table-scroll" id="tr-reviews-panel" role="tabpanel" style="margin-top: var(--ic-space-4)">
-          <table class="table table-wide assessments-table tr-reviews-table">
-            <colgroup>
-              <col style="width: 22%" /><col style="width: 22%" /><col style="width: 12%" /><col style="width: 18%" /><col style="width: 18%" /><col style="width: 8%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th><button class="th-sort" type="button">Reviewee</button></th>
-                <th><button class="th-sort" type="button">Reviewer</button></th>
-                <th><button class="th-sort" type="button">Date submitted</button></th>
-                <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
-                <th>Review cycle</th>
-                <th style="text-align: right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><div class="cell-user"><span class="cell-avatar">TU</span><div class="cell-user-meta"><span class="cell-user-name">TJ Urglavitch</span><span class="cell-user-role">Senior Manager of Cloud Services</span></div></div></td>
-                <td><div class="cell-user"><span class="cell-avatar">AS</span><div class="cell-user-meta"><span class="cell-user-name">Anastasia Shevchuk</span><span class="cell-user-role">Product Designer</span></div></div></td>
-                <td>Aug 24, 2026</td>
-                <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
-                <td>H2 2026 — Engineering</td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-              </tr>
-              <tr>
-                <td><div class="cell-user"><span class="cell-avatar">DA</span><div class="cell-user-meta"><span class="cell-user-name">Dilan Appathurai</span><span class="cell-user-role">Director, Quality Assurance</span></div></div></td>
-                <td><div class="cell-user"><span class="cell-avatar">AT</span><div class="cell-user-meta"><span class="cell-user-name">Alexander Traykov</span><span class="cell-user-role">Product Designer</span></div></div></td>
-                <td>Aug 25, 2026</td>
-                <td><span class="rel-tags"><span class="tag tag-light">RACI</span></span></td>
-                <td>H2 2026 — Engineering</td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-              </tr>
-              <tr>
-                <td><div class="cell-user"><span class="cell-avatar">MK</span><div class="cell-user-meta"><span class="cell-user-name">Matt Kelch</span><span class="cell-user-role">Engineering Manager</span></div></div></td>
-                <td><div class="cell-user"><span class="cell-avatar">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lucie Karaskova</span><span class="cell-user-role">Product Designer</span></div></div></td>
-                <td>Aug 21, 2026</td>
-                <td><span class="rel-tags"><span class="tag tag-light">Peer</span><span class="tag tag-light">Org Unit</span></span></td>
-                <td>H2 2026 — Engineering</td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-              </tr>
-              <tr>
-                <td><div class="cell-user"><span class="cell-avatar">SK</span><div class="cell-user-meta"><span class="cell-user-name">Sara Kahlau</span><span class="cell-user-role">Senior Director, Innovation &amp; Experience</span></div></div></td>
-                <td><div class="cell-user"><span class="cell-avatar">LV</span><div class="cell-user-meta"><span class="cell-user-name">Lubos Volkov</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
-                <td>Aug 26, 2026</td>
-                <td><span class="rel-tags"><span class="tag tag-light">RACI Member</span></span></td>
-                <td>H2 2026 — Engineering</td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-              </tr>
-              <tr>
-                <td><div class="cell-user"><span class="cell-avatar">EF</span><div class="cell-user-meta"><span class="cell-user-name">Ezekiel Flores</span><span class="cell-user-role">Product Design Lead</span></div></div></td>
-                <td><div class="cell-user"><span class="cell-avatar">MT</span><div class="cell-user-meta"><span class="cell-user-name">Mateusz Tatara</span><span class="cell-user-role">Product Designer</span></div></div></td>
-                <td>Feb 10, 2026</td>
-                <td><span class="rel-tags"><span class="tag tag-light">Teammate</span></span></td>
-                <td>Q1 2026 — Company-wide</td>
-                <td><div class="cell-actions"><button class="btn btn-secondary btn-xs" type="button" data-modal-open="assessment-modal">View</button></div></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- Peer reviews — every reviewer→reviewee pair in this cycle with its
+             status, so it answers both "who said what" and "who still owes
+             one". Filled by openCycle(). -->
+        <div id="cd-peer-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden></div>
 
-        <!-- Individual goals (Figma node 33540:160274) — the reviewee's own
-             answers to the cycle's Goal Questions, which is where the builder's
-             step-3 "Goal questions" end up. Question + answer share one cell,
-             matching the design. Filters/pagination omitted as above. -->
-        <!-- One row per person, not per answer. A template can ask three or
-             five open questions, so a row-per-answer table repeated every
-             name that many times and — worse, as authored — showed each
-             person a different single question, implying they were each
-             asked something different. The count is the cell; the answers
-           are behind it, in the same modal the Reviews tab uses. -->
         <div class="table-scroll" id="tr-goals-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
           <table class="table table-wide assessments-table tr-goals-table">
             <colgroup>
@@ -5267,169 +5166,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="table-scroll" id="rc-table-wrap">
           <table class="table table-wide">
             <colgroup>
-              <col style="width: 36%" /><col style="width: 19%" /><col style="width: 19%" /><col style="width: 18%" /><col style="width: 8%" />
+              <col style="width: 24%" /><col style="width: 14%" /><col style="width: 16%" /><col style="width: 16%" /><col style="width: 19%" /><col style="width: 11%" />
             </colgroup>
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Status</th>
+                <th>Start</th>
+                <th>Due</th>
                 <th>Created by</th>
-                <th>Date created</th>
                 <th style="text-align: right"><span class="sr-only">Actions</span></th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><span class="cell-title-text" title="H2 2026 — Engineering">H2 2026 — Engineering</span></td>
-                <td><span class="tag tag-indicator tag-positive">Active</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">MV</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Matt Vella">Matt Vella</span>
-                      <span class="cell-user-role">People Ops</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Aug 19, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="cell-title-text" title="H2 2026 — Company-wide">H2 2026 — Company-wide</span></td>
-                <td><span class="tag tag-indicator tag-positive">Active</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">CH</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Camilla Herrere">Camilla Herrere</span>
-                      <span class="cell-user-role">People Ops</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Aug 10, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="cell-title-text" title="Q4 2026 — Company-wide">Q4 2026 — Company-wide</span></td>
-                <td><span class="tag tag-indicator tag-blue">Scheduled</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">MV</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Matt Vella">Matt Vella</span>
-                      <span class="cell-user-role">People Ops</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Aug 24, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="cell-title-text" title="Newcomer Review — Jun 2026">Newcomer Review — Jun 2026</span></td>
-                <td><span class="tag tag-indicator">Closed</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">KR</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Katherine Rozakis">Katherine Rozakis</span>
-                      <span class="cell-user-role">Director, People &amp; Organization Consulting</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Jun 2, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="cell-title-text" title="Q1 2026 — Company-wide">Q1 2026 — Company-wide</span></td>
-                <td><span class="tag tag-indicator">Closed</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">CH</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Camilla Herrere">Camilla Herrere</span>
-                      <span class="cell-user-role">People Ops</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Jan 12, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="cell-title-text" title="H1 2026 — Design">H1 2026 — Design</span></td>
-                <td><span class="tag tag-indicator tag-light">Archived</span></td>
-                <td>
-                  <div class="cell-user">
-                    <span class="cell-avatar">CH</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name" title="Camilla Herrere">Camilla Herrere</span>
-                      <span class="cell-user-role">People Ops</span>
-                    </div>
-                  </div>
-                </td>
-                <td>Feb 2, 2026</td>
-                <td>
-                  <div class="cell-actions">
-                    <div class="dropdown">
-                      <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
-                      <div class="dropdown-menu dropdown-menu-end" hidden>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit</button>
-                        <button class="dropdown-item" type="button"><svg class="dropdown-item-icon"><use href="#i-arrow-counter-clockwise"/></svg>Restore</button>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+            <!-- Rendered from window.PR_CYCLES so this table and the results
+                 picker can't name the same cycle two different ways. -->
+            <tbody></tbody>
           </table>
         </div>
         </div>
@@ -5606,12 +5357,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            Reviews; the page-view is a sibling so it can open from either the
            summarised or detailed table. Everything on it is derived from the
            same PEOPLE data those tables read, so the two can't disagree. -->
+
+      <!-- ===== Cycle detail =====
+           What the Cycles table's name links to. The cycle's own facts, plus
+           progress derived from the assessments recorded against it — the chase
+           view an admin needs mid-cycle, which no other screen offered. -->
+
+
       <section class="page-view" data-page="breakdown" hidden>
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
               <a class="breadcrumb" href="#" id="bd-back">Review cycles</a>
-              <span class="breadcrumb is-current" aria-current="page">Breakdown</span>
+              <span class="breadcrumb is-current" aria-current="page" id="bd-crumb">Breakdown</span>
             </nav>
             <div class="page-head-title">
               <h1 class="page-head-heading" id="bd-name">Breakdown</h1>
@@ -5623,12 +5381,39 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
+        <!-- One cycle or all of them. A cycle is a snapshot and a person is
+             longitudinal, so the same page answers both "how did this cycle go"
+             and "where is this going". A tab strip rather than a segmented
+             control: these are two views of the page, not a setting on one —
+             and as a direct sibling of the head it takes the page-head divider
+             with it (see the NB-66 rule). Panels are switched by the shared
+             .tabs handler via aria-controls. -->
+        <div class="tabs" role="tablist" id="bd-scope">
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="bd-cycle-panel" type="button" data-bd-scope="cycle">This cycle</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="bd-all-panel" type="button" data-bd-scope="all">All cycles</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="bd-goals-panel" type="button" data-bd-scope="goals">Individual goals</button>
+        </div>
+
         <div class="bd-layout">
           <div>
-            <h2 class="cb-section-title" id="bd-scores-title">Competency scores</h2>
-            <p class="cb-section-hint">Each score is the average of what every reviewer gave, with their comments underneath.</p>
-            <div id="bd-feedback-state"></div>
-            <div id="bd-scores"></div>
+            <div id="bd-cycle-panel" role="tabpanel">
+              <h2 class="cb-section-title">Competency scores <span class="count-badge count-badge-secondary" id="bd-scores-count">0</span></h2>
+              <p class="cb-section-hint">Each score is the average of what every reviewer gave, with their comments underneath.</p>
+              <div id="bd-feedback-state"></div>
+              <div id="bd-scores"></div>
+            </div>
+
+            <div id="bd-goals-panel" role="tabpanel" hidden>
+              <h2 class="cb-section-title">Individual goals</h2>
+              <p class="cb-section-hint">What they asked for, cycle by cycle — most recent first, so the current ask leads and the history sits under it.</p>
+              <div id="bd-goals"></div>
+            </div>
+
+            <div id="bd-all-panel" role="tabpanel" hidden>
+              <h2 class="cb-section-title">Competency scores by cycle</h2>
+              <p class="cb-section-hint">Every cycle this person was scored in, oldest first. A dot means they were not in that cycle; a dash means they were, but not assessed on that competency.</p>
+              <div id="bd-matrix"></div>
+            </div>
           </div>
 
           <aside class="bd-side">
@@ -7151,9 +6936,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // with its own skills) — so this grows at runtime rather than being a
       // fixed set. Everything that renders groups reads it.
       const GROUPS = [
-        { id: 'general', name: 'General' },
-        { id: 'hard',    name: 'Hard skills' },
-        { id: 'soft',    name: 'Soft skills' }
+        { id: 'general', name: 'General',
+          d: 'Expectations that apply to everyone, whatever the discipline \u2014 how someone works with others and holds their end.' },
+        { id: 'hard',    name: 'Hard skills',
+          d: 'Craft in the discipline itself: what someone can build, and how well they build it.' },
+        { id: 'soft',    name: 'Soft skills',
+          d: 'How someone raises the work and the people around them \u2014 leadership, judgement and follow-through.' }
       ];
       const LIB = [
         { id: 'adapt',  g: 'general', n: 'Adaptability',              d: 'Adjusts effectively to changing priorities and contexts.' },
@@ -7687,12 +7475,141 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
     })();
 
+    // ===== Cycle model =====
+    // One source for cycles. There were two: the Cycles table named them
+    // "H2 2026 — Engineering" while the results picker called the same things
+    // "Active Regular Review: Aug 1, 2026" — two vocabularies for one object in
+    // one feature, which is a good part of why the section didn't feel joined
+    // up. Both now read from here.
+    //
+    // `data` is the PEOPLE key holding that cycle's assessments. Only the two
+    // cycles the prototype has scored people for carry one; the rest exist as
+    // records, and screens that need assessments say so rather than rendering
+    // an empty table.
+    // start / due are separate fields, not one "window" string: the list sorts
+    // and scans by them independently ("what's due soon?"), and the detail page
+    // composes them back into a range.
+    window.PR_CYCLES = [
+      { id: 'h2eng',  name: 'H2 2026 — Engineering',      status: 'active',    start: 'Aug 1, 2026', due: 'Sep 15, 2026',
+        template: 'eng',    by: 'Matt Vella',        byRole: 'People Ops',                                created: 'Jul 28, 2026', data: 'aug26' },
+      { id: 'h2co',   name: 'H2 2026 — Company-wide',     status: 'active',    start: 'Aug 10, 2026', due: 'Sep 30, 2026',
+        template: 'base',   by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Aug 10, 2026' },
+      { id: 'q4co',   name: 'Q4 2026 — Company-wide',     status: 'scheduled', start: 'Oct 1, 2026', due: 'Nov 15, 2026',
+        template: 'base',   by: 'Matt Vella',        byRole: 'People Ops',                                created: 'Aug 24, 2026' },
+      { id: 'newjun', name: 'Newcomer Review — Jun 2026', status: 'closed',    start: 'Jun 20, 2026', due: 'Jul 31, 2026',
+        template: 'eng',    by: 'Katherine Rozakis', byRole: 'Director, People &amp; Organization Consulting', created: 'Jun 2, 2026',  data: 'jun26' },
+      { id: 'q1co',   name: 'Q1 2026 — Company-wide',     status: 'closed',    start: 'Jan 15, 2026', due: 'Feb 28, 2026',
+        template: 'base',   by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Jan 12, 2026', data: 'q1_26' },
+      { id: 'h22025', name: 'H2 2025 — Company-wide',      status: 'closed',    start: 'Aug 1, 2025',  due: 'Sep 20, 2025',
+        template: 'base',   by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Jul 24, 2025', data: 'h2_25' },
+      { id: 'h12025', name: 'H1 2025 — Company-wide',      status: 'closed',    start: 'Feb 1, 2025',  due: 'Mar 20, 2025',
+        template: 'base',   by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Jan 27, 2025', created_note: '', data: 'h1_25' },
+      { id: 'h1des',  name: 'H1 2026 — Design',           status: 'archived',  start: 'Feb 5, 2026', due: 'Mar 20, 2026',
+        template: 'design', by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Feb 2, 2026' }
+    ];
+    window.PR_CYCLE_STATUS = {
+      scheduled: '<span class="tag tag-indicator tag-blue">Scheduled</span>',
+      active:    '<span class="tag tag-indicator tag-positive">Active</span>',
+      closed:    '<span class="tag tag-indicator">Closed</span>',
+      archived:  '<span class="tag tag-indicator tag-light">Archived</span>'
+    };
+
+    // ===== Cycles table =====
+    (function () {
+      const body = document.querySelector('#rc-table-wrap tbody');
+      if (!body || !window.PR_CYCLES) return;
+      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+      const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
+
+      const render = () => {
+        body.innerHTML = window.PR_CYCLES.map(c => {
+          // Archived cycles keep a Restore rather than an Archive, same as the
+          // templates list — offering to archive something already archived
+          // reads as broken.
+          const toggle = c.status === 'archived'
+            ? `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-arrow-counter-clockwise"/></svg>Restore</button>`
+            : `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>`;
+          return `<tr>
+            <td><button class="cell-title-link" type="button" data-cyc-open="${c.id}" title="${esc(c.name)}">${esc(c.name)}</button></td>
+            <td>${window.PR_CYCLE_STATUS[c.status] || ''}</td>
+            <td>${esc(c.start)}</td>
+            <!-- Due goes red once it's passed and the cycle is still running —
+                 same treatment as an overdue assessment in My assessments. -->
+            <td><span class="cyc-due" data-cyc-due="${c.due}" data-cyc-status="${c.status}">${esc(c.due)}</span></td>
+            <td><div class="cell-user"><span class="cell-avatar">${esc(initials(c.by))}</span><div class="cell-user-meta"><span class="cell-user-name" title="${esc(c.by)}">${esc(c.by)}</span><span class="cell-user-role">${c.byRole}</span></div></div></td>
+            <td><div class="cell-actions"><div class="dropdown">
+              <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item" type="button" data-cyc-open="${c.id}"><svg class="dropdown-item-icon"><use href="#i-eye"/></svg>View cycle</button>
+                ${toggle}
+              </div>
+            </div></div></td>
+          </tr>`;
+        }).join('');
+
+        // Kebabs are re-created on every render, so open/close is wired here
+        // rather than relying on the shared load-time .dropdown handler.
+        body.querySelectorAll('.dropdown').forEach(d => {
+          const trigger = d.querySelector('.dropdown-trigger'), menu = d.querySelector('.dropdown-menu');
+          trigger.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = trigger.getAttribute('aria-expanded') === 'true';
+            body.querySelectorAll('.dropdown-menu').forEach(m => m.hidden = true);
+            body.querySelectorAll('.dropdown-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
+            trigger.setAttribute('aria-expanded', String(!open));
+            menu.hidden = open;
+          });
+        });
+
+        // No tab to count into any more — Review cycles is the cycles list.
+        markOverdue();
+      };
+      // Computed, not written in: an active cycle past its due date is a real
+      // state an admin needs to see, and a hardcoded flag would rot.
+      const markOverdue = () => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        body.querySelectorAll('[data-cyc-due]').forEach(el => {
+          const due = new Date(el.dataset.cycDue + ' 00:00:00');
+          const late = el.dataset.cycStatus === 'active' && due < today;
+          el.classList.toggle('is-overdue', late);
+          if (late) {
+            const days = Math.round((today - due) / 86400000);
+            el.dataset.tooltip = `Overdue by ${days} ${days === 1 ? 'day' : 'days'}`;
+          } else { delete el.dataset.tooltip; }
+        });
+      };
+
+      window.renderCyclesTable = render;
+
+      body.addEventListener('click', e => {
+        const open = e.target.closest('[data-cyc-open]');
+        if (open) { window.prOpenCycle?.(open.dataset.cycOpen); return; }
+        const arch = e.target.closest('[data-cyc-arch]');
+        if (!arch) return;
+        const c = window.PR_CYCLES.find(x => x.id === arch.dataset.cycArch);
+        if (!c) return;
+        const was = c.status;
+        c.status = was === 'archived' ? (c.data ? 'closed' : 'scheduled') : 'archived';
+        render();
+        if (window.toast) {
+          const t = toast({ variant: 'neutral', behavior: 'action',
+            message: `“${c.name}” ${was === 'archived' ? 'restored' : 'archived'}`,
+            action: { label: 'Undo', onClick: () => { c.status = was; render(); } } });
+          setTimeout(() => t.dismiss(), 8000);
+        }
+      });
+
+      render();
+    })();
+
     // ===== Manager overview (reference: Manager / Review results) =====
     // One score matrix per person drives BOTH views — overall, best/worst and
     // the detailed grid are all derived from it, so Summarised and Detailed
     // can't disagree. Figures are the reference's own.
     (function () {
-      const panel = document.getElementById('tr-overview-panel');
+      // Bound to the whole Review cycles view: the report tables, the peer
+      // table and the cycles list all live in it.
+      const panel = document.querySelector('.page-view[data-page="team-results"]');
       if (!panel || !window.PR_TPL) return;
       const $ = sel => panel.querySelector(sel);
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -7702,10 +7619,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const SCALE = window.PR_TPL.scales['sc-5pt'].rows;
       const colorFor = v => SCALE[Math.min(SCALE.length, Math.max(1, Math.round(v))) - 1].color;
 
-      const CYCLES = {
-        aug26: { range: 'Aug 1, 2026 – Sep 15, 2026', status: 'active' },
-        jun26: { range: 'Jun 20, 2026 – Jul 31, 2026', status: 'closed' }
-      };
+      // Keyed by the shared model's `data` field, so a cycle has one name, one
+      // window and one status wherever it appears. Only cycles with recorded
+      // assessments are here — the picker can't scope results to a cycle that
+      // has none.
+      const CYCLES = Object.fromEntries((window.PR_CYCLES || [])
+        .filter(c => c.data)
+        .map(c => [c.data, { name: c.name, range: `${c.start} – ${c.due}`, status: c.status }]));
       // Columns are derived from the shared library rather than frozen here, so
       // the matrix carries whatever grouping the template builder is using —
       // including groups an admin adds. Only competencies somebody was actually
@@ -7757,6 +7677,35 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         ]
       };
 
+      /* ---------- Historical cycles ----------
+         A trend needs depth, and hand-authoring five cycles of scores for five
+         people is five chances for them to contradict each other. Older cycles
+         are derived from the current one with a downward delta — so everyone
+         reads as having improved — and every review in a closed cycle is in.
+         Deltas are per person as well as per cycle, so the lines aren't
+         parallel: some people climb faster than others. */
+      const HISTORY = [
+        { key: 'h1_25', delta: -1.3, when: 'Mar 2025' },
+        { key: 'h2_25', delta: -0.9, when: 'Sep 2025' },
+        { key: 'q1_26', delta: -0.4, when: 'Feb 2026' }
+      ];
+      // Elena joined in 2026, so she has no history — which also keeps the
+      // "only one cycle on record" state reachable rather than theoretical.
+      const JOINED_2026 = ['Elena Park'];
+      HISTORY.forEach(({ key, delta, when }, ci) => {
+        PEOPLE[key] = PEOPLE.aug26.filter(p => !JOINED_2026.includes(p.n)).map((p, pi) => {
+          // A per-person nudge on the delta, so trajectories differ in slope.
+          const d = delta + (pi % 3) * 0.15;
+          const clamp = v => Math.max(1, Math.min(5, Math.round((v + d) * 10) / 10));
+          return {
+            ...p,
+            rev: p.rev.map(r => ({ ...r, st: 'submitted', d: when })),
+            ans: (p.ans || []).map(a => ({ ...a, a: a.a || 'Answered in an earlier cycle.' })),
+            s: Object.fromEntries(Object.entries(p.s).map(([k, v]) => [k, clamp(v)]))
+          };
+        });
+      });
+
       // Counts derive from the reviewer list, so the summary figures and the
       // modal's names can never disagree. Deriving also surfaced a contradiction
       // in the reference data — a row reading "3 / 3 completed" while also
@@ -7773,9 +7722,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         .map(id => [compName(id), p.s[id]])
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-      let cycle = 'aug26', view = 'summary';
+      let cycle = 'aug26';
       const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
-      const rowsNow = () => PEOPLE[cycle].filter(p => $('#tr-admin-view').checked || p.chain);
+      // Everyone in the cycle, narrowed by the search box. Wired for real
+      // rather than left decorative: singling out one person is the thing the
+      // box is for, and a search that does nothing is worse than none.
+      let rcSearch = '';
+      const rowsNow = () => {
+        const q = rcSearch.trim().toLowerCase();
+        return PEOPLE[cycle].filter(p => !q ||
+          p.n.toLowerCase().includes(q) || p.r.toLowerCase().includes(q) || p.t.toLowerCase().includes(q));
+      };
 
       const ring = (score, size) => {
         const pct = Math.max(0, Math.min(100, (score / SCALE.length) * 100));
@@ -7834,7 +7791,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // which is the thing a manager is reading the matrix for.
         $('#tr-detail-heads').innerHTML = '<th rowspan="2">Reviewee</th>' +
           gs.map(g => `<th class="mv-group-head" colspan="${g.items.length + 1}">${esc(g.name)}</th>`).join('') +
-          '<th rowspan="2">Overall</th><th rowspan="2">Reviews</th><th rowspan="2">Answers</th>' +
+          '<th rowspan="2">Overall</th><th rowspan="2">Reviews</th><th rowspan="2">Goals</th>' +
           '<th rowspan="2" style="text-align: right">Actions</th>';
 
         $('#tr-detail-subheads').innerHTML = gs.map(g =>
@@ -7870,18 +7827,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           `<th>${avg(rows.map(overallOf)) ?? '–'}</th><th></th><th></th><th></th>`;
       };
 
+      // Both tables render every time. They live in their own panels now, so
+      // the tab strip owns which is on screen — there's no view state to keep
+      // in step with it.
       const render = () => {
-        const c = CYCLES[cycle], rows = rowsNow(), detail = view === 'detail';
-        $('#tr-cycle-meta').innerHTML = `${esc(c.range)} · <strong>${esc(c.status)}</strong>`;
-        $('#tr-summary-wrap').hidden = detail;
-        $('#tr-detail-wrap').hidden = !detail;
-        detail ? renderDetail(rows) : renderSummary(rows);
-        const badge = document.querySelector('.tab[aria-controls="tr-overview-panel"] [data-tab-count]');
-        if (badge) badge.textContent = rows.length;
+        const rows = rowsNow();
+        renderSummary(rows);
+        renderDetail(rows);
+        // Peer reviews and Individual goals describe the same population, so
+        // the filter above the tabs has to reach them too — a control that
+        // moves two of four tabs is worse than no control. Only once a cycle is
+        // open: this also runs at load, when there's no cycle to describe.
+        const c = currentCycle();
+        if (!c) return;
+        const all = rows.flatMap(p => p.rev.map(r => ({ ...r, of: p.n })));
+        renderPeer(rows, all);
+        renderCycleGoals(rows, c);
+        setCycleTabCounts(rows, all);
       };
 
-      $('#tr-legend').innerHTML = SCALE.map(r =>
+      const LEGEND = SCALE.map(r =>
         `<span class="mv-legend-item"><span class="mv-legend-swatch" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('');
+      document.querySelectorAll('[data-legend]').forEach(el => { el.innerHTML = LEGEND; });
 
       /* ---------- Who has reviewed whom ---------- */
       const REV_GROUPS = [
@@ -7944,14 +7911,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (a) openAnswers(a.dataset.mvAnswers);
       });
 
-      $('#tr-view-switch').querySelectorAll('[data-mv-view]').forEach(b => b.addEventListener('click', () => {
-        view = b.dataset.mvView;
-        $('#tr-view-switch').querySelectorAll('[data-mv-view]').forEach(x => x.classList.toggle('is-active', x === b));
-        render();
-      }));
-      $('#tr-cycle-picker').querySelectorAll('[data-cycle-id]').forEach(it =>
-        it.addEventListener('click', () => { cycle = it.dataset.cycleId; render(); }));
-      $('#tr-admin-view').addEventListener('change', render);
+      // The picker is gone: the cycle you're looking at is the page you're on,
+      // so the scope comes from the URL of the drill-down rather than a control
+      // that could disagree with the heading above it.
 
 
       /* ---------- Breakdown ----------
@@ -7977,25 +7939,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       ];
       const hash = str => [...str].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
 
-      const commentsFor = (p, compId) => {
-        // Self-assessments aren't peer feedback, and a pending reviewer has
-        // nothing to quote.
-        const voices = p.rev.filter(r => r.st === 'submitted' && r.rel !== 'Self');
-        if (!voices.length) return [];
-        const seed = hash(p.n + compId);
-        // Mostly commented, occasionally not — a silent competency is a real
-        // state worth showing, but a third of them silent read as missing data.
-        const count = seed % 4 === 0 ? 0 : 1 + (seed % 2);
-        return Array.from({ length: Math.min(count, voices.length) }, (_, i) => {
-          const who = voices[(seed + i) % voices.length];
-          // An individual score sits within a point of the average, and inside
-          // the scale — it's one voice, not the mean.
-          const base = p.s[compId];
-          const off = [(seed + i) % 3] - 1;
-          return { by: who.n, v: Math.max(1, Math.min(SCALE.length, Math.round(base) + off)),
-                   t: COMMENT_POOL[(seed + i * 3) % COMMENT_POOL.length] };
-        });
+      /* One reviewer's take on one competency. Keyed on reviewee + reviewer +
+         competency, so it is the same wherever it is read — the aggregate
+         breakdown quotes it and the individual assessment lists it, and they
+         cannot disagree about what Dmitri said about Alice's Code Quality. */
+      const takeOf = (p, reviewer, compId) => {
+        if (p.s[compId] == null) return null;
+        const seed = hash(p.n + reviewer + compId);
+        // One voice sits within a point of the average, inside the scale — it's
+        // an opinion, not the mean.
+        const v = Math.max(1, Math.min(SCALE.length, Math.round(p.s[compId]) + ((seed % 3) - 1)));
+        // Mostly commented, occasionally not: a reviewer scoring without
+        // writing anything is a real and common state.
+        const said = seed % 4 !== 0;
+        return { v, t: said ? COMMENT_POOL[seed % COMMENT_POOL.length] : null };
       };
+
+      // Who actually reviewed this person. Self-assessments aren't peer
+      // feedback, and a reviewer who hasn't submitted has said nothing.
+      const voicesFor = p => p.rev.filter(r => r.st === 'submitted' && r.rel !== 'Self');
+
+      const commentsFor = (p, compId) => voicesFor(p)
+        .map(r => ({ by: r.n, ...takeOf(p, r.n, compId) }))
+        .filter(x => x.t);
 
       const bandOf = v => SCALE[Math.min(SCALE.length, Math.max(1, Math.round(v))) - 1].label;
       const NOTES = {};   // per person, this session only
@@ -8030,6 +7996,247 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>`).join('')}</div>`;
       };
 
+
+      /* ---------- Competency × cycle ----------
+         The cross-cycle view: rows are competencies, columns are the cycles this
+         person appears in. The Detailed matrix transposed — that one is people ×
+         competencies for one cycle, this is competencies × cycles for one
+         person. */
+      let bdScope = 'cycle';
+
+      // Cycles this person was scored in, oldest first. Sorted on the parsed
+      // start date rather than the order of the model, which is authored
+      // newest-first and would put a trend backwards.
+      const cyclesFor = (name) => (window.PR_CYCLES || [])
+        .filter(c => c.data && PEOPLE[c.data]?.some(p => p.n === name))
+        .map(c => ({ c, p: PEOPLE[c.data].find(p => p.n === name), t: Date.parse(c.start) }))
+        .sort((a, b) => a.t - b.t);
+
+      // A cycle scores against its template's scale. Comparing 4/5 with 2/3 is
+      // meaningless, so a mixed-scale history loses the Change column and says
+      // why rather than showing a number that reads like progress.
+      const scaleOf = (c) => window.PR_TPL?.list.find(t => t.id === c.template)?.scaleId;
+
+      const renderMatrix = (name) => {
+        const cols = cyclesFor(name);
+        const wrap = document.getElementById('bd-matrix');
+        if (cols.length < 2) {
+          wrap.innerHTML = `<p class="cb-empty" style="margin-top: var(--ic-space-3)">${
+            cols.length ? 'Only one cycle on record — there is nothing to compare yet.' : 'Not scored in any cycle yet.'}</p>`;
+          return;
+        }
+        const scales = [...new Set(cols.map(x => scaleOf(x.c)))];
+        const mixed = scales.length > 1;
+
+        // Every competency the person has ever been scored on, grouped the way
+        // the library groups them. A cycle's template may not include all of
+        // them, which is why gaps are a first-class state below.
+        const ids = [...new Set(cols.flatMap(x => Object.keys(x.p.s)))];
+        const groups = (window.PR_TPL?.groups ?? []).map(g => ({
+          name: g.name, items: ids.filter(id => window.PR_TPL.comp(id)?.g === g.id)
+        })).filter(g => g.items.length);
+
+        const short = c => c.due.replace(/^(\w{3}) \d+, /, '$1 ');
+        const cell = (x, id) => {
+          if (!x.p) return '<td><span class="bd-mx-gap" title="Not in this cycle">·</span></td>';
+          const v = x.p.s[id];
+          if (v == null) return '<td><span class="mv-cell mv-cell-na" title="In this cycle, but not assessed on this competency">–</span></td>';
+          return `<td><span class="mv-cell" style="background: ${esc(colorFor(v))}">${v}</span></td>`;
+        };
+        const change = (id) => {
+          if (mixed) return '<td><span class="bd-mx-gap">·</span></td>';
+          const seen = cols.filter(x => x.p.s[id] != null);
+          if (seen.length < 2) return '<td><span class="bd-mx-gap" title="Needs two cycles to compare">·</span></td>';
+          const d = Math.round((seen[seen.length - 1].p.s[id] - seen[0].p.s[id]) * 10) / 10;
+          const cls = d > 0 ? 'is-up' : d < 0 ? 'is-down' : 'is-flat';
+          return `<td><span class="bd-mx-change ${cls}">${d > 0 ? '+' : ''}${d || '0'}</span></td>`;
+        };
+
+        const overallRow = `<tr class="bd-mx-overall">
+          <th scope="row">Overall</th>
+          ${cols.map(x => `<td><span class="mv-cell" style="background: ${esc(colorFor(overallOf(x.p)))}">${overallOf(x.p)}</span></td>`).join('')}
+          ${(() => {
+            if (mixed) return '<td><span class="bd-mx-gap">·</span></td>';
+            const d = Math.round((overallOf(cols[cols.length - 1].p) - overallOf(cols[0].p)) * 10) / 10;
+            const cls = d > 0 ? 'is-up' : d < 0 ? 'is-down' : 'is-flat';
+            return `<td><span class="bd-mx-change ${cls}">${d > 0 ? '+' : ''}${d || '0'}</span></td>`;
+          })()}
+        </tr>`;
+
+        wrap.innerHTML = `
+          ${mixed ? `<div class="alert alert-warning" role="status" style="margin: var(--ic-space-3) 0">
+            <svg class="icon alert-icon"><use href="#i-warning"/></svg>
+            <p class="alert-message">These cycles don't share a rating scale, so scores aren't comparable across them and the change column is left blank.</p>
+          </div>` : ''}
+          <div class="table-scroll" style="margin-top: var(--ic-space-3)">
+            <table class="table table-wide bd-mx">
+              <thead>
+                <tr>
+                  <th>Competency</th>
+                  ${cols.map(x => `<th title="${esc(x.c.name)}">${esc(short(x.c))}</th>`).join('')}
+                  <th>Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${overallRow}
+                ${groups.map(g => `
+                  <tr class="bd-mx-group"><th scope="row" colspan="${cols.length + 2}">${esc(g.name)}</th></tr>
+                  ${g.items.map(id => `<tr>
+                    <th scope="row">${esc(compName(id))}</th>
+                    ${cols.map(x => cell(x, id)).join('')}
+                    ${change(id)}
+                  </tr>`).join('')}`).join('')}
+              </tbody>
+            </table>
+          </div>`;
+      };
+
+      /* ---------- One assessment ----------
+         What a single reviewer scored and said. Read from the same takeOf() the
+         aggregate breakdown quotes, so the two always agree. */
+      const openAssessment = (revieweeName, reviewerName) => {
+        const p = PEOPLE[cycle]?.find(x => x.n === revieweeName);
+        const rev = p?.rev.find(r => r.n === reviewerName);
+        if (!p || !rev) return;
+
+        const takes = Object.keys(p.s)
+          .map(id => ({ id, ...takeOf(p, reviewerName, id) }))
+          .filter(x => x.v != null);
+        const c = currentCycle();
+        // A self-assessment is reviewer == reviewee; mirroring the same face on
+        // both sides of the arrow reads like a bug, so it gets a single block.
+        const isSelf = rev.rel === 'Self' || reviewerName === p.n;
+
+        /* No band label on these two: they are averages, and rounding 4.5 to
+           "Outstanding" invents a verdict the numbers don't support — it also
+           made a 4.7 and a 4.5 wear the same tag. The per-competency rows below
+           do carry a band, because there the score is a whole point. */
+        const scoreRow = (label, v, tag) => `<div class="mv-as-score-row">
+              <span class="mv-as-score-label">${label}</span>
+              <span class="mv-score" style="background: ${esc(colorFor(v))}">${v}</span>
+              ${tag ? `<span class="tag tag-light">${esc(tag)}</span>` : ''}
+            </div>`;
+
+        const side = (label, name, role, scores) => `<div class="mv-as-side">
+            <p class="mv-as-side-label">${esc(label)}</p>
+            <div class="mv-as-person">
+              <span class="avatar avatar-lg">${esc(initials(name))}</span>
+              <div class="mv-as-person-meta">
+                <span class="mv-as-name">${esc(name)}</span>
+                <span class="mv-as-role">${esc(role || '')}</span>
+                <div class="mv-as-scores">${scores}</div>
+              </div>
+            </div>
+          </div>`;
+
+        /* The two numbers worth putting side by side: what this one reviewer
+           landed on, and where everyone else landed. That gap is the reason to
+           open a single assessment rather than the aggregate breakdown. The
+           reviewer's second line is their relationship, not a job title — the
+           capacity they reviewed in is what matters here. */
+        const mine  = takes.length ? avg(takes.map(x => x.v)) : null;
+        const teamV = overallOf(p);
+        const gap   = mine == null ? null : Math.round((mine - teamV) * 10) / 10;
+        const given   = mine == null ? '' : scoreRow('Score given', mine,
+          gap === 0 ? 'in line with the team' : `${gap > 0 ? '+' : '\u2212'}${Math.abs(gap)} vs team`);
+        const overall = scoreRow('Overall score', teamV);
+
+        const people = isSelf
+          ? side('Self-assessment', p.n, p.r, given + overall)
+          : side('From', reviewerName, rev.rel, given)
+            + '<svg class="icon icon-24 mv-as-arrow"><use href="#i-arrow-long-right"/></svg>'
+            + side('To', p.n, p.r, overall);
+
+        // Grouped the way the library groups competencies, so an assessment
+        // reads in the same order as the template that produced it.
+        const groups = (window.PR_TPL?.groups ?? []).map(g => ({
+          name: g.name, desc: g.d,
+          items: takes.filter(x => window.PR_TPL.comp(x.id)?.g === g.id)
+            .sort((a, b) => compName(a.id).localeCompare(compName(b.id)))
+        })).filter(g => g.items.length);
+        // A competency whose group has since been removed still has a score;
+        // it belongs somewhere visible rather than dropped on the floor.
+        const covered = new Set(groups.flatMap(g => g.items.map(x => x.id)));
+        const rest = takes.filter(x => !covered.has(x.id));
+        if (rest.length) groups.push({ name: 'Ungrouped', desc: '', items: rest });
+
+        document.getElementById('mv-assess-title').textContent = 'Assessment';
+        document.getElementById('mv-assess-body').innerHTML = `
+          <div class="mv-as-people">${people}</div>
+          <p class="mv-as-meta">Submitted ${esc(rev.d || '—')}${c ? ` · ${esc(c.name)}` : ''}</p>
+          ${groups.length ? groups.map(g => `<section class="mv-as-group">
+            <h3 class="mv-as-group-name">${esc(g.name)}</h3>
+            ${g.desc ? `<p class="mv-as-group-desc">${esc(g.desc)}</p>` : ''}
+            <div class="mv-as-rows">${g.items.map(x => `<div class="mv-as-row">
+              <div class="mv-as-comp">
+                <span class="mv-as-comp-name">${esc(compName(x.id))}</span>
+                <span class="mv-score" style="background: ${esc(colorFor(x.v))}">${x.v}</span>
+                <span class="tag tag-light">${esc(bandOf(x.v))}</span>
+              </div>
+              ${x.t
+                ? `<div class="mv-as-quote"><svg class="icon icon-16"><use href="#i-quote"/></svg><p class="mv-as-quote-text">${esc(x.t)}</p></div>`
+                : '<p class="mv-as-quote-text is-empty">Scored, no comment left</p>'}
+            </div>`).join('')}</div>
+          </section>`).join('')
+            : '<p class="cb-empty">Submitted without scoring any competency.</p>'}`;
+        document.getElementById('mv-assess-modal').removeAttribute('hidden');
+      };
+
+      /* ---------- Goals over time ----------
+         The same answers the modal shows, but every cycle at once — which is the
+         thing a 1:1 actually needs ("last cycle you said you wanted X").
+         Newest first, deliberately the opposite of the matrix: there you read
+         left-to-right for a trend, here the current ask leads. */
+      const renderGoalsTimeline = (name) => {
+        const cols = cyclesFor(name).reverse();
+        const wrap = document.getElementById('bd-goals');
+        if (!cols.length) {
+          wrap.innerHTML = '<p class="cb-empty">No cycles on record yet.</p>';
+          return;
+        }
+        wrap.innerHTML = cols.map(({ c, p }) => {
+          const list = p.ans || [];
+          const done = list.filter(x => x.a).length;
+          return `<div class="bd-goal-cycle">
+            <div class="bd-goal-head">
+              <h3 class="bd-goal-cycle-name">${esc(c.name)}</h3>
+              <span class="bd-goal-count">${done} of ${list.length} answered</span>
+            </div>
+            ${list.length ? list.map(x => `<div class="mv-ans-row">
+              <p class="mv-ans-q">${esc(x.q)}</p>
+              ${x.a ? `<p class="mv-ans-a">${esc(x.a)}</p>`
+                    : '<p class="mv-ans-a is-empty">Not answered yet</p>'}
+            </div>`).join('') : '<p class="cb-empty">This cycle asked no open questions.</p>'}
+          </div>`;
+        }).join('');
+      };
+
+      // Each panel carries its own heading and hint in the markup, and the
+      // shared .tabs handler shows the right one — so this only has to build the
+      // matrix when its tab is picked.
+      document.getElementById('bd-scope').addEventListener('click', e => {
+        const b = e.target.closest('[data-bd-scope]');
+        if (!b) return;
+        bdScope = b.dataset.bdScope;
+        const who = document.getElementById('bd-name').textContent;
+        if (bdScope === 'all') renderMatrix(who);
+        if (bdScope === 'goals') renderGoalsTimeline(who);
+      });
+
+      // Opening a person resets to their current cycle: the drill-down keeps its
+      // context, and the other tab is right there to widen it.
+      const resetBdScope = () => {
+        bdScope = 'cycle';
+        document.querySelectorAll('#bd-scope .tab').forEach(t => {
+          const on = t.dataset.bdScope === 'cycle';
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-selected', String(on));
+          const p = document.getElementById(t.getAttribute('aria-controls'));
+          if (p) p.hidden = !on;
+        });
+      };
+
+      let bdReturn = null;   // cycle id when the breakdown was opened from one
       const openBreakdown = (name) => {
         const p = PEOPLE[cycle].find(x => x.n === name);
         if (!p) return;
@@ -8037,9 +8244,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const o = overallOf(p);
 
         document.getElementById('bd-name').textContent = p.n;
-        const cycleLabel = document.querySelector('#tr-cycle-picker .input-select-value')?.textContent.trim();
-        document.getElementById('bd-meta').textContent =
-          `${p.r} · ${p.t} · ${cycleLabel || c.range}`;
+        document.getElementById('bd-meta').textContent = `${p.r} · ${p.t} · ${c.name || c.range}`;
         document.getElementById('bd-overall').innerHTML =
           `${ring(o, 34)}<span class="mv-score" style="background: ${esc(colorFor(o))}">${o}</span>
            <span class="bd-overall-band">overall · ${esc(bandOf(o))}</span>`;
@@ -8049,8 +8254,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const rows = Object.keys(p.s).filter(id => p.s[id] != null)
           .sort((a, b) => p.s[b] - p.s[a] || compName(a).localeCompare(compName(b)));
 
-        document.getElementById('bd-scores-title').innerHTML =
-          `Competency scores <span class="count-badge count-badge-secondary">${rows.length}</span>`;
+        document.getElementById('bd-scores-count').textContent = rows.length;
 
         // Where a person is early in the cycle, "No comments." on all nine rows
         // reads as broken rather than as early. Said once, with the actual
@@ -8086,6 +8290,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>`;
         }).join('');
 
+        resetBdScope();
+
         renderTrend(p);
         renderNotes(p.n);
         document.getElementById('bd-note-form').hidden = true;
@@ -8116,16 +8322,216 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
       document.getElementById('bd-back').addEventListener('click', e => {
         e.preventDefault();
+        // One place to go back to now: the cycle-scoped report it was opened
+        // from. The scope never changed, so nothing needs restoring.
         window.showPrPage?.('team-results');
-        document.querySelector('.tab[aria-controls="tr-overview-panel"]')?.click();
       });
+
+
+      /* ---------- Cycle detail ----------
+         Progress is counted off the same rev arrays the Reviews table counts,
+         so the two can't disagree about how far along a cycle is. */
+      const currentCycle = () => (window.PR_CYCLES || []).find(x => x.id === currentCycleId);
+
+      // The picker lists every cycle, not just the ones with assessments: a
+      // scheduled cycle is a legitimate thing to look at, and its panels say
+      // plainly that nothing has been recorded yet.
+      const renderCyclePicker = () => {
+        const menu = document.querySelector('#rc-cycle-picker .dropdown-menu');
+        const val = document.querySelector('#rc-cycle-picker .input-select-value');
+        if (!menu) return;
+        menu.innerHTML = (window.PR_CYCLES || []).map(c =>
+          `<button class="dropdown-item${c.id === currentCycleId ? ' is-selected' : ''}" type="button" data-pick-cycle="${c.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(c.name)}</button>`).join('');
+        const c = currentCycle();
+        val.textContent = c ? c.name : 'Choose a cycle…';
+      };
+
+      const renderPeer = (rows, all) => {
+        const wrap = document.getElementById('cd-peer-panel');
+        if (!wrap || !rows) return;
+        const TAG = { submitted: 'tag-positive', pending: 'tag-light', skipped: 'tag-warning' };
+        const LABEL = { submitted: 'Submitted', pending: 'Outstanding', skipped: 'Skipped' };
+        // Why the View is dead, in the row's own vocabulary — echoing the
+        // Status label beside it rather than a generic "unavailable".
+        const WHY = {
+          pending: 'Outstanding — nothing has been submitted to view yet.',
+          skipped: 'Skipped — this reviewer will not be submitting an assessment.'
+        };
+        // Outstanding first: the reason to open this screen mid-cycle is to see
+        // who still owes a review, not to admire the ones already in.
+        const order = { pending: 0, skipped: 1, submitted: 2 };
+        const sorted = [...all].sort((a, b) => order[a.st] - order[b.st] || a.of.localeCompare(b.of));
+
+        // No heading or hint: the tab is labelled "Peer reviews" with its own
+        // count, and the Status column says which are outstanding.
+        wrap.innerHTML = `
+          <div class="table-scroll">
+            <table class="table table-wide cd-table">
+              <colgroup><col style="width: 22%" /><col style="width: 22%" /><col style="width: 17%" /><col style="width: 22%" /><col style="width: 17%" /></colgroup>
+              <thead><tr><th>Reviewer</th><th>Reviewee</th><th>Relationship</th><th>Status</th><th style="text-align: right"><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody>${sorted.map(r => `<tr>
+                <td>${esc(r.n)}</td>
+                <td>${esc(r.of)}</td>
+                <td><span class="rel-tags"><span class="tag tag-light">${esc(r.rel)}</span></span></td>
+                <td><span class="tag tag-indicator ${TAG[r.st]}">${LABEL[r.st]}</span>${
+                  r.d ? `<span class="cd-when">${esc(r.d)}</span>` : ''}</td>
+                <!-- A row here is one reviewer's assessment of one reviewee, so
+                     that is what it opens — not the reviewee's aggregate, which
+                     is what the report tables' View breakdown is for. A row
+                     nobody has submitted keeps the View so the column stays
+                     scannable, but disabled and carrying the reason: a bare dash
+                     said "nothing here" without saying why.
+                     No data-cd-assess on the disabled one, so the delegated
+                     click handler cannot reach it. -->
+                <td><div class="cell-actions">${r.st === 'submitted'
+                  ? `<button class="btn btn-secondary btn-xs" type="button" data-cd-assess="${esc(r.of)}" data-cd-by="${esc(r.n)}">View</button>`
+                  : `<button class="btn btn-secondary btn-xs" type="button" aria-disabled="true" data-tooltip="${esc(WHY[r.st] || 'Not submitted yet.')}" data-tooltip-style="regular" data-placement="left">View</button>`}</div></td>
+              </tr>`).join('')}</tbody>
+            </table>
+          </div>`;
+      };
+
+      const setCycleTabCounts = (rows, all) => {
+        const set = (id, v) => {
+          const b = document.querySelector(`.tab[aria-controls="${id}"] [data-tab-count]`);
+          if (b) b.textContent = v;
+        };
+        set('tr-summary-panel', rows ? rows.length : 0);
+        set('tr-detail-panel', rows ? rows.length : 0);
+        set('cd-peer-panel', all.length);
+        set('tr-goals-panel', rows ? rows.length : 0);
+      };
+
+      // Individual goals, scoped to this cycle. Was a standalone table of five
+      // designers on cycles nobody else in the prototype appears in; it reads
+      // from the same reviewees now, using the answers they already carry, so
+      // the tab can't describe a different population from the tab beside it.
+      const renderCycleGoals = (rows, c) => {
+        const body = document.querySelector('#tr-goals-panel tbody');
+        if (!body) return;
+        if (!rows) {
+          body.innerHTML = `<tr><td colspan="4"><p class="cb-empty">No answers recorded against this cycle.</p></td></tr>`;
+          return;
+        }
+        body.innerHTML = rows.map(p => {
+          const list = p.ans || [];
+          const done = list.filter(x => x.a).length;
+          return `<tr>
+            <td>${person(p)}</td>
+            <td>${esc(c.due)}</td>
+            <td>${esc(c.name)}</td>
+            <td><button class="mv-reviews-btn" type="button" data-cd-answers="${esc(p.n)}" aria-label="Read ${esc(p.n)}'s answers">${done} / ${list.length} answered</button></td>
+          </tr>`;
+        }).join('');
+      };
+
+      let currentCycleId = null;   // the cycle the report tabs are scoped to
+      const openCycle = (id) => {
+        const c = (window.PR_CYCLES || []).find(x => x.id === id);
+        if (!c) return;
+        currentCycleId = id;
+        // Scope the report to this cycle before anything renders, so the tabs
+        // and the heading can't describe different cycles.
+        if (c.data) cycle = c.data;
+        const tpl = window.PR_TPL?.list.find(t => t.id === c.template);
+
+        const rows = c.data ? PEOPLE[c.data] : null;
+        const all = rows ? rows.flatMap(p => p.rev.map(r => ({ ...r, of: p.n }))) : [];
+        // No stats row any more — the tab counts carry the population, and the
+        // Peer reviews tab's Status column carries submitted / outstanding /
+        // skipped, which is where those numbers came from.
+        // The Report tab is the roll-up now — the standalone "Scores at a
+        // glance" table it used to render here said the same thing twice.
+        const wrap = document.getElementById('cd-peer-panel');
+        if (rows) { render(); return; }
+        if (!rows) {
+          // An empty progress table would imply nobody has responded. Nothing
+          // has been recorded against this cycle at all, which is different.
+          renderCycleGoals(null, c);
+          setCycleTabCounts(null, []);
+          wrap.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-4)">
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message">No assessments are recorded against this cycle in the prototype${
+              c.status === 'scheduled' ? " — it hasn't started yet" : ''}. ${
+              esc(tpl ? tpl.name : 'Its')} template and dates are set; progress appears once it runs.</p>
+          </div>`;
+          return;
+        }
+
+      };
+      // Picking a cycle scopes the report tabs and shows them — it is not a
+      // navigation, so nothing here changes page.
+      window.prSelectCycle = (id, { showReport = true } = {}) => {
+        openCycle(id);
+        renderCyclePicker();
+        if (showReport) {
+          document.querySelector('.tab[aria-controls="tr-summary-panel"]')?.click();
+          document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      };
+      window.prOpenCycle = window.prSelectCycle;
+
+      document.querySelector('#rc-cycle-picker .dropdown-menu').addEventListener('click', e => {
+        const it = e.target.closest('[data-pick-cycle]');
+        if (!it) return;
+        document.querySelector('#rc-cycle-picker .input-select-trigger').setAttribute('aria-expanded', 'false');
+        document.querySelector('#rc-cycle-picker .dropdown-menu').hidden = true;
+        window.prSelectCycle(it.dataset.pickCycle, { showReport: false });
+      });
+
+      // A breakdown reads whichever cycle the results are scoped to, so jumping
+      // from this screen has to move that scope first — otherwise you'd open
+      // June's reviewee against August's scores.
+      // Delegated on the whole view: the View-breakdown CTA appears in both the
+      // report tables and the peer table.
+      panel.addEventListener('click', e => {
+        const a = e.target.closest('[data-cd-answers]');
+        if (a) {
+          const p = PEOPLE[cycle]?.find(x => x.n === a.dataset.cdAnswers);
+          if (p) window.prOpenAnswers?.(p.n, p.ans);
+          return;
+        }
+        const as = e.target.closest('[data-cd-assess]');
+        if (as) { openAssessment(as.dataset.cdAssess, as.dataset.cdBy); return; }
+        const b = e.target.closest('[data-cd-breakdown]');
+        if (!b) return;
+        const c = (window.PR_CYCLES || []).find(x => x.id === currentCycleId);
+        if (c?.data && c.data !== cycle) { cycle = c.data; render(); }
+        bdReturn = currentCycleId;
+        openBreakdown(b.dataset.cdBreakdown);
+      });
+
 
       panel.addEventListener('click', e => {
         const b = e.target.closest('[data-mv-breakdown]');
         if (b) openBreakdown(b.dataset.mvBreakdown);
       });
 
-      render();
+      // Open on the newest cycle that actually has assessments — the report
+      // tabs are the landing view, so they can't start unscoped.
+      const firstWithData = (window.PR_CYCLES || []).find(c => c.data);
+      if (firstWithData) openCycle(firstWithData.id);
+      renderCyclePicker();
+
+      document.getElementById('rc-search').addEventListener('input', e => {
+        rcSearch = e.target.value;
+        render();
+      });
+
+      // The toolbar acts on the report tables, so it goes away on the Cycles
+      // tab — that list has its own shape and no cycle to scope.
+      const syncToolbar = () => {
+        const onCycles = document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.classList.contains('is-active');
+        document.getElementById('rc-toolbar').hidden = !!onCycles;
+      };
+      panel.querySelector(':scope > .tabs')?.addEventListener('click', syncToolbar);
+      syncToolbar();
+
+      // Not defined yet — but a dead control is worse than an honest one.
+      document.getElementById('rc-filter').addEventListener('click', () => {
+        if (window.toast) toast({ variant: 'neutral',
+          message: 'Filters aren\'t defined yet — search narrows by name, role or team in the meantime.' });
+      });
     })();
 
     // Templates list — rendered from the same model the editor writes to, so a
@@ -8232,51 +8638,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       render();
     })();
 
-    // ===== My reports toolbar (Review cycles) — search + cycle filter =====
-    // Both filters apply together, so narrowing by cycle then typing behaves the
-    // way a user expects. The shared .input-select handler already opens/closes
-    // the menu and syncs the trigger label; this only adds the filtering.
-    (function () {
-      const panel  = document.getElementById('tr-reports-panel');
-      const search = document.getElementById('tr-reports-search');
-      const select = document.getElementById('tr-cycle-select');
-      if (!panel || !search || !select) return;
-
-      const rows = [...panel.querySelectorAll('tbody tr')];
-      const badge = document.querySelector('.tab[aria-controls="tr-reports-panel"] [data-tab-count]');
-      let cycle = 'all';
-
-      // Cycle lives in the 6th column; the people are in the first two.
-      const cycleOf  = row => row.children[5]?.textContent.trim() ?? '';
-      const personOf = row => [...row.querySelectorAll('.cell-user-name, .cell-user-role')]
-        .map(el => el.textContent).join(' ').toLowerCase();
-
-      const apply = () => {
-        const q = search.value.trim().toLowerCase();
-        let shown = 0;
-        rows.forEach(row => {
-          const hit = (!q || personOf(row).includes(q)) && (cycle === 'all' || cycleOf(row) === cycle);
-          row.hidden = !hit;
-          if (hit) shown++;
-        });
-        // Badge tracks what's visible, not the underlying total.
-        if (badge) badge.textContent = shown;
-
-        // Filtering to nothing would otherwise leave a bare header.
-        const body = panel.querySelector('tbody');
-        body.querySelector('[data-empty-row]')?.remove();
-        if (!shown) {
-          const cols = panel.querySelectorAll('thead th').length;
-          body.insertAdjacentHTML('beforeend',
-            `<tr data-empty-row><td colspan="${cols}" style="text-align: center; color: var(--color-text-subtle)">No assessments match this search.</td></tr>`);
-        }
-      };
-
-      search.addEventListener('input', apply);
-      select.querySelectorAll('[data-cycle]').forEach(item => {
-        item.addEventListener('click', () => { cycle = item.dataset.cycle; apply(); });
-      });
-    })();
+    // The My reports panel went with the restructure — it was already a hidden
+    // tab superseded by the Report roll-up, and carrying a hidden panel into a
+    // cycle it isn't scoped to would have been worse than removing it.
 
     // Team results tab badges — derived from each panel's row count rather than
     // typed into the markup, so they can't drift out of step with the tables
@@ -8647,7 +9011,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const name = $('#cb-name').value.trim() || 'Cycle';
         const created = STATE.pairs.length;
         window.showPrPage?.('team-results');
-        document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.click();
         if (window.toast) toast({
           variant: 'success',
           message: `“${name}” launched — ${created} assessment${created === 1 ? '' : 's'} created.`
@@ -8673,7 +9036,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       $('#cb-back-link').addEventListener('click', (e) => {
         e.preventDefault();
         window.showPrPage?.('team-results');
-        document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.click();
       });
 
       // Saving a template can rename it or move it in the hierarchy, so the
@@ -8716,69 +9078,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     };
     prRenderDueDates();
 
-    // ===== Individual goals — answers to the cycle's open questions =====
-    // Everyone on a template answers the same set, so the questions are held
-    // once and each person carries only their answers. That also makes the
-    // "not answered yet" gaps real rather than a person being absent a row.
-    (function () {
-      const body = document.querySelector('#tr-goals-panel tbody');
-      if (!body) return;
-      const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
-
-      const QS = [
-        'What are your main goals for the next 12 months?',
-        'What support do you need from your manager?',
-        'Which technical skill do you most want to grow?'
-      ];
-      // Cycle names match the Cycles tab exactly — the column is there to say
-      // which cycle an answer belongs to, which a bare "Q1" couldn't.
-      const PEOPLE = [
-        { n: 'Anastasia Shevchuk', r: 'Product Designer',    d: 'Feb 3, 2026',  cycle: 'Q1 2026 — Company-wide', a: [
-          'Grow into the technical lead role and ship the new billing service end-to-end.',
-          'More regular 1:1s and clearer prioritisation from leadership.',
-          'Deepen my distributed-systems and performance-profiling skills.'] },
-        { n: 'Alexander Traykov',  r: 'Product Designer',    d: 'Feb 5, 2026',  cycle: 'Q1 2026 — Company-wide', a: [
-          'Own the research practice end to end rather than running studies on request.',
-          'Introductions to the teams I keep designing for without ever meeting.',
-          null] },
-        { n: 'Mateusz Tatara',     r: 'Product Designer',    d: 'Jun 24, 2026', cycle: 'Newcomer Review — Jun 2026', a: [
-          'Move from executing specs to shaping them earlier in the process.',
-          null,
-          null] },
-        { n: 'Lubos Volkov',       r: 'Product Design Lead', d: 'Feb 2, 2026',  cycle: 'Q1 2026 — Company-wide', a: [
-          'Take the design system to full adoption across every product surface.',
-          'Budget for a second systems designer — this stops being a one-person job.',
-          'Motion and prototyping, so specs stop losing the interaction detail.'] },
-        { n: 'Lucie Karaskova',    r: 'Product Designer',    d: 'Jun 26, 2026', cycle: 'Newcomer Review — Jun 2026', a: [
-          null, null, null] }
-      ];
-
-      const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
-      const listFor = p => QS.map((q, i) => ({ q, a: p.a[i] || null }));
-
-      body.innerHTML = PEOPLE.map((p, i) => {
-        const list = listFor(p);
-        const done = list.filter(x => x.a).length;
-        return `<tr>
-          <td><div class="cell-user"><span class="cell-avatar">${esc(initials(p.n))}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(p.n)}</span><span class="cell-user-role">${esc(p.r)}</span></div></div></td>
-          <td>${esc(p.d)}</td>
-          <td>${esc(p.cycle)}</td>
-          <td><button class="mv-reviews-btn" type="button" data-goals-answers="${i}" aria-label="Read ${esc(p.n)}'s answers">${done} / ${list.length} answered</button></td>
-        </tr>`;
-      }).join('');
-
-      // The shared tab-badge filler counts rows at load, before this table is
-      // rendered — so it read 0. Set our own once the rows exist.
-      const badge = document.querySelector('.tab[aria-controls="tr-goals-panel"] [data-tab-count]');
-      if (badge) badge.textContent = PEOPLE.length;
-
-      document.getElementById('tr-goals-panel').addEventListener('click', e => {
-        const b = e.target.closest('[data-goals-answers]');
-        if (!b) return;
-        const p = PEOPLE[Number(b.dataset.goalsAnswers)];
-        window.prOpenAnswers?.(p.n, listFor(p));
-      });
-    })();
+    // The Individual goals table is rendered by openCycle() now — it used to be
+    // a standalone list of five designers on cycles nobody else in the prototype
+    // appears in, which meant the tab described a different population from the
+    // tabs beside it.
 
     // ===== My Assessments hub — prototype state machine (?states=1) =====
     // Each STATES entry re-renders #pr-hub-body for one hub state. Add a new

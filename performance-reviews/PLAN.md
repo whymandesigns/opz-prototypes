@@ -589,6 +589,66 @@ Two states the reference has no equivalent for, both reachable in the seed data:
 
 Notes are session-only — enough to show the interaction, with an empty state.
 
+## One assessment (Figma 33986:136076)
+
+A Peer reviews row *is* one reviewer's assessment of one reviewee, so the row
+opens that assessment — not the reviewee's aggregate breakdown, which the report
+tables already reach. Redesigned against the Figma reference; ported with
+designmd parts (`.avatar avatar-lg`, `.tag tag-light`, `#i-quote`,
+`#i-arrow-long-right`, `modal-lg` = the reference's 800px) rather than new
+equivalents.
+
+**The dead row action.** An unsubmitted row keeps a **View**, disabled, with a
+tooltip naming the reason in the Status column's own words ("Outstanding —
+nothing has been submitted to view yet." / "Skipped — this reviewer will not be
+submitting an assessment."). A bare `—` said *nothing here* without saying *why*,
+and cost the column its scannability. It carries `aria-disabled` rather than the
+`disabled` attribute on purpose: a genuinely disabled button is not focusable, so
+the tooltip — the only thing explaining the state — would never reach a keyboard
+user. It has no `data-cd-assess`, so the delegated click handler cannot reach it.
+designmd ships no disabled `.btn` style at all, so the 0.5 opacity is local.
+
+**From → To.** The reference puts identity in the body, not the title, so the
+title is just "Assessment". The reviewer's second line is their **relationship**
+(Manager / Peer / Teammate), not a job title: the capacity they reviewed in is
+what matters here, and it's the one descriptor always present — most reviewers
+are not themselves reviewees in the cycle, so their title is unknown data.
+
+**The two numbers.** The reference gives each side an "Overall Score" slot. Used
+for the comparison that justifies opening a single assessment: *Score given*
+(this reviewer's average) on the From side, *Overall score* (everyone's) on the
+To side, with the gap as the From side's tag (`+0.2 vs team`, or "in line with
+the team").
+
+No band label on those two — they're **averages**, and rounding 4.5 to
+"Outstanding" invents a verdict the numbers don't support; it also made 4.7 and
+4.5 wear the same tag. The per-competency rows *do* carry a band, because there
+the score is a whole point and the band is exact.
+
+**Self-assessments** get one block labelled "Self-assessment" carrying both
+numbers, instead of the same face mirrored across the arrow — that reads like a
+bug. (The Peer reviews tab still lists Self rows, because it doubles as the
+progress view. The content is right; the label is the loose part.)
+
+**Groups.** `GROUPS` gained a `d` description, which the reference shows under
+each group name. Runtime-added groups have none and render without one rather
+than with placeholder text. A score whose group has since been removed lands in
+an "Ungrouped" card rather than being dropped silently.
+
+**Same source as the breakdown.** Every score and quote comes from the shared
+`takeOf(reviewee, reviewer, competency)`, so the aggregate breakdown's quotes and
+this modal cannot disagree about what a reviewer said. Verified: every quote
+attributed to a reviewer in the breakdown appears identically here.
+
+### designmd bug found, not fixed here
+
+`.modal` caps its height with `calc(100vh - var(--ic-space-9))`, but the space
+scale has **no `--ic-space-9`** (it runs 0–8, then 10, 12, 16). The calc is
+invalid, so the cap is dropped and *any* modal taller than the viewport grows off
+the top of the screen — this one did, at 1308px. Capped locally with
+`--ic-space-6`; `.modal-body` already scrolls. Affects every modal in the system,
+not just this prototype.
+
 ## Open questions
 
 1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
