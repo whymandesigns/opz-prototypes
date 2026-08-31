@@ -3485,7 +3485,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        than squeezing columns to illegibility. */
     .mv-table { min-width: 1040px; }
     .mv-table tbody td { white-space: normal; vertical-align: top; }
-    .mv-overall { display: flex; align-items: center; gap: var(--ic-space-2); }
+    /* The overall score sits inside its own ring rather than in a pill beside
+       it — one object instead of two saying the same number. Dark text, not the
+       band colour: the ring already carries that, and it keeps the number
+       legible against the paler bands. */
+    .mv-overall { position: relative; display: inline-flex; }
+    .mv-ring-value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans); color: var(--color-text); }
     .mv-score { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 22px; padding: 0 var(--ic-space-2); border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans); color: var(--ic-palette-white); }
     /* Name + score share one inline box: as separate flex children the score
        was pushed to its own line whenever a long name wrapped. */
@@ -3507,6 +3513,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-rev-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .mv-rev-name { font: var(--type-body-sm); }
     .mv-rev-when { font: var(--type-caption); color: var(--color-text-subtle); }
+
+    /* A template's questions, grouped the way the editor authors them so the
+       two describe the same thing in the same words. */
+    .tpl-q-group + .tpl-q-group { margin-top: var(--ic-space-5); }
+    .tpl-q-kind { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); margin: 0 0 var(--ic-space-2); }
+    .tpl-q-kind .field-hint { font-weight: var(--ic-weight-regular); }
+    .tpl-q-row { display: flex; align-items: flex-start; gap: var(--ic-space-3);
+      padding: var(--ic-space-3) 0; border-top: 1px solid var(--color-border); }
+    .tpl-q-row:first-of-type { border-top: 0; }
+    .tpl-q-text { font: var(--type-body-sm); color: var(--color-text); margin: 0; flex: 1; min-width: 0; }
+    .tpl-q-row .rel-tags { flex: none; }
+    .tpl-q-empty { font: var(--type-body-sm); color: var(--color-text-subtle); font-style: italic; margin: 0; }
+    /* Zero isn't a link — there is nothing to open — but it says why on hover
+       rather than sitting there looking broken. */
+    .tpl-q-none { font: var(--type-body-sm); color: var(--color-text-subtle); }
 
     /* designmd caps .modal with calc(100vh - var(--ic-space-9)), but the space
        scale has no --ic-space-9 — the calc is invalid, so the cap is dropped
@@ -3587,8 +3608,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-detail-table thead th:first-child,
     .mv-detail-table tbody td:first-child { text-align: left; }
     .mv-comp-head { font-size: var(--ic-text-xxs); }
-    /* Circular chips so a row scans as a heat strip. */
-    .mv-cell { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans); color: var(--ic-palette-white); }
+    /* Score cells match the Overall column: the number inside its own ring, so
+       one score reads the same way wherever it appears. The arc still carries
+       the band colour, so a row still scans as a heat strip — in outline rather
+       than solid fill. */
+    .mv-cell { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+      border-radius: var(--ic-radius-full); font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
+      color: var(--color-text); }
+    .mv-cell-score { position: relative; }
+    .mv-cell-score .mv-ring-value { font: inherit; }
+    /* A gap has no proportion to draw, so it stays a flat disc — absence should
+       not look like a measurement. */
     .mv-cell-na { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
     .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
@@ -3608,8 +3638,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        indistinguishable from a live one. aria-disabled rather than the disabled
        attribute on purpose: a genuinely disabled button is not focusable, and
        the whole point of this one is the tooltip saying why it is dead — which
-       keyboard users would never reach. */
-    .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+       keyboard users would never reach.
+
+       Muted with explicit colours rather than `opacity: 0.5`, which broke the
+       tooltip two ways at once: group opacity multiplies into ::after, so the
+       tooltip rendered at half strength, and any opacity below 1 creates a
+       stacking context, which trapped the tooltip's z-index inside the button
+       and let later-painting rows cover it. */
+    .btn[aria-disabled="true"] {
+      cursor: not-allowed;
+      background: var(--color-surface);
+      border-color: var(--color-border);
+      color: var(--color-text-subtle);
+    }
+    /* No hover feedback on something that cannot be pressed — the tooltip is
+       the only thing hovering it should produce. */
+    .btn[aria-disabled="true"]:hover { background: var(--color-surface); }
     .cd-when { font: var(--type-caption); color: var(--color-text-subtle); margin-left: var(--ic-space-2); }
 
     /* ===== Breakdown ===== */
@@ -3718,6 +3762,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* .toolbar is display:flex in components.css, which outranks the UA
        [hidden] rule — same trap as .btn[hidden]. */
     .toolbar[hidden] { display: none; }
+    /* .alert is display:flex for the same reason, so `hidden` on one painted an
+       empty banner instead of removing it. Fourth component in this file with
+       the trap (.btn, .toolbar, .cb-vis-date, now .alert) — it belongs upstream,
+       not here. */
+    .alert[hidden] { display: none; }
 
     /* Below roughly 1200px even 15% is narrower than the label, so the button
        wraps to two lines rather than overflowing its cell. Ugly-but-legible
@@ -3856,6 +3905,35 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .assess-card-head .assess-card-head-title { margin: 0; }
     .assess-self-comment { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
 
+    /* Peer assessments — Figma node 34655:39160. The left column is designmd's
+       own .cell-user (avatar + name + relationship) rather than a restatement
+       of it; the right column is the band tag above what that person wrote. */
+    /* Measured against its own width, not the viewport's: this card can sit in a
+       ~480px column beside the competency nav, or in a much wider one when the
+       nav is away, and the right answer differs. */
+    .assess-peers { display: flex; flex-direction: column; container-type: inline-size; }
+    .assess-peer { display: flex; align-items: flex-start; gap: var(--ic-space-5); padding: var(--ic-space-1); }
+    .assess-peer + .assess-peer { margin-top: var(--ic-space-2); }
+    /* Fixed so every comment starts on the same line however long the name is. */
+    .assess-peer-who { width: 180px; flex: none; }
+    /* The reference's two columns were drawn against an 800px card. Below ~520px
+       a fixed 180px name column takes 40% of the row and squeezes the comment —
+       the actual content — from two lines to five, so the row stacks instead and
+       the comment gets the full width. */
+    @container (max-width: 520px) {
+      .assess-peer { flex-direction: column; gap: var(--ic-space-2); }
+      .assess-peer-who { width: auto; }
+    }
+    .assess-peer-said { flex: 1; min-width: 0; display: flex; flex-direction: column;
+      align-items: flex-start; gap: var(--ic-space-1); }
+    .assess-peer-comment { font: var(--type-body); color: var(--color-text); margin: 0; }
+    /* The middle band of the 3-point scale, in the same grey-violet the score
+       rings use for it — the reference draws this dot in brand blue, but blue is
+       this system's interactive colour, and green already means Overperforming
+       on the card directly above. Literal for the same reason as the gradient
+       above: the scale's colours live in data, not in tokens. */
+    .tag-dot.is-neutral { background: #9999BB; }
+
     .assess-rubric-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
     .assess-rubric-title { font: var(--type-h4); }
     .assess-rubric-toggle .icon { transition: transform var(--ic-duration-fast) var(--ic-ease); }
@@ -3948,22 +4026,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     .cb-body { max-width: 880px; display: flex; flex-direction: column; gap: var(--ic-space-4); }
 
-    /* Numbered section head — designmd has a .stepper for progress through a
-       flow, but nothing for "section 3 of a form you can see all of", which is
-       what NB-67 turned the wizard into. Local, and small enough to stay so. */
-    .cb-sec-head { display: flex; align-items: flex-start; gap: var(--ic-space-3); margin-bottom: var(--ic-space-4); }
-    .cb-sec-titles { flex: 1; min-width: 0; }
+    /* Section head. The step numbers are gone — the three sections are all on
+       one page and can be filled in any order, so numbering them implied a
+       sequence the form doesn't have. That also removed the flex row they sat
+       in; this is now just the spacing above a section's body, and the hint's
+       own bottom margin is dropped so the two don't stack. */
+    .cb-sec-head { margin-bottom: var(--ic-space-4); }
     .cb-sec-head .cb-section-hint { margin-bottom: 0; }
-    .cb-sec-num {
-      flex-shrink: 0;
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 24px; height: 24px;
-      border-radius: var(--ic-radius-full);
-      background: var(--color-accent-subtle);
-      color: var(--color-accent);
-      font: var(--type-body-sm);
-      font-weight: var(--ic-weight-semibold);
-    }
     .cb-section-title { font: var(--type-h4); margin: 0 0 var(--ic-space-1); }
     .cb-section-hint { font: var(--type-body-sm); color: var(--color-text-subtle); margin: 0 0 var(--ic-space-4); }
     .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ic-space-4); }
@@ -4552,7 +4621,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </colgroup>
               <thead>
                 <tr>
-                  <th><button class="th-sort" type="button">Team Member</button></th>
+                  <th><button class="th-sort" type="button">Member</button></th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
                   <th>Review cycle</th>
                   <th><button class="th-sort" type="button">Date Received</button></th>
@@ -4600,7 +4669,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </table>
           </div>
 
-          <!-- Completed — same table shape as Pending (Team Member /
+          <!-- Completed — same table shape as Pending (Member /
                Relationship / Actions), with "Date Received" renamed to "Date
                Completed" and Actions reduced to just View (no Skip/Assess —
                there's nothing left to act on once an assessment is done).
@@ -4613,7 +4682,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </colgroup>
               <thead>
                 <tr>
-                  <th>Team Member</th>
+                  <th>Member</th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
                   <th>Review cycle</th>
                   <th>Completed by</th>
@@ -4682,7 +4751,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </colgroup>
               <thead>
                 <tr>
-                  <th>Team Member</th>
+                  <th>Member</th>
                   <th><span style="display: inline-flex; align-items: center; gap: 4px">Relationship <svg class="icon icon-16" data-tooltip="Derived from org structure — not chosen by the reviewer" data-placement="top"><use href="#i-info"/></svg></span></th>
                   <th>Review cycle</th>
                   <th>Date Skipped</th>
@@ -4762,6 +4831,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
           </header>
           <div class="modal-body" id="mv-answers-body"></div>
+        </div>
+      </div>
+
+      <!-- A template's free-text questions. Opened from the count in the
+           Templates table, which is a link because the number alone can't say
+           what is being asked. -->
+      <div class="modal-overlay" id="tpl-qs-modal" hidden>
+        <div class="modal modal-md">
+          <header class="modal-header">
+            <h2 class="modal-title" id="tpl-qs-title">Questions</h2>
+            <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
+          </header>
+          <div class="modal-body" id="tpl-qs-body"></div>
         </div>
       </div>
 
@@ -4974,6 +5056,45 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <p class="assess-self-comment">• I can dance salsa better than you.</p>
             </div>
 
+            <!-- Peer assessments — Figma node 34655:39160. What the other
+                 reviewers have already said, so a rating isn't given blind.
+                 Sits above the rating input as the reference places it; see
+                 PLAN.md on the anchoring trade-off that creates. -->
+            <div class="assess-card">
+              <div class="assess-card-head">
+                <span class="assess-card-head-title">Peer assessments</span>
+                <span class="count-badge count-badge-sm count-badge-secondary" id="assess-peers-count">0</span>
+              </div>
+              <div class="assess-peers" id="assess-peers">
+                <div class="assess-peer">
+                  <div class="cell-user assess-peer-who">
+                    <span class="cell-avatar">SO</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name">Svetlana Ovsyannikova</span>
+                      <span class="cell-user-role">RACI Relationship</span>
+                    </div>
+                  </div>
+                  <div class="assess-peer-said">
+                    <span class="tag tag-light"><span class="tag-dot is-neutral"></span>On Track</span>
+                    <p class="assess-peer-comment">Cultivated a feedback-friendly environment by regularly hosting post-project retrospective sessions, encouraging open dialog and process optimization.</p>
+                  </div>
+                </div>
+                <div class="assess-peer">
+                  <div class="cell-user assess-peer-who">
+                    <span class="cell-avatar">MM</span>
+                    <div class="cell-user-meta">
+                      <span class="cell-user-name">Miloš Milikić</span>
+                      <span class="cell-user-role">Org Unit</span>
+                    </div>
+                  </div>
+                  <div class="assess-peer-said">
+                    <span class="tag tag-light"><span class="tag-dot is-neutral"></span>On Track</span>
+                    <p class="assess-peer-comment">Took initiative on ambiguous tasks, guiding them to resolution while mentoring junior team members on navigating complex workplace workflows.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="assess-card">
               <p class="assess-card-head-title">How would you rate Ezekiel?</p>
               <div class="assess-rating-row" style="margin-top: var(--ic-space-3)">
@@ -5028,13 +5149,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="table-scroll" id="rc-tpl-wrap">
             <table class="table table-wide">
               <colgroup>
-                <col style="width: 22%" /><col style="width: 26%" /><col style="width: 40%" /><col style="width: 12%" />
+                <!-- Questions needs enough for its own header word, not just
+                     for a single digit — at 8% the heading read "Quest". -->
+                <col style="width: 19%" /><col style="width: 22%" /><col style="width: 34%" /><col style="width: 13%" /><col style="width: 12%" />
               </colgroup>
               <thead>
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
                   <th>Competencies</th>
+                  <th>Questions</th>
                   <th style="text-align: right">Actions</th>
                 </tr>
               </thead>
@@ -5163,7 +5287,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
 
         <div id="rc-cycles-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
-        <div class="table-scroll" id="rc-table-wrap">
+        <!-- Lives inside the panel rather than beside the report tabs' toolbar:
+             it acts on this table only, so it appears and disappears with the
+             tab instead of needing to be hidden by hand.
+             role="group" with aria-pressed rather than designmd's documented
+             role="tablist" — these two segments switch a filter, not a panel,
+             and there are no tabpanels for a tablist to control. -->
+        <div class="toolbar" id="rc-cyc-toolbar">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
+            <input class="input" type="search" id="rc-cyc-search" placeholder="Search cycles…" aria-label="Search cycles by name, status or creator" />
+          </div>
+          <div class="toolbar-end">
+            <div class="segmented" role="group" aria-label="Whose cycles to show" id="rc-cyc-scope">
+              <button class="segmented-item is-active" type="button" data-cyc-scope="all" aria-pressed="true">All cycles</button>
+              <button class="segmented-item" type="button" data-cyc-scope="mine" aria-pressed="false">Created by me</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Says which control emptied the table, since a bare "no results" on a
+             screen with two filters doesn't tell you which one to undo. -->
+        <p class="cb-empty" id="rc-cyc-empty" style="margin-top: var(--ic-space-4)" hidden></p>
+
+        <div class="table-scroll" id="rc-table-wrap" style="margin-top: var(--ic-space-4)">
           <table class="table table-wide">
             <colgroup>
               <col style="width: 24%" /><col style="width: 14%" /><col style="width: 16%" /><col style="width: 16%" /><col style="width: 19%" /><col style="width: 11%" />
@@ -5206,10 +5353,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <h1 class="page-head-heading" id="te-heading">Template</h1>
             </div>
           </div>
-          <div class="page-head-actions">
-            <button class="btn btn-secondary" type="button" id="te-cancel">Cancel</button>
-            <button class="btn btn-primary" type="button" id="te-save">Save template</button>
-          </div>
+          <!-- Save and Cancel moved to the foot of the form, next to the last
+               field someone fills in, rather than sitting at the top where the
+               form's own length separates them from the work. Matches the cycle
+               builder, whose Launch has always lived there. -->
         </div>
 
         <div class="cb-body">
@@ -5326,6 +5473,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <p class="field-label" style="margin: var(--ic-space-5) 0 var(--ic-space-2)">Goal questions <span class="field-hint">— answered by the reviewee about themselves</span></p>
             <div id="te-goal-qs"></div>
             <button class="btn btn-ghost btn-xs" type="button" data-te-add-q="goal"><svg class="btn-icon"><use href="#i-plus"/></svg>Add question</button>
+          </div>
+
+          <!-- Same .cb-footer the cycle builder uses, so the two authoring
+               screens end the same way. -->
+          <div class="cb-footer">
+            <button class="btn btn-secondary" type="button" id="te-cancel">Cancel</button>
+            <button class="btn btn-primary" type="button" id="te-save">Save template</button>
           </div>
         </div>
       </section>
@@ -5452,29 +5606,36 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
               <a class="breadcrumb" href="#" id="cb-back-link">Review cycles</a>
-              <span class="breadcrumb is-current" aria-current="page">New assessment cycle</span>
+              <span class="breadcrumb is-current" aria-current="page" id="cb-crumb">New assessment cycle</span>
             </nav>
             <div class="page-head-title">
-              <h1 class="page-head-heading">New assessment cycle</h1>
+              <h1 class="page-head-heading" id="cb-heading">New assessment cycle</h1>
             </div>
           </div>
         </div>
 
         <div class="cb-body">
 
+          <!-- Shown only when editing a cycle that has already finished, where
+               "Re-launch" means reopening something with results attached. -->
+          <div class="alert alert-warning" role="status" id="cb-status-note" hidden>
+            <svg class="icon alert-icon"><use href="#i-warning"/></svg>
+            <p class="alert-message" id="cb-status-note-text"></p>
+          </div>
+
           <!-- ---------- 1 · Review template ---------- -->
           <div class="card">
             <div class="cb-sec-head">
-              <span class="cb-sec-num">1</span>
-              <div class="cb-sec-titles">
-                <h2 class="cb-section-title">Cycle setup</h2>
-                <p class="cb-section-hint">Name this cycle and pick the template it runs on — the template decides which competencies reviewers score.</p>
-              </div>
+              <h2 class="cb-section-title">Cycle setup</h2>
+              <p class="cb-section-hint">Name this cycle and pick the template it runs on — the template decides which competencies reviewers score.</p>
             </div>
 
             <label class="field">
               <span class="field-label">Cycle name</span>
-              <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 Performance Review" value="H2 2026 — Engineering" />
+              <!-- Empty on purpose. This used to ship pre-filled with the name
+                   of a cycle that actually exists in the list, which now reads as
+                   though Create cycle were editing it. -->
+              <input class="input" id="cb-name" type="text" placeholder="e.g. H2 2026 Performance Review" value="" />
               <span class="field-hint" id="cb-err-name" hidden></span>
             </label>
 
@@ -5504,11 +5665,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <!-- ---------- 2 · Schedule ---------- -->
           <div class="card">
             <div class="cb-sec-head">
-              <span class="cb-sec-num">2</span>
-              <div class="cb-sec-titles">
-                <h2 class="cb-section-title">Schedule</h2>
-                <p class="cb-section-hint">When the cycle runs, and when the collected feedback becomes visible.</p>
-              </div>
+              <h2 class="cb-section-title">Schedule</h2>
+              <p class="cb-section-hint">When the cycle runs, and when the collected feedback becomes visible.</p>
             </div>
 
             <div class="cb-grid">
@@ -5552,11 +5710,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <!-- ---------- 3 · Participants ---------- -->
           <div class="card">
             <div class="cb-sec-head">
-              <span class="cb-sec-num">3</span>
-              <div class="cb-sec-titles">
-                <h2 class="cb-section-title">Participants</h2>
-                <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
-              </div>
+              <h2 class="cb-section-title">Participants</h2>
+              <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
             </div>
 
             <span class="field-hint" id="cb-err-pairs" style="margin-bottom: var(--ic-space-3)" hidden></span>
@@ -7507,6 +7662,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       { id: 'h1des',  name: 'H1 2026 — Design',           status: 'archived',  start: 'Feb 5, 2026', due: 'Mar 20, 2026',
         template: 'design', by: 'Camilla Herrere',   byRole: 'People Ops',                                created: 'Feb 2, 2026' }
     ];
+    /* Who "me" is, in one place, so "the ones I created" can't drift from
+       whatever else needs to tell mine from everyone's. Matches the MV in the
+       topbar. A real app reads this from the session. */
+    window.PR_ME = 'Matt Vella';
+
     window.PR_CYCLE_STATUS = {
       scheduled: '<span class="tag tag-indicator tag-blue">Scheduled</span>',
       active:    '<span class="tag tag-indicator tag-positive">Active</span>',
@@ -7521,8 +7681,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
       const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
 
+      let cycSearch = '', cycScope = 'all';
+      /* Search covers the three text columns on screen — name, creator and the
+         status word — so what you can read you can search for. Dates are left
+         out: nobody types "Sep 15, 2026" to find a row. */
+      const visibleCycles = () => {
+        const q = cycSearch.trim().toLowerCase();
+        return window.PR_CYCLES.filter(c => {
+          if (cycScope === 'mine' && c.by !== window.PR_ME) return false;
+          return !q || [c.name, c.by, c.status].some(v => String(v).toLowerCase().includes(q));
+        });
+      };
+
       const render = () => {
-        body.innerHTML = window.PR_CYCLES.map(c => {
+        const rows = visibleCycles();
+        /* The badge counts what the table is showing, matching how the report
+           tabs' badges already follow their search. */
+        const badge = document.querySelector('.tab[aria-controls="rc-cycles-panel"] [data-tab-count]');
+        if (badge) badge.textContent = rows.length;
+
+        /* Name the control that emptied the table, not just the emptiness: with
+           a search and a scope both live, "no results" leaves you guessing which
+           one to undo. */
+        const empty = document.getElementById('rc-cyc-empty');
+        const wrap  = document.getElementById('rc-table-wrap');
+        const mine  = cycScope === 'mine';
+        const q     = cycSearch.trim();
+        if (empty && wrap) {
+          empty.hidden = rows.length > 0;
+          wrap.hidden  = rows.length === 0;
+          if (!rows.length) {
+            empty.textContent = q && mine ? `None of the cycles you created match \u201c${q}\u201d.`
+              : q    ? `No cycles match \u201c${q}\u201d.`
+              : mine ? 'You haven\u2019t created any cycles yet.'
+              : 'No cycles yet.';
+          }
+        }
+
+        body.innerHTML = rows.map(c => {
           // Archived cycles keep a Restore rather than an Archive, same as the
           // templates list — offering to archive something already archived
           // reads as broken.
@@ -7530,7 +7726,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             ? `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-arrow-counter-clockwise"/></svg>Restore</button>`
             : `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>`;
           return `<tr>
-            <td><button class="cell-title-link" type="button" data-cyc-open="${c.id}" title="${esc(c.name)}">${esc(c.name)}</button></td>
+            <!-- The name opens the cycle for editing rather than for reading:
+                 the reason to open a running cycle is usually to change
+                 something. The kebab keeps View cycle for the report. -->
+            <td><button class="cell-title-link" type="button" data-cyc-edit="${c.id}" title="Edit ${esc(c.name)}">${esc(c.name)}</button></td>
             <td>${window.PR_CYCLE_STATUS[c.status] || ''}</td>
             <td>${esc(c.start)}</td>
             <!-- Due goes red once it's passed and the cycle is still running —
@@ -7540,6 +7739,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <td><div class="cell-actions"><div class="dropdown">
               <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Cycle actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
               <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item" type="button" data-cyc-edit="${c.id}"><svg class="dropdown-item-icon"><use href="#i-pencil"/></svg>Edit cycle</button>
                 <button class="dropdown-item" type="button" data-cyc-open="${c.id}"><svg class="dropdown-item-icon"><use href="#i-eye"/></svg>View cycle</button>
                 ${toggle}
               </div>
@@ -7561,7 +7761,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           });
         });
 
-        // No tab to count into any more — Review cycles is the cycles list.
         markOverdue();
       };
       // Computed, not written in: an active cycle past its due date is a real
@@ -7581,7 +7780,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       window.renderCyclesTable = render;
 
+      document.getElementById('rc-cyc-search')?.addEventListener('input', e => {
+        cycSearch = e.target.value;
+        render();
+      });
+
+      document.getElementById('rc-cyc-scope')?.addEventListener('click', e => {
+        const btn = e.target.closest('[data-cyc-scope]');
+        if (!btn || btn.dataset.cycScope === cycScope) return;
+        cycScope = btn.dataset.cycScope;
+        btn.parentElement.querySelectorAll('[data-cyc-scope]').forEach(b => {
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+        render();
+      });
+
       body.addEventListener('click', e => {
+        const edit = e.target.closest('[data-cyc-edit]');
+        if (edit) { window.prEditCycle?.(edit.dataset.cycEdit); return; }
         const open = e.target.closest('[data-cyc-open]');
         if (open) { window.prOpenCycle?.(open.dataset.cycOpen); return; }
         const arch = e.target.closest('[data-cyc-arch]');
@@ -7741,6 +7959,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <circle cx="18" cy="18" r="15.9155" pathLength="100" stroke="${esc(colorFor(score))}" stroke-dasharray="${pct} 100"></circle>
         </svg>`;
       };
+      /* One score, one object, everywhere: the number inside its own ring. Used
+         by the detailed matrix, the breakdown's cycle matrix and the summary's
+         Overall column, so a 4 never looks like two different things. */
+      const scoreChip = v =>
+        `<span class="mv-cell mv-cell-score">${ring(v, 30)}<span class="mv-ring-value">${v}</span></span>`;
+      /* A gap has no proportion to draw, so it is a flat disc rather than a
+         ring — an absence should not look like a measurement. */
+      const gapChip = title => `<span class="mv-cell mv-cell-na" title="${esc(title)}">–</span>`;
+
       // One renderer for both views: name, title and team in a single cell.
       const person = p => `<div class="cell-user"><span class="cell-avatar">${esc(initials(p.n))}</span>
         <div class="cell-user-meta"><span class="cell-user-name">${esc(p.n)}</span>
@@ -7770,7 +7997,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const comps = list => list.map(([name, v]) =>
             `<span class="mv-comp">${ring(v, 16)}<span class="mv-comp-text">${esc(name)} <span class="mv-comp-score">${v}</span></span></span>`).join('');
           return `<tr><td>${person(p)}</td>
-            <td><span class="mv-overall">${ring(o, 38)}<span class="mv-score" style="background: ${esc(colorFor(o))}">${o}</span></span></td>
+            <td><span class="mv-overall">${ring(o, 44)}<span class="mv-ring-value">${o}</span></span></td>
             <td>${comps(ranked(p).slice(0, 3))}</td>
             <td>${comps(ranked(p).slice(-3).reverse())}</td>
             <td>${reviewsCell(p)}</td><td>${answersCell(p)}</td><td>${btn(p)}</td></tr>`;
@@ -7779,11 +8006,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       const renderDetail = rows => {
         const gs = groupCols(rows);
-        const chip = (v, cls = '') => v == null
-          // A competency the template never included is an explicit gap, not a
-          // zero — a blank cell would read as a low score.
-          ? `<span class="mv-cell mv-cell-na${cls}" title="Not assessed">–</span>`
-          : `<span class="mv-cell${cls}" style="background: ${esc(colorFor(v))}">${v}</span>`;
+        // A competency the template never included is an explicit gap, not a
+        // zero — a blank cell would read as a low score.
+        const chip = v => v == null ? gapChip('Not assessed') : scoreChip(v);
 
         // Two header rows: groups spanning their own competencies plus that
         // group's average, then the competency names underneath. Thirteen
@@ -8040,8 +8265,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const cell = (x, id) => {
           if (!x.p) return '<td><span class="bd-mx-gap" title="Not in this cycle">·</span></td>';
           const v = x.p.s[id];
-          if (v == null) return '<td><span class="mv-cell mv-cell-na" title="In this cycle, but not assessed on this competency">–</span></td>';
-          return `<td><span class="mv-cell" style="background: ${esc(colorFor(v))}">${v}</span></td>`;
+          if (v == null) return `<td>${gapChip('In this cycle, but not assessed on this competency')}</td>`;
+          return `<td>${scoreChip(v)}</td>`;
         };
         const change = (id) => {
           if (mixed) return '<td><span class="bd-mx-gap">·</span></td>';
@@ -8054,7 +8279,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
         const overallRow = `<tr class="bd-mx-overall">
           <th scope="row">Overall</th>
-          ${cols.map(x => `<td><span class="mv-cell" style="background: ${esc(colorFor(overallOf(x.p)))}">${overallOf(x.p)}</span></td>`).join('')}
+          ${cols.map(x => `<td>${scoreChip(overallOf(x.p))}</td>`).join('')}
           ${(() => {
             if (mixed) return '<td><span class="bd-mx-gap">·</span></td>';
             const d = Math.round((overallOf(cols[cols.length - 1].p) - overallOf(cols[0].p)) * 10) / 10;
@@ -8246,7 +8471,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         document.getElementById('bd-name').textContent = p.n;
         document.getElementById('bd-meta').textContent = `${p.r} · ${p.t} · ${c.name || c.range}`;
         document.getElementById('bd-overall').innerHTML =
-          `${ring(o, 34)}<span class="mv-score" style="background: ${esc(colorFor(o))}">${o}</span>
+          `<span class="mv-overall">${ring(o, 34)}<span class="mv-ring-value">${o}</span></span>
            <span class="bd-overall-band">overall · ${esc(bandOf(o))}</span>`;
 
         // Best first — the same ranking the summary table's "best performing
@@ -8274,8 +8499,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const cs = commentsFor(p, id);
           return `<div class="card bd-comp">
             <div class="bd-comp-head">
-              ${ring(v, 26)}
-              <span class="mv-score" style="background: ${esc(colorFor(v))}">${v}</span>
+              ${scoreChip(v)}
               <span class="bd-comp-name">${esc(compName(id))}</span>
               <span class="bd-comp-band">${esc(bandOf(v))}</span>
             </div>
@@ -8299,6 +8523,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
       };
       window.prOpenBreakdown = openBreakdown;
+      /* The cycle builder reads participants off this rather than keeping a
+         second list of its own, so an edited cycle's roster and the Peer reviews
+         tab cannot disagree about who is in it. */
+      window.PR_PEOPLE = PEOPLE;
 
       // Notes — session-only, enough to show the interaction.
       document.getElementById('bd-add-note').addEventListener('click', () => {
@@ -8470,6 +8698,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }
       };
       window.prOpenCycle = window.prSelectCycle;
+      // Renaming a cycle in the builder has to reach the picker, or it keeps
+      // showing the old name.
+      window.prRenderCyclePicker = renderCyclePicker;
 
       document.querySelector('#rc-cycle-picker .dropdown-menu').addEventListener('click', e => {
         const it = e.target.closest('[data-pick-cycle]');
@@ -8551,6 +8782,50 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         return out || '<span class="tpl-comps">—</span>';
       };
 
+      /* What a template actually asks: its own questions plus everything it
+         inherits up the chain. That total is what a reviewer will see, and it is
+         the same sum the cycle builder's template detail reports — one rule read
+         in two places rather than two counts that can disagree.
+         Note this differs from the Competencies column beside it, which shows
+         own-only on purpose (Base's four would otherwise repeat as tag chips on
+         every row). A single number has no such problem, so it shows the total
+         and the modal splits it. */
+      const qsOf = t => {
+        const own = k => (t[k] || []).map(q => ({ ...q, from: null }));
+        const inh = k => api.chain(t).flatMap(p => (p[k] || []).map(q => ({ ...q, from: p.name })));
+        // Inherited first, matching the order the editor lists them in.
+        return { review: [...inh('reviewQs'), ...own('reviewQs')],
+                 goal:   [...inh('goalQs'),   ...own('goalQs')] };
+      };
+      const qTotal = t => { const q = qsOf(t); return q.review.length + q.goal.length; };
+
+      const openTplQs = (id) => {
+        const t = api.list.find(x => x.id === id);
+        if (!t) return;
+        const q = qsOf(t);
+        const all = [...q.review, ...q.goal];
+        const inherited = all.filter(x => x.from).length;
+        const own = all.length - inherited;
+
+        const group = (label, hint, list) => `<section class="tpl-q-group">
+            <p class="tpl-q-kind">${label} <span class="field-hint">— ${hint}</span></p>
+            ${list.length ? list.map(x => `<div class="tpl-q-row">
+              <p class="tpl-q-text">${esc(x.t)}</p>
+              <span class="rel-tags">${x.req ? '<span class="tag tag-light">required</span>' : ''}${
+                x.from ? `<span class="tag tag-light">inherited from ${esc(x.from)}</span>` : ''}</span>
+            </div>`).join('') : '<p class="tpl-q-empty">None.</p>'}
+          </section>`;
+
+        document.getElementById('tpl-qs-title').textContent = `${t.name} — questions`;
+        document.getElementById('tpl-qs-body').innerHTML = `
+          <p class="mv-ans-meta">${all.length} question${all.length === 1 ? '' : 's'} — ${
+            own ? `${own} on this template` : 'none of its own'}${
+            inherited ? `, ${inherited} inherited` : ''}.</p>
+          ${group('Review questions', 'asked of reviewers', q.review)}
+          ${group('Goal questions', 'answered by the reviewee about themselves', q.goal)}`;
+        document.getElementById('tpl-qs-modal').removeAttribute('hidden');
+      };
+
       const render = () => {
         // Archived templates stay listed rather than disappearing. Hiding them
         // was what made archiving Base dangerous: it feeds every other
@@ -8580,6 +8855,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               tags.length ? `<span class="rel-tags">${tags.map(x => `<span class="tag tag-light">${x}</span>`).join('')}</span>` : ''}</div></td>
             <td>${t.desc ? `<p class="tpl-desc">${esc(t.desc)}</p>` : '<span class="tpl-desc-empty">—</span>'}</td>
             <td>${comps}</td>
+            <!-- The count is a link because the number alone can't say what is
+                 being asked. Same treatment as the Reviews and Goals counts in
+                 the report tables. -->
+            <td>${qTotal(t)
+              ? `<button class="mv-reviews-btn" type="button" data-tpl-qs="${t.id}" aria-label="Read the ${qTotal(t)} questions on ${esc(t.name)}">${qTotal(t)}</button>`
+              : `<span class="tpl-q-none" data-tooltip="No questions on this template, and nothing inherited." data-tooltip-style="regular" data-placement="left">0</span>`}</td>
             <td><div class="cell-actions"><div class="dropdown">
               <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button" aria-label="Template actions" aria-expanded="false"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button>
               <div class="dropdown-menu dropdown-menu-end" hidden>
@@ -8607,6 +8888,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       window.renderTemplateList = render;
 
       wrap.addEventListener('click', e => {
+        const qs = e.target.closest('[data-tpl-qs]');
+        if (qs) { openTplQs(qs.dataset.tplQs); return; }
         const edit = e.target.closest('[data-tpl-edit]');
         if (edit) { window.openTemplateEditor?.(edit.dataset.tplEdit); return; }
         const arch = e.target.closest('[data-tpl-arch]');
@@ -8702,6 +8985,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         rubric.classList.toggle('is-collapsed', expanded);
       });
 
+      /* The count reads off the rows rather than being typed a second time, so
+         the badge cannot disagree with what is listed under it. */
+      const assessPeers = document.getElementById('assess-peers');
+      if (assessPeers) {
+        const n = assessPeers.querySelectorAll('.assess-peer').length;
+        document.getElementById('assess-peers-count').textContent = n;
+      }
+
       // Save as Draft — no persistence in this prototype, just confirms.
       document.getElementById('assess-save-draft')?.addEventListener('click', () => {
         if (window.toast) toast({ variant: 'neutral', message: 'Saved as draft.' });
@@ -8775,7 +9066,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // selects a variant since NB-64 removed cycle type, so they resolve to
       // Regular — see PLAN.md, Newcomer variants are unreachable from here.
       const compsFor = t => window.PR_TPL?.own(t) ?? [];
-      const chosen   = () => pickable().find(t => t.id === STATE.templateId) ?? null;
+      /* Looked up in the full list, not just the pickable one: five of the
+         seeded cycles run on the Base Template, which is deliberately absent
+         from the menu for *new* cycles. Editing one of them must still show what
+         it actually runs on. A new cycle can only set this from the menu, so
+         base stays unreachable there. */
+      const chosen   = () => tplList().find(t => t.id === STATE.templateId && !t.archived) ?? null;
 
       /* ---------- Section 1 · template picker ---------- */
       const tplLabel = t => {
@@ -8941,6 +9237,76 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (window.toast) toast({ variant: 'success', message: `${added.length} participants imported from CSV.` });
       });
 
+      /* ---------- Edit an existing cycle ----------
+         Clicking a cycle's name opens this same form, filled in from that
+         cycle. The reason to open a running cycle is usually to change
+         something — dates slip, people join — so the editable form is the
+         useful place to land; the kebab's View cycle still goes to the report.
+         Reached via window.prEditCycle(id) from the cycles table. */
+      let editing = null;   // the cycle being edited, or null for a new one
+
+      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      // The cycle model stores 'Aug 1, 2026'; <input type="date"> wants
+      // '2026-08-01'. Both directions, since an edit has to write back.
+      const toISO = v => {
+        const m = /^(\w{3})\s+(\d{1,2}),\s+(\d{4})$/.exec(String(v || '').trim());
+        const i = m ? MONTHS.indexOf(m[1]) : -1;
+        return i < 0 ? '' : `${m[3]}-${String(i + 1).padStart(2, '0')}-${String(m[2]).padStart(2, '0')}`;
+      };
+      const fromISO = v => {
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v || ''));
+        return m ? `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}` : '';
+      };
+
+      /* Participants are read off the assessments actually recorded against the
+         cycle rather than stored a second time, so this table cannot disagree
+         with the Peer reviews tab about who is in the cycle. Those records name
+         people; the add-pair fields take addresses, which is the builder's own
+         placeholder vocabulary — a real backend would key both on one identity.
+         A cycle with nothing recorded against it opens with an empty roster,
+         which is the truth about it in this prototype. */
+      const pairsOf = c => ((window.PR_PEOPLE || {})[c.data] || [])
+        .flatMap(p => p.rev.map(r => ({ reviewer: r.n, reviewee: p.n, rels: [r.rel] })));
+
+      // The values the markup shipped, read before anything edits them, so a
+      // new cycle always returns to the same starting point.
+      const NEW_DATES = { starts: $('#cb-starts').value, ends: $('#cb-ends').value };
+
+      const setMode = (c) => {
+        editing = c || null;
+        $('#cb-crumb').textContent = c ? 'Edit cycle' : 'New assessment cycle';
+        $('#cb-heading').textContent = c ? c.name : 'New assessment cycle';
+        $('#cb-launch').textContent = c ? 'Re-launch cycle' : 'Launch cycle';
+        /* Re-launching something already closed or archived reopens a cycle that
+           has results recorded against it. Said before the button is pressed,
+           not after. */
+        const reopens = !!c && (c.status === 'closed' || c.status === 'archived');
+        $('#cb-status-note').hidden = !reopens;
+        if (reopens) $('#cb-status-note-text').textContent =
+          `This cycle is ${c.status}. Re-launching reopens it — the assessments already recorded against it stay attached.`;
+      };
+
+      const loadForm = (c) => {
+        $('#cb-name').value  = c ? c.name : '';
+        $('#cb-starts').value = c ? toISO(c.start) : NEW_DATES.starts;
+        $('#cb-ends').value   = c ? toISO(c.due)   : NEW_DATES.ends;
+        STATE.templateId = c ? (c.template || null) : null;
+        STATE.pairs = c ? pairsOf(c) : [];
+        syncTplTrigger(); renderTplMenu(); renderTplDetail(); renderPairs(); clearErrors();
+      };
+
+      const openBuilder = (c) => {
+        setMode(c);
+        loadForm(c);
+        window.showPrPage?.('cycle-builder');
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+
+      window.prEditCycle = (id) => {
+        const c = (window.PR_CYCLES || []).find(x => x.id === id);
+        if (c) openBuilder(c);
+      };
+
       /* ---------- Launch ----------
          The wizard's Review step is gone, so its checks moved here. Only the
          four that would make a cycle meaningless are raised; the soft warnings
@@ -9009,11 +9375,33 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // navigating; the toast region is fixed-position so it outlives the
         // page switch and lands on the list.
         const name = $('#cb-name').value.trim() || 'Cycle';
-        const created = STATE.pairs.length;
+        const count = STATE.pairs.length;
+        const was = editing;
+
+        if (was) {
+          /* The edit lands on the record. Without this you would return to the
+             list and see the old name and dates — an edit that silently didn't
+             happen. Both the table and the results picker read this object, so
+             both are told to re-render. */
+          was.name = name;
+          was.template = STATE.templateId || was.template;
+          was.start = fromISO($('#cb-starts').value) || was.start;
+          was.due   = fromISO($('#cb-ends').value)   || was.due;
+          // Derived, not assumed: a cycle re-launched with a start date in the
+          // future has not started yet.
+          const iso = $('#cb-starts').value;
+          was.status = iso && iso > new Date().toISOString().slice(0, 10) ? 'scheduled' : 'active';
+          window.renderCyclesTable?.();
+          window.prRenderCyclePicker?.();
+        }
+
+        setMode(null);
         window.showPrPage?.('team-results');
         if (window.toast) toast({
           variant: 'success',
-          message: `“${name}” launched — ${created} assessment${created === 1 ? '' : 's'} created.`
+          message: was
+            ? `“${name}” re-launched — ${count} assessment${count === 1 ? '' : 's'} in the cycle.`
+            : `“${name}” launched — ${count} assessment${count === 1 ? '' : 's'} created.`
         });
       });
 
@@ -9026,10 +9414,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       /* ---------- Entry / exit ---------- */
       // The Create cycle CTA is the only way in. Bound with getElementById
       // because it lives outside the form's own section.
-      document.getElementById('rc-new')?.addEventListener('click', () => {
-        window.showPrPage?.('cycle-builder');
-        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
-      });
+      document.getElementById('rc-new')?.addEventListener('click', () => openBuilder(null));
 
       // NB-62 moved cycle creation to the manager, so this form's parent is
       // Review cycles now — and the breadcrumb lands on its Cycles tab.

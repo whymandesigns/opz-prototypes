@@ -598,6 +598,15 @@ designmd parts (`.avatar avatar-lg`, `.tag tag-light`, `#i-quote`,
 `#i-arrow-long-right`, `modal-lg` = the reference's 800px) rather than new
 equivalents.
 
+**The disabled button is muted with colours, not `opacity`.** `opacity: 0.5` on
+the button broke its own tooltip two ways at once, from one root cause: group
+opacity multiplies into `::after`, so the tooltip painted at half strength; and
+any opacity below 1 creates a stacking context, which trapped the tooltip's
+`z-index: 1000` inside the button and let later-painting rows cover it. Explicit
+`--color-text-subtle` on `--color-surface` gives the same muted read with no
+stacking context and no bleed into the pseudo-element. Hover feedback is also
+suppressed — the tooltip is the only thing hovering a dead button should produce.
+
 **The dead row action.** An unsubmitted row keeps a **View**, disabled, with a
 tooltip naming the reason in the Status column's own words ("Outstanding —
 nothing has been submitted to view yet." / "Skipped — this reviewer will not be
@@ -649,12 +658,162 @@ the top of the screen — this one did, at 1308px. Capped locally with
 `--ic-space-6`; `.modal-body` already scrolls. Affects every modal in the system,
 not just this prototype.
 
+## Peer assessments on the Give Assessment screen (Figma 34655:39160)
+
+A card directly below the reviewee's self-assessment, listing what the other
+reviewers have already said: who they are and in what relationship, the band they
+gave, and their comment. Left column is designmd's own `.cell-user` (avatar +
+name + role) rather than a restatement of it; the badge counts the rows it sits
+above rather than being typed a second time.
+
+**Adapts to its own width, not the viewport's.** The reference's two-column split
+(180px name column, 24px gap) was drawn against an 800px card. On this screen the
+competency nav leaves ~480px, where a fixed 180px hands 40% of the row to a name
+and stretches a two-line comment to five. So `.assess-peers` is a container and
+the row stacks below 520px, giving the comment the full width; above that it is
+the reference layout exactly. Measured: 2 lines at 956px, 3 at 449px.
+
+**The dot is grey-violet, not the reference's blue.** Blue is this system's
+interactive colour, and the card directly above already establishes green =
+Overperforming — a blue "On Track" beside it reads as a different kind of signal
+rather than the middle of the same scale. So the dot uses the same `#9999BB` the
+score rings use for that band. Literal for the same reason as the nav gradient:
+the scale's colours live in the data, not in tokens.
+
+**Anchoring, unresolved.** Peer ratings sit *above* the rating input, as the
+reference places them, which means a reviewer reads what everyone else concluded
+before forming their own view. That is the classic reason review tools withhold
+peer input until submission. Built as designed; the cheap mitigation, if wanted,
+is to collapse the card by default using the rubric's existing pattern, or to
+move it below the rating.
+
+**Not built:** the empty state ("no peer assessments submitted yet"), because
+this screen is static markup for a single competency and has no data behind it.
+
+## Questions column on Templates
+
+A **Questions** column between Competencies and Actions, showing a count that
+opens a modal listing what the template actually asks.
+
+**The count is own + inherited** — the total a reviewer will see — computed by the
+same rule the cycle builder's template detail uses, so the two can't report
+different numbers for the same template. Verified they agree for all four
+templates (4 / 4 / 5 / 4).
+
+This *differs* from the Competencies column beside it, which shows **own-only** on
+purpose: Base's four competencies would otherwise repeat as tag chips on every
+row. A single digit has no such problem, so the number is the total and the modal
+splits it — the meta line reads "5 questions — 1 on this template, 4 inherited."
+Worth a decision if the inconsistency bothers you; the alternative is own-only in
+the cell, which makes Design and Management both read 0 while they do ask four.
+
+**The modal groups by kind, in the editor's own words** — "Review questions —
+asked of reviewers" and "Goal questions — answered by the reviewee about
+themselves" — so the list and the authoring screen describe the same thing the
+same way. Each row carries `required` and `inherited from <parent>` as tags.
+
+**Zero is not a link.** A template with no parent and no questions of its own
+shows a plain `0` with a tooltip saying so, rather than a link to an empty modal.
+Reachable: a newly created template starts with no parent and no questions.
+
+The count reuses `.mv-reviews-btn`, the same "reads as text, not a control"
+treatment the Reviews and Goals counts already use in the report tables.
+
+One layout fix: at 8% the column heading rendered as "Quest". Widened to 13% —
+the column has to fit its own header word, not just a single digit.
+
+## Cycles list toolbar
+
+Search plus a two-segment scope switch (**All cycles** / **Created by me**),
+inside `#rc-cycles-panel` rather than beside the report tabs' toolbar — it acts on
+this table only, so it appears and disappears with the tab instead of needing to
+be hidden by hand the way `#rc-toolbar` is.
+
+**Search covers the three text columns on screen** — name, creator and the status
+word — so what you can read, you can search for. Dates are deliberately out:
+nobody types "Sep 15, 2026" to find a row.
+
+**"Me" is one constant.** `window.PR_ME = 'Matt Vella'` (the MV in the topbar),
+so "the ones I created" can't drift from anything else that needs to tell mine
+from everyone's. A real app reads it from the session.
+
+**The tab badge counts what the table shows**, matching how the report tabs'
+badges already follow their search. This also replaced a stale comment claiming
+there was "no tab to count into any more" — there is, and it was only ever set by
+the load-time pass, so it would have frozen at 8 while the table filtered.
+
+**The empty state names the control that caused it**, not just the emptiness:
+with a search and a scope both live, "no results" leaves you guessing which one to
+undo. Four cases — search-and-scope, search alone, scope alone, and genuinely no
+cycles.
+
+`role="group"` with `aria-pressed` rather than designmd's documented
+`role="tablist"` for `.segmented`: these two segments switch a filter, not a
+panel, and there are no tabpanels for a tablist to control.
+
+Verified that archiving a row and re-launching a cycle both keep the filter —
+each goes through the same `render()`, which reads the filter state rather than
+resetting it.
+
+## Editing a launched cycle
+
+Clicking a cycle's name opens the builder filled in from that cycle — name,
+schedule dates, template, participants — with the CTA reading **Re-launch
+cycle**. The kebab keeps **View cycle** for the report and gains **Edit cycle**
+so the action is discoverable without knowing the name is clickable. This
+partly answers open question 3 ("should a launched cycle be editable after the
+fact?"): yes, editable.
+
+**The edit lands on the record.** `name`, `template`, `start` and `due` are
+written back to the cycle in `PR_CYCLES`, and both the cycles table and the
+results cycle-picker are re-rendered — otherwise you would return to the list
+and see the old name, an edit that silently didn't happen.
+
+**The warning painted empty at first.** `.alert` is `display: flex` in
+components.css, which outranks the UA stylesheet's `[hidden] { display: none }`,
+so setting `hidden` on it left an empty banner on screen for every active cycle.
+This is the fourth component in this file needing the same one-line guard
+(`.btn`, `.toolbar`, `.cb-vis-date`, now `.alert`) — the trap belongs fixed
+upstream, not patched a fifth time here.
+
+**Status is derived, not assumed.** A cycle re-launched with a start date in the
+future becomes `scheduled`; otherwise `active`. Re-launching a closed or archived
+cycle therefore reopens it, so the form shows a warning saying so before the
+button is pressed, naming that the recorded assessments stay attached.
+
+**Participants are read, not copied.** `pairsOf()` derives the roster from the
+assessments recorded against the cycle (`PR_PEOPLE[c.data]`), so the builder's
+table cannot disagree with the Peer reviews tab. Consequence: the three cycles
+with no `data` (H2 Company-wide, Q4 Company-wide, H1 Design) open with an empty
+roster and cannot be re-launched until someone is added — which is the truth
+about them in this prototype, and the existing "launch empty" check already says
+it in the right place.
+
+Two things this exposed and fixed:
+
+- **`chosen()` only looked in `pickable()`**, which excludes the Base Template.
+  Five of eight seeded cycles run on Base, so editing them showed "Choose a
+  template…" over a cycle that plainly has one. It now looks in the full list;
+  a *new* cycle can still only set the template from the menu, so Base stays
+  unreachable there.
+- **The New-cycle form shipped pre-filled** with `H2 2026 — Engineering` — the
+  name of a cycle that actually exists in the list. Harmless before; now that
+  clicking that cycle opens a filled form, it read as though Create cycle were
+  editing it. Create cycle now opens blank, with no participants (a new cycle
+  genuinely has none — the three seeded pairs were filler).
+
+**Not carried over:** visibility dates. The cycle model doesn't record them, so
+an edited cycle shows the form's defaults rather than what it was launched with.
+
 ## Open questions
 
 1. ~~Per-pair competency/scale variation~~ — **resolved 2026-08-19** by templates
    (Base + role template + variant, resolved per reviewee).
 2. Do questions survive contact with the backend, or stay a design proposal?
-3. Should a launched cycle be editable after the fact, or immutable?
+3. ~~Should a launched cycle be editable after the fact, or immutable?~~ —
+   **partly resolved 2026-08-31**: editable, via the cycles list. Still open:
+   whether re-launching a *closed* cycle should reopen it (what it does now) or
+   duplicate it into a new one.
 4. Does the library need archive-vs-delete? (Past assessments reference
    competencies by ID, so hard delete would orphan them.)
 5. **Does the reviewee get a results surface?** ("My Results" was removed from the
