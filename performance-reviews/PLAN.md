@@ -910,6 +910,94 @@ Verified that archiving a row and re-launching a cycle both keep the filter —
 each goes through the same `render()`, which reads the filter state rather than
 resetting it.
 
+## Templates moved onto the role — step 1: the cycle
+
+Requirement change (2026-09-01): a template belongs to a **role**, not to a
+cycle. A cycle therefore stops deciding *what* is asked and decides only **when**
+it runs and **who** is in it. The full impact analysis, including what this costs
+elsewhere, is a separate document; this records what changed in the builder.
+
+The form is two cards now, one per question it answers:
+
+- **Schedule** — cycle name, start and end, and the two visibility settings. The
+  name had been a whole card of its own once the template left it, which is not a
+  section; the hint says the card holds the name as well as the dates.
+- **Participants** — the pairs, unchanged, with the hint now saying that what a
+  reviewee is scored on comes from their role rather than from this form.
+
+Removed with the picker: its read-only detail block (competencies, scale and
+question count for the chosen template), the *Manage templates* link, the
+`Pick a template` launch check, and everything in the builder that reached into
+the template model — `tplList`, `pickable`, `chosen`, `tplLabel`, `renderTplMenu`,
+`syncTplTrigger`, `renderTplDetail` and `STATE.templateId`. The `.cb-detail*` and
+`.cb-tpl-*` rules went with them; `.cb-preview-*` stayed, because the template
+editor's scale preview still uses it.
+
+**`cycle.template` is left in the data on purpose.** It is no longer a choice —
+nothing writes it, and re-launching an edited cycle leaves it untouched — but it
+records what that cycle actually ran on. That is the same discipline the analysis
+asks for at the next step: the resolved template has to be *stamped*, not
+recomputed, or changing a role's mapping would retroactively rewrite what a
+finished cycle asked. Per-cycle is the wrong grain for that once roles decide it;
+per-participant is where it has to end up.
+
+Two readers of that field survive, both adjusted rather than removed:
+
+- `scaleOf(c)` — used only by the parked matrix. Still correct as history, but
+  once templates resolve per person the scale a score was measured against has to
+  be recorded per assessment.
+- The empty-cycle alert on Reports, which used to read "Base template and dates
+  are set". It names dates and participants now.
+
+`window.renderCycleTemplatePicker()` is simply no longer defined. The template
+editor calls it after every save from three places, and every call site already
+used `?.()` — left unimplemented rather than stubbed, so nothing suggests this
+form still listens to the template model.
+
+**Not built yet, and deliberately:** a *Reviewed as* column on Participants,
+showing the template each person resolves to. It is the right place for the
+coverage problem to surface, but there is no role → template mapping to read
+from until the template editor gains one.
+
+## Templates moved onto the role — step 2: the template
+
+A **Roles** card in the template editor, straight after Details, because it is the
+other half of the same question: *Inherits from* says where a template's content
+comes from, *Roles* says who receives it. Selected roles are chips; the add
+control is the same select-or-name combobox the competency groups use, so a role
+that does not exist yet is typed rather than found.
+
+**A role belongs to exactly one template.** A person has to resolve to one set of
+competencies, so sharing a role between templates would make the resolution
+ambiguous. Rather than validate against that after the fact, the editor enforces
+it on the way in: the menu labels every role that is already spoken for
+("Front-end — on Engineering"), and picking it moves it.
+
+**The move waits for Save.** Everything else in this editor is a detached clone
+that Cancel discards, and a change that reached another template on the way past
+would be the one exception to that. So adding a claimed role only touches the
+draft; a line under the chips says what will happen — "Front-end will move here
+from Engineering when you save" — and `claimRoles()` applies it at save time,
+with the confirmation naming what moved. Verified: pick then Cancel leaves both
+templates untouched.
+
+**Base has no roles, and its card is hidden rather than empty.** It reaches
+everyone through inheritance; assigning it roles would say the opposite of what
+it is, and an empty control would invite someone to try.
+
+**Roles are disciplines, not job titles.** Seeded as Design, Engineering,
+Front-end, Product and Marketing, matching the grain of the requirement's own
+examples. The people in this prototype carry free-text job titles — "Senior
+Software Engineer" and "Software Engineer" are separate strings — which is far too
+fine to map templates onto. The list is shared and growable at runtime like
+`GROUPS`, which stands in for a controlled list that does not exist yet. Where the
+real one comes from is still open.
+
+**Not built:** a Roles column on the Templates list. It is the coverage view — the
+only place you could see which roles no template claims — but it was not part of
+the ask. Nothing yet resolves a person to a template either; the mapping exists
+and is authored, but no screen reads it.
+
 ## Editing a launched cycle
 
 Clicking a cycle's name opens the builder filled in from that cycle — name,

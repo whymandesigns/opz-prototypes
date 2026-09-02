@@ -3452,6 +3452,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* "optional" beside a field label — quieter than the label, so the field
        reads as skippable without a second line of hint text. */
     .te-optional { font: var(--type-caption); color: var(--color-text-subtle); font-weight: var(--ic-weight-regular); }
+    /* Roles read as a set rather than a list, so they are chips. */
+    .te-roles { display: flex; flex-wrap: wrap; gap: var(--ic-space-2); }
+    .te-roles:empty { display: none; }
+    /* The role a chip was taken from, so moving one is visible after the toast
+       has gone. */
+    .te-role-from { font: var(--type-caption); color: var(--color-text-subtle); }
+    #te-role-select .input-select-trigger { min-width: 0; }
     /* Template description — its own column, so no top margin. .table td is
        nowrap system-wide, same as .tpl-comps, so wrapping is re-enabled here. */
     .tpl-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; white-space: normal; }
@@ -4072,9 +4079,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     /* NB-64: each template row carries its rating scale, as swatches so the
        shape of the scale reads at a glance without spelling out every label. */
-    .cb-tpl-scale { display: inline-flex; align-items: center; gap: var(--ic-space-1); margin-top: var(--ic-space-1); font: var(--type-caption); color: var(--color-text-subtle); }
-    .cb-tpl-swatch { width: 10px; height: 10px; border-radius: var(--ic-radius-sm); flex-shrink: 0; }
-    .cb-tpl-scale .cb-tpl-swatch:first-of-type { margin-left: var(--ic-space-1); }
 
     .cb-body { max-width: 880px; display: flex; flex-direction: column; gap: var(--ic-space-4); }
 
@@ -4180,13 +4184,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* Read-only summary of the picked template: what reviewers will score and
        the scale they'll score it on. Reuses the template editor's .cb-preview-*
        swatch pair for the scale legend rather than cloning it. */
-    .cb-detail { margin-top: var(--ic-space-4); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
-    .cb-detail-label { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); margin: 0 0 var(--ic-space-2); }
-    .cb-detail-group { display: flex; align-items: baseline; gap: var(--ic-space-3); margin-bottom: var(--ic-space-2); }
-    .cb-detail-group:last-of-type { margin-bottom: 0; }
-    .cb-detail-group-name { flex-shrink: 0; width: 60px; font: var(--type-caption); color: var(--color-text-muted); }
-    .cb-detail-tags { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); }
-    .cb-detail-scale { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-4); }
 
     .cb-footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--ic-space-4); padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
     /* designmd has .field-hint.is-error for the message but no error state on
@@ -5606,7 +5603,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="cb-body">
           <div class="card">
             <h2 class="cb-section-title">Details</h2>
-            <p class="cb-section-hint" id="te-type-hint">A template defines what people are assessed on. Cycles pick templates; they don't define competencies themselves.</p>
+            <p class="cb-section-hint" id="te-type-hint">A template defines what people are assessed on. It reaches people through their role, not through a cycle.</p>
             <label class="field">
               <span class="field-label">Template name</span>
               <input class="input" id="te-name" type="text" placeholder="e.g. Engineering" />
@@ -5631,6 +5628,34 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <div class="dropdown-menu" hidden id="te-parent-menu"></div>
               </div>
               <span class="field-hint" id="te-parent-hint"></span>
+            </div>
+          </div>
+
+          <!-- Who this template applies to. Sits straight after Details because
+               it is the other half of the same question — Inherits from says
+               where the content comes from, Roles says who receives it.
+               A role belongs to exactly one template: a person has to resolve to
+               one set of competencies, so picking a role that another template
+               already claims moves it rather than sharing it. -->
+          <div class="card" id="te-roles-card">
+            <h2 class="cb-section-title">Roles <span class="count-badge count-badge-secondary" id="te-roles-count">0</span></h2>
+            <p class="cb-section-hint" id="te-roles-hint">People in these roles are reviewed against this template. A role belongs to one template, so adding one here takes it off whichever template holds it now.</p>
+
+            <div class="te-roles" id="te-roles-chips"></div>
+            <p class="field-hint" id="te-roles-moving" style="margin-top: var(--ic-space-2)" hidden></p>
+
+            <div class="input-select is-auto" id="te-role-select" style="margin-top: var(--ic-space-3)">
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <svg class="btn-icon"><use href="#i-plus"/></svg>
+                <span class="input-select-value">Add a role</span>
+              </button>
+              <div class="dropdown-menu" hidden id="te-role-menu">
+                <div class="te-group-search">
+                  <input class="input input-xs" id="te-role-filter" type="text" placeholder="Select or add a role…" aria-label="Filter or name a role" />
+                </div>
+                <hr class="dropdown-divider" />
+                <div id="te-role-options"></div>
+              </div>
             </div>
           </div>
 
@@ -5740,13 +5765,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            the exact shape the script consumes today.
            ============================================================ -->
       <!-- ===== New assessment cycle =====
-           NB-67 collapsed the four-step wizard into one form with three
-           numbered sections. The steps were carrying no weight: a cycle is a
-           name, a template, a schedule and a list of people, and none of those
-           depend on an earlier answer, so paging through them only hid the
-           whole from the person filling it in. The separate Review step went
-           with them — the form is short enough to be its own summary, so
-           validation lives next to the Launch button instead. -->
+           NB-67 collapsed the four-step wizard into one form; the step numbers
+           went later, because the sections can be filled in any order.
+           A cycle is now two questions — when it runs and who is in it. The
+           template was the third, until templates moved onto the person's role:
+           the cycle no longer decides what is asked, only of whom and when. -->
 
       <!-- ===== Breakdown — one reviewee, one cycle =====
            Reference: perf-review-proto-1 /reviews/4/roles/25. Every competency
@@ -5918,8 +5941,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <!-- ---------- 1 · Review template ---------- -->
           <div class="card">
             <div class="cb-sec-head">
-              <h2 class="cb-section-title">Cycle setup</h2>
-              <p class="cb-section-hint">Name this cycle and pick the template it runs on — the template decides which competencies reviewers score.</p>
+              <h2 class="cb-section-title">Schedule</h2>
+              <p class="cb-section-hint">What this cycle is called, when it runs, and when the collected feedback becomes visible.</p>
             </div>
 
             <label class="field">
@@ -5931,37 +5954,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <span class="field-hint" id="cb-err-name" hidden></span>
             </label>
 
-            <!-- One template per cycle. NB-64 and NB-65 removed cycle type and
-                 participant team — the two facts that used to decide which of
-                 several templates a given person got — so a multi-select had
-                 nothing left to resolve against. -->
-            <div class="field" style="margin-top: var(--ic-space-4)">
-              <span class="field-label">Template</span>
-              <div class="input-select" id="cb-tpl-select">
-                <button class="input-select-trigger" aria-expanded="false" type="button">
-                  <span class="input-select-value input-select-placeholder" id="cb-tpl-value">Choose a template…</span>
-                  <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
-                </button>
-                <div class="dropdown-menu" hidden id="cb-tpl-menu"></div>
-              </div>
-            </div>
+            <!-- The template picker used to live here. Templates now hang off a
+                 person's role rather than off the cycle, so a cycle no longer
+                 chooses what is asked — it chooses who is asked, and when. Each
+                 participant will resolve their own template.
+                 Nothing else in this form referenced it, so this is a straight
+                 removal rather than a replacement; the role -> template mapping
+                 is authored in the template editor. -->
 
-            <span class="field-hint" id="cb-err-tpl" hidden></span>
-
-            <!-- Filled by renderTplDetail() once a template is picked. -->
-            <div id="cb-tpl-detail"></div>
-
-            <p class="field-hint" style="margin-top: var(--ic-space-3)">Need a different set of competencies? <a class="breadcrumb" href="#" id="cb-tpl-manage">Manage templates</a></p>
-          </div>
-
-          <!-- ---------- 2 · Schedule ---------- -->
-          <div class="card">
-            <div class="cb-sec-head">
-              <h2 class="cb-section-title">Schedule</h2>
-              <p class="cb-section-hint">When the cycle runs, and when the collected feedback becomes visible.</p>
-            </div>
-
-            <div class="cb-grid">
+            <div class="cb-grid" style="margin-top: var(--ic-space-4)">
               <label class="field">
                 <span class="field-label">Start date</span>
                 <input class="input" id="cb-starts" type="date" value="2026-09-02" />
@@ -5999,11 +6000,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </div>
           </div>
 
-          <!-- ---------- 3 · Participants ---------- -->
+          <!-- ---------- Participants ---------- -->
           <div class="card">
             <div class="cb-sec-head">
               <h2 class="cb-section-title">Participants</h2>
-              <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone.</p>
+              <p class="cb-section-hint">Each row is one assessment: one reviewer assessing one reviewee. Anyone can review anyone. What each reviewee is scored on comes from their role, not from here.</p>
             </div>
 
             <span class="field-hint" id="cb-err-pairs" style="margin-bottom: var(--ic-space-3)" hidden></span>
@@ -7382,6 +7383,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // Seeded from v2.1, but admins can add their own (e.g. a Contractor group
       // with its own skills) — so this grows at runtime rather than being a
       // fixed set. Everything that renders groups reads it.
+      /* Roles a template can apply to. Shared like GROUPS and growable at
+         runtime, because no controlled list of roles exists yet — the people in
+         this prototype carry free-text job titles ("Senior Software Engineer",
+         "Software Engineer"), which is too fine a grain to map templates onto.
+         These are disciplines instead, which is the grain the requirement's own
+         examples use. Where the real list comes from is an open question. */
+      const ROLES = [
+        { id: 'design',      name: 'Design' },
+        { id: 'engineering', name: 'Engineering' },
+        { id: 'front-end',   name: 'Front-end' },
+        { id: 'product',     name: 'Product' },
+        { id: 'marketing',   name: 'Marketing' }
+      ];
+
       const GROUPS = [
         { id: 'general', name: 'General',
           d: 'Expectations that apply to everyone, whatever the discipline \u2014 how someone works with others and holds their end.' },
@@ -7426,6 +7441,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const TEMPLATES = window.PR_TEMPLATES = [
         { id: 'base', name: 'Base Template', base: true, universal: true,
           parentId: null,
+          // Base has no roles by design: it applies through inheritance, to
+          // everyone, rather than by being assigned to anybody.
+          roles: [],
           desc: 'Applies to every cycle. Its competencies and questions are inherited by all other templates.',
           variants: { all: ['adapt', 'collab', 'comms', 'own'] }, scaleId: 'sc-5pt',
           reviewQs: [{ t: "What are this person's key strengths?", req: true },
@@ -7434,17 +7452,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                      { t: 'What support do you need from your manager?', req: false }] },
         { id: 'design', name: 'Design', universal: true,
           parentId: 'base',
+          roles: ['design'],
           desc: 'Product and brand designers. Craft-led competencies; no tenure split.',
           variants: { all: ['dsys', 'proto', 'ux', 'visual'] }, scaleId: 'sc-5pt',
           reviewQs: [], goalQs: [] },
         { id: 'eng', name: 'Engineering', universal: false,
           parentId: 'base',
+          roles: ['engineering', 'front-end'],
           desc: 'Individual contributors across engineering. Newcomers are scored on a shorter set.',
           variants: { regular: ['cq', 'mentor', 'solve', 'sysd', 'techp'],
                       newcomer: ['cq', 'solve', 'techp'] }, scaleId: 'sc-5pt',
           reviewQs: [], goalQs: [{ t: 'Which technical skill do you most want to grow?', req: false }] },
         { id: 'mgmt', name: 'Management', universal: false,
           parentId: 'base',
+          roles: [],
           desc: 'Anyone with direct reports, whatever their function.',
           variants: { regular: ['deliv', 'lead', 'people', 'strat'],
                       newcomer: ['deliv', 'lead'] }, scaleId: 'sc-5pt',
@@ -7472,7 +7493,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const ownKey = t => (t && t.universal) ? 'all' : 'regular';
       // Inherited competencies this template has dropped.
       const excludedComps = t => (t && t.excludes && t.excludes[ownKey(t)]) || [];
-      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS,
+      window.PR_TPL = { list: TEMPLATES, comp: compById, base: baseTpl, scales: SCALES, groups: GROUPS, roles: ROLES,
                         chain: chainOf, own: ownComps, excluded: excludedComps };
 
       // Working copy — edits apply on Save, so Cancel genuinely discards.
@@ -7518,6 +7539,122 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // would make a loop, and the walk above would then have to break it.
       const parentOptions = () => TEMPLATES.filter(t =>
         t.id !== draft.id && !chainOf(t).some(p => p.id === draft.id));
+
+      /* ---------- Roles ----------
+         A role belongs to exactly one template, because a person has to resolve
+         to exactly one set of competencies. The list is stored per template, but
+         that constraint is enforced here on the way in: adding a role removes it
+         from whichever template currently holds it, and says which. */
+      const rolesList = () => window.PR_TPL?.roles ?? [];
+      const roleById  = id => rolesList().find(r => r.id === id);
+      const holderOf  = id => TEMPLATES.find(t => t.id !== draft.id && (t.roles || []).includes(id));
+
+      const renderRoles = () => {
+        const card = $('#te-roles-card');
+        /* Base is deliberately roleless: it reaches everyone through
+           inheritance, so assigning it roles would say the opposite of what it
+           is. Hidden rather than disabled — there is no decision to offer. */
+        card.hidden = !!draft.base;
+        if (card.hidden) return;
+
+        const ids = draft.roles;
+        $('#te-roles-count').textContent = ids.length;
+        $('#te-roles-chips').innerHTML = ids.map(id => {
+          const r = roleById(id);
+          return `<span class="chip">${esc(r ? r.name : id)}<button class="chip-remove" type="button" data-te-role-remove="${esc(id)}" aria-label="Remove ${esc(r ? r.name : id)}"><svg><use href="#i-x"/></svg></button></span>`;
+        }).join('');
+
+        /* The move is pending until Save, so it has to be visible until then —
+           a toast on click would be gone by the time the decision is made. */
+        const moving = ids.map(id => ({ r: roleById(id), from: holderOf(id) })).filter(x => x.from);
+        const note = $('#te-roles-moving');
+        note.hidden = !moving.length;
+        if (moving.length) note.textContent = moving.length === 1
+          ? `“${moving[0].r?.name}” will move here from ${moving[0].from.name} when you save.`
+          : `${moving.length} roles will move here from other templates when you save: ${
+              moving.map(x => `${x.r?.name} (${x.from.name})`).join(', ')}.`;
+
+        renderRoleMenu();
+      };
+
+      // Filtered list plus a create row, the same shape as the competency-group
+      // combobox — a role that doesn't exist yet is named rather than found.
+      const renderRoleMenu = () => {
+        const q = $('#te-role-filter').value.trim();
+        const ql = q.toLowerCase();
+        const free = rolesList().filter(r => !draft.roles.includes(r.id));
+        const hits = free.filter(r => !ql || r.name.toLowerCase().includes(ql));
+        const exact = rolesList().some(r => r.name.toLowerCase() === ql);
+        $('#te-role-options').innerHTML = [
+          ...hits.map(r => {
+            const held = holderOf(r.id);
+            return `<button class="dropdown-item" type="button" data-te-role-add="${esc(r.id)}">${esc(r.name)}${
+              held ? `<span class="te-role-from">on ${esc(held.name)}</span>` : ''}</button>`;
+          }),
+          q && !exact ? `<button class="dropdown-item" type="button" data-te-role-create="${esc(q)}"><svg class="dropdown-item-icon"><use href="#i-plus"/></svg>Create \u201c${esc(q)}\u201d</button>` : '',
+          !hits.length && !q ? '<p class="dropdown-item" style="color: var(--color-text-subtle)">Every role is already on this template.</p>' : ''
+        ].join('');
+      };
+
+      const closeRoleMenu = () => {
+        $('#te-role-menu').hidden = true;
+        $('#te-role-select .input-select-trigger').setAttribute('aria-expanded', 'false');
+      };
+
+      /* Adding only touches the draft. Taking the role off the other template
+         happens on save, not here — everything else in this editor is discarded
+         by Cancel, and a change that reached another template on the way past
+         would be the one exception. */
+      const addRole = (id) => {
+        draft.roles.push(id);
+        closeRoleMenu();
+        renderRoles();
+      };
+
+      // Applied by Save. Returns what moved, so the confirmation can say so.
+      const claimRoles = () => TEMPLATES.filter(t => t.id !== draft.id)
+        .flatMap(t => {
+          const taken = (t.roles || []).filter(id => draft.roles.includes(id));
+          t.roles = (t.roles || []).filter(id => !draft.roles.includes(id));
+          return taken.map(id => ({ id, from: t.name }));
+        });
+
+      // The shared .input-select handler owns opening and closing; this only
+      // clears and focuses the filter, which it can't know about.
+      $('#te-role-select .input-select-trigger').addEventListener('click', () => {
+        if ($('#te-role-menu').hidden) return;
+        $('#te-role-filter').value = '';
+        renderRoleMenu();
+        $('#te-role-filter').focus();
+      });
+      $('#te-role-filter').addEventListener('input', renderRoleMenu);
+      $('#te-role-filter').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); closeRoleMenu(); return; }
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        $('#te-role-options').querySelector('[data-te-role-add], [data-te-role-create]')?.click();
+      });
+
+      $('#te-role-menu').addEventListener('click', e => {
+        const add = e.target.closest('[data-te-role-add]');
+        if (add) { addRole(add.dataset.teRoleAdd); return; }
+        const make = e.target.closest('[data-te-role-create]');
+        if (!make) return;
+        const name = make.dataset.teRoleCreate.trim();
+        const id = 'role-' + name.toLowerCase().replace(/\W+/g, '-');
+        // Reuse an existing role of the same name rather than making a twin.
+        const existing = rolesList().find(r => r.id === id || r.name.toLowerCase() === name.toLowerCase());
+        if (!existing) rolesList().push({ id, name });
+        addRole(existing ? existing.id : id);
+      });
+
+      $('#te-roles-chips').addEventListener('click', e => {
+        const rm = e.target.closest('[data-te-role-remove]');
+        if (!rm) return;
+        const id = rm.dataset.teRoleRemove;
+        draft.roles.splice(draft.roles.indexOf(id), 1);
+        renderRoles();
+      });
 
       const renderParent = () => {
         let parent = draft.parentId ? byId(draft.parentId) : null;
@@ -7990,9 +8127,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#te-crumb').textContent = draft.name || 'New template';
         $('#te-heading').textContent = draft.id ? `Edit ${draft.name}` : 'New review template';
         $('#te-type-hint').textContent = draft.base
-          ? 'Base Template — these competencies and questions are inherited by every other template.'
-          : 'A template defines what people are assessed on. Cycles pick templates; they don\'t define competencies themselves.';
-        renderParent(); renderVariantTabs(); renderLibrary(); renderScale(); renderAllQs();
+          ? 'Base Template — these competencies and questions are inherited by every other template, so it needs no roles of its own.'
+          : 'A template defines what people are assessed on. It reaches people through their role, not through a cycle.';
+        renderParent(); renderRoles(); renderVariantTabs(); renderLibrary(); renderScale(); renderAllQs();
       };
 
       const open = (id) => {
@@ -8000,7 +8137,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // structuredClone keeps the draft fully detached, so Cancel discards
         // nested edits (scale rows, question objects) too — not just the top level.
         draft = src ? structuredClone(src)
-                    : { id: '', name: '', desc: '', parentId: null, universal: true, variants: {}, scaleId: 'sc-5pt', reviewQs: [], goalQs: [] };
+                    : { id: '', name: '', desc: '', parentId: null, universal: true, variants: {}, scaleId: 'sc-5pt', reviewQs: [], goalQs: [], roles: [] };
+        draft.roles = draft.roles || [];   // seeded templates predate the field
         draft.scaleRows = draft.scaleRows || SCALES[draft.scaleId].rows.map(r => ({ ...r }));
         variant = 'regular';
         render();
@@ -8019,13 +8157,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (!name) { $('#te-name').focus(); if (window.toast) toast({ variant: 'error', message: 'Give the template a name.' }); return; }
         draft.name = name;
         draft.desc = $('#te-desc').value.trim();
+        // Roles this template now claims come off whichever template held them,
+        // so the one-role-one-template rule holds after the write.
+        const moved = claimRoles();
         const i = TEMPLATES.findIndex(t => t.id === draft.id);
         if (i > -1) TEMPLATES[i] = draft;
         else { draft.id = 'tpl-' + name.toLowerCase().replace(/\W+/g, '-'); TEMPLATES.push(draft); }
         window.renderTemplateList?.();
         window.renderCycleTemplatePicker?.();
         leave();
-        if (window.toast) toast({ variant: 'success', message: `“${name}” saved.` });
+        if (window.toast) toast({ variant: 'success',
+          message: moved.length
+            ? `“${name}” saved — ${moved.map(m => `${roleById(m.id)?.name ?? m.id} moved from ${m.from}`).join(', ')}.`
+            : `“${name}” saved.` });
       });
     })();
 
@@ -8691,6 +8835,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // A cycle scores against its template's scale. Comparing 4/5 with 2/3 is
       // meaningless, so a mixed-scale history loses the Change column and says
       // why rather than showing a number that reads like progress.
+      /* Reads the template a cycle *ran on*, which is a historical record now
+         rather than something the builder chooses. Only the parked matrix uses
+         it; once templates resolve per person, the scale a score was measured
+         against has to be recorded per assessment instead. */
       const scaleOf = (c) => window.PR_TPL?.list.find(t => t.id === c.template)?.scaleId;
 
       /* PARKED — the competency x cycle matrix, which was the "All cycles" tab.
@@ -9345,8 +9493,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // Scope the report to this cycle before anything renders, so the tabs
         // and the heading can't describe different cycles.
         if (c.data) cycle = c.data;
-        const tpl = window.PR_TPL?.list.find(t => t.id === c.template);
-
         const rows = c.data ? PEOPLE[c.data] : null;
         const all = rows ? rows.flatMap(p => p.rev.map(r => ({ ...r, of: p.n }))) : [];
         // No stats row any more — the tab counts carry the population, and the
@@ -9361,9 +9507,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           // has been recorded against this cycle at all, which is different.
           renderCycleGoals(null, c);
           setCycleTabCounts(null, []);
+          // No longer names a template: a cycle doesn't have one. What each
+          // participant is scored on is resolved from their role.
           const msg = `No assessments are recorded against this cycle in the prototype${
-              c.status === 'scheduled' ? " — it hasn't started yet" : ''}. ${
-              esc(tpl ? tpl.name : 'Its')} template and dates are set; progress appears once it runs.`;
+              c.status === 'scheduled' ? " — it hasn't started yet" : ''}. Its dates and participants are set; progress appears once it runs.`;
           wrap.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-4)">
             <svg class="icon alert-icon"><use href="#i-info"/></svg>
             <p class="alert-message">${msg}</p>
@@ -9848,123 +9995,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          The form doesn't own competencies, scales or questions — those are
          template properties, authored in Templates. A cycle records which
          template it uses; everything a reviewer sees is resolved from that. */
-      const tplList  = () => window.PR_TPL?.list ?? [];
-      // Base is a foundation other templates inherit from, not something a
-      // cycle picks directly. It reaches a cycle by being in the chain.
-      const pickable = () => tplList().filter(t => !t.base && !t.archived);
-      const chainOf  = t => window.PR_TPL?.chain(t) ?? [];
-      const parentOf = t => chainOf(t)[0] ?? null;
-      const compById = id => window.PR_TPL?.comp(id);
-      const groups   = () => window.PR_TPL?.groups ?? [];
-
+      /* A cycle no longer names a template. Templates hang off a person's
+         role, so what a reviewer is asked is resolved per participant rather
+         than chosen once here — the picker, its read-only detail block and the
+         Manage-templates link all went with that. The template model itself is
+         untouched; only this form stopped reaching into it. */
       const STATE = {
-        // NB-67 made this one template rather than a set. NB-64 and NB-65 had
-        // already removed cycle type and participant team — the two facts that
-        // decided which of several templates a given person got — so a
-        // multi-select had nothing left to resolve against.
-        // Starts empty: the whole point of the picker is that the competencies
-        // and rating scale appear once a template is chosen.
-        templateId: null,
         pairs: [
           { reviewer: 'alice@toptal.com',   reviewee: 'john@toptal.com', rels: ['Peer'] },
           { reviewer: 'jack@toptal.com',    reviewee: 'john@toptal.com', rels: ['Teammate'] },
           { reviewer: 'michael@toptal.com', reviewee: 'john@toptal.com', rels: ['Manager'] }
         ]
       };
-
-      // Non-universal templates split Regular / Newcomer. Nothing in this flow
-      // selects a variant since NB-64 removed cycle type, so they resolve to
-      // Regular — see PLAN.md, Newcomer variants are unreachable from here.
-      const compsFor = t => window.PR_TPL?.own(t) ?? [];
-      /* Looked up in the full list, not just the pickable one: five of the
-         seeded cycles run on the Base Template, which is deliberately absent
-         from the menu for *new* cycles. Editing one of them must still show what
-         it actually runs on. A new cycle can only set this from the menu, so
-         base stays unreachable there. */
-      const chosen   = () => tplList().find(t => t.id === STATE.templateId && !t.archived) ?? null;
-
-      /* ---------- Section 1 · template picker ---------- */
-      const tplLabel = t => {
-        const p = parentOf(t);
-        return `${t.name}${p ? ` (extends ${p.name})` : ''}`;
-      };
-
-      const syncTplTrigger = () => {
-        const t = chosen();
-        const value = $('#cb-tpl-value');
-        value.textContent = t ? tplLabel(t) : 'Choose a template…';
-        value.classList.toggle('input-select-placeholder', !t);
-      };
-
-      const renderTplMenu = () => {
-        $('#cb-tpl-menu').innerHTML = pickable().map(t => `
-          <button class="dropdown-item${t.id === STATE.templateId ? ' is-selected' : ''}" type="button" data-tpl="${t.id}">
-            <svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(tplLabel(t))}
-          </button>`).join('') || '<p class="dropdown-item" style="color: var(--color-text-subtle)">No templates yet — create one first.</p>';
-      };
-
-      // Competencies, rating scale and open questions for the picked template,
-      // unioned with the Base Template since that always applies. Rendered as
-      // one read-only block: it answers "what will reviewers actually score?"
-      // without making any of it editable here.
-      const renderTplDetail = () => {
-        const t = chosen();
-        const wrap = $('#cb-tpl-detail');
-        // Nothing at all until a template is picked. A placeholder here just
-        // restated the empty select right above it.
-        if (!t) { wrap.innerHTML = ''; return; }
-
-        const chain   = chainOf(t);
-        // A template can drop something it inherits, so the chain's set is
-        // filtered by this template's exclusions before it counts.
-        const dropped = window.PR_TPL?.excluded(t) ?? [];
-        const inherit = [...new Set(chain.flatMap(compsFor))].filter(id => !dropped.includes(id));
-        const own     = compsFor(t);
-        const ids     = [...new Set([...inherit, ...own])];
-        const scale   = window.PR_TPL?.scales?.[t.scaleId];
-        const qCount  = [t, ...chain]
-          .reduce((n, x) => n + (x.reviewQs?.length ?? 0) + (x.goalQs?.length ?? 0), 0);
-
-        // Grouped by the shared library's General / Skills split rather than
-        // listed flat, so "which skills does this cycle actually test?" reads
-        // off the block directly.
-        const byGroup = groups().map(g => ({
-          name: g.name,
-          items: ids.map(compById).filter(c => c && c.g === g.id)
-        })).filter(g => g.items.length);
-
-        wrap.innerHTML = `
-          <div class="cb-detail">
-            <p class="cb-detail-label">Competencies from this template (${ids.length})</p>
-            ${byGroup.map(g => `<div class="cb-detail-group">
-              <span class="cb-detail-group-name">${esc(g.name)}</span>
-              <div class="cb-detail-tags">${g.items.map(c =>
-                `<span class="tag tag-light"${inherit.includes(c.id) && !own.includes(c.id) ? ' title="Inherited from the Base Template"' : ''}>${esc(c.n)}</span>`).join('')}</div>
-            </div>`).join('')}
-            ${scale ? `<p class="cb-detail-label" style="margin-top: var(--ic-space-4)">Rating scale · ${esc(scale.name)}</p>
-              <div class="cb-detail-scale">${scale.rows.map(r =>
-                `<span class="cb-preview-item"><span class="cb-preview-dot" style="background: ${esc(r.color)}"></span>${esc(r.value)} · ${esc(r.label)}</span>`).join('')}</div>` : ''}
-            <p class="field-hint" style="margin-top: var(--ic-space-3)">${qCount} open question${qCount === 1 ? '' : 's'} defined on this template${chain.length ? ` · ${inherit.length} inherited from ${esc(chain.map(x => x.name).join(' → '))}${dropped.length ? `, ${dropped.length} dropped` : ''}` : ' · nothing inherited'}.</p>
-          </div>`;
-      };
-
-      // The shared .input-select handler binds menu items at load, and these
-      // are rendered after it runs — so selection is wired here instead. It
-      // still owns opening/closing the menu and the outside-click dismiss.
-      $('#cb-tpl-menu').addEventListener('click', e => {
-        const item = e.target.closest('[data-tpl]');
-        if (!item) return;
-        STATE.templateId = item.dataset.tpl;
-        syncTplTrigger();
-        renderTplMenu();
-        renderTplDetail();
-        clearErrors();
-      });
-
-      $('#cb-tpl-manage').addEventListener('click', e => {
-        e.preventDefault();
-        window.showPrPage?.('templates');
-      });
 
       /* ---------- Section 3 · participants ---------- */
       const renderPairs = () => {
@@ -10100,9 +10142,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         $('#cb-name').value  = c ? c.name : '';
         $('#cb-starts').value = c ? toISO(c.start) : NEW_DATES.starts;
         $('#cb-ends').value   = c ? toISO(c.due)   : NEW_DATES.ends;
-        STATE.templateId = c ? (c.template || null) : null;
         STATE.pairs = c ? pairsOf(c) : [];
-        syncTplTrigger(); renderTplMenu(); renderTplDetail(); renderPairs(); clearErrors();
+        renderPairs(); clearErrors();
       };
 
       const openBuilder = (c) => {
@@ -10131,9 +10172,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         { err: '#cb-err-name', ctl: '#cb-name',
           bad: () => !$('#cb-name').value.trim(),
           msg: 'Give the review cycle a name.' },
-        { err: '#cb-err-tpl', ctl: '#cb-tpl-select .input-select-trigger',
-          bad: () => !chosen(),
-          msg: 'Pick a template — it decides what reviewers score.' },
         { err: '#cb-err-dates', ctl: '#cb-ends',
           bad: () => $('#cb-starts').value && $('#cb-ends').value && $('#cb-starts').value > $('#cb-ends').value,
           msg: 'The end date is before the start date.' },
@@ -10194,7 +10232,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              happen. Both the table and the results picker read this object, so
              both are told to re-render. */
           was.name = name;
-          was.template = STATE.templateId || was.template;
+          // `template` is left as it was: it records what the cycle ran on, and
+          // this form no longer chooses it.
           was.start = fromISO($('#cb-starts').value) || was.start;
           was.due   = fromISO($('#cb-ends').value)   || was.due;
           // Derived, not assumed: a cycle re-launched with a start date in the
@@ -10233,18 +10272,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         window.showPrPage?.('cycles');
       });
 
-      // Saving a template can rename it or move it in the hierarchy, so the
-      // editor calls this the same way it refreshes the templates list.
-      window.renderCycleTemplatePicker = () => {
-        // An archived template can't stay picked — it's left circulation, so a
-        // cycle still being drafted has to choose again. (A cycle that already
-        // launched keeps its reference: archiving doesn't remove the template.)
-        if (STATE.templateId && !chosen()) STATE.templateId = null;
-        renderTplMenu(); syncTplTrigger(); renderTplDetail(); clearErrors();
-      };
+      /* The template editor still calls window.renderCycleTemplatePicker() after
+         a save, from three places. There is no picker to refresh any more, so it
+         is simply not defined — every call site already uses `?.()`. Left
+         unimplemented rather than stubbed, so nothing suggests this form still
+         listens to the template model. */
 
-      renderTplMenu();
-      renderTplDetail();
       renderPairs();
     })();
   </script>
