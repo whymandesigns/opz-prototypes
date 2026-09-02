@@ -3622,6 +3622,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mv-cell-na { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
     .mv-detail-table tfoot th { background: var(--color-surface-muted); font: var(--ic-weight-semibold) var(--ic-text-xs)/1.2 var(--ic-font-sans); color: var(--color-text); padding: var(--ic-space-3) var(--ic-space-4); border-top: 1px solid var(--color-border); }
 
+    /* A name that navigates. Keeps .cell-user-name's own type and colour — this
+       only strips the button chrome and adds the affordance, so the cell reads as
+       a name rather than as a control dropped into a table. */
+    .cell-user-name-link { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
+    .cell-user-name-link:hover { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+    .cell-user-name-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: var(--ic-radius-sm); }
+
     /* A table cell that navigates. Reads as the row's title, not a button —
        .btn would put a control where a name belongs. */
     .cell-title-link { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0;
@@ -3678,6 +3685,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* The panels below carry no top margin of their own (unlike the cycle
        detail's, which set one inline), so the gap lives on the strip. */
     #bd-scope { margin-bottom: var(--ic-space-4); }
+    /* The rating chips inside the rating filter's menu keep their own size
+       rather than stretching the item. */
+    #bd-band-filter .dropdown-item .mv-score { min-width: 26px; height: 20px; }
 
     /* Competency × cycle. Row headers are text, cells are chips — so the
        leftmost column reads as a list and the rest as a heat strip. */
@@ -3824,6 +3834,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .assessment-party { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--ic-space-2); }
     .assessment-party-label { font: var(--type-caption); color: var(--color-text-subtle); text-transform: uppercase; letter-spacing: .04em; }
     .assessment-party-score { display: flex; align-items: center; gap: var(--ic-space-2); font: var(--type-caption); color: var(--color-text-subtle); }
+    /* With one party the row no longer needs to divide the width between two,
+       so the block sizes to its content instead of stretching. */
+    .assessment-parties:not(:has(.assessment-arrow)) .assessment-party { flex: 0 1 auto; }
     .assessment-arrow { color: var(--color-text-subtle); flex-shrink: 0; margin-top: 28px; }
     .assessment-group { border-left: 3px solid var(--color-accent); padding-left: var(--ic-space-4); display: flex; flex-direction: column; gap: var(--ic-space-3); margin-bottom: var(--ic-space-6); }
     .assessment-group-title { font: var(--type-h4); margin: 0; }
@@ -3943,8 +3956,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .assess-rubric.is-collapsed .assess-rubric-body { display: none; }
     .assess-rubric.is-collapsed .assess-rubric-toggle .icon { transform: rotate(-90deg); }
 
-    .assess-rating-row { display: flex; flex-wrap: wrap; gap: var(--ic-space-4) var(--ic-space-6); }
-    .assess-rating-row .radio { width: 200px; }
+    /* A scale, not a list. Laid out as a wrapping flex row the five band names
+       need ~770px and this column is ~480px, so they broke into three rows of
+       two — which reads as a list of options and throws away the ordering that
+       is the whole point of a scale. One column per band instead, the dot above
+       its own label: low to high reads left to right, and each target is the
+       full column rather than a 16px circle.
+       auto-fit rather than a fixed five columns, for two reasons: a template can
+       carry a 3-point scale as easily as a 5-point one, and five columns need
+       about 460px of card — below that they reflow rather than overflow it. The
+       86px floor is the widest single word in the labels ("Expectations"), so a
+       column never has to break a word. */
+    .assess-rating-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+      gap: var(--ic-space-2); align-items: start; }
+    .assess-rating-row .radio { flex-direction: column; align-items: center; text-align: center;
+      gap: var(--ic-space-2); padding: var(--ic-space-2) var(--ic-space-1); border-radius: var(--ic-radius-sm); }
+    .assess-rating-row .radio:hover { background: var(--color-surface-muted); }
+    /* 14px in a ~90px column wraps every long band name to three ragged lines;
+       13px holds most of them to two. */
+    .assess-rating-row .radio-label { font: var(--type-body-sm); }
     .assess-required { color: var(--color-danger); margin-right: 2px; }
     /* Another components.css gap (not fixed here, same reason as the two
        flagged above): there's no .input.is-error rule anywhere in the
@@ -3999,6 +4029,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        count as a page-level tab strip. */
     .page-head:has(+ .tabs),
     .page-head:has(+ * > .tabs) { border-bottom: 0; margin-bottom: var(--ic-space-4); }
+    /* .tabs is display:flex in components.css, which outranks the UA [hidden]
+       rule — the same trap as .alert, .btn, .toolbar and .cb-vis-date. */
+    .tabs[hidden] { display: none; }
+
+    /* A heading that switches. Keeps .page-head-heading's own type — this only
+       strips the button chrome and hangs a chevron off the end, so it reads as
+       the page's title rather than as a control sitting where a title belongs. */
+    .rc-title-trigger { display: inline-flex; align-items: center; gap: var(--ic-space-2);
+      background: none; border: 0; padding: 0; cursor: pointer; color: var(--color-text); }
+    /* Cycle names are long enough to wrap in a narrow window; balance splits
+       them evenly rather than orphaning "2026" on its own line. */
+    #rc-title-name { text-wrap: balance; text-align: left; }
+    .rc-title-chevron { color: var(--color-text-subtle); transition: transform var(--ic-duration-fast) var(--ic-ease); }
+    .rc-title-trigger:hover .rc-title-chevron { color: var(--color-text); }
+    .rc-title-trigger[aria-expanded="true"] .rc-title-chevron { transform: rotate(180deg); }
+    .rc-title-trigger:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: var(--ic-radius-sm); }
+    /* The menu hangs under the title rather than being squeezed to its width. */
+    #rc-title-select .dropdown-menu { min-width: 260px; }
+    /* A parked strip still matches :has(+ .tabs) above, so the page head would
+       keep the divider it drops for a visible one. Put it back, and the page
+       reads like Cycles and Templates. */
+    .page-head:has(+ .tabs[hidden]) { border-bottom: 1px solid var(--ic-palette-gray-150); margin-bottom: 0; }
 
     /* Undo below the message, not beside it. designmd's .toast is one flex row
        (icon · message · action · close), which puts a button of unpredictable
@@ -4077,6 +4129,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .cb-comp-name { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); }
     .cb-comp-desc { font: var(--type-caption); color: var(--color-text-muted); }
     .cb-comp-new { border-top: 1px solid var(--color-border); margin-top: var(--ic-space-4); padding-top: var(--ic-space-4); }
+
+    /* Group maintenance. Seventeen competencies across three groups is fine to
+       build and miserable to revise, so each group head carries the three things
+       revising needs: a tri-state box that takes the whole group in or out, a
+       count so you can see the state without expanding, and a collapse. */
+    .cb-group-head .checkbox { flex-shrink: 0; }
+    .cb-group-count { font: var(--type-caption); color: var(--color-text-subtle); font-variant-numeric: tabular-nums; }
+    /* Quiet, neutral, and pinned after the blue plus — it changes what you can
+       see, not what the template contains. */
+    .cb-group-collapse { flex-shrink: 0; }
+    .cb-group-collapse .icon { transition: transform var(--ic-duration-fast) var(--ic-ease); }
+    .cb-group-collapse[aria-expanded="false"] .icon { transform: rotate(-90deg); }
+    .cb-group-body[hidden] { display: none; }
+
+    /* The card the plus drops into a group: same shape as a competency row so it
+       reads as the row it is about to become, with the border in the accent to
+       say it isn't saved yet. */
+    .cb-comp-draft { display: flex; flex-direction: column; gap: var(--ic-space-2);
+      padding: var(--ic-space-3); border: 1px solid var(--color-accent);
+      border-radius: var(--ic-radius-sm); margin-bottom: var(--ic-space-2);
+      background: var(--color-surface); }
+    .cb-comp-draft-actions { display: flex; align-items: center; gap: var(--ic-space-2); }
+    .cb-comp-draft-hint { font: var(--type-caption); color: var(--color-text-subtle); margin-left: auto; }
 
     /* Rating scale editor + reviewer-facing preview */
     .cb-scale-row { display: grid; grid-template-columns: 72px 1fr 44px 32px; gap: var(--ic-space-2); align-items: center; margin-bottom: var(--ic-space-2); }
@@ -4556,16 +4631,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-performance-2"/></svg><span class="sidenav-item-label">Performance reviews</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
             <!-- One entry per role (PLAN.md § Roles), ordered narrowest scope
                  outward — your own work, then your team, then the whole org:
-                   My assessments    → Reviewer · assessments assigned to you
-                   Review cycles → Manager  · how your report chain is faring
-                   Review cycle      → Admin    · set up cycles and templates
+                   My assessments → Reviewer · assessments assigned to you
+                   Reports        → Manager  · how your report chain is faring
+                   Cycles         → Admin    · set up and run the cycles
+                   Templates      → Admin    · what a cycle asks
                  Kept flat: .sidenav-sublist supports a single level, so
                  Templates lives inside the admin section rather than as a
                  fourth sibling that would break the one-item-per-role read. -->
             <ul class="sidenav-sublist">
               <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="my-assessments"><span class="sidenav-item-label">My assessments</span></a></li>
-              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="team-results"><span class="sidenav-item-label">Review cycles</span></a></li>
-              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="review-cycles"><span class="sidenav-item-label">Templates</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="team-results"><span class="sidenav-item-label">Reports</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="cycles"><span class="sidenav-item-label">Cycles</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="#" data-page="templates"><span class="sidenav-item-label">Templates</span></a></li>
             </ul>
           </div>
         </li>
@@ -4643,7 +4720,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>H2 2026 — Company-wide</td>
                   <td>Aug 12, 2026</td>
-                  <td data-due="2026-09-02"><span class="assess-due">Sep 2, 2026</span></td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
                   <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
                 <tr>
@@ -4659,10 +4736,74 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
                   <td>H2 2026 — Company-wide</td>
                   <td>Aug 3, 2026</td>
-                  <td data-due="2026-08-21"><span class="assess-due">Aug 21, 2026</span></td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
                   <!-- Both rows open the same static "Give Assessment" content (Figma only
                        specs Ezekiel Flores's data) — same reuse-one-instance pattern as the
                        My Reports "View" modal above. -->
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">CR</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Carla Ruiz</span>
+                        <span class="cell-user-role">Software Engineer</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="rel-tags"><span class="tag tag-light">Direct Report</span></span></td>
+                  <td>H2 2026 — Engineering</td>
+                  <td>Aug 14, 2026</td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">SO</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Svetlana Ovsyannikova</span>
+                        <span class="cell-user-role">Engineering Manager</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="rel-tags"><span class="tag tag-light">RACI</span><span class="tag tag-light">Org Unit</span></span></td>
+                  <td>H2 2026 — Company-wide</td>
+                  <td>Aug 12, 2026</td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">MM</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Miloš Milikić</span>
+                        <span class="cell-user-role">Senior Backend Engineer</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="rel-tags"><span class="tag tag-light">Teammate</span></span></td>
+                  <td>H2 2026 — Company-wide</td>
+                  <td>Aug 18, 2026</td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
+                  <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <span class="cell-avatar">NB</span>
+                      <div class="cell-user-meta">
+                        <span class="cell-user-name">Nina Brandt</span>
+                        <span class="cell-user-role">Product Manager</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="rel-tags"><span class="tag tag-light">Teammate</span><span class="tag tag-light">Org Unit</span></span></td>
+                  <td>H2 2026 — Company-wide</td>
+                  <td>Aug 20, 2026</td>
+                  <td data-due="2026-09-30"><span class="assess-due">Sep 30, 2026</span></td>
                   <td><div class="cell-actions"><button class="link-action" type="button" data-skip>Skip</button><button class="btn btn-secondary btn-xs" type="button" data-assess-open>Assess</button></div></td>
                 </tr>
               </tbody>
@@ -4834,6 +4975,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
 
+      <!-- Skipping asks for a reason first. A row that just leaves Pending
+           gives the manager a "Includes 1 skipped" flag with nothing behind it,
+           and that count is only useful if each skip says why. -->
+      <div class="modal-overlay" id="skip-modal" hidden>
+        <div class="modal modal-sm">
+          <header class="modal-header">
+            <h2 class="modal-title">Skip this assessment</h2>
+            <button class="modal-close" data-modal-close aria-label="Close" type="button"><svg><use href="#i-x"/></svg></button>
+          </header>
+          <div class="modal-body">
+            <p class="mv-ans-meta" id="skip-who"></p>
+            <label class="field">
+              <span class="field-label"><span class="assess-required">*</span>Reason for skipping</span>
+              <textarea class="input" id="skip-reason" rows="4" placeholder="e.g. I haven't worked with them this cycle"></textarea>
+              <span class="field-hint is-error" id="skip-reason-hint" hidden>Give a reason — a skip with nothing behind it can't be explained later.</span>
+            </label>
+          </div>
+          <footer class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+            <button class="btn btn-primary" type="button" id="skip-confirm">Continue</button>
+          </footer>
+        </div>
+      </div>
+
       <!-- A template's free-text questions. Opened from the count in the
            Templates table, which is a link because the number alone can't say
            what is being asked. -->
@@ -4855,26 +5020,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             </header>
             <div class="modal-body">
 
+              <!-- One person, not a From -> To pair. This is an assessment the
+                   signed-in user wrote, so the reviewer is themselves and naming
+                   them adds nothing; the reviewee is the only party worth stating.
+                   (The Peer reviews tab's own modal keeps From -> To, because
+                   there the reviewer is someone else.)
+                   Name, role and initials are filled from the row that opened
+                   this, so it can't name a different person from the one clicked. -->
               <div class="assessment-parties">
                 <div class="assessment-party">
-                  <span class="assessment-party-label">From</span>
-                  <div class="cell-user">
-                    <span class="cell-avatar">EF</span>
+                  <span class="assessment-party-label">Reviewee</span>
+                  <div class="cell-user" id="assessment-of">
+                    <span class="cell-avatar">PN</span>
                     <div class="cell-user-meta">
-                      <span class="cell-user-name">Ezekiel Flores</span>
-                      <span class="cell-user-role">Product Design Lead</span>
-                    </div>
-                  </div>
-                  <span class="assessment-party-score">Overall Score <span class="tag tag-light">Overperforming</span></span>
-                </div>
-                <svg class="icon assessment-arrow"><use href="#i-arrow-right"/></svg>
-                <div class="assessment-party">
-                  <span class="assessment-party-label">To</span>
-                  <div class="cell-user">
-                    <span class="cell-avatar">MK</span>
-                    <div class="cell-user-meta">
-                      <span class="cell-user-name">Matt Kelch</span>
-                      <span class="cell-user-role">Engineering Manager</span>
+                      <span class="cell-user-name">Priya Nair</span>
+                      <span class="cell-user-role">Senior Data Scientist</span>
                     </div>
                   </div>
                   <span class="assessment-party-score">Overall Score <span class="tag tag-light">Overperforming</span></span>
@@ -5097,7 +5257,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
             <div class="assess-card">
               <p class="assess-card-head-title">How would you rate Ezekiel?</p>
-              <div class="assess-rating-row" style="margin-top: var(--ic-space-3)">
+              <!-- One row, one column per band, the dot above its own label.
+                   See .assess-rating-row for why it isn't a wrapping flex row. -->
+              <div class="assess-rating-row" style="margin-top: var(--ic-space-4)">
                 <label class="radio"><input type="radio" name="assess-rating" class="radio-input" /><span class="radio-circle"></span><span class="radio-label">Underperforming</span></label>
                 <label class="radio"><input type="radio" name="assess-rating" class="radio-input" /><span class="radio-circle"></span><span class="radio-label">Partially Meets Expectations</span></label>
                 <label class="radio"><input type="radio" name="assess-rating" class="radio-input" /><span class="radio-circle"></span><span class="radio-label">Meets Expectations</span></label>
@@ -5123,17 +5285,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            the CTA into the builder. The body is where the list of existing
            cycles goes (status, window, participant count, progress), which is
            the natural next screen. -->
-      <section class="page-view" data-page="review-cycles" hidden>
+      <section class="page-view" data-page="templates" hidden>
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
               <h1 class="page-head-heading">Templates</h1>
+              <span class="count-badge count-badge-lg count-badge-secondary" id="rc-tpl-count">0</span>
             </div>
             <p class="page-head-subtitle">Create and manage assessment cycles.</p>
           </div>
-          <!-- One CTA per tab rather than one that changes meaning — the two
-               create different things, and a button whose action depends on
-               hidden state is the kind of thing that gets misclicked. -->
           <div class="page-head-actions">
             <button class="btn btn-primary" type="button" id="rc-new-template">Create template</button>
           </div>
@@ -5146,6 +5306,27 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              tab; the reference's inline red Delete has no design-system
              equivalent. Editor is the next build step (PLAN.md § Phase 2). -->
         <div id="rc-templates-panel" style="margin-top: var(--ic-space-4)">
+          <!-- Same shape as the Cycles toolbar, minus the Created-by-me switch:
+               templates are a shared library, not something you own a slice of. -->
+          <div class="toolbar" id="rc-tpl-toolbar">
+            <div class="input-icon input-icon-left toolbar-search">
+              <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
+              <input class="input" type="search" id="rc-tpl-search" placeholder="Search templates…" aria-label="Search templates by name, description or competency" />
+            </div>
+            <div class="toolbar-end">
+              <!-- Inert, like the Filter on Cycles and Reports — the dimensions
+                   aren't settled. No `dropdown-trigger` class, so the shared
+                   handler binds nothing and the click really does nothing. -->
+              <div class="dropdown" id="rc-tpl-filter">
+                <button class="btn btn-secondary" type="button" id="rc-tpl-filter-btn"><svg class="btn-icon"><use href="#i-funnel"/></svg><span>Filter</span></button>
+                <div class="dropdown-menu dropdown-menu-end" hidden></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Says what emptied the table rather than leaving a headless frame. -->
+          <p class="cb-empty" id="rc-tpl-empty" style="margin-bottom: var(--ic-space-4)" hidden></p>
+
           <div class="table-scroll" id="rc-tpl-wrap">
             <table class="table table-wide">
               <colgroup>
@@ -5186,21 +5367,45 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <section class="page-view" data-page="team-results" hidden>
         <div class="page-head">
           <div class="page-head-main">
+            <!-- The page is entirely scoped to one cycle, so the cycle is what
+                 the page is about and the heading says so. Switching cycles is
+                 the same act as changing the title, which is why the two are one
+                 control rather than a fixed word and a picker further down.
+                 The page still names itself through the sidebar, the way a
+                 project page titled with the project name does. -->
             <div class="page-head-title">
-              <h1 class="page-head-heading">Review cycles</h1>
+              <div class="dropdown" id="rc-title-select">
+                <button class="rc-title-trigger dropdown-trigger" type="button" aria-expanded="false" aria-label="Switch cycle">
+                  <span class="page-head-heading" id="rc-title-name">Reports</span>
+                  <svg class="icon icon-24 rc-title-chevron"><use href="#i-chevron-down"/></svg>
+                </button>
+                <!-- -start, not a bare .dropdown-menu: designmd only positions a
+                     menu absolutely when it carries -start/-end, or when it sits
+                     inside an .input-select. Without it the menu stays in normal
+                     flow and pushes the page down instead of overlaying it. -->
+                <div class="dropdown-menu dropdown-menu-start" hidden></div>
+              </div>
             </div>
             <p class="page-head-subtitle">How your reports are doing, cycle by cycle.</p>
           </div>
           <div class="page-head-actions">
-            <button class="btn btn-primary" type="button" id="rc-new">Create cycle</button>
+            <button class="btn btn-secondary" type="button" id="rc-export"><svg class="btn-icon"><use href="#i-download"/></svg>Export CSV</button>
           </div>
         </div>
 
-        <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-summary-panel" type="button">Report summarised <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-detail-panel" type="button">Report detailed <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="cd-peer-panel" type="button">Peer reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="rc-cycles-panel" type="button">Cycles <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+        <!-- PARKED as a strip, not deleted. Two views is a switch, not a tab
+             set, so the segmented control in the toolbar drives these now — it
+             clicks the matching button in here, and the shared .tabs handler
+             does the panel switching exactly as before. Every tab that was
+             already parked stays parked, and unhiding this strip brings the
+             whole thing back. -->
+        <div class="tabs" role="tablist" hidden>
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="tr-summary-panel" type="button">Summary report <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tr-detail-panel" type="button">Detailed report <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
+          <!-- Parked alongside Individual goals. The panel and its renderer stay
+               in place; bringing it back is removing this `hidden` and adding a
+               third segment to the switch. -->
+          <button class="tab" role="tab" aria-selected="false" aria-controls="cd-peer-panel" type="button" hidden>Peer reviews <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" data-tab-count>0</span></button>
           <!-- Parked. The Report tables already carry an Answers column that
                opens the same content per person, so a whole tab for it repeated
                the roll-up a row at a time. Panel and renderer stay in place, so
@@ -5219,7 +5424,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
             <input class="input" type="search" id="rc-search" placeholder="Search a reviewee…" aria-label="Search reviewees" />
           </div>
-          <div class="input-select is-auto" id="rc-cycle-picker">
+          <!-- Hidden: the heading is the cycle switcher now, and two controls
+               for one scope is one too many. Kept in the markup and still
+               populated by renderCyclePicker(), so unhiding it gives a working
+               control. -->
+          <div class="input-select is-auto" id="rc-cycle-picker" hidden>
             <button class="input-select-trigger" aria-expanded="false" type="button">
               <span class="input-select-value">Choose a cycle…</span>
               <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
@@ -5227,6 +5436,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="dropdown-menu" hidden></div>
           </div>
           <div class="toolbar-end">
+            <!-- Same switch shape as Cycles. role="group" with aria-pressed
+                 rather than a tablist: the panels it drives are owned by the
+                 parked tab strip, which is the real tablist. -->
+            <div class="segmented" role="group" aria-label="Which report to show" id="rc-report-switch">
+              <button class="segmented-item is-active" type="button" data-report="tr-summary-panel" aria-pressed="true">Summary</button>
+              <button class="segmented-item" type="button" data-report="tr-detail-panel" aria-pressed="false">Detailed</button>
+            </div>
             <button class="btn btn-secondary" type="button" id="rc-filter"><svg class="btn-icon"><use href="#i-funnel"/></svg>Filter</button>
           </div>
         </div>
@@ -5286,13 +5502,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </table>
         </div>
 
-        <div id="rc-cycles-panel" role="tabpanel" style="margin-top: var(--ic-space-4)" hidden>
-        <!-- Lives inside the panel rather than beside the report tabs' toolbar:
-             it acts on this table only, so it appears and disappears with the
-             tab instead of needing to be hidden by hand.
-             role="group" with aria-pressed rather than designmd's documented
-             role="tablist" — these two segments switch a filter, not a panel,
-             and there are no tabpanels for a tablist to control. -->
+      </section>
+
+      <!-- ===== Cycles — the admin list =====
+           Was the fourth tab on Reports. Moved out because creating a cycle is
+           not reporting on one: the other three tabs read results, this one runs
+           the thing that produces them, and Create cycle sat as the primary
+           action on a page otherwise about numbers. Reports keeps the cycle
+           *picker* — a cycle is still the scope those tables are read through. -->
+      <section class="page-view" data-page="cycles" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Cycles</h1>
+              <!-- Counts what the table is showing, so it follows the filters
+                   the way the tab badge used to. -->
+              <span class="count-badge count-badge-lg count-badge-secondary" id="rc-cyc-count">0</span>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" type="button" id="rc-new">Create cycle</button>
+          </div>
+        </div>
+
+        <!-- role="group" with aria-pressed rather than designmd's documented
+             role="tablist" for .segmented — these two segments switch a filter,
+             not a panel, and there are no tabpanels for a tablist to control. -->
         <div class="toolbar" id="rc-cyc-toolbar">
           <div class="input-icon input-icon-left toolbar-search">
             <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
@@ -5302,6 +5537,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="segmented" role="group" aria-label="Whose cycles to show" id="rc-cyc-scope">
               <button class="segmented-item is-active" type="button" data-cyc-scope="all" aria-pressed="true">All cycles</button>
               <button class="segmented-item" type="button" data-cyc-scope="mine" aria-pressed="false">Created by me</button>
+            </div>
+            <!-- Inert for now, matching the Filter on Reports: the dimensions
+                 are not settled yet.
+                 The status menu behind it is built and working — renderStatusFilter()
+                 still populates it and cycStatus still filters visibleCycles() —
+                 it is just hidden and the trigger is unwired. Bringing it back is
+                 restoring the `dropdown-trigger` class and dropping `hidden`; the
+                 shared .dropdown handler does the rest. -->
+            <div class="dropdown" id="rc-cyc-filter">
+              <button class="btn btn-secondary" type="button" id="rc-cyc-filter-btn"><svg class="btn-icon"><use href="#i-funnel"/></svg><span id="rc-cyc-filter-label">Filter</span></button>
+              <div class="dropdown-menu dropdown-menu-end" hidden></div>
             </div>
           </div>
         </div>
@@ -5329,8 +5575,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                  picker can't name the same cycle two different ways. -->
             <tbody></tbody>
           </table>
-        </div>
-        </div>
       </section>
 
       <!-- ============================================================
@@ -5522,11 +5766,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" id="bd-back">Review cycles</a>
+              <a class="breadcrumb" href="#" id="bd-back">Reports</a>
               <span class="breadcrumb is-current" aria-current="page" id="bd-crumb">Breakdown</span>
             </nav>
             <div class="page-head-title">
               <h1 class="page-head-heading" id="bd-name">Breakdown</h1>
+              <!-- Whether this person's round is finished. The cycle itself is
+                   named in the breadcrumb now, so this says the thing you can't
+                   read anywhere else on the page: an average over three of five
+                   reviewers is provisional, and the tag is what says so. -->
+              <span class="tag" id="bd-cycle-tag" data-tooltip-style="regular" data-placement="bottom" hidden></span>
             </div>
             <p class="page-head-subtitle" id="bd-meta"></p>
           </div>
@@ -5535,24 +5784,72 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
-        <!-- One cycle or all of them. A cycle is a snapshot and a person is
-             longitudinal, so the same page answers both "how did this cycle go"
-             and "where is this going". A tab strip rather than a segmented
-             control: these are two views of the page, not a setting on one —
-             and as a direct sibling of the head it takes the page-head divider
-             with it (see the NB-66 rule). Panels are switched by the shared
-             .tabs handler via aria-controls. -->
+        <!-- This cycle / All cycles used to be two tabs holding two different
+             shapes — a list of competencies with comments, and a cycle-by-cycle
+             matrix. They are one view now, in the list's shape, with the cycle
+             as a filter on it: "which cycle" is a question about scope, not a
+             different screen. One cycle is always selected — there is no All,
+             because scores from different cycles measure a moving target, and
+             averaging them turned the headline number into a lifetime average.
+             The matrix is parked (see renderMatrix).
+             As a direct sibling of the head the strip takes the page-head
+             divider with it (the NB-66 rule). -->
         <div class="tabs" role="tablist" id="bd-scope">
-          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="bd-cycle-panel" type="button" data-bd-scope="cycle">This cycle</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="bd-all-panel" type="button" data-bd-scope="all">All cycles</button>
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="bd-cycle-panel" type="button" data-bd-scope="cycle">Competency scores <span class="count-badge count-badge-sm count-badge-secondary" style="margin-left: var(--ic-space-1)" id="bd-scores-count">0</span></button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="bd-goals-panel" type="button" data-bd-scope="goals">Individual goals</button>
+        </div>
+
+        <!-- Full width, above the two-column layout, so the search has room and
+             the selects pin right — the same shape as the toolbars on Reports and
+             Cycles. It belongs to the Competency scores tab, so the tab handler
+             hides it on Individual goals. -->
+        <div class="toolbar" id="bd-filters" style="margin-top: var(--ic-space-4)">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
+            <input class="input" type="search" id="bd-search" placeholder="Search competencies…" aria-label="Search competencies by name or by what a reviewer wrote" />
+          </div>
+          <div class="toolbar-end">
+            <!-- Hidden. The cycle is inherited from the one Reports is scoped to,
+                 so a second picker here duplicated that control — and with no All
+                 left to choose, it only ever restated where you came from. The
+                 page head names the cycle instead. Kept in the markup and still
+                 populated by renderBdFilters(), so unhiding it gives a working
+                 control. -->
+            <div class="input-select is-auto" id="bd-cycle-filter" hidden>
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">Cycle</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+            <div class="input-select is-auto" id="bd-by-filter">
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">All reviewers</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+            <!-- Where they struggle and where they do well. Every option carries
+                 how many competencies fall in it, so the open menu is the
+                 distribution — often the answer without filtering. -->
+            <div class="input-select is-auto" id="bd-band-filter">
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">All ratings</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+          </div>
         </div>
 
         <div class="bd-layout">
           <div>
             <div id="bd-cycle-panel" role="tabpanel">
-              <h2 class="cb-section-title">Competency scores <span class="count-badge count-badge-secondary" id="bd-scores-count">0</span></h2>
-              <p class="cb-section-hint">Each score is the average of what every reviewer gave, with their comments underneath.</p>
+              <!-- Hidden, like the page subtitles: the filters above already say
+                   what the list is scoped to. Kept in the markup and still kept
+                   up to date by renderScores(), so unhiding it gives a live line
+                   rather than a stale one. -->
+              <p class="cb-section-hint" id="bd-scores-hint" hidden>Each score is the average of what every reviewer gave, with their comments underneath.</p>
               <div id="bd-feedback-state"></div>
               <div id="bd-scores"></div>
             </div>
@@ -5563,11 +5860,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div id="bd-goals"></div>
             </div>
 
-            <div id="bd-all-panel" role="tabpanel" hidden>
-              <h2 class="cb-section-title">Competency scores by cycle</h2>
-              <p class="cb-section-hint">Every cycle this person was scored in, oldest first. A dot means they were not in that cycle; a dash means they were, but not assessed on that competency.</p>
-              <div id="bd-matrix"></div>
-            </div>
           </div>
 
           <aside class="bd-side">
@@ -5605,7 +5897,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" id="cb-back-link">Review cycles</a>
+              <a class="breadcrumb" href="#" id="cb-back-link">Cycles</a>
               <span class="breadcrumb is-current" aria-current="page" id="cb-crumb">New assessment cycle</span>
             </nav>
             <div class="page-head-title">
@@ -7266,9 +7558,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
 
 
-      // Groups whose unpicked competencies are currently revealed. Kept out of
-      // the draft: it's a view preference, not part of the template.
+      // Groups whose unpicked competencies are currently revealed, and groups
+      // collapsed altogether. Both kept out of the draft: they are view
+      // preferences, not part of the template.
       const revealed = new Set();
+      const collapsed = new Set();
+      // The group currently showing an unsaved competency card, if any.
+      let drafting = null;
 
       const renderLibrary = () => {
         const inh = inheritedIds();
@@ -7283,12 +7579,25 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const off = items.filter(c => !isOn(c));
           const open = revealed.has(g.id);
           const visible = open ? items : items.filter(isOn);
+          const on = items.filter(isOn).length;
+          const shut = collapsed.has(g.id);
+          /* Tri-state: all in, some in, none in. The box is the whole group's
+             membership, so unticking it drops every competency under it. */
+          const groupState = on === items.length ? 'checked' : on ? 'mixed' : 'off';
           return `<div class="cb-group">
-            <div class="cb-group-head"><span class="cb-group-name">${esc(g.name)}</span>
-              ${off.length ? `<button class="link-action cb-group-toggle" type="button" data-toggle-group="${g.id}">${open ? 'Hide unselected' : `Show ${off.length} unselected`}</button>` : ''}
+            <div class="cb-group-head">
+              <label class="checkbox" data-tooltip="${groupState === 'checked' ? `Drop all of ${esc(g.name)} from this template` : `Add all of ${esc(g.name)} to this template`}">
+                <input type="checkbox" class="checkbox-input" data-te-group="${g.id}" data-group-state="${groupState}" ${groupState === 'checked' ? 'checked' : ''} aria-label="Select every competency in ${esc(g.name)}" />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
+              </label>
+              <span class="cb-group-name">${esc(g.name)}</span>
+              <span class="cb-group-count">${on} of ${items.length}</span>
+              ${off.length && !shut ? `<button class="link-action cb-group-toggle" type="button" data-toggle-group="${g.id}">${open ? 'Hide unselected' : `Show ${off.length} unselected`}</button>` : ''}
               <button class="btn btn-icon-only btn-ghost btn-xs cb-group-add" type="button" data-add-to-group="${g.id}" data-tooltip="Add a competency to ${esc(g.name)}" aria-label="Add a competency to ${esc(g.name)}"><svg class="icon"><use href="#i-plus"/></svg></button>
+              <button class="btn btn-icon-only btn-ghost btn-xs cb-group-collapse" type="button" data-collapse-group="${g.id}" aria-expanded="${!shut}" data-tooltip="${shut ? 'Show' : 'Hide'} ${esc(g.name)}" aria-label="${shut ? 'Show' : 'Hide'} ${esc(g.name)}"><svg class="icon"><use href="#i-chevron-down"/></svg></button>
             </div>
-            ${visible.length ? '' : '<p class="cb-empty">Nothing picked from this group yet.</p>'}
+            <div class="cb-group-body" ${shut ? 'hidden' : ''}>
+            ${visible.length || drafting === g.id ? '' : '<p class="cb-empty">Nothing picked from this group yet.</p>'}
             ${visible.map(c => {
               const isInh = inh.includes(c.id);
               const on = isOn(c);
@@ -7297,8 +7606,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <span class="cb-comp-meta"><span class="cb-comp-name">${esc(c.n)}</span><span class="cb-comp-desc">${esc(c.d)}</span></span>
               ${isInh ? '<span class="tag tag-light te-inherited-tag">inherited</span>' : ''}
             </label>`; }).join('')}
+            ${drafting === g.id ? `<div class="cb-comp-draft">
+              <input class="input input-xs" type="text" id="te-draft-name" placeholder="Competency name" aria-label="Competency name" />
+              <input class="input input-xs" type="text" id="te-draft-desc" placeholder="What it means, in one line (optional)" aria-label="Competency description" />
+              <div class="cb-comp-draft-actions">
+                <button class="btn btn-primary btn-xs" type="button" data-draft-save>Add</button>
+                <button class="btn btn-secondary btn-xs" type="button" data-draft-cancel>Cancel</button>
+                <span class="cb-comp-draft-hint">Enter to add · Esc to cancel</span>
+              </div>
+            </div>` : ''}
+            </div>
           </div>`;
         }).join('');
+        /* indeterminate is a DOM property, not an attribute, so it can only be
+           set after the markup lands. */
+        $('#te-library').querySelectorAll('[data-te-group]').forEach(cb => {
+          cb.indeterminate = cb.dataset.groupState === 'mixed';
+        });
         $('#te-comp-count').textContent = effective().length;
         // The group choice survives re-renders, so adding one competency to a
         // new group doesn't bounce the picker back for the next one.
@@ -7306,15 +7630,66 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (groupMenuOpen()) renderGroupMenu();
       };
 
+      /* One creation path for both ways in — the plus's in-place card and the
+         add row at the foot of the section — so the two cannot drift into
+         producing different library entries. */
+      const createComp = (groupId, name, desc) => {
+        const id = 'c-' + name.toLowerCase().replace(/\W+/g, '-');
+        if (!compById(id)) LIB.push({ id, g: groupId, n: name, d: desc || 'No description yet.' });
+        if (!selected().includes(id)) selected().push(id);
+        return id;
+      };
+
+      const saveDraftComp = () => {
+        const nameEl = $('#te-draft-name');
+        const name = nameEl?.value.trim();
+        if (!name) { nameEl?.focus(); return; }
+        const gid = drafting;
+        createComp(gid, name, $('#te-draft-desc').value.trim());
+        /* Straight back into an empty card rather than closing it: adding one
+           competency to a group is usually adding several, and `drafting` is
+           still set so the re-render puts a fresh one below the new row. */
+        renderLibrary();
+        $('#te-draft-name')?.focus();
+        renderParent();
+        window.renderCycleTemplatePicker?.();
+        if (window.toast) toast({ variant: 'success', timeout: 2400,
+          message: `“${name}” added to ${GROUPS.find(g => g.id === gid)?.name ?? 'the library'}.` });
+      };
+
+      /* Same control, two meanings: an inherited competency is held out by
+         being *excluded*, anything else by being *selected*. Both the row's own
+         checkbox and the group's select-all go through here, so a group can't
+         end up meaning something different from ticking its rows one by one. */
+      const setComp = (id, on) => {
+        const inherited = inheritedIds().includes(id);
+        const list = inherited ? excludes() : selected();
+        const wants = inherited ? !on : on;   // excludes() holds what is dropped
+        const at = list.indexOf(id);
+        if (wants) { if (at < 0) list.push(id); }
+        else if (at > -1) list.splice(at, 1);
+      };
+
       section.addEventListener('change', e => {
+        const gb = e.target.closest('[data-te-group]');
+        if (gb) {
+          /* A group box only ever moves in one direction from where it was: if
+             any of the group is missing, take all of it in; if all of it is
+             there, drop all of it. Reading e.target.checked instead would make
+             the indeterminate state's first click depend on what the browser
+             decided that click meant. */
+          const gid = gb.dataset.teGroup;
+          const turnOn = gb.dataset.groupState !== 'checked';
+          LIB.filter(c => c.g === gid).forEach(c => setComp(c.id, turnOn));
+          renderLibrary(); renderParent();
+          window.renderCycleTemplatePicker?.();
+          $(`[data-te-group="${gid}"]`)?.focus();
+          return;
+        }
         const cb = e.target.closest('[data-te-comp]');
         if (!cb) return;
         const id = cb.dataset.teComp;
-        // Same control, two meanings: an inherited row toggles an exclusion,
-        // any other row toggles this template's own selection.
-        const list = inheritedIds().includes(id) ? excludes() : selected();
-        const wants = inheritedIds().includes(id) ? !cb.checked : cb.checked;
-        wants ? (!list.includes(id) && list.push(id)) : list.splice(list.indexOf(id), 1);
+        setComp(id, cb.checked);
         $('#te-comp-count').textContent = effective().length;
         // The Details hint counts what's been dropped, so it has to move too.
         renderParent();
@@ -7399,6 +7774,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // plus points the one add row at that group and puts the cursor in it —
       // same control, one less decision.
       $('#te-library').addEventListener('click', e => {
+        const col = e.target.closest('[data-collapse-group]');
+        if (col) {
+          const id = col.dataset.collapseGroup;
+          collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id);
+          // Collapsing the group a card is being filled in would hide the card
+          // and lose what was typed, so the card goes with it.
+          if (collapsed.has(id) && drafting === id) drafting = null;
+          renderLibrary();
+          $(`[data-collapse-group="${id}"]`)?.focus();
+          return;
+        }
+        if (e.target.closest('[data-draft-cancel]')) { drafting = null; renderLibrary(); return; }
+        if (e.target.closest('[data-draft-save]')) { saveDraftComp(); return; }
         const tg = e.target.closest('[data-toggle-group]');
         if (tg) {
           const id = tg.dataset.toggleGroup;
@@ -7413,11 +7801,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (!btn) return;
         const g = GROUPS.find(x => x.id === btn.dataset.addToGroup);
         if (!g) return;
-        groupChoice = { id: g.id, name: g.name };
-        syncGroupTrigger();
-        closeGroupMenu();
-        $('.cb-comp-new')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        $('#te-new-comp-name').focus();
+        /* The plus used to point the one add row at the bottom of the card at
+           this group and move the cursor there. It now drops the card into the
+           group instead — the trip to the bottom and back was the expensive part
+           of adding several competencies to one group. Expand first, or the card
+           would land inside something hidden. */
+        collapsed.delete(g.id);
+        drafting = g.id;
+        renderLibrary();
+        $('#te-draft-name')?.focus();
+        $('#te-draft-name')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+
+      /* Enter commits, Escape abandons — the card is a two-field form, so the
+         keys people already expect from one should work. */
+      $('#te-library').addEventListener('keydown', e => {
+        if (!e.target.closest('.cb-comp-draft')) return;
+        if (e.key === 'Enter') { e.preventDefault(); saveDraftComp(); }
+        if (e.key === 'Escape') { e.preventDefault(); drafting = null; renderLibrary(); }
       });
 
       $('#te-add-comp').addEventListener('click', () => {
@@ -7437,9 +7838,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           groupChoice = { id: g, name: GROUPS.find(x => x.id === g).name };
         }
 
-        const id = 'c-' + n.toLowerCase().replace(/\W+/g, '-');
-        if (!compById(id)) LIB.push({ id, g, n, d: $('#te-new-comp-desc').value.trim() || 'No description yet.' });
-        if (!selected().includes(id)) selected().push(id);
+        createComp(g, n, $('#te-new-comp-desc').value.trim());
         $('#te-new-comp-name').value = ''; $('#te-new-comp-desc').value = '';
         renderLibrary();
         // The cycle form groups a template's competencies by the same list.
@@ -7610,7 +8009,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       window.openTemplateEditor = open;
 
       const leave = () => {
-        window.showPrPage?.('review-cycles');   // Templates is the whole page now
+        window.showPrPage?.('templates');
       };
       $('#te-cancel').addEventListener('click', leave);
       $('#te-back').addEventListener('click', e => { e.preventDefault(); leave(); });
@@ -7681,7 +8080,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
       const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
 
-      let cycSearch = '', cycScope = 'all';
+      let cycSearch = '', cycScope = 'all', cycStatus = 'all';
       /* Search covers the three text columns on screen — name, creator and the
          status word — so what you can read you can search for. Dates are left
          out: nobody types "Sep 15, 2026" to find a row. */
@@ -7689,15 +8088,42 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const q = cycSearch.trim().toLowerCase();
         return window.PR_CYCLES.filter(c => {
           if (cycScope === 'mine' && c.by !== window.PR_ME) return false;
+          if (cycStatus !== 'all' && c.status !== cycStatus) return false;
           return !q || [c.name, c.by, c.status].some(v => String(v).toLowerCase().includes(q));
         });
+      };
+
+      /* Counted over the search and the All / Created-by-me scope but ignoring
+         the status filter itself — counting against its own result would zero
+         every other option the moment you picked one. Same rule as the rating
+         filter on the breakdown. */
+      const renderStatusFilter = () => {
+        const menu = document.querySelector('#rc-cyc-filter .dropdown-menu');
+        if (!menu) return;
+        const was = cycStatus;
+        cycStatus = 'all';
+        const pool = visibleCycles();
+        cycStatus = was;
+
+        const item = (val, label, count) =>
+          `<button class="dropdown-item${val === cycStatus ? ' is-selected' : ''}" type="button" data-cyc-status="${val}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${label}<span class="dropdown-item-count">${count}</span></button>`;
+        menu.innerHTML = item('all', 'All statuses', pool.length)
+          + '<hr class="dropdown-divider" />'
+          + Object.keys(window.PR_CYCLE_STATUS).map(k =>
+              item(k, window.PR_CYCLE_STATUS[k], pool.filter(c => c.status === k).length)).join('');
+
+        // The button says what is on, rather than making you open it to find out.
+        document.getElementById('rc-cyc-filter-label').textContent = cycStatus === 'all'
+          ? 'Filter' : `Filter · ${cycStatus[0].toUpperCase()}${cycStatus.slice(1)}`;
       };
 
       const render = () => {
         const rows = visibleCycles();
         /* The badge counts what the table is showing, matching how the report
            tabs' badges already follow their search. */
-        const badge = document.querySelector('.tab[aria-controls="rc-cycles-panel"] [data-tab-count]');
+        // Was a tab badge; now the count beside the Cycles page heading. Still
+        // counts what the table is showing rather than the whole list.
+        const badge = document.getElementById('rc-cyc-count');
         if (badge) badge.textContent = rows.length;
 
         /* Name the control that emptied the table, not just the emptiness: with
@@ -7711,9 +8137,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           empty.hidden = rows.length > 0;
           wrap.hidden  = rows.length === 0;
           if (!rows.length) {
-            empty.textContent = q && mine ? `None of the cycles you created match \u201c${q}\u201d.`
-              : q    ? `No cycles match \u201c${q}\u201d.`
-              : mine ? 'You haven\u2019t created any cycles yet.'
+            // Name every filter that is on, so it is clear which one to undo.
+            const bits = [];
+            if (q) bits.push(`matching \u201c${q}\u201d`);
+            if (mine) bits.push('you created');
+            if (cycStatus !== 'all') bits.push(`marked ${cycStatus}`);
+            empty.textContent = bits.length
+              ? `No cycles ${bits.join(', ')}.`
               : 'No cycles yet.';
           }
         }
@@ -7726,10 +8156,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             ? `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-arrow-counter-clockwise"/></svg>Restore</button>`
             : `<button class="dropdown-item" type="button" data-cyc-arch="${c.id}"><svg class="dropdown-item-icon"><use href="#i-archive"/></svg>Archive</button>`;
           return `<tr>
-            <!-- The name opens the cycle for editing rather than for reading:
-                 the reason to open a running cycle is usually to change
-                 something. The kebab keeps View cycle for the report. -->
-            <td><button class="cell-title-link" type="button" data-cyc-edit="${c.id}" title="Edit ${esc(c.name)}">${esc(c.name)}</button></td>
+            <!-- The name opens the cycle's results: Reports, scoped to it. That
+                 reversed once Cycles became its own page — while this list was a
+                 tab on Reports, "open" could only sensibly mean edit, because the
+                 report was already on screen. Now the two are separate places and
+                 a name should take you to the thing it names. Editing lives in
+                 the kebab, alongside the same View. The title attribute carries
+                 the full name because this column truncates. -->
+            <td><button class="cell-title-link" type="button" data-cyc-open="${c.id}" title="${esc(c.name)}">${esc(c.name)}</button></td>
             <td>${window.PR_CYCLE_STATUS[c.status] || ''}</td>
             <td>${esc(c.start)}</td>
             <!-- Due goes red once it's passed and the cycle is still running —
@@ -7762,6 +8196,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
 
         markOverdue();
+        renderStatusFilter();
       };
       // Computed, not written in: an active cycle past its due date is a real
       // state an admin needs to see, and a hardcoded flag would rot.
@@ -7782,6 +8217,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       document.getElementById('rc-cyc-search')?.addEventListener('input', e => {
         cycSearch = e.target.value;
+        render();
+      });
+
+      document.querySelector('#rc-cyc-filter .dropdown-menu')?.addEventListener('click', e => {
+        const it = e.target.closest('[data-cyc-status]');
+        if (!it) return;
+        cycStatus = it.dataset.cycStatus;
+        // The shared .dropdown handler binds item clicks at load and these are
+        // rendered after it, so closing is done here.
+        const trigger = document.getElementById('rc-cyc-filter-btn');
+        trigger.setAttribute('aria-expanded', 'false');
+        document.querySelector('#rc-cyc-filter .dropdown-menu').hidden = true;
         render();
       });
 
@@ -7969,8 +8416,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const gapChip = title => `<span class="mv-cell mv-cell-na" title="${esc(title)}">–</span>`;
 
       // One renderer for both views: name, title and team in a single cell.
+      /* The name opens their breakdown — the same place the row's View goes, and
+         the same rule the Cycles list follows: a name takes you to the thing it
+         names. A button rather than the row itself, so the other things in the
+         row that already navigate (the Reviews and Goals counts) keep working. */
       const person = p => `<div class="cell-user"><span class="cell-avatar">${esc(initials(p.n))}</span>
-        <div class="cell-user-meta"><span class="cell-user-name">${esc(p.n)}</span>
+        <div class="cell-user-meta"><button class="cell-user-name cell-user-name-link" type="button" data-mv-breakdown="${esc(p.n)}">${esc(p.n)}</button>
           <span class="cell-user-role">${esc(p.r)}</span><span class="cell-user-role">${esc(p.t)}</span></div></div>`;
       // Clickable in both views — a bare count can't say *who* is outstanding,
       // which is the thing a manager chasing a cycle actually needs.
@@ -8242,6 +8693,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // why rather than showing a number that reads like progress.
       const scaleOf = (c) => window.PR_TPL?.list.find(t => t.id === c.template)?.scaleId;
 
+      /* PARKED — the competency x cycle matrix, which was the "All cycles" tab.
+         Kept because it is the only view that shows change per competency rather
+         than in aggregate, and the trend card only shows the overall. Bringing it
+         back means restoring #bd-matrix and a tab; nothing calls this now.
+         Referenced from the tab-strip comment above. */
+      // eslint-disable-next-line no-unused-vars
       const renderMatrix = (name) => {
         const cols = cyclesFor(name);
         const wrap = document.getElementById('bd-matrix');
@@ -8436,22 +8893,270 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }).join('');
       };
 
-      // Each panel carries its own heading and hint in the markup, and the
-      // shared .tabs handler shows the right one — so this only has to build the
-      // matrix when its tab is picked.
+      /* ---------- Competency scores, filtered ----------
+         One view where there were two. "Which cycle" and "who said it" are
+         questions about scope, so they are filters on this list rather than
+         separate screens. Both default to All: the page is reached from a
+         cycle-scoped table, but a breakdown is about a person, and everything
+         said about them is the more useful place to start. */
+      /* A cycle is always selected — there is no All. Scores from different
+         cycles are different measurements of a moving target, and averaging them
+         made the headline number a lifetime average rather than "how are they
+         doing". The breakdown opens on the cycle it was reached from.
+         bdBand is 'all' or a rating from the scale. */
+      let bdWho = null, bdCycleId = null, bdBy = 'all', bdBand = 'all', bdQuery = '';
+
+      const bandIndexOf = v => Math.min(SCALE.length, Math.max(1, Math.round(v)));
+      const inBand = v => bdBand === 'all' || bandIndexOf(v) === Number(bdBand);
+
+      // The cycle a name was opened from, as a PR_CYCLES id: PEOPLE is keyed by
+      // the cycle's `data` field, the filter by its id.
+      const openingCycleId = () => (window.PR_CYCLES || []).find(c => c.data === cycle)?.id
+        ?? cyclesFor(bdWho)[0]?.c.id ?? null;
+
+      // Every individual take in scope: one row per reviewer per competency per
+      // cycle. Everything on the page is derived from this, so the card scores,
+      // the quotes and the counts cannot disagree.
+      const bdCol = () => cyclesFor(bdWho).find(x => x.c.id === bdCycleId) ?? null;
+
+      const bdTakes = () => {
+        const cols = [bdCol()].filter(Boolean);
+        return cols.flatMap(({ c, p }) => voicesFor(p)
+          .filter(r => bdBy === 'all' || r.n === bdBy)
+          .flatMap(r => Object.keys(p.s).filter(id => p.s[id] != null).map(id => {
+            const t = takeOf(p, r.n, id);
+            return t && { id, cycle: c, person: p, by: r.n, rel: r.rel, when: r.d, v: t.v, t: t.t };
+          }).filter(Boolean)));
+      };
+
+      // Who has actually reviewed this person, across the cycles in scope. Self
+      // isn't here: this list is peer feedback, the same population the quotes
+      // have always come from.
+      const bdReviewers = () => {
+        const col = bdCol();
+        return col ? [...new Set(voicesFor(col.p).map(r => r.n))].sort() : [];
+      };
+
+      /* Every competency with a score in the cycle + reviewer scope, best
+         first — before the band filter. Shared so the band menu can count
+         against this set rather than against its own result.
+
+         With All reviewers the score is the cycle's own aggregate, averaged
+         across the cycles in scope: the same number the report tables and the
+         rings show. Recomputing it from individual takes would put a slightly
+         different figure on this page than on every other one. With one reviewer
+         picked, their own score is the honest answer. */
+      const bdScoredRows = () => {
+        const col = bdCol();
+        const takes = bdTakes();
+        const scoreOf = id => bdBy === 'all'
+          ? col?.p.s[id] ?? null
+          : avg(takes.filter(x => x.id === id).map(x => x.v));
+        /* The search is part of the scope, not a view on top of it, so the
+           rating counts narrow with it too. It matches the competency's name or
+           anything a reviewer wrote about it — "who mentioned mentoring" is a
+           question this page should be able to answer. */
+        const q = bdQuery.trim().toLowerCase();
+        const hit = id => !q || compName(id).toLowerCase().includes(q)
+          || takes.some(x => x.id === id && (x.t || '').toLowerCase().includes(q));
+        return [...new Set(takes.map(x => x.id))].filter(hit)
+          .map(id => ({ id, v: scoreOf(id) })).filter(x => x.v != null)
+          .sort((a, b) => b.v - a.v || compName(a.id).localeCompare(compName(b.id)));
+      };
+
+      const renderBdFilters = () => {
+        const cols = cyclesFor(bdWho);
+        // `raw` for the rating chips, which are markup rather than text.
+        const item = (val, label, cur, key, count, raw) =>
+          `<button class="dropdown-item${val === cur ? ' is-selected' : ''}" type="button" data-bd-${key}="${esc(val)}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${raw ? label : esc(label)}${
+            count == null ? '' : `<span class="dropdown-item-count">${count}</span>`}</button>`;
+
+        // No All: one cycle at a time, newest last as cyclesFor orders them.
+        const cf = document.getElementById('bd-cycle-filter');
+        cf.querySelector('.dropdown-menu').innerHTML =
+          cols.map(({ c }) => item(c.id, c.name, bdCycleId, 'cycle')).join('')
+          || '<p class="dropdown-item" style="color: var(--color-text-subtle)">No cycles on record</p>';
+        cf.querySelector('.input-select-value').textContent =
+          cols.find(x => x.c.id === bdCycleId)?.c.name ?? 'No cycle';
+
+        const bf = document.getElementById('bd-by-filter');
+        const revs = bdReviewers();
+        bf.querySelector('.dropdown-menu').innerHTML =
+          item('all', 'All reviewers', bdBy, 'by') +
+          revs.map(n => item(n, n, bdBy, 'by')).join('');
+        bf.querySelector('.input-select-value').textContent =
+          bdBy === 'all' ? `All reviewers (${revs.length})` : bdBy;
+
+        /* One entry per point on the scale. Counted over the cycle + reviewer
+           scope but ignoring the band filter itself — counting against its own
+           result would zero every other option the moment you picked one, and
+           the point of the counts is that the open menu is the distribution. */
+        const scored = bdScoredRows();
+        const tally = n => scored.filter(x => bandIndexOf(x.v) === n).length;
+        // The number as the same coloured chip a score wears everywhere else, so
+        // "where do they struggle" reads off the menu by colour.
+        const chip = n => `<span class="mv-score" style="background: ${esc(colorFor(n))}">${n}</span>`;
+
+        const nf = document.getElementById('bd-band-filter');
+        nf.querySelector('.dropdown-menu').innerHTML =
+          item('all', 'All ratings', bdBand, 'band', scored.length)
+          + '<hr class="dropdown-divider" />'
+          + SCALE.map(r => item(String(r.value), chip(r.value), bdBand, 'band', tally(r.value), true)).join('');
+        nf.querySelector('.input-select-value').innerHTML =
+          bdBand === 'all' ? `All ratings (${scored.length})` : `Rating ${esc(bdBand)}`;
+      };
+
+      const renderScores = () => {
+        const col = bdCol();
+        const takes = bdTakes();
+        const scored = bdScoredRows();
+        const rows = scored.filter(x => inBand(x.v));
+
+        document.getElementById('bd-scores-count').textContent = rows.length;
+        document.getElementById('bd-scores-hint').textContent = bdBy === 'all'
+          ? 'Each score is the average of what every reviewer gave, with their comments underneath.'
+          : `Each score is what ${bdBy} gave, with their comment underneath.`;
+
+        /* One cycle at a time, so there is no mixed-scale case to refuse any
+           more — every score on screen is measured against one template's
+           scale. */
+        const state = document.getElementById('bd-feedback-state');
+        if (!scored.length && bdQuery.trim() && takes.length) {
+          state.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-3)">
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message">No competency matches \u201c${esc(bdQuery.trim())}\u201d, by name or in any comment.</p>
+          </div>`;
+        } else if (scored.length && !rows.length) {
+          // The scope has scores; this band just isn't one of them. Said plainly,
+          // because "no competencies" would read as "nothing recorded".
+          state.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-3)">
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message">Nothing scored ${esc(bdBand)} here. ${scored.length} competenc${
+              scored.length === 1 ? 'y is' : 'ies are'} scored in this cycle${bdBy === 'all' ? '' : ` by ${esc(bdBy)}`}.</p>
+          </div>`;
+        } else if (!takes.length) {
+          // Naming which filter emptied it, rather than leaving the person to
+          // guess which of the two to undo.
+          state.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-3)">
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message">${
+              !col ? `${esc(bdWho)} isn't in any cycle with recorded assessments yet.`
+              : bdBy !== 'all' ? `${esc(bdBy)} hasn't submitted anything in this cycle.`
+              // The head still shows a number, because the cycle's aggregate
+              // includes the reviewee's own assessment. Saying so is what stops
+              // that number reading as feedback nobody can see.
+              : `No peer assessments have been submitted in this cycle yet.${
+                  col.p.rev.some(r => r.rel === 'Self' && r.st === 'submitted')
+                    ? ' The score above is their own self-assessment.' : ''}`}</p>
+          </div>`;
+        } else state.innerHTML = '';
+
+        document.getElementById('bd-scores').innerHTML = rows.map(({ id, v }) => {
+          const quotes = takes.filter(x => x.id === id && x.t);
+          return `<div class="card bd-comp">
+            <div class="bd-comp-head">
+              ${scoreChip(v)}
+              <span class="bd-comp-name">${esc(compName(id))}</span>
+              <span class="bd-comp-band">${esc(bandOf(v))}</span>
+            </div>
+            ${quotes.length ? quotes.map(x => `<p class="bd-quote">
+                <span class="bd-quote-by">${esc(x.by)}</span>
+                <span class="mv-score bd-quote-score" style="background: ${esc(colorFor(x.v))}">${x.v}</span>
+                <span class="bd-quote-text">${esc(x.t)}</span>
+              </p>`).join('')
+            // A score with no comment behind it is a different thing from a
+            // score you simply haven't opened.
+            : '<p class="bd-quote is-empty">No comments.</p>'}
+          </div>`;
+        }).join('');
+      };
+
+      document.getElementById('bd-search').addEventListener('input', e => {
+        bdQuery = e.target.value;
+        renderBdFilters();   // the rating counts narrow with the search
+        renderScores();
+      });
+
+      document.getElementById('bd-filters').addEventListener('click', e => {
+        const c = e.target.closest('[data-bd-cycle]');
+        if (c) {
+          bdCycleId = c.dataset.bdCycle;
+          /* Narrowing to one cycle can drop the reviewer that was picked. Reset
+             rather than show an empty list under a name nobody in scope has. */
+          if (bdBy !== 'all' && !bdReviewers().includes(bdBy)) bdBy = 'all';
+        }
+        const b = e.target.closest('[data-bd-by]');
+        if (b) bdBy = b.dataset.bdBy;
+        const n = e.target.closest('[data-bd-band]');
+        if (n) bdBand = n.dataset.bdBand;
+        if (!c && !b && !n) return;
+        renderBdFilters();
+        renderScores();
+        renderBdOverall();
+        renderBdMeta();
+      });
+
+      // The number in the page head follows the filters too — it used to be the
+      // opening cycle's overall, which would contradict a list showing every
+      // cycle.
+      /* With the cycle picker hidden, the head is the only thing that says
+         which cycle these scores are from — and they are cycle-specific, so it
+         has to. Derived from the selected cycle rather than the opening one, so
+         it stays right if that picker is ever unhidden. */
+      const renderBdMeta = () => {
+        const col = bdCol();
+        const p = col?.p ?? PEOPLE[cycle]?.find(x => x.n === bdWho);
+        document.getElementById('bd-meta').textContent = p ? `${p.r} · ${p.t}` : '';
+
+        // The breadcrumb carries the cycle: it is the scope this page sits in,
+        // and "Breakdown" said nothing you couldn't already see.
+        document.getElementById('bd-crumb').textContent = col?.c.name ?? 'Breakdown';
+
+        /* Skipped is counted separately from submitted: a skip will never
+           arrive, so the round can be finished without everyone having spoken,
+           and folding the two together would overstate what the scores rest on. */
+        const tag = document.getElementById('bd-cycle-tag');
+        const rev = col?.p.rev ?? [];
+        const sub_ = rev.filter(r => r.st === 'submitted').length;
+        const skip = rev.filter(r => r.st === 'skipped').length;
+        const out  = rev.length - sub_ - skip;
+        tag.hidden = !col || !rev.length;
+        if (tag.hidden) return;
+        tag.textContent = out ? 'Outstanding' : 'Completed';
+        tag.className = `tag ${out ? 'tag-warning' : 'tag-positive'}`;
+        tag.dataset.tooltip = `${sub_} of ${rev.length} reviews submitted${
+          skip ? `, ${skip} skipped` : ''}${out ? `, ${out} still outstanding` : ''}.`;
+      };
+
+      const renderBdOverall = () => {
+        const col = bdCol();
+        const takes = bdTakes();
+        const o = bdBy === 'all' ? (col ? overallOf(col.p) : null) : avg(takes.map(x => x.v));
+        document.getElementById('bd-overall').innerHTML = o == null ? '' :
+          `<span class="mv-overall">${ring(o, 34)}<span class="mv-ring-value">${o}</span></span>
+           <span class="bd-overall-band">${bdBy === 'all' ? 'overall' : `${esc(bdBy.split(' ')[0])}'s overall`} · ${esc(bandOf(o))}</span>`;
+      };
+
+      /* The toolbar sits outside the tab panels now, so it no longer hides with
+         them — it belongs to Competency scores, and Individual goals has nothing
+         for it to filter. */
+      const syncBdFilters = () => {
+        document.getElementById('bd-filters').hidden = bdScope !== 'cycle';
+      };
+
       document.getElementById('bd-scope').addEventListener('click', e => {
         const b = e.target.closest('[data-bd-scope]');
         if (!b) return;
         bdScope = b.dataset.bdScope;
-        const who = document.getElementById('bd-name').textContent;
-        if (bdScope === 'all') renderMatrix(who);
-        if (bdScope === 'goals') renderGoalsTimeline(who);
+        syncBdFilters();
+        if (bdScope === 'goals') renderGoalsTimeline(bdWho);
       });
 
       // Opening a person resets to their current cycle: the drill-down keeps its
       // context, and the other tab is right there to widen it.
       const resetBdScope = () => {
         bdScope = 'cycle';
+        syncBdFilters();
         document.querySelectorAll('#bd-scope .tab').forEach(t => {
           const on = t.dataset.bdScope === 'cycle';
           t.classList.toggle('is-active', on);
@@ -8465,55 +9170,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const openBreakdown = (name) => {
         const p = PEOPLE[cycle].find(x => x.n === name);
         if (!p) return;
-        const c = CYCLES[cycle];
-        const o = overallOf(p);
 
+        /* The head no longer names the opening cycle: the cycle is a filter on
+           this page now, and a heading fixed to one of them would contradict a
+           list showing all. Role and team are true whichever cycle is in scope. */
+        bdWho = name;
+        bdCycleId = openingCycleId();
+        bdBy = 'all';
+        bdBand = 'all';
+        bdQuery = '';
+        document.getElementById('bd-search').value = '';
         document.getElementById('bd-name').textContent = p.n;
-        document.getElementById('bd-meta').textContent = `${p.r} · ${p.t} · ${c.name || c.range}`;
-        document.getElementById('bd-overall').innerHTML =
-          `<span class="mv-overall">${ring(o, 34)}<span class="mv-ring-value">${o}</span></span>
-           <span class="bd-overall-band">overall · ${esc(bandOf(o))}</span>`;
 
-        // Best first — the same ranking the summary table's "best performing
-        // in" column uses, just not truncated to three.
-        const rows = Object.keys(p.s).filter(id => p.s[id] != null)
-          .sort((a, b) => p.s[b] - p.s[a] || compName(a).localeCompare(compName(b)));
-
-        document.getElementById('bd-scores-count').textContent = rows.length;
-
-        // Where a person is early in the cycle, "No comments." on all nine rows
-        // reads as broken rather than as early. Said once, with the actual
-        // numbers, it reads as what it is — and it names whose scores these are,
-        // since an average over only a self-assessment is a self-assessment.
-        const voices = p.rev.filter(r => r.st === 'submitted' && r.rel !== 'Self');
-        const selfIn = p.rev.some(r => r.rel === 'Self' && r.st === 'submitted');
-        document.getElementById('bd-feedback-state').innerHTML = voices.length ? '' : `
-          <div class="alert alert-info" role="status" style="margin-top: var(--ic-space-3)">
-            <svg class="icon alert-icon"><use href="#i-info"/></svg>
-            <p class="alert-message">No peer assessments submitted yet — ${subs(p).length} of ${p.rev.length} reviewers have responded.${
-              selfIn ? ' The scores below are their own self-assessment.' : ''}</p>
-          </div>`;
-
-        document.getElementById('bd-scores').innerHTML = rows.map(id => {
-          const v = p.s[id];
-          const cs = commentsFor(p, id);
-          return `<div class="card bd-comp">
-            <div class="bd-comp-head">
-              ${scoreChip(v)}
-              <span class="bd-comp-name">${esc(compName(id))}</span>
-              <span class="bd-comp-band">${esc(bandOf(v))}</span>
-            </div>
-            ${cs.length ? cs.map(x => `<p class="bd-quote">
-                <span class="bd-quote-by">${esc(x.by)}</span>
-                <span class="mv-score bd-quote-score" style="background: ${esc(colorFor(x.v))}">${x.v}</span>
-                <span class="bd-quote-text">${esc(x.t)}</span>
-              </p>`).join('')
-            // Worth saying explicitly: a score with no comment behind it is a
-            // different thing from a score you simply haven't opened.
-            : '<p class="bd-quote is-empty">No comments.</p>'}
-          </div>`;
-        }).join('');
-
+        renderBdFilters();
+        renderScores();
+        renderBdOverall();
+        renderBdMeta();
         resetBdScope();
 
         renderTrend(p);
@@ -8565,12 +9237,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // scheduled cycle is a legitimate thing to look at, and its panels say
       // plainly that nothing has been recorded yet.
       const renderCyclePicker = () => {
+        const items = (window.PR_CYCLES || []).map(c =>
+          `<button class="dropdown-item${c.id === currentCycleId ? ' is-selected' : ''}" type="button" data-pick-cycle="${c.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(c.name)}</button>`).join('');
+        const c = currentCycle();
+
+        // The heading is the switcher; the toolbar's picker is parked behind it
+        // and kept in step so unhiding it needs nothing else.
+        const title = document.getElementById('rc-title-name');
+        if (title) title.textContent = c ? c.name : 'Reports';
+        const titleMenu = document.querySelector('#rc-title-select .dropdown-menu');
+        if (titleMenu) titleMenu.innerHTML = items;
+
         const menu = document.querySelector('#rc-cycle-picker .dropdown-menu');
         const val = document.querySelector('#rc-cycle-picker .input-select-value');
         if (!menu) return;
-        menu.innerHTML = (window.PR_CYCLES || []).map(c =>
-          `<button class="dropdown-item${c.id === currentCycleId ? ' is-selected' : ''}" type="button" data-pick-cycle="${c.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(c.name)}</button>`).join('');
-        const c = currentCycle();
+        menu.innerHTML = items;
         val.textContent = c ? c.name : 'Choose a cycle…';
       };
 
@@ -8628,6 +9309,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         set('tr-detail-panel', rows ? rows.length : 0);
         set('cd-peer-panel', all.length);
         set('tr-goals-panel', rows ? rows.length : 0);
+        // No heading count here: the cycle name is the title and a number beside
+        // it read as a property of the cycle rather than of the table. The parked
+        // tab badges above still carry it if the strip is ever unhidden.
       };
 
       // Individual goals, scoped to this cycle. Was a standalone table of five
@@ -8677,23 +9361,39 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           // has been recorded against this cycle at all, which is different.
           renderCycleGoals(null, c);
           setCycleTabCounts(null, []);
+          const msg = `No assessments are recorded against this cycle in the prototype${
+              c.status === 'scheduled' ? " — it hasn't started yet" : ''}. ${
+              esc(tpl ? tpl.name : 'Its')} template and dates are set; progress appears once it runs.`;
           wrap.innerHTML = `<div class="alert alert-info" role="status" style="margin-top: var(--ic-space-4)">
             <svg class="icon alert-icon"><use href="#i-info"/></svg>
-            <p class="alert-message">No assessments are recorded against this cycle in the prototype${
-              c.status === 'scheduled' ? " — it hasn't started yet" : ''}. ${
-              esc(tpl ? tpl.name : 'Its')} template and dates are set; progress appears once it runs.</p>
+            <p class="alert-message">${msg}</p>
           </div>`;
+          /* The report tables have to be emptied too. They used to keep whichever
+             cycle's rows were last rendered, so picking a cycle with nothing
+             recorded left the picker naming one cycle above another cycle's
+             people — with the tab badges already reset to 0 beside them. Headers
+             stay, so the columns still explain what would appear here. */
+          ['#tr-summary-wrap', '#tr-detail-wrap'].forEach(sel => {
+            const body = panel.querySelector(`${sel} tbody`);
+            if (!body) return;
+            const cols = panel.querySelectorAll(`${sel} thead tr:last-child th`).length || 1;
+            body.innerHTML = `<tr><td colspan="${cols}" style="text-align: center; color: var(--color-text-subtle)">${msg}</td></tr>`;
+          });
           return;
         }
 
       };
-      // Picking a cycle scopes the report tabs and shows them — it is not a
-      // navigation, so nothing here changes page.
+      /* Picking a cycle scopes the report tabs. This used not to change page,
+         because the Cycles list was one of those tabs; now that it is its own
+         page, "View cycle" has to travel to Reports or it would scope tables the
+         person cannot see. */
       window.prSelectCycle = (id, { showReport = true } = {}) => {
         openCycle(id);
         renderCyclePicker();
         if (showReport) {
+          window.showPrPage?.('team-results');
           document.querySelector('.tab[aria-controls="tr-summary-panel"]')?.click();
+          syncReportSwitch();
           document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
         }
       };
@@ -8702,11 +9402,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // showing the old name.
       window.prRenderCyclePicker = renderCyclePicker;
 
-      document.querySelector('#rc-cycle-picker .dropdown-menu').addEventListener('click', e => {
+      /* Delegated on the whole view rather than on one menu, because the same
+         items are now rendered in two places — the heading's switcher and the
+         parked picker in the toolbar. Both are re-rendered on every pick, so
+         binding the items themselves would need rebinding each time. */
+      panel.addEventListener('click', e => {
         const it = e.target.closest('[data-pick-cycle]');
         if (!it) return;
-        document.querySelector('#rc-cycle-picker .input-select-trigger').setAttribute('aria-expanded', 'false');
-        document.querySelector('#rc-cycle-picker .dropdown-menu').hidden = true;
+        panel.querySelectorAll('#rc-title-select, #rc-cycle-picker').forEach(d => {
+          d.querySelector('.dropdown-trigger, .input-select-trigger')?.setAttribute('aria-expanded', 'false');
+          d.querySelector('.dropdown-menu').hidden = true;
+        });
         window.prSelectCycle(it.dataset.pickCycle, { showReport: false });
       });
 
@@ -8749,19 +9455,90 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         render();
       });
 
-      // The toolbar acts on the report tables, so it goes away on the Cycles
-      // tab — that list has its own shape and no cycle to scope.
-      const syncToolbar = () => {
-        const onCycles = document.querySelector('.tab[aria-controls="rc-cycles-panel"]')?.classList.contains('is-active');
-        document.getElementById('rc-toolbar').hidden = !!onCycles;
-      };
-      panel.querySelector(':scope > .tabs')?.addEventListener('click', syncToolbar);
-      syncToolbar();
+      /* The toolbar used to hide itself on the Cycles tab, which had its own
+         shape and no cycle to scope. With Cycles moved to its own page every
+         remaining tab is a report scoped by the picker, so there is nothing left
+         to hide it from. */
 
       // Not defined yet — but a dead control is worse than an honest one.
+      /* The switch doesn't own which panel is open — the parked tab strip does.
+         It clicks the matching tab and then mirrors whatever ended up active, so
+         anything else that switches panels (prSelectCycle clicks Summary when a
+         cycle is picked) keeps the switch honest without knowing about it. */
+      const syncReportSwitch = () => {
+        const open = panel.querySelector(':scope > .tabs .tab.is-active')?.getAttribute('aria-controls');
+        panel.querySelectorAll('#rc-report-switch [data-report]').forEach(b => {
+          const on = b.dataset.report === open;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+      };
+
+      document.getElementById('rc-report-switch').addEventListener('click', e => {
+        const b = e.target.closest('[data-report]');
+        if (!b) return;
+        panel.querySelector(`:scope > .tabs .tab[aria-controls="${b.dataset.report}"]`)?.click();
+        syncReportSwitch();
+      });
+      syncReportSwitch();
+
       document.getElementById('rc-filter').addEventListener('click', () => {
         if (window.toast) toast({ variant: 'neutral',
           message: 'Filters aren\'t defined yet — search narrows by name, role or team in the meantime.' });
+      });
+
+      /* ---------- Export CSV ----------
+         Exports the report tab you are looking at, not "everything": what lands
+         in the file is what was on screen, including whatever the search and the
+         cycle picker have narrowed it to. The cycle goes in the filename because
+         every one of these tables is scoped to one.
+
+         Cells are read with innerText rather than textContent so the browser's
+         own line breaks survive as separators — textContent glues an avatar's
+         initials onto the name behind it ("ACAlice Chen"). The avatar line is
+         then dropped, since initials aren't data. */
+      const csvCell = v => '"' + String(v).replace(/"/g, '""') + '"';
+      const cellText = td => {
+        const lines = (td.innerText || '').split('\n').map(x => x.trim()).filter(Boolean);
+        if (td.querySelector('.cell-avatar') && lines.length > 1) lines.shift();
+        return lines.join(' · ');
+      };
+      /* The Actions column is dropped. "View" in a spreadsheet is a button that
+         isn't there — it's chrome, not data. Matched per cell rather than by
+         column index, because the detailed matrix's rowspans mean the two header
+         rows don't share an index space. */
+      const isActions = c => !!c.querySelector('.cell-actions') || cellText(c) === 'Actions';
+      const csvRow = cells => [...cells].filter(c => !isActions(c))
+        .map(c => csvCell(cellText(c))).join(',');
+
+      document.getElementById('rc-export')?.addEventListener('click', () => {
+        const open = panel.querySelector(':scope > [role="tabpanel"]:not([hidden])');
+        const table = open?.querySelector('table');
+        const rows = table?.querySelectorAll('tbody tr') ?? [];
+        if (!table || !rows.length) {
+          if (window.toast) toast({ variant: 'neutral', message: 'Nothing to export on this tab yet.' });
+          return;
+        }
+        // Both header rows of the detailed matrix are kept: the group row above
+        // the competency row is how that table is meant to be read.
+        const lines = [
+          ...[...table.querySelectorAll('thead tr')].map(tr => csvRow(tr.children)),
+          ...[...rows].map(tr => csvRow(tr.children)),
+          ...[...table.querySelectorAll('tfoot tr')].map(tr => csvRow(tr.children))
+        ];
+
+        const c = currentCycle();
+        const tabName = panel.querySelector(':scope > .tabs .tab.is-active')
+          ?.textContent.replace(/\d+\s*$/, '').trim() || 'report';
+        const slug = v => String(v).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const file = `${slug(c ? c.name : 'cycle')}-${slug(tabName)}.csv`;
+
+        const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }));
+        const a = Object.assign(document.createElement('a'), { href: url, download: file });
+        a.click();
+        URL.revokeObjectURL(url);
+        if (window.toast) toast({ variant: 'success',
+          message: `${rows.length} row${rows.length === 1 ? '' : 's'} exported to ${file}` });
       });
     })();
 
@@ -8826,14 +9603,36 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         document.getElementById('tpl-qs-modal').removeAttribute('hidden');
       };
 
+      let tplSearch = '';
+      /* Covers what the row shows: its name, its description, its tags, and the
+         competencies it scores — "which template asks about Code Quality" is a
+         real question and the answer is on screen, so it should be searchable. */
+      const visibleTemplates = () => {
+        const q = tplSearch.trim().toLowerCase();
+        if (!q) return api.list;
+        return api.list.filter(t => {
+          const comps = Object.values(t.variants || {}).flat()
+            .map(id => api.comp(id)?.n).filter(Boolean);
+          const tags = [t.base && 'base', t.universal && 'universal', t.archived && 'archived'].filter(Boolean);
+          return [t.name, t.desc, ...tags, ...comps].some(v => String(v || '').toLowerCase().includes(q));
+        });
+      };
+
       const render = () => {
         // Archived templates stay listed rather than disappearing. Hiding them
         // was what made archiving Base dangerous: it feeds every other
         // template, so a hidden-but-still-applying Base would be unreachable
         // to see or edit. Listed and marked, archiving is reversible from the
         // same place, and the only thing it changes is that a cycle can't pick
-        // it. (Filtering the list is the next thing this needs at scale.)
-        wrap.querySelector('tbody').innerHTML = api.list.map(t => {
+        // it.
+        const list = visibleTemplates();
+        const empty = document.getElementById('rc-tpl-empty');
+        if (empty) {
+          empty.hidden = list.length > 0;
+          wrap.hidden = list.length === 0;
+          if (!list.length) empty.textContent = `No templates match \u201c${tplSearch.trim()}\u201d.`;
+        }
+        wrap.querySelector('tbody').innerHTML = list.map(t => {
           const tags = [t.base && 'base', t.universal && 'universal', t.archived && 'archived'].filter(Boolean);
           // Own competencies only — inherited ones belong to Base's own row.
           const comps = t.universal
@@ -8882,10 +9681,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             menu.hidden = open;
           });
         });
-        const badge = document.querySelector('.tab[aria-controls="rc-templates-panel"] [data-tab-count]');
-        if (badge) badge.textContent = api.list.length;
+        // Was a tab badge, from when Templates was a tab beside Cycles; that
+        // lookup found nothing once it became its own page, so the count sat at
+        // whatever the markup shipped. Same count beside the heading the Cycles
+        // page uses.
+        // Counts what the table is showing, so search moves it — same as the
+        // Cycles page.
+        const badge = document.getElementById('rc-tpl-count');
+        if (badge) badge.textContent = list.length;
       };
       window.renderTemplateList = render;
+
+      document.getElementById('rc-tpl-search')?.addEventListener('input', e => {
+        tplSearch = e.target.value;
+        render();
+      });
 
       wrap.addEventListener('click', e => {
         const qs = e.target.closest('[data-tpl-qs]');
@@ -9153,7 +9963,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       $('#cb-tpl-manage').addEventListener('click', e => {
         e.preventDefault();
-        window.showPrPage?.('review-cycles');   // Templates is the whole page now
+        window.showPrPage?.('templates');
       });
 
       /* ---------- Section 3 · participants ---------- */
@@ -9396,7 +10206,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         }
 
         setMode(null);
-        window.showPrPage?.('team-results');
+        window.showPrPage?.('cycles');   // back to the list this was opened from
         if (window.toast) toast({
           variant: 'success',
           message: was
@@ -9416,11 +10226,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // because it lives outside the form's own section.
       document.getElementById('rc-new')?.addEventListener('click', () => openBuilder(null));
 
-      // NB-62 moved cycle creation to the manager, so this form's parent is
-      // Review cycles now — and the breadcrumb lands on its Cycles tab.
+      // The form's parent is the Cycles list it is opened from — its own page
+      // now rather than a tab on Reports.
       $('#cb-back-link').addEventListener('click', (e) => {
         e.preventDefault();
-        window.showPrPage?.('team-results');
+        window.showPrPage?.('cycles');
       });
 
       // Saving a template can rename it or move it in the hierarchy, so the
@@ -9503,6 +10313,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
         hub.querySelectorAll('[data-modal-open]').forEach(trigger => {
           trigger.addEventListener('click', () => {
+            /* The assessment modal names one person — the reviewee — and every
+               Completed row opens the same modal, so it takes that person from
+               the row it was opened from. Left static it named whoever the
+               markup happened to ship with, on all three rows. */
+            const who = trigger.closest('tr')?.querySelector('.cell-user');
+            const slot = document.getElementById('assessment-of');
+            if (who && slot) slot.innerHTML = who.innerHTML;
             document.getElementById(trigger.dataset.modalOpen)?.removeAttribute('hidden');
           });
         });
@@ -9513,11 +10330,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         hub.querySelectorAll('[data-assess-open]').forEach(trigger => {
           trigger.addEventListener('click', () => window.showAssessPage?.());
         });
-        // Skip moves the row from Pending into Skipped.
+        // Skip asks for a reason first; the modal's Continue does the move.
         hub.querySelectorAll('[data-skip]').forEach(btn => {
-          btn.addEventListener('click', () => skipRow(btn));
+          btn.addEventListener('click', () => openSkip(btn));
         });
         refreshPanels();   // counts derive from the rows, not hand-set markup
+        // After the counts, so the badges reflect the move rather than the
+        // moment before it.
+        autoSkipOverdue();
       };
 
       /* Tab badges + empty rows, recomputed from whatever each tbody actually
@@ -9547,22 +10367,134 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
       };
 
-      const skipRow = (btn) => {
-        const row = btn.closest('tr');
+      /* The move itself, shared by the two ways a row leaves Pending: the
+         reviewer choosing to skip it, and its due date passing. */
+      const moveToSkipped = (row, tooltip) => {
         const target = hub.querySelector('#pr-panel-skipped tbody');
-        if (!row || !target) return;
+        if (!row || !target) return null;
         const name = row.querySelector('.cell-user-name')?.textContent ?? 'this person';
 
-        // Pending's third column is "Date Received"; in Skipped the same slot is
-        // "Date Skipped", so it becomes the date the skip happened.
-        row.children[2].textContent = new Date().toLocaleDateString('en-US',
+        /* Pending is Member · Relationship · Review cycle · Date Received · Due ·
+           Actions; Skipped drops Due and turns Date Received into Date Skipped.
+           This used to write the date into children[2] and leave the extra cell
+           in place — stale from before the Review cycle and Due columns existed,
+           so a skipped row lost its cycle name and shifted every column after
+           Relationship by one. Index 3 first, then drop what is now index 4. */
+        row.children[3].textContent = new Date().toLocaleDateString('en-US',
           { month: 'short', day: 'numeric', year: 'numeric' });
-        btn.remove();            // Skip is gone; Assess stays — skipping isn't final
-        target.appendChild(row); // the Assess button keeps its existing listener
+        /* Why it was skipped has nowhere of its own in this table's five
+           columns, so it rides on the date it belongs to rather than being
+           collected and thrown away. A Reason column would be the better home
+           if skips matter. The caller writes the whole string, so a reviewer's
+           reason and an automatic one can read differently. */
+        if (tooltip) {
+          row.children[3].dataset.tooltip = tooltip;
+          row.children[3].dataset.tooltipStyle = 'regular';
+          row.children[3].dataset.placement = 'left';
+        }
+        row.children[4].remove();               // the Due cell — Skipped has no such column
+        row.querySelector('[data-skip]')?.remove();  // Skip is gone; Assess stays — skipping isn't final
+        target.appendChild(row);                // the Assess button keeps its existing listener
+        return name;
+      };
 
+      const skipRow = (btn, reason) => {
+        const row = btn.closest('tr');
+        const name = moveToSkipped(row, reason && `Reason: ${reason}`);
+        if (!name) return;
         refreshPanels();
         if (window.toast) toast({ variant: 'neutral', message: `Skipped the assessment for ${name}.` });
       };
+
+      /* ---------- Overdue rows leave Pending on their own ----------
+         Asked for directly: once the due date has passed the assessment is no
+         longer something to chase, so it moves to Skipped without waiting for
+         anyone to press Skip.
+
+         Two things this deliberately does NOT pretend. The reason is written by
+         the system, not the reviewer, and says so — a chosen skip and a lapsed
+         one are different facts and the Skipped tab shouldn't merge them. And
+         it announces itself once, because a row silently absent from Pending is
+         worse than one that explains where it went.
+
+         Note the wider tension, recorded in PLAN.md: everywhere else in this
+         feature overdue is a *flag on* a state (an Outstanding peer review stays
+         Outstanding; a past-due cycle stays Active), so this is the one place a
+         deadline changes state rather than colouring it. */
+      const autoSkipOverdue = () => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const overdue = [...hub.querySelectorAll('#pr-panel-pending tbody tr')].filter(row => {
+          const cell = row.querySelector('[data-due]');
+          if (!cell) return false;
+          return new Date(cell.dataset.due + 'T00:00:00') < today;
+        });
+        if (!overdue.length) return;
+
+        overdue.forEach(row => {
+          const was = row.querySelector('[data-due] .assess-due')?.textContent.trim();
+          row.dataset.skipAuto = '1';
+          moveToSkipped(row, `Auto-skipped — not submitted by ${was || 'the due date'}.`);
+        });
+        refreshPanels();
+        if (window.toast) toast({
+          variant: 'warning',
+          message: overdue.length === 1
+            ? 'One assessment passed its due date and moved to Skipped.'
+            : `${overdue.length} assessments passed their due date and moved to Skipped.`
+        });
+      };
+
+      /* ---------- Skip, with a reason ----------
+         The modal lives outside #pr-hub-body, so its handlers bind once here
+         rather than in wirePopulated() — a fresh innerHTML render of the hub
+         doesn't touch them. */
+      let pendingSkip = null;
+      const skipModal  = document.getElementById('skip-modal');
+      const skipReason = document.getElementById('skip-reason');
+      const skipHint   = document.getElementById('skip-reason-hint');
+
+      const closeSkip = () => {
+        skipModal?.setAttribute('hidden', '');
+        pendingSkip = null;
+        if (skipReason) { skipReason.value = ''; skipReason.classList.remove('is-error'); }
+        if (skipHint) skipHint.hidden = true;
+      };
+
+      const openSkip = (btn) => {
+        const row = btn.closest('tr');
+        if (!row || !skipModal) return;
+        pendingSkip = btn;
+        // Names the assessment being skipped, so the modal can't be confused for
+        // a different row when several are pending.
+        const name  = row.querySelector('.cell-user-name')?.textContent ?? 'this person';
+        const cycle = row.children[2]?.textContent.trim() ?? '';
+        document.getElementById('skip-who').textContent = cycle ? `${name} · ${cycle}` : name;
+        skipModal.removeAttribute('hidden');
+        skipReason?.focus();
+      };
+
+      skipModal?.addEventListener('click', e => {
+        // Cancel, the X, and the backdrop all mean the same thing here.
+        if (e.target.closest('[data-modal-close]') || e.target === skipModal) closeSkip();
+      });
+      skipReason?.addEventListener('input', () => {
+        skipReason.classList.remove('is-error');
+        if (skipHint) skipHint.hidden = true;
+      });
+      document.getElementById('skip-confirm')?.addEventListener('click', () => {
+        const reason = skipReason?.value.trim();
+        if (!reason) {
+          // Same treatment as the assessment's required comment: the message
+          // attaches to the field that owns it, not to the button.
+          skipReason?.classList.add('is-error');
+          if (skipHint) skipHint.hidden = false;
+          skipReason?.focus();
+          return;
+        }
+        const btn = pendingSkip;
+        closeSkip();               // clears pendingSkip, so read it first
+        if (btn) skipRow(btn, reason);
+      });
 
       const STATES = {
         populated: () => { hub.innerHTML = POPULATED_HTML; wirePopulated(); },

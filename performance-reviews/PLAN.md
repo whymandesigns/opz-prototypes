@@ -690,6 +690,45 @@ move it below the rating.
 **Not built:** the empty state ("no peer assessments submitted yet"), because
 this screen is static markup for a single competency and has no data behind it.
 
+## Maintaining a template's competencies
+
+Building a template was smooth; revising one was not — seventeen competencies
+across three groups, each ticked and unticked one row at a time. Each group head
+now carries the three things revising needs.
+
+**A tri-state group checkbox.** All in / some in / none in, using designmd's own
+indeterminate checkbox (`checkbox-mark-dash`, set as a DOM property after render
+since `indeterminate` is not an attribute). It moves in one direction from
+wherever it is: **any missing → take all in; all present → drop all**. Reading
+`e.target.checked` instead would make the first click on an indeterminate box
+depend on what the browser decided that click meant.
+
+Crucially it routes through the same `setComp(id, on)` the individual rows use.
+That matters because "in this template" has two shapes: an inherited competency
+is held out by being **excluded**, anything else by being **selected**. One
+function owns that, so a group can't come to mean something different from
+ticking its rows one at a time. Verified on Engineering, which inherits Base's
+four: mixed → all in → all out (via exclusions) → back.
+
+**A count, `4 of 7`.** The state of a group without expanding it.
+
+**A collapse.** Distinct from the existing "Show N unselected" reveal, which is a
+different question — that one asks *what else could be here*, this one asks *get
+this out of my way*. Both view preferences, both kept out of the draft. A
+collapsed group hides its reveal link, since there is nothing to reveal into.
+
+**The plus drops a card into the group.** It used to point the single add row at
+the foot of the section at that group and move the cursor there; the trip down and
+back was the expensive part of adding several competencies to one group. The card
+sits where the row will, in accent-bordered form to say it isn't saved, and after
+Add it reopens empty in place — adding one competency to a group is usually adding
+several. Enter commits, Escape abandons. Collapsing a group mid-draft closes the
+card rather than hiding what was typed.
+
+Both ways in — the card and the bottom add row — go through one `createComp()`,
+so they can't drift into producing different library entries. The bottom row keeps
+its group combobox, because it is still the only way to create a *new* group.
+
 ## Questions column on Templates
 
 A **Questions** column between Competencies and Actions, showing a count that
@@ -721,6 +760,122 @@ treatment the Reviews and Goals counts already use in the report tables.
 
 One layout fix: at 8% the column heading rendered as "Quest". Widened to 13% —
 the column has to fit its own header word, not just a single digit.
+
+## Breakdown: one view, two filters
+
+**This cycle** and **All cycles** were two tabs holding two different shapes — a
+list of competencies with their comments, and a cycle-by-cycle matrix. They are
+one view now, in the list's shape, with **cycle** and **reviewer** as filters on
+it. "Which cycle" and "who said it" are questions about scope, not different
+screens.
+
+**A cycle is always selected — there is no All.** It opens on the one the page
+was reached from. Averaging across cycles made the headline number a lifetime
+average (Alice read 3.8 rather than 4.5) and put six identical quotes on one card,
+because scores from different cycles are measurements of a moving target. With
+one cycle at a time the mixed-scale refusal also disappears — every score on
+screen is against one template's scale — and quotes no longer need to say which
+cycle they came from. Reviewer still defaults to All.
+
+**Everything derives from one list of takes** — one row per reviewer per
+competency per cycle, from the same shared `takeOf()` the assessment modal reads.
+So the card scores, the quotes and the counts cannot disagree.
+
+**Two meanings for the card's score, deliberately.** With *All reviewers* it is
+the cycle's own aggregate (averaged across the cycles in scope) — the same number
+the report tables and the rings show. Recomputing it from individual takes would
+put a slightly different number on this page than on every other one. With one
+reviewer picked, their own score is the honest answer, and the hint above the list
+changes to say so.
+
+**The page-head overall follows the filters.** It used to be the opening cycle's
+overall, which would contradict a list showing every cycle. Same for the meta
+line, which dropped the cycle name — role and team are true whichever cycle is in
+scope.
+
+**Quotes carry their cycle only when more than one is in scope.** Inside a single
+cycle that would just repeat the filter above them.
+
+**A rating filter, third of the three.** Where they struggle and where they do
+well. One entry per point on the scale — rendered as the same coloured chip a
+score wears everywhere else, so the menu reads by colour — built from `SCALE`
+rather than hardcoded to five.
+
+Every option carries a count, so **the open menu is the distribution** — usually
+the answer without filtering at all. The counts are computed over the cycle and
+reviewer scope but ignore the rating filter itself; counting against its own
+result would zero every other option the moment you picked one.
+
+It deliberately does **not** move the page-head overall. The overall answers "how
+is this person doing", which is a property of the person over a scope of cycles
+and reviewers; the band filter is a view on the competency list, not a change of
+scope. An overall computed from only the competencies you filtered to would be a
+different question wearing the same label.
+
+**Refusals kept.** A scope spanning two rating scales can't be averaged, so it
+says so rather than producing a number — the same refusal the matrix made about
+its Change column. An empty list names *which* filter emptied it. And when a
+cycle has no peer assessments, the alert still says the score above is the
+reviewee's own self-assessment; without that sentence the head shows a number
+with nothing visibly behind it.
+
+Narrowing to one cycle can drop the reviewer that was picked, so the reviewer
+resets to All rather than showing an empty list under a name nobody in scope has.
+(Unreachable with the current seed: the historical cycles mark every reviewer
+submitted, so every reviewer appears in every past cycle.)
+
+**Parked, not deleted:** `renderMatrix`. It is the only view that shows change
+*per competency* rather than in aggregate — the trend card beside the list only
+shows the overall — so it is worth keeping recoverable.
+
+Swept all five reviewees × every cycle option (24 combinations): nothing throws,
+and every empty result carries an explanation.
+
+## Cycles moved out of Reports
+
+The Cycles tab became its own page and its own nav item, sitting between Reports
+and Templates: **My assessments · Reports · Cycles · Templates** — your own work,
+your team's results, the cycles you run, what they ask.
+
+The reason is that creating a cycle is not reporting on one. Three of those tabs
+read results; the fourth ran the thing that produces them, and **Create cycle**
+sat as the primary action on a page otherwise about numbers. Reports keeps the
+cycle *picker*, because a cycle is still the scope those tables are read through —
+what moved is the list and the authoring, not the scoping.
+
+Consequences handled rather than left to rot:
+
+- The tab badge became a **count beside the page heading** (designmd's documented
+  `count-badge` next to a title). It still counts what the table is showing, so
+  the search and the All / Created-by-me switch drive it.
+- **`prSelectCycle` is now a navigation.** Its comment used to say the opposite —
+  correctly, while the list was a tab on the same page. From a separate page,
+  the kebab's View cycle has to travel to Reports or it would scope tables the
+  person can't see.
+- The builder's breadcrumb reads **Cycles** and returns there, and launching or
+  re-launching lands back on the list it was opened from rather than on Reports.
+- `syncToolbar` is gone. It existed to hide the report toolbar on the Cycles tab;
+  every remaining tab is a report scoped by the picker, so it had nothing left to
+  hide from.
+
+## Export CSV
+
+Replaces Create cycle as the Reports CTA, and it exports rather than toasting an
+apology: the **tab you are looking at**, including whatever the search and the
+cycle picker have narrowed it to, with the cycle in the filename because every
+one of those tables is scoped to one.
+
+Two details that matter for the output:
+
+- Cells are read with `innerText`, not `textContent`. `textContent` glues an
+  avatar's initials onto the name behind it ("ACAlice Chen"); `innerText` keeps
+  the browser's own line breaks, which become ` · ` separators. The avatar line is
+  then dropped, since initials aren't data.
+- The **Actions column is dropped** — "View" in a spreadsheet is a button that
+  isn't there. Matched per cell rather than by column index, because the detailed
+  matrix's rowspans mean its two header rows don't share an index space. Both of
+  those header rows are kept: the group row above the competency row is how that
+  table is meant to be read.
 
 ## Cycles list toolbar
 
@@ -804,6 +959,47 @@ Two things this exposed and fixed:
 
 **Not carried over:** visibility dates. The cycle model doesn't record them, so
 an edited cycle shows the form's defaults rather than what it was launched with.
+
+## Skipping an assessment
+
+Skip opens a modal naming the row, with a **required** reason, Cancel (secondary)
+and Continue (primary). The reason is required because the manager's Reviews
+column already flags "Includes N skipped", and that count only means something if
+each skip says why. It rides as a tooltip on the Date Skipped cell — the Skipped
+table has five fixed columns and none of them is Reason. **A Reason column is the
+better home** if skips are something anyone reviews.
+
+**Overdue rows leave Pending on their own** (asked for directly, 2026-09-01):
+once the due date passes, the assessment moves to Skipped without anyone pressing
+Skip. Its reason is written by the system and says so — "Auto-skipped — not
+submitted by Aug 21, 2026." — and the row carries `data-skip-auto`, so a chosen
+skip and a lapsed one are not merged into one fact. One summary toast announces
+it, because a row silently absent from Pending is worse than one that explains
+where it went.
+
+**The tension this creates, unresolved.** Everywhere else in this feature overdue
+is a *flag on* a state, not a state: an Outstanding peer review that passes its
+date stays Outstanding and turns red; a past-due cycle stays Active. This is the
+one place a deadline changes state. Two consequences worth a decision:
+
+1. Skipped now mixes "I decided not to" with "the clock ran out". They read
+   differently in the tooltip but look identical in the table, and the manager's
+   skipped count no longer distinguishes them.
+2. The red overdue date in Pending was the thing that prompted a late reviewer to
+   act. Moving the row out removes that nudge — the deadline now closes the
+   review rather than chasing it.
+
+If either matters, the alternative is to leave overdue rows in Pending (red, as
+they were) and surface them as their own filter or count instead.
+
+### A bug this uncovered
+
+`skipRow` wrote the skip date into `children[2]` with a comment claiming that
+slot was Date Received — stale from before the Review cycle and Due columns were
+added. So skipping a row overwrote its cycle name with the date and left a 6-cell
+row in a 5-column table, shifting every column after Relationship by one. It now
+writes into the Date Skipped cell, keeps the cycle, and drops the Due cell that
+Skipped has no column for.
 
 ## Open questions
 
