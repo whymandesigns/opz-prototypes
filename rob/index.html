@@ -5046,7 +5046,7 @@ body { overflow: hidden; }
               <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
               <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
               <label class="checkbox">
-                <input type="checkbox" class="checkbox-input" />
+                <input type="checkbox" class="checkbox-input" data-cm-editable-rob />
                 <span class="checkbox-box">
                   <svg class="checkbox-mark"><use href="#i-check"/></svg>
                 </span>
@@ -5203,6 +5203,8 @@ body { overflow: hidden; }
           if (e.target.closest('[data-modal-close]')) {
             title.value = '';
             title.classList.remove('is-error');
+            const editableCb = modal.querySelector('[data-cm-editable-rob]');
+            if (editableCb) editableCb.checked = false;
           }
         });
 
@@ -5223,7 +5225,8 @@ body { overflow: hidden; }
           if (!cell) return;
 
           const id = 'um-' + (seq++);
-          userMeetings[id] = { id, title: t, date, iso, start, end };
+          const editableByParticipants = !!modal.querySelector('[data-cm-editable-rob]')?.checked;
+          userMeetings[id] = { id, title: t, date, iso, start, end, editableByParticipants };
 
           const btn = document.createElement('button');
           btn.type = 'button';
@@ -5274,6 +5277,10 @@ body { overflow: hidden; }
           const long = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
           whenEl.textContent = `${long} · ${m.start} – ${m.end}`;
         }
+        // Restore per-meeting settings that don't yet have their own storage
+        // pattern. Editable-by-participants is one of them.
+        const editableInput = md.querySelector('[data-md-editable-rob]');
+        if (editableInput) editableInput.checked = !!m.editableByParticipants;
         // Design system's data-modal-open handler is attached per-element on
         // load, so it doesn't fire for dynamically-inserted triggers. Open manually.
         md.removeAttribute('hidden');
@@ -7582,7 +7589,7 @@ Platform reliability — error budget
               <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
               <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
               <label class="checkbox">
-                <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock />
+                <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
                 <span class="checkbox-label">Editable RoB by participants</span>
               </label>
@@ -8496,7 +8503,7 @@ Platform reliability — error budget
     // <a href="profile-items.html"> resolve to /<dir>/profile-items.html
     // instead of /profile-items.html. Local-only fix — Cloudflare Pages
     // already serves trailing slashes for directory targets.
-    if (/\/action-items$/.test(location.pathname)) {
+    if (/\/rob$/.test(location.pathname)) {
       history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
     }
 
