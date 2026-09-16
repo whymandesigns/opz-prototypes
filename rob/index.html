@@ -7834,6 +7834,17 @@ Platform reliability — error budget
           if (reason) me.dataset.rejectionReason = reason;
           if (proposed) me.dataset.rejectionProposed = proposed;
           if (exclude) me.dataset.rejectionExcludeRequested = 'true';
+
+          // Compose the hover tooltip that surfaces the rejection detail from
+          // the row. Reuses designmd's regular data-tooltip pattern.
+          const name = me.querySelector('.md-person-name')?.textContent.trim().replace(/\s+\(you\)$/, '') || 'This person';
+          const parts = [`${name} declined this meeting${scope === 'all events' ? ' and every following one' : ''}.`];
+          if (reason) parts.push(`"${reason}"`);
+          if (proposed) parts.push(`Proposed ${proposed}`);
+          if (exclude) parts.push('Also asked to be removed from the series.');
+          me.setAttribute('data-tooltip', parts.join(' '));
+          me.setAttribute('data-tooltip-style', 'regular');
+          me.setAttribute('data-placement', 'left');
         }
         modal.setAttribute('hidden', '');
         toggle.checked = false;
