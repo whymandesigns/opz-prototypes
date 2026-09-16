@@ -413,7 +413,25 @@ body {
 }
 .btn-icon-only.btn-danger:hover  { background: var(--color-danger-subtle); }
 .btn-icon-only.btn-danger:active { background: var(--color-danger-subtle); }
+
+/* Secondary as icon-only: graphite-700 icon on the outlined surface. A shade
+ * darker than the ghost's graphite-500 — reads as a bordered, resting control. */
+.btn-icon-only.btn-secondary {
+  color: var(--ic-palette-graphite-700);
+}
 .btn:active { transform: translateY(1px); }
+/* Disabled — reduced-opacity + not-allowed cursor across every variant.
+ * `aria-disabled` mirrors the treatment for elements that stay focusable
+ * but shouldn't be actionable. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn:disabled:hover,
+.btn[aria-disabled="true"]:hover { filter: none; }
+.btn:disabled:active,
+.btn[aria-disabled="true"]:active { transform: none; }
 .btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
@@ -483,12 +501,12 @@ body {
  * on that side to make room.
  *
  *   <div class="input-icon input-icon-left">
- *     <svg class="icon input-icon-glyph i-calendar"><use href="#i-calendar"/></svg>
+ *     <i class="ph ph-calendar-blank input-icon-glyph"></i>
  *     <input class="input" type="text" />
  *   </div>
  *   <div class="input-icon input-icon-right">
  *     <input class="input" type="search" />
- *     <svg class="icon input-icon-glyph i-search"><use href="#i-search"/></svg>
+ *     <i class="ph ph-magnifying-glass input-icon-glyph"></i>
  *   </div>
  */
 .input-icon { position: relative; }
@@ -539,7 +557,7 @@ textarea.input {
  *   <div class="input-select">
  *     <button class="input-select-trigger" aria-expanded="false">
  *       <span class="input-select-value input-select-placeholder">Choose…</span>
- *       <svg class="btn-icon i-chevron-down"><use href="#i-chevron-down"/></svg>
+ *       <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
  *     </button>
  *     <div class="dropdown-menu" hidden>...</div>
  *   </div>
@@ -686,10 +704,10 @@ textarea.input {
  *
  *   <div class="toolbar">
  *     <div class="input-icon input-icon-left toolbar-search">
- *       <svg class="icon input-icon-glyph i-search"><use href="#i-search"/></svg>
+ *       <i class="ph ph-magnifying-glass input-icon-glyph"></i>
  *       <input class="input" placeholder="Search…">
  *     </div>
- *     <button class="btn btn-secondary"><svg class="icon i-filter"><use href="#i-filter"/></svg>Filters</button>
+ *     <button class="btn btn-secondary"><i class="ph ph-funnel"></i>Filters</button>
  *     <div class="toolbar-end"> … .input-select.is-auto … .segmented … </div>
  *   </div>
  */
@@ -863,6 +881,9 @@ textarea.input {
   border-color: var(--color-border-focus);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
+/* Invalid state — matches .editor.is-error: red border + red focus ring. */
+.input.is-error                { border-color: var(--color-danger); }
+.input.is-error:focus          { border-color: var(--color-danger); box-shadow: 0 0 0 3px var(--color-danger-subtle); }
 
 /* ---------- Card ---------- */
 .card {
@@ -1376,7 +1397,7 @@ textarea.input {
  *     <div class="accordion is-open">
  *       <button class="accordion-summary" type="button" aria-expanded="true">
  *         <span class="accordion-title">Title</span>
- *         <svg class="icon accordion-chevron i-chevron-down"><use href="#i-chevron-down"/></svg>
+ *         <svg class="icon accordion-chevron"><use href="#i-chevron-down"/></svg>
  *       </button>
  *       <div class="accordion-details"><div class="accordion-content">…</div></div>
  *     </div>
@@ -1440,13 +1461,13 @@ textarea.input {
  * Horizontal block with: icon · message · optional CTAs · optional close button.
  *
  *   <div class="alert alert-danger" role="alert">
- *     <svg class="icon alert-icon i-stop-solid"><use href="#i-stop-solid"/></svg>
+ *     <i class="ph ph-warning-octagon alert-icon"></i>
  *     <p class="alert-message">Something went wrong.</p>
  *     <div class="alert-actions">              optional — drop if no CTAs
  *       <button class="btn btn-xs btn-primary">Retry</button>
  *       <button class="btn btn-xs btn-secondary">Dismiss</button>
  *     </div>
- *     <button class="alert-close" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+ *     <button class="alert-close" aria-label="Close"><i class="ph ph-x"></i></button>
  *   </div>
  *
  * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
@@ -1457,7 +1478,9 @@ textarea.input {
   align-items: center;
   gap: var(--ic-space-3);
   min-height: 56px;
-  padding: var(--ic-space-4);
+  /* 12px vertical keeps the 24px-CTA variant within the 56px min-height
+     (24 + 24 + 2px border = 50 < 56); single-line + multi-line still fit. */
+  padding: var(--ic-space-3) var(--ic-space-4);
   border-radius: var(--ic-radius-md);
   border: 1px solid transparent;
   background: var(--color-surface-muted);
@@ -1465,7 +1488,10 @@ textarea.input {
   font: var(--type-body-sm);
 }
 .alert-icon    { font-size: 16px; flex-shrink: 0; }
-.alert-message { flex: 1; min-width: 0; margin: 0; }
+/* Tighter than body-sm's 20px leading: the loose line box let the glyphs ride
+ * high above the centred icon. 1.35 hugs the text so it optically centres with
+ * the 16px icon and the CTAs, and still wraps cleanly on multi-line alerts. */
+.alert-message { flex: 1; min-width: 0; margin: 0; line-height: 1.35; padding-top: 2px; }
 .alert-actions { display: inline-flex; gap: var(--ic-space-2); flex-shrink: 0; }
 /* Dismiss button — styled by the icon-only ghost button component in the
  * markup (.btn.btn-icon-only.btn-ghost.btn-xs); this class only handles layout. */
@@ -1488,8 +1514,8 @@ textarea.input {
  *
  *   <span class="badge badge-success">Active</span>                          read-only
  *   <button class="badge badge-warning" type="button">Pending</button>       editable
- *   <span class="badge badge-info"><svg class="icon badge-icon i-info"><use href="#i-info"/></svg>New</span>          icon left
- *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><svg class="icon i-close"><use href="#i-close"/></svg></button></span>   deletable
+ *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
  */
 .badge {
   display: inline-flex; align-items: center;
@@ -1497,8 +1523,9 @@ textarea.input {
   font: var(--type-caption);
   padding: var(--ic-space-1) var(--ic-space-2);
   border-radius: var(--ic-radius-full);
-  /* Neutral follows the variant recipe: {hue}-100 fill + {hue}-150 stroke */
-  background: var(--ic-palette-gray-100);
+  /* Neutral: white fill on a gray-150 stroke — reads as a chip on any surface.
+   * Variants below still follow the {hue}-subtle + {hue}-150 recipe. */
+  background: var(--color-surface);
   color: var(--color-text-muted);
   border: 1px solid var(--ic-palette-gray-150);
 }
@@ -1558,6 +1585,7 @@ button.badge:focus-visible {
   gap: var(--ic-space-1);
   height: 16px;
   padding: 0 var(--ic-space-2);
+  border: 0;                    /* reset native button border when a tag is a <button> */
   border-radius: var(--ic-radius-sm);
   font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
   background: var(--tag-color);
@@ -1645,7 +1673,7 @@ button.badge:focus-visible {
  *
  *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
  *   Initials:  <span class="avatar avatar-md">JD</span>
- *   Team/co:   <span class="avatar avatar-md avatar-team"><svg class="icon i-company"><use href="#i-company"/></svg></span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><i class="ph ph-buildings"></i></span>
  *
  * Sizes (default = avatar-md / 32px):
  *   .avatar-xs   16px
@@ -1778,8 +1806,8 @@ a.avatar:focus-visible {
  *   <label class="checkbox">
  *     <input type="checkbox" class="checkbox-input" />
  *     <span class="checkbox-box">
- *       <svg class="checkbox-mark i-check"><use href="#i-check"/></svg>
- *       <svg class="checkbox-mark checkbox-mark-dash i-minus"><use href="#i-minus"/></svg>
+ *       <svg class="checkbox-mark"><use href="#i-check"/></svg>
+ *       <svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg>
  *     </span>
  *     <span class="checkbox-label">Label</span>
  *   </label>
@@ -1926,7 +1954,7 @@ a.avatar:focus-visible {
  *   </div>
  *
  * Variants compose via optional siblings around the range input:
- *   icons        <svg class="icon slider-icon i-minus"><use href="#i-minus"/></svg> … <svg class="icon slider-icon i-plus"><use href="#i-plus"/></svg>
+ *   icons        <i class="ph ph-minus slider-icon"></i> … <i class="ph ph-plus slider-icon"></i>
  *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
  *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
  *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
@@ -2008,7 +2036,7 @@ a.avatar:focus-visible {
  *     <div class="modal modal-md">
  *       <header class="modal-header">
  *         <h2 class="modal-title">Title</h2>
- *         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon i-x"><use href="#i-x"/></svg></button>
+ *         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
  *       </header>
  *       <div class="modal-body">…</div>
  *       <footer class="modal-footer">
@@ -2056,6 +2084,10 @@ a.avatar:focus-visible {
   border-radius: 0;
 }
 .modal-overlay:has(> .modal-full) { padding: 0; }
+/* Full modal only: divider borders separate the header + footer from the body. */
+.modal-full .modal-header { border-bottom: 1px solid var(--ic-palette-gray-200); }
+.modal-full .modal-footer { border-top: 1px solid var(--ic-palette-gray-200); }
+.modal-full .modal-body   { padding-top: var(--ic-space-5); background: var(--ic-palette-gray-100); }
 
 .modal-header {
   display: flex;
@@ -2132,7 +2164,6 @@ a.avatar:focus-visible {
 .drawer-medium  { max-width: 640px; }
 .drawer-wide    { max-width: 960px; }
 .drawer-ultra   { max-width: 1180px; }
-.drawer-full    { max-width: 100%; }
 
 /* On narrow viewports, any drawer goes full-width + footer buttons stack */
 @media (max-width: 480px) {
@@ -2359,6 +2390,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   cursor: default;
 }
 
+/* Overflow collapse — a container query on the trail's wrapper (.breadcrumbs-fit,
+ * container-type: inline-size) hides the middle crumbs and reveals a "…" menu
+ * below ~480px. Keeps the last parent + current page visible to save space on
+ * mobile; desktop and tablet show the full trail. */
+.breadcrumbs[data-collapsible] { flex-wrap: nowrap; }
+.breadcrumbs-fit { container-type: inline-size; }
+/* Hidden by default; specificity beats .dropdown { display: inline-flex }. */
+.breadcrumbs .breadcrumb-overflow { display: none; }
+@container (max-width: 480px) {
+  .breadcrumbs-fit .bc-collapsible { display: none; }
+  .breadcrumbs-fit .breadcrumb-overflow { display: inline-flex; }
+}
+
 /* ---------- Page head ----------
  * Page-level header. Title (+ optional breadcrumbs + count + subtitle) on
  * the left, actions on the right. Breadcrumbs, when present, are the first
@@ -2400,7 +2444,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   gap: var(--ic-space-3);
 }
 .page-head-heading {
-  font: var(--type-h1);
+  font: var(--type-h2); /* H2 / 20px — page titles sit one step below the display size */
   color: var(--color-text);
   margin: 0;
 }
@@ -2512,6 +2556,51 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   border-radius: var(--ic-radius-sm);
 }
 
+/* Overflow — when the tab strip is wider than its container it scrolls
+ * horizontally; JS (initTabScrollers) wraps it in .tabs-scroller and toggles
+ * .can-left / .can-right, which reveal an edge fade + chevron affordance. */
+.tabs-scroller { position: relative; }
+.tabs-scroller > .tabs {
+  overflow-x: auto;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* old Edge */
+  scroll-behavior: smooth;
+}
+.tabs-scroller > .tabs::-webkit-scrollbar { display: none; }
+/* Grab-to-scroll (mouse/pen; touch uses native momentum scrolling). */
+.tabs-scroller.can-left > .tabs,
+.tabs-scroller.can-right > .tabs { cursor: grab; }
+.tabs.is-dragging { cursor: grabbing; scroll-behavior: auto; user-select: none; }
+.tabs-more {
+  position: absolute;
+  top: 0;
+  bottom: 1px;                    /* clear the hairline border */
+  width: 44px;
+  display: none;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  z-index: 1;
+}
+.tabs-more:hover { color: var(--color-text); }
+.tabs-more .icon { width: 16px; height: 16px; }
+/* Fade blurs the tabs into the surface behind the strip. */
+.tabs-more-right {
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to right, transparent, var(--color-surface) 55%);
+}
+.tabs-more-left {
+  left: 0;
+  justify-content: flex-start;
+  background: linear-gradient(to left, transparent, var(--color-surface) 55%);
+}
+.tabs-more-right .icon { transform: scaleX(-1); } /* flip the left chevron */
+.tabs-scroller.can-right > .tabs-more-right,
+.tabs-scroller.can-left  > .tabs-more-left { display: flex; }
+
 /* ---------- Stepper ----------
  * Horizontal step indicator for wizards / multi-step flows. Numbered 24px
  * circles + labels, joined by caret separators. The current step's circle is
@@ -2519,7 +2608,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <ol class="stepper">
  *     <li class="stepper-step is-current"><span class="stepper-num">1</span><span class="stepper-label">Details</span></li>
- *     <li class="stepper-sep"><svg class="icon i-chevron-minor i-caret-right"><use href="#i-chevron-minor"/></svg></li>
+ *     <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
  *     <li class="stepper-step"><span class="stepper-num">2</span><span class="stepper-label">Review</span></li>
  *   </ol>
  */
@@ -2550,6 +2639,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   color: var(--ic-palette-graphite-500);
   font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);
 }
+/* The check/number icon takes the circle's colour (white on the filled states). */
+.stepper-num .icon { color: inherit; }
 .stepper-label {
   font: var(--ic-weight-semibold) var(--ic-text-xxs)/1.3 var(--ic-font-sans);
   color: var(--ic-palette-graphite-500);
@@ -2723,7 +2814,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding: var(--ic-space-5) var(--ic-space-4);
   min-height: 126px;
   text-align: center;
-  background: var(--color-surface-sunken);
+  background: var(--color-bg); /* gray-100 */
   border: 1px dashed var(--color-border-strong);
   border-radius: var(--ic-radius-md);
   color: var(--color-text);
@@ -2841,10 +2932,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <div class="toast-region" aria-live="polite"></div>     ← one per page
  *   <div class="toast toast-success">
- *     <svg class="icon toast-icon i-check"><use href="#i-check"/></svg>
+ *     <i class="ph ph-check-circle toast-icon"></i>
  *     <p class="toast-message">Saved.</p>
  *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
- *     <button class="toast-close" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+ *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
  *   </div>
  */
 .toast-region {
@@ -2998,7 +3089,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  * Usage:
  *   <div class="dropdown-menu">
  *     <button class="dropdown-item">
- *       <svg class="dropdown-item-icon i-bell"><use href="#i-bell"/></svg>
+ *       <svg class="dropdown-item-icon"><use href="#i-bell"/></svg>
  *       <div class="dropdown-item-text">
  *         <span class="dropdown-item-label">Label</span>
  *         <span class="dropdown-item-description">Optional sub-line</span>
@@ -3030,10 +3121,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   font: var(--type-body);
   color: var(--color-text);
   text-align: left;
+  text-decoration: none;      /* dropdown items render as <a> or <button> */
   cursor: pointer;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.dropdown-item:hover  { background: var(--color-accent-subtle); }
+.dropdown-item:hover  { background: var(--color-accent-subtle); text-decoration: none; }
 .dropdown-item:disabled,
 .dropdown-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 
@@ -3456,6 +3548,11 @@ body { overflow: hidden; }
 .icon.i-caret-up   use { transform: rotate(-90deg); transform-origin: center; transform-box: fill-box; }
 /* .icon.i-caret-right — no rotation needed. */
 
+/* Trash / delete icons render neutral graphite (not danger red) across the
+ * prototype. Wins over .btn-danger's color at the button level because it
+ * targets the icon element directly. */
+.icon.i-trash { color: var(--ic-palette-graphite-700); }
+
 /* ---------- Month calendar ---------- */
 .cal {
   display: flex;
@@ -3585,10 +3682,14 @@ body { overflow: hidden; }
 }
 
 /* ---------- Walkthrough spotlight on the Jan 21 event ---------- */
+/* Walkthrough hint + spotlight pulse are turned off. Keep the markup so it
+ * can be re-enabled by removing this override. */
+.cal-hint { display: none !important; }
 .cal-event.has-spotlight {
   position: relative;
   animation: cal-spotlight 1.8s ease-in-out infinite;
 }
+.cal-event.has-spotlight { animation: none; }
 @keyframes cal-spotlight {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent); }
   50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-accent) 0%, transparent); }
@@ -3930,7 +4031,7 @@ body { overflow: hidden; }
   <symbol id="i-list-ordered" viewBox="0 0 24 24"><path d="M4.04403 18.2611C4.63203 18.2611 5.0882 18.3766 5.41253 18.6076C5.73687 18.8386 5.89903 19.1501 5.89903 19.5421C5.89903 19.8081 5.79987 20.0379 5.60153 20.2316C5.4032 20.4252 5.1617 20.5454 4.87703 20.5921C5.15703 20.6201 5.4102 20.7332 5.63653 20.9316C5.86287 21.1299 5.97603 21.3854 5.97603 21.6981C5.97603 22.1087 5.7987 22.4424 5.44403 22.6991C5.08937 22.9557 4.6227 23.0841 4.04403 23.0841C3.6147 23.0841 3.2332 23.0164 2.89953 22.8811C2.56587 22.7457 2.30337 22.5684 2.11203 22.3491L2.72103 21.5301L2.82085 21.6208C2.96011 21.7358 3.124 21.8269 3.31253 21.8941C3.5482 21.9781 3.7757 22.0201 3.99503 22.0201C4.24703 22.0201 4.4407 21.9781 4.57603 21.8941C4.71137 21.8101 4.77903 21.7004 4.77903 21.5651C4.77903 21.4297 4.7172 21.3306 4.59353 21.2676C4.46987 21.2046 4.25403 21.1731 3.94603 21.1731L3.81369 21.1732L3.59494 21.174C3.43817 21.1751 3.3452 21.1771 3.31603 21.1801V20.1091L3.35118 20.1109C3.41022 20.1132 3.51803 20.1147 3.67461 20.1155L3.94603 20.1161L4.08967 20.1124C4.49791 20.0906 4.70203 19.9705 4.70203 19.7521C4.70203 19.6121 4.6297 19.5059 4.48503 19.4336C4.34037 19.3612 4.15137 19.3251 3.91803 19.3251C3.47937 19.3251 3.09203 19.4744 2.75603 19.7731L2.17503 19.0171L2.30155 18.8858C2.73775 18.4693 3.31858 18.2611 4.04403 18.2611ZM23 20.0001V21.0001H9.00003V20.0001H23ZM4.04403 10.2611C4.59937 10.2611 5.0532 10.4034 5.40553 10.6881C5.75787 10.9727 5.93403 11.3484 5.93403 11.8151C5.93403 12.1651 5.80337 12.5057 5.54203 12.8371C5.2807 13.1684 4.8537 13.5394 4.26103 13.9501H5.96903V15.0001H2.30803V14.0621L2.52427 13.9058C3.43628 13.2446 4.02337 12.7927 4.28553 12.5501C4.56787 12.2887 4.70903 12.0437 4.70903 11.8151C4.70903 11.6611 4.6472 11.5409 4.52353 11.4546C4.39987 11.3682 4.24703 11.3251 4.06503 11.3251C3.59837 11.3251 3.18303 11.4954 2.81903 11.8361L2.15403 11.0381L2.30271 10.8892C2.50879 10.7014 2.74623 10.5562 3.01503 10.4536C3.35103 10.3252 3.69403 10.2611 4.04403 10.2611ZM23 12.0001V13.0001H9.00003V12.0001H23ZM4.70903 2.33105V7.00005H3.50503V3.87105L2.72103 4.66205L2.03503 3.94105L3.66603 2.33105H4.70903ZM23 4.00005V5.00005H9.00003V4.00005H23Z" fill="currentColor"/></symbol>
   <symbol id="i-list-unordered" viewBox="0 0 24 24"><path d="M3.5 18C4.88071 18 6 19.1193 6 20.5C6 21.8807 4.88071 23 3.5 23C2.11929 23 1 21.8807 1 20.5C1 19.1193 2.11929 18 3.5 18ZM3.5 19C2.67157 19 2 19.6716 2 20.5C2 21.3284 2.67157 22 3.5 22C4.32843 22 5 21.3284 5 20.5C5 19.6716 4.32843 19 3.5 19ZM23 20V21H9V20H23ZM3.5 10C4.88071 10 6 11.1193 6 12.5C6 13.8807 4.88071 15 3.5 15C2.11929 15 1 13.8807 1 12.5C1 11.1193 2.11929 10 3.5 10ZM3.5 11C2.67157 11 2 11.6716 2 12.5C2 13.3284 2.67157 14 3.5 14C4.32843 14 5 13.3284 5 12.5C5 11.6716 4.32843 11 3.5 11ZM23 12V13H9V12H23ZM3.5 2C4.88071 2 6 3.11929 6 4.5C6 5.88071 4.88071 7 3.5 7C2.11929 7 1 5.88071 1 4.5C1 3.11929 2.11929 2 3.5 2ZM3.5 3C2.67157 3 2 3.67157 2 4.5C2 5.32843 2.67157 6 3.5 6C4.32843 6 5 5.32843 5 4.5C5 3.67157 4.32843 3 3.5 3ZM23 4V5H9V4H23Z" fill="currentColor"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C15.3137 0 18 2.68629 18 6V10H21V24H3V10H6V6C6 2.68629 8.68629 0 12 0ZM7 10H17V6C17 3.23858 14.7614 1 12 1C9.23858 1 7 3.23858 7 6V10ZM18 11H6H4V23H20V11H18Z" fill="currentColor"/></symbol>
-  <symbol id="i-minus" viewBox="0 0 24 24"><rect x="4" y="11.5" width="16" height="1" fill="currentColor"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><rect x="4" y="10.75" width="16" height="2.5" rx="1.25" fill="currentColor"/></symbol>
   <symbol id="i-minus-minor" viewBox="0 0 24 24"><path d="M7 11.5H17V12.5H7V11.5Z" fill="currentColor"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M15 4C15 5.65685 13.6569 7 12 7C10.3431 7 9 5.65685 9 4C9 2.34315 10.3431 1 12 1C13.6569 1 15 2.34315 15 4ZM10 4C10 5.10457 10.8954 6 12 6C13.1046 6 14 5.10457 14 4C14 2.89543 13.1046 2 12 2C10.8954 2 10 2.89543 10 4ZM15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12ZM10 12C10 13.1046 10.8954 14 12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12ZM12 23C13.6569 23 15 21.6569 15 20C15 18.3431 13.6569 17 12 17C10.3431 17 9 18.3431 9 20C9 21.6569 10.3431 23 12 23ZM12 22C10.8954 22 10 21.1046 10 20C10 18.8954 10.8954 18 12 18C13.1046 18 14 18.8954 14 20C14 21.1046 13.1046 22 12 22Z" fill="currentColor"/></symbol>
   <symbol id="i-new" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 0.792969L23.2071 4.50008L12.7071 15.0001H9V11.293L19.5 0.792969ZM12 1.00008V2.00008H2V22.0001H22V12.0001H23V23.0001H1V1.00008H12ZM10 11.7072L19.5 2.20718L21.7929 4.50008L12.2929 14.0001H10V11.7072Z" fill="currentColor"/></symbol>
@@ -4191,6 +4292,7 @@ body { overflow: hidden; }
   <symbol id="i-storage" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M12 8.5C17.799 8.5 22.5 6.933 22.5 5C22.5 3.067 17.799 1.5 12 1.5C6.20101 1.5 1.5 3.067 1.5 5C1.5 6.933 6.20101 8.5 12 8.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M1.5 5V20C1.5 21.93 6.2 23.5 12 23.5C17.8 23.5 22.5 21.93 22.5 20V5" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M1.5 15C1.5 16.93 6.2 18.5 12 18.5C17.8 18.5 22.5 16.93 22.5 15" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M1.5 10C1.5 11.93 6.2 13.5 12 13.5C17.8 13.5 22.5 11.93 22.5 10" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
   <symbol id="i-vr" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M0.5 9.5L3.5 6.5H19.5L22.5 9.5V15.5C22.5 17.71 20.71 19.5 18.5 19.5H17.11C15.48 19.5 13.96 18.69 13.06 17.33C12.71 16.81 12.13 16.5 11.51 16.5C10.89 16.5 10.3 16.81 9.96 17.33C9.06 18.68 7.54 19.5 5.91 19.5H4.52C2.31 19.5 0.52 17.71 0.52 15.5V9.5H0.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M0.5 9.5H22.5" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M6.5 4V0.5H16.5V4" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M16.5 19V23.5H6.5V19" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
   <symbol id="i-goggles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle vector-effect="non-scaling-stroke" cx="7" cy="13" r="4"/><circle vector-effect="non-scaling-stroke" cx="17" cy="13" r="4"/><path vector-effect="non-scaling-stroke" d="M11 13h2"/><path vector-effect="non-scaling-stroke" d="M3.4 10.4 1 8"/><path vector-effect="non-scaling-stroke" d="M20.6 10.4 23 8"/></symbol>
+  <symbol id="i-ellipses" viewBox="0 0 24 24"><g transform="rotate(90 12 12)"><path fill-rule="evenodd" clip-rule="evenodd" d="M15 4C15 5.65685 13.6569 7 12 7C10.3431 7 9 5.65685 9 4C9 2.34315 10.3431 1 12 1C13.6569 1 15 2.34315 15 4ZM10 4C10 5.10457 10.8954 6 12 6C13.1046 6 14 5.10457 14 4C14 2.89543 13.1046 2 12 2C10.8954 2 10 2.89543 10 4ZM15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12ZM10 12C10 13.1046 10.8954 14 12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12ZM12 23C13.6569 23 15 21.6569 15 20C15 18.3431 13.6569 17 12 17C10.3431 17 9 18.3431 9 20C9 21.6569 10.3431 23 12 23ZM12 22C10.8954 22 10 21.1046 10 20C10 18.8954 10.8954 18 12 18C13.1046 18 14 18.8954 14 20C14 21.1046 13.1046 22 12 22Z" fill="currentColor"/></g></symbol>
 </svg>
 <!-- === /icons.svg === -->
 
@@ -4271,7 +4373,6 @@ body { overflow: hidden; }
           <div class="page-head-main">
             <div class="page-head-title">
               <h1 class="page-head-heading">RoB Meetings</h1>
-              <span class="page-head-count">8</span>
             </div>
             <p class="page-head-subtitle">Recurring business reviews.</p>
           </div>
@@ -4364,9 +4465,9 @@ body { overflow: hidden; }
                 </button>
               </div>
             </div>
-            <div class="cal-day"><span class="cal-day-num">22</span></div>
-            <div class="cal-day"><span class="cal-day-num">23</span></div>
-            <div class="cal-day"><span class="cal-day-num">24</span></div>
+            <div class="cal-day" data-date="2026-01-22"><span class="cal-day-num">22</span></div>
+            <div class="cal-day" data-date="2026-01-23"><span class="cal-day-num">23</span></div>
+            <div class="cal-day" data-date="2026-01-24"><span class="cal-day-num">24</span></div>
 
             <!-- Week 5: Jan 25-31 -->
             <div class="cal-day"><span class="cal-day-num">25</span></div>
@@ -4520,6 +4621,13 @@ body { overflow: hidden; }
       margin: 0;
     }
     .cm-section + .cm-section { margin-top: var(--ic-space-5); }
+    /* Divider above Agenda items and Connections — treat them as top-level
+     * sections separate from Details + Description block that precedes them. */
+    #cm-agenda,
+    #cm-connections {
+      border-top: 1px solid var(--ic-palette-gray-200);
+      padding-top: var(--ic-space-5);
+    }
     .cm-section { display: flex; flex-direction: column; gap: var(--ic-space-4); }
 
     .cm-input-icon {
@@ -4656,7 +4764,7 @@ body { overflow: hidden; }
     <div class="modal modal-full" role="dialog" aria-modal="true" aria-labelledby="cm-title-label">
       <!-- HEADER: title input + close -->
       <header class="modal-header" style="height: 80px; flex-shrink: 0; border-bottom: 1px solid var(--ic-palette-gray-200)">
-        <input id="cm-title-label" class="input" type="text" placeholder="Add meeting name" style="flex: 1" />
+        <input id="cm-title-label" class="input" type="text" placeholder="Add meeting name" required aria-required="true" style="flex: 1; max-width: 520px" />
         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
       </header>
 
@@ -4673,18 +4781,18 @@ body { overflow: hidden; }
               <div class="cm-row">
                 <div class="cm-input-icon">
                   <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
-                  <input class="input" type="text" value="Jan 21, 2026" aria-label="Date" />
+                  <input id="cm-date" class="input" type="text" value="Jan 22, 2026" aria-label="Date" />
                 </div>
                 <div class="cm-time">
                   <div class="cm-time-fields">
                     <div class="cm-input-suffix" style="flex: 1">
                       <svg class="icon i-time"><use href="#i-time"/></svg>
-                      <input class="input" type="text" value="14:30" aria-label="Start time" />
+                      <input id="cm-time-start" class="input" type="text" value="14:30" aria-label="Start time" />
                     </div>
                     <span class="cm-time-to">to</span>
                     <div class="cm-input-suffix" style="flex: 1">
                       <svg class="icon i-time"><use href="#i-time"/></svg>
-                      <input class="input" type="text" value="15:30" aria-label="End time" />
+                      <input id="cm-time-end" class="input" type="text" value="15:30" aria-label="End time" />
                     </div>
                   </div>
                   <button class="btn btn-ghost btn-sm" type="button">Find Time</button>
@@ -4723,7 +4831,7 @@ body { overflow: hidden; }
                 </div>
                 <div class="cm-cell-stack">
                   <div class="cm-input-suffix">
-                    <svg class="icon cm-lead i-availability-full-time"><use href="#i-availability-full-time"/></svg>
+                    <svg class="icon cm-lead i-jobs"><use href="#i-jobs"/></svg>
                     <input class="input" type="text" value="Busy" readonly aria-label="Availability" />
                     <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
                   </div>
@@ -4772,6 +4880,10 @@ body { overflow: hidden; }
                 <span>1000 characters left</span>
                 <svg class="icon i-check" style="font-size: 14px; color: var(--color-success)"><use href="#i-check"/></svg>
               </div>
+              <button class="cm-agenda-add" type="button">
+                <svg class="icon i-plus"><use href="#i-plus"/></svg>
+                Add a key result
+              </button>
             </section>
 
             <!-- Agenda items (create flow only) -->
@@ -4779,7 +4891,7 @@ body { overflow: hidden; }
               <div class="cm-agenda-head">
                 <div class="cm-agenda-title-row">
                   <h3 class="cm-section-title">Agenda items</h3>
-                  <span class="cm-agenda-count">0</span>
+                  <span class="badge">0</span>
                 </div>
                 <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item">
                   <svg class="icon i-plus"><use href="#i-plus"/></svg>
@@ -4850,24 +4962,96 @@ body { overflow: hidden; }
                   <p class="cm-owner-name">Adan Jones</p>
                   <p class="cm-owner-role">Senior Director of Program Management</p>
                 </div>
-                <button class="btn btn-icon-only btn-danger btn-xs" type="button" aria-label="Remove owner"><svg class="icon i-trash"><use href="#i-trash"/></svg></button>
+                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove owner"><svg class="icon i-trash"><use href="#i-trash"/></svg></button>
               </div>
             </section>
 
             <section class="cm-section">
-              <h3 class="cm-section-title">Participants (0)</h3>
-              <div class="cm-input-suffix">
-                <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
-                <input class="input" type="text" placeholder="Select participants" readonly />
-              </div>
+              <h3 class="cm-section-title" style="display: flex; align-items: center; gap: var(--ic-space-2)">Participants <span class="badge" data-cm-participant-count>0</span></h3>
+
+              <div data-cm-participants>
+                <div class="input-select">
+                  <button class="input-select-trigger" type="button" data-cm-participants-trigger aria-haspopup="listbox" aria-expanded="false">
+                    <span class="input-select-value input-select-placeholder">Add participants…</span>
+                    <svg class="icon i-chevron-minor i-caret-down" style="width: 12px; height: 12px"><use href="#i-chevron-minor"/></svg>
+                  </button>
+
+                  <div class="dropdown-menu" hidden data-cm-participants-menu>
+                  <button class="dropdown-item" type="button" data-cm-participant="kb" data-name="Keith Berlin" data-role="Staff Engineer · Platform" data-initials="KB">
+                    <span class="dropdown-item-avatar avatar avatar-md">KB</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Keith Berlin</span>
+                      <span class="dropdown-item-description">Staff Engineer · Platform</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="rl" data-name="Rick Lacroix" data-role="Engineering Manager · Data" data-initials="RL">
+                    <span class="dropdown-item-avatar avatar avatar-md">RL</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Rick Lacroix</span>
+                      <span class="dropdown-item-description">Engineering Manager · Data</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="tt" data-name="Tile Tampakas" data-role="Senior Engineer · Infrastructure" data-initials="TT">
+                    <span class="dropdown-item-avatar avatar avatar-md">TT</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Tile Tampakas</span>
+                      <span class="dropdown-item-description">Senior Engineer · Infrastructure</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="cp" data-name="Collete Parker" data-role="Director of Engineering" data-initials="CP">
+                    <span class="dropdown-item-avatar avatar avatar-md">CP</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Collete Parker</span>
+                      <span class="dropdown-item-description">Director of Engineering</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="ko" data-name="Kate Ottavio Kent" data-role="Senior Director of Program Management" data-initials="KO">
+                    <span class="dropdown-item-avatar avatar avatar-md">KO</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Kate Ottavio Kent</span>
+                      <span class="dropdown-item-description">Senior Director of Program Management</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="je" data-name="Jane Eveland" data-role="Tech Lead · Pipelines" data-initials="JE">
+                    <span class="dropdown-item-avatar avatar avatar-md">JE</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Jane Eveland</span>
+                      <span class="dropdown-item-description">Tech Lead · Pipelines</span>
+                    </div>
+                  </button>
+                  <button class="dropdown-item" type="button" data-cm-participant="es" data-name="Emily Smith" data-role="Software Engineer · Platform" data-initials="ES">
+                    <span class="dropdown-item-avatar avatar avatar-md">ES</span>
+                    <div class="dropdown-item-text">
+                      <span class="dropdown-item-label">Emily Smith</span>
+                      <span class="dropdown-item-description">Software Engineer · Platform</span>
+                    </div>
+                  </button>
+                  </div><!-- /dropdown-menu -->
+                </div><!-- /input-select -->
+              </div><!-- /data-cm-participants -->
+
+              <div class="md-persons" data-cm-participants-list style="margin-top: var(--ic-space-2)"></div>
+
+              <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
+              <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
+              <label class="checkbox">
+                <input type="checkbox" class="checkbox-input" />
+                <span class="checkbox-box">
+                  <svg class="checkbox-mark"><use href="#i-check"/></svg>
+                </span>
+                <span class="checkbox-label">Editable RoB by participants</span>
+              </label>
+              <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: -4px 0 0; padding-left: 24px; line-height: 1.4">
+                Anyone in the participants list can update the details, deck, agenda items, and action items.
+              </p>
             </section>
           </div>
 
           <!-- TOC RAIL -->
           <nav class="cm-toc" aria-label="Sections" data-cm-toc>
-            <a class="cm-toc-item is-active" href="#cm-details"    data-cm-toc-target="cm-details"><svg class="icon i-list"><use href="#i-list"/></svg> Details</a>
-            <a class="cm-toc-item"           href="#cm-agenda"     data-cm-toc-target="cm-agenda"><svg class="icon i-list-checkboxes"><use href="#i-list-checkboxes"/></svg> Agenda items</a>
-            <a class="cm-toc-item"           href="#cm-connections" data-cm-toc-target="cm-connections"><svg class="icon i-connectors-2"><use href="#i-connectors-2"/></svg> Connections</a>
+            <a class="cm-toc-item is-active" href="#cm-details"    data-cm-toc-target="cm-details"><svg class="icon i-legal-info"><use href="#i-legal-info"/></svg> Details</a>
+            <a class="cm-toc-item"           href="#cm-agenda"     data-cm-toc-target="cm-agenda"><svg class="icon i-list-unordered"><use href="#i-list-unordered"/></svg> Agenda items</a>
+            <a class="cm-toc-item"           href="#cm-connections" data-cm-toc-target="cm-connections"><svg class="icon i-connectors"><use href="#i-connectors"/></svg> Connections</a>
           </nav>
         </div>
       </div>
@@ -4875,16 +5059,206 @@ body { overflow: hidden; }
       <!-- FOOTER -->
       <footer class="modal-footer" style="border-top: 1px solid var(--ic-palette-gray-200)">
         <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
-        <button class="btn btn-primary" type="button">Create meeting</button>
+        <button id="cm-create-btn" class="btn btn-primary" type="button">Create meeting</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ============ USER-CREATED MEETING VIEW MODAL ============ -->
+  <div class="modal-overlay" id="user-meeting-view" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="umv-title">
+      <header class="modal-header" style="height: 80px; flex-shrink: 0; border-bottom: 1px solid var(--ic-palette-gray-200)">
+        <h2 id="umv-title" class="md-title" style="font: var(--type-h2); color: var(--color-text); margin: 0">Meeting</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="modal-body" style="padding: var(--ic-space-5)">
+        <div style="display: flex; gap: var(--ic-space-3); align-items: center; padding: var(--ic-space-3) var(--ic-space-4); background: var(--ic-palette-gray-100); border-radius: var(--ic-radius-md); font: var(--type-body)">
+          <svg class="icon i-calendar" style="color: var(--color-text-muted)"><use href="#i-calendar"/></svg>
+          <span id="umv-when" data-when-date>Thursday, January 22, 2026 · 14:30 – 15:30</span>
+        </div>
+        <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: var(--ic-space-4) 0 0">
+          Created just now. Deck, action items, and connections will appear here once the meeting runs.
+        </p>
+      </div>
+      <footer class="modal-footer" style="border-top: 1px solid var(--ic-palette-gray-200)">
+        <button class="btn btn-secondary" data-modal-close type="button">Close</button>
       </footer>
     </div>
   </div>
 
   <script>
-    // Create-meeting: TOC scroll + scrollspy
+    // Create-meeting: TOC scroll + scrollspy + required-title gate + save-to-calendar + participants picker
     (function () {
       const modal = document.getElementById('create-meeting');
       if (!modal) return;
+
+      // Participants picker — trigger opens a dropdown of unselected people;
+      // clicking a person moves them into the list below and closes the menu.
+      const pWrap = modal.querySelector('[data-cm-participants]');
+      if (pWrap) {
+        const trigger = pWrap.querySelector('[data-cm-participants-trigger]');
+        const pMenu   = pWrap.querySelector('[data-cm-participants-menu]');
+        const list    = modal.querySelector('[data-cm-participants-list]');
+        const pCount  = modal.querySelector('[data-cm-participant-count]');
+
+        const setOpen = (open) => {
+          pMenu.toggleAttribute('hidden', !open);
+          trigger.setAttribute('aria-expanded', String(open));
+        };
+        trigger.addEventListener('click', () => setOpen(pMenu.hasAttribute('hidden')));
+        document.addEventListener('click', e => {
+          if (!pWrap.contains(e.target)) setOpen(false);
+        });
+
+        pMenu.addEventListener('click', e => {
+          const item = e.target.closest('[data-cm-participant]');
+          if (!item) return;
+          const id = item.dataset.cmParticipant;
+          const name = item.dataset.name;
+          const role = item.dataset.role;
+          const initials = item.dataset.initials;
+
+          list.insertAdjacentHTML('beforeend', `
+            <div class="md-person" data-cm-person="${id}">
+              <span class="avatar avatar-md">${initials}</span>
+              <div class="md-person-body">
+                <p class="md-person-name">${escapeHtml(name)}</p>
+                <p class="md-person-role">${escapeHtml(role)}</p>
+              </div>
+              <button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-cm-remove-participant="${id}" aria-label="Remove ${escapeHtml(name)}">
+                <svg class="icon"><use href="#i-trash"/></svg>
+              </button>
+            </div>
+          `);
+          item.remove();
+          updateCount();
+          setOpen(false);
+        });
+
+        list.addEventListener('click', e => {
+          const rm = e.target.closest('[data-cm-remove-participant]');
+          if (!rm) return;
+          const row = rm.closest('[data-cm-person]');
+          if (!row) return;
+          const id = row.dataset.cmPerson;
+          const nameEl = row.querySelector('.md-person-name');
+          const roleEl = row.querySelector('.md-person-role');
+          const avatar = row.querySelector('.avatar');
+          const initials = avatar ? avatar.textContent.trim() : '';
+
+          pMenu.insertAdjacentHTML('beforeend', `
+            <button class="dropdown-item" type="button" data-cm-participant="${id}"
+                    data-name="${escapeHtml(nameEl?.textContent || '')}"
+                    data-role="${escapeHtml(roleEl?.textContent || '')}"
+                    data-initials="${escapeHtml(initials)}">
+              <span class="dropdown-item-avatar avatar avatar-md">${escapeHtml(initials)}</span>
+              <div class="dropdown-item-text">
+                <span class="dropdown-item-label">${escapeHtml(nameEl?.textContent || '')}</span>
+                <span class="dropdown-item-description">${escapeHtml(roleEl?.textContent || '')}</span>
+              </div>
+            </button>
+          `);
+          row.remove();
+          updateCount();
+        });
+
+        function updateCount() {
+          if (pCount) pCount.textContent = String(list.querySelectorAll('.md-person').length);
+        }
+        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+      }
+
+      // Required title — Create button stays disabled until the input is non-empty.
+      const title = modal.querySelector('#cm-title-label');
+      const createBtn = modal.querySelector('#cm-create-btn');
+      const dateInput = modal.querySelector('#cm-date');
+      const startInput = modal.querySelector('#cm-time-start');
+      const endInput = modal.querySelector('#cm-time-end');
+
+      // In-memory store keyed by generated id. Read back when the calendar
+      // event is clicked to hydrate the view modal.
+      const userMeetings = (window.__userMeetings = window.__userMeetings || {});
+      let seq = 1;
+
+      if (title && createBtn) {
+        createBtn.disabled = false;
+        title.addEventListener('input', () => title.classList.remove('is-error'));
+        modal.addEventListener('click', e => {
+          if (e.target.closest('[data-modal-close]')) {
+            title.value = '';
+            title.classList.remove('is-error');
+          }
+        });
+
+        createBtn.addEventListener('click', () => {
+          const t = title.value.trim();
+          if (!t) {
+            title.classList.add('is-error');
+            title.focus();
+            return;
+          }
+          const date = (dateInput?.value || 'Jan 22, 2026').trim();
+          const start = (startInput?.value || '14:30').trim();
+          const end = (endInput?.value || '15:30').trim();
+          const iso = parseCalDate(date);
+          if (!iso) return;
+          const cell = document.querySelector(`.cal-day[data-date="${iso}"]`);
+          if (!cell) return;
+
+          const id = 'um-' + (seq++);
+          userMeetings[id] = { id, title: t, date, iso, start, end };
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'cal-event';
+          btn.dataset.modalOpen = 'meeting-detail';
+          btn.dataset.userMeetingId = id;
+          btn.innerHTML = `
+            <span class="cal-event-dot"></span>
+            <span class="cal-event-time">${escapeHtml(start)}</span>
+            <span class="cal-event-title">${escapeHtml(t)}</span>
+          `;
+          cell.appendChild(btn);
+
+          modal.querySelector('[data-modal-close]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+      }
+
+      function parseCalDate(s) {
+        const m = s.match(/^([A-Za-z]{3,})\s+(\d{1,2}),\s*(\d{4})$/);
+        if (!m) return null;
+        const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
+        const mm = months[m[1].slice(0, 3).toLowerCase()];
+        if (!mm) return null;
+        return `${m[3]}-${mm}-${String(+m[2]).padStart(2, '0')}`;
+      }
+      function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+      // User-created meetings reuse the meeting-detail modal — we swap the
+      // title and the when pill on the way in. Deck / action items / etc.
+      // still show the Engineering Weekly seed content for now; each of those
+      // sections will get its own per-meeting state as we build them out.
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-user-meeting-id]');
+        if (!trigger) return;
+        const id = trigger.dataset.userMeetingId;
+        const m = userMeetings[id];
+        if (!m) return;
+        const md = document.getElementById('meeting-detail');
+        if (!md) return;
+        const titleEl = md.querySelector('#md-title');
+        const whenEl = md.querySelector('[data-when-date]');
+        if (titleEl) titleEl.textContent = m.title;
+        if (whenEl) {
+          const d = new Date(m.iso + 'T00:00:00');
+          const long = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+          whenEl.textContent = `${long} · ${m.start} – ${m.end}`;
+        }
+        // Design system's data-modal-open handler is attached per-element on
+        // load, so it doesn't fire for dynamically-inserted triggers. Open manually.
+        md.removeAttribute('hidden');
+      });
+
       const toc = modal.querySelector('[data-cm-toc]');
       const body = modal.querySelector('.modal-body');
       if (!toc || !body) return;
@@ -4905,6 +5279,9 @@ body { overflow: hidden; }
         const y = body.scrollTop + body.clientHeight * 0.4;
         let active = targets[0];
         for (const t of targets) if (offsetIn(t) <= y) active = t;
+        if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) {
+          active = targets[targets.length - 1];
+        }
         links.forEach(l => l.classList.toggle('is-active', l.dataset.cmTocTarget === active?.id));
       });
     })();
@@ -5014,6 +5391,118 @@ body { overflow: hidden; }
     }
     .md-do-not-delete a { color: var(--color-text-link); }
 
+    #meeting-detail .md-person.is-me { position: relative; }
+    #meeting-detail .md-me-reject { opacity: 0; transition: opacity var(--ic-duration-fast) var(--ic-ease); }
+    #meeting-detail .md-person.is-me:hover .md-me-reject,
+    #meeting-detail .md-person.is-me:focus-within .md-me-reject { opacity: 1; }
+
+    .md-view-toast {
+      position: fixed;
+      left: 50%; bottom: var(--ic-space-6);
+      transform: translateX(-50%) translateY(8px);
+      padding: 10px 16px;
+      background: var(--ic-palette-graphite-900);
+      color: var(--ic-palette-white);
+      border-radius: var(--ic-radius-sm);
+      font: var(--type-body-sm);
+      box-shadow: var(--ic-shadow-md);
+      display: inline-flex; align-items: center; gap: var(--ic-space-3);
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--ic-duration-base) var(--ic-ease),
+                  transform var(--ic-duration-base) var(--ic-ease);
+      z-index: calc(var(--ic-z-modal) + 10);
+    }
+    .md-view-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .md-view-toast .icon { color: var(--ic-palette-white); font-size: 16px; opacity: 0.8; }
+    .md-view-toast-cta { background: transparent; border: 0; padding: 0; margin-left: var(--ic-space-2); color: var(--ic-palette-white); font-weight: var(--ic-weight-semibold); text-decoration: underline; cursor: pointer; }
+
+    .rm-section-title { font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2); }
+    .rm-textarea { width: 100%; min-height: 96px; padding: var(--ic-space-3); font: var(--type-body); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); resize: vertical; }
+    .rm-textarea:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+    [data-rm-propose][hidden] { display: none !important; }
+
+    /* Edit-mode affordances on the meeting-detail modal. */
+    #meeting-detail [data-md-editable] { padding: 4px 8px; margin: -4px -8px; border-radius: var(--ic-radius-sm); border: 1px solid transparent; transition: background var(--ic-duration-fast) var(--ic-ease), border-color var(--ic-duration-fast) var(--ic-ease); }
+    #meeting-detail.is-editing [data-md-editable] { background: var(--color-surface); border-color: var(--color-border); cursor: text; }
+    #meeting-detail.is-editing [data-md-editable]:hover { border-color: var(--color-border-strong); }
+    #meeting-detail.is-editing [data-md-editable]:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+    #meeting-detail:not(.is-editing) [hidden-when-editing] { display: inline-flex; }
+    #meeting-detail:not(.is-editing) [show-when-editing]   { display: none !important; }
+    #meeting-detail.is-editing [hidden-when-editing]       { display: none !important; }
+    #meeting-detail.is-editing [show-when-editing]         { display: inline-flex !important; }
+    #meeting-detail:not(.is-editing) [data-md-edit-only]   { display: none !important; }
+    #meeting-detail.is-editing        [data-md-view-only]  { display: none !important; }
+    #meeting-detail.is-editing        .md-when-nav         { display: none !important; }
+
+    /* Detail row grid — read-only rows with a leading icon (see Figma
+     * 30081:404104). Two columns on desktop, stacked on narrow. */
+    .md-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--ic-space-3) var(--ic-space-5);
+      margin-bottom: var(--ic-space-4);
+    }
+    @media (max-width: 720px) {
+      .md-detail-grid { grid-template-columns: 1fr; }
+    }
+    .md-detail-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      min-height: 32px;
+      font: var(--type-body);
+      color: var(--color-text);
+    }
+    .md-detail-row > .icon {
+      color: var(--color-text-muted);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .md-detail-row a { color: var(--color-text-link); text-decoration: none; }
+    .md-detail-row a:hover { text-decoration: underline; }
+    .md-detail-row .md-detail-arrow { color: var(--color-text-subtle); }
+    .md-detail-row .badge { margin-left: var(--ic-space-1); }
+
+    .md-rec-dot {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--color-danger);
+      font: var(--ic-weight-semibold) var(--ic-text-xxs)/1 var(--ic-font-sans);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .md-rec-dot::before {
+      content: ''; display: inline-block; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--color-danger);
+    }
+    .md-rec-copy {
+      background: transparent; border: 0; padding: 2px; cursor: pointer;
+      color: var(--color-text-muted); display: inline-flex; align-items: center;
+    }
+    .md-rec-copy:hover { color: var(--color-text); }
+
+    .md-kr {
+      display: flex; gap: var(--ic-space-3); align-items: flex-start;
+      padding: var(--ic-space-3) 0;
+      margin-top: var(--ic-space-2);
+    }
+    .md-kr > .icon { color: var(--color-text-muted); font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+    .md-kr-body { flex: 1; min-width: 0; }
+    .md-kr-title { font: var(--type-body); color: var(--color-text); margin: 0; }
+    .md-kr-sub { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 var(--ic-space-2); }
+    .md-kr-bar {
+      display: flex; align-items: center; gap: var(--ic-space-2);
+      font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);
+      color: var(--color-text);
+    }
+    .md-kr-track {
+      flex: 1; height: 6px; border-radius: var(--ic-radius-full);
+      background: var(--ic-palette-gray-150); overflow: hidden;
+    }
+    .md-kr-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-info) 0%, var(--color-success) 100%);
+    }
+
     .md-meta-row {
       display: flex;
       align-items: center;
@@ -5038,6 +5527,50 @@ body { overflow: hidden; }
       justify-content: space-between;
       margin-bottom: var(--ic-space-4);
     }
+
+    .md-history-lede {
+      font: var(--type-body);
+      color: var(--color-text);
+      margin: 0 0 var(--ic-space-4);
+    }
+    .md-history-entry {
+      padding: var(--ic-space-4) 0;
+      border-bottom: 1px solid var(--ic-palette-gray-150);
+    }
+    .md-history-entry:first-of-type { padding-top: 0; }
+    .md-history-date {
+      display: inline-flex;
+      align-items: center;
+      padding-left: var(--ic-space-3);
+      border-left: 3px solid var(--color-accent);
+      font: var(--ic-weight-semibold) var(--ic-text-md)/1.2 var(--ic-font-sans);
+      color: var(--color-accent);
+      margin: 0 0 var(--ic-space-3);
+    }
+    .md-history-facts {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ic-space-2);
+    }
+    .md-history-fact {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      font: var(--type-body);
+      color: var(--color-text);
+    }
+    .md-history-fact > .icon {
+      color: var(--color-text-muted);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .md-history-fact a { color: var(--color-text-link); text-decoration: none; }
+    .md-history-fact a:hover { text-decoration: underline; }
+    .md-history-see-all { margin-top: var(--ic-space-4); }
+    [data-history-body][hidden] { display: none; }
     .md-toggle {
       background: transparent;
       border: 0;
@@ -5501,8 +6034,11 @@ body { overflow: hidden; }
       display: inline-flex; align-items: center; justify-content: center;
       font: var(--ic-weight-semibold) 10px/1 var(--ic-font-sans);
     }
+    /* RACI role dots (Responsible / Accountable / Consulted / Informed). */
     .md-badge-r { background: var(--color-success-subtle); color: var(--color-success); }
-    .md-badge-a { background: var(--color-danger-subtle); color: var(--color-danger); }
+    .md-badge-a { background: var(--color-danger-subtle);  color: var(--color-danger); }
+    .md-badge-c { background: var(--color-info-subtle);    color: var(--color-info); }
+    .md-badge-i { background: var(--color-warning-subtle); color: var(--ic-palette-yellow-700); }
 
     /* Resources — Google Slides empty state */
     .md-resource {
@@ -6087,59 +6623,205 @@ body { overflow: hidden; }
   </style>
 
   <div class="modal-overlay" id="meeting-detail" hidden>
+    <div class="md-view-toast" data-md-view-toast role="status" aria-live="polite">
+      <svg class="icon i-info"><use href="#i-info"/></svg>
+      <span>You're in view mode — enter edit to change this.</span>
+      <button class="md-view-toast-cta" type="button" data-md-view-toast-edit>Edit</button>
+    </div>
     <div class="modal modal-full" role="dialog" aria-modal="true" aria-labelledby="md-title">
-      <header class="modal-header" style="padding: var(--ic-space-5) var(--ic-space-5) var(--ic-space-4)">
-        <h2 id="md-title" class="md-title">Engineering Weekly</h2>
+      <header class="modal-header" style="height: 80px; flex-shrink: 0; border-bottom: 1px solid var(--ic-palette-gray-200); gap: var(--ic-space-3)">
+        <h2 id="md-title" class="md-title" data-md-editable>Engineering Weekly</h2>
+        <div class="md-when-nav">
+          <button class="cal-nav-btn" type="button" aria-label="Previous occurrence"><svg class="icon i-chevron-minor i-caret-left"><use href="#i-chevron-minor"/></svg></button>
+          <span class="md-when-pill">
+            <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
+            <span data-when-date>Wednesday, January 21, 2026 · 2:30 PM – 3:30 PM</span>
+          </span>
+          <button class="cal-nav-btn" type="button" aria-label="Next occurrence"><svg class="icon i-chevron-minor i-caret-right"><use href="#i-chevron-minor"/></svg></button>
+        </div>
         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
       </header>
 
       <div class="modal-body">
-        <div class="md-when">
-          <div class="md-when-nav">
-            <button class="cal-nav-btn" type="button" aria-label="Previous occurrence"><svg class="icon i-chevron-minor i-caret-left"><use href="#i-chevron-minor"/></svg></button>
-            <span class="md-when-pill">
-              <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
-              <span data-when-date>Wednesday, January 21, 2026 · 2:30 PM – 3:30 PM</span>
-            </span>
-            <button class="cal-nav-btn" type="button" aria-label="Next occurrence"><svg class="icon i-chevron-minor i-caret-right"><use href="#i-chevron-minor"/></svg></button>
-          </div>
-          <span class="md-recurrence-tag">Every week on Wednesday</span>
-        </div>
-
         <div class="md-grid">
           <!-- LEFT COLUMN -->
           <div>
             <section id="md-details">
-              <h3 class="md-section-title">Meeting details</h3>
+              <h3 class="md-section-title">Details</h3>
 
-              <div class="md-doc-line">
-                <svg class="icon i-profile"><use href="#i-profile"/></svg>
-                <div class="md-doc-line-body">
-                  <div>
-                    <span class="md-new-badge">NEW</span>
-                    <a href="#" class="md-link">Q1 Roadmap Review &amp; Engineering Priorities</a>
-                  </div>
-                  <a href="#" class="md-link" style="font-weight: var(--ic-weight-regular); font-size: var(--ic-text-sm)">Platform reliability — error budget</a>
+              <div class="md-detail-grid" data-md-view-only>
+                <div class="md-detail-row">
+                  <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
+                  <span data-detail-date>Wednesday, January 21, 2026</span>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-time"><use href="#i-time"/></svg>
+                  <span data-detail-time>2:30 PM – 3:30 PM</span>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-globe"><use href="#i-globe"/></svg>
+                  <span>(GMT-04:00) New York</span>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-update"><use href="#i-update"/></svg>
+                  <span data-detail-recurrence>Every week on a Wednesday</span>
+                  <span class="tag tag-indicator tag-blue">Moderate</span>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
+                  <a href="#" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">https://zoom.us/j/98859055013</a>
+                  <span class="md-rec-dot">Rec</span>
+                  <button type="button" class="md-rec-copy" aria-label="Copy Zoom link">
+                    <svg class="icon i-copy" style="font-size: 14px"><use href="#i-copy"/></svg>
+                  </button>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-jobs"><use href="#i-jobs"/></svg>
+                  <span>Busy</span>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-company"><use href="#i-company"/></svg>
+                  <a href="#">Engineering</a>
+                  <span class="md-detail-arrow">→</span>
+                  <a href="#">Platform</a>
+                </div>
+                <div class="md-detail-row">
+                  <svg class="icon i-org-chart"><use href="#i-org-chart"/></svg>
+                  <span>ExpertCrowd</span>
                 </div>
               </div>
 
-              <ul class="md-bullets">
-                <li>Review last week's deploy stability and incident post-mortems</li>
-                <li>Walk through the platform reliability roadmap — error-budget burn, p95 latency goals, and the on-call rotation refresh</li>
-                <li>Unblock the data-pipeline migration — confirm cutover date and rollback criteria with the team</li>
-              </ul>
+              <div class="cm-grid" data-md-edit-only style="grid-template-columns: 1fr 1fr; margin-top: 0">
+                <section class="cm-section" style="grid-column: 1 / -1">
+                  <div class="cm-row">
+                    <div class="cm-input-icon">
+                      <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
+                      <input class="input" type="text" value="Jan 21, 2026" aria-label="Date" />
+                    </div>
+                    <div class="cm-time">
+                      <div class="cm-time-fields">
+                        <div class="cm-input-suffix" style="flex: 1">
+                          <svg class="icon i-time"><use href="#i-time"/></svg>
+                          <input class="input" type="text" value="14:30" aria-label="Start time" />
+                        </div>
+                        <span class="cm-time-to">to</span>
+                        <div class="cm-input-suffix" style="flex: 1">
+                          <svg class="icon i-time"><use href="#i-time"/></svg>
+                          <input class="input" type="text" value="15:30" aria-label="End time" />
+                        </div>
+                      </div>
+                      <button class="btn btn-ghost btn-sm" type="button">Find Time</button>
+                    </div>
+                  </div>
 
-              <p class="md-do-not-delete">-----Please do not delete this: <a href="#">https://team.operationalize.com/initiatives/list?initiativeId=4187</a>-----</p>
+                  <div class="cm-row">
+                    <div class="cm-input-suffix">
+                      <svg class="icon cm-lead i-globe"><use href="#i-globe"/></svg>
+                      <input class="input" type="text" value="(GMT-04:00) New York" readonly aria-label="Time zone" />
+                      <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                    </div>
+                    <div class="cm-input-suffix">
+                      <svg class="icon cm-lead i-update"><use href="#i-update"/></svg>
+                      <input class="input" type="text" value="Every week on a Wednesday" readonly aria-label="Recurrence" />
+                      <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                    </div>
+                  </div>
 
-              <div class="md-meta-row">
-                <svg class="icon i-org-chart"><use href="#i-org-chart"/></svg>
-                <a href="#">Engineering</a>
-                <span style="color: var(--color-text-subtle)">→</span>
-                <a href="#">Platform</a>
+                  <div class="cm-row">
+                    <div class="cm-cell-stack">
+                      <div class="cm-zoom">
+                        <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
+                        <input class="input" type="text" value="https://zoom.us/j/············" readonly aria-label="Zoom URL" />
+                        <span class="cm-zoom-badge">Auto-created</span>
+                      </div>
+                      <label class="checkbox">
+                        <input type="checkbox" class="checkbox-input" checked />
+                        <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                        <span class="checkbox-label">Auto-recording</span>
+                      </label>
+                    </div>
+                    <div class="cm-cell-stack">
+                      <div class="cm-input-suffix">
+                        <svg class="icon cm-lead i-jobs"><use href="#i-jobs"/></svg>
+                        <input class="input" type="text" value="Busy" readonly aria-label="Availability" />
+                        <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                      </div>
+                      <p class="cm-cell-hint">Controls whether this blocks the slot on participants calendars.</p>
+                    </div>
+                  </div>
+
+                  <div class="cm-row">
+                    <div class="cm-input-suffix">
+                      <svg class="icon cm-lead i-org-chart"><use href="#i-org-chart"/></svg>
+                      <input class="input" type="text" value="ExpertCrowd" readonly aria-label="Org unit" />
+                      <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                    </div>
+                    <div class="cm-input-suffix">
+                      <svg class="icon cm-lead i-company"><use href="#i-company"/></svg>
+                      <input class="input" type="text" value="Engineering → Platform" readonly aria-label="Business Line" />
+                      <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                    </div>
+                  </div>
+                </section>
               </div>
-              <div class="md-meta-row">
-                <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
-                <a href="#">https://zoom.us/j/98859055013</a>
+
+              <div data-md-view-only>
+                <div class="md-doc-line">
+                  <svg class="icon i-profile"><use href="#i-profile"/></svg>
+                  <div class="md-doc-line-body">
+                    <div>
+                      <span class="md-new-badge">NEW</span>
+                      <a href="#" class="md-link">Q1 Roadmap Review &amp; Engineering Priorities</a>
+                    </div>
+                    <a href="#" class="md-link" style="font-weight: var(--ic-weight-regular); font-size: var(--ic-text-sm)">Platform reliability — error budget</a>
+                  </div>
+                </div>
+
+                <ul class="md-bullets">
+                  <li>Review last week's deploy stability and incident post-mortems</li>
+                  <li>Walk through the platform reliability roadmap — error-budget burn, p95 latency goals, and the on-call rotation refresh</li>
+                  <li>Unblock the data-pipeline migration — confirm cutover date and rollback criteria with the team</li>
+                </ul>
+
+                <p class="md-do-not-delete">-----Please do not delete this: <a href="#">https://team.operationalize.com/initiatives/list?initiativeId=4187</a>-----</p>
+              </div>
+
+              <div data-md-edit-only style="margin-top: var(--ic-space-4)">
+                <div class="cm-editor">
+                  <div class="cm-editor-toolbar">
+                    <div class="cm-input-suffix" style="width: 120px">
+                      <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                      <input class="input" type="text" value="Normal Text" readonly />
+                    </div>
+                    <button class="cm-tb-btn" type="button" aria-label="Bold"><svg class="icon i-bold"><use href="#i-bold"/></svg></button>
+                    <button class="cm-tb-btn" type="button" aria-label="Italic"><svg class="icon i-italic"><use href="#i-italic"/></svg></button>
+                    <span class="cm-tb-divider"></span>
+                    <button class="cm-tb-btn" type="button" aria-label="Bullet list"><svg class="icon i-list-unordered"><use href="#i-list-unordered"/></svg></button>
+                    <button class="cm-tb-btn" type="button" aria-label="Numbered list"><svg class="icon i-list-ordered"><use href="#i-list-ordered"/></svg></button>
+                    <span class="cm-tb-divider"></span>
+                    <button class="cm-tb-btn" type="button" aria-label="Link"><svg class="icon i-link"><use href="#i-link"/></svg></button>
+                  </div>
+                  <div class="cm-editor-area" contenteditable="true" style="min-height: 200px; white-space: pre-wrap" data-placeholder="Add a description.">Q1 Roadmap Review &amp; Engineering Priorities
+Platform reliability — error budget
+
+• Review last week's deploy stability and incident post-mortems
+• Walk through the platform reliability roadmap — error-budget burn, p95 latency goals, and the on-call rotation refresh
+• Unblock the data-pipeline migration — confirm cutover date and rollback criteria with the team
+
+-----Please do not delete this: https://team.operationalize.com/initiatives/list?initiativeId=4187-----</div>
+                </div>
+              </div>
+
+              <div class="md-kr">
+                <svg class="icon i-jobs"><use href="#i-jobs"/></svg>
+                <div class="md-kr-body">
+                  <p class="md-kr-title">Resolve all critical and high CVEs within 7 days of disclosure</p>
+                  <p class="md-kr-sub">Objective: Strengthen platform security · Q2 / 2026</p>
+                  <div class="md-kr-bar">
+                    <div class="md-kr-track"><div class="md-kr-fill" style="width: 32%"></div></div>
+                    <span>32%</span>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -6149,7 +6831,7 @@ body { overflow: hidden; }
             <section id="md-deck" data-resource-section>
               <div class="md-section-head-row">
                 <div class="md-title-with-info">
-                  <h3 class="md-section-title" style="margin: 0">Meeting deck</h3>
+                  <h3 class="md-section-title" style="margin: 0">Deck</h3>
                   <span class="md-info-icon-wrap" data-deck-info hidden>
                     <span class="md-info-icon" tabindex="0" aria-label="About the deck variables" aria-describedby="deck-vars-tooltip">
                       <svg class="icon i-info"><use href="#i-info"/></svg>
@@ -6200,6 +6882,10 @@ body { overflow: hidden; }
                     </button>
                   </div>
                 </div>
+                <button class="md-toggle" type="button" data-deck-toggle aria-expanded="true" style="margin-left: auto;">
+                  <span data-deck-toggle-label>Collapse</span>
+                  <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                </button>
               </div>
 
               <div class="alert alert-info md-deck-info" data-deck-info hidden>
@@ -6348,6 +7034,29 @@ body { overflow: hidden; }
 
             <div class="md-divider"></div>
 
+            <!-- AGENDA ITEMS -->
+            <section id="md-agenda">
+              <div class="cm-agenda-head" style="margin-bottom: var(--ic-space-3)">
+                <div class="cm-agenda-title-row">
+                  <h3 class="md-section-title" style="margin: 0">Agenda items</h3>
+                  <span class="badge">0</span>
+                </div>
+                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item">
+                  <svg class="icon i-plus"><use href="#i-plus"/></svg>
+                </button>
+              </div>
+              <div class="cm-agenda-empty">
+                <svg class="icon i-list-unordered"><use href="#i-list-unordered"/></svg>
+                No Agenda items yet
+              </div>
+              <button class="cm-agenda-add" type="button" style="margin-top: var(--ic-space-2)">
+                <svg class="icon i-plus"><use href="#i-plus"/></svg>
+                Add agenda item
+              </button>
+            </section>
+
+            <div class="md-divider"></div>
+
             <!-- ACTION ITEMS -->
             <section id="md-action-items" data-ai-section data-current-occurrence="2026-01-21" data-prev-occurrence="2026-01-14" data-next-occurrence="2026-01-28">
               <div class="ai-section-head">
@@ -6368,15 +7077,6 @@ body { overflow: hidden; }
                   <span data-ai-completed-label>Show all</span>
                   <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
                 </button>
-              </div>
-            </section>
-
-            <div class="md-divider"></div>
-
-            <section id="md-history">
-              <div class="md-history-row">
-                <h3 class="md-section-title" style="margin: 0">Meeting history</h3>
-                <button class="md-toggle" type="button">Expand <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg></button>
               </div>
             </section>
 
@@ -6435,6 +7135,73 @@ body { overflow: hidden; }
                 </div>
               </div>
             </section>
+
+            <div class="md-divider"></div>
+
+            <!-- HISTORY — surfaces past occurrences. In production, only render for meetings
+                 whose first occurrence is before "today"; for the prototype it's always visible. -->
+            <section id="md-history">
+              <div class="md-section-head-row">
+                <div class="md-title-with-info">
+                  <h3 class="md-section-title" style="margin: 0">History</h3>
+                  <span class="badge">10</span>
+                </div>
+                <button class="md-toggle" type="button" data-history-toggle aria-expanded="true" style="margin-left: auto">
+                  <span data-history-toggle-label>Collapse</span>
+                  <svg class="icon i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                </button>
+              </div>
+
+              <div data-history-body>
+                <p class="md-history-lede">There were 46 events for [RoB] [Initiative] Operationalize Launch</p>
+
+                <article class="md-history-entry">
+                  <h4 class="md-history-date">Sep 07, 2024</h4>
+                  <ul class="md-history-facts">
+                    <li class="md-history-fact">
+                      <svg class="icon i-time"><use href="#i-time"/></svg>
+                      <span>19min</span>
+                    </li>
+                    <li class="md-history-fact">
+                      <svg class="icon i-participants"><use href="#i-participants"/></svg>
+                      <span>[x] users were invited, [x] participated</span>
+                    </li>
+                    <li class="md-history-fact">
+                      <svg class="icon i-play"><use href="#i-play"/></svg>
+                      <a href="#">Zoom Recording</a>
+                      <span style="color: var(--color-text-muted)">(xmin)</span>
+                      <button type="button" class="md-rec-copy" aria-label="Copy recording link">
+                        <svg class="icon i-copy" style="font-size: 14px"><use href="#i-copy"/></svg>
+                      </button>
+                    </li>
+                  </ul>
+                </article>
+
+                <article class="md-history-entry">
+                  <h4 class="md-history-date">Aug 31, 2024</h4>
+                  <ul class="md-history-facts">
+                    <li class="md-history-fact">
+                      <svg class="icon i-time"><use href="#i-time"/></svg>
+                      <span>19min</span>
+                    </li>
+                    <li class="md-history-fact">
+                      <svg class="icon i-participants"><use href="#i-participants"/></svg>
+                      <span>[x] users were invited, [x] participated</span>
+                    </li>
+                    <li class="md-history-fact">
+                      <svg class="icon i-play"><use href="#i-play"/></svg>
+                      <a href="#">Zoom Recording</a>
+                      <span style="color: var(--color-text-muted)">(xmin)</span>
+                      <button type="button" class="md-rec-copy" aria-label="Copy recording link">
+                        <svg class="icon i-copy" style="font-size: 14px"><use href="#i-copy"/></svg>
+                      </button>
+                    </li>
+                  </ul>
+                </article>
+
+                <button class="btn btn-secondary btn-sm md-history-see-all" type="button">See all [8]</button>
+              </div>
+            </section>
           </div>
 
           <div class="cm-divider-v" style="min-height: 100%"></div>
@@ -6456,7 +7223,7 @@ body { overflow: hidden; }
             <div style="height: var(--ic-space-3)"></div>
 
             <section>
-              <h3 class="md-section-title">Participants (8)</h3>
+              <h3 class="md-section-title">Participants (9)</h3>
 
               <div class="md-person">
                 <span class="avatar avatar-md" style="background: var(--color-surface-muted); color: var(--color-text-muted)"><svg class="icon i-settings"><use href="#i-settings"/></svg></span>
@@ -6467,7 +7234,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-info-subtle); color: var(--color-info)">KB</span>
+                <span class="avatar avatar-md">KB</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Keith Berlin</p>
                   <p class="md-person-role">Staff Engineer · Platform</p>
@@ -6476,43 +7243,43 @@ body { overflow: hidden; }
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-warning-subtle); color: var(--color-warning)">RL</span>
+                <span class="avatar avatar-md">RL</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Rick Lacroix</p>
                   <p class="md-person-role">Engineering Manager · Data</p>
                 </div>
-                <span class="md-person-badge md-badge-r">R</span>
+                <span class="md-person-badge md-badge-c">C</span>
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-success-subtle); color: var(--color-success)">TT</span>
+                <span class="avatar avatar-md">TT</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Tile Tampakas</p>
                   <p class="md-person-role">Senior Engineer · Infrastructure</p>
                 </div>
-                <span class="md-person-badge md-badge-r">R</span>
+                <span class="md-person-badge md-badge-c">C</span>
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-danger-subtle); color: var(--color-danger)">CP</span>
+                <span class="avatar avatar-md">CP</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Collete Parker</p>
                   <p class="md-person-role">Director of Engineering</p>
                 </div>
-                <span class="md-person-badge md-badge-r">R</span>
+                <span class="md-person-badge md-badge-c">C</span>
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-accent-subtle); color: var(--color-accent)">KO</span>
+                <span class="avatar avatar-md">KO</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Kate Ottavio Kent</p>
                   <p class="md-person-role">Senior Director of Program Management</p>
                 </div>
-                <span class="md-person-badge md-badge-r">R</span>
+                <span class="md-person-badge md-badge-i">I</span>
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-warning-subtle); color: var(--color-warning)">JE</span>
+                <span class="avatar avatar-md">JE</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Jane Eveland</p>
                   <p class="md-person-role">Tech Lead · Pipelines</p>
@@ -6521,38 +7288,122 @@ body { overflow: hidden; }
               </div>
 
               <div class="md-person">
-                <span class="avatar avatar-md" style="background: var(--color-success-subtle); color: var(--color-success)">ES</span>
+                <span class="avatar avatar-md">ES</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Emily Smith</p>
                   <p class="md-person-role">Software Engineer · Platform</p>
                 </div>
+                <span class="md-person-badge md-badge-c">C</span>
+              </div>
+
+              <div class="md-person is-me" data-md-me>
+                <span class="avatar avatar-md">MV</span>
+                <div class="md-person-body">
+                  <p class="md-person-name">Matthew Vella <span style="color: var(--color-text-muted); font-weight: var(--ic-weight-regular)">(you)</span></p>
+                  <p class="md-person-role">Senior Product Designer · Platform</p>
+                </div>
+                <button class="btn btn-icon-only btn-ghost btn-xs md-me-reject" type="button" aria-label="Reject meeting" data-modal-open="reject-meeting">
+                  <svg class="icon i-close-circle"><use href="#i-close-circle"/></svg>
+                </button>
                 <span class="md-person-badge md-badge-r">R</span>
               </div>
+
+              <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
+              <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
+              <label class="checkbox">
+                <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Editable RoB by participants</span>
+              </label>
+              <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: -4px 0 0; padding-left: 24px; line-height: 1.4">
+                Anyone in the participants list can update the details, deck, agenda items, and action items.
+              </p>
             </section>
           </div>
 
           <!-- TOC RAIL -->
           <nav class="cm-toc" aria-label="Sections" data-md-toc>
-            <a class="cm-toc-item is-active" href="#md-details"      data-md-toc-target="md-details"><svg class="icon i-list"><use href="#i-list"/></svg> Details</a>
-            <a class="cm-toc-item"           href="#md-deck"         data-md-toc-target="md-deck"><svg class="icon i-presenter-mode"><use href="#i-presenter-mode"/></svg> Meeting deck</a>
+            <a class="cm-toc-item is-active" href="#md-details"      data-md-toc-target="md-details"><svg class="icon i-legal-info"><use href="#i-legal-info"/></svg> Details</a>
+            <a class="cm-toc-item"           href="#md-deck"         data-md-toc-target="md-deck"><svg class="icon i-presenter-mode"><use href="#i-presenter-mode"/></svg> Deck</a>
+            <a class="cm-toc-item"           href="#md-agenda"       data-md-toc-target="md-agenda"><svg class="icon i-list-unordered"><use href="#i-list-unordered"/></svg> Agenda items</a>
             <a class="cm-toc-item"           href="#md-action-items" data-md-toc-target="md-action-items"><svg class="icon i-list-checkboxes"><use href="#i-list-checkboxes"/></svg> Action items</a>
-            <a class="cm-toc-item"           href="#md-history"      data-md-toc-target="md-history"><svg class="icon i-update"><use href="#i-update"/></svg> History</a>
-            <a class="cm-toc-item"           href="#md-connections"  data-md-toc-target="md-connections"><svg class="icon i-connectors-2"><use href="#i-connectors-2"/></svg> Connections</a>
+            <a class="cm-toc-item"           href="#md-connections"  data-md-toc-target="md-connections"><svg class="icon i-connectors"><use href="#i-connectors"/></svg> Connections</a>
+            <a class="cm-toc-item"           href="#md-history"      data-md-toc-target="md-history"><svg class="icon i-time"><use href="#i-time"/></svg> History</a>
           </nav>
         </div>
       </div>
 
-      <footer class="modal-footer">
-        <button class="btn btn-secondary" type="button" data-modal-switch="meeting-edit">Edit</button>
+      <footer class="modal-footer" style="border-top: 1px solid var(--ic-palette-gray-200)">
+        <button class="btn btn-secondary" type="button" data-md-edit-start hidden-when-editing>Edit</button>
+        <button class="btn btn-secondary" type="button" data-md-edit-cancel show-when-editing hidden>Cancel</button>
+        <button class="btn btn-primary" type="button" data-md-edit-save show-when-editing hidden>Save changes</button>
       </footer>
     </div>
   </div>
 
   <script>
-    // Meeting-detail: TOC scroll + scrollspy
+    // Meeting-detail: TOC scroll + scrollspy + inline edit mode
     (function () {
       const modal = document.getElementById('meeting-detail');
       if (!modal) return;
+
+      const editables = () => modal.querySelectorAll('[data-md-editable]');
+      let snapshot = null;
+
+      const setLocks = (locked) => {
+        modal.querySelectorAll('[data-md-edit-lock]').forEach(el => {
+          if (locked) el.setAttribute('disabled', '');
+          else el.removeAttribute('disabled');
+        });
+      };
+      const startEdit = () => {
+        snapshot = {};
+        editables().forEach(el => {
+          snapshot[Math.random()] = { el, html: el.innerHTML };
+          el.setAttribute('contenteditable', 'true');
+        });
+        setLocks(false);
+        modal.classList.add('is-editing');
+        modal.querySelector('[data-md-edit-start]')?.setAttribute('hidden', '');
+        modal.querySelector('[data-md-edit-cancel]')?.removeAttribute('hidden');
+        modal.querySelector('[data-md-edit-save]')?.removeAttribute('hidden');
+      };
+      const endEdit = ({ restore }) => {
+        editables().forEach(el => el.removeAttribute('contenteditable'));
+        if (restore && snapshot) {
+          Object.values(snapshot).forEach(({ el, html }) => { el.innerHTML = html; });
+        }
+        snapshot = null;
+        setLocks(true);
+        modal.classList.remove('is-editing');
+        modal.querySelector('[data-md-edit-start]')?.removeAttribute('hidden');
+        modal.querySelector('[data-md-edit-cancel]')?.setAttribute('hidden', '');
+        modal.querySelector('[data-md-edit-save]')?.setAttribute('hidden', '');
+      };
+      modal.querySelector('[data-md-edit-start]')?.addEventListener('click', startEdit);
+      modal.querySelector('[data-md-edit-cancel]')?.addEventListener('click', () => endEdit({ restore: true }));
+      modal.querySelector('[data-md-edit-save]')?.addEventListener('click', () => endEdit({ restore: false }));
+
+      // View-mode snackbar — surfaces why a disabled control isn't reacting.
+      const toast = modal.querySelector('[data-md-view-toast]');
+      let toastTimer = null;
+      const showToast = () => {
+        if (!toast) return;
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3200);
+      };
+      modal.addEventListener('click', e => {
+        if (modal.classList.contains('is-editing')) return;
+        const lockedLabel = e.target.closest('label:has(input:disabled)');
+        if (!lockedLabel) return;
+        showToast();
+      });
+      toast?.querySelector('[data-md-view-toast-edit]')?.addEventListener('click', () => {
+        toast.classList.remove('is-visible');
+        startEdit();
+      });
+
       const toc = modal.querySelector('[data-md-toc]');
       const body = modal.querySelector('.modal-body');
       if (!toc || !body) return;
@@ -6573,7 +7424,109 @@ body { overflow: hidden; }
         const y = body.scrollTop + body.clientHeight * 0.4;
         let active = targets[0];
         for (const t of targets) if (offsetIn(t) <= y) active = t;
+        if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) {
+          active = targets[targets.length - 1];
+        }
         links.forEach(l => l.classList.toggle('is-active', l.dataset.mdTocTarget === active?.id));
+      });
+    })();
+  </script>
+
+  <!-- ============ REJECT MEETING MODAL ============ -->
+  <div class="modal-overlay" id="reject-meeting" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="rm-title">
+      <header class="modal-header" style="height: 80px; flex-shrink: 0; border-bottom: 1px solid var(--ic-palette-gray-200)">
+        <h2 id="rm-title" style="font: var(--type-h3); margin: 0">Reject meeting</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+      </header>
+
+      <div class="modal-body" style="padding: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-5)">
+        <div>
+          <p class="rm-section-title" style="margin-bottom: var(--ic-space-3)">Reject</p>
+          <div style="display: flex; flex-direction: column; gap: var(--ic-space-2)">
+            <label class="radio">
+              <input type="radio" name="rm-scope" class="radio-input" value="occurrence" checked data-rm-scope />
+              <span class="radio-circle"></span>
+              <span class="radio-label">This event only <span style="color: var(--color-text-muted)">— Wednesday, January 21, 2026</span></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="rm-scope" class="radio-input" value="series" data-rm-scope />
+              <span class="radio-circle"></span>
+              <span class="radio-label">All events in the series <span style="color: var(--color-text-muted)">— Every week on Wednesday</span></span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="rm-section-title" for="rm-reason">Reason <span style="font-weight: var(--ic-weight-regular); color: var(--color-text-muted)">(optional)</span></label>
+          <textarea id="rm-reason" class="rm-textarea" placeholder="Let the organizer know why you're rejecting — a scheduling conflict, missing context, or something else." data-rm-reason></textarea>
+        </div>
+
+        <div>
+          <label style="display: inline-flex; align-items: center; gap: var(--ic-space-3); cursor: pointer">
+            <span class="switch">
+              <input type="checkbox" class="switch-input" data-rm-propose-toggle />
+              <span class="switch-track"></span>
+            </span>
+            <span style="font: var(--type-body); color: var(--color-text)">Propose an alternative time</span>
+          </label>
+          <div class="cm-section" data-rm-propose hidden style="margin-top: var(--ic-space-3); gap: var(--ic-space-3)">
+            <div class="cm-row">
+              <div class="cm-input-icon">
+                <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
+                <input class="input" type="text" value="Thursday, Jan 29, 2026" aria-label="Proposed date" data-rm-date />
+              </div>
+              <div class="cm-time" style="align-items: center; gap: var(--ic-space-2)">
+                <div class="cm-input-suffix" style="flex: 1">
+                  <svg class="icon i-time"><use href="#i-time"/></svg>
+                  <input class="input" type="text" value="14:30" aria-label="Proposed start time" data-rm-start />
+                </div>
+                <span class="cm-time-to">to</span>
+                <div class="cm-input-suffix" style="flex: 1">
+                  <svg class="icon i-time"><use href="#i-time"/></svg>
+                  <input class="input" type="text" value="15:30" aria-label="Proposed end time" data-rm-end />
+                </div>
+              </div>
+            </div>
+            <p class="cm-cell-hint" style="font-size: var(--ic-text-xxs)">The organizer will see your proposal and can accept, counter, or decline.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-footer" style="border-top: 1px solid var(--ic-palette-gray-200)">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-primary" type="button" data-rm-submit style="background: var(--color-danger); border-color: var(--color-danger)">Reject meeting</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById('reject-meeting');
+      if (!modal) return;
+      const toggle = modal.querySelector('[data-rm-propose-toggle]');
+      const propose = modal.querySelector('[data-rm-propose]');
+      toggle?.addEventListener('change', () => propose.toggleAttribute('hidden', !toggle.checked));
+
+      modal.querySelector('[data-rm-submit]')?.addEventListener('click', () => {
+        const reason = modal.querySelector('[data-rm-reason]').value.trim();
+        const scope = modal.querySelector('[data-rm-scope]:checked')?.value === 'series' ? 'all events' : 'this event';
+        const proposed = toggle.checked
+          ? `${modal.querySelector('[data-rm-date]').value} · ${modal.querySelector('[data-rm-start]').value} – ${modal.querySelector('[data-rm-end]').value}`
+          : null;
+        const me = document.querySelector('#meeting-detail [data-md-me]');
+        if (me) {
+          me.querySelector('.md-person-role').innerHTML =
+            `<span style="color: var(--color-danger); font-weight: var(--ic-weight-semibold)">Rejected ${scope}</span>` +
+            (proposed ? ` · proposed ${proposed}` : '') +
+            (reason ? ` — "${reason.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}"` : '');
+          me.querySelector('.md-person-badge')?.remove();
+        }
+        modal.setAttribute('hidden', '');
+        toggle.checked = false;
+        propose.setAttribute('hidden', '');
+        const first = modal.querySelector('[data-rm-scope][value="occurrence"]');
+        if (first) first.checked = true;
       });
     })();
   </script>
@@ -6703,7 +7656,7 @@ body { overflow: hidden; }
   </style>
 
   <div class="modal-overlay" id="meeting-edit" hidden>
-    <div class="modal modal-xl" role="dialog" aria-modal="true" aria-labelledby="me-title" style="max-height: calc(100vh - var(--ic-space-6))">
+    <div class="modal modal-full" role="dialog" aria-modal="true" aria-labelledby="me-title">
       <header class="modal-header" style="padding: var(--ic-space-5) var(--ic-space-5) var(--ic-space-3)">
         <div class="me-title-wrap">
           <input id="me-title" class="me-title-input" type="text" value="Engineering Weekly" />
@@ -6942,7 +7895,7 @@ body { overflow: hidden; }
                 <input class="input" type="text" placeholder="Select Options" readonly />
               </div>
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-danger-subtle); color: var(--color-danger)">AJ</span>
+                <span class="avatar avatar-md">AJ</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Adan Jones</p>
                   <p class="me-person-role">Senior Director of Program Management</p>
@@ -6984,7 +7937,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-info-subtle); color: var(--color-info)">KB</span>
+                <span class="avatar avatar-md">KB</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Keith Berlin</p>
                   <p class="me-person-role">Staff Engineer · Platform</p>
@@ -6993,7 +7946,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-warning-subtle); color: var(--color-warning)">RL</span>
+                <span class="avatar avatar-md">RL</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Rick Lacroix</p>
                   <p class="me-person-role">Engineering Manager · Data</p>
@@ -7002,7 +7955,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-success-subtle); color: var(--color-success)">TT</span>
+                <span class="avatar avatar-md">TT</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Tile Tampakas</p>
                   <p class="me-person-role">Senior Engineer · Infrastructure</p>
@@ -7011,7 +7964,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-danger-subtle); color: var(--color-danger)">CP</span>
+                <span class="avatar avatar-md">CP</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Collete Parker</p>
                   <p class="me-person-role">Director of Engineering</p>
@@ -7020,7 +7973,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-accent-subtle); color: var(--color-accent)">KO</span>
+                <span class="avatar avatar-md">KO</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Kate Ottavio Kent</p>
                   <p class="me-person-role">Senior Director of Program Management</p>
@@ -7029,7 +7982,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-warning-subtle); color: var(--color-warning)">JE</span>
+                <span class="avatar avatar-md">JE</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Jane Eveland</p>
                   <p class="me-person-role">Tech Lead · Pipelines</p>
@@ -7038,7 +7991,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="me-person">
-                <span class="avatar avatar-md" style="background: var(--color-success-subtle); color: var(--color-success)">ES</span>
+                <span class="avatar avatar-md">ES</span>
                 <div class="me-person-body">
                   <p class="me-person-name">Emily Smith</p>
                   <p class="me-person-role">Software Engineer · Platform</p>
@@ -7602,6 +8555,19 @@ body { overflow: hidden; }
         if (trigger) positionAddDeckMenu(trigger, menu);
       });
     }, true);
+
+    // Meeting history — collapse/expand toggle.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-history-toggle]');
+      if (!btn) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const next = !expanded;
+      btn.setAttribute('aria-expanded', String(next));
+      const label = btn.querySelector('[data-history-toggle-label]');
+      if (label) label.textContent = next ? 'Collapse' : 'Expand';
+      const body = document.querySelector('[data-history-body]');
+      if (body) body.toggleAttribute('hidden', !next);
+    });
 
     // Walkthrough hint: dismiss when the spotlighted event is clicked or close pressed
     const dismissHint = () => {
