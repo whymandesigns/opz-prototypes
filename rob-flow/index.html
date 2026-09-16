@@ -7465,6 +7465,17 @@ Platform reliability — error budget
               <span class="radio-circle"></span>
               <span class="radio-label">All events in the series <span style="color: var(--color-text-muted)">— Every week on Wednesday</span></span>
             </label>
+
+            <div style="padding-left: 24px; margin-top: 4px" data-rm-exclude-wrap>
+              <label class="checkbox">
+                <input type="checkbox" class="checkbox-input" data-rm-exclude-toggle disabled />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Also ask the organizer to remove me from this series</span>
+              </label>
+              <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; padding-left: 24px; line-height: 1.4">
+                A request goes to the organizer to drop you from every future occurrence. You'll stay on until they accept.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -7499,7 +7510,6 @@ Platform reliability — error budget
                 </div>
               </div>
             </div>
-            <p class="cm-cell-hint" style="font-size: var(--ic-text-xxs)">The organizer will see your proposal and can accept, counter, or decline.</p>
           </div>
         </div>
       </div>
@@ -7519,24 +7529,38 @@ Platform reliability — error budget
       const propose = modal.querySelector('[data-rm-propose]');
       toggle?.addEventListener('change', () => propose.toggleAttribute('hidden', !toggle.checked));
 
+      const excludeToggle = modal.querySelector('[data-rm-exclude-toggle]');
+
+      const syncExcludeAvailability = () => {
+        const seriesScope = modal.querySelector('[data-rm-scope]:checked')?.value === 'series';
+        if (!excludeToggle) return;
+        excludeToggle.disabled = !seriesScope;
+        if (!seriesScope) excludeToggle.checked = false;
+      };
+      modal.querySelectorAll('[data-rm-scope]').forEach(r => r.addEventListener('change', syncExcludeAvailability));
+
       modal.querySelector('[data-rm-submit]')?.addEventListener('click', () => {
         const reason = modal.querySelector('[data-rm-reason]').value.trim();
         const scope = modal.querySelector('[data-rm-scope]:checked')?.value === 'series' ? 'all events' : 'this event';
         const proposed = toggle.checked
           ? `${modal.querySelector('[data-rm-date]').value} · ${modal.querySelector('[data-rm-start]').value} – ${modal.querySelector('[data-rm-end]').value}`
           : null;
+        const exclude = !!excludeToggle?.checked;
         const me = document.querySelector('#meeting-detail [data-md-me]');
         if (me) {
           me.classList.add('is-rejected');
           me.dataset.rejectionScope = scope;
           if (reason) me.dataset.rejectionReason = reason;
           if (proposed) me.dataset.rejectionProposed = proposed;
+          if (exclude) me.dataset.rejectionExcludeRequested = 'true';
         }
         modal.setAttribute('hidden', '');
         toggle.checked = false;
         propose.setAttribute('hidden', '');
+        if (excludeToggle) excludeToggle.checked = false;
         const first = modal.querySelector('[data-rm-scope][value="occurrence"]');
         if (first) first.checked = true;
+        syncExcludeAvailability();
       });
     })();
   </script>
