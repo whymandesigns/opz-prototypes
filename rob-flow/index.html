@@ -5396,6 +5396,15 @@ body { overflow: hidden; }
     #meeting-detail .md-person.is-me:hover .md-me-reject,
     #meeting-detail .md-person.is-me:focus-within .md-me-reject { opacity: 1; }
 
+    #meeting-detail .md-person.is-rejected .avatar { position: relative; overflow: visible; }
+    #meeting-detail .md-person.is-rejected .avatar::after {
+      content: '';
+      position: absolute;
+      right: -4px; bottom: -4px;
+      width: 15px; height: 15px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15' fill='none'><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' fill='%23FBEDF1'/><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' stroke='%23D42551' stroke-width='0.933333'/><path d='M10.6191 4.8418L7.99414 7.4668L10.6191 10.0918L10.0889 10.6221L7.46387 7.99707L4.83887 10.6221L4.30859 10.0918L6.93359 7.4668L4.30859 4.8418L4.83887 4.31152L7.46387 6.93652L10.0889 4.31152L10.6191 4.8418Z' fill='%23D42551'/></svg>") center/contain no-repeat;
+    }
+
     .md-view-toast {
       position: fixed;
       left: 50%; bottom: var(--ic-space-6);
@@ -6624,9 +6633,7 @@ body { overflow: hidden; }
 
   <div class="modal-overlay" id="meeting-detail" hidden>
     <div class="md-view-toast" data-md-view-toast role="status" aria-live="polite">
-      <svg class="icon i-info"><use href="#i-info"/></svg>
-      <span>You're in view mode — enter edit to change this.</span>
-      <button class="md-view-toast-cta" type="button" data-md-view-toast-edit>Edit</button>
+      <span>Permissions can only be changed in edit mode.</span>
     </div>
     <div class="modal modal-full" role="dialog" aria-modal="true" aria-labelledby="md-title">
       <header class="modal-header" style="height: 80px; flex-shrink: 0; border-bottom: 1px solid var(--ic-palette-gray-200); gap: var(--ic-space-3)">
@@ -7303,7 +7310,11 @@ Platform reliability — error budget
                   <p class="md-person-role">Senior Product Designer · Platform</p>
                 </div>
                 <button class="btn btn-icon-only btn-ghost btn-xs md-me-reject" type="button" aria-label="Reject meeting" data-modal-open="reject-meeting">
-                  <svg class="icon i-close-circle"><use href="#i-close-circle"/></svg>
+                  <svg class="icon" viewBox="0 0 15 15" fill="none" style="width: 15px; height: 15px">
+                    <rect x="0.464844" y="0.466797" width="14" height="14" rx="7" fill="#FBEDF1"/>
+                    <rect x="0.464844" y="0.466797" width="14" height="14" rx="7" stroke="#D42551" stroke-width="0.933333"/>
+                    <path d="M10.6191 4.8418L7.99414 7.4668L10.6191 10.0918L10.0889 10.6221L7.46387 7.99707L4.83887 10.6221L4.30859 10.0918L6.93359 7.4668L4.30859 4.8418L4.83887 4.31152L7.46387 6.93652L10.0889 4.31152L10.6191 4.8418Z" fill="#D42551"/>
+                  </svg>
                 </button>
                 <span class="md-person-badge md-badge-r">R</span>
               </div>
@@ -7516,11 +7527,10 @@ Platform reliability — error budget
           : null;
         const me = document.querySelector('#meeting-detail [data-md-me]');
         if (me) {
-          me.querySelector('.md-person-role').innerHTML =
-            `<span style="color: var(--color-danger); font-weight: var(--ic-weight-semibold)">Rejected ${scope}</span>` +
-            (proposed ? ` · proposed ${proposed}` : '') +
-            (reason ? ` — "${reason.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}"` : '');
-          me.querySelector('.md-person-badge')?.remove();
+          me.classList.add('is-rejected');
+          me.dataset.rejectionScope = scope;
+          if (reason) me.dataset.rejectionReason = reason;
+          if (proposed) me.dataset.rejectionProposed = proposed;
         }
         modal.setAttribute('hidden', '');
         toggle.checked = false;
