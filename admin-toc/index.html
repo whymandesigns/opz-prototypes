@@ -1,0 +1,2289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · contents rail — Operationalize</title>
+  <!-- Design system, linked while iterating locally. Run
+       `python3 inline.py ../features/admin-toc/index.html` from designmd/ before
+       sharing: it swaps these three links for one inlined <style> block, inlines
+       the logo, and injects the icon sprite after <body>. -->
+  <link rel="stylesheet" href="../designmd/tokens.css" />
+  <link rel="stylesheet" href="../designmd/semantic.css" />
+  <link rel="stylesheet" href="../designmd/components.css" />
+  <style>
+    /* ── Prototype-local styles ────────────────────────────────────────────
+       Only shell wiring and page-specific layout live here. Anything that
+       would be useful in a second prototype belongs in designmd/components.css
+       instead (design.md §6 "Compose, don't override"). inline.py preserves
+       this block — it only rewrites the design-system block above. */
+
+    /* The shell is a fixed topbar over a scrolling main column. Without this
+       the page scrolls as one document and the topbar/sidenav slide away. */
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    .app-shell { flex: 1; min-height: 0; }
+    .app-shell-main { overflow-y: auto; padding: var(--ic-space-6); }
+
+    /* Mobile nav hamburger. The shared handler block injects one
+       .adm-nav-toggle into every .page-head-title; below the breakpoint the
+       topbar is gone and the sidenav has no rail, so this is the only way to
+       open it. Hidden above 720px. */
+    .adm-nav-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      /* Optical: pulls the bars level with the page's left edge rather than
+         indenting the title by the button's own padding. */
+      margin-left: calc(var(--ic-space-2) * -1);
+      padding: 0;
+      border: 0;
+      border-radius: var(--ic-radius-sm);
+      background: none;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+    .adm-nav-toggle:hover { background: var(--color-surface-muted); }
+    .adm-nav-toggle:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+    /* ── Settings document ─────────────────────────────────────────────────
+       One scrolling document of sections with a table of contents pinned to
+       the right, the same pattern features/rob uses in its meeting modal
+       (.cm-toc): sticky rail, scroll-spy active state, dropped when the
+       viewport can no longer spare the column. */
+    /* Both columns sized, then parked at the start of the row: as a 1fr track
+       the document kept its 626px but the rail was pushed to the far edge,
+       leaving a corridor of nothing between the two. */
+    .adm-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 626px) 180px;   /* 626 = the Figma content column */
+      justify-content: start;
+      gap: var(--ic-space-6);
+      align-items: start;
+    }
+
+    /* One panel in the rail here; the sections live in the contents rail on
+       the right instead. Kept as a panel so both variants share the markup. */
+    .sidenav-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+    .adm-toc { position: sticky; top: 0; display: flex; flex-direction: column; gap: 2px; }
+    .adm-toc-item {
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      padding: var(--ic-space-2) var(--ic-space-3);
+      border-radius: var(--ic-radius-sm);
+      color: var(--color-text-muted);
+      font: var(--type-body-sm);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .adm-toc-item:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .adm-toc-item.is-active {
+      background: var(--color-surface-muted);
+      color: var(--color-text);
+      font-weight: var(--ic-weight-semibold);
+    }
+    .adm-toc-item .icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* Sections are separated by space alone — the cards already carry the only
+       rules on the page. */
+    .adm-section + .adm-section { margin-top: var(--ic-space-7); }
+    .adm-section-head { display: flex; align-items: flex-start; }
+    .adm-section-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .adm-section-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4); }
+    .adm-section-title { font: var(--type-h3); color: var(--color-text); margin: 0; }
+    .adm-section-body {
+      margin-top: var(--ic-space-4);
+      display: flex; flex-direction: column; gap: var(--ic-space-4);
+    }
+
+    /* A settings group: a heading row (title + optional switch) over a
+       caption, usually followed by a .card carrying the controls. */
+    .adm-group { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .adm-group-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4); }
+    .adm-group-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+    .adm-caption { font: var(--type-body-xs); color: var(--color-text-muted); margin: 0; }
+
+    .adm-card { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    /* Settings that belong together share one card, hairline between them —
+       three cards in a row were spending a border and a gap each to say the
+       same thing. The rule is inset by the card's padding, like .adm-limit. */
+    .adm-card-grouped { gap: 0; }
+    .adm-card-grouped > .adm-setting + .adm-setting {
+      margin-top: var(--ic-space-4);
+      padding-top: var(--ic-space-4);
+      border-top: 1px solid var(--color-border);
+    }
+    .adm-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4); }
+    .adm-card-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+    /* The three best-practice rules are what the toggle above actually enforces,
+       so they sit in an alert rather than reading as more body copy. Full basis
+       so it wraps onto its own line under both columns of the row. */
+    .adm-rules { flex-basis: 100%; margin-top: var(--ic-space-3); }
+    .adm-rules .alert-message { font: var(--type-body-sm); }
+    /* A row whose left side is several lines tall keeps its control level with
+       the title rather than floating halfway down the block. */
+    .adm-setting.adm-setting-top { align-items: flex-start; }
+    /* Governed rows, dimmed the way the system dims a disabled block
+       (.editor.is-disabled). They still receive clicks — the handler swallows
+       them and explains why in a toast, which a pointer-events:none row could
+       never do — so the controls are marked aria-disabled and taken out of the
+       tab order rather than given the disabled attribute (a disabled control
+       fires no events at all). */
+    .adm-setting.is-disabled,
+    .adm-card-footer.is-disabled { opacity: 0.5; }
+    .is-disabled .input-select-trigger,
+    .is-disabled .switch,
+    .is-disabled .btn { cursor: not-allowed; }
+
+    /* designmd bug, patched locally: .switch-track is position:relative and
+       comes after .switch-input in the DOM, so it paints over the input that
+       should be receiving the click — and .switch is a <span>, not a <label>.
+       A mouse click therefore toggles nothing (only keyboard Space works).
+       Letting clicks through to the input fixes every switch on the page.
+       The real fix belongs in designmd/components.css. */
+    .switch-track { pointer-events: none; }
+
+    /* Snackbar — the dark bottom-centre notice features/rob uses in its meeting
+       modal (.md-view-toast), for exactly this job: saying why a disabled
+       control isn't reacting. No icon; the sentence is the whole message. */
+    .adm-snackbar {
+      position: fixed;
+      left: 50%;
+      bottom: var(--ic-space-6);
+      transform: translateX(-50%) translateY(8px);
+      padding: var(--ic-space-2) var(--ic-space-4);
+      background: var(--ic-palette-graphite-900);
+      color: var(--ic-palette-white);
+      border-radius: var(--ic-radius-sm);
+      font: var(--type-body-sm);
+      box-shadow: var(--ic-shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--ic-duration-base) var(--ic-ease),
+                  transform var(--ic-duration-base) var(--ic-ease);
+      z-index: var(--ic-z-toast);
+    }
+    .adm-snackbar.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) {
+      .adm-snackbar { transition: opacity var(--ic-duration-fast) linear; }
+    }
+    .adm-rules strong { font-weight: var(--ic-weight-semibold); }
+
+    /* ── Slack compliance ──────────────────────────────────────────────────
+       Variable rows: drag handle, name, format select, and an eye that decides
+       whether the variable appears in the name at all. */
+    /* min-width:0 throughout: a flex item won't shrink under its content's
+       min-width by default, and these rows would otherwise push the card
+       sideways on a narrow screen. */
+    .adm-vars { flex-basis: 100%; min-width: 0; margin-top: var(--ic-space-4); display: flex; flex-direction: column; gap: var(--ic-space-2); }
+    .adm-var { display: flex; align-items: center; gap: var(--ic-space-3); min-width: 0; }
+    .adm-var-grip { color: var(--color-text-subtle); cursor: grab; flex-shrink: 0; }
+    .adm-var-name { flex: 0 1 96px; min-width: 0; font: var(--type-body-sm); color: var(--color-text); overflow: hidden; text-overflow: ellipsis; }
+    .adm-var-select { flex: 1 1 120px; min-width: 0; }
+    .adm-var-eye { color: var(--color-text-muted); flex-shrink: 0; }
+    .adm-var-eye:hover { color: var(--color-text); }
+    /* A hidden variable is still configurable — it just isn't in the name. */
+    .adm-var.is-hidden .adm-var-name,
+    .adm-var.is-hidden .adm-var-select { opacity: 0.55; }
+    .adm-var-add { align-self: flex-start; margin-top: var(--ic-space-1); }
+
+    /* Live preview — a suggestion of the Slack window, not a copy of it: the
+       point is the channel name, which recomputes from the rows above. */
+    .adm-preview {
+      flex-basis: 100%;
+      min-width: 0;
+      margin-top: var(--ic-space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+    .adm-preview-chrome {
+      display: flex; align-items: center; gap: 6px;
+      padding: var(--ic-space-2) var(--ic-space-3);
+      background: var(--color-surface-muted);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .adm-preview-dot { width: 8px; height: 8px; border-radius: var(--ic-radius-full); background: var(--color-border-strong); }
+    .adm-preview-app { margin-left: var(--ic-space-2); font: var(--type-body-xs); color: var(--color-text-subtle); }
+    .adm-preview-body { display: flex; align-items: baseline; gap: var(--ic-space-3); padding: var(--ic-space-4); }
+    .adm-preview-channel { font: var(--type-body-lg-semibold); color: var(--color-text); }
+    .adm-preview-meta { font: var(--type-body-xs); color: var(--color-text-subtle); }
+
+    /* Card-level actions, pinned right under the last row. */
+    .adm-card-footer {
+      display: flex; justify-content: flex-end; gap: var(--ic-space-3);
+      margin-top: var(--ic-space-4);
+      padding-top: var(--ic-space-4);
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* The limits list spans the row it belongs to, under both columns. */
+    .adm-limits-block { flex-basis: 100%; margin-top: var(--ic-space-4); }
+    .adm-limits-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4); margin-bottom: var(--ic-space-2); }
+    .adm-limits-title { font: var(--type-body-sm-semibold); color: var(--color-text); margin: 0; }
+
+    /* Member limits — one row per RACI role, hairline between. */
+    .adm-limits { display: flex; flex-direction: column; }
+    .adm-limit { display: flex; align-items: center; gap: var(--ic-space-4); padding: var(--ic-space-2) 0; }
+    .adm-limit + .adm-limit { border-top: 1px solid var(--color-border); }
+    .adm-limit-main { flex: 1; min-width: 0; }
+    .adm-limit-name { font: var(--type-body-sm-semibold); color: var(--color-text-muted); margin: 0; }
+    .adm-limit-hint { font: var(--type-body-xxs); color: var(--color-text-muted); margin: 0; }
+    .adm-limit-value { font: var(--type-body-sm); color: var(--color-text-muted); white-space: nowrap; }
+
+    /* A setting reads as one line: what it is on the left, what it's set to on
+       the right. Replaces the design's radio rows — three of those per card
+       was most of the noise on this page. */
+    .adm-setting {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ic-space-3) var(--ic-space-4);
+    }
+    /* Basis, not shrink: when the value is a sentence the control drops to its
+       own line rather than squeezing the description into a column of wrapped
+       fragments. */
+    .adm-setting-main { flex: 1 1 260px; min-width: 0; }
+    .adm-select { flex-shrink: 0; margin-left: auto; max-width: min(240px, 100%); }
+    /* An action in the control slot (e.g. "Add job position") lines up with the
+       selects and switches above it. */
+    .adm-setting > .btn { flex-shrink: 0; margin-left: auto; }
+    .adm-select-wide { max-width: min(300px, 100%); }
+    /* .is-auto sizes the trigger to its content, which a sentence-length value
+       would ride straight off a narrow card. Cap it and let the value ellipse;
+       the menu still shows each option in full. */
+    .adm-select .input-select-trigger { max-width: 100%; }
+    /* The menu is sized by its options, not by the trigger: some of these
+       choices are sentences while the trigger is only as wide as the current
+       value. Anchored to the right edge so a wider menu grows back into the
+       page instead of off it. */
+    .adm-select .dropdown-menu { left: auto; right: 0; width: max-content; max-width: 320px; }
+
+    /* The rail is the first thing to go: below this width the document
+       column is already at its comfortable minimum. */
+    @media (max-width: 1180px) {
+      .adm-grid { grid-template-columns: minmax(0, 1fr); }
+      .adm-toc { display: none; }
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────────
+       Below 720px the nav becomes an overlay drawer and the topbar is dropped,
+       matching the treatment in features/integrations-v3. */
+    @media (max-width: 720px) {
+      .topbar { display: none; }
+      .adm-nav-toggle { display: inline-flex; }
+      .app-shell { position: relative; }
+      .app-shell-main { padding: var(--ic-space-4); overflow-x: hidden; }
+      .sidenav.is-compact { width: 52px; }
+      .sidenav:not(.is-compact) {
+        position: absolute; inset: 0 auto 0 0; z-index: var(--ic-z-sticky);
+        box-shadow: var(--ic-shadow-lg);
+      }
+      /* Scrim behind the open drawer. Sits under .sidenav's z-index. */
+      .app-shell:has(.sidenav:not(.is-compact))::after {
+        content: ""; position: absolute; inset: 0;
+        background: var(--color-overlay); z-index: calc(var(--ic-z-sticky) - 1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dev-only icon sprite loader. inline.py injects designmd/icons.svg right
+       after <body> before this file is shared; until then there is nothing for
+       `<use href="#i-…">` to point at, so the sprite is fetched from the sibling
+       system so icons render while iterating locally. Once inlined the guard
+       finds a symbol already present and this does nothing. -->
+  <script>
+    if (!document.getElementById('i-search')) {
+      fetch('../designmd/icons.svg')
+        .then(r => r.text())
+        .then(svg => document.body.insertAdjacentHTML('afterbegin', svg))
+        .catch(() => {});
+    }
+  </script>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <a class="topbar-brand" href="#">
+      <img class="topbar-brand-logo" src="../designmd/assets/logo.svg" alt="Operationalize" />
+    </a>
+    <div class="topbar-actions">
+      <div class="topbar-search">
+        <svg class="search-icon"><use href="#i-search"/></svg>
+        <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
+      </div>
+      <div class="dropdown">
+        <button class="topbar-avatar dropdown-trigger" aria-label="Account" aria-expanded="false" type="button">MV</button>
+        <div class="dropdown-menu dropdown-menu-end" hidden>
+          <button class="dropdown-item" type="button">My profile</button>
+          <button class="dropdown-item" type="button">Feedback</button>
+          <button class="dropdown-item" type="button">Career map</button>
+          <button class="dropdown-item" type="button">Recognitions</button>
+          <hr class="dropdown-divider" />
+          <button class="dropdown-item" type="button">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidenav + Main -->
+  <div class="app-shell">
+    <aside class="sidenav">
+      <button class="sidenav-toggle" aria-label="Toggle navigation" type="button"><svg><use href="#i-chevron-left"/></svg></button>
+      <div class="sidenav-panel sidenav-panel-app">
+      <!-- Primary nav mirrors the app shell used across prototypes. These items
+           are decorative here — only entries with a matching .page-view route. -->
+      <ul class="sidenav-list">
+        <li><a class="sidenav-item" href="#" data-page="processes"><svg class="sidenav-item-icon"><use href="#i-cpu-2"/></svg><span class="sidenav-item-label">Processes</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="initiatives"><svg class="sidenav-item-icon"><use href="#i-initiatives"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="rob-meetings"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="okrs"><svg class="sidenav-item-icon"><use href="#i-okr"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="people"><svg class="sidenav-item-icon"><use href="#i-participants"/></svg><span class="sidenav-item-label">People</span></a></li>
+        <li><a class="sidenav-item" href="#" data-page="team"><svg class="sidenav-item-icon"><use href="#i-org-unit"/></svg><span class="sidenav-item-label">Team</span></a></li>
+      </ul>
+      <div class="sidenav-spacer"></div>
+      <div class="sidenav-footer">
+        <!-- Admin Settings expanded — this prototype lives inside it. The three
+             subitems are the standard set; only Settings has a .page-view so
+             far, so it carries the active state. Point the others at their own
+             .page-view sections as the screens get designed. -->
+        <div class="sidenav-group">
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin Settings</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
+          <ul class="sidenav-sublist">
+            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="permissions"><span class="sidenav-item-label">Permissions</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="admin"><span class="sidenav-item-label">Settings</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="integrations"><span class="sidenav-item-label">Integrations</span></a></li>
+          </ul>
+        </div>
+        <a class="sidenav-item" href="#" data-page="learning"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
+      </div>
+      </div>
+
+    </aside>
+
+    <main class="app-shell-main">
+
+      <!-- ===== Admin ==========================================================
+           Shell only. Add sibling .page-view sections (hidden) for any
+           sub-screen and route to them with window.showAdminPage('<name>'). -->
+      <section class="page-view" data-page="admin">
+
+        <div class="page-head">
+          <div class="page-head-main">
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Admin</h1>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings as one scrolling document (Figma 24630:285534). The
+             design's left "Vertical Tabs" rail is replaced by the right-hand
+             table of contents below — same job, on the side of the page that
+             isn't already carrying the app's own navigation. -->
+        <div id="adm-body" class="adm-grid">
+
+          <div class="adm-doc">
+
+            <!-- ===== Initiatives and Processes ============================ -->
+            <section class="adm-section" id="adm-initiatives">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">Initiatives and Processes</h2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped">
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">RACI</p>
+                      <p class="adm-caption">Choose how RACI roles are configured across Initiatives and Processes</p>
+                    </div>
+                  </div>
+
+                  <div class="adm-setting adm-setting-top">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Best practice recommendations</p>
+                      <p class="adm-caption">Warn users when RACI roles don't follow best practices</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+                    <div class="alert alert-warning adm-rules" role="note">
+                      <svg class="icon alert-icon"><use href="#i-warning"/></svg>
+                      <p class="alert-message">
+                        A manager is assigned as <strong>Responsible</strong> ·
+                        The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong> ·
+                        Require RACI members to match the respective Slack channel
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="adm-setting adm-setting-top">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Manage RACI roles</p>
+                      <p class="adm-caption">Control how many people can hold each RACI role</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+
+                    <div class="adm-limits-block">
+                      <div class="adm-limits-head">
+                        <p class="adm-limits-title">Member limits</p>
+                        <button class="btn btn-secondary btn-xs" type="button">Edit limits</button>
+                      </div>
+                    <div class="adm-limits">
+                      <div class="adm-limit">
+                        <div class="adm-limit-main">
+                          <p class="adm-limit-name">Total people</p>
+                          <p class="adm-limit-hint">Defines the limit on the total number of people in a RACI matrix</p>
+                        </div>
+                        <span class="adm-limit-value">20</span>
+                      </div>
+                      <div class="adm-limit">
+                        <div class="adm-limit-main">
+                          <p class="adm-limit-name">Responsible</p>
+                          <p class="adm-limit-hint">Defines the max number of people responsible for the task</p>
+                        </div>
+                        <span class="adm-limit-value">8</span>
+                      </div>
+                      <div class="adm-limit">
+                        <div class="adm-limit-main">
+                          <p class="adm-limit-name">Accountable</p>
+                          <p class="adm-limit-hint">The person ultimately answerable for the task</p>
+                        </div>
+                        <span class="adm-limit-value">1</span>
+                      </div>
+                      <div class="adm-limit">
+                        <div class="adm-limit-main">
+                          <p class="adm-limit-name">Consulted</p>
+                          <p class="adm-limit-hint">Defines the max number of people whose opinions are sought</p>
+                        </div>
+                        <span class="adm-limit-value">2</span>
+                      </div>
+                      <div class="adm-limit">
+                        <div class="adm-limit-main">
+                          <p class="adm-limit-name">Informed</p>
+                          <p class="adm-limit-hint">Defines the max number of people updated on progress</p>
+                        </div>
+                        <span class="adm-limit-value">9</span>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ===== OKRs ================================================= -->
+            <section class="adm-section" id="adm-okrs">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">OKRs</h2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped" data-adm-governed="OKRs are disabled. Turn OKRs on to change these settings.">
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Enable OKRs</p>
+                      <p class="adm-caption">Enable initiatives and show in navigation bar</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Approval Workflow</p>
+                      <p class="adm-caption">Require approval for new OKRs</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Default approver type</p>
+                    </div>
+                    <div class="input-select is-auto adm-select" data-adm-select="approver">
+                      <button class="input-select-trigger" aria-expanded="false" type="button">
+                        <span class="input-select-value">Direct manager</span>
+                        <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                      </button>
+                      <div class="dropdown-menu" hidden>
+                        <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Direct manager</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Org unit lead</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Super admin</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Escalation rules</p>
+                      <p class="adm-caption">If not approved for 3 days, escalate to</p>
+                    </div>
+                    <div class="input-select is-auto adm-select" data-adm-select="escalation">
+                      <button class="input-select-trigger" aria-expanded="false" type="button">
+                        <span class="input-select-value">Off</span>
+                        <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                      </button>
+                      <div class="dropdown-menu" hidden>
+                        <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Off</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Direct manager</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Org unit lead</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Super admin</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+            <!-- ===== People =============================================== -->
+            <section class="adm-section" id="adm-people">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">People</h2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped">
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Email invites</p>
+                      <p class="adm-caption">Allow members beyond Super Admin to send invite</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Public profile visibility</p>
+                      <p class="adm-caption">Show public profile information across the organization</p>
+                    </div>
+                    <div class="input-select is-auto adm-select" data-adm-select="visibility">
+                      <button class="input-select-trigger" aria-expanded="false" type="button">
+                        <span class="input-select-value">Everyone</span>
+                        <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                      </button>
+                      <div class="dropdown-menu" hidden>
+                        <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Everyone</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Across organizaton</button>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>None</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Job positions</p>
+                      <p class="adm-caption">Job positions are required when creating new people</p>
+                    </div>
+                    <button class="btn btn-ghost btn-xs" type="button"><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ===== Slack compliance ===================================== -->
+            <section class="adm-section" id="adm-slack">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">Slack compliance</h2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped" data-adm-governed="Channel naming standards are off. Turn them on to change these settings.">
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Slack channel naming standards</p>
+                      <p class="adm-caption">Enforce a consistent naming convention for Slack channels created and linked within Operationalize. This does not affect any channels managed outside of Operationalize.</p>
+                    </div>
+                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
+                  </div>
+
+                  <div class="adm-setting adm-setting-top">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Structure variables</p>
+                      <p class="adm-caption">Customize how channel name variables are formatted.</p>
+                    </div>
+
+                    <div class="adm-vars">
+                      <div class="adm-var is-hidden" data-adm-var data-full="marketing" data-abbr="mktg">
+                        <svg class="icon icon-16 adm-var-grip"><use href="#i-drag"/></svg>
+                        <span class="adm-var-name">Function</span>
+                        <div class="input-select adm-var-select" data-adm-select="var-function">
+                          <button class="input-select-trigger" aria-expanded="false" type="button">
+                            <span class="input-select-value">First letter</span>
+                            <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                          </button>
+                          <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>First letter</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Abbreviation</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Full value</button>
+                          </div>
+                        </div>
+                        <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="false" aria-label="Include Function in channel names"><svg class="icon icon-16"><use href="#i-eye-hide"/></svg></button>
+                      </div>
+                      <div class="adm-var" data-adm-var data-full="seo" data-abbr="seo">
+                        <svg class="icon icon-16 adm-var-grip"><use href="#i-drag"/></svg>
+                        <span class="adm-var-name">Team</span>
+                        <div class="input-select adm-var-select" data-adm-select="var-team">
+                          <button class="input-select-trigger" aria-expanded="false" type="button">
+                            <span class="input-select-value">Abbreviation</span>
+                            <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                          </button>
+                          <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>First letter</button>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Abbreviation</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Full value</button>
+                          </div>
+                        </div>
+                        <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="true" aria-label="Include Team in channel names"><svg class="icon icon-16"><use href="#i-eye"/></svg></button>
+                      </div>
+                      <div class="adm-var" data-adm-var data-full="initiative" data-abbr="init">
+                        <svg class="icon icon-16 adm-var-grip"><use href="#i-drag"/></svg>
+                        <span class="adm-var-name">Entity</span>
+                        <div class="input-select adm-var-select" data-adm-select="var-entity">
+                          <button class="input-select-trigger" aria-expanded="false" type="button">
+                            <span class="input-select-value">Abbreviation</span>
+                            <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                          </button>
+                          <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>First letter</button>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Abbreviation</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Full value</button>
+                          </div>
+                        </div>
+                        <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="true" aria-label="Include Entity in channel names"><svg class="icon icon-16"><use href="#i-eye"/></svg></button>
+                      </div>
+                      <div class="adm-var" data-adm-var data-full="outreach" data-abbr="out">
+                        <svg class="icon icon-16 adm-var-grip"><use href="#i-drag"/></svg>
+                        <span class="adm-var-name">Name</span>
+                        <div class="input-select adm-var-select" data-adm-select="var-name">
+                          <button class="input-select-trigger" aria-expanded="false" type="button">
+                            <span class="input-select-value">Full value</span>
+                            <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                          </button>
+                          <div class="dropdown-menu" hidden>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>First letter</button>
+                          <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Abbreviation</button>
+                          <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Full value</button>
+                          </div>
+                        </div>
+                        <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="true" aria-label="Include Name in channel names"><svg class="icon icon-16"><use href="#i-eye"/></svg></button>
+                      </div>
+                      <button class="btn btn-ghost btn-xs adm-var-add" type="button"><svg class="btn-icon"><use href="#i-plus"/></svg>Add variable</button>
+                    </div>
+                  </div>
+
+                  <div class="adm-setting adm-setting-top">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Live preview</p>
+                      <p class="adm-caption">How a channel created from these rules is named.</p>
+                    </div>
+
+                    <div class="adm-preview">
+                      <div class="adm-preview-chrome">
+                        <span class="adm-preview-dot"></span><span class="adm-preview-dot"></span><span class="adm-preview-dot"></span>
+                        <span class="adm-preview-app">Slack</span>
+                      </div>
+                      <div class="adm-preview-body">
+                        <span class="adm-preview-channel"># <span data-adm-preview>m-seo-init-outreach</span></span>
+                        <span class="adm-preview-meta">Project brief</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adm-card-footer">
+                    <button class="btn btn-secondary" type="button">Cancel</button>
+                    <button class="btn btn-primary" type="button">Save</button>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- Table of contents. Anchors into the document above, active item
+               driven by scroll position — the same .cm-toc behaviour as
+               features/rob, not tabs that swap panels. -->
+          <nav class="adm-toc" aria-label="Settings sections" data-adm-toc>
+            <a class="adm-toc-item is-active" href="#adm-initiatives" data-adm-toc-target="adm-initiatives"><svg class="icon"><use href="#i-initiatives"/></svg>Initiatives &amp; Processes</a>
+            <a class="adm-toc-item" href="#adm-okrs" data-adm-toc-target="adm-okrs"><svg class="icon"><use href="#i-okr"/></svg>OKRs</a>
+            <a class="adm-toc-item" href="#adm-people" data-adm-toc-target="adm-people"><svg class="icon"><use href="#i-participants"/></svg>People</a>
+            <a class="adm-toc-item" href="#adm-slack" data-adm-toc-target="adm-slack"><svg class="icon"><use href="#i-chat"/></svg>Slack compliance</a>
+          </nav>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <div class="adm-snackbar" data-adm-snackbar role="status" aria-live="polite"></div>
+
+  <script>
+    /* Shared component handlers, copied from designmd/example.html.
+       Delegated and idempotent — they activate on any markup using the right
+       classes / data attributes, so dropdowns, tooltips, modals, tabs and the
+       sidenav collapse all work without per-prototype wiring.
+       example.html's showcase-only code is deliberately left out: the palette /
+       radii rendering targets DOM ids (#palette-root, #radii-root) this shell has
+       no reason to carry and threw on load when copied verbatim, and the
+       annotation tool is duplicated in the source — one copy is kept. */
+
+    // Apply indeterminate state to checkboxes marked with data-indeterminate
+    document.querySelectorAll('input[type=checkbox][data-indeterminate]').forEach(cb => {
+      cb.indeterminate = true;
+    });
+
+    // Dropzone — drag-over highlight, click-to-browse, simulated upload progress.
+    document.querySelectorAll('[data-dropzone]').forEach(field => {
+      const zone = field.querySelector('.dropzone');
+      const input = field.querySelector('.dropzone-input');
+      if (!zone || !input) return;
+
+      const setStatus = html => {
+        field.querySelectorAll('.dropzone-status').forEach(s => s.remove());
+        if (html) field.insertAdjacentHTML('beforeend', html);
+      };
+
+      ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => {
+        e.preventDefault();
+        zone.classList.add('is-dragover');
+      }));
+      ['dragleave', 'dragend', 'drop'].forEach(ev => zone.addEventListener(ev, e => {
+        if (ev === 'dragleave' && zone.contains(e.relatedTarget)) return;
+        zone.classList.remove('is-dragover');
+      }));
+
+      // A file dropped onto the covering <input type=file> sets its files and
+      // fires 'change' natively, so one handler covers both click and drop.
+      input.addEventListener('change', () => {
+        const files = input.files;
+        if (!files || !files.length) return;
+        zone.classList.remove('is-error');
+        const name = files.length > 1 ? files.length + ' files' : files[0].name;
+        setStatus('<div class="dropzone-status"><span class="dropzone-status-label">Uploading ' + name + '…</span><div class="dropzone-progress"><div class="dropzone-progress-bar"></div></div></div>');
+        const bar = field.querySelector('.dropzone-progress-bar');
+        requestAnimationFrame(() => { bar.style.width = '100%'; });
+        setTimeout(() => {
+          setStatus('<div class="dropzone-status"><span class="dropzone-status-label" style="color: var(--color-success)">Uploaded ' + name + '.</span></div>');
+        }, 1000);
+      });
+    });
+
+    // Chase spinners — stagger each segment's fade around the ring.
+    document.querySelectorAll('.chase').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      paths.forEach((p, i) => { p.style.animationDelay = (i / paths.length * 1.1).toFixed(3) + 's'; });
+    });
+    document.querySelectorAll('.chase-cw').forEach(svg => {
+      const paths = svg.querySelectorAll('path');
+      const n = paths.length;
+      paths.forEach((p, i) => { p.style.animationDelay = ((n - 1 - i) / n * 1.1).toFixed(3) + 's'; });
+    });
+
+    // Sliders — keep the filled-track gradient in sync with the value, plus
+    // any live readout (<output data-slider-output>) or number field
+    // (.slider-field, synced both ways).
+    document.querySelectorAll('.slider').forEach(slider => {
+      const range = slider.querySelector('.slider-input');
+      if (!range) return;
+      const out   = slider.querySelector('[data-slider-output]');
+      const field = slider.querySelector('.slider-field');
+      const update = () => {
+        const min = parseFloat(range.min) || 0;
+        const max = parseFloat(range.max) || 100;
+        const pct = ((range.value - min) / (max - min)) * 100;
+        range.style.setProperty('--slider-progress', pct + '%');
+        if (out) out.textContent = range.value;
+        if (field && field.value !== range.value) field.value = range.value;
+      };
+      range.addEventListener('input', update);
+      if (field) field.addEventListener('input', () => {
+        const v = parseFloat(field.value);
+        if (!Number.isNaN(v)) { range.value = v; update(); }
+      });
+      update();
+    });
+
+    // Toast — global helper that spawns a notification in the top-right region.
+    //   toast({ variant: 'success', message: 'Saved.' })
+    //   toast({ variant: 'error', message: '…', behavior: 'persistent' })
+    //   toast({ variant: 'neutral', message: '…', behavior: 'action', action: { label: 'Undo', onClick: () => {…} } })
+    window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+      let region = document.querySelector('.toast-region');
+      if (!region) {
+        region = document.createElement('div');
+        region.className = 'toast-region';
+        region.setAttribute('aria-live', 'polite');
+        region.setAttribute('aria-atomic', 'false');
+        document.body.appendChild(region);
+      }
+      const defaultIcon = { neutral: 'info', info: 'info', success: 'done', warning: 'warning', error: 'exclamation-solid' }[variant] || 'info';
+      const el = document.createElement('div');
+      el.className = `toast toast-${variant} is-entering`;
+      el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+      const actionHTML = behavior === 'action' && action ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>` : '';
+      el.innerHTML = `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg><p class="toast-message"></p>${actionHTML}${closeHTML}`;
+      el.querySelector('.toast-message').textContent = message;
+      region.appendChild(el);
+      // Trigger entrance transition on next frame
+      requestAnimationFrame(() => el.classList.remove('is-entering'));
+
+      const dismiss = () => {
+        if (!el.isConnected) return;
+        el.classList.add('is-leaving');
+        const cleanup = () => el.remove();
+        el.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 400); // fallback if transitionend doesn't fire
+      };
+
+      el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+      if (behavior === 'action' && action) {
+        el.querySelector('.toast-action').addEventListener('click', () => {
+          try { action.onClick?.(); } catch (e) { /* swallow */ }
+          dismiss();
+        });
+      }
+      if (behavior === 'timed') {
+        setTimeout(dismiss, timeout);
+      }
+      return { dismiss };
+    };
+
+    // Heading anchors — inject a hover-revealed "#" button next to every
+    // section heading. Clicking copies a direct link to that section so a
+    // reviewer can point at "use this component" by sharing the URL.
+    document.querySelectorAll('section[id] > h3.h3, section[id] > div > h3.h3, h2.section-head').forEach(heading => {
+      const section = heading.closest('section[id]');
+      if (!section) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'heading-anchor';
+      btn.textContent = '#';
+      btn.title = 'Copy link to this section';
+      btn.setAttribute('aria-label', `Copy link to ${heading.textContent.trim()}`);
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const url = `${window.location.origin}${window.location.pathname}#${section.id}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          if (window.toast) toast({ variant: 'success', message: `Link copied — ${section.id}`, timeout: 2400 });
+        } catch {
+          if (window.toast) toast({ variant: 'error', message: 'Copy failed — select the URL bar instead' });
+        }
+        history.replaceState(null, '', `#${section.id}`);
+      });
+      heading.appendChild(btn);
+    });
+
+    // Sidebar TOC — fixed vertical nav listing every section + subsection,
+    // with scroll-spy highlighting the section currently in view.
+    (function buildSidebarToc() {
+      const container = document.querySelector('.page-toc');
+      if (!container) return;
+      document.querySelectorAll('main > section[id]').forEach(top => {
+        const sectionWrap = document.createElement('div');
+        sectionWrap.className = 'page-toc-section';
+        const label = document.createElement('div');
+        label.className = 'page-toc-section-label';
+        const topHeading = top.querySelector('h2.section-head');
+        // Strip the trailing "#" injected by the heading-anchor button
+        label.textContent = (topHeading?.firstChild?.textContent || top.id).trim();
+        sectionWrap.appendChild(label);
+        top.querySelectorAll(':scope > section[id]').forEach(sub => {
+          const heading = sub.querySelector('h3.h3');
+          if (!heading) return;
+          const a = document.createElement('a');
+          a.className = 'page-toc-item';
+          a.href = '#' + sub.id;
+          a.dataset.tocTarget = sub.id;
+          a.textContent = (heading.firstChild?.textContent || sub.id).trim();
+          sectionWrap.appendChild(a);
+        });
+        container.appendChild(sectionWrap);
+      });
+      // Scroll-spy: highlight item whose section is most prominent in viewport
+      const items = container.querySelectorAll('.page-toc-item');
+      const idToItem = new Map([...items].map(i => [i.dataset.tocTarget, i]));
+      const setActive = id => {
+        items.forEach(i => i.classList.toggle('is-active', i.dataset.tocTarget === id));
+      };
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length === 0) return;
+        // Pick the one closest to the top of the viewport
+        visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        setActive(visible[0].target.id);
+      }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+      document.querySelectorAll('main > section[id] > section[id]').forEach(sec => observer.observe(sec));
+
+      // Hamburger toggle (narrow viewports). Opens panel, closes on outside
+      // click or after a TOC item is clicked.
+      const toggle = document.querySelector('.page-toc-toggle');
+      const panel = document.querySelector('.page-toc');
+      if (toggle && panel) {
+        const setOpen = open => {
+          panel.classList.toggle('is-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+          toggle.setAttribute('aria-label', open ? 'Close table of contents' : 'Open table of contents');
+        };
+        toggle.addEventListener('click', e => {
+          e.stopPropagation();
+          setOpen(!panel.classList.contains('is-open'));
+        });
+        document.addEventListener('click', e => {
+          if (!panel.classList.contains('is-open')) return;
+          if (panel.contains(e.target) || toggle.contains(e.target)) return;
+          setOpen(false);
+        });
+        panel.addEventListener('click', e => {
+          if (e.target.closest('.page-toc-item')) setOpen(false);
+        });
+      }
+    })();
+
+    // Inline TOC — build a per-section list of links from each <section id>'s h3.
+    document.querySelectorAll('.toc[data-toc-for]').forEach(nav => {
+      const parent = document.getElementById(nav.dataset.tocFor);
+      if (!parent) return;
+      const items = parent.querySelectorAll(':scope > section[id]');
+      items.forEach(sec => {
+        const heading = sec.querySelector('h3.h3');
+        if (!heading) return;
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        // First text node only — skips the injected heading-anchor "#" button
+        a.textContent = (heading.firstChild?.textContent || heading.textContent).trim();
+        nav.appendChild(a);
+      });
+    });
+
+    // CTA linking — clone <button class="btn"> children from a [data-cta-source]
+    // master into every [data-cta-link] target with the same id. Lets the demo
+    // page-head act as the source of truth for action labels everywhere they
+    // appear (e.g. template-app-shell page-heads).
+    document.querySelectorAll('[data-cta-link]').forEach(target => {
+      const id = target.dataset.ctaLink;
+      const source = document.querySelector(`[data-cta-source="${id}"]`);
+      if (!source) return;
+      const clones = [...source.querySelectorAll(':scope > .btn')].map(b => b.cloneNode(true));
+      target.prepend(...clones);
+    });
+
+    // Modal + Drawer — open via [data-modal-open="id"], close via [data-modal-close], overlay click, or Escape.
+    // Selector covers both .modal-overlay and .drawer-overlay so a single handler runs both components.
+    (function wireOverlays() {
+      const OVERLAY_SELECTOR = '.modal-overlay, .drawer-overlay';
+      const close = (overlay) => { if (overlay) overlay.hidden = true; };
+      document.querySelectorAll('[data-modal-open]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          document.getElementById(trigger.dataset.modalOpen)?.removeAttribute('hidden');
+        });
+      });
+      document.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-modal-close]');
+        if (closeBtn) { close(closeBtn.closest(OVERLAY_SELECTOR)); return; }
+        const overlay = e.target.closest(OVERLAY_SELECTOR);
+        if (overlay && e.target === overlay) close(overlay);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll(`${OVERLAY_SELECTOR}`).forEach(o => { if (!o.hidden) close(o); });
+      });
+    })();
+
+    // Single-select dropdowns — any menu whose items carry a .dropdown-item-check slot
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (!menu.querySelector('.dropdown-item-check')) return;
+      const items = menu.querySelectorAll('.dropdown-item');
+      items.forEach(item => item.addEventListener('click', () => {
+        items.forEach(i => i.classList.remove('is-selected'));
+        item.classList.add('is-selected');
+      }));
+    });
+
+    // Select (dropdown input) — toggle menu, sync chosen value into the trigger
+    document.querySelectorAll('.input-select').forEach(sel => {
+      const trigger = sel.querySelector('.input-select-trigger');
+      const menu = sel.querySelector('.dropdown-menu');
+      const value = sel.querySelector('.input-select-value');
+      if (!trigger || !menu) return;
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          // Item text without the check icon
+          const label = (item.textContent || '').trim();
+          value.textContent = label;
+          value.classList.remove('input-select-placeholder');
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+
+    // Close any open select when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.input-select').forEach(sel => {
+        if (sel.contains(e.target)) return;
+        sel.querySelector('.input-select-trigger')?.setAttribute('aria-expanded', 'false');
+        const menu = sel.querySelector('.dropdown-menu');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Segmented control — click selects one option within the group
+    document.querySelectorAll('.segmented').forEach(seg => {
+      seg.addEventListener('click', (e) => {
+        const item = e.target.closest('.segmented-item');
+        if (!item || !seg.contains(item)) return;
+        seg.querySelectorAll('.segmented-item').forEach(i => i.classList.remove('is-active'));
+        item.classList.add('is-active');
+      });
+    });
+
+    // Iconography gallery — render the custom icon set from icons.index.json with live search
+    (function () {
+      const grid = document.getElementById('icon-gallery');
+      if (!grid) return;
+      const search = document.getElementById('icon-search');
+      const count = document.getElementById('icon-count');
+      fetch('icons.index.json').then(r => r.json()).then(data => {
+        const icons = data.icons.slice().sort((a, b) => a.slug.localeCompare(b.slug));
+        const render = (q = '') => {
+          const ql = q.trim().toLowerCase();
+          const rows = icons.filter(i => !ql || i.slug.includes(ql) ||
+            (i.name || '').toLowerCase().includes(ql) || (i.section || '').toLowerCase().includes(ql));
+          grid.innerHTML = rows.map(i =>
+            `<div class="icon-card" title="${i.name || i.slug} · ${i.section || ''}"><svg class="icon"><use href="#i-${i.slug}"/></svg><span class="icon-card-name">${i.slug}</span></div>`).join('');
+          if (count) count.textContent = ql ? `${rows.length} of ${icons.length} icons` : `${icons.length} icons`;
+        };
+        render();
+        search && search.addEventListener('input', () => render(search.value));
+      }).catch(() => { if (count) count.textContent = 'icons.index.json not found — run tools/export_icons.py'; });
+    })();
+
+    // Generic .dropdown — pairs .dropdown-trigger with .dropdown-menu
+    document.querySelectorAll('.dropdown').forEach(d => {
+      const trigger = d.querySelector('.dropdown-trigger');
+      const menu = d.querySelector('.dropdown-menu');
+      if (!trigger || !menu) return;
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+        menu.hidden = open;
+      });
+      // Item click closes the menu
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          trigger.setAttribute('aria-expanded', 'false');
+          menu.hidden = true;
+        });
+      });
+    });
+    // Close any open generic dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.dropdown').forEach(d => {
+        if (d.contains(e.target)) return;
+        const trigger = d.querySelector('.dropdown-trigger');
+        const menu = d.querySelector('.dropdown-menu');
+        trigger?.setAttribute('aria-expanded', 'false');
+        if (menu) menu.hidden = true;
+      });
+    });
+
+    // Character counters — .field[data-char-limit] with one .field-hint as the readout
+    document.querySelectorAll('.field[data-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.charLimit, 10);
+      const input = field.querySelector('.input');
+      const counter = field.querySelector('.field-hint');
+      if (!input || !counter) return;
+      const update = () => {
+        const n = input.value.length;
+        counter.textContent = `${n} / ${max}`;
+        counter.classList.toggle('is-error', n >= max);
+      };
+      input.addEventListener('input', update);
+      update();
+    });
+
+    // Side navigation — toggle compact/expanded
+    document.querySelectorAll('.sidenav-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.sidenav').classList.toggle('is-compact');
+      });
+    });
+
+    /* Narrow viewports start on the icon rail so the page has room (the
+       stylesheet's 720px block turns the expanded state into an overlay, so
+       the toggle above still reaches the sub-nav). Applied on the breakpoint
+       crossing rather than on every resize, so choosing to open the nav isn't
+       undone by the next scroll-bar-width reflow. */
+    const narrow = window.matchMedia('(max-width: 720px)');
+    const fitNav = mq => document.querySelectorAll('.sidenav')
+      .forEach(nav => nav.classList.toggle('is-compact', mq.matches));
+    fitNav(narrow);
+    narrow.addEventListener('change', fitNav);
+
+    /* The hamburger. Below the breakpoint the topbar is gone and the nav has
+       no rail left, so this is the only way to either — hence one in every
+       page head rather than a single button somewhere. Injected from the page
+       heads that already exist, so a new page gets one for free.
+       The bars are drawn here: designmd's pack has no menu glyph, and the pack
+       is not ours to add to. */
+    document.querySelectorAll('.page-head-title').forEach(title => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'adm-nav-toggle';
+      btn.setAttribute('aria-label', 'Open navigation');
+      btn.innerHTML = '<svg class="icon icon-24" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+      btn.addEventListener('click', () => {
+        document.querySelector('.sidenav')?.classList.toggle('is-compact');
+      });
+      title.prepend(btn);
+    });
+
+    /* Because the open nav is an overlay at this width, it has to get out of
+       the way again — a link tapped behind it would otherwise change the page
+       nobody can see. Any click outside the panel, or on a destination inside
+       it, folds it away. */
+    document.addEventListener('click', e => {
+      if (!narrow.matches) return;
+      const nav = document.querySelector('.sidenav:not(.is-compact)');
+      if (!nav) return;
+      // The two controls that own the open/closed state get to do their own
+      // toggling; without this the hamburger's click would open the drawer and
+      // then be caught here on the way up and close it again.
+      if (e.target.closest('.sidenav-toggle, .adm-nav-toggle')) return;
+      const inside = e.target.closest('.sidenav') === nav;
+      if (!inside || e.target.closest('.sidenav-item:not(.sidenav-group-trigger)')) {
+        nav.classList.add('is-compact');
+      }
+    });
+
+    // Side navigation — expand/collapse nested groups
+    document.querySelectorAll('.sidenav-group-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const open = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
+    // Tree tables — expand/collapse nested rows. Visibility derives from the
+    // stack of currently collapsed ancestor levels, so a deeply collapsed
+    // branch stays hidden even when an outer ancestor is re-expanded.
+    document.querySelectorAll('.table tbody').forEach(tbody => {
+      if (!tbody.querySelector('.row-toggle')) return;
+      const refresh = () => {
+        const collapsedAt = [];
+        [...tbody.children].forEach(row => {
+          const lvl = parseInt(row.dataset.level || '0', 10);
+          while (collapsedAt.length && collapsedAt[collapsedAt.length - 1] >= lvl) collapsedAt.pop();
+          row.hidden = collapsedAt.length > 0;
+          const t = row.querySelector('.row-toggle');
+          if (t && t.getAttribute('aria-expanded') === 'false') collapsedAt.push(lvl);
+        });
+      };
+      tbody.querySelectorAll('.row-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = btn.getAttribute('aria-expanded') !== 'false';
+          btn.setAttribute('aria-expanded', String(!open));
+          refresh();
+        });
+      });
+    });
+
+    // Side navigation routing (template only) — clicking an item shows the matching .page-view
+    document.querySelectorAll('#template-app-shell .sidenav-item[data-page]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = link.dataset.page;
+        const shell = link.closest('#template-app-shell');
+        // Toggle active class across all items in this template
+        shell.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+        link.classList.add('is-active');
+        // Show only the matching page-view
+        shell.querySelectorAll('.page-view').forEach(p => {
+          p.hidden = p.dataset.page !== name;
+        });
+        // Scroll the main area to top so the new page-head is visible
+        shell.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    });
+
+    // Rich text editors — toolbar commands + heading select + character counter
+    document.querySelectorAll('.editor').forEach(editor => {
+      const content = editor.querySelector('.editor-content');
+
+      // Generic execCommand buttons (bold, italic, lists)
+      editor.querySelectorAll('[data-cmd]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault()); // keep selection
+        btn.addEventListener('click', () => {
+          content.focus();
+          document.execCommand(btn.dataset.cmd, false, null);
+        });
+      });
+
+      // Inline code — wraps selection in <code>
+      editor.querySelectorAll('[data-cmd-code]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          content.focus();
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          const text = sel.toString();
+          if (!text) return;
+          document.execCommand('insertHTML', false, `<code>${text}</code>`);
+        });
+      });
+
+      // Link prompt
+      editor.querySelectorAll('[data-cmd-link]').forEach(btn => {
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('click', () => {
+          const url = prompt('Enter URL');
+          if (!url) return;
+          content.focus();
+          document.execCommand('createLink', false, url);
+        });
+      });
+
+      // Heading select — formatBlock
+      editor.querySelectorAll('.editor-toolbar-select .dropdown-item[data-block]').forEach(item => {
+        item.addEventListener('click', () => {
+          content.focus();
+          document.execCommand('formatBlock', false, item.dataset.block);
+        });
+      });
+    });
+
+    // Editor character counters — count plain text, update sibling .editor-counter
+    document.querySelectorAll('.field[data-editor-char-limit]').forEach(field => {
+      const max = parseInt(field.dataset.editorCharLimit, 10);
+      const content = field.querySelector('.editor-content');
+      const text = field.querySelector('.editor-counter-text');
+      const tick = field.querySelector('.editor-counter-ok');
+      if (!content || !text) return;
+      const update = () => {
+        const len = content.textContent.length;
+        const left = max - len;
+        text.textContent = `${left} character${left === 1 ? '' : 's'} left`;
+        const valid = left >= 0;
+        text.parentElement.classList.toggle('is-error', !valid);
+        if (tick) tick.style.opacity = (len > 0 && valid) ? '1' : '0';
+      };
+      content.addEventListener('input', update);
+      update();
+    });
+
+    // Universal chip remove — clicking .chip-remove removes its parent .chip
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip-remove');
+      if (btn) btn.closest('.chip')?.remove();
+    });
+
+    // Alert dismiss — clicking .alert-close removes its parent .alert
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.alert-close');
+      if (btn) btn.closest('.alert')?.remove();
+    });
+
+    // Badge remove — clicking .badge-remove deletes its parent pill
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.badge-remove');
+      if (btn) btn.closest('.badge')?.remove();
+    });
+
+    // Tabs — click to activate. If a tab declares aria-controls, also toggle
+    // the matching tabpanel's visibility.
+    document.querySelectorAll('.tabs').forEach(tablist => {
+      const tabs = [...tablist.querySelectorAll('.tab')];
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+            const panelId = t.getAttribute('aria-controls');
+            if (panelId) {
+              const panel = document.getElementById(panelId);
+              if (panel) panel.hidden = !on;
+            }
+          });
+        });
+      });
+    });
+
+    // Tag inputs — Enter to add, Backspace on empty to remove last
+    document.querySelectorAll('.input-tags').forEach(wrap => {
+      const input = wrap.querySelector('.input-tags-input');
+
+      const addTag = (text) => {
+        const t = text.trim();
+        if (!t) return;
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `${t}<button class="chip-remove" aria-label="Remove" type="button"><svg><use href="#i-x"/></svg></button>`;
+        input.before(chip);
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          e.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        } else if (e.key === 'Backspace' && !input.value) {
+          const chips = wrap.querySelectorAll('.chip');
+          chips[chips.length - 1]?.remove();
+        }
+      });
+
+      // Click anywhere in the wrap focuses the text input
+      wrap.addEventListener('click', (e) => {
+        if (e.target === wrap) input.focus();
+      });
+    });
+
+    // === Sheet — editable spreadsheet interactions ================================
+    // Self-contained, delegation-based module. Drop a `<table data-sheet>` into any
+    // prototype and this wires the generic cell state machine (select · edit ·
+    // commit · cancel · arrow-nav · optimistic save sim), the six cell-primitive
+    // editors, empty-add, add-child rows, and range-select + copy. No per-table
+    // config: everything is driven by data-* attributes on cells.
+    (function () {
+      const PEOPLE = ['Maria Santos', 'Pavel Vydra', 'Alejandro Reyes', 'Camilla Herrere', 'Nina Brandt', 'Tomas Weil', 'Priya Nair'];
+      const STATUS_OPTS = ['Idea', 'Definition', 'Execution', 'Complete', 'On hold', 'Impact assessment', 'Opportunity assessment'];
+      // Per-status solid-tag colour; anything unlisted stays neutral gray.
+      const STATUS_TAG = { 'Execution': 'tag-blue', 'Complete': 'tag-positive', 'Impact assessment': 'tag-blue-light' };
+      const statusTag = (label) => STATUS_TAG[label] || 'tag-light';
+      const HEALTH_OPTS = [
+        { label: 'On track', tone: '' },
+        { label: 'At Risk', tone: 'is-warning' },
+        { label: 'Off track', tone: 'is-danger' },
+      ];
+      const TAG_OPTS = ['marketing-client', 'coaching', 'Coaching-business', 'growth', 'ops', 'research'];
+      // Map a Health value to a solid tag variant (the fill colour is the indicator).
+      const healthTag = (label) => { const o = HEALTH_OPTS.find(h => h.label === label); return o && o.tone === 'is-warning' ? 'tag-warning' : o && o.tone === 'is-danger' ? 'tag-negative' : 'tag-positive'; };
+
+      const tables = document.querySelectorAll('table[data-sheet]');
+      if (!tables.length) return;
+      let openPop = null; // the single popover open across all sheets
+
+      const closePop = () => { if (openPop) { openPop.remove(); openPop = null; } };
+      const initials = (name) => name.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
+
+      // ---- Optimistic save simulation: saving → saved → clear (or → error) ----
+      function simulateSave(cell) {
+        cell.classList.remove('is-saved', 'is-error');
+        cell.classList.add('is-saving');
+        setStatusIcon(cell, 'saving');
+        setTimeout(() => {
+          cell.classList.remove('is-saving');
+          if (cell.hasAttribute('data-fail')) {
+            cell.classList.add('is-error');
+            setStatusIcon(cell, 'error');
+            showError(cell, 'Couldn’t save — retry');
+          } else {
+            cell.classList.add('is-saved');
+            setStatusIcon(cell, 'saved');
+            setTimeout(() => { cell.classList.remove('is-saved'); setStatusIcon(cell, null); }, 1100);
+          }
+        }, 650);
+      }
+      function setStatusIcon(cell, kind) {
+        let el = cell.querySelector('.sheet-status');
+        if (!el) { el = document.createElement('span'); el.className = 'sheet-status'; cell.appendChild(el); }
+        const map = { saving: 'rotate', saved: 'check', error: 'exclamation' };
+        el.innerHTML = kind ? `<svg class="icon"><use href="#i-${map[kind]}"/></svg>` : '';
+      }
+      function showError(cell, msg) {
+        let el = cell.querySelector('.sheet-error-msg');
+        if (!el) { el = document.createElement('span'); el.className = 'sheet-error-msg'; cell.appendChild(el); }
+        el.textContent = msg;
+      }
+      function clearError(cell) {
+        cell.classList.remove('is-error');
+        cell.querySelector('.sheet-error-msg')?.remove();
+        setStatusIcon(cell, null);
+      }
+
+      // ---- Value rendering per primitive ----
+      function renderValue(cell, value) {
+        const type = cell.dataset.type;
+        const variant = cell.dataset.variant || '';
+        const inner = cell.querySelector('.sheet-cell-inner');
+        const isEmpty = value == null || value === '' || (Array.isArray(value) && !value.length);
+        cell.classList.toggle('is-empty', isEmpty);
+
+        if (isEmpty) {
+          const icon = cell.dataset.emptyIcon || 'plus';
+          if (type === 'text' && variant === 'name') {
+            const tree = cell.querySelector('.sheet-tree');
+            tree.querySelector('.sheet-name').innerHTML = `<span class="sheet-empty"><svg class="icon"><use href="#i-${icon}"/></svg></span>`;
+          } else {
+            inner.innerHTML = `<span class="sheet-empty"><svg class="icon"><use href="#i-${icon}"/></svg></span>`;
+          }
+          return;
+        }
+        if (type === 'text' && variant === 'name') {
+          const tree = cell.querySelector('.sheet-tree');
+          tree.querySelector('.sheet-name').textContent = value;
+          return;
+        }
+        if (type === 'text') {
+          inner.innerHTML = `<span class="sheet-text">${escapeHtml(value)}</span>`;
+          return;
+        }
+        if (type === 'select') {
+          if (variant === 'health') {
+            inner.innerHTML = `<span class="tag tag-indicator ${healthTag(value)}">${escapeHtml(value)}</span>`;
+          } else {
+            inner.innerHTML = `<span class="tag ${statusTag(value)}">${escapeHtml(value)}</span>`;
+          }
+          return;
+        }
+        if (type === 'person') {
+          // Avatar intentionally omitted in the cell (name only); it's kept in the picker.
+          inner.innerHTML = `<span class="sheet-person"><span class="sheet-person-name">${escapeHtml(value)}</span></span>`;
+          return;
+        }
+        if (type === 'date') {
+          const dot = cell.dataset.dot ? `<span class="cell-dot ${cell.dataset.dot}"></span>` : '';
+          inner.innerHTML = `<span class="sheet-date">${dot}${escapeHtml(value)}</span>`;
+          return;
+        }
+        if (type === 'tags') {
+          const tags = Array.isArray(value) ? value : String(value).split(',').map(s => s.trim()).filter(Boolean);
+          const shown = tags.slice(0, 2);
+          const more = tags.length - shown.length;
+          inner.innerHTML = `<span class="sheet-tags">${shown.map(t => `<span class="tag tag-light">${escapeHtml(t)}</span>`).join('')}${more > 0 ? `<span class="sheet-tags-more">+${more}</span>` : ''}</span>`;
+          cell._tags = tags;
+          return;
+        }
+        if (type === 'link') {
+          const label = cell.dataset.label || value;
+          inner.innerHTML = `<a class="sheet-link" href="${escapeAttr(value)}" target="_blank" rel="noopener"><span class="sheet-link-label">${escapeHtml(label)}</span><svg class="icon"><use href="#i-arrow-square-out"/></svg></a>`;
+          return;
+        }
+      }
+
+      function getValue(cell) {
+        if (cell.dataset.type === 'tags') return cell._tags || [];
+        return cell.dataset.value || '';
+      }
+      function setValue(cell, value) {
+        if (cell.dataset.type === 'tags') { cell._tags = value; cell.dataset.value = (value || []).join(','); }
+        else { cell.dataset.value = value == null ? '' : value; }
+        renderValue(cell, value);
+      }
+
+      // ---- Editors ----
+      function editCell(cell) {
+        if (cell.classList.contains('is-readonly')) return;
+        clearError(cell);
+        const type = cell.dataset.type;
+        if (type === 'text') return editText(cell);
+        if (type === 'select') return editSelect(cell);
+        if (type === 'person') return editPerson(cell);
+        if (type === 'date') return editDate(cell);
+        if (type === 'tags') return editTags(cell);
+        if (type === 'link') return editLink(cell);
+      }
+
+      function editText(cell) {
+        const variant = cell.dataset.variant || '';
+        const inner = cell.querySelector('.sheet-cell-inner');
+        cell.classList.add('is-editing');
+        const cur = getValue(cell);
+        if (variant === 'name') {
+          const nameEl = cell.querySelector('.sheet-name');
+          nameEl.innerHTML = `<input class="sheet-input" value="${escapeAttr(cur)}">`;
+          const input = nameEl.querySelector('.sheet-input');
+          input.value = cur; input.focus(); input.select();
+          bindTextInput(cell, input, cur, () => renderValue(cell, cur));
+          return;
+        }
+        const tag = variant === 'muted' ? 'textarea' : 'input';
+        const prev = inner.innerHTML;
+        inner.innerHTML = `<${tag} class="sheet-input"></${tag}>`;
+        const input = inner.querySelector('.sheet-input');
+        input.value = cur; input.focus(); input.select();
+        bindTextInput(cell, input, cur, () => renderValue(cell, cur));
+      }
+      function bindTextInput(cell, input, cur, restore) {
+        const commit = () => { const v = input.value.trim(); cell.classList.remove('is-editing'); setValue(cell, v); if (v !== cur) simulateSave(cell); select(cell); };
+        const cancel = () => { cell.classList.remove('is-editing'); restore(); select(cell); };
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
+          else if (e.key === 'Escape') { e.preventDefault(); input.removeEventListener('blur', commit); cancel(); }
+          e.stopPropagation();
+        });
+        input.addEventListener('blur', commit);
+      }
+
+      function editSelect(cell) {
+        const variant = cell.dataset.variant || '';
+        const opts = variant === 'health' ? HEALTH_OPTS.map(o => o.label) : STATUS_OPTS;
+        popupList(cell, opts, getValue(cell), (val) => { setValue(cell, val); simulateSave(cell); }, {
+          renderOpt: variant === 'health'
+            ? (label) => `<span class="tag tag-indicator ${healthTag(label)}">${escapeHtml(label)}</span>`
+            : (label) => `<span class="tag ${statusTag(label)}">${escapeHtml(label)}</span>`,
+          search: false,
+        });
+      }
+
+      function editPerson(cell) {
+        popupList(cell, PEOPLE, getValue(cell), (val) => { setValue(cell, val); simulateSave(cell); }, {
+          search: true,
+          extra: [{ label: 'Unassign', clear: true }],
+          renderOpt: (name) => `<span class="sheet-avatar">${escapeHtml(initials(name))}</span>${escapeHtml(name)}`,
+          onClear: () => { setValue(cell, ''); simulateSave(cell); },
+        });
+      }
+
+      function editDate(cell) {
+        const withTime = cell.dataset.variant === 'time';
+        const pop = makePop(cell);
+        pop.innerHTML = `<input type="date" class="sheet-pop-search" style="margin-bottom:8px">${withTime ? '<input type="time" class="sheet-pop-search" style="margin-bottom:8px" value="18:00">' : ''}<div style="display:flex;gap:6px"><button class="btn btn-xs btn-primary" data-ok>Set</button><button class="btn btn-xs btn-ghost" data-clear>Clear</button></div>`;
+        const dateI = pop.querySelector('input[type=date]');
+        const timeI = pop.querySelector('input[type=time]');
+        pop.querySelector('[data-ok]').addEventListener('click', () => {
+          if (!dateI.value) return;
+          const d = new Date(dateI.value + 'T00:00:00');
+          let label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          if (withTime && timeI.value) {
+            const [h, m] = timeI.value.split(':').map(Number);
+            const ap = h >= 12 ? 'pm' : 'am'; const h12 = ((h + 11) % 12) + 1;
+            label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ` · ${h12}:${String(m).padStart(2, '0')}${ap}`;
+          }
+          setValue(cell, label); simulateSave(cell); closePop(); select(cell);
+        });
+        pop.querySelector('[data-clear]').addEventListener('click', () => { setValue(cell, ''); simulateSave(cell); closePop(); select(cell); });
+        dateI.focus();
+      }
+
+      function editTags(cell) {
+        const pop = makePop(cell);
+        const chosen = new Set(cell._tags || []);
+        const commit = () => { setValue(cell, Array.from(chosen)); simulateSave(cell); };
+        pop.innerHTML = `<input class="sheet-pop-search" placeholder="Search or create…"><div class="sheet-pop-list"></div>`;
+        const list = pop.querySelector('.sheet-pop-list');
+        const search = pop.querySelector('.sheet-pop-search');
+        const paint = (q = '') => {
+          const all = Array.from(new Set([...TAG_OPTS, ...chosen]));
+          const ql = q.toLowerCase();
+          const matches = all.filter(t => t.toLowerCase().includes(ql));
+          list.innerHTML = (matches.map(t => `<button class="sheet-opt" data-tag="${escapeAttr(t)}"><span class="tag tag-light">${escapeHtml(t)}</span>${chosen.has(t) ? '<svg class="icon ph-check"><use href="#i-check"/></svg>' : ''}</button>`).join(''))
+            || (q ? `<button class="sheet-opt" data-create="${escapeAttr(q)}"><svg class="icon"><use href="#i-plus"/></svg>&nbsp;Create “${escapeHtml(q)}”</button>` : '<span class="sheet-opt is-empty-note">No tags</span>');
+          if (q && !matches.some(t => t.toLowerCase() === ql)) list.insertAdjacentHTML('beforeend', `<button class="sheet-opt" data-create="${escapeAttr(q)}"><svg class="icon"><use href="#i-plus"/></svg>&nbsp;Create “${escapeHtml(q)}”</button>`);
+        };
+        paint();
+        search.addEventListener('input', () => paint(search.value));
+        search.addEventListener('keydown', (e) => { if (e.key === 'Enter' && search.value) { chosen.add(search.value.trim()); commit(); search.value = ''; paint(); } e.stopPropagation(); });
+        list.addEventListener('click', (e) => {
+          const btn = e.target.closest('.sheet-opt'); if (!btn) return;
+          if (btn.dataset.create) chosen.add(btn.dataset.create);
+          else if (btn.dataset.tag) { chosen.has(btn.dataset.tag) ? chosen.delete(btn.dataset.tag) : chosen.add(btn.dataset.tag); }
+          commit(); paint(search.value); search.focus();
+        });
+        search.focus();
+      }
+
+      function editLink(cell) {
+        const pop = makePop(cell);
+        pop.innerHTML = `<input class="sheet-pop-search" placeholder="Label" value="${escapeAttr(cell.dataset.label || '')}"><input class="sheet-pop-search" placeholder="https://…" value="${escapeAttr(getValue(cell))}"><div style="display:flex;gap:6px"><button class="btn btn-xs btn-primary" data-ok>Save</button></div>`;
+        const [labelI, urlI] = pop.querySelectorAll('.sheet-pop-search');
+        pop.querySelector('[data-ok]').addEventListener('click', () => {
+          const url = urlI.value.trim();
+          if (url && !/^https?:\/\/|^#|^\//.test(url)) { urlI.style.borderColor = 'var(--color-danger)'; showError(cell, 'Invalid URL'); return; }
+          cell.dataset.label = labelI.value.trim();
+          setValue(cell, url); if (url) simulateSave(cell); closePop(); select(cell);
+        });
+        labelI.focus();
+      }
+
+      // ---- Generic popover list (select / person) ----
+      function popupList(cell, options, current, onPick, opts = {}) {
+        const pop = makePop(cell);
+        const searchHtml = opts.search ? '<input class="sheet-pop-search" placeholder="Search…">' : '';
+        pop.innerHTML = `${searchHtml}<div class="sheet-pop-list"></div>`;
+        const list = pop.querySelector('.sheet-pop-list');
+        const render = (q = '') => {
+          const ql = q.toLowerCase();
+          const rows = options.filter(o => o.toLowerCase().includes(ql));
+          list.innerHTML = (rows.map(o => `<button class="sheet-opt${o === current ? ' is-active' : ''}" data-val="${escapeAttr(o)}">${opts.renderOpt ? opts.renderOpt(o) : escapeHtml(o)}${o === current ? '<svg class="icon ph-check"><use href="#i-check"/></svg>' : ''}</button>`).join('')
+            + (opts.extra || []).map(x => `<button class="sheet-opt" data-clear="1">${escapeHtml(x.label)}</button>`).join(''))
+            || '<span class="sheet-opt is-empty-note">No matches</span>';
+        };
+        render();
+        if (opts.search) { const s = pop.querySelector('.sheet-pop-search'); s.addEventListener('input', () => render(s.value)); s.addEventListener('keydown', e => e.stopPropagation()); s.focus(); }
+        list.addEventListener('click', (e) => {
+          const btn = e.target.closest('.sheet-opt'); if (!btn) return;
+          if (btn.dataset.clear) { opts.onClear && opts.onClear(); } else { onPick(btn.dataset.val); }
+          closePop(); select(cell);
+        });
+      }
+
+      function makePop(cell) {
+        closePop();
+        const pop = document.createElement('div');
+        pop.className = 'sheet-pop';
+        cell.appendChild(pop);
+        openPop = pop;
+        requestAnimationFrame(() => {
+          const r = pop.getBoundingClientRect();
+          if (r.bottom > window.innerHeight - 8) pop.style.bottom = '100%'; else pop.style.top = '100%';
+          if (r.right > window.innerWidth - 8) pop.style.right = '0';
+        });
+        return pop;
+      }
+
+      // ---- Selection + keyboard navigation ----
+      let anchor = null; // active cell for keyboard scope
+      function select(cell, opts = {}) {
+        if (!cell) return;
+        const table = cell.closest('table[data-sheet]');
+        clearRange(table);
+        table.querySelectorAll('.sheet-cell.is-selected').forEach(c => c.classList.remove('is-selected'));
+        table.querySelectorAll('tr.is-selected').forEach(r => r.classList.remove('is-selected'));
+        cell.classList.add('is-selected');
+        cell.closest('tr').classList.add('is-selected');
+        anchor = cell;
+        if (!opts.noScroll) cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+      function clearRange(table) { table.querySelectorAll('.sheet-cell.is-range').forEach(c => c.classList.remove('is-range')); }
+
+      function cellsOf(row) { return [...row.querySelectorAll('td.sheet-cell')]; }
+      function visibleRows(table) { return [...table.querySelectorAll('tbody tr')].filter(r => !r.hidden); }
+      function move(dRow, dCol, extend) {
+        if (!anchor) return;
+        const table = anchor.closest('table[data-sheet]');
+        const rows = visibleRows(table);
+        const row = anchor.closest('tr');
+        const rIdx = rows.indexOf(row);
+        const cells = cellsOf(row);
+        const cIdx = cells.indexOf(anchor);
+        if (dCol) { const next = cells[cIdx + dCol]; if (next) extend ? extendRange(next) : select(next); return; }
+        const nextRow = rows[rIdx + dRow];
+        if (!nextRow) return;
+        const nextCells = cellsOf(nextRow);
+        const target = nextCells[Math.min(cIdx, nextCells.length - 1)];
+        extend ? extendRange(target) : select(target);
+      }
+      function extendRange(to) {
+        const table = to.closest('table[data-sheet]');
+        clearRange(table);
+        const rows = visibleRows(table);
+        const aRow = anchor.closest('tr'), tRow = to.closest('tr');
+        const r1 = rows.indexOf(aRow), r2 = rows.indexOf(tRow);
+        const aCells = cellsOf(aRow), tCells = cellsOf(tRow);
+        const c1 = aCells.indexOf(anchor), c2 = tCells.indexOf(to);
+        const [rlo, rhi] = [Math.min(r1, r2), Math.max(r1, r2)];
+        const [clo, chi] = [Math.min(c1, c2), Math.max(c1, c2)];
+        for (let r = rlo; r <= rhi; r++) { const cs = cellsOf(rows[r]); for (let c = clo; c <= chi; c++) if (cs[c]) cs[c].classList.add('is-range'); }
+      }
+      function copyRange() {
+        if (!anchor) return;
+        const table = anchor.closest('table[data-sheet]');
+        const ranged = [...table.querySelectorAll('.sheet-cell.is-range, .sheet-cell.is-selected')];
+        const cells = ranged.length ? ranged : [anchor];
+        const byRow = new Map();
+        cells.forEach(c => { const tr = c.closest('tr'); if (!byRow.has(tr)) byRow.set(tr, []); byRow.get(tr).push(c); });
+        const tsv = [...byRow.values()].map(cs => cs.map(c => (c.innerText || '').trim().replace(/\s+/g, ' ')).join('\t')).join('\n');
+        navigator.clipboard?.writeText(tsv);
+        cells.forEach(c => { c.classList.add('is-saved'); setStatusIcon(c, 'saved'); setTimeout(() => { c.classList.remove('is-saved'); setStatusIcon(c, null); }, 500); });
+      }
+
+      // ---- Add child row (clone structure, clear values, bump level) ----
+      function addChild(cell) {
+        const row = cell.closest('tr');
+        const level = Math.min(2, (parseInt(row.dataset.level || '0', 10) + 1));
+        const clone = row.cloneNode(true);
+        clone.dataset.level = level;
+        clone.classList.remove('is-selected');
+        clone.querySelectorAll('.sheet-cell').forEach((c) => {
+          c.classList.remove('is-selected', 'is-range', 'is-editing', 'is-saving', 'is-saved', 'is-error');
+          c.querySelector('.sheet-status')?.remove();
+          c.querySelector('.sheet-error-msg')?.remove();
+          c._tags = null;
+          if (c.dataset.type === 'text' && c.dataset.variant === 'name') c.dataset.level = level;
+          setValue(c, c.dataset.type === 'tags' ? [] : '');
+        });
+        const table = cell.closest('table[data-sheet]');
+        // New child is a leaf → clear its toggle cell (drop any inherited caret).
+        const childToggleCell = clone.querySelector('td.sheet-toggle');
+        if (childToggleCell) childToggleCell.innerHTML = '';
+        // Parent may have been a leaf; give it a caret so it can collapse the child.
+        const parentToggleCell = row.querySelector('td.sheet-toggle');
+        if (parentToggleCell && !parentToggleCell.querySelector('.row-toggle')) {
+          parentToggleCell.innerHTML = '<button class="row-toggle" type="button" aria-expanded="true" aria-label="Toggle children"><svg class="icon"><use href="#i-caret-right"/></svg></button>';
+          bindToggle(parentToggleCell.querySelector('.row-toggle'), table);
+        }
+        row.after(clone);
+        renumber(table);
+        const firstEditable = clone.querySelector('.sheet-cell[data-type="text"][data-variant="name"]');
+        select(firstEditable); editCell(firstEditable);
+      }
+      function spacer() { const s = document.createElement('span'); s.className = 'row-toggle-spacer'; return s; }
+      function renumber(table) { let n = 1; visibleRows(table).forEach(r => { const g = r.querySelector('.sheet-rownum'); if (g) g.textContent = n++; }); }
+
+      // Recompute row visibility from the stack of collapsed ancestor levels.
+      function refreshTree(table) {
+        const tbody = table.querySelector('tbody');
+        const collapsedAt = [];
+        [...tbody.children].forEach(row => {
+          const lvl = parseInt(row.dataset.level || '0', 10);
+          while (collapsedAt.length && collapsedAt[collapsedAt.length - 1] >= lvl) collapsedAt.pop();
+          row.hidden = collapsedAt.length > 0;
+          const t = row.querySelector('.row-toggle');
+          if (t && t.getAttribute('aria-expanded') === 'false') collapsedAt.push(lvl);
+        });
+      }
+      function bindToggle(btn, table) {
+        btn.addEventListener('click', () => {
+          const open = btn.getAttribute('aria-expanded') !== 'false';
+          btn.setAttribute('aria-expanded', String(!open));
+          refreshTree(table);
+        });
+      }
+      // Split the expand/collapse caret out of the Name cell into a dedicated
+      // pinned column right after the `#` gutter, and add a collapse/expand-all
+      // control in its header. Purely structural — markup keeps the caret in the
+      // name cell and this relocates it, so any [data-sheet] table gets the column.
+      function buildToggleColumn(table) {
+        const headRow = table.querySelector('thead tr');
+        const headGutter = headRow.querySelector('.sheet-gutter');
+        if (headGutter && !headRow.querySelector('.sheet-toggle')) {
+          const th = document.createElement('th');
+          th.className = 'sheet-toggle';
+          th.innerHTML = '<button class="sheet-collapse-all" type="button" aria-label="Collapse or expand all rows"><svg class="icon"><use href="#i-caret-down"/></svg><svg class="icon"><use href="#i-caret-up"/></svg></button>';
+          headGutter.after(th);
+          th.querySelector('.sheet-collapse-all').addEventListener('click', () => {
+            const toggles = [...table.querySelectorAll('.row-toggle')];
+            const collapse = toggles.some(t => t.getAttribute('aria-expanded') !== 'false');
+            toggles.forEach(t => t.setAttribute('aria-expanded', String(!collapse)));
+            refreshTree(table);
+          });
+        }
+        table.querySelectorAll('tbody tr').forEach(row => {
+          const gut = row.querySelector('.sheet-gutter');
+          if (!gut || row.querySelector('td.sheet-toggle')) return;
+          const td = document.createElement('td');
+          td.className = 'sheet-toggle';
+          const toggle = row.querySelector('.row-toggle');
+          if (toggle) td.appendChild(toggle); // move it (its tree-module click handler moves with it)
+          gut.after(td);
+          row.querySelector('.row-toggle-spacer')?.remove(); // leaf rows: no lead needed in their own column
+        });
+      }
+
+      // ---- Wiring (delegated per table) ----
+      tables.forEach(table => {
+        buildToggleColumn(table);
+        table.querySelectorAll('td.sheet-cell').forEach(cell => {
+          if (cell.dataset.type === 'tags' && cell.dataset.value) cell._tags = cell.dataset.value.split(',').map(s => s.trim()).filter(Boolean);
+          if (!cell.querySelector('.sheet-cell-inner')) {
+            const inner = document.createElement('span'); inner.className = 'sheet-cell-inner';
+            while (cell.firstChild) inner.appendChild(cell.firstChild);
+            cell.appendChild(inner);
+          }
+          renderValue(cell, getValue(cell));
+        });
+
+        table.addEventListener('click', (e) => {
+          if (e.target.closest('.row-toggle')) return; // handled by the tree-table module
+          const add = e.target.closest('.sheet-addchild');
+          if (add) { e.stopPropagation(); addChild(add.closest('.sheet-cell')); return; }
+          const errCell = e.target.closest('.sheet-cell.is-error');
+          if (errCell && errCell === anchor) { errCell.removeAttribute('data-fail'); clearError(errCell); simulateSave(errCell); return; }
+          const link = e.target.closest('.sheet-link');
+          const cell = e.target.closest('td.sheet-cell');
+          if (!cell) return;
+          if (link && !cell.classList.contains('is-selected')) e.preventDefault(); // first click selects, doesn't navigate
+          if (cell.classList.contains('is-editing')) return;
+          if (cell === anchor) { editCell(cell); return; } // second click on the selected cell edits (incl. empty → add)
+          select(cell);
+          if (e.shiftKey) extendRange(cell);
+        });
+
+        table.addEventListener('dblclick', (e) => {
+          const cell = e.target.closest('td.sheet-cell');
+          if (cell) { select(cell); editCell(cell); }
+        });
+
+        table.addEventListener('keydown', (e) => {
+          if (!anchor || anchor.classList.contains('is-editing')) return;
+          const k = e.key;
+          if (k === 'ArrowDown') { e.preventDefault(); move(1, 0, e.shiftKey); }
+          else if (k === 'ArrowUp') { e.preventDefault(); move(-1, 0, e.shiftKey); }
+          else if (k === 'ArrowRight' || (k === 'Tab' && !e.shiftKey)) { e.preventDefault(); move(0, 1, e.shiftKey); }
+          else if (k === 'ArrowLeft' || (k === 'Tab' && e.shiftKey)) { e.preventDefault(); move(0, -1, e.shiftKey); }
+          else if (k === 'Enter') { e.preventDefault(); editCell(anchor); }
+          else if (k === 'Escape') { e.preventDefault(); anchor.classList.remove('is-selected'); anchor.closest('tr').classList.remove('is-selected'); clearRange(table); anchor = null; }
+          else if ((e.metaKey || e.ctrlKey) && (k === 'c' || k === 'C')) { e.preventDefault(); copyRange(); }
+          else if (k === 'Backspace' || k === 'Delete') { e.preventDefault(); if (!anchor.classList.contains('is-readonly')) { setValue(anchor, anchor.dataset.type === 'tags' ? [] : ''); simulateSave(anchor); } }
+        });
+
+        wireHeader(table);
+        table.setAttribute('tabindex', '0');
+      });
+
+      // ---- Header: sort (arrow + row reorder), column menu, filter chip (T12) ----
+      function wireHeader(table) {
+        const tbody = table.querySelector('tbody');
+        const colIndex = (th) => [...th.parentElement.children].indexOf(th);
+        function sortBy(th, dir) {
+          const idx = colIndex(th);
+          table.querySelectorAll('thead th').forEach(h => h.classList.remove('is-sorted', 'is-desc'));
+          th.classList.add('is-sorted'); if (dir === 'desc') th.classList.add('is-desc');
+          const rows = [...tbody.querySelectorAll('tr')];
+          rows.sort((a, b) => {
+            const av = (a.children[idx]?.innerText || '').trim().toLowerCase();
+            const bv = (b.children[idx]?.innerText || '').trim().toLowerCase();
+            return dir === 'desc' ? bv.localeCompare(av) : av.localeCompare(bv);
+          });
+          rows.forEach(r => tbody.appendChild(r));
+          renumber(table);
+        }
+        table.querySelectorAll('thead .th-sort').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const th = btn.closest('th');
+            const dir = th.classList.contains('is-sorted') && !th.classList.contains('is-desc') ? 'desc' : 'asc';
+            sortBy(th, dir);
+          });
+        });
+        table.querySelectorAll('thead .th-menu').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const th = btn.closest('th');
+            const pop = makePop(th);
+            pop.innerHTML = `<div class="sheet-pop-list">
+              <button class="sheet-opt" data-a="asc"><svg class="icon"><use href="#i-sort-ascending"/></svg>Sort ascending</button>
+              <button class="sheet-opt" data-a="desc"><svg class="icon"><use href="#i-sort-descending"/></svg>Sort descending</button>
+              <button class="sheet-opt" data-a="filter"><svg class="icon"><use href="#i-funnel"/></svg>Filter…</button>
+              <button class="sheet-opt" data-a="hide"><svg class="icon"><use href="#i-eye-slash"/></svg>Hide column</button></div>`;
+            pop.addEventListener('click', (ev) => {
+              const o = ev.target.closest('.sheet-opt'); if (!o) return;
+              if (o.dataset.a === 'asc') sortBy(th, 'asc');
+              else if (o.dataset.a === 'desc') sortBy(th, 'desc');
+              else if (o.dataset.a === 'filter') th.classList.toggle('is-filtered');
+              else if (o.dataset.a === 'hide') { const i = colIndex(th); table.querySelectorAll('tr').forEach(r => { if (r.children[i]) r.children[i].style.display = 'none'; }); }
+              closePop();
+            });
+          });
+        });
+        // column resize
+        table.querySelectorAll('thead .th-resize').forEach(handle => {
+          handle.addEventListener('mousedown', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const th = handle.closest('th'); const startX = e.clientX; const startW = th.offsetWidth;
+            handle.classList.add('is-dragging');
+            const onMove = (me) => { th.style.width = Math.max(64, startW + (me.clientX - startX)) + 'px'; };
+            const onUp = () => { handle.classList.remove('is-dragging'); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+            document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+          });
+        });
+      }
+
+      document.addEventListener('mousedown', (e) => {
+        if (openPop && !e.target.closest('.sheet-pop') && !e.target.closest('.sheet-cell')) closePop();
+      });
+
+      function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+      function escapeAttr(s) { return escapeHtml(s).replace(/'/g, '&#39;'); }
+    })();
+
+    // === Annotation tool — append ?notes=1 to the URL to enable ====================
+    // In-page batch annotation overlay. Lets you click multiple UI elements,
+    // queue notes, then "Copy batch" to paste a single grouped payload into
+    // your coding agent. Notes clear on reload. CSS lives in components.css
+    // (`.annot-toolbar`, `.annot-pin`, `.annot-popover`, `.annot-mode`).
+    (function annotationTool() {
+      if (!new URLSearchParams(location.search).has('notes')) return;
+
+      const STATE = { annotations: [], inspecting: false };
+
+      const bar = document.createElement('div');
+      bar.className = 'annot-toolbar';
+      bar.innerHTML = `
+        <button id="annot-inspect" type="button">Inspect</button>
+        <span class="annot-count" id="annot-count">0 pending</span>
+        <button id="annot-copy" type="button" disabled>Copy batch</button>
+        <button id="annot-clear" type="button" disabled>Clear</button>
+      `;
+      document.body.appendChild(bar);
+
+      const inspectBtn = bar.querySelector('#annot-inspect');
+      const countEl    = bar.querySelector('#annot-count');
+      const copyBtn    = bar.querySelector('#annot-copy');
+      const clearBtn   = bar.querySelector('#annot-clear');
+
+      const updateUI = () => {
+        const n = STATE.annotations.length;
+        countEl.textContent = `${n} pending`;
+        copyBtn.disabled  = n === 0;
+        clearBtn.disabled = n === 0;
+        inspectBtn.classList.toggle('is-active', STATE.inspecting);
+        inspectBtn.textContent = STATE.inspecting ? 'Stop' : 'Inspect';
+      };
+
+      // Shortest readable selector: prefer #id, then a unique class, then tag.class,
+      // climbing to a parent if needed to disambiguate.
+      function bestSelector(el) {
+        if (el.id) return `#${el.id}`;
+        const classes = [...el.classList].filter(c => !c.startsWith('annot-'));
+        for (const c of classes) {
+          if (document.querySelectorAll(`.${c}`).length === 1) return `.${c}`;
+        }
+        const tag = el.tagName.toLowerCase();
+        if (classes.length) {
+          const sel = `${tag}.${classes[0]}`;
+          if (document.querySelectorAll(sel).length === 1) return sel;
+        }
+        if (el.parentElement) {
+          return `${bestSelector(el.parentElement)} > ${tag}${classes[0] ? '.' + classes[0] : ''}`;
+        }
+        return tag;
+      }
+
+      const startInspect = () => { STATE.inspecting = true; document.body.classList.add('annot-mode'); updateUI(); };
+      const stopInspect  = () => { STATE.inspecting = false; document.body.classList.remove('annot-mode'); updateUI(); };
+
+      inspectBtn.addEventListener('click', () => STATE.inspecting ? stopInspect() : startInspect());
+
+      // Capture-phase click so we intercept before app handlers (drawers, tabs, etc.)
+      document.addEventListener('click', (e) => {
+        if (!STATE.inspecting) return;
+        if (bar.contains(e.target)) return;
+        if (e.target.closest('.annot-popover, .annot-pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        openPopover(e.target);
+      }, true);
+
+      function openPopover(el) {
+        document.querySelectorAll('.annot-popover').forEach(p => p.remove());
+
+        const sel = bestSelector(el);
+        const tag = el.tagName.toLowerCase();
+        const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+
+        const rect = el.getBoundingClientRect();
+        const pop = document.createElement('div');
+        pop.className = 'annot-popover';
+        pop.innerHTML = `
+          <div class="annot-popover-meta"><strong>${tag}</strong> <code>${sel}</code></div>
+          ${text ? `<div class="annot-popover-text">"${text}${text.length === 60 ? '…' : ''}"</div>` : ''}
+          <textarea placeholder="What should change?"></textarea>
+          <div class="annot-popover-hint">Enter to save · Shift+Enter for newline · Esc to cancel</div>
+        `;
+        const left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 296);
+        const top  = rect.bottom + window.scrollY + 6;
+        pop.style.left = Math.max(8, left) + 'px';
+        pop.style.top  = top + 'px';
+        document.body.appendChild(pop);
+
+        const ta = pop.querySelector('textarea');
+        ta.focus();
+
+        const save = () => {
+          const note = ta.value.trim();
+          if (!note) { pop.remove(); return; }
+          STATE.annotations.push({ selector: sel, tag, text, note });
+          addPin(el, STATE.annotations.length);
+          pop.remove();
+          updateUI();
+        };
+
+        ta.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); save(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); pop.remove(); }
+        });
+      }
+
+      function addPin(el, n) {
+        const r = el.getBoundingClientRect();
+        const pin = document.createElement('div');
+        pin.className = 'annot-pin';
+        pin.textContent = n;
+        pin.style.left = (r.left + window.scrollX - 6) + 'px';
+        pin.style.top  = (r.top + window.scrollY - 6) + 'px';
+        document.body.appendChild(pin);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && STATE.inspecting && !document.querySelector('.annot-popover')) stopInspect();
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const out = STATE.annotations.map((a, i) => {
+          const head = `${i + 1}. <${a.tag}>  ${a.selector}${a.text ? `  "${a.text}"` : ''}`;
+          return `${head}\n   → ${a.note}`;
+        }).join('\n\n');
+        try { await navigator.clipboard.writeText(out); }
+        catch (_) { /* fall through */ }
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy batch', 1400);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        STATE.annotations = [];
+        document.querySelectorAll('.annot-pin').forEach(p => p.remove());
+        updateUI();
+      });
+
+      updateUI();
+    })();
+  </script>
+
+  <script>
+    // ===== Shell-local: sidenav routing + active state ======================
+    // The shared block above handles the sidenav collapse toggle and the
+    // expandable groups generically; its routing handler is scoped to
+    // example.html's #template-app-shell, so active state is wired here.
+    (function () {
+      const sidenav = document.querySelector('.sidenav');
+      const main = document.querySelector('.app-shell-main');
+
+      // Scoped to .page-view — a bare [data-page] selector also matches the
+      // sidenav links, which share the same data-page values.
+      window.showAdminPage = (name) => {
+        document.querySelectorAll('.page-view').forEach(p => { p.hidden = p.dataset.page !== name; });
+      };
+
+      sidenav?.querySelectorAll('.sidenav-item[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          sidenav.querySelectorAll('.sidenav-item').forEach(i => i.classList.remove('is-active'));
+          link.classList.add('is-active');
+          // Most nav items are decorative in this prototype — only the ones
+          // with a matching .page-view actually navigate. Without this guard
+          // an unbuilt item would blank the content area.
+          if (document.querySelector(`.page-view[data-page="${link.dataset.page}"]`)) {
+            window.showAdminPage(link.dataset.page);
+          }
+          main?.scrollTo({ top: 0, behavior: 'instant' });
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    // ===== Table of contents — anchors + scroll-spy ========================
+    // Lifted from features/rob's meeting modal (.cm-toc) and re-pointed at the
+    // shell's scroll container. A section becomes active when its top crosses
+    // ~40% down the column, so a long section stays active while it's the one
+    // being read; at the very bottom the last section is forced active, since
+    // a short trailing section may never reach that threshold.
+    (function () {
+      // Two lists point at the same sections — the right-hand rail and the
+      // sidenav's settings submenu — so both are driven from here.
+      const navs = [...document.querySelectorAll('[data-adm-toc]')];
+      const body = document.querySelector('.app-shell-main');
+      if (!navs.length || !body) return;
+
+      const links = navs.flatMap(nav => [...nav.querySelectorAll('[data-adm-toc-target]')]);
+      const seen = new Set();
+      const targets = links
+        .map(l => l.dataset.admTocTarget)
+        .filter(id => !seen.has(id) && seen.add(id))
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+      const offsetIn = (el) => el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
+
+      // Own tween rather than scrollTo({behavior:'smooth'}): embedded webviews
+      // (the desktop app's own preview pane among them) ignore smooth scrolling
+      // on a scroll container, and a table of contents whose links don't move
+      // the page is worse than no table of contents. Duration is the system's
+      // --ic-duration-slow; reduced-motion jumps.
+      const ease = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+      const glideTo = (top) => {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { body.scrollTop = top; return; }
+        const from = body.scrollTop, delta = top - from, start = performance.now();
+        const step = (now) => {
+          const p = Math.min(1, (now - start) / 320);
+          body.scrollTop = from + delta * ease(p);
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+
+      links.forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const el = document.getElementById(link.dataset.admTocTarget);
+          if (!el) return;
+          glideTo(offsetIn(el) - 12);
+        });
+      });
+
+      const sync = () => {
+        const y = body.scrollTop + body.clientHeight * 0.4;
+        let active = targets[0];
+        for (const t of targets) if (offsetIn(t) <= y) active = t;
+        if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) {
+          active = targets[targets.length - 1];
+        }
+        links.forEach(l => l.classList.toggle('is-active', l.dataset.admTocTarget === active?.id));
+      };
+
+      body.addEventListener('scroll', sync);
+      // Also exposed because the sidenav's routing handler clears every
+      // .is-active in the nav when Settings is opened, which would otherwise
+      // leave the settings submenu with nothing marked.
+      window.admSyncToc = sync;
+      sync();
+    })();
+  </script>
+
+  <script>
+    // The shared .input-select handler writes the chosen label into the trigger
+    // but leaves the check mark where it was, so a reopened menu would still
+    // point at the old value. Move it with the selection.
+    document.querySelectorAll('[data-adm-select] .dropdown-menu').forEach(menu => {
+      menu.addEventListener('click', e => {
+        const picked = e.target.closest('.dropdown-item');
+        if (!picked) return;
+        menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === picked));
+      });
+    });
+  </script>
+
+  <script>
+    // A card's first row can govern the rest of it: switch it off and the
+    // settings underneath have nothing to act on, so they go inert. They stay
+    // clickable on purpose — a click explains itself in the snackbar, which a
+    // pointer-events:none block could never do.
+    document.querySelectorAll('[data-adm-governed]').forEach(card => {
+      const rows = [...card.querySelectorAll(':scope > .adm-setting')];
+      const master = rows.shift();
+      const toggle = master?.querySelector('.switch-input');
+      if (!toggle) return;
+
+      // The card's own actions belong to the governed part, not the switch.
+      const governed = [...rows, ...card.querySelectorAll(':scope > .adm-card-footer')];
+
+      const snack = document.querySelector('[data-adm-snackbar]');
+      let snackTimer = null;
+      const explain = () => {
+        if (!snack) return;
+        snack.textContent = card.dataset.admGoverned;
+        snack.classList.add('is-visible');
+        clearTimeout(snackTimer);
+        snackTimer = setTimeout(() => snack.classList.remove('is-visible'), 3200);
+      };
+
+      const apply = () => {
+        const off = !toggle.checked;
+        governed.forEach(part => {
+          part.classList.toggle('is-disabled', off);
+          part.querySelectorAll('.switch-input, .input-select-trigger, .btn').forEach(c => {
+            c.setAttribute('aria-disabled', String(off));
+            if (off) c.setAttribute('tabindex', '-1'); else c.removeAttribute('tabindex');
+          });
+          if (!off) return;
+          // A menu left open behind the dimming would be unreachable.
+          part.querySelectorAll('.dropdown-menu').forEach(m => { m.hidden = true; });
+          part.querySelectorAll('.input-select-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
+        });
+      };
+
+      // Capture, so the click is swallowed before it reaches the control's own
+      // handler — and before a checkbox or label would act on it.
+      governed.forEach(part => {
+        part.addEventListener('click', e => {
+          if (!part.classList.contains('is-disabled')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          explain();
+        }, true);
+      });
+
+      toggle.addEventListener('change', apply);
+      apply();
+    });
+  </script>
+
+  <script>
+    // Slack channel naming — the preview is computed from the rows, so changing
+    // a format or hiding a variable shows the channel name people will get.
+    (function () {
+      const out = document.querySelector('[data-adm-preview]');
+      if (!out) return;
+      const rows = [...document.querySelectorAll('[data-adm-var]')];
+
+      const part = (row) => {
+        const format = row.querySelector('.input-select-value')?.textContent.trim();
+        const full = row.dataset.full || '';
+        if (format === 'First letter') return full.charAt(0);
+        if (format === 'Abbreviation') return row.dataset.abbr || full;
+        return full;
+      };
+
+      const render = () => {
+        out.textContent = rows
+          .filter(r => !r.classList.contains('is-hidden'))
+          .map(part)
+          .filter(Boolean)
+          .join('-') || 'channel-name';
+      };
+
+      // Format changes: the shared .input-select handler writes the label on the
+      // item's own listener, so this one — delegated on the menu — runs after it.
+      rows.forEach(row => {
+        row.querySelector('.dropdown-menu')?.addEventListener('click', e => {
+          if (e.target.closest('.dropdown-item')) render();
+        });
+
+        row.querySelector('.adm-var-eye')?.addEventListener('click', (e) => {
+          const hidden = row.classList.toggle('is-hidden');
+          const btn = e.currentTarget;
+          btn.setAttribute('aria-pressed', String(!hidden));
+          btn.querySelector('use')?.setAttribute('href', hidden ? '#i-eye-hide' : '#i-eye');
+          render();
+        });
+      });
+
+      render();
+    })();
+  </script>
+
+</body>
+</html>
