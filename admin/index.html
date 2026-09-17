@@ -2273,6 +2273,10 @@
         window.admSyncToc?.();
       });
 
+      // Deep link: /features/admin#settings opens straight into the Admin view.
+      // Handy for sharing, and it is how the directory thumbnail is captured.
+      if (location.hash === '#settings') entry.click();
+
       // Back leaves settings the way it was entered: the app nav, on Processes.
       sidenav.querySelector('[data-adm-nav-back]')?.addEventListener('click', () => {
         sidenav.classList.remove('is-settings');
