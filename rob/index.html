@@ -4549,6 +4549,7 @@ body { overflow: hidden; }
 
     /* Auto-created Zoom URL field */
     .cm-zoom { position: relative; }
+    .cm-zoom > .icon,
     .cm-zoom > .icon {
       position: absolute;
       left: var(--ic-space-3);
@@ -4634,6 +4635,7 @@ body { overflow: hidden; }
       position: relative;
       width: 100%;
     }
+    .cm-input-icon > .icon,
     .cm-input-icon > .icon {
       position: absolute;
       left: var(--ic-space-3);
@@ -4646,6 +4648,7 @@ body { overflow: hidden; }
     .cm-input-icon > .input { padding-left: 32px; width: 100%; }
 
     .cm-input-suffix { position: relative; width: 100%; }
+    .cm-input-suffix > .icon,
     .cm-input-suffix > .icon {
       position: absolute;
       right: var(--ic-space-3);
@@ -4658,6 +4661,7 @@ body { overflow: hidden; }
     .cm-input-suffix > .input { padding-right: 32px; width: 100%; }
     /* Leading icon inside .cm-input-suffix — pair a semantic icon on the left
        with the caret-down (or any suffix) on the right. */
+    .cm-input-suffix > .icon.cm-lead,
     .cm-input-suffix > .icon.cm-lead {
       left: var(--ic-space-3);
       right: auto;
@@ -4969,6 +4973,8 @@ body { overflow: hidden; }
             <section class="cm-section">
               <h3 class="cm-section-title" style="display: flex; align-items: center; gap: var(--ic-space-2)">Participants <span class="badge" data-cm-participant-count>0</span></h3>
 
+              <!-- Single-line select trigger + dropdown of team members. Selections
+                   land in the list below; the dropdown closes after each pick. -->
               <div data-cm-participants>
                 <div class="input-select">
                   <button class="input-select-trigger" type="button" data-cm-participants-trigger aria-haspopup="listbox" aria-expanded="false">
@@ -5030,8 +5036,13 @@ body { overflow: hidden; }
                 </div><!-- /input-select -->
               </div><!-- /data-cm-participants -->
 
+              <!-- Selected participants list — empty on create. Users add via the
+                   dropdown; picks land here as .md-person rows so the shape matches
+                   the view modal's participants list. -->
               <div class="md-persons" data-cm-participants-list style="margin-top: var(--ic-space-2)"></div>
 
+              <!-- Participant permissions — Google Calendar-style toggle. Owner opts
+                   participants into direct editing of the meeting. -->
               <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
               <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
               <label class="checkbox">
@@ -5105,11 +5116,13 @@ body { overflow: hidden; }
           pMenu.toggleAttribute('hidden', !open);
           trigger.setAttribute('aria-expanded', String(open));
         };
+
         trigger.addEventListener('click', () => setOpen(pMenu.hasAttribute('hidden')));
         document.addEventListener('click', e => {
           if (!pWrap.contains(e.target)) setOpen(false);
         });
 
+        // Pick a person: remove their dropdown option, append them to the list, close.
         pMenu.addEventListener('click', e => {
           const item = e.target.closest('[data-cm-participant]');
           if (!item) return;
@@ -5135,6 +5148,7 @@ body { overflow: hidden; }
           setOpen(false);
         });
 
+        // Remove from list: send them back to the dropdown pool.
         list.addEventListener('click', e => {
           const rm = e.target.closest('[data-cm-remove-participant]');
           if (!rm) return;
@@ -5181,7 +5195,9 @@ body { overflow: hidden; }
       let seq = 1;
 
       if (title && createBtn) {
+        // Ensure the button is enabled — validation now happens on click.
         createBtn.disabled = false;
+        // Typing clears any error state on the title input.
         title.addEventListener('input', () => title.classList.remove('is-error'));
         modal.addEventListener('click', e => {
           if (e.target.closest('[data-modal-close]')) {
@@ -5192,6 +5208,7 @@ body { overflow: hidden; }
           }
         });
 
+        // Save — validate first; if the title is empty, flag the input and stop.
         createBtn.addEventListener('click', () => {
           const t = title.value.trim();
           if (!t) {
@@ -5202,7 +5219,7 @@ body { overflow: hidden; }
           const date = (dateInput?.value || 'Jan 22, 2026').trim();
           const start = (startInput?.value || '14:30').trim();
           const end = (endInput?.value || '15:30').trim();
-          const iso = parseCalDate(date);
+          const iso = parseCalDate(date);          // e.g. "2026-01-22"
           if (!iso) return;
           const cell = document.querySelector(`.cal-day[data-date="${iso}"]`);
           if (!cell) return;
@@ -5223,10 +5240,12 @@ body { overflow: hidden; }
           `;
           cell.appendChild(btn);
 
+          // Close the create modal — piggyback on the existing data-modal-close handler.
           modal.querySelector('[data-modal-close]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         });
       }
 
+      // "Jan 22, 2026" → "2026-01-22"
       function parseCalDate(s) {
         const m = s.match(/^([A-Za-z]{3,})\s+(\d{1,2}),\s*(\d{4})$/);
         if (!m) return null;
@@ -5237,6 +5256,7 @@ body { overflow: hidden; }
       }
       function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
+      // Populate the view modal when a user-meeting event is opened.
       // User-created meetings reuse the meeting-detail modal — we swap the
       // title and the when pill on the way in. Deck / action items / etc.
       // still show the Engineering Weekly seed content for now; each of those
@@ -5257,6 +5277,8 @@ body { overflow: hidden; }
           const long = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
           whenEl.textContent = `${long} · ${m.start} – ${m.end}`;
         }
+        // Restore per-meeting settings that don't yet have their own storage
+        // pattern. Editable-by-participants is one of them.
         const editableInput = md.querySelector('[data-md-editable-rob]');
         if (editableInput) editableInput.checked = !!m.editableByParticipants;
         // Design system's data-modal-open handler is attached per-element on
@@ -5269,6 +5291,7 @@ body { overflow: hidden; }
       if (!toc || !body) return;
       const links = [...toc.querySelectorAll('.cm-toc-item')];
       const targets = links.map(l => modal.querySelector('#' + l.dataset.cmTocTarget)).filter(Boolean);
+
       const offsetIn = (el) => el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
 
       links.forEach(link => {
@@ -5280,6 +5303,10 @@ body { overflow: hidden; }
         });
       });
 
+      // Scrollspy — trigger when a section's top crosses ~40% down the viewport,
+      // so a mid-length section becomes active as it moves up. When scrolled
+      // to the very bottom, force the last section active (a short trailing
+      // section may never reach the 40% threshold).
       body.addEventListener('scroll', () => {
         const y = body.scrollTop + body.clientHeight * 0.4;
         let active = targets[0];
@@ -5396,23 +5423,36 @@ body { overflow: hidden; }
     }
     .md-do-not-delete a { color: var(--color-text-link); }
 
+    /* Logged-in participant row — reject button is revealed on row hover /
+     * keyboard focus. Sits between the body and the RACI badge. */
     #meeting-detail .md-person.is-me { position: relative; }
-    #meeting-detail .md-me-reject { opacity: 0; transition: opacity var(--ic-duration-fast) var(--ic-ease); }
+    #meeting-detail .md-me-reject {
+      opacity: 0;
+      transition: opacity var(--ic-duration-fast) var(--ic-ease);
+    }
     #meeting-detail .md-person.is-me:hover .md-me-reject,
     #meeting-detail .md-person.is-me:focus-within .md-me-reject { opacity: 1; }
 
+    /* Rejected marker — the custom reject glyph pinned to the avatar's
+     * bottom-right. Inlined as a data URI so it's decoupled from the sprite. */
     #meeting-detail .md-person.is-rejected .avatar { position: relative; overflow: visible; }
     #meeting-detail .md-person.is-rejected .avatar::after {
       content: '';
       position: absolute;
-      right: -4px; bottom: -4px;
-      width: 15px; height: 15px;
+      right: -4px;
+      bottom: -4px;
+      width: 15px;
+      height: 15px;
       background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15' fill='none'><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' fill='%23FBEDF1'/><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' stroke='%23D42551' stroke-width='0.933333'/><path d='M10.6191 4.8418L7.99414 7.4668L10.6191 10.0918L10.0889 10.6221L7.46387 7.99707L4.83887 10.6221L4.30859 10.0918L6.93359 7.4668L4.30859 4.8418L4.83887 4.31152L7.46387 6.93652L10.0889 4.31152L10.6191 4.8418Z' fill='%23D42551'/></svg>") center/contain no-repeat;
     }
 
+    /* View-mode snackbar — dismisses on its own timer. Sits fixed at the bottom
+     * center of the viewport; used to tell the viewer to enter edit mode when
+     * they click a locked control. */
     .md-view-toast {
       position: fixed;
-      left: 50%; bottom: var(--ic-space-6);
+      left: 50%;
+      bottom: var(--ic-space-6);
       transform: translateX(-50%) translateY(8px);
       padding: 10px 16px;
       background: var(--ic-palette-graphite-900);
@@ -5420,22 +5460,57 @@ body { overflow: hidden; }
       border-radius: var(--ic-radius-sm);
       font: var(--type-body-sm);
       box-shadow: var(--ic-shadow-md);
-      display: inline-flex; align-items: center; gap: var(--ic-space-3);
-      opacity: 0; pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ic-space-3);
+      opacity: 0;
+      pointer-events: none;
       transition: opacity var(--ic-duration-base) var(--ic-ease),
                   transform var(--ic-duration-base) var(--ic-ease);
       z-index: calc(var(--ic-z-modal) + 10);
     }
-    .md-view-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .md-view-toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
     .md-view-toast .icon { color: var(--ic-palette-white); font-size: 16px; opacity: 0.8; }
-    .md-view-toast-cta { background: transparent; border: 0; padding: 0; margin-left: var(--ic-space-2); color: var(--ic-palette-white); font-weight: var(--ic-weight-semibold); text-decoration: underline; cursor: pointer; }
+    .md-view-toast-cta {
+      background: transparent; border: 0; padding: 0; margin-left: var(--ic-space-2);
+      color: var(--ic-palette-white); font-weight: var(--ic-weight-semibold);
+      text-decoration: underline; cursor: pointer;
+    }
 
-    .rm-section-title { font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2); }
-    .rm-textarea { width: 100%; min-height: 96px; padding: var(--ic-space-3); font: var(--type-body); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); resize: vertical; }
-    .rm-textarea:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-subtle); }
+    /* Reject modal — comment textarea + propose-a-new-time toggle. */
+    .rm-section-title {
+      font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans);
+      color: var(--color-text);
+      margin: 0 0 var(--ic-space-2);
+    }
+    .rm-textarea {
+      width: 100%;
+      min-height: 96px;
+      padding: var(--ic-space-3);
+      font: var(--type-body);
+      color: var(--color-text);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-sm);
+      resize: vertical;
+    }
+    .rm-textarea:focus {
+      outline: none;
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px var(--color-accent-subtle);
+    }
+    /* .cm-section uses display:flex so [hidden] alone doesn't hide it —
+     * force it here so the propose-time reveal works. */
     [data-rm-propose][hidden] { display: none !important; }
 
-    /* Edit-mode affordances on the meeting-detail modal. */
+    /* Edit-mode affordances on the meeting-detail modal.
+     *  - Title span still uses contenteditable (input-style hover/focus ring).
+     *  - Details section swaps its read-only grid for a parallel input-based
+     *    grid (identical to the create modal's Details layout). */
     #meeting-detail [data-md-editable] { padding: 4px 8px; margin: -4px -8px; border-radius: var(--ic-radius-sm); border: 1px solid transparent; transition: background var(--ic-duration-fast) var(--ic-ease), border-color var(--ic-duration-fast) var(--ic-ease); }
     #meeting-detail.is-editing [data-md-editable] { background: var(--color-surface); border-color: var(--color-border); cursor: text; }
     #meeting-detail.is-editing [data-md-editable]:hover { border-color: var(--color-border-strong); }
@@ -5477,6 +5552,7 @@ body { overflow: hidden; }
     .md-detail-row .md-detail-arrow { color: var(--color-text-subtle); }
     .md-detail-row .badge { margin-left: var(--ic-space-1); }
 
+    /* REC dot for the Zoom row. */
     .md-rec-dot {
       display: inline-flex; align-items: center; gap: 4px;
       color: var(--color-danger);
@@ -5494,6 +5570,7 @@ body { overflow: hidden; }
     }
     .md-rec-copy:hover { color: var(--color-text); }
 
+    /* KR (key result) progress card inside details. */
     .md-kr {
       display: flex; gap: var(--ic-space-3); align-items: flex-start;
       padding: var(--ic-space-3) 0;
@@ -5542,6 +5619,9 @@ body { overflow: hidden; }
       margin-bottom: var(--ic-space-4);
     }
 
+    /* Meeting history entries — one card per past occurrence, with a small
+     * blue rail beside the date. Rendered as a stack; each entry has a
+     * subtle bottom divider. */
     .md-history-lede {
       font: var(--type-body);
       color: var(--color-text);
@@ -5599,6 +5679,88 @@ body { overflow: hidden; }
     /* ==========================================================
        Action items
        ========================================================== */
+    /* Review-state slot — holds either the "Reviewed" checkbox (before) or
+       the eye-chip viewers pill (after the current user has reviewed) */
+    .ai-review-slot { display: inline-flex; align-items: center; }
+    .ai-review-check {
+      font: var(--type-caption);
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+    .ai-review-check[hidden] { display: none; }
+
+    /* Viewers chip — 👁 count with a rich hover/focus tooltip listing viewers */
+    .ai-viewers {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: var(--ic-radius-sm);
+      background: transparent;
+      color: var(--color-text-muted);
+      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+      cursor: default;
+      outline: none;
+    }
+    .ai-viewers[hidden] { display: none; }
+    .ai-viewers:hover, .ai-viewers:focus-visible { background: var(--color-surface-muted); color: var(--color-text); }
+    .ai-viewers .i-eye { font-size: 14px; }
+    .ai-viewers-tooltip {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 1100;
+      min-width: 220px;
+      max-width: 280px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+      padding: var(--ic-space-3);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-2px);
+      transition: opacity 120ms var(--ic-ease), transform 120ms var(--ic-ease);
+    }
+    .ai-viewers:hover .ai-viewers-tooltip,
+    .ai-viewers:focus-visible .ai-viewers-tooltip,
+    .ai-viewers.is-open .ai-viewers-tooltip {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .ai-viewers-title {
+      font: var(--ic-weight-semibold) var(--ic-text-sm)/1.4 var(--ic-font-sans);
+      color: var(--color-text);
+      margin: 0 0 var(--ic-space-2);
+    }
+    .ai-viewers-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ic-space-2);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .ai-viewers-entry {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: var(--type-caption);
+      color: var(--color-text);
+    }
+    .ai-viewers-name { flex: 1; min-width: 0; }
+    .ai-viewers-ts   { color: var(--color-text-subtle); }
+    .ai-viewers-empty {
+      font: var(--type-caption);
+      color: var(--color-text-subtle);
+      font-style: italic;
+      margin: 0;
+    }
+
     .ai-section-head {
       display: flex;
       align-items: center;
@@ -5672,6 +5834,34 @@ body { overflow: hidden; }
     .ai-assignee[disabled] { cursor: default; }
     .ai-assignee[disabled]:hover { background: transparent; }
     .ai-assignee-name { white-space: nowrap; }
+    /* Not-a-participant warning — sits right after the assignee. Amber glyph,
+       amber-tinted hover; click opens the invite/reassign popover. */
+    .ai-warn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin-left: -2px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--color-warning);
+      cursor: pointer;
+      border-radius: var(--ic-radius-full);
+      transition: background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-warn:hover { background: var(--color-warning-subtle); }
+    .ai-warn .icon { font-size: 15px; }
+    /* Invite/reassign popover rows reuse .ai-pop; give the invite row an icon gutter */
+    .ai-pop-action { display: flex; align-items: center; gap: 8px; }
+    .ai-pop-action .icon { font-size: 15px; color: var(--color-text-muted); flex-shrink: 0; }
+    .ai-pop-note {
+      padding: 8px 12px 4px;
+      font: var(--ic-weight-regular) var(--ic-text-xs)/1.4 var(--ic-font-sans);
+      color: var(--color-text-muted);
+      max-width: 240px;
+    }
     /* Overdue due-date pill — red-100 fill with red-500 text (soft danger).
        Hovers to red-150 for an interactive cue, matching the gray-150→gray-200
        affordance on neutral pills. */
@@ -5925,12 +6115,50 @@ body { overflow: hidden; }
     }
     .ai-show-completed[hidden] { display: none; }
     /* Chevron mirrors the .md-toggle pattern — flips on expand */
-    .ai-show-completed .i-chevron-minor {
+    .ai-show-completed .i-chevron-minor,
+    .md-toggle .i-chevron-minor {
       transition: transform var(--ic-duration-fast) var(--ic-ease);
     }
-    .ai-show-completed[aria-expanded="true"] .i-chevron-minor {
+    .ai-show-completed[aria-expanded="true"] .i-chevron-minor,
+    .md-toggle[aria-expanded="true"] .i-chevron-minor {
       transform: rotate(180deg);
     }
+
+    /* Archived items — collapsible section that lives between the list and footer */
+    .ai-archived { margin-top: var(--ic-space-3); }
+    .ai-archived[hidden] { display: none; }
+    .ai-archived-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 0;
+      padding: 4px 8px;
+      margin-left: -8px;
+      border-radius: var(--ic-radius-sm);
+      cursor: pointer;
+      font: var(--ic-weight-medium) var(--ic-text-xs)/1 var(--ic-font-sans);
+      color: var(--color-text-muted);
+    }
+    .ai-archived-toggle:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .ai-archived-toggle .i-archive { font-size: 14px; }
+    .ai-archived-chevron {
+      font-size: 12px;
+      transition: transform var(--ic-duration-fast) var(--ic-ease);
+    }
+    .ai-archived-toggle[aria-expanded="true"] .ai-archived-chevron {
+      transform: rotate(180deg);
+    }
+    .ai-archived-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ic-space-2);
+      margin-top: var(--ic-space-2);
+    }
+    .ai-archived-list[hidden] { display: none; }
+    /* Archived items look muted — emphasizes they're not active */
+    .ai-archived-list .ai-item { background: var(--color-surface-muted); opacity: 0.8; }
+    .ai-archived-list .ai-item:hover { opacity: 1; }
 
     .ai-empty {
       font: var(--type-body-sm);
@@ -6661,6 +6889,7 @@ body { overflow: hidden; }
             <section id="md-details">
               <h3 class="md-section-title">Details</h3>
 
+              <!-- READ-ONLY grid (view mode) -->
               <div class="md-detail-grid" data-md-view-only>
                 <div class="md-detail-row">
                   <svg class="icon i-calendar"><use href="#i-calendar"/></svg>
@@ -6703,6 +6932,7 @@ body { overflow: hidden; }
                 </div>
               </div>
 
+              <!-- EDIT MODE grid — mirrors the create-modal input pattern. -->
               <div class="cm-grid" data-md-edit-only style="grid-template-columns: 1fr 1fr; margin-top: 0">
                 <section class="cm-section" style="grid-column: 1 / -1">
                   <div class="cm-row">
@@ -6777,6 +7007,7 @@ body { overflow: hidden; }
                 </section>
               </div>
 
+              <!-- VIEW MODE: doc line + bullets + please-do-not-delete stack -->
               <div data-md-view-only>
                 <div class="md-doc-line">
                   <svg class="icon i-profile"><use href="#i-profile"/></svg>
@@ -6798,6 +7029,7 @@ body { overflow: hidden; }
                 <p class="md-do-not-delete">-----Please do not delete this: <a href="#">https://team.operationalize.com/initiatives/list?initiativeId=4187</a>-----</p>
               </div>
 
+              <!-- EDIT MODE: single description editor collecting the above as free text -->
               <div data-md-edit-only style="margin-top: var(--ic-space-4)">
                 <div class="cm-editor">
                   <div class="cm-editor-toolbar">
@@ -6824,6 +7056,7 @@ Platform reliability — error budget
                 </div>
               </div>
 
+              <!-- KR progress row (per Figma reference) -->
               <div class="md-kr">
                 <svg class="icon i-jobs"><use href="#i-jobs"/></svg>
                 <div class="md-kr-body">
@@ -6900,6 +7133,7 @@ Platform reliability — error budget
                 </button>
               </div>
 
+              <div data-deck-body>
               <div class="alert alert-info md-deck-info" data-deck-info hidden>
                 <svg class="icon alert-icon i-info"><use href="#i-info"/></svg>
                 <div class="alert-message md-deck-info-body">
@@ -7042,6 +7276,7 @@ Platform reliability — error budget
 
                 </div>
               </div>
+              </div><!-- /data-deck-body -->
             </section>
 
             <div class="md-divider"></div>
@@ -7075,11 +7310,36 @@ Platform reliability — error budget
                 <div class="ai-section-title">
                   <h3 class="md-section-title">Action items</h3>
                   <span class="ai-count" data-ai-count>0</span>
+                  <span class="ai-review-slot" data-review-slot="items">
+                    <label class="checkbox ai-review-check" data-review-check hidden title="Mark as reviewed">
+                      <input type="checkbox" class="checkbox-input" />
+                      <span class="checkbox-box"><svg class="checkbox-mark i-check"><use href="#i-check"/></svg></span>
+                      <span class="checkbox-label">Reviewed</span>
+                    </label>
+                    <span class="ai-viewers" tabindex="0" data-ai-viewers hidden aria-label="Viewers">
+                      <svg class="icon i-eye"><use href="#i-eye"/></svg>
+                      <span data-ai-viewers-count>0</span>
+                      <div class="ai-viewers-tooltip" role="tooltip">
+                        <h5 class="ai-viewers-title">Viewed by</h5>
+                        <ul class="ai-viewers-list" data-ai-viewers-list></ul>
+                        <p class="ai-viewers-empty" data-ai-viewers-empty hidden>No one has viewed this yet.</p>
+                      </div>
+                    </span>
+                  </span>
                 </div>
               </div>
 
               <div class="ai-list" data-ai-list></div>
               <p class="ai-empty" data-ai-empty hidden>No action items yet.</p>
+              <!-- Archived expander — collapsible list of archived items with Restore action -->
+              <div class="ai-archived" data-ai-archived hidden>
+                <button class="ai-archived-toggle" type="button" data-ai-archived-toggle aria-expanded="false">
+                  <svg class="icon i-archive"><use href="#i-archive"/></svg>
+                  <span>Archived items (<span data-ai-archived-count>0</span>)</span>
+                  <svg class="icon ai-archived-chevron i-chevron-minor i-caret-down"><use href="#i-chevron-minor"/></svg>
+                </button>
+                <div class="ai-archived-list" data-ai-archived-list hidden></div>
+              </div>
 
               <div class="ai-footer">
                 <button class="btn btn-ghost btn-xs ai-add-btn" type="button" data-ai-add>
@@ -7308,6 +7568,8 @@ Platform reliability — error budget
                 <span class="md-person-badge md-badge-c">C</span>
               </div>
 
+              <!-- The logged-in user — an on-hover "reject meeting" affordance
+                   opens the reject popover / modal from the person row. -->
               <div class="md-person is-me" data-md-me>
                 <span class="avatar avatar-md">MV</span>
                 <div class="md-person-body">
@@ -7363,6 +7625,8 @@ Platform reliability — error budget
       const modal = document.getElementById('meeting-detail');
       if (!modal) return;
 
+      // Inline edit mode — Edit swaps read-only spans to contenteditable,
+      // Cancel restores the pre-edit snapshot, Save keeps the changes.
       const editables = () => modal.querySelectorAll('[data-md-editable]');
       let snapshot = null;
 
@@ -7385,7 +7649,9 @@ Platform reliability — error budget
         modal.querySelector('[data-md-edit-save]')?.removeAttribute('hidden');
       };
       const endEdit = ({ restore }) => {
-        editables().forEach(el => el.removeAttribute('contenteditable'));
+        editables().forEach(el => {
+          el.removeAttribute('contenteditable');
+        });
         if (restore && snapshot) {
           Object.values(snapshot).forEach(({ el, html }) => { el.innerHTML = html; });
         }
@@ -7400,7 +7666,9 @@ Platform reliability — error budget
       modal.querySelector('[data-md-edit-cancel]')?.addEventListener('click', () => endEdit({ restore: true }));
       modal.querySelector('[data-md-edit-save]')?.addEventListener('click', () => endEdit({ restore: false }));
 
-      // View-mode snackbar — surfaces why a disabled control isn't reacting.
+      // View-mode snackbar — tells the viewer why a disabled control isn't
+      // reacting. Triggered by clicks on labels wrapping disabled inputs while
+      // not in edit mode. Fires only in view mode.
       const toast = modal.querySelector('[data-md-view-toast]');
       let toastTimer = null;
       const showToast = () => {
@@ -7411,6 +7679,7 @@ Platform reliability — error budget
       };
       modal.addEventListener('click', e => {
         if (modal.classList.contains('is-editing')) return;
+        // Any label wrapping a disabled input — the current interactive lock.
         const lockedLabel = e.target.closest('label:has(input:disabled)');
         if (!lockedLabel) return;
         showToast();
@@ -7440,6 +7709,9 @@ Platform reliability — error budget
         const y = body.scrollTop + body.clientHeight * 0.4;
         let active = targets[0];
         for (const t of targets) if (offsetIn(t) <= y) active = t;
+        // Bottom-anchor: if scrolled to the last few pixels, activate the last
+        // section — otherwise a short final section (History, when collapsed)
+        // never reaches the 40% threshold and stays skipped.
         if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) {
           active = targets[targets.length - 1];
         }
@@ -7471,6 +7743,7 @@ Platform reliability — error budget
               <span class="radio-label">All events in the series <span style="color: var(--color-text-muted)">— Every week on Wednesday</span></span>
             </label>
 
+            <!-- Sub-option under "All events" — only enabled when that scope is chosen. -->
             <div style="padding-left: 24px; margin-top: 4px" data-rm-exclude-wrap>
               <label class="checkbox">
                 <input type="checkbox" class="checkbox-input" data-rm-exclude-toggle disabled />
@@ -7527,6 +7800,7 @@ Platform reliability — error budget
   </div>
 
   <script>
+    // Reject modal — toggle "propose new time" section, echo submission for now.
     (function () {
       const modal = document.getElementById('reject-meeting');
       if (!modal) return;
@@ -7534,8 +7808,10 @@ Platform reliability — error budget
       const propose = modal.querySelector('[data-rm-propose]');
       toggle?.addEventListener('change', () => propose.toggleAttribute('hidden', !toggle.checked));
 
+      // On submit — for the prototype, close and show a status update on the person row.
       const excludeToggle = modal.querySelector('[data-rm-exclude-toggle]');
 
+      // Sub-option only makes sense with "All events" — enable/disable to match scope.
       const syncExcludeAvailability = () => {
         const seriesScope = modal.querySelector('[data-rm-scope]:checked')?.value === 'series';
         if (!excludeToggle) return;
@@ -7559,6 +7835,8 @@ Platform reliability — error budget
           if (proposed) me.dataset.rejectionProposed = proposed;
           if (exclude) me.dataset.rejectionExcludeRequested = 'true';
 
+          // Compose the hover tooltip that surfaces the rejection detail from
+          // the row. Reuses designmd's regular data-tooltip pattern.
           const name = me.querySelector('.md-person-name')?.textContent.trim().replace(/\s+\(you\)$/, '') || 'This person';
           const parts = [`${name} declined this meeting${scope === 'all events' ? ' and every following one' : ''}.`];
           if (reason) parts.push(`"${reason}"`);
@@ -8604,7 +8882,20 @@ Platform reliability — error budget
       });
     }, true);
 
-    // Meeting history — collapse/expand toggle.
+    // Meeting deck — collapse/expand toggle
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-deck-toggle]');
+      if (!btn) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const next = !expanded;
+      btn.setAttribute('aria-expanded', String(next));
+      const label = btn.querySelector('[data-deck-toggle-label]');
+      if (label) label.textContent = next ? 'Collapse' : 'Expand';
+      const body = document.querySelector('[data-deck-body]');
+      if (body) body.toggleAttribute('hidden', !next);
+    });
+
+    // Meeting history — collapse/expand toggle (same pattern as deck).
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-history-toggle]');
       if (!btn) return;
@@ -8724,6 +9015,12 @@ Platform reliability — error budget
         'system':         { name: 'System',         initials: 'OP', color: '#94A3B8', photo: null },
       };
       const OWNER_ID = 'adan-jones';
+
+      // Who's actually on this RoB call. An assignee not in this set gets a
+      // "not a participant" warning on their item, with a quick invite/reassign.
+      // (tile-tampakas is intentionally left off to demo the warning.)
+      const PARTICIPANTS = new Set(['adan-jones', 'keith-berlin', 'rick-lacroix', 'collete-parker']);
+      const onCall = (id) => PARTICIPANTS.has(id);
 
       const TODAY = new Date('2026-01-21');
       // Description length: soft warning at SOFT, hard cap at MAX.
@@ -8925,6 +9222,107 @@ Platform reliability — error budget
         '2026-01-28': 'Wednesday, January 28, 2026 · 2:30 PM – 3:30 PM',
       };
 
+      // Viewer records per occurrence — split by artifact (deck vs items).
+      // Each entry: { id: person key from PEOPLE, ts: ISO string of last view }
+      const viewersByOccurrence = {
+        '2026-01-21': {
+          deck: [
+            { id: 'keith-berlin',  ts: '2026-01-21T09:12:00' },
+            { id: 'rick-lacroix',  ts: '2026-01-20T18:44:00' },
+            { id: 'collete-parker',ts: '2026-01-20T17:03:00' },
+          ],
+          items: [
+            { id: 'keith-berlin',  ts: '2026-01-21T13:02:00' },
+            { id: 'adan-jones',    ts: '2026-01-21T11:45:00' },
+            { id: 'rick-lacroix',  ts: '2026-01-20T20:15:00' },
+            { id: 'tile-tampakas', ts: '2026-01-20T16:30:00' },
+          ],
+        },
+        '2026-01-14': {
+          deck:  [ { id: 'adan-jones',   ts: '2026-01-14T09:00:00' }, { id: 'keith-berlin', ts: '2026-01-14T08:55:00' } ],
+          items: [ { id: 'rick-lacroix', ts: '2026-01-19T10:22:00' }, { id: 'adan-jones',   ts: '2026-01-16T17:20:00' }, { id: 'keith-berlin', ts: '2026-01-15T09:00:00' } ],
+        },
+        '2026-01-07': { deck: [], items: [] },
+        '2025-12-31': { deck: [], items: [] },
+        '2026-01-28': { deck: [], items: [] },
+      };
+
+      // Human-readable relative time — used inside the viewers tooltip
+      const fmtRelative = (iso) => {
+        const then = new Date(iso).getTime();
+        const now = TODAY.getTime();
+        const diff = Math.max(0, now - then);
+        const day = 24 * 60 * 60 * 1000;
+        const days = Math.floor(diff / day);
+        if (days === 0) return 'today';
+        if (days === 1) return 'yesterday';
+        if (days < 7)   return `${days} days ago`;
+        if (days < 30)  return `${Math.floor(days / 7)}w ago`;
+        return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+
+      // Populate a viewers chip (deck or items). When the current user hasn't
+      // reviewed yet, show the "Reviewed" checkbox instead of the eye chip.
+      // Clicking the checkbox adds them to the viewers list and swaps the UI
+      // to the reviewed-state (eye + count with tooltip).
+      const renderViewers = (kind /* 'deck' | 'items' */) => {
+        const slot = document.querySelector(`[data-review-slot="${kind}"]`);
+        if (!slot) return;
+        const chip    = slot.querySelector('[data-deck-viewers], [data-ai-viewers]');
+        const check   = slot.querySelector('[data-review-check]');
+        const countEl = slot.querySelector('[data-deck-viewers-count], [data-ai-viewers-count]');
+        const listEl  = slot.querySelector('[data-deck-viewers-list], [data-ai-viewers-list]');
+        const emptyEl = slot.querySelector('[data-deck-viewers-empty], [data-ai-viewers-empty]');
+
+        const list = (viewersByOccurrence[activeOccurrence]?.[kind] || [])
+          .slice()
+          .sort((a, b) => (a.ts < b.ts ? 1 : -1));
+        const hasCurrentUser = list.some(v => v.id === currentUser);
+
+        // State A — current user hasn't reviewed → show the checkbox
+        if (!hasCurrentUser) {
+          check.hidden = false;
+          chip.hidden = true;
+          check.querySelector('input').checked = false;
+          return;
+        }
+
+        // State B — current user has reviewed → show the eye chip + tooltip
+        check.hidden = true;
+        chip.hidden = false;
+        countEl.textContent = list.length;
+        emptyEl.hidden = true;
+        listEl.innerHTML = list.map(v => {
+          const p = PEOPLE[v.id] || { name: v.id, initials: '??' };
+          const avatar = p.photo
+            ? `<img src="${p.photo}" alt="${escapeHTML(p.name)}" />`
+            : escapeHTML(p.initials);
+          return `
+            <li class="ai-viewers-entry">
+              <span class="avatar avatar-xs">${avatar}</span>
+              <span class="ai-viewers-name">${escapeHTML(p.name)}</span>
+              <span class="ai-viewers-ts">${fmtRelative(v.ts)}</span>
+            </li>
+          `;
+        }).join('');
+      };
+
+      // Wire the "Reviewed" checkboxes — clicking adds the current user to the
+      // viewers list for that artifact and swaps the slot to the eye chip.
+      document.querySelectorAll('[data-review-slot]').forEach(slot => {
+        const kind = slot.dataset.reviewSlot;
+        const check = slot.querySelector('[data-review-check] input');
+        check?.addEventListener('change', () => {
+          if (!check.checked) return;
+          const pool = viewersByOccurrence[activeOccurrence] || (viewersByOccurrence[activeOccurrence] = { deck: [], items: [] });
+          if (!pool[kind]) pool[kind] = [];
+          if (!pool[kind].some(v => v.id === currentUser)) {
+            pool[kind].push({ id: currentUser, ts: new Date().toISOString() });
+          }
+          renderViewers(kind);
+        });
+      });
+
       const setOccurrence = (date) => {
         activeOccurrence = date;
         items = initOccurrence(date);
@@ -8936,6 +9334,8 @@ Platform reliability — error budget
         showCompleted = true; // reset to default (show everything) when switching occurrences
         closePop();
         render();
+        renderViewers('deck');
+        renderViewers('items');
       };
 
       // Hook into the meeting-detail open trigger to switch occurrence before show.
@@ -8971,14 +9371,16 @@ Platform reliability — error budget
       // Item id pending archive confirmation; cleared once the modal closes
       let pendingArchiveId = null;
 
-      // Wire the "Archive" confirm button — runs the actual removal
+      // Wire the "Archive" confirm button — flags the item as archived
+      // (kept in the list so it can be restored later via the Archived expander)
       document.getElementById('archive-ai-confirm')?.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-confirm-archive-ai]');
         if (!btn) return;
         if (pendingArchiveId) {
-          const idx = items.findIndex(i => i.id === pendingArchiveId);
-          if (idx >= 0) {
-            items.splice(idx, 1);
+          const item = items.find(i => i.id === pendingArchiveId);
+          if (item) {
+            item.archived = true;
+            recordHistory(item, 'archived', '', 'true');
             render();
           }
         }
@@ -9047,10 +9449,15 @@ Platform reliability — error budget
           return;
         }
 
-        const visible = items.filter(it => showCompleted || !isClosed(it.status));
-        const openCount = items.filter(it => !isClosed(it.status)).length;
-        const doneCount = items.filter(it => isClosed(it.status)).length;
-        const totalCount = items.length;
+        // Split active vs archived — archived items live in the collapsible
+        // expander below the list so they remain accessible + restorable.
+        const activeItems = items.filter(it => !it.archived);
+        const archivedItems = items.filter(it => it.archived);
+
+        const visible = activeItems.filter(it => showCompleted || !isClosed(it.status));
+        const openCount = activeItems.filter(it => !isClosed(it.status)).length;
+        const doneCount = activeItems.filter(it => isClosed(it.status)).length;
+        const totalCount = activeItems.length;
         const visibleCount = visible.length;
 
         countEl.textContent = `${visibleCount}/${totalCount}`;
@@ -9072,9 +9479,23 @@ Platform reliability — error budget
         // Stable sort preserves the original seed order within each bucket.
         const sortedVisible = [...visible].sort((a, b) => Number(isClosed(a.status)) - Number(isClosed(b.status)));
         sortedVisible.forEach(item => list.appendChild(renderItem(item)));
+
+        // Render the Archived expander (visible only when there's at least one)
+        const archivedWrap = section.querySelector('[data-ai-archived]');
+        const archivedList = section.querySelector('[data-ai-archived-list]');
+        const archivedCount = section.querySelector('[data-ai-archived-count]');
+        if (archivedItems.length > 0) {
+          archivedWrap.hidden = false;
+          archivedCount.textContent = archivedItems.length;
+          archivedList.innerHTML = '';
+          archivedItems.forEach(it => archivedList.appendChild(renderItem(it, { archived: true })));
+        } else {
+          archivedWrap.hidden = true;
+          archivedList.innerHTML = '';
+        }
       };
 
-      const renderItem = (item) => {
+      const renderItem = (item, opts = {}) => {
         const node = document.createElement('article');
         node.className = 'ai-item' + (isClosed(item.status) ? ' is-done' : '');
         node.dataset.itemId = item.id;
@@ -9124,13 +9545,18 @@ Platform reliability — error budget
               <span class="avatar avatar-xs">${person.photo ? `<img src="${person.photo}" alt="${escapeHTML(person.name)}" />` : person.initials}</span>
               <span class="ai-assignee-name">${escapeHTML(person.name)}</span>
             </button>
+            ${(!isClosed(item.status) && item.assignee !== 'system' && !onCall(item.assignee))
+              ? `<button class="ai-warn" type="button" data-action="not-participant" data-tooltip="${escapeHTML(person.name)} isn't a participant of this RoB" data-tooltip-style="regular" data-placement="bottom" aria-label="${escapeHTML(person.name)} isn't a participant of this RoB — invite or reassign">
+                  <svg class="icon i-warning"><use href="#i-warning"/></svg>
+                </button>`
+              : ''}
             <span class="ai-spacer"></span>
             <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${commentTitle}" ${editableComment ? '' : 'disabled'} aria-label="Comment">
               <svg class="icon i-chat"><use href="#i-chat"/></svg>
             </button>
-            <button class="ai-icon-btn ai-kebab" type="button" data-action="archive" ${canManage() ? '' : 'disabled'} title="Archive" aria-label="Archive">
-              <svg class="icon i-archive"><use href="#i-archive"/></svg>
-            </button>
+            ${opts.archived
+              ? `<button class="ai-icon-btn ai-kebab" type="button" data-action="unarchive" ${canManage() ? '' : 'disabled'} title="Restore" aria-label="Restore"><svg class="icon i-update"><use href="#i-update"/></svg></button>`
+              : `<button class="ai-icon-btn ai-kebab" type="button" data-action="archive" ${canManage() ? '' : 'disabled'} title="Archive" aria-label="Archive"><svg class="icon i-archive"><use href="#i-archive"/></svg></button>`}
           </div>
           <p class="ai-desc" data-action="desc" ${editableDesc ? 'contenteditable="true" spellcheck="false"' : ''}>${escapeHTML(item.desc)}</p>
           <p class="ai-desc-counter" data-desc-counter>${item.desc.length}/${DESC_MAX}</p>
@@ -9155,6 +9581,7 @@ Platform reliability — error budget
         const action = trigger.dataset.action;
 
         if (action === 'status' && canEdit(item, 'status')) openStatusPop(trigger, item);
+        else if (action === 'not-participant') openNotParticipantPop(trigger, item);
         else if (action === 'assignee' && canEdit(item, 'assignee')) openAssigneePop(trigger, item);
         else if (action === 'due' && canEdit(item, 'due')) openDuePop(trigger, item);
         else if (action === 'comment') openCommentPop(trigger, item);
@@ -9163,6 +9590,27 @@ Platform reliability — error budget
           pendingArchiveId = item.id;
           document.getElementById('archive-ai-confirm')?.removeAttribute('hidden');
         }
+      });
+
+      // Archived list — handle Restore clicks + the expander toggle
+      const archivedWrap = section.querySelector('[data-ai-archived]');
+      const archivedList = section.querySelector('[data-ai-archived-list]');
+      const archivedToggle = section.querySelector('[data-ai-archived-toggle]');
+      archivedToggle?.addEventListener('click', () => {
+        const open = archivedToggle.getAttribute('aria-expanded') === 'true';
+        archivedToggle.setAttribute('aria-expanded', String(!open));
+        archivedList.toggleAttribute('hidden', open);
+      });
+      archivedList?.addEventListener('click', (e) => {
+        const node = e.target.closest('.ai-item');
+        if (!node) return;
+        const trigger = e.target.closest('[data-action="unarchive"]');
+        if (!trigger || !canManage()) return;
+        const item = findItem(node.dataset.itemId);
+        if (!item) return;
+        item.archived = false;
+        recordHistory(item, 'archived', 'true', 'false');
+        render();
       });
 
       // Inline edits (description only — comment is popover-edited)
@@ -9250,6 +9698,44 @@ Platform reliability — error budget
       })[s];
 
       // Assignee popover
+      // Not-a-participant popover — the assignee isn't on this RoB call.
+      // Offers inviting them (they're a known active user) or reassigning.
+      const openNotParticipantPop = (anchor, item) => {
+        const person = PEOPLE[item.assignee];
+        const canInvite = canManage(); // only the owner manages the roster
+        const pop = document.createElement('div');
+        pop.className = 'ai-pop';
+        pop.innerHTML = `
+          <p class="ai-pop-note"><strong>${escapeHTML(person.name)}</strong> is assigned this item but isn't a participant of this RoB.</p>
+          ${canInvite
+            ? `<button class="ai-pop-item ai-pop-action" type="button" data-np="invite">
+                 <svg class="icon i-user"><use href="#i-user"/></svg>Invite to this RoB
+               </button>`
+            : ''}
+          <button class="ai-pop-item ai-pop-action" type="button" data-np="reassign">
+            <svg class="icon i-update"><use href="#i-update"/></svg>Reassign&hellip;
+          </button>
+        `;
+        pop.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-np]');
+          if (!btn) return;
+          if (btn.dataset.np === 'invite') {
+            PARTICIPANTS.add(item.assignee);
+            recordHistory(item, 'RoB participant', 'not invited', PEOPLE[item.assignee].name + ' invited');
+            closePop();
+            render();
+          } else {
+            // Reopen the assignee picker anchored to this item's assignee button.
+            // Defer so this click finishes bubbling (the outside-click handler
+            // would otherwise close the picker the instant it opens).
+            const assigneeBtn = anchor.closest('.ai-meta-row')?.querySelector('[data-action="assignee"]');
+            closePop();
+            if (assigneeBtn && canEdit(item, 'assignee')) setTimeout(() => openAssigneePop(assigneeBtn, item), 0);
+          }
+        });
+        showPop(anchor, pop);
+      };
+
       const openAssigneePop = (anchor, item) => {
         const pop = document.createElement('div');
         pop.className = 'ai-pop';
@@ -9548,6 +10034,8 @@ Platform reliability — error budget
       };
 
       render();
+      renderViewers('deck');
+      renderViewers('items');
     })();
   </script>
 
