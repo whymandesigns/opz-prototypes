@@ -4413,15 +4413,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
                   <div class="adm-setting">
                     <div class="adm-setting-main">
-                      <p class="adm-card-title">Approval Workflow</p>
-                      <p class="adm-caption">Require approval for new OKRs</p>
-                    </div>
-                    <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
-                  </div>
-
-                  <div class="adm-setting">
-                    <div class="adm-setting-main">
                       <p class="adm-card-title">Default approver type</p>
+                      <p class="adm-caption">None means new OKRs need no approval</p>
                     </div>
                     <div class="input-select is-auto adm-select" data-adm-select="approver">
                       <button class="input-select-trigger" aria-expanded="false" type="button">
@@ -4429,6 +4422,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                         <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
                       </button>
                       <div class="dropdown-menu" hidden>
+                        <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>None</button>
                         <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Direct manager</button>
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Org unit lead</button>
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Super admin</button>
@@ -4443,11 +4437,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                     <div class="input-select is-auto adm-select" data-adm-select="escalation">
                       <button class="input-select-trigger" aria-expanded="false" type="button">
-                        <span class="input-select-value">Off</span>
+                        <span class="input-select-value">None</span>
                         <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
                       </button>
                       <div class="dropdown-menu" hidden>
-                        <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Off</button>
+                        <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>None</button>
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Direct manager</button>
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Org unit lead</button>
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Super admin</button>
@@ -4495,6 +4489,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                         <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>None</button>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">User roles and permissions</p>
+                      <p class="adm-caption">Define what each user role can access and do</p>
+                    </div>
+                    <button class="btn btn-ghost btn-xs" type="button">55 user roles<svg class="btn-icon"><use href="#i-arrow-right"/></svg></button>
                   </div>
 
                   <div class="adm-setting">
