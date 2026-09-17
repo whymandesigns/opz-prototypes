@@ -2650,12 +2650,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          Refresh thumbnails with headless Chrome:
          chrome --headless --window-size=1280,800 --screenshot=_thumbs/<name>.png http://localhost:4173/features/<name>/ -->
     <section class="links" id="feature-list">
-      <a class="card" href="./action-items/">
-        <img class="thumb" src="./_thumbs/action-items.png" alt="Action items screenshot" loading="lazy" />
+      <a class="card" href="./rob/">
+        <img class="thumb" src="./_thumbs/rob.png" alt="RoB screenshot" loading="lazy" />
         <div class="card-meta">
           <h3 class="card-title">Action items <span class="arrow">&rarr;</span></h3>
           <p class="card-body">RoB meeting action items.</p>
-          <span class="folder">action-items/</span>
+          <span class="folder">rob/</span>
+        </div>
+      </a>
+      <a class="card" href="./admin/">
+        <img class="thumb" src="./_thumbs/admin.png" alt="Admin screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Admin <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Admin settings; the sidenav drills into a settings submenu.</p>
+          <span class="folder">admin/</span>
+        </div>
+      </a>
+      <a class="card" href="./admin-toc/">
+        <img class="thumb" src="./_thumbs/admin-toc.png" alt="Admin contents rail screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Admin &middot; contents rail <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Same settings, navigated by a contents rail beside the page.</p>
+          <span class="folder">admin-toc/</span>
         </div>
       </a>
       <a class="card" href="./agenda-items/">
@@ -2779,7 +2795,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         var REPO = 'whymandesigns/opz-prototypes';
         var CACHE_TTL = 3600000; // 1 hour
         var FALLBACK = {
-          'action-items/': '2026-07-10',
+          'rob/': '2026-07-10',
+          'admin/': '2026-09-17',
+          'admin-toc/': '2026-09-17',
           'agenda-items/': '2026-07-06',
           'api-token-management/': '2026-07-06',
           'connections/': '2026-07-06',
