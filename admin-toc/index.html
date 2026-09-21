@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin · contents rail — Operationalize</title>
+  <title>Admin Settings — Operationalize</title>
   <style>
     /* === tokens.css === */
 /* Icarus Design Tokens
@@ -3727,7 +3727,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* The name gives the button room so a long one doesn't run under it. */
     .adm-pos-card:has(.adm-card-edit) .adm-pos-card-name { padding-right: var(--ic-space-6); }
     .adm-pos-card-name { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+    /* A locked role wears the lock next to its name — the one place a reader
+       looks before reaching for the pencil. */
+    .adm-card-lock {
+      width: 14px; height: 14px;
+      margin-left: var(--ic-space-2);
+      vertical-align: -2px;
+      color: var(--ic-palette-graphite-500);
+    }
+    /* Its controls stay put and stay focusable (aria-disabled, not disabled, so
+       the click still reaches the handler that explains itself). The pencil
+       keeps the hover contract every other card has — .btn[aria-disabled]
+       would otherwise pin it visible — and comes up dimmed when it does. */
+    .adm-pos-card.is-locked .adm-card-edit { opacity: 0; }
+    .adm-pos-card.is-locked:hover .adm-card-edit,
+    .adm-pos-card.is-locked .adm-card-edit:focus-visible { opacity: 0.5; }
     .adm-pos-card-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+    /* An empty member count keeps the icon so the row reads the same as a
+       card that has members — just without a link to follow. */
+    .adm-card-members { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+    /* The headcount icon reads at 16px rather than btn-xs's 12px, and stays
+       graphite so the number alone carries the ghost button's blue. */
+    .adm-card-members .btn-icon,
+    .adm-card-members .icon {
+      width: 16px; height: 16px;
+      color: var(--ic-palette-graphite-700);
+    }
     .adm-pos-card-meta {
       display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3);
       margin-top: auto; padding-top: var(--ic-space-3);
@@ -3746,6 +3771,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-perm-grid th.adm-perm-head,
     .adm-perm-grid td.adm-perm-cell { text-align: center; width: 1%; white-space: nowrap; }
     .adm-perm-grid th { vertical-align: bottom; }
+    /* 56px rows. The name cell is two lines now, and .table-wide's generous
+       padding on top of that ran rows to 86px — more air than a directory you
+       scan needs. Height on the row, not padding, so every row matches whether
+       its cells run to one line or two. */
+    .adm-perm-grid tbody tr { height: 56px; }
+    .adm-perm-grid tbody td { padding-top: 0; padding-bottom: 0; }
     .adm-perm-col { font: var(--type-body-xs-semibold); color: var(--color-text-muted); }
     .adm-person-cell { display: flex; align-items: center; gap: var(--ic-space-3); }
     .adm-person-cell .adm-person-meta { gap: 0; }
@@ -3834,6 +3865,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-person + .adm-person { border-top: 1px solid var(--color-border); }
     .adm-person-meta { display: flex; flex-direction: column; min-width: 0; flex: 1 1 0; }
     .adm-person-name { font: var(--type-body-sm-semibold); color: var(--color-text); }
+    /* The directory's second line is the person's job position, set like the
+       team's second line so the two columns read as one pair. */
+    .adm-person-position { font: var(--type-body-xxs); color: var(--ic-palette-graphite-700); }
     .adm-person-role { font: var(--type-body-xs); color: var(--color-text-muted); }
     /* Org unit column — the one thing that differs person to person here, so it
        gets its own edge rather than being buried under the name. */
@@ -4475,6 +4509,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">Initiatives and Processes</h2>
                   </div>
+                  <p class="adm-caption">RACI configuration, best-practice warnings, and member limits per RACI role</p>
                 </div>
               </div>
 
@@ -4568,6 +4603,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">OKRs</h2>
                   </div>
+                  <p class="adm-caption">Whether OKRs are available, the default approver, and approval escalation</p>
                 </div>
               </div>
 
@@ -4577,7 +4613,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-setting">
                     <div class="adm-setting-main">
                       <p class="adm-card-title">Enable OKRs</p>
-                      <p class="adm-caption">Enable initiatives and show in navigation bar</p>
+                      <p class="adm-caption">Visible to everyone and shown in the navigation bar</p>
                     </div>
                     <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
                   </div>
@@ -4631,7 +4667,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">People</h2>
                   </div>
-                  <p class="adm-caption">Profiles, roles and job positions</p>
+                  <p class="adm-caption">Member invites, public profile visibility, user roles and permissions, and job positions</p>
                 </div>
               </div>
 
@@ -4690,6 +4726,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">Slack compliance</h2>
                   </div>
+                  <p class="adm-caption">Channel naming standards, the variables each name is built from, and a live preview</p>
                 </div>
               </div>
 
@@ -4854,7 +4891,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="toolbar adm-jp-toolbar">
             <div class="input-icon input-icon-left toolbar-search">
               <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-              <input class="input" type="search" placeholder="Search people or roles" data-adm-up-search />
+              <input class="input" type="search" placeholder="Search people, positions or roles" data-adm-up-search />
             </div>
 
             <!-- Menus are built from the directory itself, so they only ever
@@ -6587,12 +6624,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         { unit: 'Data', children: ['Analytics Function', 'Insights Pod'] },
         { unit: 'Support', children: ['Tier 1 Pod', 'Escalations Pod'] },
       ];
+      // Job positions per org unit, so nobody in Engineering turns up as a
+      // Brand Designer. Titles carry seniority because that is how they read on
+      // a real directory row — the position, not the permission role.
+      const POSITIONS = {
+        'Engineering':       ['Senior Full-stack Engineer', 'Technical Lead', 'Engineering Manager',
+                              'Backend Engineer', 'Mobile Engineer', 'Site Reliability Engineer'],
+        'Marketing':         ['Growth Marketer', 'Content Strategist', 'Brand Designer', 'Marketing Manager'],
+        'Talent Operations': ['Recruiter', 'People Partner', 'Talent Operations Lead', 'Onboarding Specialist'],
+        'Revenue':           ['SMB Client Partner', 'Enterprise Client Partner', 'Account Executive',
+                              'Customer Success Manager'],
+        'Design Studio':     ['Designer', 'Product Designer', 'Design Lead', 'Brand Designer'],
+        'Data':              ['Data Analyst', 'Analytics Engineer', 'Data Science Lead'],
+        'Support':           ['Support Specialist', 'Escalations Lead', 'Support Team Lead'],
+      };
       const pick = (list) => list[Math.floor(Math.random() * list.length)];
       window.admMakeRoster = (n) => {
         const pool = [...NAMES].sort(() => Math.random() - 0.5);
         return pool.slice(0, n).map(name => {
           const org = pick(ORG_UNITS);
-          return { name, unit: org.unit, sub: pick(org.children) };
+          return { name, unit: org.unit, sub: pick(org.children), position: pick(POSITIONS[org.unit]) };
         });
       };
     })();
@@ -6856,8 +6907,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <div class="adm-pos-card-meta">
                   <span>${p.level ? 'Level ' + esc(p.level) : '<span class="adm-none">No level</span>'}</span>
                   ${p.roster.length
-                    ? `<button class="btn btn-ghost btn-xs" type="button" data-adm-people-open="${positions.indexOf(p)}">${p.roster.length} member${p.roster.length === 1 ? '' : 's'}</button>`
-                    : '<span class="adm-none">0 members</span>'}
+                    ? `<button class="btn btn-ghost btn-xs adm-card-members" type="button" data-adm-people-open="${positions.indexOf(p)}" aria-label="${p.roster.length} ${p.roster.length === 1 ? 'person' : 'people'} in ${esc(p.name)}"><svg class="btn-icon"><use href="#i-user"/></svg>${p.roster.length}</button>`
+                    : `<span class="adm-none adm-card-members" aria-label="No members"><svg class="icon icon-16"><use href="#i-user"/></svg>0</span>`}
                 </div>
               </article>`).join('')}
           </div>`;
@@ -7098,10 +7149,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       if (!rows) return;
 
       const ROLES = [
+        // Locked: the role that can do everything is not one a workspace admin
+        // gets to redefine, so it is read-only wherever it is reached from.
         ['Super Admin', 'Full access to every setting and record', 2, [
           'Access all admin settings', 'Grant/revoke permissions', 'Log in as any user',
           'Manage Slack, Google & Zoom integrations', 'Create/edit any Initiative, Process, and RACI matrix',
-          'Edit/approve any OKR', 'Create/edit member profiles', 'View salary data']],
+          'Edit/approve any OKR', 'Create/edit member profiles', 'View salary data'], true],
         ['Admin', 'Workspace configuration, without billing', 6, [
           'Access all admin settings', 'Manage Slack, Google & Zoom integrations',
           'Create/edit member profiles', 'Manage teams & reporting lines']],
@@ -7130,8 +7183,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         ['Guest', 'Time-boxed access for people outside the org', 8, []],
         ['Auditor', 'Read-only across the whole workspace', 2, [
           'Access spreadsheet views for table data', 'Export People data', 'Export OKR data']],
-      ].map(([name, description, members, permissions]) => ({
-        name, description, permissions, roster: window.admMakeRoster(Math.min(members, 40)), members,
+      ].map(([name, description, members, permissions, locked = false]) => ({
+        name, description, permissions, roster: window.admMakeRoster(Math.min(members, 40)), members, locked,
       }));
 
       const esc = (v) => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -7154,16 +7207,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         // A card per role, like the positions grid: what it is, what it's for,
         // and who holds it. The permission count stands in for the list — the
         // detail belongs on the role itself, not in a grid of cards.
+        // A locked role keeps its controls in place and marks them inert — the
+        // same contract as a governed card: the click still lands, and explains
+        // itself, rather than hitting a dead button.
+        const inert = (role) => role.locked ? ' aria-disabled="true" tabindex="-1"' : '';
+
         rows.innerHTML = view.map(role => `
-          <article class="card adm-pos-card">
-            <button class="btn btn-icon-only btn-ghost btn-xs adm-card-edit" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit ${esc(role.name)}"><svg class="icon icon-16"><use href="#i-pencil"/></svg></button>
-            <p class="adm-pos-card-name">${esc(role.name)}</p>
+          <article class="card adm-pos-card${role.locked ? ' is-locked' : ''}">
+            <button class="btn btn-icon-only btn-ghost btn-xs adm-card-edit" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit ${esc(role.name)}"${inert(role)}><svg class="icon icon-16"><use href="#i-pencil"/></svg></button>
+            <p class="adm-pos-card-name">${esc(role.name)}${role.locked
+              ? `<svg class="icon adm-card-lock" aria-label="Locked role" role="img"><use href="#i-lock"/></svg>`
+              : ''}</p>
             <p class="adm-pos-card-desc">${esc(role.description)}</p>
             <div class="adm-pos-card-meta">
-              <button class="btn btn-ghost btn-xs" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit permissions for ${esc(role.name)}">${role.permissions.length} permission${role.permissions.length === 1 ? '' : 's'}</button>
               ${role.members
-                ? `<button class="btn btn-ghost btn-xs" type="button" data-adm-ur-members="${ROLES.indexOf(role)}">${role.members} member${role.members === 1 ? '' : 's'}</button>`
-                : '<span class="adm-none">No members</span>'}
+                ? `<button class="btn btn-ghost btn-xs adm-card-members" type="button" data-adm-ur-members="${ROLES.indexOf(role)}" aria-label="${role.members} ${role.members === 1 ? 'person' : 'people'} with ${esc(role.name)}"><svg class="btn-icon"><use href="#i-user"/></svg>${role.members}</button>`
+                : `<span class="adm-none adm-card-members" aria-label="No members"><svg class="icon icon-16"><use href="#i-user"/></svg>0</span>`}
+              <button class="btn btn-ghost btn-xs" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit permissions for ${esc(role.name)}"${inert(role)}>${role.permissions.length} permission${role.permissions.length === 1 ? '' : 's'}</button>
             </div>
           </article>`).join('');
       };
@@ -7299,8 +7359,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const syncSave = () => { roleSave.disabled = snapshot() === baseline; };
 
       const openRoleModal = (index = null) => {
-        editing = index;
         const role = index === null ? null : ROLES[index];
+        if (role?.locked) {
+          window.admSnack?.('You do not have permissions to edit this role.');
+          return;
+        }
+        editing = index;
 
         renderPermTabs();
         roleTitle.textContent = role ? 'Edit Role' : 'New Role';
@@ -7566,6 +7630,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           if (permFilter && !p.granted.has(permFilter)) return false;
           return !q
             || p.name.toLowerCase().includes(q)
+            || p.position.toLowerCase().includes(q)
             || p.role.toLowerCase().includes(q)
             || p.unit.toLowerCase().includes(q);
         });
@@ -7586,7 +7651,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <td>
               <span class="adm-person-cell">
                 <span class="avatar avatar-md">${esc(initials(p.name))}</span>
-                <span class="adm-person-name">${esc(p.name)}</span>
+                <span class="adm-person-meta">
+                  <span class="adm-person-name">${esc(p.name)}</span>
+                  <span class="adm-person-position">${esc(p.position)}</span>
+                </span>
               </span>
             </td>
             <td>
