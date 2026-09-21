@@ -3636,7 +3636,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* The three best-practice rules are what the toggle above actually enforces,
        so they sit in an alert rather than reading as more body copy. Full basis
        so it wraps onto its own line under both columns of the row. */
-    .adm-rules { flex-basis: 100%; margin-top: var(--ic-space-3); }
+    .adm-rules {
+      flex-basis: 100%;
+      margin-top: var(--ic-space-3);
+      transition: opacity var(--ic-duration-base) var(--ic-ease);
+    }
+    /* What a row's switch governs fades with it: the rules it enforces, the
+       limits it applies. With the switch off they describe nothing, so they
+       fade back rather than sitting there claiming to be in force. */
+    .adm-setting:has(.switch-input:not(:checked)) .adm-rules,
+    .adm-setting:has(.switch-input:not(:checked)) .adm-limits-block { opacity: 0.4; }
     .adm-rules .alert-message { font: var(--type-body-sm); }
     /* A row whose left side is several lines tall keeps its control level with
        the title rather than floating halfway down the block. */
@@ -3660,6 +3669,187 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        Letting clicks through to the input fixes every switch on the page.
        The real fix belongs in designmd/components.css. */
     .switch-track { pointer-events: none; }
+
+    .adm-jp-toolbar { margin-bottom: var(--ic-space-4); }
+
+    /* 56px rows: the system's .table pads for two-line cells, and these hold one
+       line. Height rather than padding so the number is the row, not a sum. */
+    [data-adm-jp-table] .table tbody td { height: 56px; padding-top: 0; padding-bottom: 0; }
+
+    /* Card view — a position per card, grouped under its initial. */
+    /* The rule separates the toolbar from the list, so the letters belong under
+       it with the cards they filter — not above it with the controls. */
+    .adm-alpha {
+      display: flex; flex-wrap: wrap; gap: var(--ic-space-1);
+      margin-bottom: var(--ic-space-4);
+    }
+    /* .adm-alpha is a flex row, so [hidden] needs saying twice. */
+    .adm-alpha[hidden] { display: none; }
+    /* The rule sits above whichever index is on show. */
+    .adm-alpha-group { padding-top: var(--ic-space-4); border-top: 1px solid var(--color-border); }
+    .adm-alpha-letter {
+      min-width: 28px; height: 28px; padding: 0 var(--ic-space-2);
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid transparent; background: none; border-radius: var(--ic-radius-full);
+      font: var(--type-body-sm-semibold); color: var(--color-text-link);
+      cursor: pointer;
+      transition: background var(--ic-duration-fast) var(--ic-ease),
+                  color var(--ic-duration-fast) var(--ic-ease);
+    }
+    .adm-alpha-letter:hover { background: var(--color-surface-muted); }
+    .adm-alpha-group { margin-bottom: var(--ic-space-4); }
+
+    /* The group is one control, so it sizes to its items rather than the row. */
+    .adm-alpha-group .segmented { display: inline-flex; flex-wrap: wrap; }
+    .adm-alpha-group .segmented-item { min-width: 34px; padding: 0 var(--ic-space-2); }
+    /* "All" is a word among single letters — it needs room to read as one. */
+    .adm-alpha-group .segmented-item[data-letter=""] { padding: 0 var(--ic-space-4); }
+
+    .adm-alpha-letter.is-active {
+      background: var(--ic-palette-graphite-800);
+      color: var(--color-text-inverse);
+    }
+    .adm-cards { display: grid; grid-template-columns: 1fr; gap: var(--ic-space-4); }
+    @media (min-width: 768px)  { .adm-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1180px) { .adm-cards { grid-template-columns: repeat(3, 1fr); } }
+    .adm-pos-card { display: flex; flex-direction: column; gap: var(--ic-space-2); position: relative; }
+    /* Edit stays out of the way until the card is under the cursor — or until
+       it is tabbed to, which hover alone would never reveal. */
+    .adm-card-edit {
+      position: absolute;
+      top: var(--ic-space-3);
+      right: var(--ic-space-3);
+      opacity: 0;
+      transition: opacity var(--ic-duration-fast) var(--ic-ease);
+    }
+    .adm-pos-card:hover .adm-card-edit,
+    .adm-card-edit:focus-visible { opacity: 1; }
+    /* The name gives the button room so a long one doesn't run under it. */
+    .adm-pos-card:has(.adm-card-edit) .adm-pos-card-name { padding-right: var(--ic-space-6); }
+    .adm-pos-card-name { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+    .adm-pos-card-desc { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0; }
+    .adm-pos-card-meta {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-3);
+      margin-top: auto; padding-top: var(--ic-space-3);
+      border-top: 1px solid var(--color-border);
+      font: var(--type-body-sm); color: var(--color-text-muted);
+    }
+    /* The roles page carries its own tab strip, and a second hairline directly
+       above it read as a double rule. Scoped to this page rather than the
+       .page-head component, which other pages still want a divider on. */
+    .page-view[data-page="user-roles"] .page-head { border-bottom: 0; }
+    .page-view[data-page="user-roles"] .tabs { margin-bottom: var(--ic-space-4); }
+
+    /* Permission grid — a person per row, a permission per column. The name
+       column holds its width; the checkbox columns stay narrow and centred so
+       the pattern of ticks is readable across a row. */
+    .adm-perm-grid th.adm-perm-head,
+    .adm-perm-grid td.adm-perm-cell { text-align: center; width: 1%; white-space: nowrap; }
+    .adm-perm-grid th { vertical-align: bottom; }
+    .adm-perm-col { font: var(--type-body-xs-semibold); color: var(--color-text-muted); }
+    .adm-person-cell { display: flex; align-items: center; gap: var(--ic-space-3); }
+    .adm-person-cell .adm-person-meta { gap: 0; }
+    /* A person in a group is named by it; one who isn't carries their own
+       permissions instead, tagged Custom so the difference is legible. */
+    .adm-role-group { font: var(--type-body-sm); }
+    /* The row's edit sits beside the group it edits, on the same terms as the
+       card's: out of sight until the row is hovered or tabbed to. Inline rather
+       than pinned to the cell's right edge, where it collided with the table's
+       scrollbar and could sit outside the visible row. */
+    .adm-row-group { display: inline-flex; align-items: center; gap: var(--ic-space-1); }
+    .adm-row-edit {
+      opacity: 0;
+      transition: opacity var(--ic-duration-fast) var(--ic-ease);
+    }
+    tbody tr:hover .adm-row-edit,
+    .adm-row-edit:focus-visible { opacity: 1; }
+    .adm-role-pill { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
+
+    .adm-active-filter {
+      display: flex; align-items: center; gap: var(--ic-space-2);
+      margin-bottom: var(--ic-space-3);
+    }
+    .adm-active-filter[hidden] { display: none; }
+
+    /* Permission picker — the product's own taxonomy, four tabs of grouped
+       permissions with a Select all per group. */
+    .adm-perm-tabs { margin-bottom: var(--ic-space-4); }
+    .adm-perm-picker { display: flex; flex-direction: column; }
+    .adm-perm-picker .checkbox { gap: var(--ic-space-1); }
+    .adm-perm-group + .adm-perm-group { margin-top: var(--ic-space-5); }
+    .adm-perm-group-head {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4);
+      padding-bottom: var(--ic-space-2);
+      margin-bottom: var(--ic-space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .adm-perm-group-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+    .adm-perm-group-head .checkbox-label { font: var(--type-body-sm); color: var(--color-text-muted); }
+    /* .checkbox is inline-flex, so short permissions shared a line. The items
+       carry a wider gap than their group's Select all — a sentence beside a box
+       needs more air than two words do. */
+    .adm-perm-picker .adm-perm-item { display: flex; gap: var(--ic-space-2); padding: var(--ic-space-1) 0; }
+
+    /* A role cell: name over what the role is for. */
+    .adm-role-name { font: var(--type-body-sm-semibold); color: var(--color-text); margin: 0; }
+    .adm-role-desc { font: var(--type-body-xs); color: var(--color-text-muted); margin: 0; }
+    /* Permissions read as a set, with the tail counted rather than listed. */
+    .adm-perms { display: flex; flex-wrap: wrap; gap: var(--ic-space-1); align-items: center; }
+    .adm-perms-more { font: var(--type-body-xs); color: var(--color-text-muted); }
+    .adm-jp-empty {
+      border: 1px dashed var(--color-border-strong);
+      border-radius: var(--ic-radius-lg);
+      padding: var(--ic-space-7);
+      text-align: center;
+      background: var(--color-surface-muted);
+      display: flex; flex-direction: column; align-items: center; gap: var(--ic-space-3);
+    }
+    .adm-jp-empty[hidden] { display: none; }
+    .adm-jp-empty-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+
+    /* An empty cell says so rather than looking unfinished. */
+    .adm-none { color: var(--color-text-subtle); }
+
+    /* designmd's .modal has no height cap and .modal-body no max-height, so a
+       long list grows the dialog straight past the viewport — header and footer
+       included. Capped for every modal here; worth fixing in components.css,
+       since any modal with a list hits it. */
+    .modal-body { max-height: 60vh; overflow-y: auto; }
+
+    /* The roster behind a position's people count. Hairlines rather than cards:
+       this can run to dozens of rows and the modal body scrolls. */
+    /* Header sits over the same two halves as a row, cleared past the avatar. */
+    .adm-people-head {
+      display: flex;
+      gap: var(--ic-space-3);
+      padding-left: calc(var(--ic-space-6) + var(--ic-space-3));   /* avatar + its gap */
+      padding-bottom: var(--ic-space-2);
+      border-bottom: 1px solid var(--color-border);
+      font: var(--type-body-xs-semibold);
+      color: var(--color-text-subtle);
+    }
+    .adm-people-head span { flex: 1 1 0; min-width: 0; }
+    .adm-people-list { list-style: none; margin: 0; padding: 0; }
+    .adm-person { display: flex; align-items: center; gap: var(--ic-space-3); padding: var(--ic-space-2) 0; }
+    .adm-person + .adm-person { border-top: 1px solid var(--color-border); }
+    .adm-person-meta { display: flex; flex-direction: column; min-width: 0; flex: 1 1 0; }
+    .adm-person-name { font: var(--type-body-sm-semibold); color: var(--color-text); }
+    .adm-person-role { font: var(--type-body-xs); color: var(--color-text-muted); }
+    /* Org unit column — the one thing that differs person to person here, so it
+       gets its own edge rather than being buried under the name. */
+    /* The two halves share the row evenly, both reading from the left — a
+       right-aligned column ragged against variable-length unit names was
+       harder to scan than it looked. */
+    .adm-person-unit {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .adm-person-unit-name { font: var(--type-body); color: var(--color-text-muted); }
+    /* graphite-700 by name: no semantic alias points at it (--color-icon does,
+       but that is for icons, not text). */
+    .adm-person-unit-sub  { font: var(--type-body-xxs); color: var(--ic-palette-graphite-700); }
 
     /* Snackbar — the dark bottom-centre notice features/rob uses in its meeting
        modal (.md-view-toast), for exactly this job: saying why a disabled
@@ -3700,9 +3890,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-var-select { flex: 1 1 120px; min-width: 0; }
     .adm-var-eye { color: var(--color-text-muted); flex-shrink: 0; }
     .adm-var-eye:hover { color: var(--color-text); }
-    /* A hidden variable is still configurable — it just isn't in the name. */
+    /* A hidden variable is out of the name, so its format is out of play too. */
     .adm-var.is-hidden .adm-var-name,
     .adm-var.is-hidden .adm-var-select { opacity: 0.55; }
+    .adm-var.is-hidden .input-select-trigger { cursor: not-allowed; }
     .adm-var-add { align-self: flex-start; margin-top: var(--ic-space-1); }
 
     /* Live preview — a suggestion of the Slack window, not a copy of it: the
@@ -3737,7 +3928,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     }
 
     /* The limits list spans the row it belongs to, under both columns. */
-    .adm-limits-block { flex-basis: 100%; margin-top: var(--ic-space-4); }
+    .adm-limits-block {
+      flex-basis: 100%;
+      margin-top: var(--ic-space-4);
+      transition: opacity var(--ic-duration-base) var(--ic-ease);
+    }
     .adm-limits-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ic-space-4); margin-bottom: var(--ic-space-2); }
     .adm-limits-title { font: var(--type-body-sm-semibold); color: var(--color-text); margin: 0; }
 
@@ -4436,6 +4631,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">People</h2>
                   </div>
+                  <p class="adm-caption">Profiles, roles and job positions</p>
                 </div>
               </div>
 
@@ -4472,7 +4668,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                       <p class="adm-card-title">User roles and permissions</p>
                       <p class="adm-caption">Define what each user role can access and do</p>
                     </div>
-                    <button class="btn btn-ghost btn-xs" type="button">55 user roles<svg class="btn-icon"><use href="#i-arrow-right"/></svg></button>
+                    <button class="btn btn-ghost btn-xs" type="button" data-adm-ur-entry>55 user roles<svg class="btn-icon"><use href="#i-arrow-right"/></svg></button>
                   </div>
 
                   <div class="adm-setting">
@@ -4480,7 +4676,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                       <p class="adm-card-title">Job positions</p>
                       <p class="adm-caption">Job positions are required when creating new people</p>
                     </div>
-                    <button class="btn btn-ghost btn-xs" type="button"><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
+                    <button class="btn btn-ghost btn-xs" type="button" data-adm-jp-entry><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
                   </div>
                 </div>
 
@@ -4626,7 +4822,282 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       </section>
 
+      <!-- ===== User roles and permissions ====================================
+           A role is the subject here: what it can do is the row's content, and
+           who holds it opens the shared roster. -->
+      <section class="page-view" data-page="user-roles" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <a class="breadcrumb" href="#" data-adm-ur-back>Admin</a>
+              <span class="breadcrumb is-current" aria-current="page">User roles</span>
+            </nav>
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Roles management</h1>
+              <span class="count-badge count-badge-lg count-badge-secondary" data-adm-ur-count>0</span>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" type="button" data-adm-ur-add><svg class="btn-icon"><use href="#i-plus"/></svg>Add role</button>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" role="tab" aria-selected="true" type="button" data-adm-ur-tab="people">People</button>
+          <button class="tab" role="tab" aria-selected="false" type="button" data-adm-ur-tab="roles">Roles &amp; Permissions</button>
+        </div>
+
+        <!-- People: permissions are held per person, so the directory is the
+             subject and the grid is where they are actually set. A role sets the
+             defaults; a row that departs from them is marked Custom. -->
+        <div data-adm-ur-panel="people">
+          <div class="toolbar adm-jp-toolbar">
+            <div class="input-icon input-icon-left toolbar-search">
+              <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+              <input class="input" type="search" placeholder="Search people or roles" data-adm-up-search />
+            </div>
+
+            <!-- Menus are built from the directory itself, so they only ever
+                 offer values that exist and follow a role rename. -->
+            <div class="input-select is-auto" data-adm-up-perm>
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">All permissions</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+
+            <div class="input-select is-auto" data-adm-up-team>
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">All teams</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+
+            <div class="input-select is-auto" data-adm-up-group>
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <span class="input-select-value">All role groups</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" hidden></div>
+            </div>
+          </div>
+
+          <div class="table-scroll" data-adm-up-table>
+            <table class="table table-wide adm-perm-grid">
+              <thead data-adm-up-head></thead>
+              <tbody data-adm-up-rows></tbody>
+            </table>
+          </div>
+
+          <div class="adm-jp-empty" data-adm-up-empty hidden>
+            <p class="adm-jp-empty-title">No one matches that search</p>
+            <button class="btn btn-secondary btn-xs" type="button" data-adm-up-clear>Clear search</button>
+          </div>
+        </div>
+
+        <!-- Roles: the grouped view, kept as it was. -->
+        <div data-adm-ur-panel="roles" hidden>
+        <div class="toolbar adm-jp-toolbar">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+            <input class="input" type="search" placeholder="Search roles or permissions" data-adm-ur-search />
+          </div>
+        </div>
+
+        <div class="adm-cards" data-adm-ur-cards></div>
+
+        <div class="adm-jp-empty" data-adm-ur-empty hidden>
+          <p class="adm-jp-empty-title">No roles match that search</p>
+          <button class="btn btn-secondary btn-xs" type="button" data-adm-ur-clear>Clear search</button>
+        </div>
+        </div>
+      </section>
+
+      <!-- ===== Job positions ==================================================
+           A sub page rather than a list in the card: a big org can run to
+           hundreds of these, which is a table's job, not a settings row's. -->
+      <section class="page-view" data-page="job-positions" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <a class="breadcrumb" href="#" data-adm-jp-back>Admin</a>
+              <span class="breadcrumb is-current" aria-current="page">Job positions</span>
+            </nav>
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Job positions</h1>
+              <span class="count-badge count-badge-lg count-badge-secondary" data-adm-jp-count>0</span>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" type="button" data-adm-jp-add><svg class="btn-icon"><use href="#i-plus"/></svg>Add position</button>
+          </div>
+        </div>
+
+        <div class="toolbar adm-jp-toolbar">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+            <input class="input" type="search" placeholder="Search positions" data-adm-jp-search />
+          </div>
+
+          <!-- Levels actually in use, not a fixed 1-10 ladder. Multi-select, so
+               its menu stays open while you tick (see the capture handler). -->
+          <div class="input-select is-auto" data-adm-jp-levels>
+            <button class="input-select-trigger" aria-expanded="false" type="button">
+              <span class="input-select-value">All levels</span>
+              <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="dropdown-menu" hidden data-adm-jp-levels-menu></div>
+          </div>
+
+          <div class="input-select is-auto" data-adm-jp-assignment>
+            <button class="input-select-trigger" aria-expanded="false" type="button">
+              <span class="input-select-value">All positions</span>
+              <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="dropdown-menu" hidden>
+              <button class="dropdown-item is-selected" type="button" data-value="all"><svg class="dropdown-item-check"><use href="#i-check"/></svg>All positions</button>
+              <button class="dropdown-item" type="button" data-value="unassigned"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Unassigned only</button>
+              <button class="dropdown-item" type="button" data-value="assigned"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Assigned only</button>
+            </div>
+          </div>
+
+          <div class="toolbar-end">
+            <div class="input-select is-auto" data-adm-jp-sort>
+              <button class="input-select-trigger" aria-expanded="false" type="button">
+                <svg class="icon"><use href="#i-sort"/></svg>
+                <span class="input-select-value">Name</span>
+                <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" hidden>
+                <button class="dropdown-item is-selected" type="button" data-value="name"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Name</button>
+                <button class="dropdown-item" type="button" data-value="level"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Job level</button>
+                <button class="dropdown-item" type="button" data-value="people"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Members</button>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-icon-only" type="button" data-adm-jp-sortdir aria-label="Sort ascending"><svg class="icon"><use href="#i-arrow-long-down"/></svg></button>
+            <div class="segmented" role="tablist" aria-label="View">
+              <button class="segmented-item segmented-icon is-active" type="button" data-adm-jp-view="table" aria-label="Table view" title="Table view"><svg class="icon"><use href="#i-table"/></svg></button>
+              <button class="segmented-item segmented-icon" type="button" data-adm-jp-view="cards" aria-label="Card view" title="Card view"><svg class="icon"><use href="#i-grid"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-scroll" data-adm-jp-table>
+          <table class="table table-wide">
+            <thead>
+              <tr><th>Position</th><th>Job level</th><th>Members</th><th>Description</th></tr>
+            </thead>
+            <tbody data-adm-jp-rows></tbody>
+          </table>
+        </div>
+
+        <!-- Card view. Alphabetical by definition: the letter index is the point
+             of it, so the sort controls step aside while it is on screen. -->
+        <div data-adm-jp-cards hidden>
+          <!-- Pill variant, parked: kept alongside the button group so the two
+               can be compared again. Still rendered, just not shown. -->
+          <nav class="adm-alpha" aria-label="Filter by letter" data-adm-jp-alpha hidden></nav>
+          <div class="adm-alpha-group">
+            <div class="segmented" role="group" aria-label="Filter by letter" data-adm-jp-alpha2></div>
+          </div>
+          <div data-adm-jp-groups></div>
+        </div>
+
+        <div class="adm-jp-empty" data-adm-jp-empty hidden>
+          <p class="adm-jp-empty-title">No positions match these filters</p>
+          <button class="btn btn-secondary btn-xs" type="button" data-adm-jp-clear>Clear filters</button>
+        </div>
+      </section>
+
     </main>
+  </div>
+
+
+  <!-- Add New Position -->
+  <div class="modal-overlay" id="adm-jp-modal" hidden>
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <h2 class="modal-title">Add New Position</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="stack" style="gap: var(--ic-space-4)">
+          <label class="field">
+            <span class="field-label">Position Name</span>
+            <input class="input" type="text" data-adm-jp-name />
+            <span class="field-hint is-error" data-adm-jp-error hidden>Please complete this field.</span>
+          </label>
+          <label class="field">
+            <span class="field-label">Job Level</span>
+            <input class="input" type="number" min="1" max="10" data-adm-jp-level />
+          </label>
+          <label class="field">
+            <span class="field-label">Description (optional)</span>
+            <textarea class="input" rows="4" data-adm-jp-desc></textarea>
+          </label>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-primary" type="button" data-adm-jp-save>Add Position</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Who holds a position -->
+  <div class="modal-overlay" id="adm-people-modal" hidden>
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <div>
+          <h2 class="modal-title" data-adm-people-title>Position</h2>
+          <p class="adm-caption" data-adm-people-count></p>
+        </div>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="adm-people-head">
+          <span>Name</span>
+          <span>Org unit</span>
+        </div>
+        <ul class="adm-people-list" data-adm-people-list></ul>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Add role -->
+  <div class="modal-overlay" id="adm-role-modal" hidden>
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <h2 class="modal-title">New Role</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="stack" style="gap: var(--ic-space-4)">
+          <!-- Placeholders carry these two; aria-label keeps them named for
+               anyone not looking at the placeholder. -->
+          <div class="field">
+            <input class="input" type="text" data-adm-role-name placeholder="Role title" aria-label="Role title" />
+            <span class="field-hint is-error" data-adm-role-error hidden>Please complete this field.</span>
+          </div>
+          <div class="field">
+            <input class="input" type="text" data-adm-role-desc placeholder="Role description" aria-label="Role description" />
+          </div>
+          <div class="field">
+            <div class="tabs adm-perm-tabs" role="tablist" data-adm-perm-tabs></div>
+            <div class="adm-perm-picker" data-adm-role-perms></div>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-primary" type="button" data-adm-role-save>Save Role</button>
+      </footer>
+    </div>
   </div>
 
   <div class="adm-snackbar" data-adm-snackbar role="status" aria-live="polite"></div>
@@ -6070,6 +6541,80 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
+    // The roster modal, shared: both job positions and user roles answer "who
+    // is in this?" the same way, so the list is built in one place.
+    (function () {
+      const modal = document.getElementById('adm-people-modal');
+      if (!modal) return;
+      const title = modal.querySelector('[data-adm-people-title]');
+      const count = modal.querySelector('[data-adm-people-count]');
+      const list = modal.querySelector('[data-adm-people-list]');
+      const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2);
+
+      window.admShowRoster = (heading, roster, subtitleNoun = 'member') => {
+        title.textContent = heading;
+        count.textContent = `${roster.length} ${subtitleNoun}${roster.length === 1 ? '' : 's'}`;
+        list.innerHTML = roster.map(person => `
+          <li class="adm-person">
+            <span class="avatar avatar-md">${esc(initials(person.name))}</span>
+            <span class="adm-person-meta">
+              <span class="adm-person-name">${esc(person.name)}</span>
+              <span class="adm-person-role">${esc(heading)}</span>
+            </span>
+            <span class="adm-person-unit">
+              <span class="adm-person-unit-name">${esc(person.unit)}</span>
+              <span class="adm-person-unit-sub">${esc(person.sub)}</span>
+            </span>
+          </li>`).join('');
+        modal.hidden = false;
+      };
+
+      // The people a roster is drawn from, and the org units they sit in.
+      const NAMES = ['Maria Santos', 'Alejandro Reyes', 'Pavel Vydra', 'Camilla Herrere', 'Anna Schmidt',
+        'John Appleseed', 'Lena Fischer', 'Tomas Silva', 'Priya Nair', 'Omar Haddad', 'Grace Okafor',
+        'Yuki Tanaka', 'Sofia Rossi', 'Liam O\u2019Connor', 'Nadia Petrova', 'Marcus Webb', 'Elena Nowak',
+        'Carter Poplin', 'Bea Rosen', 'Will Rodrigues', 'Hana Kim', 'Diego Morales', 'Ingrid Larsen',
+        'Samir Patel', 'Chloe Dubois', 'Ben Carter', 'Amara Diallo', 'Kenji Sato', 'Rosa Delgado',
+        'Tom Hayes', 'Freya Berg', 'Noah Klein', 'Isabel Marques', 'Viktor Novak', 'Mei Chen',
+        'Adam Walsh', 'Zara Ahmed', 'Felix Braun', 'Lucia Ferrari', 'Ryan Doyle'];
+      const ORG_UNITS = [
+        { unit: 'Engineering', children: ['Platform Team', 'Mobile Team', 'Infrastructure Team'] },
+        { unit: 'Marketing', children: ['Brand Function', 'Growth Function', 'Content Function'] },
+        { unit: 'Talent Operations', children: ['Sourcing Pod', 'Onboarding Pod', 'Mobility Pod'] },
+        { unit: 'Revenue', children: ['Enterprise Sub-function', 'Mid-market Sub-function'] },
+        { unit: 'Design Studio', children: ['Product Team', 'Brand Team'] },
+        { unit: 'Data', children: ['Analytics Function', 'Insights Pod'] },
+        { unit: 'Support', children: ['Tier 1 Pod', 'Escalations Pod'] },
+      ];
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      window.admMakeRoster = (n) => {
+        const pool = [...NAMES].sort(() => Math.random() - 0.5);
+        return pool.slice(0, n).map(name => {
+          const org = pick(ORG_UNITS);
+          return { name, unit: org.unit, sub: pick(org.children) };
+        });
+      };
+    })();
+  </script>
+
+  <script>
+    // The dark bottom snackbar, in one place: more than one governing rule
+    // raises it now. Re-armed on each call rather than stacked.
+    (function () {
+      const snack = document.querySelector('[data-adm-snackbar]');
+      let timer = null;
+      window.admSnack = (message) => {
+        if (!snack) return;
+        snack.textContent = message;
+        snack.classList.add('is-visible');
+        clearTimeout(timer);
+        timer = setTimeout(() => snack.classList.remove('is-visible'), 3200);
+      };
+    })();
+  </script>
+
+  <script>
     // A card's first row can govern the rest of it: switch it off and the
     // settings underneath have nothing to act on, so they go inert. They stay
     // clickable on purpose — a click explains itself in the snackbar, which a
@@ -6083,15 +6628,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // The card's own actions belong to the governed part, not the switch.
       const governed = [...rows, ...card.querySelectorAll(':scope > .adm-card-footer')];
 
-      const snack = document.querySelector('[data-adm-snackbar]');
-      let snackTimer = null;
-      const explain = () => {
-        if (!snack) return;
-        snack.textContent = card.dataset.admGoverned;
-        snack.classList.add('is-visible');
-        clearTimeout(snackTimer);
-        snackTimer = setTimeout(() => snack.classList.remove('is-visible'), 3200);
-      };
+      const explain = () => window.admSnack?.(card.dataset.admGoverned);
 
       const apply = () => {
         const off = !toggle.checked;
@@ -6155,12 +6692,980 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           if (e.target.closest('.dropdown-item')) render();
         });
 
+        // A hidden variable isn't in the name, so its format has nothing to
+        // describe: the select goes inert with the eye rather than staying
+        // operable behind the dimming.
+        const select = row.querySelector('.input-select');
+        const trigger = row.querySelector('.input-select-trigger');
+        const syncSelect = () => {
+          const hidden = row.classList.contains('is-hidden');
+          trigger?.setAttribute('aria-disabled', String(hidden));
+          if (hidden) {
+            trigger?.setAttribute('tabindex', '-1');
+            trigger?.setAttribute('aria-expanded', 'false');
+            row.querySelector('.dropdown-menu').hidden = true;
+          } else {
+            trigger?.removeAttribute('tabindex');
+          }
+        };
+        // Clicking it anyway should say why, the way the governed cards do.
+        const varName = row.querySelector('.adm-var-name')?.textContent.trim() || 'This variable';
+        select?.addEventListener('click', (e) => {
+          if (!row.classList.contains('is-hidden')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          window.admSnack?.(`${varName} is hidden from channel names. Show it to change its format.`);
+        }, true);
+
         row.querySelector('.adm-var-eye')?.addEventListener('click', (e) => {
           const hidden = row.classList.toggle('is-hidden');
           const btn = e.currentTarget;
           btn.setAttribute('aria-pressed', String(!hidden));
           btn.querySelector('use')?.setAttribute('href', hidden ? '#i-eye-hide' : '#i-eye');
+          syncSelect();
           render();
+        });
+
+        syncSelect();
+      });
+
+      render();
+    })();
+  </script>
+
+  <script>
+    // Job positions. Zero of them is a settings row with a way to add one; one
+    // or more is a table of its own, because a large org runs to hundreds and
+    // that does not belong inside a settings card.
+    (function () {
+      const entry = document.querySelector('[data-adm-jp-entry]');
+      const modal = document.getElementById('adm-jp-modal');
+      const rows = document.querySelector('[data-adm-jp-rows]');
+      if (!entry || !modal || !rows) return;
+
+      const nameInput = modal.querySelector('[data-adm-jp-name]');
+      const levelInput = modal.querySelector('[data-adm-jp-level]');
+      const descInput = modal.querySelector('[data-adm-jp-desc]');
+      const error = modal.querySelector('[data-adm-jp-error]');
+      const countEl = document.querySelector('[data-adm-jp-count]');
+
+      // Seeded so the page has something to be: an empty table teaches nothing
+      // about filtering, grouping or scale. Levels and member counts vary, and a
+      // couple of positions carry nobody so the zero state stays visible.
+      const positions = [
+        ['Account Executive', '3', 'Owns a book of business and closes new revenue.', 12],
+        ['Backend Engineer', '4', '', 26],
+        ['Brand Designer', '3', 'Owns brand expression across channels.', 4],
+        ['Business Analyst', '3', '', 7],
+        ['Chief of Staff', '7', 'Runs the operating cadence for the exec team.', 1],
+        ['Content Strategist', '4', '', 3],
+        ['Customer Success Manager', '4', 'Keeps accounts healthy after the sale.', 18],
+        ['Data Analyst', '3', '', 9],
+        ['Engineering Manager', '6', 'Leads an engineering team and its delivery.', 6],
+        ['Finance Business Partner', '5', '', 2],
+        ['Growth Marketer', '4', '', 5],
+        ['Head of Design', '7', 'Owns the design function end to end.', 1],
+        ['Implementation Consultant', '4', '', 0],
+        ['Office Manager', '2', '', 2],
+        ['People Partner', '5', 'Supports managers across the employee lifecycle.', 8],
+        ['Product Designer', '4', 'Designs product surfaces end to end.', 11],
+        ['Product Manager', '5', 'Owns a product area and its roadmap.', 14],
+        ['Recruiter', '3', '', 6],
+        ['Solutions Architect', '6', 'Designs technical solutions for enterprise deals.', 0],
+        ['Support Specialist', '2', '', 21],
+      ].map(([name, level, description, members]) => ({
+        name, level, description, roster: window.admMakeRoster(members),
+      }));
+
+      const esc = (s) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      // Toolbar state. Search does most of the work at this scale; the filters
+      // answer the specific questions (which level, what's unused).
+      const filters = { search: '', levels: new Set(), assignment: 'all', sort: 'name', dir: 'asc' };
+
+      const visible = () => {
+        const q = filters.search.trim().toLowerCase();
+        const list = positions.filter(p => {
+          if (q && !p.name.toLowerCase().includes(q)) return false;
+          if (filters.levels.size && !filters.levels.has(p.level || '\u2014')) return false;
+          if (filters.assignment === 'unassigned' && p.roster.length) return false;
+          if (filters.assignment === 'assigned' && !p.roster.length) return false;
+          return true;
+        });
+        const by = {
+          name: (a, b) => a.name.localeCompare(b.name),
+          level: (a, b) => (Number(a.level) || 0) - (Number(b.level) || 0),
+          people: (a, b) => a.roster.length - b.roster.length,
+        }[filters.sort];
+        list.sort(by);
+        if (filters.dir === 'desc') list.reverse();
+        return list;
+      };
+
+      const filtering = () =>
+        filters.search.trim() !== '' || filters.levels.size > 0 || filters.assignment !== 'all'
+        || (mode === 'cards' && letter !== null);
+
+      // Levels offered are the ones in use — a fixed ladder would list levels
+      // this org has never created.
+      const renderLevels = () => {
+        const menu = document.querySelector('[data-adm-jp-levels-menu]');
+        const trigger = document.querySelector('[data-adm-jp-levels] .input-select-value');
+        if (!menu) return;
+        const used = [...new Set(positions.map(p => p.level || '\u2014'))]
+          .sort((a, b) => (Number(a) || 0) - (Number(b) || 0));
+        menu.innerHTML = used.map(l => `
+          <button class="dropdown-item${filters.levels.has(l) ? ' is-selected' : ''}" type="button" data-level="${esc(l)}">
+            <svg class="dropdown-item-check"><use href="#i-check"/></svg>${l === '\u2014' ? 'No level' : 'Level ' + esc(l)}
+          </button>`).join('');
+        trigger.textContent = filters.levels.size === 0
+          ? 'All levels'
+          : `${filters.levels.size} level${filters.levels.size === 1 ? '' : 's'}`;
+      };
+
+      // Two views over the same list. Cards are grouped under an initial and
+      // reached by the letter index, so they ignore the sort control — which is
+      // hidden while they are on screen rather than sitting there doing nothing.
+      let mode = 'table';
+      let letter = null;   // card view only: null is "All"
+
+      // The letter row filters rather than jumps, and only offers letters that
+      // exist: an A-Z strip where half the letters are dead was mostly noise,
+      // and grouping broke the grid into rows of one or two cards. Now the
+      // cards sit side by side and the alphabet narrows them.
+      const renderCards = (view) => {
+        const used = [...new Set(view.map(p => (p.name[0] || '#').toUpperCase()))].sort();
+
+        document.querySelector('[data-adm-jp-alpha]').innerHTML = [
+          `<button class="adm-alpha-letter${letter === null ? ' is-active' : ''}" type="button" data-letter="">All (${view.length})</button>`,
+          ...used.map(l => `<button class="adm-alpha-letter${letter === l ? ' is-active' : ''}" type="button" data-letter="${l}">${l}</button>`),
+        ].join('');
+
+        document.querySelector('[data-adm-jp-alpha2]').innerHTML = [
+          `<button class="segmented-item${letter === null ? ' is-active' : ''}" type="button" data-letter="">All (${view.length})</button>`,
+          ...used.map(l => `<button class="segmented-item${letter === l ? ' is-active' : ''}" type="button" data-letter="${l}">${l}</button>`),
+        ].join('');
+
+        const shown = letter ? view.filter(p => (p.name[0] || '').toUpperCase() === letter) : view;
+        document.querySelector('[data-adm-jp-groups]').innerHTML = `
+          <div class="adm-cards">
+            ${shown.map(p => `
+              <article class="card adm-pos-card">
+                <p class="adm-pos-card-name">${esc(p.name)}</p>
+                <p class="adm-pos-card-desc">${p.description ? esc(p.description) : '<span class="adm-none">No description</span>'}</p>
+                <div class="adm-pos-card-meta">
+                  <span>${p.level ? 'Level ' + esc(p.level) : '<span class="adm-none">No level</span>'}</span>
+                  ${p.roster.length
+                    ? `<button class="btn btn-ghost btn-xs" type="button" data-adm-people-open="${positions.indexOf(p)}">${p.roster.length} member${p.roster.length === 1 ? '' : 's'}</button>`
+                    : '<span class="adm-none">0 members</span>'}
+                </div>
+              </article>`).join('')}
+          </div>`;
+      };
+
+      const render = () => {
+        const view = visible();
+        const n = positions.length;
+        const lettered = mode === 'cards' && letter
+          ? view.filter(p => (p.name[0] || '').toUpperCase() === letter)
+          : view;
+        countEl.textContent = filtering() ? `${lettered.length} of ${n}` : String(n);
+        const hasRows = lettered.length > 0;
+        document.querySelector('[data-adm-jp-table]').hidden = !hasRows || mode !== 'table';
+        document.querySelector('[data-adm-jp-cards]').hidden = !hasRows || mode !== 'cards';
+        document.querySelector('[data-adm-jp-empty]').hidden = hasRows;
+        renderLevels();
+        if (mode === 'cards') renderCards(view);
+        rows.innerHTML = view.map(p => `
+          <tr>
+            <td><span class="cell-title-text">${esc(p.name)}</span></td>
+            <td>${p.level ? esc(p.level) : '<span class="adm-none">&mdash;</span>'}</td>
+            <td>${p.roster.length
+              ? `<button class="btn btn-ghost btn-xs" type="button" data-adm-people-open="${positions.indexOf(p)}">${p.roster.length}</button>`
+              : '<span class="adm-none">0</span>'}</td>
+            <td>${p.description ? esc(p.description) : '<span class="adm-none">&mdash;</span>'}</td>
+          </tr>`).join('');
+
+        // The row's control is the state: add the first one, or go see them.
+        entry.innerHTML = n === 0
+          ? '<svg class="btn-icon"><use href="#i-plus"/></svg>Add job position'
+          : `${n} job position${n === 1 ? '' : 's'}<svg class="btn-icon"><use href="#i-arrow-right"/></svg>`;
+      };
+
+      const openModal = () => {
+        nameInput.value = '';
+        levelInput.value = '';
+        descInput.value = '';
+        nameInput.classList.remove('is-error');
+        error.hidden = true;
+        modal.hidden = false;
+        nameInput.focus();
+      };
+
+      // The section lists point at the settings document, so nothing in them is
+      // current while this sub page is up.
+      const showList = () => {
+        window.showAdminPage?.('job-positions');
+        document.querySelectorAll('[data-adm-toc-target]').forEach(l => l.classList.remove('is-active'));
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+
+      entry.addEventListener('click', () => {
+        if (positions.length === 0) { openModal(); return; }
+        showList();
+      });
+
+      document.querySelector('[data-adm-jp-add]')?.addEventListener('click', openModal);
+
+      document.querySelector('[data-adm-jp-back]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.showAdminPage?.('admin');
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+        window.admSyncToc?.();
+      });
+
+      // Name is the only required field, so it is the only one that can fail.
+      const validate = () => {
+        const ok = nameInput.value.trim() !== '';
+        nameInput.classList.toggle('is-error', !ok);
+        error.hidden = ok;
+        if (!ok) nameInput.focus();
+        return ok;
+      };
+      nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim() !== '') { nameInput.classList.remove('is-error'); error.hidden = true; }
+      });
+
+      // Who holds a position is a look-up, not a place to go: the shared roster
+      // modal answers it without losing the table underneath.
+      rows.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-adm-people-open]');
+        if (!trigger) return;
+        const position = positions[Number(trigger.dataset.admPeopleOpen)];
+        if (!position) return;
+        window.admShowRoster?.(position.name, position.roster);
+      });
+
+      // ── Views ────────────────────────────────────────────────────────────
+      const sortControls = [
+        document.querySelector('[data-adm-jp-sort]'),
+        document.querySelector('[data-adm-jp-sortdir]'),
+      ];
+      document.querySelectorAll('[data-adm-jp-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          mode = btn.dataset.admJpView;
+          document.querySelectorAll('[data-adm-jp-view]').forEach(b => b.classList.toggle('is-active', b === btn));
+          sortControls.forEach(c => { if (c) c.hidden = mode === 'cards'; });
+          render();
+        });
+      });
+
+      ['[data-adm-jp-alpha]', '[data-adm-jp-alpha2]'].forEach(sel => {
+        document.querySelector(sel)?.addEventListener('click', (e) => {
+          const chip = e.target.closest('[data-letter]');
+          if (!chip) return;
+          letter = chip.dataset.letter || null;
+          render();
+        });
+      });
+
+      // Cards reach the roster the same way rows do.
+      document.querySelector('[data-adm-jp-groups]')?.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-adm-people-open]');
+        if (!trigger) return;
+        const position = positions[Number(trigger.dataset.admPeopleOpen)];
+        if (position) window.admShowRoster?.(position.name, position.roster);
+      });
+
+      // ── Toolbar ──────────────────────────────────────────────────────────
+      document.querySelector('[data-adm-jp-search]')?.addEventListener('input', (e) => {
+        filters.search = e.target.value;
+        render();
+      });
+
+      // Multi-select: capture the click before the shared .input-select handler
+      // can write one label into the trigger and close the menu.
+      document.querySelector('[data-adm-jp-levels-menu]')?.addEventListener('click', (e) => {
+        const item = e.target.closest('.dropdown-item');
+        if (!item) return;
+        e.stopPropagation();
+        const level = item.dataset.level;
+        filters.levels.has(level) ? filters.levels.delete(level) : filters.levels.add(level);
+        render();
+      }, true);
+
+      const single = (host, key) => {
+        document.querySelector(host)?.addEventListener('click', (e) => {
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          filters[key] = item.dataset.value;
+          item.parentElement.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === item));
+          render();
+        });
+      };
+      single('[data-adm-jp-assignment]', 'assignment');
+      single('[data-adm-jp-sort]', 'sort');
+
+      document.querySelector('[data-adm-jp-sortdir]')?.addEventListener('click', (e) => {
+        filters.dir = filters.dir === 'asc' ? 'desc' : 'asc';
+        const btn = e.currentTarget;
+        btn.querySelector('use').setAttribute('href', filters.dir === 'asc' ? '#i-arrow-long-down' : '#i-arrow-long-up');
+        btn.setAttribute('aria-label', filters.dir === 'asc' ? 'Sort ascending' : 'Sort descending');
+        render();
+      });
+
+      document.querySelector('[data-adm-jp-clear]')?.addEventListener('click', () => {
+        filters.search = '';
+        filters.levels.clear();
+        filters.assignment = 'all';
+        letter = null;
+        const search = document.querySelector('[data-adm-jp-search]');
+        if (search) search.value = '';
+        const assignment = document.querySelector('[data-adm-jp-assignment]');
+        assignment.querySelector('.input-select-value').textContent = 'All positions';
+        assignment.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+        render();
+      });
+
+
+      modal.querySelector('[data-adm-jp-save]').addEventListener('click', () => {
+        if (!validate()) return;
+        positions.push({
+          name: nameInput.value.trim(),
+          level: levelInput.value.trim(),
+          description: descInput.value.trim(),
+          // Stand-in for the people who hold this position. A position created
+          // here would truly start at nobody; a spread of names is what makes
+          // the column worth opening in a demo.
+          roster: window.admMakeRoster(Math.floor(Math.random() * 40)),
+        });
+        render();
+        modal.hidden = true;
+        // Land on the table: the position that was just described is now a row,
+        // and seeing it there is the confirmation the form can't give.
+        showList();
+
+        // A success toast, top right: this confirms something that worked. The
+        // dark bottom snackbar is kept for the narrower case of explaining why
+        // a control did nothing.
+        window.toast?.({
+          variant: 'success',
+          message: `${positions[positions.length - 1].name} added`,
+        });
+      });
+
+      render();
+    })();
+  </script>
+
+  <script>
+    // A row's switch can also govern a block inside that same row — Manage RACI
+    // roles over the member limits. Same contract as a governed card, one level
+    // down: the block fades (CSS), its controls go inert, and a click explains
+    // itself rather than doing nothing at all.
+    document.querySelectorAll('.adm-setting:has(.switch-input):has(.adm-limits-block)').forEach(row => {
+      const toggle = row.querySelector('.switch-input');
+      const block = row.querySelector('.adm-limits-block');
+      const title = row.querySelector('.adm-card-title')?.textContent.trim() || 'This setting';
+
+      const apply = () => {
+        const off = !toggle.checked;
+        block.querySelectorAll('.btn').forEach(b => {
+          b.setAttribute('aria-disabled', String(off));
+          if (off) b.setAttribute('tabindex', '-1'); else b.removeAttribute('tabindex');
+        });
+      };
+
+      block.addEventListener('click', (e) => {
+        if (toggle.checked) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.admSnack?.(`${title} is disabled. Turn it on to change these settings.`);
+      }, true);
+
+      toggle.addEventListener('change', apply);
+      apply();
+    });
+  </script>
+
+  <script>
+    // User roles and permissions. The role is the subject: a row says what it is
+    // for, who holds it, and what it can do. Read-only for now — creating and
+    // editing roles is its own screen.
+    (function () {
+      const rows = document.querySelector('[data-adm-ur-cards]');
+      const entry = document.querySelector('[data-adm-ur-entry]');
+      if (!rows) return;
+
+      const ROLES = [
+        ['Super Admin', 'Full access to every setting and record', 2, [
+          'Access all admin settings', 'Grant/revoke permissions', 'Log in as any user',
+          'Manage Slack, Google & Zoom integrations', 'Create/edit any Initiative, Process, and RACI matrix',
+          'Edit/approve any OKR', 'Create/edit member profiles', 'View salary data']],
+        ['Admin', 'Workspace configuration, without billing', 6, [
+          'Access all admin settings', 'Manage Slack, Google & Zoom integrations',
+          'Create/edit member profiles', 'Manage teams & reporting lines']],
+        ['People Ops Manager', 'Owns people records, positions and reviews', 9, [
+          'Create/edit member profiles', 'Manage job positions', 'Create/manage review cycles',
+          'Export People data']],
+        ['Org Unit Lead', 'Runs one org unit and the teams under it', 24, [
+          'Manage teams & reporting lines', 'Manage divisions hierarchy', 'Edit/approve any OKR']],
+        ['Process Owner', 'Owns processes and the RACI on them', 31, [
+          'Create/edit any Initiative, Process, and RACI matrix', 'Set RACI policy rules & limits',
+          'Access spreadsheet views for table data']],
+        ['Initiative Owner', 'Owns initiatives end to end', 18, [
+          'Create/edit any Initiative, Process, and RACI matrix',
+          'Export Initiatives and Business as Usual data']],
+        ['Meeting Facilitator', 'Runs RoB meetings and their agendas', 12, [
+          'Manage all RoB meetings']],
+        ['OKR Owner', 'Sets objectives and keeps them current', 27, [
+          'Edit/approve any OKR', 'Administer OKR Admin Settings', 'Export OKR data']],
+        ['Reviewer', 'Takes part in performance cycles', 140, [
+          'Export peer feedback data']],
+        ['Finance Reviewer', 'Reads financial reporting only', 4, [
+          'View salary data', 'Export salary data']],
+        ['Integration Manager', 'Connects and maintains integrations', 3, [
+          'Manage Slack, Google & Zoom integrations']],
+        ['Member', 'Standard access for everyone in the workspace', 312, []],
+        ['Guest', 'Time-boxed access for people outside the org', 8, []],
+        ['Auditor', 'Read-only across the whole workspace', 2, [
+          'Access spreadsheet views for table data', 'Export People data', 'Export OKR data']],
+      ].map(([name, description, members, permissions]) => ({
+        name, description, permissions, roster: window.admMakeRoster(Math.min(members, 40)), members,
+      }));
+
+      const esc = (v) => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const countEl = document.querySelector('[data-adm-ur-count]');
+      let search = '';
+
+      const render = () => {
+        const q = search.trim().toLowerCase();
+        const view = ROLES.filter(r => !q
+          || r.name.toLowerCase().includes(q)
+          || r.description.toLowerCase().includes(q)
+          || r.permissions.some(perm => perm.toLowerCase().includes(q)));
+
+        if (document.querySelector('[data-adm-ur-panel="roles"]')?.hidden === false) {
+          countEl.textContent = q ? `${view.length} of ${ROLES.length}` : String(ROLES.length);
+        }
+        document.querySelector('[data-adm-ur-cards]').hidden = view.length === 0;
+        document.querySelector('[data-adm-ur-empty]').hidden = view.length > 0;
+
+        // A card per role, like the positions grid: what it is, what it's for,
+        // and who holds it. The permission count stands in for the list — the
+        // detail belongs on the role itself, not in a grid of cards.
+        rows.innerHTML = view.map(role => `
+          <article class="card adm-pos-card">
+            <button class="btn btn-icon-only btn-ghost btn-xs adm-card-edit" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit ${esc(role.name)}"><svg class="icon icon-16"><use href="#i-pencil"/></svg></button>
+            <p class="adm-pos-card-name">${esc(role.name)}</p>
+            <p class="adm-pos-card-desc">${esc(role.description)}</p>
+            <div class="adm-pos-card-meta">
+              <button class="btn btn-ghost btn-xs" type="button" data-adm-ur-edit="${ROLES.indexOf(role)}" aria-label="Edit permissions for ${esc(role.name)}">${role.permissions.length} permission${role.permissions.length === 1 ? '' : 's'}</button>
+              ${role.members
+                ? `<button class="btn btn-ghost btn-xs" type="button" data-adm-ur-members="${ROLES.indexOf(role)}">${role.members} member${role.members === 1 ? '' : 's'}</button>`
+                : '<span class="adm-none">No members</span>'}
+            </div>
+          </article>`).join('');
+      };
+
+      rows.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-adm-ur-members]');
+        if (!trigger) return;   // the pencil has its own handler
+        const role = ROLES[Number(trigger.dataset.admUrMembers)];
+        // Who holds a role is a question the directory already answers, so this
+        // crosses to the People tab filtered to that role rather than opening a
+        // second, shallower list in a modal.
+        window.admShowPeopleByRole?.(role.name);
+      });
+
+      // ── Add role ─────────────────────────────────────────────────────────
+      // The permissions offered are the ones the system already uses, gathered
+      // from the roles themselves rather than kept in a second list.
+      const roleModal = document.getElementById('adm-role-modal');
+      const roleName = roleModal?.querySelector('[data-adm-role-name]');
+      const roleDesc = roleModal?.querySelector('[data-adm-role-desc]');
+      const roleError = roleModal?.querySelector('[data-adm-role-error]');
+      const permBox = roleModal?.querySelector('[data-adm-role-perms]');
+
+      // The permission taxonomy, as the product groups it. Four tabs, each a set
+      // of groups, each group a list of permissions with its own Select all.
+      const PERM_TABS = [
+        ['Core Features', [
+          ['Initiatives and Processes', [
+            'Create/edit any Initiative, Process, and RACI matrix',
+            'Set RACI policy rules & limits',
+            'Manage Slack channel naming standards',
+            'Export Initiatives and Business as Usual data',
+            'Access spreadsheet views for table data',
+          ]],
+          ['OKRs', [
+            'Edit/approve any OKR',
+            'Administer OKR Admin Settings',
+            'Export OKR data',
+          ]],
+          ['Meetings', [
+            'Manage all RoB meetings',
+          ]],
+        ]],
+        ['People', [
+          ['Profiles and teams', [
+            'Create/edit member profiles',
+            'Edit & send welcome email',
+            'Transfer ownership or terminate accounts',
+            'Manage teams & reporting lines',
+            'Manage divisions hierarchy',
+            'Manage job positions',
+            'Export People data',
+            'Access Team Collaboration view',
+          ]],
+          ['Salary', [
+            'View salary data',
+            'Edit salary data',
+            'Export salary data',
+          ]],
+        ]],
+        ['People Experience', [
+          ['Recognitions', ['Review recognitions', 'Export recognitions data']],
+          ['Badges', ['Create/manage badges']],
+          ['Performance reviews', [
+            'Create/manage review cycles',
+            'Export performance reviews data',
+            'Export peer feedback data',
+          ]],
+          ['Time off', ['Manage org-wide time off', 'Export time off data']],
+        ]],
+        ['System', [
+          ['Access', ['Access all admin settings']],
+          ['System', [
+            'Manage Slack, Google & Zoom integrations',
+            'Grant/revoke permissions',
+            'Manage watercooler community',
+            'Log in as any user',
+            'Enable/disable Visual System',
+          ]],
+        ]],
+      ];
+
+      const tabStrip = roleModal?.querySelector('[data-adm-perm-tabs]');
+
+      // Every tab's boxes stay in the DOM so a selection survives tab switching
+      // — and so saving can read the lot without visiting each tab.
+      const renderPermTabs = () => {
+        tabStrip.innerHTML = PERM_TABS.map(([name], i) => `
+          <button class="tab${i === 0 ? ' is-active' : ''}" role="tab" aria-selected="${i === 0}" type="button" data-perm-tab="${esc(name)}">${esc(name)}</button>`).join('');
+
+        permBox.innerHTML = PERM_TABS.map(([name, groups], i) => `
+          <div class="adm-perm-panel" data-perm-panel="${esc(name)}"${i === 0 ? '' : ' hidden'}>
+            ${groups.map(([group, items]) => `
+              <section class="adm-perm-group">
+                <header class="adm-perm-group-head">
+                  <h3 class="adm-perm-group-title">${esc(group)}</h3>
+                  <label class="checkbox">
+                    <input type="checkbox" class="checkbox-input" data-perm-all />
+                    <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
+                    <span class="checkbox-label">Select all</span>
+                  </label>
+                </header>
+                ${items.map(perm => `
+                  <label class="checkbox adm-perm-item">
+                    <input type="checkbox" class="checkbox-input" value="${esc(perm)}" />
+                    <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg><svg class="checkbox-mark checkbox-mark-dash"><use href="#i-minus"/></svg></span>
+                    <span class="checkbox-label">${esc(perm)}</span>
+                  </label>`).join('')}
+              </section>`).join('')}
+          </div>`).join('');
+      };
+
+      const syncGroup = (group) => {
+        const all = group.querySelector('[data-perm-all]');
+        const items = [...group.querySelectorAll('.adm-perm-item input')];
+        const checked = items.filter(i => i.checked).length;
+        all.checked = checked === items.length;
+        all.indeterminate = checked > 0 && checked < items.length;
+      };
+
+      const roleTitle = roleModal?.querySelector('.modal-title');
+      const roleSave = roleModal?.querySelector('[data-adm-role-save]');
+      let editing = null;   // index into ROLES, or null for a new one
+
+      // Save is only live once the form differs from what it opened with — for
+      // a new role that means anything typed, for an edit an actual change.
+      let baseline = null;
+      const snapshot = () => JSON.stringify({
+        name: roleName.value.trim(),
+        description: roleDesc.value.trim(),
+        permissions: [...permBox.querySelectorAll('.adm-perm-item input:checked')].map(i => i.value).sort(),
+      });
+      const syncSave = () => { roleSave.disabled = snapshot() === baseline; };
+
+      const openRoleModal = (index = null) => {
+        editing = index;
+        const role = index === null ? null : ROLES[index];
+
+        renderPermTabs();
+        roleTitle.textContent = role ? 'Edit Role' : 'New Role';
+        roleSave.textContent = 'Save Role';
+        roleName.value = role ? role.name : '';
+        roleDesc.value = role && role.description !== 'No description yet' ? role.description : '';
+
+        // Filled state: tick what the role already grants, then let each group's
+        // Select all reflect what that leaves it as.
+        if (role) {
+          const granted = new Set(role.permissions);
+          permBox.querySelectorAll('.adm-perm-item input').forEach(i => { i.checked = granted.has(i.value); });
+          permBox.querySelectorAll('.adm-perm-group').forEach(syncGroup);
+        }
+
+        roleName.classList.remove('is-error');
+        roleError.hidden = true;
+        baseline = snapshot();
+        syncSave();
+        roleModal.hidden = false;
+        roleName.focus();
+      };
+
+      document.querySelector('[data-adm-ur-add]')?.addEventListener('click', () => openRoleModal());
+
+      // The People tab names role groups too, and editing one from there should
+      // be the same modal, not a second version of it.
+      window.admEditRole = (roleName) => {
+        const index = ROLES.findIndex(r => r.name === roleName);
+        if (index >= 0) openRoleModal(index);
+      };
+
+      rows.addEventListener('click', (e) => {
+        const pencil = e.target.closest('[data-adm-ur-edit]');
+        if (!pencil) return;
+        openRoleModal(Number(pencil.dataset.admUrEdit));
+      });
+      roleName?.addEventListener('input', () => {
+        if (roleName.value.trim() !== '') { roleName.classList.remove('is-error'); roleError.hidden = true; }
+        syncSave();
+      });
+      roleDesc?.addEventListener('input', syncSave);
+
+      tabStrip?.addEventListener('click', (e) => {
+        const tab = e.target.closest('[data-perm-tab]');
+        if (!tab) return;
+        tabStrip.querySelectorAll('[data-perm-tab]').forEach(t => {
+          const on = t === tab;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-selected', String(on));
+        });
+        permBox.querySelectorAll('[data-perm-panel]').forEach(panel => {
+          panel.hidden = panel.dataset.permPanel !== tab.dataset.permTab;
+        });
+      });
+
+      permBox?.addEventListener('change', (e) => {
+        const box = e.target.closest('.checkbox-input');
+        if (!box) return;
+        const group = box.closest('.adm-perm-group');
+        if (box.hasAttribute('data-perm-all')) {
+          group.querySelectorAll('.adm-perm-item input').forEach(i => { i.checked = box.checked; });
+          box.indeterminate = false;
+          syncSave();
+          return;
+        }
+        syncGroup(group);
+        syncSave();
+      });
+
+      roleModal?.querySelector('[data-adm-role-save]')?.addEventListener('click', () => {
+        if (roleName.value.trim() === '') {
+          roleName.classList.add('is-error');
+          roleError.hidden = false;
+          roleName.focus();
+          return;
+        }
+        // Across every tab, not just the visible one; Select all boxes carry no
+        // permission of their own.
+        const permissions = [...permBox.querySelectorAll('.adm-perm-item input:checked')].map(i => i.value);
+        const name = roleName.value.trim();
+        const description = roleDesc.value.trim() || 'No description yet';
+
+        if (editing === null) {
+          ROLES.push({ name, description, permissions, roster: [], members: 0 });
+        } else {
+          // A rename has to reach the directory, or its Role group column keeps
+          // pointing at a group that no longer exists under that name.
+          const previous = ROLES[editing].name;
+          Object.assign(ROLES[editing], { name, description, permissions });
+          if (previous !== name) window.admRenamePeopleRole?.(previous, name);
+        }
+
+        roleModal.hidden = true;
+        search = '';
+        const input = document.querySelector('[data-adm-ur-search]');
+        if (input) input.value = '';
+        render();
+        window.toast?.({ variant: 'success', message: `${name} ${editing === null ? 'added' : 'updated'}` });
+        editing = null;
+      });
+
+      window.admRenderRoles = render;   // the tab switch refreshes the count
+
+      document.querySelector('[data-adm-ur-search]')?.addEventListener('input', (e) => {
+        search = e.target.value;
+        render();
+      });
+      document.querySelector('[data-adm-ur-clear]')?.addEventListener('click', () => {
+        search = '';
+        const input = document.querySelector('[data-adm-ur-search]');
+        if (input) input.value = '';
+        render();
+      });
+
+      const show = () => {
+        window.showAdminPage?.('user-roles');
+        document.querySelectorAll('[data-adm-toc-target]').forEach(l => l.classList.remove('is-active'));
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+      entry?.addEventListener('click', show);
+
+      document.querySelector('[data-adm-ur-back]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.showAdminPage?.('admin');
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+        window.admSyncToc?.();
+      });
+
+      // The settings row states the count, so it comes from the same list.
+      if (entry) {
+        entry.innerHTML = `${ROLES.length} user roles<svg class="btn-icon"><use href="#i-arrow-right"/></svg>`;
+      }
+
+      render();
+    })();
+  </script>
+
+  <script>
+    // The people directory: permissions are held per person, not by group, so
+    // this is the grid where they are actually read and set. A role seeds the
+    // defaults; departing from them marks the row Custom. The Roles tab beside
+    // it keeps the grouped view.
+    (function () {
+      const rows = document.querySelector('[data-adm-up-rows]');
+      const head = document.querySelector('[data-adm-up-head]');
+      if (!rows || !head) return;
+
+      // Six permissions, not the full set: enough to show the shape of a role
+      // across a row without a grid nobody can scan.
+      const PERMISSIONS = [
+        { key: 'settings', label: 'Settings' },
+        { key: 'people', label: 'People' },
+        { key: 'processes', label: 'Processes' },
+        { key: 'okrs', label: 'OKRs' },
+        { key: 'reviews', label: 'Reviews' },
+        { key: 'reports', label: 'Reports' },
+      ];
+
+      // What each role switches on by default.
+      const ROLE_DEFAULTS = {
+        'Super Admin':        ['settings', 'people', 'processes', 'okrs', 'reviews', 'reports'],
+        'Admin':              ['settings', 'people', 'processes', 'reports'],
+        'People Ops Manager': ['people', 'reviews', 'reports'],
+        'Org Unit Lead':      ['people', 'okrs', 'reports'],
+        'Process Owner':      ['processes', 'reports'],
+        'OKR Owner':          ['okrs', 'reports'],
+        'Reviewer':           ['reviews'],
+        'Member':             [],
+      };
+      const ROLE_NAMES = Object.keys(ROLE_DEFAULTS);
+
+      const esc = (v) => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2);
+
+      // A directory drawn from the same people the rosters use.
+      const people = window.admMakeRoster(28).map((person, i) => {
+        const role = ROLE_NAMES[i % ROLE_NAMES.length];
+        const granted = new Set(ROLE_DEFAULTS[role]);
+        // A few people deviate from their role — which is the whole reason
+        // permissions live per person rather than per group.
+        if (i % 7 === 3) granted.add('reports');
+        if (i % 9 === 5) granted.delete('reports');
+        return { ...person, role, granted };
+      });
+
+      const isCustom = (p) => {
+        const base = ROLE_DEFAULTS[p.role];
+        return base.length !== p.granted.size || base.some(k => !p.granted.has(k));
+      };
+
+      const countEl = document.querySelector('[data-adm-ur-count]');
+      let search = '';
+      let roleFilter = null;   // also set when arriving from a role card
+      let permFilter = null;
+      let teamFilter = null;
+
+      // Role is parked, not removed: it still seeds the defaults and is still
+      // searchable — it just isn't a column for now. Flip to show it again.
+      const SHOW_ROLE = false;
+
+      head.innerHTML = `
+        <tr>
+          <th>Name</th>
+          <th>Team</th>
+          <th>Role group</th>
+        </tr>`;
+
+      // The three quick filters. Each menu lists only values the directory
+      // actually holds, so a role that nobody carries never offers an empty
+      // result — and a renamed role follows along.
+      const FILTERS = [
+        { host: '[data-adm-up-perm]',  all: 'All permissions',
+          get: () => permFilter, set: (v) => { permFilter = v; },
+          options: () => PERMISSIONS
+            .filter(perm => people.some(p => p.granted.has(perm.key)))
+            .map(perm => ({ value: perm.key, label: perm.label })) },
+        { host: '[data-adm-up-team]',  all: 'All teams',
+          get: () => teamFilter, set: (v) => { teamFilter = v; },
+          options: () => [...new Set(people.map(p => p.unit))].sort()
+            .map(unit => ({ value: unit, label: unit })) },
+        { host: '[data-adm-up-group]', all: 'All role groups',
+          get: () => roleFilter, set: (v) => { roleFilter = v; },
+          options: () => [...new Set(people.filter(p => !isCustom(p)).map(p => p.role))].sort()
+            .map(role => ({ value: role, label: role }))
+            .concat(people.some(isCustom) ? [{ value: 'Custom', label: 'Custom' }] : []) },
+      ];
+
+      const renderFilterMenus = () => {
+        FILTERS.forEach(filter => {
+          const host = document.querySelector(filter.host);
+          if (!host) return;
+          const current = filter.get();
+          const items = [{ value: '', label: filter.all }, ...filter.options()];
+          host.querySelector('.dropdown-menu').innerHTML = items.map(item => `
+            <button class="dropdown-item${(item.value || null) === current ? ' is-selected' : ''}" type="button" data-adm-up-value="${esc(item.value)}">
+              <svg class="dropdown-item-check"><use href="#i-check"/></svg>${esc(item.label)}
+            </button>`).join('');
+          host.querySelector('.input-select-value').textContent =
+            items.find(item => (item.value || null) === current)?.label || filter.all;
+        });
+      };
+
+      // Menus are rebuilt on every render, so the shared .input-select handler
+      // never sees these items — this stands in for it.
+      FILTERS.forEach(filter => {
+        document.querySelector(filter.host)?.addEventListener('click', (e) => {
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          filter.set(item.dataset.admUpValue || null);
+          const host = document.querySelector(filter.host);
+          host.querySelector('.input-select-trigger').setAttribute('aria-expanded', 'false');
+          host.querySelector('.dropdown-menu').hidden = true;
+          render();
+        });
+      });
+
+      const render = () => {
+        const q = search.trim().toLowerCase();
+        const view = people.filter(p => {
+          if (roleFilter === 'Custom' ? !isCustom(p) : (roleFilter && p.role !== roleFilter)) return false;
+          if (teamFilter && p.unit !== teamFilter) return false;
+          if (permFilter && !p.granted.has(permFilter)) return false;
+          return !q
+            || p.name.toLowerCase().includes(q)
+            || p.role.toLowerCase().includes(q)
+            || p.unit.toLowerCase().includes(q);
+        });
+
+        renderFilterMenus();
+
+        const filtering = q || roleFilter || teamFilter || permFilter;
+        if (document.querySelector('[data-adm-ur-panel="people"]').hidden === false) {
+          countEl.textContent = filtering ? `${view.length} of ${people.length}` : String(people.length);
+        }
+        document.querySelector('[data-adm-up-table]').hidden = view.length === 0;
+        document.querySelector('[data-adm-up-empty]').hidden = view.length > 0;
+
+        const label = (key) => PERMISSIONS.find(perm => perm.key === key)?.label || key;
+
+        rows.innerHTML = view.map(p => `
+          <tr>
+            <td>
+              <span class="adm-person-cell">
+                <span class="avatar avatar-md">${esc(initials(p.name))}</span>
+                <span class="adm-person-name">${esc(p.name)}</span>
+              </span>
+            </td>
+            <td>
+              <span class="adm-person-unit">
+                <span class="adm-person-unit-name">${esc(p.unit)}</span>
+                <span class="adm-person-unit-sub">${esc(p.sub)}</span>
+              </span>
+            </td>
+            <td>
+              <span class="adm-row-group">
+                ${isCustom(p)
+                  ? `<span class="adm-perms">
+                       <span class="tag tag-light">Custom</span>
+                       ${[...p.granted].map(key => `<span class="tag tag-light">${esc(label(key))}</span>`).join('')}
+                       ${p.granted.size === 0 ? '<span class="adm-none">No permissions</span>' : ''}
+                     </span>`
+                  : `<button class="btn btn-ghost btn-xs adm-role-group" type="button" data-adm-up-role="${esc(p.role)}">${esc(p.role)}</button>`}
+                <button class="btn btn-icon-only btn-ghost btn-xs adm-row-edit" type="button" data-adm-up-role="${esc(p.role)}" aria-label="Edit ${esc(p.role)}"><svg class="icon icon-16"><use href="#i-pencil"/></svg></button>
+              </span>
+            </td>
+          </tr>`).join('');
+      };
+
+      // Name and pencil both open the role group — one editor, two ways in.
+      rows.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-adm-up-role]');
+        if (!trigger) return;
+        window.admEditRole?.(trigger.dataset.admUpRole);
+      });
+
+      window.admRenamePeopleRole = (from, to) => {
+        if (ROLE_DEFAULTS[from] && !ROLE_DEFAULTS[to]) ROLE_DEFAULTS[to] = ROLE_DEFAULTS[from];
+        people.forEach(person => { if (person.role === from) person.role = to; });
+        if (roleFilter === from) roleFilter = to;
+        render();
+      };
+
+      document.querySelector('[data-adm-up-search]')?.addEventListener('input', (e) => {
+        search = e.target.value;
+        render();
+      });
+      const clearPeopleFilters = () => {
+        search = '';
+        roleFilter = null;
+        permFilter = null;
+        teamFilter = null;
+        const input = document.querySelector('[data-adm-up-search]');
+        if (input) input.value = '';
+        render();
+      };
+      document.querySelector('[data-adm-up-clear]')?.addEventListener('click', clearPeopleFilters);
+
+      // Arriving from a role card: show that role's people, on this tab.
+      window.admShowPeopleByRole = (role) => {
+        roleFilter = role;
+        permFilter = null;
+        teamFilter = null;
+        search = '';
+        const input = document.querySelector('[data-adm-up-search]');
+        if (input) input.value = '';
+        document.querySelector('[data-adm-ur-tab="people"]')?.click();
+        render();
+      };
+
+      // Tabs. The count in the page head follows whichever list is on screen.
+      const panels = {
+        people: document.querySelector('[data-adm-ur-panel="people"]'),
+        roles: document.querySelector('[data-adm-ur-panel="roles"]'),
+      };
+      document.querySelectorAll('[data-adm-ur-tab]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const name = tab.dataset.admUrTab;
+          document.querySelectorAll('[data-adm-ur-tab]').forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+          });
+          Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== name; });
+          if (name === 'people') render(); else window.admRenderRoles?.();
         });
       });
 

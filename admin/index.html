@@ -3639,7 +3639,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* The three best-practice rules are what the toggle above actually enforces,
        so they sit in an alert rather than reading as more body copy. Full basis
        so it wraps onto its own line under both columns of the row. */
-    .adm-rules { flex-basis: 100%; margin-top: var(--ic-space-3); }
+    .adm-rules {
+      flex-basis: 100%;
+      margin-top: var(--ic-space-3);
+      transition: opacity var(--ic-duration-base) var(--ic-ease);
+    }
+    /* The rules are what the switch on this row enforces. With it off they
+       describe nothing, so they fade back rather than sitting there in full
+       colour claiming to be in force. */
+    .adm-setting:has(.switch-input:not(:checked)) .adm-rules { opacity: 0.4; }
     .adm-rules .alert-message { font: var(--type-body-sm); }
     /* A row whose left side is several lines tall keeps its control level with
        the title rather than floating halfway down the block. */
@@ -3663,6 +3671,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        Letting clicks through to the input fixes every switch on the page.
        The real fix belongs in designmd/components.css. */
     .switch-track { pointer-events: none; }
+
+    /* An empty cell says so rather than looking unfinished. */
+    .adm-none { color: var(--color-text-subtle); }
 
     /* Snackbar — the dark bottom-centre notice features/rob uses in its meeting
        modal (.md-view-toast), for exactly this job: saying why a disabled
@@ -4504,7 +4515,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                       <p class="adm-card-title">Job positions</p>
                       <p class="adm-caption">Job positions are required when creating new people</p>
                     </div>
-                    <button class="btn btn-ghost btn-xs" type="button"><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
+                    <button class="btn btn-ghost btn-xs" type="button" data-adm-jp-entry><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
                   </div>
                 </div>
 
@@ -4640,7 +4651,69 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       </section>
 
+      <!-- ===== Job positions ==================================================
+           A sub page rather than a list in the card: a big org can run to
+           hundreds of these, which is a table's job, not a settings row's. -->
+      <section class="page-view" data-page="job-positions" hidden>
+        <div class="page-head">
+          <div class="page-head-main">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+              <a class="breadcrumb" href="#" data-adm-jp-back>Admin</a>
+              <span class="breadcrumb is-current" aria-current="page">Job positions</span>
+            </nav>
+            <div class="page-head-title">
+              <h1 class="page-head-heading">Job positions</h1>
+              <span class="count-badge count-badge-lg count-badge-secondary" data-adm-jp-count>0</span>
+            </div>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary" type="button" data-adm-jp-add><svg class="btn-icon"><use href="#i-plus"/></svg>Add position</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="table table-wide">
+            <thead>
+              <tr><th>Position</th><th>Job level</th><th>Description</th></tr>
+            </thead>
+            <tbody data-adm-jp-rows></tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
+  </div>
+
+
+  <!-- Add New Position -->
+  <div class="modal-overlay" id="adm-jp-modal" hidden>
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <h2 class="modal-title">Add New Position</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="stack" style="gap: var(--ic-space-4)">
+          <label class="field">
+            <span class="field-label">Position Name</span>
+            <input class="input" type="text" data-adm-jp-name />
+            <span class="field-hint is-error" data-adm-jp-error hidden>Please complete this field.</span>
+          </label>
+          <label class="field">
+            <span class="field-label">Job Level</span>
+            <input class="input" type="number" min="1" max="10" data-adm-jp-level />
+          </label>
+          <label class="field">
+            <span class="field-label">Description (optional)</span>
+            <textarea class="input" rows="4" data-adm-jp-desc></textarea>
+          </label>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
+        <button class="btn btn-primary" type="button" data-adm-jp-save>Add Position</button>
+      </footer>
+    </div>
   </div>
 
   <div class="adm-snackbar" data-adm-snackbar role="status" aria-live="polite"></div>
@@ -6209,6 +6282,108 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           btn.querySelector('use')?.setAttribute('href', hidden ? '#i-eye-hide' : '#i-eye');
           render();
         });
+      });
+
+      render();
+    })();
+  </script>
+
+  <script>
+    // Job positions. Zero of them is a settings row with a way to add one; one
+    // or more is a table of its own, because a large org runs to hundreds and
+    // that does not belong inside a settings card.
+    (function () {
+      const entry = document.querySelector('[data-adm-jp-entry]');
+      const modal = document.getElementById('adm-jp-modal');
+      const rows = document.querySelector('[data-adm-jp-rows]');
+      if (!entry || !modal || !rows) return;
+
+      const nameInput = modal.querySelector('[data-adm-jp-name]');
+      const levelInput = modal.querySelector('[data-adm-jp-level]');
+      const descInput = modal.querySelector('[data-adm-jp-desc]');
+      const error = modal.querySelector('[data-adm-jp-error]');
+      const countEl = document.querySelector('[data-adm-jp-count]');
+      const positions = [];
+
+      const esc = (s) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      const render = () => {
+        const n = positions.length;
+        countEl.textContent = String(n);
+        rows.innerHTML = positions.map(p => `
+          <tr>
+            <td><span class="cell-title-text">${esc(p.name)}</span></td>
+            <td>${p.level ? esc(p.level) : '<span class="adm-none">&mdash;</span>'}</td>
+            <td>${p.description ? esc(p.description) : '<span class="adm-none">&mdash;</span>'}</td>
+          </tr>`).join('');
+
+        // The row's control is the state: add the first one, or go see them.
+        entry.innerHTML = n === 0
+          ? '<svg class="btn-icon"><use href="#i-plus"/></svg>Add job position'
+          : `${n} job position${n === 1 ? '' : 's'}<svg class="btn-icon"><use href="#i-arrow-right"/></svg>`;
+      };
+
+      const openModal = () => {
+        nameInput.value = '';
+        levelInput.value = '';
+        descInput.value = '';
+        nameInput.classList.remove('is-error');
+        error.hidden = true;
+        modal.hidden = false;
+        nameInput.focus();
+      };
+
+      // The section lists point at the settings document, so nothing in them is
+      // current while this sub page is up.
+      const showList = () => {
+        window.showAdminPage?.('job-positions');
+        document.querySelectorAll('[data-adm-toc-target]').forEach(l => l.classList.remove('is-active'));
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+
+      entry.addEventListener('click', () => {
+        if (positions.length === 0) { openModal(); return; }
+        showList();
+      });
+
+      document.querySelector('[data-adm-jp-add]')?.addEventListener('click', openModal);
+
+      document.querySelector('[data-adm-jp-back]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.showAdminPage?.('admin');
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+        window.admSyncToc?.();
+      });
+
+      // Name is the only required field, so it is the only one that can fail.
+      const validate = () => {
+        const ok = nameInput.value.trim() !== '';
+        nameInput.classList.toggle('is-error', !ok);
+        error.hidden = ok;
+        if (!ok) nameInput.focus();
+        return ok;
+      };
+      nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim() !== '') { nameInput.classList.remove('is-error'); error.hidden = true; }
+      });
+
+      modal.querySelector('[data-adm-jp-save]').addEventListener('click', () => {
+        if (!validate()) return;
+        positions.push({
+          name: nameInput.value.trim(),
+          level: levelInput.value.trim(),
+          description: descInput.value.trim(),
+        });
+        render();
+        modal.hidden = true;
+
+        const snack = document.querySelector('[data-adm-snackbar]');
+        if (snack) {
+          snack.textContent = `${positions[positions.length - 1].name} added`;
+          snack.classList.add('is-visible');
+          clearTimeout(window.__admJpSnack);
+          window.__admJpSnack = setTimeout(() => snack.classList.remove('is-visible'), 3200);
+        }
       });
 
       render();
