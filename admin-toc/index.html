@@ -3636,15 +3636,85 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* The three best-practice rules are what the toggle above actually enforces,
        so they sit in an alert rather than reading as more body copy. Full basis
        so it wraps onto its own line under both columns of the row. */
-    .adm-rules {
+    .adm-rules-stack {
+      /* The edges take their colour from the front card, so a deck that turns
+         red turns red all the way down rather than sitting on amber slivers. */
+      --adm-deck-bg: var(--color-warning-subtle);
+      --adm-deck-border: color-mix(in srgb, var(--color-warning) 32%, transparent);
+      /* One step per card behind the front one — the offsets, the insets and
+         the room left under the deck all come off this. */
+      --adm-deck-step: 5px;
+      --adm-deck-layers: 2;
       flex-basis: 100%;
+      position: relative;
       margin-top: var(--ic-space-3);
+      /* Room for the edges below the front card, so the deck doesn't sit on
+         top of the divider under it. */
+      padding-bottom: calc(var(--adm-deck-step) * var(--adm-deck-layers));
       transition: opacity var(--ic-duration-base) var(--ic-ease);
+      cursor: pointer;
+    }
+    .adm-rules { position: relative; z-index: 1; }
+    /* The cards behind are edges, not content: two slivers offset down from the
+       front one, so the row reads as a deck without reserving their height. */
+    .adm-rules-peek {
+      position: absolute;
+      top: 0; bottom: calc(var(--adm-deck-step) * var(--adm-deck-layers));
+      border-radius: var(--ic-radius-md);
+      border: 1px solid var(--adm-deck-border);
+      background: var(--adm-deck-bg);
+    }
+    .adm-rules-stack.is-danger {
+      --adm-deck-bg: var(--color-danger-subtle);
+      --adm-deck-border: color-mix(in srgb, var(--color-danger) 22%, transparent);
+    }
+    /* Both edges sit above the card's background and below the front alert, so
+       the deck paints the same dimmed as it does at full strength. */
+    .adm-rules-peek-2 {
+      left: calc(var(--ic-space-4) * 2); right: calc(var(--ic-space-4) * 2);
+      transform: translateY(calc(var(--adm-deck-step) * 2)); z-index: 0;
+    }
+    .adm-rules-peek-1 {
+      left: var(--ic-space-4); right: var(--ic-space-4);
+      transform: translateY(var(--adm-deck-step)); z-index: 0;
+    }
+    /* Dots under the deck, carousel style: they say how many there are, which
+       one is showing, and let you go straight to any of them. */
+    .adm-rules-dots {
+      flex-basis: 100%;
+      display: flex; justify-content: center; align-items: center;
+      gap: 2px;
+      margin-top: var(--ic-space-1);
+      transition: opacity var(--ic-duration-base) var(--ic-ease);
+    }
+    .adm-rules-dot {
+      display: flex; align-items: center;
+      padding: var(--ic-space-2) 3px;
+      background: none; border: 0;
+      cursor: pointer;
+    }
+    .adm-rules-dot-mark {
+      display: block;
+      width: 6px; height: 6px;
+      border-radius: var(--ic-radius-full);
+      background: var(--ic-palette-blue-100);
+      transition: width var(--ic-duration-fast) var(--ic-ease),
+                  background var(--ic-duration-fast) var(--ic-ease);
+    }
+    .adm-rules-dot:hover .adm-rules-dot-mark { background: var(--ic-palette-blue-200); }
+    /* Inert with the switch off: the cursor says so before the click does. */
+    .adm-rules-stack.is-off,
+    .adm-rules-dots.is-off .adm-rules-dot { cursor: not-allowed; }
+    .adm-rules-dots.is-off .adm-rules-dot:hover .adm-rules-dot-mark { background: var(--ic-palette-blue-100); }
+    .adm-rules-dot[aria-current="true"] .adm-rules-dot-mark {
+      width: 18px;
+      background: var(--ic-palette-blue-500);
     }
     /* What a row's switch governs fades with it: the rules it enforces, the
        limits it applies. With the switch off they describe nothing, so they
        fade back rather than sitting there claiming to be in force. */
-    .adm-setting:has(.switch-input:not(:checked)) .adm-rules,
+    .adm-setting:has(.switch-input:not(:checked)) .adm-rules-stack,
+    .adm-setting:has(.switch-input:not(:checked)) .adm-rules-dots,
     .adm-setting:has(.switch-input:not(:checked)) .adm-limits-block { opacity: 0.4; }
     .adm-rules .alert-message { font: var(--type-body-sm); }
     /* A row whose left side is several lines tall keeps its control level with
@@ -3669,6 +3739,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        Letting clicks through to the input fixes every switch on the page.
        The real fix belongs in designmd/components.css. */
     .switch-track { pointer-events: none; }
+
+    /* A tab holds a label and its count; .tab is display:block by default. */
+    .tabs .tab { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
 
     .adm-jp-toolbar { margin-bottom: var(--ic-space-4); }
 
@@ -3929,9 +4002,38 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-var.is-hidden .adm-var-select { opacity: 0.55; }
     .adm-var.is-hidden .input-select-trigger { cursor: not-allowed; }
     .adm-var-add { align-self: flex-start; margin-top: var(--ic-space-1); }
+    /* A custom variable is typed, not picked: two fields where the fixed rows
+       carry a label and a format select, so the columns still line up. */
+    .adm-var-input { flex: 1 1 0; min-width: 0; }
+    .adm-var-custom > .adm-var-input:first-of-type { flex: 0 1 148px; }
+    /* The value field and its hint stack in one column, so the hint always
+       starts exactly where the value does. */
+    .adm-var-value-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    .adm-var-value-col .adm-var-input { flex: 0 0 auto; }
+    .adm-var-hint { margin: 0; }
+    .adm-var-hint[hidden] { display: none; }
+    /* With a hint under it the row is taller than its fields, so the grip and
+       the two icon buttons align to the input's line rather than to the block. */
+    .adm-var-custom { align-items: flex-start; }
+    .adm-var-custom > .adm-var-grip { margin-top: var(--ic-space-2); }
+    .adm-var-custom > .btn { margin-top: var(--ic-space-1); }
+    .adm-var-remove { color: var(--color-text-muted); flex-shrink: 0; }
+    .adm-var-remove:hover { color: var(--color-text); }
+    .adm-var.is-hidden .adm-var-input { opacity: 0.55; }
 
     /* Live preview — a suggestion of the Slack window, not a copy of it: the
        point is the channel name, which recomputes from the rows above. */
+    /* Boxed rather than divided: this row goes somewhere else, so it reads as
+       its own object inside the card instead of one more setting in the list. */
+    .adm-compliance {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--ic-space-4);
+      margin-top: var(--ic-space-4);
+      padding: var(--ic-space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--ic-radius-md);
+    }
+
     .adm-preview {
       flex-basis: 100%;
       min-width: 0;
@@ -3954,11 +4056,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-preview-meta { font: var(--type-body-xs); color: var(--color-text-subtle); }
 
     /* Card-level actions, pinned right under the last row. */
+    /* No rule above the actions: the row it would separate is already divided
+       from the one before it, and two hairlines that close together read as a
+       stripe rather than as structure. */
     .adm-card-footer {
       display: flex; justify-content: flex-end; gap: var(--ic-space-3);
-      margin-top: var(--ic-space-4);
-      padding-top: var(--ic-space-4);
-      border-top: 1px solid var(--color-border);
+      margin-top: var(--ic-space-5);
     }
 
     /* The limits list spans the row it belongs to, under both columns. */
@@ -3978,6 +4081,45 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-limit-name { font: var(--type-body-sm-semibold); color: var(--color-text-muted); margin: 0; }
     .adm-limit-hint { font: var(--type-body-xxs); color: var(--color-text-muted); margin: 0; }
     .adm-limit-value { font: var(--type-body-sm); color: var(--color-text-muted); white-space: nowrap; }
+    .adm-limit-value[hidden] { display: none; }
+
+    /* Edit mode: the number becomes a field with its own stepper, since these
+       are small integers that get nudged rather than typed from scratch. */
+    .adm-limit-field { display: flex; align-items: stretch; flex-shrink: 0; }
+    .adm-limit-field[hidden] { display: none; }
+    .adm-limit-input {
+      width: 72px;
+      border-radius: var(--ic-radius-sm) 0 0 var(--ic-radius-sm);
+      border-right: 0;
+      text-align: left;
+      -moz-appearance: textfield;
+    }
+    .adm-limit-input::-webkit-outer-spin-button,
+    .adm-limit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .adm-limit-input:disabled { background: var(--color-surface-muted); color: var(--color-text-subtle); }
+    .adm-limit-spin { display: flex; flex-direction: column; width: 28px; }
+    .adm-limit-step {
+      flex: 1 1 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--ic-palette-graphite-500);
+      cursor: pointer;
+    }
+    .adm-limit-step:first-child { border-radius: 0 var(--ic-radius-sm) 0 0; border-bottom: 0; }
+    .adm-limit-step:last-child  { border-radius: 0 0 var(--ic-radius-sm) 0; }
+    .adm-limit-step:hover:not(:disabled) { background: var(--color-surface-muted); color: var(--color-text); }
+    .adm-limit-step:disabled { background: var(--color-surface-muted); color: var(--color-text-subtle); cursor: not-allowed; }
+    .adm-limit-step .icon { width: 12px; height: 12px; }
+    /* No chevron-up in the sprite — the down one, turned over. */
+    .adm-limit-step-up .icon { transform: rotate(180deg); }
+
+    .adm-limits-foot { display: flex; justify-content: flex-end; margin-top: var(--ic-space-4); }
+    .adm-limits-foot[hidden] { display: none; }
+    /* .btn sets display:inline-flex, which outranks the UA rule for [hidden] —
+       so hiding a button takes saying it. */
+    .btn[hidden] { display: none; }
 
     /* A setting reads as one line: what it is on the left, what it's set to on
        the right. Replaces the design's radio rows — three of those per card
@@ -4489,7 +4631,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
-              <h1 class="page-head-heading">Admin</h1>
+              <h1 class="page-head-heading">Settings</h1>
             </div>
           </div>
         </div>
@@ -4529,14 +4671,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                       <p class="adm-caption">Warn users when RACI roles don't follow best practices</p>
                     </div>
                     <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
-                    <div class="alert alert-warning adm-rules" role="note">
-                      <svg class="icon alert-icon"><use href="#i-warning"/></svg>
-                      <p class="alert-message">
-                        A manager is assigned as <strong>Responsible</strong> ·
-                        The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong> ·
-                        Require RACI members to match the respective Slack channel
-                      </p>
+                    <!-- Three separate rules, not one run-on sentence: a deck
+                         you click through, so each is read on its own and the
+                         row stays the height of a single alert. -->
+                    <div class="adm-rules-stack" data-adm-rules>
+                      <span class="adm-rules-peek adm-rules-peek-2" aria-hidden="true"></span>
+                      <span class="adm-rules-peek adm-rules-peek-1" aria-hidden="true"></span>
+                      <div class="alert alert-warning adm-rules" role="note" aria-live="polite">
+                        <svg class="icon alert-icon"><use href="#i-warning"/></svg>
+                        <p class="alert-message" data-adm-rule-text>
+                          A manager is assigned as <strong>Responsible</strong>
+                        </p>
+                      </div>
                     </div>
+                    <div class="adm-rules-dots" data-adm-rules-dots aria-label="Best practice rules"></div>
                   </div>
 
                   <div class="adm-setting adm-setting-top">
@@ -4549,44 +4697,50 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     <div class="adm-limits-block">
                       <div class="adm-limits-head">
                         <p class="adm-limits-title">Member limits</p>
-                        <button class="btn btn-secondary btn-xs" type="button">Edit limits</button>
+                        <button class="btn btn-secondary" type="button" data-adm-limits-edit>Edit limits</button>
                       </div>
                     <div class="adm-limits">
-                      <div class="adm-limit">
+                      <div class="adm-limit" data-adm-limit>
                         <div class="adm-limit-main">
                           <p class="adm-limit-name">Total people</p>
                           <p class="adm-limit-hint">Defines the limit on the total number of people in a RACI matrix</p>
                         </div>
                         <span class="adm-limit-value">20</span>
                       </div>
-                      <div class="adm-limit">
+                      <div class="adm-limit" data-adm-limit>
                         <div class="adm-limit-main">
                           <p class="adm-limit-name">Responsible</p>
                           <p class="adm-limit-hint">Defines the max number of people responsible for the task</p>
                         </div>
                         <span class="adm-limit-value">8</span>
                       </div>
-                      <div class="adm-limit">
+                      <div class="adm-limit" data-adm-limit data-locked>
                         <div class="adm-limit-main">
                           <p class="adm-limit-name">Accountable</p>
                           <p class="adm-limit-hint">The person ultimately answerable for the task</p>
                         </div>
                         <span class="adm-limit-value">1</span>
                       </div>
-                      <div class="adm-limit">
+                      <div class="adm-limit" data-adm-limit>
                         <div class="adm-limit-main">
                           <p class="adm-limit-name">Consulted</p>
                           <p class="adm-limit-hint">Defines the max number of people whose opinions are sought</p>
                         </div>
                         <span class="adm-limit-value">2</span>
                       </div>
-                      <div class="adm-limit">
+                      <div class="adm-limit" data-adm-limit>
                         <div class="adm-limit-main">
                           <p class="adm-limit-name">Informed</p>
                           <p class="adm-limit-hint">Defines the max number of people updated on progress</p>
                         </div>
                         <span class="adm-limit-value">9</span>
                       </div>
+                    </div>
+                    <!-- Raising a limit lets bigger matrices through immediately,
+                         so the numbers are read-only until Edit limits is asked
+                         for, and the change is committed on its own button. -->
+                    <div class="adm-limits-foot" data-adm-limits-foot hidden>
+                      <button class="btn btn-primary" type="button" data-adm-limits-save>Update Limits</button>
                     </div>
                     </div>
                   </div>
@@ -4812,6 +4966,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                         </div>
                         <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="true" aria-label="Include Name in channel names"><svg class="icon icon-16"><use href="#i-eye"/></svg></button>
                       </div>
+                      <p class="field-hint adm-var-hint" data-adm-var-hint hidden>Text written here will appear exactly in the channel name.</p>
                       <button class="btn btn-ghost btn-xs adm-var-add" type="button"><svg class="btn-icon"><use href="#i-plus"/></svg>Add variable</button>
                     </div>
                   </div>
@@ -4834,9 +4989,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </div>
 
+                  <div class="adm-compliance">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Slack channel compliance</p>
+                      <p class="adm-caption">Monitor and manage all public Slack channels for naming standard adherence</p>
+                    </div>
+                    <button class="btn btn-ghost btn-xs" type="button" data-adm-channels-entry aria-label="Browse 548 channels">548 channels<svg class="btn-icon"><use href="#i-arrow-right"/></svg></button>
+                  </div>
+
+                  <!-- These two act on the structure variables above, and on
+                       nothing else. Saving them changes the names people get,
+                       so it is deliberate rather than autosaved. -->
                   <div class="adm-card-footer">
-                    <button class="btn btn-secondary" type="button">Cancel</button>
-                    <button class="btn btn-primary" type="button">Save</button>
+                    <button class="btn btn-secondary" type="button" data-adm-vars-cancel disabled>Cancel</button>
+                    <button class="btn btn-primary" type="button" data-adm-vars-save disabled>Save</button>
                   </div>
 
                 </div>
@@ -4866,12 +5032,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" data-adm-ur-back>Admin</a>
+              <a class="breadcrumb" href="#" data-adm-ur-back>Settings</a>
               <span class="breadcrumb is-current" aria-current="page">User roles</span>
             </nav>
             <div class="page-head-title">
               <h1 class="page-head-heading">Roles management</h1>
-              <span class="count-badge count-badge-lg count-badge-secondary" data-adm-ur-count>0</span>
             </div>
           </div>
           <div class="page-head-actions">
@@ -4880,8 +5045,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
 
         <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" aria-selected="true" type="button" data-adm-ur-tab="people">People</button>
-          <button class="tab" role="tab" aria-selected="false" type="button" data-adm-ur-tab="roles">Roles &amp; Permissions</button>
+          <!-- The count belongs to the list it counts, so it rides in the tab
+               rather than in the head, where it changed meaning per tab. -->
+          <button class="tab is-active" role="tab" aria-selected="true" type="button" data-adm-ur-tab="people">People<span class="count-badge count-badge-secondary" data-adm-up-count>0</span></button>
+          <button class="tab" role="tab" aria-selected="false" type="button" data-adm-ur-tab="roles">Roles &amp; Permissions<span class="count-badge count-badge-secondary" data-adm-ur-count>0</span></button>
         </div>
 
         <!-- People: permissions are held per person, so the directory is the
@@ -4959,7 +5126,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head">
           <div class="page-head-main">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-              <a class="breadcrumb" href="#" data-adm-jp-back>Admin</a>
+              <a class="breadcrumb" href="#" data-adm-jp-back>Settings</a>
               <span class="breadcrumb is-current" aria-current="page">Job positions</span>
             </nav>
             <div class="page-head-title">
@@ -6713,14 +6880,190 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
+    // The best-practice rules, one at a time. Three rules in one alert read as
+    // a run-on sentence; as a deck each gets its own line and the row keeps the
+    // height of a single alert however many there are.
+    (function () {
+      const stack = document.querySelector('[data-adm-rules]');
+      if (!stack) return;
+      const text = stack.querySelector('[data-adm-rule-text]');
+      const dots = document.querySelector('[data-adm-rules-dots]');
+
+      // Three recommendations and one breach. The breach is the same deck
+      // because it is about the same matrix — it just arrives in red, since it
+      // blocks a save rather than advising on one.
+      const RULES = [
+        { html: 'A manager is assigned as <strong>Responsible</strong>' },
+        { html: 'The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong>' },
+        { html: 'Require RACI members to match the respective Slack channel' },
+        { html: '<strong>Limit exceeded!</strong> Only 8 Consulted members are allowed. Please adjust before saving.',
+          variant: 'danger' },
+      ];
+      let index = 0;
+
+      const card = stack.querySelector('.adm-rules');
+      const icon = card.querySelector('.alert-icon use');
+
+      dots.innerHTML = RULES.map((rule, i) => `
+        <button class="adm-rules-dot" type="button" data-adm-rule-index="${i}" aria-label="Rule ${i + 1} of ${RULES.length}"><span class="adm-rules-dot-mark"></span></button>`).join('');
+      const dotBtns = [...dots.querySelectorAll('[data-adm-rule-index]')];
+
+      const render = () => {
+        const rule = RULES[index];
+        const danger = rule.variant === 'danger';
+        text.innerHTML = rule.html;
+        dotBtns.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
+        card.classList.toggle('alert-danger', danger);
+        card.classList.toggle('alert-warning', !danger);
+        stack.classList.toggle('is-danger', danger);
+        icon.setAttribute('href', danger ? '#i-warning-octagon' : '#i-warning');
+        card.setAttribute('role', danger ? 'alert' : 'note');
+      };
+
+      // The whole card advances, so the click doesn't have to find the counter —
+      // which is a real button for the keyboard, and stops the click bubbling
+      // back into the card so one press moves one rule.
+      // The row's own switch governs the deck: with recommendations off these
+      // rules enforce nothing, so the deck goes inert. Clicks still land — and
+      // say why in the bottom snackbar — rather than doing nothing at all.
+      const row = stack.closest('.adm-setting');
+      const toggle = row?.querySelector('.switch-input');
+      const title = row?.querySelector('.adm-card-title')?.textContent.trim() || 'This setting';
+      const isOff = () => !!toggle && !toggle.checked;
+
+      const guard = (e) => {
+        if (!isOff()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.admSnack?.(`${title} is off. Turn it on to browse these rules.`);
+      };
+      stack.addEventListener('click', guard, true);
+      dots.addEventListener('click', guard, true);
+
+      const syncGoverned = () => {
+        const off = isOff();
+        stack.classList.toggle('is-off', off);
+        dots.classList.toggle('is-off', off);
+        dotBtns.forEach(dot => {
+          dot.setAttribute('aria-disabled', String(off));
+          if (off) dot.setAttribute('tabindex', '-1'); else dot.removeAttribute('tabindex');
+        });
+      };
+      toggle?.addEventListener('change', syncGoverned);
+      syncGoverned();
+
+      const advance = () => { index = (index + 1) % RULES.length; render(); };
+      stack.addEventListener('click', advance);
+
+      // A dot goes straight to its rule rather than stepping through to it.
+      dots.addEventListener('click', (e) => {
+        const dot = e.target.closest('[data-adm-rule-index]');
+        if (!dot) return;
+        index = Number(dot.dataset.admRuleIndex);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+
+  <script>
+    // Member limits. Read-only until asked for: raising one lets bigger RACI
+    // matrices through the moment it is saved, so the numbers only become
+    // fields on request and the change is committed on its own button.
+    (function () {
+      const block = document.querySelector('.adm-limits-block');
+      const editBtn = document.querySelector('[data-adm-limits-edit]');
+      const foot = document.querySelector('[data-adm-limits-foot]');
+      const saveBtn = document.querySelector('[data-adm-limits-save]');
+      if (!block || !editBtn || !foot) return;
+
+      const rows = [...block.querySelectorAll('[data-adm-limit]')];
+
+      // One field per row, built once and reused on every pass.
+      rows.forEach(row => {
+        const locked = row.dataset.locked !== undefined;
+        const value = row.querySelector('.adm-limit-value');
+        const name = row.querySelector('.adm-limit-name').textContent.trim();
+        const field = document.createElement('span');
+        field.className = 'adm-limit-field';
+        field.hidden = true;
+        field.innerHTML = `
+          <input class="input adm-limit-input" type="number" min="1" max="999" step="1"
+                 aria-label="${name} limit"${locked ? ' disabled' : ''} />
+          <span class="adm-limit-spin">
+            <button class="adm-limit-step adm-limit-step-up" type="button" data-step="1" aria-label="Increase ${name} limit"${locked ? ' disabled' : ''}><svg class="icon"><use href="#i-chevron-down"/></svg></button>
+            <button class="adm-limit-step" type="button" data-step="-1" aria-label="Decrease ${name} limit"${locked ? ' disabled' : ''}><svg class="icon"><use href="#i-chevron-down"/></svg></button>
+          </span>`;
+        row.appendChild(field);
+
+        const input = field.querySelector('input');
+        field.querySelectorAll('[data-step]').forEach(step => {
+          step.addEventListener('click', () => {
+            const next = (Number(input.value) || 0) + Number(step.dataset.step);
+            input.value = String(Math.min(999, Math.max(1, next)));
+          });
+        });
+        // A blank or nonsense entry falls back to what the row already showed.
+        input.addEventListener('blur', () => {
+          const n = Math.round(Number(input.value));
+          input.value = String(Number.isFinite(n) && n >= 1 ? Math.min(999, n) : Number(value.textContent.trim()));
+        });
+
+        row._limit = { value, input, locked };
+      });
+
+      const setEditing = (editing) => {
+        rows.forEach(row => {
+          const { value, input } = row._limit;
+          if (editing) input.value = value.textContent.trim();
+          value.hidden = editing;
+          row.querySelector('.adm-limit-field').hidden = !editing;
+        });
+        editBtn.hidden = editing;
+        foot.hidden = !editing;
+        if (editing) rows[0]._limit.input.focus();
+      };
+
+      editBtn.addEventListener('click', () => setEditing(true));
+
+      saveBtn?.addEventListener('click', () => {
+        rows.forEach(row => {
+          const { value, input, locked } = row._limit;
+          if (!locked) value.textContent = input.value;
+        });
+        setEditing(false);
+        window.toast?.({ variant: 'success', message: 'Member limits updated.' });
+      });
+    })();
+  </script>
+
+  <script>
+    // Browse channels — the drill-down target isn't built yet, so the click
+    // reports that rather than dying silently under the cursor.
+    document.querySelector('[data-adm-channels-entry]')?.addEventListener('click', () => {
+      window.admSnack?.('The channel compliance list is not part of this prototype yet.');
+    });
+  </script>
+
+  <script>
     // Slack channel naming — the preview is computed from the rows, so changing
     // a format or hiding a variable shows the channel name people will get.
     (function () {
       const out = document.querySelector('[data-adm-preview]');
       if (!out) return;
-      const rows = [...document.querySelectorAll('[data-adm-var]')];
+      const list = document.querySelector('.adm-vars');
+      const addBtn = document.querySelector('.adm-var-add');
+      const hint = document.querySelector('[data-adm-var-hint]');
+      // Read live: rows are added after load, so a snapshot would go stale.
+      const allRows = () => [...document.querySelectorAll('[data-adm-var]')];
 
       const part = (row) => {
+        // A custom variable is a literal — whatever was typed goes in as typed,
+        // so there is no format to apply to it.
+        if (row.dataset.custom !== undefined) {
+          return row.querySelector('[data-adm-var-value]')?.value.trim() || '';
+        }
         const format = row.querySelector('.input-select-value')?.textContent.trim();
         const full = row.dataset.full || '';
         if (format === 'First letter') return full.charAt(0);
@@ -6728,8 +7071,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         return full;
       };
 
+      // The hint belongs to the typed rows, so it comes and goes with them —
+      // and it sits inside the last one, directly under the value it describes,
+      // rather than being repeated under every row that follows the same rule.
+      const syncHint = () => {
+        if (!hint) return;
+        const custom = [...document.querySelectorAll('[data-custom]')];
+        hint.hidden = custom.length === 0;
+        if (custom.length) custom[custom.length - 1].querySelector('[data-adm-var-col]').appendChild(hint);
+        else list.insertBefore(hint, addBtn);
+      };
+
       const render = () => {
-        out.textContent = rows
+        syncHint();
+        syncFooter();
+        out.textContent = allRows()
           .filter(r => !r.classList.contains('is-hidden'))
           .map(part)
           .filter(Boolean)
@@ -6738,7 +7094,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       // Format changes: the shared .input-select handler writes the label on the
       // item's own listener, so this one — delegated on the menu — runs after it.
-      rows.forEach(row => {
+      const wire = (row) => {
         row.querySelector('.dropdown-menu')?.addEventListener('click', e => {
           if (e.target.closest('.dropdown-item')) render();
         });
@@ -6754,19 +7110,47 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           if (hidden) {
             trigger?.setAttribute('tabindex', '-1');
             trigger?.setAttribute('aria-expanded', 'false');
-            row.querySelector('.dropdown-menu').hidden = true;
+            // A custom row has no format menu to close.
+            const menu = row.querySelector('.dropdown-menu');
+            if (menu) menu.hidden = true;
           } else {
             trigger?.removeAttribute('tabindex');
           }
         };
+        row._syncHidden = syncSelect;
+
         // Clicking it anyway should say why, the way the governed cards do.
-        const varName = row.querySelector('.adm-var-name')?.textContent.trim() || 'This variable';
+        const varName = () => row.querySelector('.adm-var-name')?.textContent.trim()
+          || row.querySelector('[data-adm-var-label]')?.value.trim()
+          || 'This variable';
         select?.addEventListener('click', (e) => {
           if (!row.classList.contains('is-hidden')) return;
           e.preventDefault();
           e.stopPropagation();
-          window.admSnack?.(`${varName} is hidden from channel names. Show it to change its format.`);
+          window.admSnack?.(`${varName()} is hidden from channel names. Show it to change its format.`);
         }, true);
+
+        // A custom variable's own inputs: the name is a label, the value is what
+        // lands in the channel name, character for character.
+        row.querySelectorAll('[data-adm-var-label], [data-adm-var-value]').forEach(input => {
+          input.addEventListener('input', () => {
+            const eye = row.querySelector('.adm-var-eye');
+            if (eye) eye.setAttribute('aria-label', `Include ${varName()} in channel names`);
+            render();
+          });
+        });
+
+        row.querySelector('[data-adm-var-remove]')?.addEventListener('click', () => {
+          const name = varName();
+          row.remove();
+          render();
+          // Top-right info toast: this reports something that happened, which
+          // is not the bottom snackbar's job — that explains a blocked click.
+          window.toast?.({
+            variant: 'info',
+            message: `${name === 'This variable' ? 'Variable' : name} removed from channel names.`,
+          });
+        });
 
         row.querySelector('.adm-var-eye')?.addEventListener('click', (e) => {
           const hidden = row.classList.toggle('is-hidden');
@@ -6778,6 +7162,109 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
 
         syncSelect();
+      };
+
+      allRows().forEach(wire);
+
+      // ── Add variable ─────────────────────────────────────────────────────
+      // Two free-text fields: a name to recognise it by, and the value that is
+      // written into the channel name exactly as entered. As many as wanted.
+      const makeCustomRow = ({ label = '', value = '', hidden = false } = {}) => {
+        const row = document.createElement('div');
+        row.className = 'adm-var adm-var-custom' + (hidden ? ' is-hidden' : '');
+        row.setAttribute('data-adm-var', '');
+        row.setAttribute('data-custom', '');
+        row.innerHTML = `
+          <svg class="icon icon-16 adm-var-grip"><use href="#i-drag"/></svg>
+          <input class="input adm-var-input" type="text" data-adm-var-label placeholder="Label..." aria-label="Variable name" />
+          <div class="adm-var-value-col" data-adm-var-col>
+            <input class="input adm-var-input" type="text" data-adm-var-value placeholder="Enter fixed word..." aria-label="Variable value" />
+          </div>
+          <button class="btn btn-icon-only btn-ghost btn-xs adm-var-eye" type="button" aria-pressed="true" aria-label="Include this variable in channel names"><svg class="icon icon-16"><use href="#i-eye"/></svg></button>
+          <button class="btn btn-icon-only btn-ghost btn-xs adm-var-remove" type="button" data-adm-var-remove aria-label="Remove variable"><svg class="icon icon-16"><use href="#i-trash"/></svg></button>`;
+        row.querySelector('[data-adm-var-label]').value = label;
+        row.querySelector('[data-adm-var-value]').value = value;
+        const eye = row.querySelector('.adm-var-eye');
+        eye.setAttribute('aria-pressed', String(!hidden));
+        eye.querySelector('use').setAttribute('href', hidden ? '#i-eye-hide' : '#i-eye');
+        list.insertBefore(row, addBtn);
+        wire(row);
+        return row;
+      };
+
+      addBtn?.addEventListener('click', () => {
+        const row = makeCustomRow();
+        render();
+        row.querySelector('[data-adm-var-label]').focus();
+      });
+
+      // ── Cancel / Save ────────────────────────────────────────────────────
+      // Saving these rules changes the channel names people get from then on,
+      // so it is an explicit act: the footer stays dead until something in the
+      // variables above actually differs from what was last saved.
+      const cancelBtn = document.querySelector('[data-adm-vars-cancel]');
+      const saveBtn = document.querySelector('[data-adm-vars-save]');
+
+      const stateOf = () => allRows().map(row => {
+        const custom = row.dataset.custom !== undefined;
+        return {
+          custom,
+          label: custom
+            ? row.querySelector('[data-adm-var-label]').value
+            : row.querySelector('.adm-var-name')?.textContent.trim() || '',
+          value: custom ? row.querySelector('[data-adm-var-value]').value : '',
+          format: row.querySelector('.input-select-value')?.textContent.trim() || '',
+          hidden: row.classList.contains('is-hidden'),
+          full: row.dataset.full || '',
+        };
+      });
+      const fingerprint = () => JSON.stringify(stateOf());
+      let baseline = fingerprint();
+
+      const syncFooter = () => {
+        const clean = fingerprint() === baseline;
+        if (cancelBtn) cancelBtn.disabled = clean;
+        if (saveBtn) saveBtn.disabled = clean;
+      };
+
+      const setHidden = (row, hidden) => {
+        row.classList.toggle('is-hidden', hidden);
+        const eye = row.querySelector('.adm-var-eye');
+        eye?.setAttribute('aria-pressed', String(!hidden));
+        eye?.querySelector('use')?.setAttribute('href', hidden ? '#i-eye-hide' : '#i-eye');
+        row._syncHidden?.();
+      };
+
+      const setFormat = (row, format) => {
+        const value = row.querySelector('.input-select-value');
+        if (!value || !format) return;
+        value.textContent = format;
+        row.querySelectorAll('.dropdown-item').forEach(item => {
+          item.classList.toggle('is-selected', item.textContent.trim() === format);
+        });
+      };
+
+      cancelBtn?.addEventListener('click', () => {
+        const saved = JSON.parse(baseline);
+        // Typed rows are rebuilt rather than patched: Cancel has to undo rows
+        // that were added or removed, not only values that were edited.
+        document.querySelectorAll('[data-custom]').forEach(row => row.remove());
+        saved.forEach(entry => {
+          if (entry.custom) { makeCustomRow(entry); return; }
+          const row = [...document.querySelectorAll('[data-adm-var]:not([data-custom])')]
+            .find(r => (r.dataset.full || '') === entry.full);
+          if (!row) return;
+          setFormat(row, entry.format);
+          setHidden(row, entry.hidden);
+        });
+        render();
+        window.toast?.({ variant: 'info', message: 'Changes to the structure variables were discarded.' });
+      });
+
+      saveBtn?.addEventListener('click', () => {
+        baseline = fingerprint();
+        syncFooter();
+        window.toast?.({ variant: 'success', message: 'Channel naming standards saved.' });
       });
 
       render();
@@ -7198,9 +7685,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           || r.description.toLowerCase().includes(q)
           || r.permissions.some(perm => perm.toLowerCase().includes(q)));
 
-        if (document.querySelector('[data-adm-ur-panel="roles"]')?.hidden === false) {
-          countEl.textContent = q ? `${view.length} of ${ROLES.length}` : String(ROLES.length);
-        }
+        countEl.textContent = q ? `${view.length} of ${ROLES.length}` : String(ROLES.length);
         document.querySelector('[data-adm-ur-cards]').hidden = view.length === 0;
         document.querySelector('[data-adm-ur-empty]').hidden = view.length > 0;
 
@@ -7556,7 +8041,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         return base.length !== p.granted.size || base.some(k => !p.granted.has(k));
       };
 
-      const countEl = document.querySelector('[data-adm-ur-count]');
+      const countEl = document.querySelector('[data-adm-up-count]');
       let search = '';
       let roleFilter = null;   // also set when arriving from a role card
       let permFilter = null;
@@ -7637,10 +8122,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
         renderFilterMenus();
 
+        // In the tab it reads whether or not that tab is the open one.
         const filtering = q || roleFilter || teamFilter || permFilter;
-        if (document.querySelector('[data-adm-ur-panel="people"]').hidden === false) {
-          countEl.textContent = filtering ? `${view.length} of ${people.length}` : String(people.length);
-        }
+        countEl.textContent = filtering ? `${view.length} of ${people.length}` : String(people.length);
         document.querySelector('[data-adm-up-table]').hidden = view.length === 0;
         document.querySelector('[data-adm-up-empty]').hidden = view.length > 0;
 
