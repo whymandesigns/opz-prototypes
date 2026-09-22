@@ -2474,6 +2474,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *   <div role="tabpanel" id="p-1" aria-labelledby="t-1">…</div>
  *   <div role="tabpanel" id="p-2" aria-labelledby="t-2" hidden>…</div>
  */
+/* On this page the tab strip sits directly under the head and carries the
+   rule, so the head doesn't draw a second one four pixels above it. */
+.page-view[data-page="integrations"] .page-head { border-bottom: 0; margin-bottom: var(--ic-space-4); }
+.page-view[data-page="integrations"] .tabs { margin-bottom: var(--ic-space-6); }
 .tabs {
   display: flex;
   gap: var(--ic-space-6);
@@ -2482,6 +2486,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .tab {
   background: transparent;
   border: 0;
+  /* A tab can be an <a> when it leads to another screen; without this it would
+     arrive underlined and stop matching the buttons beside it. */
+  text-decoration: none;
   border-bottom: 2px solid transparent;
   padding: 0 0 var(--ic-space-1);
   margin-bottom: -1px;
@@ -4136,6 +4143,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
+        <div class="tabs" role="tablist" aria-label="Integrations sections">
+          <button class="tab is-active" type="button" role="tab" aria-selected="true">Integrations</button>
+          <!-- Not a panel: the API token flow is its own prototype, so the tab
+               goes there, landing on that page's own API tokens tab. -->
+          <a class="tab" role="tab" aria-selected="false" href="../api-token-management/#tokens" data-ig-sibling="api-token-management" data-ig-hash="tokens">API tokens</a>
+        </div>
+
         <!-- Content region. Sections and cards are generated from the Figma
              reference (node 35846:262599) using designmd components: .card for
              each integration, .btn/.btn-primary/.btn-secondary for the CTA, and
@@ -4355,6 +4369,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     </article>
     </div>
   </section>
+        </div>
+
         </div>
 
       </section>
@@ -5743,7 +5759,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.querySelectorAll('[data-ig-sibling]').forEach(link => {
       const here = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
       const base = here.slice(0, here.lastIndexOf('/'));
-      link.href = `${base}/${link.dataset.igSibling}/`;
+      const hash = link.dataset.igHash ? `#${link.dataset.igHash}` : '';
+      link.href = `${base}/${link.dataset.igSibling}/${hash}`;
     });
 
     document.querySelectorAll('#template-app-shell .sidenav-item[data-page]').forEach(link => {
