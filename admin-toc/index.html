@@ -3542,6 +3542,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        .adm-nav-toggle into every .page-head-title; below the breakpoint the
        topbar is gone and the sidenav has no rail, so this is the only way to
        open it. Hidden above 720px. */
+    /* A nav entry marked for removal — the setting it points at has moved. */
+    .adm-nav-struck .sidenav-item-label {
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      color: var(--color-text-subtle);
+    }
+
     .adm-nav-toggle {
       display: none;
       align-items: center;
@@ -3601,6 +3608,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       font-weight: var(--ic-weight-semibold);
     }
     .adm-toc-item .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    /* One step in from its section: the sub carries its own icon, so it indents
+       by a fixed step rather than to the parent's label. */
+    .adm-toc-sub {
+      padding-left: calc(var(--ic-space-3) + var(--ic-space-4));
+      font: var(--type-body-sm);
+    }
+    /* The section holding the active sub-item is named, not highlighted — one
+       filled row at a time keeps the rail readable. */
+    .adm-toc-item.is-ancestor {
+      background: transparent;
+      color: var(--color-text);
+      font-weight: var(--ic-weight-semibold);
+    }
 
     /* Sections are separated by space alone — the cards already carry the only
        rules on the page. */
@@ -4161,7 +4181,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .adm-limit { display: flex; align-items: center; gap: var(--ic-space-4); padding: var(--ic-space-2) 0; }
     .adm-limit + .adm-limit { border-top: 1px solid var(--color-border); }
     .adm-limit-main { flex: 1; min-width: 0; }
-    .adm-limit-name { font: var(--type-body-sm-semibold); color: var(--color-text-muted); margin: 0; }
+    .adm-limit-name { font: var(--type-body-sm-semibold); color: var(--ic-palette-graphite-700); margin: 0; }
     .adm-limit-hint { font: var(--type-body-xxs); color: var(--color-text-muted); margin: 0; }
     .adm-limit-value { font: var(--type-body-sm); color: var(--color-text-muted); white-space: nowrap; }
     .adm-limit-value[hidden] { display: none; }
@@ -4692,11 +4712,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              far, so it carries the active state. Point the others at their own
              .page-view sections as the screens get designed. -->
         <div class="sidenav-group">
-          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin Settings</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
           <ul class="sidenav-sublist">
-            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="permissions"><span class="sidenav-item-label">Permissions</span></a></li>
+            <!-- Struck through on purpose: both of these now live as sections
+                 inside Settings, so the entries are leftovers to be removed. -->
+            <li><a class="sidenav-item sidenav-subitem adm-nav-struck" href="#" data-page="permissions"><span class="sidenav-item-label">Permissions</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem adm-nav-struck" href="#" data-page="positions"><span class="sidenav-item-label">Positions</span></a></li>
             <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="admin"><span class="sidenav-item-label">Settings</span></a></li>
-            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="integrations"><span class="sidenav-item-label">Integrations</span></a></li>
+            <!-- A real link out to the Integrations v3 prototype: the first
+                 thread between these prototypes, so the shell behaves like one
+                 product rather than a set of screens. -->
+            <li><a class="sidenav-item sidenav-subitem" href="../integrations-v3/" data-adm-sibling="integrations-v3"><span class="sidenav-item-label">Integrations</span></a></li>
           </ul>
         </div>
         <a class="sidenav-item" href="#" data-page="learning"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
@@ -4733,26 +4759,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="adm-section-head">
                 <div class="adm-section-meta">
                   <div class="adm-section-title-row">
-                    <h2 class="adm-section-title">Initiatives and Processes</h2>
+                    <h2 class="adm-section-title">RACI</h2>
                   </div>
-                  <p class="adm-caption">RACI configuration, best-practice warnings, and member limits per RACI role</p>
+                  <p class="adm-caption">How RACI roles are configured, best-practice guidance, and member limits per role</p>
                 </div>
               </div>
 
               <div class="adm-section-body">
                 <div class="card adm-card adm-card-grouped">
 
-                  <div class="adm-setting">
-                    <div class="adm-setting-main">
-                      <p class="adm-card-title">RACI</p>
-                      <p class="adm-caption">Choose how RACI roles are configured across Initiatives and Processes</p>
-                    </div>
-                  </div>
-
                   <div class="adm-setting adm-setting-top">
                     <div class="adm-setting-main">
                       <p class="adm-card-title">Best practice recommendations</p>
-                      <p class="adm-caption">Warn users when RACI roles don't follow best practices</p>
+                      <p class="adm-caption">Guide people towards a well-formed RACI as they assign roles</p>
                     </div>
                     <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
                     <!-- Three separate rules, not one run-on sentence: a deck
@@ -4905,7 +4924,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-section-title-row">
                     <h2 class="adm-section-title">People</h2>
                   </div>
-                  <p class="adm-caption">Member invites, public profile visibility, user roles and permissions, and job positions</p>
+                  <p class="adm-caption">Member invites and what a profile shows publicly</p>
                 </div>
               </div>
 
@@ -4937,6 +4956,53 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </div>
 
+
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ===== Positions ============================================
+                 Was a row inside People; its own section now that the contents
+                 rail names it, so the entry lands on the setting itself. -->
+            <section class="adm-section" id="adm-positions">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">Positions</h2>
+                  </div>
+                  <p class="adm-caption">The job positions people are hired into and assigned to</p>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped">
+                  <div class="adm-setting">
+                    <div class="adm-setting-main">
+                      <p class="adm-card-title">Positions</p>
+                      <p class="adm-caption">A job position is required when creating new people</p>
+                    </div>
+                    <button class="btn btn-ghost btn-xs" type="button" data-adm-jp-entry><svg class="btn-icon"><use href="#i-plus"/></svg>Add position</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===== Permissions ==========================================
+                 Head only for now — the controls that belong here are still to
+                 be decided. -->
+            <section class="adm-section" id="adm-permissions">
+              <div class="adm-section-head">
+                <div class="adm-section-meta">
+                  <div class="adm-section-title-row">
+                    <h2 class="adm-section-title">Permissions</h2>
+                  </div>
+                  <p class="adm-caption">What each role can see and do across the workspace</p>
+                </div>
+              </div>
+
+              <div class="adm-section-body">
+                <div class="card adm-card adm-card-grouped">
                   <div class="adm-setting">
                     <div class="adm-setting-main">
                       <p class="adm-card-title">User roles and permissions</p>
@@ -4944,16 +5010,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                     <button class="btn btn-ghost btn-xs" type="button" data-adm-ur-entry>55 user roles<svg class="btn-icon"><use href="#i-arrow-right"/></svg></button>
                   </div>
-
-                  <div class="adm-setting">
-                    <div class="adm-setting-main">
-                      <p class="adm-card-title">Job positions</p>
-                      <p class="adm-caption">Job positions are required when creating new people</p>
-                    </div>
-                    <button class="btn btn-ghost btn-xs" type="button" data-adm-jp-entry><svg class="btn-icon"><use href="#i-plus"/></svg>Add job position</button>
-                  </div>
                 </div>
-
               </div>
             </section>
 
@@ -5339,9 +5396,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                driven by scroll position — the same .cm-toc behaviour as
                features/rob, not tabs that swap panels. -->
           <nav class="adm-toc" aria-label="Settings sections" data-adm-toc>
-            <a class="adm-toc-item is-active" href="#adm-initiatives" data-adm-toc-target="adm-initiatives"><svg class="icon"><use href="#i-initiatives"/></svg>Initiatives &amp; Processes</a>
+            <!-- Sub-items are supported (.adm-toc-sub + data-adm-toc-parent);
+                 nothing needs one yet, so every section is one line. -->
+            <a class="adm-toc-item is-active" href="#adm-initiatives" data-adm-toc-target="adm-initiatives"><svg class="icon"><use href="#i-table"/></svg>RACI</a>
             <a class="adm-toc-item" href="#adm-okrs" data-adm-toc-target="adm-okrs"><svg class="icon"><use href="#i-okr"/></svg>OKRs</a>
             <a class="adm-toc-item" href="#adm-people" data-adm-toc-target="adm-people"><svg class="icon"><use href="#i-participants"/></svg>People</a>
+            <a class="adm-toc-item" href="#adm-positions" data-adm-toc-target="adm-positions"><svg class="icon"><use href="#i-jobs"/></svg>Positions</a>
+            <a class="adm-toc-item" href="#adm-permissions" data-adm-toc-target="adm-permissions"><svg class="icon"><use href="#i-lock"/></svg>Permissions</a>
             <a class="adm-toc-item" href="#adm-slack" data-adm-toc-target="adm-slack"><svg class="icon"><use href="#i-chat"/></svg>Slack compliance</a>
           </nav>
 
@@ -7096,10 +7157,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <script>
     // ===== Table of contents — anchors + scroll-spy ========================
     // Lifted from features/rob's meeting modal (.cm-toc) and re-pointed at the
-    // shell's scroll container. A section becomes active when its top crosses
-    // ~40% down the column, so a long section stays active while it's the one
-    // being read; at the very bottom the last section is forced active, since
-    // a short trailing section may never reach that threshold.
+    // shell's scroll container. A section is active while it holds the reading
+    // line — a fixed 96px below the top of the column, not a fraction of it.
+    // The fraction (40% of the viewport, ~320px) was further down the page than
+    // a short section is tall, so clicking People landed on People and then
+    // marked Positions, the section the line had already reached. At the very
+    // bottom the last section is forced active, since a trailing section may
+    // never reach the line at all.
     (function () {
       // Two lists point at the same sections — the right-hand rail and the
       // sidenav's settings submenu — so both are driven from here.
@@ -7139,17 +7203,33 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const el = document.getElementById(link.dataset.admTocTarget);
           if (!el) return;
           glideTo(offsetIn(el) - 12);
+          markActive(el.id);
         });
       });
 
+      // A sub-item's section stays named while the sub-item is the one being
+      // read, so the rail never loses the context of where you are.
+      const markActive = (activeId) => {
+        const ancestorId = links.find(l => l.dataset.admTocTarget === activeId)?.dataset.admTocParent;
+        links.forEach(l => {
+          const id = l.dataset.admTocTarget;
+          l.classList.toggle('is-active', id === activeId);
+          l.classList.toggle('is-ancestor', !!ancestorId && id === ancestorId);
+        });
+      };
+
+      // Just below the sticky head, so the section you have scrolled to is the
+      // one named — and comfortably shorter than the shortest section.
+      const READING_LINE = 96;
+
       const sync = () => {
-        const y = body.scrollTop + body.clientHeight * 0.4;
+        const y = body.scrollTop + READING_LINE;
         let active = targets[0];
         for (const t of targets) if (offsetIn(t) <= y) active = t;
         if (body.scrollTop + body.clientHeight >= body.scrollHeight - 4) {
           active = targets[targets.length - 1];
         }
-        links.forEach(l => l.classList.toggle('is-active', l.dataset.admTocTarget === active?.id));
+        markActive(active?.id);
       };
 
       body.addEventListener('scroll', sync);
@@ -7326,7 +7406,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         { html: 'A manager is assigned as <strong>Responsible</strong>' },
         { html: 'The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong>' },
         { html: 'Require RACI members to match the respective Slack channel' },
-        { html: '<strong>Limit exceeded!</strong> Only 8 Consulted members are allowed. Please adjust before saving.',
+        { html: '<strong>Limit exceeded!</strong> Only 8 Consulted members are allowed.',
           variant: 'danger' },
       ];
       let index = 0;
@@ -7626,6 +7706,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       render();
     })();
+  </script>
+
+  <script>
+    // Links to a sibling prototype, resolved from wherever this file is served:
+    // a plain ../ href lands in the wrong place when the URL has no trailing
+    // slash, which is exactly how the local server hands it over.
+    document.querySelectorAll('[data-adm-sibling]').forEach(link => {
+      const here = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+      const base = here.slice(0, here.lastIndexOf('/'));
+      link.href = `${base}/${link.dataset.admSibling}/`;
+    });
   </script>
 
   <script>
@@ -8096,8 +8187,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
         // The row's control is the state: add the first one, or go see them.
         entry.innerHTML = n === 0
-          ? '<svg class="btn-icon"><use href="#i-plus"/></svg>Add job position'
-          : `${n} job position${n === 1 ? '' : 's'}<svg class="btn-icon"><use href="#i-arrow-right"/></svg>`;
+          ? '<svg class="btn-icon"><use href="#i-plus"/></svg>Add position'
+          : `${n} position${n === 1 ? '' : 's'}<svg class="btn-icon"><use href="#i-arrow-right"/></svg>`;
       };
 
       const openModal = () => {
