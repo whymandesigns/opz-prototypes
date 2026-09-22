@@ -4095,7 +4095,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <ul class="sidenav-list">
         <li><a class="sidenav-item" href="#" data-page="processes"><svg class="sidenav-item-icon"><use href="#i-cpu-2"/></svg><span class="sidenav-item-label">Processes</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="initiatives"><svg class="sidenav-item-icon"><use href="#i-initiatives"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
-        <li><a class="sidenav-item" href="#" data-page="rob-meetings"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+        <!-- Out to the RoB prototype, the same thread as Settings below. -->
+        <li><a class="sidenav-item" href="../rob/" data-ig-sibling="rob"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="okrs"><svg class="sidenav-item-icon"><use href="#i-okr"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="people"><svg class="sidenav-item-icon"><use href="#i-participants"/></svg><span class="sidenav-item-label">People</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="team"><svg class="sidenav-item-icon"><use href="#i-org-unit"/></svg><span class="sidenav-item-label">Team</span></a></li>
@@ -6838,6 +6839,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (cta) { cta.classList.replace('btn-primary', 'btn-secondary'); cta.textContent = 'Disconnect'; }
       }
     })();
+  </script>
+
+  <script>
+    // Every integration CTA except HireGlobal's is a placeholder. Saying so on
+    // the click — and naming the one flow that does run — is more use to a
+    // reviewer than a button that looks live and does nothing.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ic-cta .btn');
+      if (!btn || btn.closest('[data-integration="hireglobal"]')) return;
+      e.preventDefault();
+      const card = btn.closest('.integration-card');
+      const name = card?.querySelector('.ic-title')?.textContent.trim() || 'This integration';
+      window.toast?.({
+        variant: 'info',
+        message: `${name} isn't built in this prototype yet. HireGlobal is the connection that runs end to end — try Connect on that card.`,
+        timeout: 5000,
+      });
+    });
   </script>
 
 </body>
