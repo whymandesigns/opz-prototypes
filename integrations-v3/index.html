@@ -2391,7 +2391,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   gap: var(--ic-space-3);
 }
 .page-head-heading {
-  font: var(--type-h1);
+  font: var(--type-h2); /* H2 / 20px — page titles sit one step below the display size */
   color: var(--color-text);
   margin: 0;
 }
@@ -4107,7 +4107,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin Settings</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
           <ul class="sidenav-sublist">
             <li><a class="sidenav-item sidenav-subitem" href="#" data-page="permissions"><span class="sidenav-item-label">Permissions</span></a></li>
-            <li><a class="sidenav-item sidenav-subitem" href="#" data-page="settings"><span class="sidenav-item-label">Settings</span></a></li>
+            <!-- A real link out to the Admin Settings prototype, the other half
+                 of this shell — data-page is dropped so the nav's own router
+                 doesn't swallow the click. -->
+            <li><a class="sidenav-item sidenav-subitem" href="../admin-toc/" data-ig-sibling="admin-toc"><span class="sidenav-item-label">Settings</span></a></li>
             <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="integrations"><span class="sidenav-item-label">Integrations</span></a></li>
           </ul>
         </div>
@@ -5733,6 +5736,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     });
 
     // Side navigation routing (template only) — clicking an item shows the matching .page-view
+    // Links to a sibling prototype, resolved from wherever this file is served:
+    // a plain ../ href lands in the wrong place when the URL has no trailing
+    // slash, which is exactly how the local server hands it over.
+    document.querySelectorAll('[data-ig-sibling]').forEach(link => {
+      const here = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+      const base = here.slice(0, here.lastIndexOf('/'));
+      link.href = `${base}/${link.dataset.igSibling}/`;
+    });
+
     document.querySelectorAll('#template-app-shell .sidenav-item[data-page]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
