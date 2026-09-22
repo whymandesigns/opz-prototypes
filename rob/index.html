@@ -712,6 +712,8 @@ textarea.input {
  *   </div>
  */
 .toolbar { display: flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
+.rob-toolbar { margin-bottom: var(--ic-space-5); }
+.rob-toolbar .toolbar-search { flex: 0 1 320px; }
 .toolbar-search { flex: 1 1 240px; min-width: 160px; }
 .toolbar-search > .input { width: 100%; }
 .toolbar-end { margin-left: auto; display: inline-flex; align-items: center; gap: var(--ic-space-2); flex-wrap: wrap; }
@@ -3575,27 +3577,12 @@ body { overflow: hidden; }
   align-items: center;
   gap: var(--ic-space-3);
 }
-.cal-nav {
-  display: inline-flex;
-  border: 1px solid var(--color-border);
-  border-radius: var(--ic-radius-sm);
-  background: var(--color-surface);
-  overflow: hidden;
-}
-.cal-nav-btn {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  background: transparent;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--ic-duration-fast) var(--ic-ease), color var(--ic-duration-fast) var(--ic-ease);
-}
-.cal-nav-btn:hover { background: var(--color-surface-muted); color: var(--color-text); }
-.cal-nav-btn + .cal-nav-btn { border-left: 1px solid var(--color-border); }
+/* Three buttons in a row rather than a joined pair beside a pill: an arrow,
+   Today, an arrow. The sprite has no left arrow, so the back one is the right
+   arrow turned over. */
+.cal-nav-btn { width: 32px; padding: 0; }
+.cal-nav-btn .icon { width: 16px; height: 16px; }
+.cal-nav-back { transform: rotate(180deg); }
 
 .cal-grid {
   display: grid;
@@ -3626,6 +3613,10 @@ body { overflow: hidden; }
   gap: var(--ic-space-1);
   min-height: 0;
 }
+/* Every cell is a way into Create meeting, so it reacts like one. */
+.cal-day { cursor: pointer; transition: background var(--ic-duration-fast) var(--ic-ease); }
+.cal-day:hover { background: var(--color-surface-muted); }
+.cal-day:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
 .cal-day-num {
   font: var(--type-body-sm);
   color: var(--color-text);
@@ -4335,33 +4326,33 @@ body { overflow: hidden; }
     <div class="app-shell">
 
       <!-- SIDE NAV -->
+      <!-- Sidenav, refreshed from designmd/example.html: the icon set moved on
+           (i-cycle/i-rocket/i-target/i-users/i-org are the old names) and the
+           duplicate i-* classes on each svg were doing nothing. The links out to
+           the sibling prototypes are ours and are kept. -->
       <aside class="sidenav">
-        <button class="sidenav-toggle" aria-label="Toggle navigation" type="button">
-          <svg><use href="#i-chevron-left"/></svg>
-        </button>
+        <button class="sidenav-toggle" aria-label="Toggle navigation" type="button"><svg><use href="#i-chevron-left"/></svg></button>
         <ul class="sidenav-list">
-          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-cycle"><use href="#i-cycle"/></svg><span class="sidenav-item-label">Processes</span></a></li>
-          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-rocket"><use href="#i-rocket"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
-          <li><a class="sidenav-item is-active" href="#"><svg class="sidenav-item-icon i-calendar"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
-          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-target"><use href="#i-target"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
-          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-users"><use href="#i-users"/></svg><span class="sidenav-item-label">People</span></a></li>
-          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-org"><use href="#i-org"/></svg><span class="sidenav-item-label">Team</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-cpu-2"/></svg><span class="sidenav-item-label">Processes</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-initiatives"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
+          <li><a class="sidenav-item is-active" href="#"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-okr"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-participants"/></svg><span class="sidenav-item-label">People</span></a></li>
+          <li><a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-org-unit"/></svg><span class="sidenav-item-label">Team</span></a></li>
         </ul>
         <div class="sidenav-spacer"></div>
         <div class="sidenav-footer">
           <div class="sidenav-group">
-            <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="false">
-              <svg class="sidenav-item-icon i-settings"><use href="#i-settings"/></svg>
-              <span class="sidenav-item-label">Admin Settings</span>
-              <svg class="sidenav-item-chevron i-chevron-down"><use href="#i-chevron-down"/></svg>
-            </button>
+            <!-- Open, not collapsed as in the reference: the two links out of
+                 this prototype live in here. -->
+            <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="true"><svg class="sidenav-item-icon"><use href="#i-settings"/></svg><span class="sidenav-item-label">Admin Settings</span><svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg></button>
             <ul class="sidenav-sublist">
               <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Permissions</span></a></li>
-              <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Settings</span></a></li>
-              <li><a class="sidenav-item sidenav-subitem" href="#"><span class="sidenav-item-label">Integrations</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="../admin-toc/" data-rob-sibling="admin-toc"><span class="sidenav-item-label">Settings</span></a></li>
+              <li><a class="sidenav-item sidenav-subitem" href="../integrations-v3/" data-rob-sibling="integrations-v3"><span class="sidenav-item-label">Integrations</span></a></li>
             </ul>
           </div>
-          <a class="sidenav-item" href="#"><svg class="sidenav-item-icon i-lightbulb"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
+          <a class="sidenav-item" href="#"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></a>
         </div>
       </aside>
 
@@ -4377,8 +4368,25 @@ body { overflow: hidden; }
             <p class="page-head-subtitle">Recurring business reviews.</p>
           </div>
           <div class="page-head-actions">
-            <button class="btn btn-secondary">Filter</button>
             <button class="btn btn-primary" data-modal-open="create-meeting">Create meeting</button>
+          </div>
+        </div>
+
+        <!-- Search and filter on the left, the view switcher on the right.
+             Month is the view this prototype draws; the other two are labelled
+             so the shape of the control is right when they arrive. -->
+        <div class="toolbar rob-toolbar">
+          <div class="input-icon input-icon-left toolbar-search">
+            <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+            <input class="input" type="search" placeholder="Search meetings" data-rob-search />
+          </div>
+          <button class="btn btn-secondary" type="button" data-rob-filter><svg class="btn-icon"><use href="#i-funnel"/></svg>Filter</button>
+          <div class="toolbar-end">
+            <div class="segmented" role="tablist" aria-label="Calendar view">
+              <button class="segmented-item" type="button" role="tab" aria-selected="false" data-rob-view="schedule" title="Schedule view is not in this prototype yet">Schedule</button>
+              <button class="segmented-item" type="button" role="tab" aria-selected="false" data-rob-view="week" title="Week view is not in this prototype yet">Week</button>
+              <button class="segmented-item is-active" type="button" role="tab" aria-selected="true" data-rob-view="month">Month</button>
+            </div>
           </div>
         </div>
 
@@ -4387,11 +4395,9 @@ body { overflow: hidden; }
           <div class="cal-toolbar">
             <h2 class="cal-month">January 2026</h2>
             <div class="cal-toolbar-actions">
-              <button class="btn btn-secondary btn-xs" type="button">Today</button>
-              <div class="cal-nav">
-                <button class="cal-nav-btn" type="button" aria-label="Previous month"><svg class="icon i-chevron-minor i-caret-left"><use href="#i-chevron-minor"/></svg></button>
-                <button class="cal-nav-btn" type="button" aria-label="Next month"><svg class="icon i-chevron-minor i-caret-right"><use href="#i-chevron-minor"/></svg></button>
-              </div>
+              <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Previous month"><svg class="icon cal-nav-back"><use href="#i-arrow-right"/></svg></button>
+              <button class="btn btn-secondary" type="button">Today</button>
+              <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Next month"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
             </div>
           </div>
 
@@ -8518,6 +8524,27 @@ Platform reliability — error budget
       history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
     }
 
+    // Links to a sibling prototype, resolved from wherever this file is served:
+    // a plain ../ href lands in the wrong place when the URL has no trailing
+    // slash, which is exactly how the local server hands it over.
+    document.querySelectorAll('[data-rob-sibling]').forEach(link => {
+      const here = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+      const base = here.slice(0, here.lastIndexOf('/'));
+      link.href = `${base}/${link.dataset.robSibling}/`;
+    });
+
+    // Calendar view switcher. Month is what this prototype draws, so the other
+    // two only move the selection for now.
+    document.querySelectorAll('[data-rob-view]').forEach(seg => {
+      seg.addEventListener('click', () => {
+        document.querySelectorAll('[data-rob-view]').forEach(s => {
+          const on = s === seg;
+          s.classList.toggle('is-active', on);
+          s.setAttribute('aria-selected', String(on));
+        });
+      });
+    });
+
     // Sidenav: toggle compact mode
     document.querySelector('.sidenav-toggle')?.addEventListener('click', () => {
       document.querySelector('.sidenav')?.classList.toggle('is-compact');
@@ -8540,6 +8567,61 @@ Platform reliability — error budget
     document.querySelectorAll('[data-modal-close]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn));
     });
+
+    // A day in the grid is a place to put a meeting: clicking one opens the
+    // same Create meeting modal the page-head button opens, with its date
+    // already filled in. Clicks on a meeting keep belonging to that meeting.
+    (function () {
+      const grid = document.querySelector('.cal-grid');
+      const monthEl = document.querySelector('.cal-month');
+      const dateField = document.getElementById('cm-date');
+      if (!grid || !monthEl) return;
+
+      const days = [...grid.querySelectorAll('.cal-day')];
+      // The cells before the first day of this month belong to the one before
+      // it; the ones after, to the one after.
+      const firstOfMonth = days.findIndex(d => !d.classList.contains('is-other'));
+
+      days.forEach(day => {
+        day.setAttribute('role', 'button');
+        day.setAttribute('tabindex', '0');
+        const num = day.querySelector('.cal-day-num')?.textContent.trim();
+        day.setAttribute('aria-label', `Create a meeting on ${num}`);
+      });
+
+      const dateOf = (day) => {
+        const [monthName, year] = monthEl.textContent.trim().split(/\s+/);
+        const base = new Date(`${monthName} 1, ${year}`);
+        let month = base.getMonth();
+        if (day.classList.contains('is-other')) {
+          month += days.indexOf(day) < firstOfMonth ? -1 : 1;
+        }
+        const num = Number(day.querySelector('.cal-day-num')?.textContent.trim());
+        return new Date(base.getFullYear(), month, num);
+      };
+
+      const openFor = (day) => {
+        if (dateField) {
+          dateField.value = dateOf(day).toLocaleDateString('en-US',
+            { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        openModal('create-meeting');
+      };
+
+      grid.addEventListener('click', (e) => {
+        if (e.target.closest('.cal-event')) return;
+        const day = e.target.closest('.cal-day');
+        if (day) openFor(day);
+      });
+
+      grid.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const day = e.target.closest('.cal-day');
+        if (!day || e.target.closest('.cal-event')) return;
+        e.preventDefault();
+        openFor(day);
+      });
+    })();
     // Switch: close current overlay, then open another by id
     document.querySelectorAll('[data-modal-switch]').forEach(btn => {
       btn.addEventListener('click', () => {
