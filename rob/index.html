@@ -5438,13 +5438,29 @@ body { overflow: hidden; }
     }
     #meeting-detail .md-person.is-me:hover .md-me-reject,
     #meeting-detail .md-person.is-me:focus-within .md-me-reject { opacity: 1; }
-    /* One button, two states: decline while attending, change your answer once
-       you have given one — declined or tentative both offer the way back. */
-    #meeting-detail .md-me-glyph-rejoin { display: none; }
-    #meeting-detail .md-person.is-rejected .md-me-glyph-reject,
-    #meeting-detail .md-person.is-tentative .md-me-glyph-reject { display: none; }
-    #meeting-detail .md-person.is-rejected .md-me-glyph-rejoin,
-    #meeting-detail .md-person.is-tentative .md-me-glyph-rejoin { display: block; }
+    /* One button, two glyphs: the person you are while attending, the removed
+       one once you have answered. */
+    #meeting-detail .md-me-glyph-answered { display: none; }
+    #meeting-detail .md-person.is-rejected .md-me-glyph-going,
+    #meeting-detail .md-person.is-tentative .md-me-glyph-going { display: none; }
+    #meeting-detail .md-person.is-rejected .md-me-glyph-answered,
+    #meeting-detail .md-person.is-tentative .md-me-glyph-answered { display: block; }
+
+    /* An answer on record is a state, not just an action: the button stays on
+       screen and carries the colour of the answer. */
+    #meeting-detail .md-person.is-rejected .md-me-reject,
+    #meeting-detail .md-person.is-tentative .md-me-reject { opacity: 1; }
+    #meeting-detail .md-person.is-rejected .md-me-glyph-answered { color: var(--color-danger); }
+    #meeting-detail .md-person.is-tentative .md-me-glyph-answered { color: var(--ic-palette-yellow-500); }
+
+    /* Menu variant: a maybe keeps the plain person, in amber. Tentative is not
+       a removal — the row is still expected, just not confirmed — and with the
+       status menu carrying the answer the glyph is free to say only that. */
+    .respond-menu #meeting-detail .md-person.is-tentative .md-me-glyph-going {
+      display: block;
+      color: var(--ic-palette-yellow-500);
+    }
+    .respond-menu #meeting-detail .md-person.is-tentative .md-me-glyph-answered { display: none; }
 
     /* Rejected marker — the custom reject glyph pinned to the avatar's
      * bottom-right. Inlined as a data URI so it's decoupled from the sprite. */
@@ -5457,6 +5473,19 @@ body { overflow: hidden; }
       width: 15px;
       height: 15px;
       background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15' fill='none'><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' fill='%23FBEDF1'/><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' stroke='%23D42551' stroke-width='0.933333'/><path d='M10.6191 4.8418L7.99414 7.4668L10.6191 10.0918L10.0889 10.6221L7.46387 7.99707L4.83887 10.6221L4.30859 10.0918L6.93359 7.4668L4.30859 4.8418L4.83887 4.31152L7.46387 6.93652L10.0889 4.31152L10.6191 4.8418Z' fill='%23D42551'/></svg>") center/contain no-repeat;
+    }
+
+    /* Going marker — the same pin again, in green with a tick. Scoped to your
+     * own row: the other participants carry RACI badges, not attendance. */
+    #meeting-detail .md-person.is-me:not(.is-rejected):not(.is-tentative) .avatar { position: relative; overflow: visible; }
+    #meeting-detail .md-person.is-me:not(.is-rejected):not(.is-tentative) .avatar::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      bottom: -4px;
+      width: 15px;
+      height: 15px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15' fill='none'><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' fill='%23EAFBF5'/><rect x='0.464844' y='0.466797' width='14' height='14' rx='7' stroke='%2303B080' stroke-width='0.933333'/><path d='M4.1 7.7L6.4 10L10.9 5.2' stroke='%2303B080' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") center/contain no-repeat;
     }
 
     /* Tentative marker — the same pin as the rejected one, in the warning
@@ -7614,14 +7643,12 @@ Platform reliability — error budget
                      modal. Without it, the icon opens the modal directly. -->
                 <span class="dropdown md-respond-dd">
                 <button class="btn btn-icon-only btn-ghost btn-xs md-me-reject" type="button" aria-label="Reject meeting" data-md-respond aria-haspopup="menu" aria-expanded="false">
-                  <!-- Person-with-a-cross: declining the invite, not deleting
-                       the meeting. Takes the button's colour rather than
-                       carrying its own red. Once declined it becomes the
-                       system's new-candidate glyph — the way back in. -->
-                  <svg class="icon md-me-glyph-reject" viewBox="0 0 16 16" fill="none" style="width: 16px; height: 16px">
-                    <path d="M6 2C8.20914 2 10 3.79086 10 6C10 7.42831 9.2503 8.68005 8.12402 9.3877C10.3892 10.2454 12 12.4343 12 15H11C11 12.2386 8.76142 10 6 10C3.23858 10 1 12.2386 1 15H0C0 12.4346 1.61023 10.2457 3.875 9.3877C2.74912 8.67997 2 7.42802 2 6C2 3.79086 3.79086 2 6 2ZM6 3C4.34315 3 3 4.34315 3 6C3 7.65685 4.34315 9 6 9C7.65685 9 9 7.65685 9 6C9 4.34315 7.65685 3 6 3ZM15.6211 2.08594L14.207 3.5L15.6211 4.91406L14.9141 5.62109L13.5 4.20703L12.0859 5.62109L11.3789 4.91406L12.793 3.5L11.3789 2.08594L12.0859 1.37891L13.5 2.79297L14.9141 1.37891L15.6211 2.08594Z" fill="currentColor"/>
-                  </svg>
-                  <svg class="icon md-me-glyph-rejoin" style="width: 16px; height: 16px"><use href="#i-new-candidate"/></svg>
+                  <!-- Attending: a plain person, revealed on hover — the way
+                       to answer. Once an answer is on record it becomes the
+                       removed-user glyph and stops hiding, carrying the state
+                       in its colour: red for declined, amber for tentative. -->
+                  <svg class="icon md-me-glyph-going" style="width: 16px; height: 16px"><use href="#i-user"/></svg>
+                  <svg class="icon md-me-glyph-answered" style="width: 16px; height: 16px"><use href="#i-removed-user"/></svg>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end md-respond-menu" data-md-respond-menu hidden role="menu">
                   <button class="dropdown-item" type="button" role="menuitem" data-md-status="going"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Going</button>
@@ -8070,6 +8097,9 @@ Platform reliability — error budget
       // its way to the page, and a hash survives both it and Vercel.
       const MENU_VARIANT = /(^|[#&])respond=menu\b/.test(location.hash)
         || new URLSearchParams(location.search).get('respond') === 'menu';
+      // Marked on the root so the variant can differ visually too, not only in
+      // how the answer is given.
+      document.documentElement.classList.toggle('respond-menu', MENU_VARIANT);
       const menu = document.querySelector('[data-md-respond-menu]');
 
       const statusOf = () => {
