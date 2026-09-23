@@ -4772,7 +4772,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   <div class="adm-setting adm-setting-top">
                     <div class="adm-setting-main">
                       <p class="adm-card-title">Best practice recommendations</p>
-                      <p class="adm-caption">Guide people towards a well-formed RACI as they assign roles</p>
+                      <p class="adm-caption">Turn on guided alerts to steer people towards a well-formed RACI as they assign roles</p>
                     </div>
                     <span class="switch"><input type="checkbox" class="switch-input" checked /><span class="switch-track"></span></span>
                     <!-- Three separate rules, not one run-on sentence: a deck
@@ -5743,28 +5743,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </div>
 
   <!-- Who holds a position -->
-  <div class="modal-overlay" id="adm-people-modal" hidden>
-    <div class="modal modal-sm">
-      <header class="modal-header">
-        <div>
-          <h2 class="modal-title" data-adm-people-title>Position</h2>
-          <p class="adm-caption" data-adm-people-count></p>
-        </div>
-        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
-      </header>
-      <div class="modal-body">
-        <div class="adm-people-head">
-          <span>Name</span>
-          <span>Org unit</span>
-        </div>
-        <ul class="adm-people-list" data-adm-people-list></ul>
-      </div>
-      <footer class="modal-footer">
-        <button class="btn btn-secondary" data-modal-close type="button">Close</button>
-      </footer>
-    </div>
-  </div>
-
   <!-- Add role -->
   <div class="modal-overlay" id="adm-role-modal" hidden>
     <div class="modal modal-sm">
@@ -7256,35 +7234,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </script>
 
   <script>
-    // The roster modal, shared: both job positions and user roles answer "who
-    // is in this?" the same way, so the list is built in one place.
+    // The people a roster is drawn from. Who holds a position is answered on
+    // the People page now, not in a modal here, but the rosters themselves are
+    // still what the counts are counted from.
     (function () {
-      const modal = document.getElementById('adm-people-modal');
-      if (!modal) return;
-      const title = modal.querySelector('[data-adm-people-title]');
-      const count = modal.querySelector('[data-adm-people-count]');
-      const list = modal.querySelector('[data-adm-people-list]');
-      const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-      const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2);
-
-      window.admShowRoster = (heading, roster, subtitleNoun = 'member') => {
-        title.textContent = heading;
-        count.textContent = `${roster.length} ${subtitleNoun}${roster.length === 1 ? '' : 's'}`;
-        list.innerHTML = roster.map(person => `
-          <li class="adm-person">
-            <span class="avatar avatar-md">${esc(initials(person.name))}</span>
-            <span class="adm-person-meta">
-              <span class="adm-person-name">${esc(person.name)}</span>
-              <span class="adm-person-role">${esc(heading)}</span>
-            </span>
-            <span class="adm-person-unit">
-              <span class="adm-person-unit-name">${esc(person.unit)}</span>
-              <span class="adm-person-unit-sub">${esc(person.sub)}</span>
-            </span>
-          </li>`).join('');
-        modal.hidden = false;
-      };
-
       // The people a roster is drawn from, and the org units they sit in.
       const NAMES = ['Maria Santos', 'Alejandro Reyes', 'Pavel Vydra', 'Camilla Herrere', 'Anna Schmidt',
         'John Appleseed', 'Lena Fischer', 'Tomas Silva', 'Priya Nair', 'Omar Haddad', 'Grace Okafor',
@@ -8236,14 +8189,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (nameInput.value.trim() !== '') { nameInput.classList.remove('is-error'); error.hidden = true; }
       });
 
-      // Who holds a position is a look-up, not a place to go: the shared roster
-      // modal answers it without losing the table underneath.
+      // Who holds a position belongs on the People page, filtered to them —
+      // not in a modal over this table. That page isn't wired to a position
+      // filter yet, so the count says where it would land and stays on screen
+      // until it is dismissed.
+      const announceMembers = (position) => {
+        window.toast?.({
+          variant: 'info',
+          behavior: 'persistent',
+          message: `Opens the People page filtered to the ${position.roster.length} ${position.roster.length === 1 ? 'person' : 'people'} in ${position.name}.`,
+        });
+      };
+
       rows.addEventListener('click', (e) => {
         const trigger = e.target.closest('[data-adm-people-open]');
         if (!trigger) return;
         const position = positions[Number(trigger.dataset.admPeopleOpen)];
-        if (!position) return;
-        window.admShowRoster?.(position.name, position.roster);
+        if (position) announceMembers(position);
       });
 
       // ── Views ────────────────────────────────────────────────────────────
@@ -8269,12 +8231,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
       });
 
-      // Cards reach the roster the same way rows do.
+      // Cards answer it the same way rows do.
       document.querySelector('[data-adm-jp-groups]')?.addEventListener('click', (e) => {
         const trigger = e.target.closest('[data-adm-people-open]');
         if (!trigger) return;
         const position = positions[Number(trigger.dataset.admPeopleOpen)];
-        if (position) window.admShowRoster?.(position.name, position.roster);
+        if (position) announceMembers(position);
       });
 
       // ── Toolbar ──────────────────────────────────────────────────────────
