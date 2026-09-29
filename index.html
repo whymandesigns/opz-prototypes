@@ -2651,11 +2651,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          Refresh thumbnails with headless Chrome:
          chrome --headless --window-size=1280,800 --screenshot=_thumbs/<name>.png http://localhost:4173/features/<name>/ -->
     <section class="links" id="feature-list">
-      <a class="card" href="./rob/">
+      <!-- Deep-links to the respond-via-menu variant: it reads as the more
+           approved flow, so that is what the directory should open. The hash
+           (not ?respond=menu) is deliberate — the preview pane and static
+           servers drop query strings. Drop the hash to land on the default. -->
+      <a class="card" href="./rob/#respond=menu">
         <img class="thumb" src="./_thumbs/rob.png" alt="RoB screenshot" loading="lazy" />
         <div class="card-meta">
           <h3 class="card-title">RoB <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">RoB meeting action items.</p>
+          <p class="card-body">RoB meeting action items, opening the respond-via-menu variant.</p>
           <span class="folder">rob/</span>
         </div>
       </a>

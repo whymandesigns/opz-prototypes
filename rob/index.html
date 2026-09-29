@@ -4567,23 +4567,80 @@ body { overflow: hidden; }
     }
     .cm-zoom > .input {
       padding-left: 32px;
-      padding-right: 96px;
+      /* Sized for the wider "Custom link" hover label, not "Auto-created". */
+      padding-right: 108px;
       background: var(--color-surface-muted);
       color: var(--color-text-muted);
       width: 100%;
     }
+    /* The badge IS the affordance: it reads "Auto-created" at rest and swaps to
+     * "Custom link" on hover/focus, so the row carries no extra button. */
     .cm-zoom-badge {
       position: absolute;
       right: var(--ic-space-2);
       top: 50%;
       transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ic-space-1);
       padding: 2px 8px;
       background: var(--color-accent-subtle);
       color: var(--color-accent);
+      border: 0;
       border-radius: var(--ic-radius-full);
       font: var(--type-caption);
-      pointer-events: none;
+      cursor: pointer;
+      white-space: nowrap;
     }
+    .cm-zoom-badge[hidden] { display: none !important; }
+    .cm-zoom-badge-custom { display: none; align-items: center; gap: var(--ic-space-1); }
+    .cm-zoom:not(.is-custom):hover .cm-zoom-badge-auto,
+    .cm-zoom-badge:focus-visible .cm-zoom-badge-auto { display: none; }
+    .cm-zoom:not(.is-custom):hover .cm-zoom-badge-custom,
+    .cm-zoom-badge:focus-visible .cm-zoom-badge-custom { display: inline-flex; }
+    .cm-zoom-badge:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    /* The whole row is the click target, matching what the tooltip promises. */
+    .cm-zoom:not(.is-custom),
+    .cm-zoom:not(.is-custom) > .input { cursor: pointer; }
+    /* Custom-link escape hatch. The auto-created room stays the default; the
+     * user can hand the field back to themselves to paste their own standing
+     * Zoom room, and switch back again without losing what they typed. */
+    .cm-zoom-field { display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    /* Custom mode: editable, so it reads as a live field rather than a
+     * system-filled one, and the badge's 96px gutter is no longer needed. */
+    .cm-zoom.is-custom > .input {
+      background: var(--color-surface);
+      color: var(--color-text);
+      /* Room for the revert control, which sits where the badge used to. */
+      padding-right: 34px;
+    }
+    /* Revert lives inside the field, so custom mode never grows a second row
+     * of actions the way the old text link did. */
+    .cm-zoom-revert {
+      position: absolute;
+      right: var(--ic-space-2);
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: var(--ic-radius-full);
+      color: var(--color-text-muted);
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .cm-zoom.is-custom > .cm-zoom-revert { display: inline-flex; }
+    .cm-zoom-revert[hidden] { display: none !important; }
+    .cm-zoom-revert:hover { color: var(--color-text); }
+    .cm-zoom-revert:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    .cm-zoom.is-custom > .cm-zoom-badge { display: none; }
+    .cm-zoom.is-custom::after, .cm-zoom.is-custom::before { content: none; }
+    .cm-zoom-field .field-hint[hidden] { display: none !important; }
     .cm-cell-stack { display: flex; flex-direction: column; gap: var(--ic-space-2); }
     .cm-cell-hint { font: var(--ic-weight-regular) var(--ic-text-xxs)/var(--ic-lh-body-xxs) var(--ic-font-sans); color: var(--color-text-muted); margin: 0; }
 
@@ -4826,10 +4883,23 @@ body { overflow: hidden; }
               <!-- Row 3: Zoom URL + Auto-recording | Availability + helper -->
               <div class="cm-row">
                 <div class="cm-cell-stack">
-                  <div class="cm-zoom">
-                    <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
-                    <input class="input" type="text" value="https://zoom.us/j/············" readonly aria-label="Zoom URL" />
-                    <span class="cm-zoom-badge">Auto-created</span>
+                  <!-- Zoom link: auto-created by default, with an opt-in custom link.
+                       Behaviour is wired by the delegated [data-zoom-field] block. -->
+                  <div class="cm-zoom-field" data-zoom-field>
+                    <div class="cm-zoom" data-tooltip="This Zoom URL is auto-created. Click to paste your own link instead." data-tooltip-style="regular" data-placement="bottom">
+                      <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
+                      <input class="input" type="text" value="https://zoom.us/j/············" readonly aria-label="Zoom URL" data-zoom-input />
+                      <button class="cm-zoom-badge" type="button" data-zoom-badge data-zoom-custom
+                              aria-label="Use a custom Zoom link instead of the auto-created one">
+                        <span class="cm-zoom-badge-auto">Auto-created</span>
+                        <span class="cm-zoom-badge-custom"><svg class="icon i-link"><use href="#i-link"/></svg>Custom link</span>
+                      </button>
+                      <button class="cm-zoom-revert" type="button" data-zoom-auto hidden
+                              data-tooltip="Use the auto-created link" aria-label="Use the auto-created link">
+                        <svg class="icon i-close-circle"><use href="#i-close-circle"/></svg>
+                      </button>
+                    </div>
+                    <p class="field-hint is-error" data-zoom-error hidden>Enter a full meeting link, starting with https://</p>
                   </div>
                   <label class="checkbox">
                     <input type="checkbox" class="checkbox-input" checked />
@@ -6972,7 +7042,7 @@ body { overflow: hidden; }
                 </div>
                 <div class="md-detail-row">
                   <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
-                  <a href="#" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">https://zoom.us/j/98859055013</a>
+                  <a href="#" data-detail-zoom style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">https://zoom.us/j/98859055013</a>
                   <span class="md-rec-dot">Rec</span>
                   <button type="button" class="md-rec-copy" aria-label="Copy Zoom link">
                     <svg class="icon i-copy" style="font-size: 14px"><use href="#i-copy"/></svg>
@@ -7033,10 +7103,23 @@ body { overflow: hidden; }
 
                   <div class="cm-row">
                     <div class="cm-cell-stack">
-                      <div class="cm-zoom">
-                        <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
-                        <input class="input" type="text" value="https://zoom.us/j/············" readonly aria-label="Zoom URL" />
-                        <span class="cm-zoom-badge">Auto-created</span>
+                      <!-- Zoom link: auto-created by default, with an opt-in custom link.
+                           Behaviour is wired by the delegated [data-zoom-field] block. -->
+                      <div class="cm-zoom-field" data-zoom-field>
+                        <div class="cm-zoom" data-tooltip="This Zoom URL is auto-created. Click to paste your own link instead." data-tooltip-style="regular" data-placement="bottom">
+                          <svg class="icon i-video-on"><use href="#i-video-on"/></svg>
+                          <input class="input" type="text" value="https://zoom.us/j/············" readonly aria-label="Zoom URL" data-zoom-input />
+                          <button class="cm-zoom-badge" type="button" data-zoom-badge data-zoom-custom
+                                  aria-label="Use a custom Zoom link instead of the auto-created one">
+                            <span class="cm-zoom-badge-auto">Auto-created</span>
+                            <span class="cm-zoom-badge-custom"><svg class="icon i-link"><use href="#i-link"/></svg>Custom link</span>
+                          </button>
+                          <button class="cm-zoom-revert" type="button" data-zoom-auto hidden
+                                  data-tooltip="Use the auto-created link" aria-label="Use the auto-created link">
+                            <svg class="icon i-close-circle"><use href="#i-close-circle"/></svg>
+                          </button>
+                        </div>
+                        <p class="field-hint is-error" data-zoom-error hidden>Enter a full meeting link, starting with https://</p>
                       </div>
                       <label class="checkbox">
                         <input type="checkbox" class="checkbox-input" checked />
@@ -10914,5 +10997,146 @@ Platform reliability — error budget
       </div>
     </div>
   </div>
+  <script>
+    // Zoom link — auto-created by default, with an opt-in custom link.
+    //
+    // Default stays exactly as before: the room is created for you and the
+    // field is read-only with an "Auto-created" badge. The badge doubles as the
+    // escape hatch — it reads "Custom link" on hover, and clicking it (or
+    // anywhere on the read-only row, which the tooltip invites) hands the field
+    // back so a standing personal room can be pasted in. "Use the auto-created
+    // link" puts it back. Delegated from the document so it covers the create
+    // modal, the meeting-detail edit grid, and any later copy of the field
+    // without per-instance wiring.
+    (function () {
+      const AUTO_URL = 'https://zoom.us/j/············';
+      // Deliberately loose: a prototype should flag "zoom.us/j/123" (no scheme)
+      // and obvious junk, not adjudicate every valid URL shape.
+      const looksLikeLink = v => /^https?:\/\/[^\s.]+\.[^\s]+$/.test(v.trim());
+
+      const parts = field => ({
+        zoom:     field.querySelector('.cm-zoom'),
+        input:    field.querySelector('[data-zoom-input]'),
+        error:    field.querySelector('[data-zoom-error]'),
+        toCustom: field.querySelector('[data-zoom-custom]'),
+        toAuto:   field.querySelector('[data-zoom-auto]'),
+      });
+
+      function validate(field) {
+        const p = parts(field);
+        const custom = p.zoom.classList.contains('is-custom');
+        const value = p.input.value.trim();
+        // Empty is not an error yet — it is the un-filled starting state, and
+        // nagging before the paste lands would be noise.
+        const bad = custom && value !== '' && !looksLikeLink(value);
+        p.input.classList.toggle('is-error', bad);
+        p.error.hidden = !bad;
+        p.input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      }
+
+      function setMode(field, custom, opts) {
+        const p = parts(field);
+        const focus = !opts || opts.focus !== false;
+        if (custom) {
+          // Start from whatever they last typed, or empty so the placeholder
+          // invites a paste instead of making them clear the auto value first.
+          p.input.value = field.dataset.zoomCustom || '';
+          p.input.placeholder = 'Paste your Zoom link';
+        } else {
+          // Remember the custom value so switching back and forth is free.
+          if (p.zoom.classList.contains('is-custom')) field.dataset.zoomCustom = p.input.value;
+          p.input.value = AUTO_URL;
+          p.input.placeholder = '';
+        }
+        p.zoom.classList.toggle('is-custom', custom);
+        p.input.readOnly = !custom;
+        p.toCustom.hidden = custom;
+        p.toAuto.hidden = !custom;
+        validate(field);
+        if (custom && focus) p.input.focus();
+      }
+
+      document.addEventListener('click', e => {
+        const toCustom = e.target.closest('[data-zoom-custom]');
+        if (toCustom) { setMode(toCustom.closest('[data-zoom-field]'), true); return; }
+
+        // The tooltip says "click to paste your own link", so the read-only
+        // field has to honour a click on itself, not only on the badge.
+        const onInput = e.target.closest('[data-zoom-input]');
+        if (onInput && onInput.readOnly) { setMode(onInput.closest('[data-zoom-field]'), true); return; }
+        const toAuto = e.target.closest('[data-zoom-auto]');
+        if (toAuto) { setMode(toAuto.closest('[data-zoom-field]'), false); return; }
+
+        // Cancelling the meeting-detail edit should drop a half-finished custom
+        // link too, not just the contenteditable text the edit IIFE snapshots.
+        const start = e.target.closest('[data-md-edit-start]');
+        const cancel = e.target.closest('[data-md-edit-cancel]');
+        const modal = (start || cancel)?.closest('.modal-overlay, #meeting-detail');
+        if (!modal) return;
+        modal.querySelectorAll('[data-zoom-field]').forEach(field => {
+          if (start) {
+            field.dataset.zoomSnapshot = JSON.stringify({
+              custom: parts(field).zoom.classList.contains('is-custom'),
+              value: parts(field).input.value,
+            });
+          } else if (field.dataset.zoomSnapshot) {
+            const snap = JSON.parse(field.dataset.zoomSnapshot);
+            field.dataset.zoomCustom = snap.custom ? snap.value : '';
+            setMode(field, snap.custom, { focus: false });
+            delete field.dataset.zoomSnapshot;
+          }
+        });
+      });
+
+      // Writes the field's current link into the read-only detail row, so
+      // leaving edit mode shows what was actually saved.
+      function commit(field) {
+        const p = parts(field);
+        const modal = field.closest('#meeting-detail');
+        const link = modal?.querySelector('[data-detail-zoom]');
+        delete field.dataset.zoomSnapshot;   // saved — nothing left to revert to
+        if (!link) return;                   // the create modal has no view row
+        // The auto room's real URL lives in the view row; the field only ever
+        // shows a masked stand-in, so it can't be the source of truth here.
+        if (!link.dataset.zoomAutoUrl) link.dataset.zoomAutoUrl = link.textContent.trim();
+        const custom = p.zoom.classList.contains('is-custom');
+        // href stays "#": this is a prototype, and a live link would navigate
+        // away from the modal.
+        link.textContent = custom ? p.input.value.trim() : link.dataset.zoomAutoUrl;
+      }
+
+      // Capture phase, so an invalid link can stop the modal's own save handler
+      // before it closes edit mode and strands a broken URL.
+      document.addEventListener('click', e => {
+        const save = e.target.closest('[data-md-edit-save]');
+        const modal = save?.closest('.modal-overlay, #meeting-detail');
+        if (!modal) return;
+        const fields = [...modal.querySelectorAll('[data-zoom-field]')];
+        const broken = fields.find(field => {
+          const p = parts(field);
+          if (!p.zoom.classList.contains('is-custom')) return false;
+          const value = p.input.value.trim();
+          return value === '' || !looksLikeLink(value);
+        });
+        if (broken) {
+          e.stopPropagation();
+          e.preventDefault();
+          const p = parts(broken);
+          // An empty custom field is fine while typing, but not on save.
+          p.input.classList.add('is-error');
+          p.error.hidden = false;
+          p.input.setAttribute('aria-invalid', 'true');
+          p.input.focus();
+          return;
+        }
+        fields.forEach(commit);
+      }, true);
+
+      document.addEventListener('input', e => {
+        const input = e.target.closest('[data-zoom-input]');
+        if (input) validate(input.closest('[data-zoom-field]'));
+      });
+    })();
+  </script>
 </body>
 </html>
