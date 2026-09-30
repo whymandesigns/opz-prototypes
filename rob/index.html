@@ -363,6 +363,9 @@ body {
   border-radius: var(--ic-radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
+  /* No link underline when a button is rendered as an <a>. The deliberate
+   * .btn-ghost:hover underline below still wins on hover. */
+  text-decoration: none;
   transition: background var(--ic-duration-fast) var(--ic-ease),
               transform var(--ic-duration-fast) var(--ic-ease),
               box-shadow var(--ic-duration-fast) var(--ic-ease);
@@ -2585,6 +2588,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   cursor: pointer;
   font: var(--ic-weight-semibold) var(--ic-text-sm)/1.25 var(--ic-font-sans);
   color: var(--color-text-muted);
+  /* No link underline when a tab is rendered as an <a> (cross-page tab). */
+  text-decoration: none;
   white-space: nowrap;
   transition: color var(--ic-duration-fast) var(--ic-ease),
               border-color var(--ic-duration-fast) var(--ic-ease);
@@ -4437,6 +4442,7 @@ body { overflow: hidden; }
   <symbol id="i-slack" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.88929 3.36143C4.96429 3.36143 4.20857 2.60571 4.20857 1.68071C4.20857 0.755714 4.96429 0 5.88929 0C6.81429 0 7.57 0.755714 7.57 1.68071V3.36143H5.88929ZM1.68071 11.7914C2.60571 11.7914 3.36143 11.0357 3.36143 10.1107V8.43H1.68071C0.755714 8.43 0 9.18571 0 10.1107C0 11.0357 0.755714 11.7914 1.68071 11.7914ZM5.88929 8.43C4.96429 8.43 4.20857 9.18571 4.20857 10.1107V14.3193C4.20857 15.2443 4.96429 16 5.88929 16C6.81429 16 7.57 15.2443 7.57 14.3193V10.1107C7.57 9.18571 6.81429 8.43 5.88929 8.43ZM7.57 5.88929C7.57 4.96429 6.81429 4.20857 5.88929 4.20857H1.68071C0.755714 4.20857 0 4.96429 0 5.88929C0 6.81429 0.755714 7.57 1.68071 7.57H5.88929C6.81429 7.57 7.57 6.81429 7.57 5.88929ZM12.6386 5.88929C12.6386 4.96429 13.3943 4.20857 14.3193 4.20857C15.2443 4.20857 16 4.96429 16 5.88929C16 6.81429 15.2443 7.57 14.3193 7.57H12.6386V5.88929ZM10.1107 7.57C11.0357 7.57 11.7914 6.81429 11.7914 5.88929V1.68071C11.7914 0.755714 11.0357 0 10.1107 0C9.18571 0 8.43 0.755714 8.43 1.68071V5.88929C8.43 6.81429 9.18571 7.57 10.1107 7.57ZM10.1107 12.6386C11.0357 12.6386 11.7914 13.3943 11.7914 14.3193C11.7914 15.2443 11.0357 16 10.1107 16C9.18571 16 8.43 15.2443 8.43 14.3193V12.6386H10.1107ZM8.43 10.1107C8.43 11.0357 9.18571 11.7914 10.1107 11.7914H14.3193C15.2443 11.7914 16 11.0357 16 10.1107C16 9.18571 15.2443 8.43 14.3193 8.43H10.1107C9.18571 8.43 8.43 9.18571 8.43 10.1107Z" fill="currentColor"/></symbol>
   <symbol id="i-jira-software" viewBox="0 0 16 16"><path d="M15.3204 7.55227L8.64688 0.667371L8 0L2.97644 5.18268L0.679604 7.55227C0.440132 7.79963 0.440132 8.20037 0.679604 8.44773L5.26918 13.1827L8 16L13.0236 10.8173L13.1013 10.7371L15.3204 8.44773C15.5599 8.20037 15.5599 7.79963 15.3204 7.55227ZM8 10.3654L5.70726 8L8 5.63464L10.2927 8L8 10.3654Z" fill="currentColor"/></symbol>
   <symbol id="i-google" viewBox="0 0 16 16"><path d="M8.16318 6.54547V9.64367H12.5565C12.3636 10.64 11.7847 11.4837 10.9164 12.051L13.5658 14.0656C15.1094 12.6692 15.9999 10.6183 15.9999 8.18192C15.9999 7.61466 15.948 7.06915 15.8515 6.54556L8.16318 6.54547Z" fill="#4285F4"/><path d="M3.58823 9.52273L2.9907 9.97099L0.875629 11.5855C2.21886 14.1964 4.97192 16.0001 8.16301 16.0001C10.367 16.0001 12.2149 15.2874 13.5656 14.0656L10.9162 12.051C10.189 12.531 9.2613 12.8219 8.16301 12.8219C6.04056 12.8219 4.23726 11.4183 3.59157 9.52735L3.58823 9.52273Z" fill="#34A853"/><path d="M0.875637 4.41457C0.319078 5.4909 0 6.70547 0 8C0 9.29453 0.319078 10.5091 0.875637 11.5854C0.875637 11.5927 3.59184 9.51996 3.59184 9.51996C3.42857 9.03996 3.33207 8.5309 3.33207 7.99992C3.33207 7.46893 3.42857 6.95987 3.59184 6.47987L0.875637 4.41457Z" fill="#FBBC05"/><path d="M8.16317 3.18547C9.36542 3.18547 10.4341 3.59273 11.2875 4.3782L13.6251 2.08731C12.2077 0.792781 10.3673 0 8.16317 0C4.97209 0 2.21886 1.79637 0.875629 4.41458L3.59175 6.48004C4.23735 4.5891 6.04073 3.18547 8.16317 3.18547Z" fill="#EA4335"/></symbol>
+  <symbol id="i-okr-custom" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10ZM8 9C7.44772 9 7 8.55228 7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8C9 8.55228 8.55228 9 8 9Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M13 8C13 10.7614 10.7614 13 8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3C10.7614 3 13 5.23858 13 8ZM4 8C4 10.2091 5.79086 12 8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4C5.79086 4 4 5.79086 4 8Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8ZM1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8Z" fill="currentColor"/><path vector-effect="non-scaling-stroke" d="M15.293 3L10.793 7.5H8.5V5.20703L13 0.707031L15.293 3Z" fill="white" stroke="currentColor"/></symbol>
 </svg>
 <!-- === /icons.svg === -->
 
@@ -5876,9 +5882,65 @@ body { overflow: hidden; }
     /* KR (key result) progress card inside details. */
     .md-kr {
       display: flex; gap: var(--ic-space-3); align-items: flex-start;
-      padding: var(--ic-space-3) 0;
-      margin-top: var(--ic-space-2);
+      /* Side padding with a matching negative margin: the hover fill gets some
+         air around the text without the text itself shifting. */
+      padding: var(--ic-space-3);
+      margin: var(--ic-space-2) calc(var(--ic-space-3) * -1) 0;
+      border-radius: var(--ic-radius-md);
+      transition: background var(--ic-duration-fast) var(--ic-ease);
     }
+    .md-kr:hover { background: var(--ic-palette-gray-200); }
+    /* Key metric flow: add → pick → the metric itself. One state at a time,
+       and both .btn and .md-kr are flex, so [hidden] needs the assist. */
+    .md-kr-flow { margin-top: var(--ic-space-2); }
+    .md-kr-flow > [hidden] { display: none !important; }
+    .md-kr-flow > .md-kr { margin-top: 0; }
+    .md-kr-add { padding-left: 0; }
+    /* Edit and delete only appear on hover or keyboard focus, so the row stays
+       quiet until you reach for it. */
+    .md-kr-actions {
+      display: flex;
+      gap: var(--ic-space-1);
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity var(--ic-duration-fast) var(--ic-ease);
+    }
+    .md-kr:hover .md-kr-actions,
+    .md-kr:focus-within .md-kr-actions { opacity: 1; }
+    /* The prototype-wide `.icon.i-trash` rule forces trash icons to neutral
+       graphite and outranks .btn-danger, so this one opts back into red-500. */
+    .md-kr-delete .icon.i-trash { color: var(--color-danger); }
+    /* .modal-body already sets the type and colour; just drop the UA margin. */
+    .md-confirm-text { margin: 0; }
+    /* Leading icon inside the select, per the Figma reference. */
+    .md-kr-select-value { display: inline-flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+    .md-kr-select-value > .icon { font-size: 16px; flex-shrink: 0; }
+    /* Key-metric menu (Figma 31083:45295). Two-line rows, so the icon aligns to
+       the title rather than floating between the two lines, and the meta drops
+       to hint size. */
+    .md-kr-menu .dropdown-item { align-items: flex-start; }
+    .md-kr-menu .dropdown-item[hidden] { display: none !important; }
+    .md-kr-menu .dropdown-item-icon { margin-top: 3px; }
+    .md-kr-menu .dropdown-item-text { flex: 1; min-width: 0; }
+    .md-kr-menu .dropdown-item-description {
+      font: var(--ic-weight-regular) var(--ic-text-xxs)/var(--ic-lh-body-xxs) var(--ic-font-sans);
+      color: var(--ic-palette-graphite-500);
+    }
+    /* Group label: semibold and near-black, and the whole row occupies 32px
+       rather than 26px plus a 12px margin either side. */
+    .md-kr-menu .dropdown-menu-label {
+      display: flex;
+      align-items: center;
+      height: 32px;
+      margin: 0;
+      padding: 0 var(--ic-space-2);
+      font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);
+      color: var(--color-text);
+    }
+    /* The custom-metric row reads as a link, with the trailing "opens elsewhere"
+       mark on the right. */
+    .md-kr-custom .dropdown-item-label { color: var(--color-text-link); font-weight: var(--ic-weight-semibold); }
+    .md-kr-custom-icon { color: var(--ic-palette-graphite-500); font-size: 16px; flex-shrink: 0; margin-top: 3px; }
     .md-kr > .icon { color: var(--color-text-muted); font-size: 20px; margin-top: 2px; flex-shrink: 0; }
     .md-kr-body { flex: 1; min-width: 0; }
     .md-kr-title { font: var(--type-body); color: var(--color-text); margin: 0; }
@@ -7372,15 +7434,66 @@ Platform reliability — error budget
                 </div>
               </div>
 
-              <!-- KR progress row (per Figma reference) -->
-              <div class="md-kr">
-                <svg class="icon i-jobs"><use href="#i-jobs"/></svg>
-                <div class="md-kr-body">
-                  <p class="md-kr-title">Resolve all critical and high CVEs within 7 days of disclosure</p>
-                  <p class="md-kr-sub">Objective: Strengthen platform security · Q2 / 2026</p>
-                  <div class="md-kr-bar">
-                    <div class="md-kr-track"><div class="md-kr-fill" style="width: 32%"></div></div>
-                    <span>32%</span>
+              <!-- Key metric — three states: an empty add affordance, the select
+                   (Figma 31083:44592), then the metric row itself. -->
+              <div class="md-kr-flow" data-md-kr-flow>
+                <button class="btn btn-ghost btn-xs md-kr-add" type="button" data-md-kr-add>
+                  <svg class="btn-icon"><use href="#i-plus"/></svg>Add key metric
+                </button>
+
+                <div class="input-select md-kr-select" hidden data-md-kr-select>
+                  <button class="input-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" data-md-kr-trigger>
+                    <span class="input-select-value input-select-placeholder md-kr-select-value" data-md-kr-label>
+                      <svg class="icon i-okr"><use href="#i-okr"/></svg><span data-md-kr-label-text>Search or select a suggested OKR, or create a custom metric</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                  </button>
+                  <div class="dropdown-menu md-kr-menu" hidden data-md-kr-menu>
+                    <!-- Custom metric leads: it is the way out of the OKR list,
+                         so it sits above the divider rather than buried under it. -->
+                    <button class="dropdown-item md-kr-custom" type="button" data-md-kr-custom>
+                      <div class="dropdown-item-text">
+                        <span class="dropdown-item-label">Create a custom metric</span>
+                        <span class="dropdown-item-description">Manually track a custom target outside of your OKRs</span>
+                      </div>
+                      <svg class="icon md-kr-custom-icon"><use href="#i-arrow-square-out"/></svg>
+                    </button>
+                    <hr class="dropdown-divider" />
+                    <div class="dropdown-search">
+                      <div class="input-icon input-icon-left">
+                        <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                        <input class="input" type="search" placeholder="Search OKRs" data-md-kr-search aria-label="Search OKRs" />
+                      </div>
+                    </div>
+                    <p class="dropdown-menu-label" data-md-kr-group-label>Suggested OKRs</p>
+                    <!-- Rows are rendered from the OKR list in script: five
+                         suggestions by default, the whole catalogue on search. -->
+                    <div class="dropdown-list" data-md-kr-list>
+                      <p class="dropdown-empty" hidden data-md-kr-empty>No OKRs match that search.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- End of the flow: the metric, as it was. -->
+                <div class="md-kr" hidden data-md-kr-result>
+                  <svg class="icon i-okr" data-md-kr-icon><use href="#i-okr"/></svg>
+                  <div class="md-kr-body">
+                    <p class="md-kr-title" data-md-kr-title></p>
+                    <p class="md-kr-sub" data-md-kr-sub></p>
+                    <div class="md-kr-bar">
+                      <div class="md-kr-track"><div class="md-kr-fill" data-md-kr-fill style="width: 0%"></div></div>
+                      <span data-md-kr-pct>0%</span>
+                    </div>
+                  </div>
+                  <div class="md-kr-actions">
+                    <button class="btn btn-icon-only btn-ghost btn-xs md-kr-edit" type="button"
+                            data-md-kr-edit aria-label="Change key metric">
+                      <svg class="icon i-pencil"><use href="#i-pencil"/></svg>
+                    </button>
+                    <button class="btn btn-icon-only btn-danger btn-xs md-kr-delete" type="button"
+                            data-md-kr-delete aria-label="Remove key metric">
+                      <svg class="icon i-trash"><use href="#i-trash"/></svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -11339,6 +11452,61 @@ Platform reliability — error budget
       syncAll();
     })();
   </script>
+  <!-- Custom metric (Figma 29887:104158). Sits above the meeting detail, so it
+       carries a higher z-index like the other modal-over-modal in this page. -->
+  <div class="modal-overlay" id="kpi-setup" hidden style="z-index: 1000">
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <h2 class="modal-title">Set up KPI</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" data-modal-close aria-label="Close">
+          <svg class="icon i-close"><use href="#i-close"/></svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="kpi-name">Metric Name</label>
+          <input class="input" id="kpi-name" type="text" placeholder="PRs merged within 24hrs" data-kpi-name />
+        </div>
+        <div class="field" style="margin-top: var(--ic-space-4)">
+          <label class="field-label" for="kpi-target">Target</label>
+          <input class="input" id="kpi-target" type="number" min="1" value="90" data-kpi-target />
+        </div>
+        <div class="field" style="margin-top: var(--ic-space-4)">
+          <label class="field-label" for="kpi-current">Current value</label>
+          <div class="slider">
+            <input class="slider-input" id="kpi-current" type="range" min="0" max="90" value="76" data-kpi-range />
+            <input class="input input-xs slider-field" type="number" min="0" max="90" value="76" aria-label="Current value" data-kpi-value />
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-primary" type="button" data-kpi-add>Add metric</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Removing a metric is destructive and has no undo, so it asks first. -->
+  <div class="modal-overlay" id="kr-delete-confirm" hidden style="z-index: 1001">
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="kr-delete-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="kr-delete-title">Delete key metric?</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" data-modal-close aria-label="Close">
+          <svg class="icon i-close"><use href="#i-close"/></svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <p class="md-confirm-text">
+          <strong data-krdel-name></strong> will be removed from this meeting. You can add another key metric afterwards.
+        </p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-danger" type="button" data-krdel-confirm>Delete metric</button>
+      </footer>
+    </div>
+  </div>
+
   <script>
     // Toast helper — mirrors designmd/example.html.
     window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
@@ -11396,6 +11564,268 @@ Platform reliability — error budget
           told = true;
           window.robNotBuilt(input.dataset.robTodo);
         });
+      });
+    })();
+  </script>
+  <script>
+    // Key metric: add → pick → the metric. The select is designmd's
+    // .input-select, wired here because this page has no generic select JS.
+    (function () {
+      const flow = document.querySelector('[data-md-kr-flow]');
+      if (!flow) return;
+      const addBtn  = flow.querySelector('[data-md-kr-add]');
+      const select  = flow.querySelector('[data-md-kr-select]');
+      const trigger = flow.querySelector('[data-md-kr-trigger]');
+      const menu    = flow.querySelector('[data-md-kr-menu]');
+      const result  = flow.querySelector('[data-md-kr-result]');
+
+      const showOnly = (el) => [addBtn, select, result].forEach(s => { s.hidden = s !== el; });
+      const setMenu = (open) => {
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+        if (open) {
+          search?.focus();
+        } else if (search?.value) {
+          // Don't leave a stale filter behind for the next open.
+          search.value = '';
+          filter();
+        }
+      };
+
+      const search = flow.querySelector('[data-md-kr-search]');
+      const empty  = flow.querySelector('[data-md-kr-empty]');
+      const list   = flow.querySelector('[data-md-kr-list]');
+      const label  = flow.querySelector('[data-md-kr-group-label]');
+      const editBtn   = flow.querySelector('[data-md-kr-edit]');
+      const delBtn    = flow.querySelector('[data-md-kr-delete]');
+      const labelWrap = flow.querySelector('[data-md-kr-label]');
+      const labelText = flow.querySelector('[data-md-kr-label-text]');
+      const PLACEHOLDER = labelText.textContent;
+      let selected = null;
+
+      // The whole OKR catalogue. Only the first SUGGESTED are offered up front;
+      // the rest are there to be found by searching. Four fits the list's
+      // max-height, so the default view never scrolls.
+      const SUGGESTED = 4;
+      const WORKSPACE = 'Operationalize';
+      const PERIOD = '4 / 2026';
+      const OKRS = [
+        ['Strengthen platform security', 'Resolve all critical and high CVEs within 7 days of disclosure', 32],
+        ['Strengthen platform security', 'Roll out SSO and MFA to 100% of internal tools', 52],
+        ['Strengthen platform security', 'Reduce mean time to detect a security event from 6 hours to 30 minutes', 22],
+        ['Strengthen platform security', 'Pass the SOC 2 Type II audit with zero major findings', 82],
+        ['Strengthen platform security', 'Cut unpatched dependencies to under 20 across all services', 41],
+        ['Improve platform performance', 'Cut p95 API latency to under 250 ms', 58],
+        ['Improve platform performance', 'Bring the dashboard first paint under 1.5 seconds', 64],
+        ['Improve platform performance', 'Hold p99 database query time under 100 ms', 37],
+        ['Ship faster and safer', 'Raise deploy frequency to once a day', 71],
+        ['Ship faster and safer', 'Cut change failure rate below 5%', 45],
+        ['Ship faster and safer', 'Reduce mean time to restore to under 30 minutes', 29],
+        ['Grow enterprise revenue', 'Close 25 new enterprise accounts', 48],
+        ['Grow enterprise revenue', 'Lift net revenue retention to 120%', 66],
+        ['Grow enterprise revenue', 'Reduce enterprise churn to under 4%', 55],
+        ['Raise customer satisfaction', 'Lift CSAT to 4.6 out of 5', 73],
+        ['Raise customer satisfaction', 'Cut first response time to under 2 hours', 38],
+        ['Raise customer satisfaction', 'Resolve 90% of tickets within one business day', 61],
+        ['Build a stronger team', 'Fill every open engineering role within 60 days', 26],
+        ['Build a stronger team', 'Raise engagement survey participation to 90%', 84],
+        ['Build a stronger team', 'Publish career frameworks for every discipline', 19],
+      ];
+
+      const items = OKRS.map(([objective, title, progress]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'dropdown-item';
+        b.setAttribute('data-md-kr-pick', '');
+        Object.assign(b.dataset, { title, objective, period: PERIOD, progress });
+        b.innerHTML = '<svg class="dropdown-item-icon"><use href="#i-okr"/></svg>'
+          + '<div class="dropdown-item-text"><span class="dropdown-item-label"></span>'
+          + '<span class="dropdown-item-description"></span></div>';
+        b.querySelector('.dropdown-item-label').textContent = title;
+        b.querySelector('.dropdown-item-description').textContent =
+          `${objective} \u00b7 ${PERIOD} \u00b7 ${WORKSPACE} \u00b7 ${progress}%`;
+        return b;
+      });
+      items.forEach(b => list.insertBefore(b, empty));
+
+      // No query: the five suggestions. With a query: the whole catalogue,
+      // and the heading stops calling them suggestions.
+      const filter = () => {
+        const q = (search?.value || '').trim().toLowerCase();
+        let shown = 0;
+        items.forEach((item, i) => {
+          const hit = q
+            ? item.textContent.toLowerCase().includes(q)
+            : (i < SUGGESTED || item === selected);
+          item.hidden = !hit;
+          if (hit) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+        if (label) label.textContent = q ? `Results (${shown})` : 'Suggested OKRs';
+      };
+      search?.addEventListener('input', filter);
+      filter();
+
+      // Reveal the closed select, matching the Figma reference; the menu opens
+      // on the next click, like any other select.
+      let customMetric = null;   // { name, target, current } for a hand-set metric
+      const setIcon = (name) => {
+        const svg = flow.querySelector('[data-md-kr-icon]');
+        if (!svg) return;
+        svg.setAttribute('class', `icon i-${name}`);
+        svg.querySelector('use')?.setAttribute('href', `#i-${name}`);
+      };
+      const setLabel = () => {
+        labelText.textContent = selected ? selected.dataset.title : (customMetric?.name || PLACEHOLDER);
+        labelWrap.classList.toggle('input-select-placeholder', !selected && !customMetric);
+        items.forEach(i => i.classList.toggle('is-selected', i === selected));
+      };
+
+      addBtn.addEventListener('click', () => { showOnly(select); trigger.focus(); });
+
+      // Pencil: back to the select, with the current OKR already chosen and in
+      // view (it may sit outside the four suggestions).
+      editBtn?.addEventListener('click', () => {
+        // A hand-set metric is edited in the modal it was made in; a Key Result
+        // goes back to the list it was chosen from.
+        if (customMetric) { openKpi(customMetric); return; }
+        showOnly(select);
+        setLabel();
+        filter();
+        setMenu(true);
+      });
+
+      // Trash: confirm first — removing a metric cannot be undone.
+      const krDel      = document.getElementById('kr-delete-confirm');
+      const krDelName  = krDel?.querySelector('[data-krdel-name]');
+      const krDelOk    = krDel?.querySelector('[data-krdel-confirm]');
+
+      const closeKrDel = () => { if (krDel) krDel.hidden = true; };
+
+      delBtn?.addEventListener('click', () => {
+        if (!krDel) return;
+        // Name the metric in the prompt, so it is clear what is about to go.
+        if (krDelName) krDelName.textContent =
+          flow.querySelector('[data-md-kr-title]').textContent;
+        krDel.hidden = false;
+        krDelOk?.focus();
+      });
+
+      // Confirmed: drop the metric and rewind to the empty add affordance — the
+      // section reads as having no metric again. Cleared first, so nothing
+      // carries over from the old metric into the next one.
+      krDelOk?.addEventListener('click', () => {
+        selected = null;
+        customMetric = null;
+        setIcon('okr');
+        setLabel();
+        filter();
+        setMenu(false);
+        closeKrDel();
+        showOnly(addBtn);
+        addBtn.focus();
+      });
+
+      // Escape belongs to the confirm while it is up: the page's global handler
+      // closes every open overlay, which would take the meeting modal with it.
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && krDel && !krDel.hidden) {
+          e.stopPropagation();
+          closeKrDel();
+          delBtn?.focus();
+        }
+      }, true);
+
+      trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
+
+      // A menu left open behind a click elsewhere would hang around.
+      document.addEventListener('click', (e) => {
+        if (!menu.hidden && !flow.contains(e.target)) setMenu(false);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menu.hidden) setMenu(false);
+      });
+
+      // ---- Custom metric: "Set up KPI" ----
+      const kpi       = document.getElementById('kpi-setup');
+      const kpiName   = kpi?.querySelector('[data-kpi-name]');
+      const kpiTarget = kpi?.querySelector('[data-kpi-target]');
+      const kpiRange  = kpi?.querySelector('[data-kpi-range]');
+      const kpiValue  = kpi?.querySelector('[data-kpi-value]');
+      const kpiAdd    = kpi?.querySelector('[data-kpi-add]');
+
+      const targetOf = () => Math.max(1, parseFloat(kpiTarget.value) || 1);
+
+      // The slider runs 0..target, so the thumb reads as progress toward it.
+      // Track fill follows designmd's --slider-progress contract.
+      const kpiSync = () => {
+        const target = targetOf();
+        kpiRange.max = target;
+        kpiValue.max = target;
+        if (parseFloat(kpiRange.value) > target) kpiRange.value = target;
+        kpiRange.style.setProperty('--slider-progress', (parseFloat(kpiRange.value) / target) * 100 + '%');
+        if (kpiValue.value !== kpiRange.value) kpiValue.value = kpiRange.value;
+      };
+      kpiRange?.addEventListener('input', kpiSync);
+      kpiTarget?.addEventListener('input', kpiSync);
+      kpiValue?.addEventListener('input', () => {
+        const v = parseFloat(kpiValue.value);
+        if (Number.isNaN(v)) return;
+        kpiRange.value = v;
+        kpiSync();
+      });
+      kpiName?.addEventListener('input', () => kpiName.classList.remove('is-error'));
+
+      const openKpi = (prefill = null) => {
+        if (!kpi) return;
+        kpiName.value   = prefill ? prefill.name : '';
+        kpiTarget.value = prefill ? prefill.target : 90;
+        kpiRange.value  = prefill ? prefill.current : 76;
+        kpiName.classList.remove('is-error');
+        kpiAdd.textContent = prefill ? 'Save metric' : 'Add metric';
+        kpi.hidden = false;
+        kpiSync();
+        kpiName.focus();
+      };
+
+      kpiAdd?.addEventListener('click', () => {
+        const name = kpiName.value.trim();
+        if (!name) { kpiName.classList.add('is-error'); kpiName.focus(); return; }
+        const target = targetOf();
+        const current = parseFloat(kpiRange.value) || 0;
+        const pct = Math.round((current / target) * 100);
+        flow.querySelector('[data-md-kr-title]').textContent = name;
+        flow.querySelector('[data-md-kr-sub]').textContent = `Custom metric \u00b7 ${current} of ${target}`;
+        flow.querySelector('[data-md-kr-fill]').style.width = `${pct}%`;
+        flow.querySelector('[data-md-kr-pct]').textContent = `${pct}%`;
+        selected = null;
+        customMetric = { name, target, current };
+        setIcon('okr-custom');
+        setLabel();
+        kpi.hidden = true;
+        showOnly(result);
+      });
+
+      menu.addEventListener('click', (e) => {
+        const pick = e.target.closest('[data-md-kr-pick]');
+        if (pick) {
+          const { title, objective, period, progress } = pick.dataset;
+          flow.querySelector('[data-md-kr-title]').textContent = title;
+          flow.querySelector('[data-md-kr-sub]').textContent = `Objective: ${objective} · ${period}`;
+          flow.querySelector('[data-md-kr-fill]').style.width = `${progress}%`;
+          flow.querySelector('[data-md-kr-pct]').textContent = `${progress}%`;
+          selected = pick;
+          customMetric = null;
+          setIcon('okr');
+          setLabel();
+          setMenu(false);
+          showOnly(result);
+          return;
+        }
+        if (e.target.closest('[data-md-kr-custom]')) {
+          setMenu(false);
+          openKpi();
+        }
       });
     })();
   </script>
