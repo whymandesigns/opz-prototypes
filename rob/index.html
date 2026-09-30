@@ -5131,10 +5131,66 @@ body { overflow: hidden; }
                 <span>1000 characters left</span>
                 <svg class="icon i-check" style="font-size: 14px; color: var(--color-success)"><use href="#i-check"/></svg>
               </div>
-              <button class="cm-agenda-add" type="button">
-                <svg class="icon i-plus"><use href="#i-plus"/></svg>
-                Add a key result
-              </button>
+
+              <!-- Key metric — the same three-state flow as the meeting detail,
+                   wearing this modal's own link-style add affordance. -->
+              <div class="md-kr-flow" data-md-kr-flow>
+                <button class="cm-agenda-add" type="button" data-md-kr-add>
+                  <svg class="icon i-plus"><use href="#i-plus"/></svg>
+                  Add a key result
+                </button>
+
+                <div class="input-select md-kr-select" hidden data-md-kr-select>
+                  <button class="input-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" data-md-kr-trigger>
+                    <span class="input-select-value input-select-placeholder md-kr-select-value" data-md-kr-label>
+                      <svg class="icon i-okr"><use href="#i-okr"/></svg><span data-md-kr-label-text>Search or select a suggested OKR, or create a custom metric</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                  </button>
+                  <div class="dropdown-menu md-kr-menu" hidden data-md-kr-menu>
+                    <button class="dropdown-item md-kr-custom" type="button" data-md-kr-custom>
+                      <div class="dropdown-item-text">
+                        <span class="dropdown-item-label">Create a custom metric</span>
+                        <span class="dropdown-item-description">Manually track a custom target outside of your OKRs</span>
+                      </div>
+                      <svg class="icon md-kr-custom-icon"><use href="#i-arrow-square-out"/></svg>
+                    </button>
+                    <hr class="dropdown-divider" />
+                    <div class="dropdown-search">
+                      <div class="input-icon input-icon-left">
+                        <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                        <input class="input" type="search" placeholder="Search OKRs" data-md-kr-search aria-label="Search OKRs" />
+                      </div>
+                    </div>
+                    <p class="dropdown-menu-label" data-md-kr-group-label>Suggested OKRs</p>
+                    <div class="dropdown-list" data-md-kr-list>
+                      <p class="dropdown-empty" hidden data-md-kr-empty>No OKRs match that search.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="md-kr" hidden data-md-kr-result>
+                  <svg class="icon i-okr" data-md-kr-icon><use href="#i-okr"/></svg>
+                  <div class="md-kr-body">
+                    <p class="md-kr-title" data-md-kr-title></p>
+                    <p class="md-kr-sub" data-md-kr-sub></p>
+                    <div class="md-kr-bar">
+                      <div class="md-kr-track"><div class="md-kr-fill" data-md-kr-fill style="width: 0%"></div></div>
+                      <span data-md-kr-pct>0%</span>
+                    </div>
+                  </div>
+                  <div class="md-kr-actions">
+                    <button class="btn btn-icon-only btn-ghost btn-xs md-kr-edit" type="button"
+                            data-md-kr-edit aria-label="Change key metric">
+                      <svg class="icon i-pencil"><use href="#i-pencil"/></svg>
+                    </button>
+                    <button class="btn btn-icon-only btn-danger btn-xs md-kr-delete" type="button"
+                            data-md-kr-delete aria-label="Remove key metric">
+                      <svg class="icon i-trash"><use href="#i-trash"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <!-- Agenda items (create flow only) -->
@@ -5893,6 +5949,8 @@ body { overflow: hidden; }
     /* Key metric flow: add → pick → the metric itself. One state at a time,
        and both .btn and .md-kr are flex, so [hidden] needs the assist. */
     .md-kr-flow { margin-top: var(--ic-space-2); }
+    /* .cm-section already spaces its children; don't stack a margin on top. */
+    .cm-section > .md-kr-flow { margin-top: 0; }
     .md-kr-flow > [hidden] { display: none !important; }
     .md-kr-flow > .md-kr { margin-top: 0; }
     .md-kr-add { padding-left: 0; }
@@ -11570,38 +11628,14 @@ Platform reliability — error budget
   <script>
     // Key metric: add → pick → the metric. The select is designmd's
     // .input-select, wired here because this page has no generic select JS.
+    //
+    // The page has two of these — one in the meeting detail, one in the create
+    // modal — so the flow is a factory over [data-md-kr-flow]. The Set up KPI
+    // and delete-confirm dialogs stay single shared modals; each records which
+    // flow opened it, and hands the result back to that one.
     (function () {
-      const flow = document.querySelector('[data-md-kr-flow]');
-      if (!flow) return;
-      const addBtn  = flow.querySelector('[data-md-kr-add]');
-      const select  = flow.querySelector('[data-md-kr-select]');
-      const trigger = flow.querySelector('[data-md-kr-trigger]');
-      const menu    = flow.querySelector('[data-md-kr-menu]');
-      const result  = flow.querySelector('[data-md-kr-result]');
-
-      const showOnly = (el) => [addBtn, select, result].forEach(s => { s.hidden = s !== el; });
-      const setMenu = (open) => {
-        menu.hidden = !open;
-        trigger.setAttribute('aria-expanded', String(open));
-        if (open) {
-          search?.focus();
-        } else if (search?.value) {
-          // Don't leave a stale filter behind for the next open.
-          search.value = '';
-          filter();
-        }
-      };
-
-      const search = flow.querySelector('[data-md-kr-search]');
-      const empty  = flow.querySelector('[data-md-kr-empty]');
-      const list   = flow.querySelector('[data-md-kr-list]');
-      const label  = flow.querySelector('[data-md-kr-group-label]');
-      const editBtn   = flow.querySelector('[data-md-kr-edit]');
-      const delBtn    = flow.querySelector('[data-md-kr-delete]');
-      const labelWrap = flow.querySelector('[data-md-kr-label]');
-      const labelText = flow.querySelector('[data-md-kr-label-text]');
-      const PLACEHOLDER = labelText.textContent;
-      let selected = null;
+      const flows = document.querySelectorAll('[data-md-kr-flow]');
+      if (!flows.length) return;
 
       // The whole OKR catalogue. Only the first SUGGESTED are offered up front;
       // the rest are there to be found by searching. Four fits the list's
@@ -11632,127 +11666,14 @@ Platform reliability — error budget
         ['Build a stronger team', 'Publish career frameworks for every discipline', 19],
       ];
 
-      const items = OKRS.map(([objective, title, progress]) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'dropdown-item';
-        b.setAttribute('data-md-kr-pick', '');
-        Object.assign(b.dataset, { title, objective, period: PERIOD, progress });
-        b.innerHTML = '<svg class="dropdown-item-icon"><use href="#i-okr"/></svg>'
-          + '<div class="dropdown-item-text"><span class="dropdown-item-label"></span>'
-          + '<span class="dropdown-item-description"></span></div>';
-        b.querySelector('.dropdown-item-label').textContent = title;
-        b.querySelector('.dropdown-item-description').textContent =
-          `${objective} \u00b7 ${PERIOD} \u00b7 ${WORKSPACE} \u00b7 ${progress}%`;
-        return b;
-      });
-      items.forEach(b => list.insertBefore(b, empty));
-
-      // No query: the five suggestions. With a query: the whole catalogue,
-      // and the heading stops calling them suggestions.
-      const filter = () => {
-        const q = (search?.value || '').trim().toLowerCase();
-        let shown = 0;
-        items.forEach((item, i) => {
-          const hit = q
-            ? item.textContent.toLowerCase().includes(q)
-            : (i < SUGGESTED || item === selected);
-          item.hidden = !hit;
-          if (hit) shown++;
-        });
-        if (empty) empty.hidden = shown > 0;
-        if (label) label.textContent = q ? `Results (${shown})` : 'Suggested OKRs';
-      };
-      search?.addEventListener('input', filter);
-      filter();
-
-      // Reveal the closed select, matching the Figma reference; the menu opens
-      // on the next click, like any other select.
-      let customMetric = null;   // { name, target, current } for a hand-set metric
-      const setIcon = (name) => {
-        const svg = flow.querySelector('[data-md-kr-icon]');
-        if (!svg) return;
-        svg.setAttribute('class', `icon i-${name}`);
-        svg.querySelector('use')?.setAttribute('href', `#i-${name}`);
-      };
-      const setLabel = () => {
-        labelText.textContent = selected ? selected.dataset.title : (customMetric?.name || PLACEHOLDER);
-        labelWrap.classList.toggle('input-select-placeholder', !selected && !customMetric);
-        items.forEach(i => i.classList.toggle('is-selected', i === selected));
-      };
-
-      addBtn.addEventListener('click', () => { showOnly(select); trigger.focus(); });
-
-      // Pencil: back to the select, with the current OKR already chosen and in
-      // view (it may sit outside the four suggestions).
-      editBtn?.addEventListener('click', () => {
-        // A hand-set metric is edited in the modal it was made in; a Key Result
-        // goes back to the list it was chosen from.
-        if (customMetric) { openKpi(customMetric); return; }
-        showOnly(select);
-        setLabel();
-        filter();
-        setMenu(true);
-      });
-
-      // Trash: confirm first — removing a metric cannot be undone.
-      const krDel      = document.getElementById('kr-delete-confirm');
-      const krDelName  = krDel?.querySelector('[data-krdel-name]');
-      const krDelOk    = krDel?.querySelector('[data-krdel-confirm]');
-
-      const closeKrDel = () => { if (krDel) krDel.hidden = true; };
-
-      delBtn?.addEventListener('click', () => {
-        if (!krDel) return;
-        // Name the metric in the prompt, so it is clear what is about to go.
-        if (krDelName) krDelName.textContent =
-          flow.querySelector('[data-md-kr-title]').textContent;
-        krDel.hidden = false;
-        krDelOk?.focus();
-      });
-
-      // Confirmed: drop the metric and rewind to the empty add affordance — the
-      // section reads as having no metric again. Cleared first, so nothing
-      // carries over from the old metric into the next one.
-      krDelOk?.addEventListener('click', () => {
-        selected = null;
-        customMetric = null;
-        setIcon('okr');
-        setLabel();
-        filter();
-        setMenu(false);
-        closeKrDel();
-        showOnly(addBtn);
-        addBtn.focus();
-      });
-
-      // Escape belongs to the confirm while it is up: the page's global handler
-      // closes every open overlay, which would take the meeting modal with it.
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && krDel && !krDel.hidden) {
-          e.stopPropagation();
-          closeKrDel();
-          delBtn?.focus();
-        }
-      }, true);
-
-      trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
-
-      // A menu left open behind a click elsewhere would hang around.
-      document.addEventListener('click', (e) => {
-        if (!menu.hidden && !flow.contains(e.target)) setMenu(false);
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !menu.hidden) setMenu(false);
-      });
-
-      // ---- Custom metric: "Set up KPI" ----
+      // ---- Shared: custom metric "Set up KPI" ----
       const kpi       = document.getElementById('kpi-setup');
       const kpiName   = kpi?.querySelector('[data-kpi-name]');
       const kpiTarget = kpi?.querySelector('[data-kpi-target]');
       const kpiRange  = kpi?.querySelector('[data-kpi-range]');
       const kpiValue  = kpi?.querySelector('[data-kpi-value]');
       const kpiAdd    = kpi?.querySelector('[data-kpi-add]');
+      let kpiOwner = null;   // the flow that opened it
 
       const targetOf = () => Math.max(1, parseFloat(kpiTarget.value) || 1);
 
@@ -11776,8 +11697,9 @@ Platform reliability — error budget
       });
       kpiName?.addEventListener('input', () => kpiName.classList.remove('is-error'));
 
-      const openKpi = (prefill = null) => {
+      const openKpi = (owner, prefill = null) => {
         if (!kpi) return;
+        kpiOwner = owner;
         kpiName.value   = prefill ? prefill.name : '';
         kpiTarget.value = prefill ? prefill.target : 90;
         kpiRange.value  = prefill ? prefill.current : 76;
@@ -11791,42 +11713,210 @@ Platform reliability — error budget
       kpiAdd?.addEventListener('click', () => {
         const name = kpiName.value.trim();
         if (!name) { kpiName.classList.add('is-error'); kpiName.focus(); return; }
-        const target = targetOf();
         const current = parseFloat(kpiRange.value) || 0;
-        const pct = Math.round((current / target) * 100);
-        flow.querySelector('[data-md-kr-title]').textContent = name;
-        flow.querySelector('[data-md-kr-sub]').textContent = `Custom metric \u00b7 ${current} of ${target}`;
-        flow.querySelector('[data-md-kr-fill]').style.width = `${pct}%`;
-        flow.querySelector('[data-md-kr-pct]').textContent = `${pct}%`;
-        selected = null;
-        customMetric = { name, target, current };
-        setIcon('okr-custom');
-        setLabel();
+        kpiOwner?.setCustom({ name, target: targetOf(), current });
         kpi.hidden = true;
-        showOnly(result);
       });
 
-      menu.addEventListener('click', (e) => {
-        const pick = e.target.closest('[data-md-kr-pick]');
-        if (pick) {
-          const { title, objective, period, progress } = pick.dataset;
-          flow.querySelector('[data-md-kr-title]').textContent = title;
-          flow.querySelector('[data-md-kr-sub]').textContent = `Objective: ${objective} · ${period}`;
-          flow.querySelector('[data-md-kr-fill]').style.width = `${progress}%`;
-          flow.querySelector('[data-md-kr-pct]').textContent = `${progress}%`;
-          selected = pick;
-          customMetric = null;
-          setIcon('okr');
-          setLabel();
-          setMenu(false);
-          showOnly(result);
-          return;
-        }
-        if (e.target.closest('[data-md-kr-custom]')) {
-          setMenu(false);
-          openKpi();
-        }
+      // ---- Shared: delete confirmation ----
+      const krDel     = document.getElementById('kr-delete-confirm');
+      const krDelName = krDel?.querySelector('[data-krdel-name]');
+      const krDelOk   = krDel?.querySelector('[data-krdel-confirm]');
+      let delOwner = null;
+
+      const closeKrDel = () => { if (krDel) krDel.hidden = true; };
+
+      const openKrDel = (owner, name) => {
+        if (!krDel) return;
+        delOwner = owner;
+        // Name the metric in the prompt, so it is clear what is about to go.
+        if (krDelName) krDelName.textContent = name;
+        krDel.hidden = false;
+        krDelOk?.focus();
+      };
+
+      krDelOk?.addEventListener('click', () => {
+        const owner = delOwner;
+        closeKrDel();
+        owner?.clearMetric();
       });
+
+      // Escape belongs to the confirm while it is up: the page's global handler
+      // closes every open overlay, which would take the meeting modal with it.
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && krDel && !krDel.hidden) {
+          e.stopPropagation();
+          const owner = delOwner;
+          closeKrDel();
+          owner?.focusDelete();
+        }
+      }, true);
+
+      // ---- Per-flow ----
+      const initFlow = (flow) => {
+        const addBtn  = flow.querySelector('[data-md-kr-add]');
+        const select  = flow.querySelector('[data-md-kr-select]');
+        const trigger = flow.querySelector('[data-md-kr-trigger]');
+        const menu    = flow.querySelector('[data-md-kr-menu]');
+        const result  = flow.querySelector('[data-md-kr-result]');
+        if (!addBtn || !select || !trigger || !menu || !result) return;
+
+        const search = flow.querySelector('[data-md-kr-search]');
+        const empty  = flow.querySelector('[data-md-kr-empty]');
+        const list   = flow.querySelector('[data-md-kr-list]');
+        const label  = flow.querySelector('[data-md-kr-group-label]');
+        const editBtn   = flow.querySelector('[data-md-kr-edit]');
+        const delBtn    = flow.querySelector('[data-md-kr-delete]');
+        const labelWrap = flow.querySelector('[data-md-kr-label]');
+        const labelText = flow.querySelector('[data-md-kr-label-text]');
+        const PLACEHOLDER = labelText.textContent;
+
+        let selected = null;
+        let customMetric = null;   // { name, target, current } for a hand-set metric
+
+        const showOnly = (el) => [addBtn, select, result].forEach(s => { s.hidden = s !== el; });
+        const setMenu = (open) => {
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', String(open));
+          if (open) {
+            search?.focus();
+          } else if (search?.value) {
+            // Don't leave a stale filter behind for the next open.
+            search.value = '';
+            filter();
+          }
+        };
+
+        const items = OKRS.map(([objective, title, progress]) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'dropdown-item';
+          b.setAttribute('data-md-kr-pick', '');
+          Object.assign(b.dataset, { title, objective, period: PERIOD, progress });
+          b.innerHTML = '<svg class="dropdown-item-icon"><use href="#i-okr"/></svg>'
+            + '<div class="dropdown-item-text"><span class="dropdown-item-label"></span>'
+            + '<span class="dropdown-item-description"></span></div>';
+          b.querySelector('.dropdown-item-label').textContent = title;
+          b.querySelector('.dropdown-item-description').textContent =
+            `${objective} \u00b7 ${PERIOD} \u00b7 ${WORKSPACE} \u00b7 ${progress}%`;
+          return b;
+        });
+        items.forEach(b => list.insertBefore(b, empty));
+
+        // No query: the four suggestions. With a query: the whole catalogue,
+        // and the heading stops calling them suggestions.
+        const filter = () => {
+          const q = (search?.value || '').trim().toLowerCase();
+          let shown = 0;
+          items.forEach((item, i) => {
+            const hit = q
+              ? item.textContent.toLowerCase().includes(q)
+              : (i < SUGGESTED || item === selected);
+            item.hidden = !hit;
+            if (hit) shown++;
+          });
+          if (empty) empty.hidden = shown > 0;
+          if (label) label.textContent = q ? `Results (${shown})` : 'Suggested OKRs';
+        };
+        search?.addEventListener('input', filter);
+        filter();
+
+        const setIcon = (name) => {
+          const svg = flow.querySelector('[data-md-kr-icon]');
+          if (!svg) return;
+          svg.setAttribute('class', `icon i-${name}`);
+          svg.querySelector('use')?.setAttribute('href', `#i-${name}`);
+        };
+        const setLabel = () => {
+          labelText.textContent = selected ? selected.dataset.title : (customMetric?.name || PLACEHOLDER);
+          labelWrap.classList.toggle('input-select-placeholder', !selected && !customMetric);
+          items.forEach(i => i.classList.toggle('is-selected', i === selected));
+        };
+        const fill = (title, sub, pct) => {
+          flow.querySelector('[data-md-kr-title]').textContent = title;
+          flow.querySelector('[data-md-kr-sub]').textContent = sub;
+          flow.querySelector('[data-md-kr-fill]').style.width = `${pct}%`;
+          flow.querySelector('[data-md-kr-pct]').textContent = `${pct}%`;
+        };
+
+        // Reveal the closed select, matching the Figma reference; the menu opens
+        // on the next click, like any other select.
+        addBtn.addEventListener('click', () => { showOnly(select); trigger.focus(); });
+
+        // Pencil: a hand-set metric is edited in the modal it was made in; a Key
+        // Result goes back to the list it was chosen from, already selected and
+        // in view (it may sit outside the four suggestions).
+        editBtn?.addEventListener('click', () => {
+          if (customMetric) { openKpi(api, customMetric); return; }
+          showOnly(select);
+          setLabel();
+          filter();
+          setMenu(true);
+        });
+
+        // Trash: confirm first — removing a metric cannot be undone.
+        delBtn?.addEventListener('click', () => {
+          openKrDel(api, flow.querySelector('[data-md-kr-title]').textContent);
+        });
+
+        trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
+
+        // A menu left open behind a click elsewhere would hang around.
+        document.addEventListener('click', (e) => {
+          if (!menu.hidden && !flow.contains(e.target)) setMenu(false);
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && !menu.hidden) setMenu(false);
+        });
+
+        menu.addEventListener('click', (e) => {
+          const pick = e.target.closest('[data-md-kr-pick]');
+          if (pick) {
+            const { title, objective, period, progress } = pick.dataset;
+            fill(title, `Objective: ${objective} \u00b7 ${period}`, progress);
+            selected = pick;
+            customMetric = null;
+            setIcon('okr');
+            setLabel();
+            setMenu(false);
+            showOnly(result);
+            return;
+          }
+          if (e.target.closest('[data-md-kr-custom]')) {
+            setMenu(false);
+            openKpi(api);
+          }
+        });
+
+        // What the shared modals call back into.
+        const api = {
+          setCustom({ name, target, current }) {
+            fill(name, `Custom metric \u00b7 ${current} of ${target}`, Math.round((current / target) * 100));
+            selected = null;
+            customMetric = { name, target, current };
+            setIcon('okr-custom');
+            setLabel();
+            showOnly(result);
+          },
+          // Drop the metric and rewind to the empty add affordance — the section
+          // reads as having no metric again. Cleared first, so nothing carries
+          // over from the old metric into the next one.
+          clearMetric() {
+            selected = null;
+            customMetric = null;
+            setIcon('okr');
+            setLabel();
+            filter();
+            setMenu(false);
+            showOnly(addBtn);
+            addBtn.focus();
+          },
+          focusDelete() { delBtn?.focus(); },
+        };
+        return api;
+      };
+
+      flows.forEach(initFlow);
     })();
   </script>
 </body>
