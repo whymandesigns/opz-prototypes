@@ -4918,10 +4918,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       });
       document.addEventListener('click', e => { if (!kickSelect.contains(e.target)) closeKick(); });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeKick(); });
+      // Entering from the kick-off goes straight in — there is nothing on
+      // screen yet to re-load. The loader belongs to switches made from
+      // inside the app, where the page underneath changes.
       kickoff.querySelectorAll('.ws-kickoff-option').forEach(opt => {
         opt.addEventListener('click', () => {
           closeKick();
-          switchWorkspace(opt.dataset.workspace, enterApp);
+          applyWorkspace(opt.dataset.workspace);
+          enterApp();
         });
       });
 
@@ -4954,7 +4958,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         paths.forEach((path, i) => { path.style.animationDelay = ((n - 1 - i) / n * 1.1).toFixed(3) + 's'; });
       });
 
-      function switchWorkspace(picked, onDone) {
+      function switchWorkspace(picked) {
         if (!WORKSPACES.includes(picked)) return;
         clearTimeout(switchTimer);
         loaderName.textContent = picked;
@@ -4962,7 +4966,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         switchTimer = setTimeout(() => {
           loader.hidden = true;
           applyWorkspace(picked);
-          if (onDone) onDone();
           // Confirmation toast — parked: the loader already tells the story.
           // Uncomment to bring it back (markup, styles and helper all remain).
           // workspaceToast(picked);
