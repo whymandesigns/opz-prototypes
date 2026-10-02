@@ -59,7 +59,7 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   | 19 | Problem / Opportunity — required, 2–3 lines | **Built** — below Description, ⓘ carries the roadmap helper text, 500-char cap with counter |
   | 20 | Objective(s) — required, 3 boxes, add / remove / reorder | **Built** — reusable multi-entry list: numbered rows, sample placeholders, + Add, × (last row protected), drag handle + Alt+↑/↓, Enter adds a row. Required = ≥ 1 filled |
   | 21 | Success metrics — required, 3 boxes, add / remove | **Built** — same list as Objective(s), numbered for consistency (user call; roadmap sample is unnumbered) |
-  | 5 | Duplicate / related notice | **Built (prototype rule)** — designmd `.alert-info` above Health: "Sounds like this relates to another initiative already in TopTeam." Shows only when the name contains **"partner"** (any case), and points at **Partner Enablement Program** — a real seed row in the Initiatives table (Sales · In progress · Aisha Khan, 2 projects); the match line reads that row. Real fuzzy matching on name / description / objectives still to design with ID 22 |
+  | 5 | Duplicate / related notice | **Built (prototype rule)** — designmd `.alert-warning` (yellow, warning icon) above Health: "Sounds like this relates to another initiative already in TopTeam." Shows only when the name contains **"partner"** (any case), and points at **Partner Enablement Program** — a real seed row in the Initiatives table (Sales · In progress · Aisha Khan, 2 projects); the match line reads that row. Real fuzzy matching on name / description / objectives still to design with ID 22 |
   | 22 | Related & duplicate initiatives section | Not started |
 
   **Drawer → table (2026-10-02):** Create and Save as draft add the initiative to
@@ -74,6 +74,33 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   Drafts reopen in draft mode; published ones reopen in edit mode — primary
   button reads **Save changes**, Save as draft is hidden, and saving updates the
   same row (toast: "… updated."). Seed rows aren't editable yet.
+
+  **View mode (2026-10-02)** — Figma *Drawer / Regular* `20327:41665`, extended
+  with the TopTrack fields. A second, read-only drawer:
+  - Header: title, Initiative + stage tags, "Last edit was made … by …", copy-link
+    and close.
+  - **Overview** tab: label · value rows (Health tag, Executive sponsor /
+    Accountable owner / Project manager as avatar + name + role, Beneficiary
+    function, Working team stack + names, duration, dates, impact quarters,
+    Core strategy + objective); Description, Problem / Opportunity, numbered
+    Objective(s) and Success metrics; Connections, Documents, Projects sections
+    (placeholders: "Not connected", "No documents yet", "Add project").
+  - **Activity log** tab: created / published / edited / draft entries with times.
+  - Footer CTA **Edit initiative** → edit drawer ("Save changes") → back to view.
+  - Flow: a successful **Create** lands on the **table** (new row pinned first,
+    toast) — clicking that row opens view mode. Saving an *edit* returns to
+    view mode, where the edit started. Drafts still open straight into edit. Empty values show "—".
+
+  **States switcher — `features/initiatives/?states=1`** (2026-10-02). Floating
+  window, same look as toptrack's. Each state reloads with `&state=…` and
+  replays the real UI steps, so every state starts clean:
+  - *Table:* Default · Drafts + created rows · No initiatives · Search, no
+    results · Long text
+  - *Create drawer:* Blank · Required errors · Duplicate notice · Filled, ready
+    to create
+  - *Draft & edit:* Draft reopened · Edit (Save changes)
+  - *View mode:* View — all fields · View — required only · View — activity log
+
 
   **ID 18 decisions (2026-10-01):** keep Health, Connections, More details and
   Core strategy (not in ID 18's list, but stay — optional). Keep Description

@@ -3932,6 +3932,63 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .btn.in-link:hover { background: transparent; text-decoration: underline; }
     /* Save as draft sits far left; Cancel + Create stay right. */
     .drawer-footer .in-draft-btn { margin-right: auto; }
+
+    /* Prototype state switcher (?states=1) — same look as the other
+       prototypes' switchers (toptrack, performance-reviews, csv-export). */
+    /* Bottom-left, so it stays clear of the right-hand drawers it drives. */
+    .in-switcher { position: fixed; left: 16px; bottom: 16px; z-index: 999; width: 232px; background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--ic-radius-lg); box-shadow: var(--ic-shadow-lg); overflow: hidden; }
+    .in-switcher[hidden] { display: none; }
+    .in-switcher-head { display: flex; align-items: center; justify-content: space-between; padding: var(--ic-space-2) var(--ic-space-3); background: var(--ic-palette-graphite-800); color: var(--color-text-inverse); font: var(--ic-weight-semibold) var(--ic-text-xxs)/1.4 var(--ic-font-sans); letter-spacing: .06em; text-transform: uppercase; }
+    .in-switcher-toggle { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 2px 4px; }
+    .in-switcher-body { max-height: 64vh; overflow: auto; padding: var(--ic-space-2); display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .in-switcher.is-collapsed .in-switcher-body { display: none; }
+    .in-switcher-group { display: flex; flex-direction: column; gap: 4px; }
+    .in-switcher-group > span { font-size: var(--ic-text-xxs); text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-subtle); font-weight: var(--ic-weight-semibold); padding: 2px 4px 0; }
+    .in-switcher-group button { text-align: left; padding: 5px 8px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); color: var(--color-text); cursor: pointer; font: var(--type-body-sm); }
+    .in-switcher-group button:hover { background: var(--color-surface-muted); border-color: var(--color-border-strong); }
+    .in-switcher-group button.is-current { border-color: var(--color-accent); color: var(--color-accent); font-weight: var(--ic-weight-semibold); }
+
+    /* ===== View mode (Figma 20327:41665) =====
+       Header: title, Initiative + stage tags, last-edit line, link + close.
+       Body: Overview / Activity log tabs; label (192px) · value rows; long
+       text as paragraphs; Connections / Documents / Projects sections. */
+    .in-view-header { align-items: flex-start; }
+    .in-view-heading { display: flex; flex-direction: column; gap: var(--ic-space-1); min-width: 0; }
+    .in-view-title { margin: 0; font: var(--type-h3); color: var(--color-text); overflow-wrap: anywhere; }
+    .in-view-meta { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2); }
+    .in-view-edited { font: var(--type-body-xs); color: var(--color-text-muted); }
+    .in-view-edited a, .in-view-link { color: var(--color-text-link); text-decoration: none; }
+    .in-view-edited a:hover, .in-view-link:hover { text-decoration: underline; }
+    .in-view-header-actions { display: flex; gap: var(--ic-space-2); flex-shrink: 0; }
+    .in-view-body { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .in-view-panel { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .in-view-panel[hidden] { display: none; }
+    .in-view-rows { display: flex; flex-direction: column; gap: var(--ic-space-1); margin: 0; }
+    .in-view-row { display: grid; grid-template-columns: 192px minmax(0, 1fr); gap: var(--ic-space-2); align-items: center; min-height: 36px; }
+    .in-view-row dt { font: var(--type-body-sm); color: var(--color-text-muted); }
+    .in-view-row dd { margin: 0; font: var(--type-body-sm); color: var(--color-text); min-width: 0; }
+    .in-view-empty { color: var(--color-text-subtle); }
+    .in-view-person { display: inline-flex; align-items: center; gap: var(--ic-space-3); min-width: 0; }
+    .in-view-person-text { display: flex; flex-direction: column; min-width: 0; }
+    .in-view-person-name { color: var(--color-text-link); font-weight: var(--ic-weight-semibold); text-decoration: none; }
+    .in-view-person-name:hover { text-decoration: underline; }
+    .in-view-person-role { font: var(--type-body-xs); color: var(--color-text-muted); }
+    .in-view-team { display: flex; align-items: center; gap: var(--ic-space-3); flex-wrap: wrap; }
+    .in-view-team-names { color: var(--color-text); }
+    .in-view-block { display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    .in-view-block h3, .in-view-section h3 { margin: 0; font: var(--type-body-sm); color: var(--color-text-muted); font-weight: var(--ic-weight-regular); }
+    .in-view-section h3 { font: var(--type-body-semibold); color: var(--color-text); }
+    .in-view-text { margin: 0; font: var(--type-body); color: var(--color-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .in-view-list { margin: 0; padding-left: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-1); font: var(--type-body); color: var(--color-text); }
+    .in-view-section { display: flex; flex-direction: column; gap: var(--ic-space-2); border-top: 1px solid var(--color-border); padding-top: var(--ic-space-4); }
+    .in-view-conn { display: grid; grid-template-columns: 24px 160px minmax(0, 1fr); gap: var(--ic-space-2); align-items: center; font: var(--type-body-sm); }
+    .in-view-conn-icon { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ic-radius-sm); background: var(--color-surface-muted); color: var(--color-icon); }
+    .in-view-conn-label { color: var(--color-text-muted); }
+    .in-view-activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .in-view-activity li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--ic-space-3); align-items: start; font: var(--type-body-sm); }
+    .in-view-activity time { display: block; font: var(--type-body-xs); color: var(--color-text-muted); }
+    #in-drawer-view .drawer-footer { justify-content: flex-end; }
+    @media (max-width: 560px) { .in-view-row, .in-view-conn { grid-template-columns: minmax(0, 1fr); gap: 2px; } .in-view-conn-icon { display: none; } }
     /* Duplicate notice (ID 5). designmd gap: .alert's display: flex beats the
        UA [hidden] rule, so hidden is restated. Two lines: claim, then match. */
     .alert[hidden] { display: none; }
@@ -4559,11 +4616,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <div class="drawer-body in-form">
         <div class="in-form-rows">
           <!-- TopTrack roadmap ID 5 — duplicate / related notice (designmd
-               .alert-info). Prototype: shows when the name mentions "partner"
+               .alert-warning). Prototype: shows when the name mentions "partner"
                and points at Partner Enablement Program (a table row); real
                matching is a fuzzy search over name, description, objectives. -->
-          <div class="alert alert-info in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
-            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+          <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
+            <svg class="icon alert-icon"><use href="#i-warning"/></svg>
             <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
           </div>
           <div class="in-form-row">
@@ -4907,6 +4964,39 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <button class="btn btn-secondary in-draft-btn" type="button" data-save-draft>Save as draft</button>
         <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
         <button class="btn btn-primary" type="button" data-create-initiative>Create Initiative</button>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- View mode — Figma "Drawer / Regular" (20327:41665), extended with the
+       TopTrack set-up fields. Read-only label/value rows filled from the
+       saved initiative; "Edit initiative" switches to the edit drawer. -->
+  <div class="drawer-overlay" id="in-drawer-view" hidden>
+    <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="in-view-title">
+      <header class="drawer-header in-view-header">
+        <div class="in-view-heading">
+          <h2 class="in-view-title" id="in-view-title"></h2>
+          <div class="in-view-meta">
+            <span class="tag tag-blue">Initiative</span>
+            <span class="tag tag-light" data-view="stage"></span>
+            <span class="in-view-edited" data-view="edited"></span>
+          </div>
+        </div>
+        <div class="in-view-header-actions">
+          <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy link" data-tooltip="Copy link" data-view-copy><svg class="icon"><use href="#i-link"/></svg></button>
+          <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+        </div>
+      </header>
+      <div class="drawer-body in-view-body">
+        <div class="tabs" role="tablist" aria-label="Initiative">
+          <button class="tab is-active" role="tab" aria-selected="true" type="button" data-view-tab="overview">Overview</button>
+          <button class="tab" role="tab" aria-selected="false" type="button" data-view-tab="activity">Activity log</button>
+        </div>
+        <div class="in-view-panel" data-view-panel="overview" role="tabpanel"></div>
+        <div class="in-view-panel" data-view-panel="activity" role="tabpanel" hidden></div>
+      </div>
+      <footer class="drawer-footer">
+        <button class="btn btn-secondary" type="button" data-view-edit>Edit initiative</button>
       </footer>
     </aside>
   </div>
@@ -5722,7 +5812,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const data = { ...readInitiative(true), editable: true };
         const name = data.name;
         draftId = window.inUpsertInitiative?.(data, draftId) ?? draftId;
-        if (draftId) drafts[draftId] = snapshot();
+        if (draftId) { drafts[draftId] = snapshot(); (activity[draftId] ||= []).push({ what: 'saved a draft', at: Date.now() }); }
         closeOverlay(document.getElementById('in-drawer-new'));
         window.toast({ variant: 'success', message: `“${name}” saved as a draft.` });
       });
@@ -5808,6 +5898,112 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         setMode(false);
         restore({ ...BLANK, start: startInput.value });
       });
+      // ---- View mode (Figma 20327:41665) ----
+      // Built from the drawer form: the saved snapshot is restored into the
+      // (closed) edit drawer, then read back as labels, avatars and text.
+      const viewEl = document.getElementById('in-drawer-view');
+      const viewPanel = viewEl.querySelector('[data-view-panel="overview"]');
+      const activityPanel = viewEl.querySelector('[data-view-panel="activity"]');
+      const activity = {}; // id → [{ what, at }]
+      const vEsc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const EMPTY = '<span class="in-view-empty">—</span>';
+      const pickedItems = id => [...document.querySelectorAll(`#${id} .dropdown-item.is-selected`)];
+      const label = it => (it.querySelector('.dropdown-item-label') || it).textContent.trim();
+      const person = it => {
+        if (!it) return '<span class="in-view-person"><span class="avatar avatar-md"><svg class="icon"><use href="#i-user"/></svg></span><span class="in-view-empty">To be assigned</span></span>';
+        const img = it.querySelector('.avatar img');
+        const av = img ? `<img src="${img.src}" alt="" />` : vEsc(it.dataset.initials || '');
+        const role = it.querySelector('.dropdown-item-description')?.textContent.trim();
+        return `<span class="in-view-person"><span class="avatar avatar-md">${av}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(it))}</a>${role ? `<span class="in-view-person-role">${vEsc(role)}</span>` : ''}</span></span>`;
+      };
+      const textOr = v => v && v.trim() ? vEsc(v.trim()) : EMPTY;
+      const row = (dt, dd) => `<div class="in-view-row"><dt>${dt}</dt><dd>${dd}</dd></div>`;
+      const timeAgo = t => {
+        const m = Math.round((Date.now() - t) / 60000);
+        return m < 1 ? 'just now' : m < 60 ? `${m} minute${m === 1 ? '' : 's'} ago` : `${Math.round(m / 60)} hours ago`;
+      };
+      const renderView = id => {
+        const stage = drawerEl.querySelector('.in-stage-trigger')?.textContent.trim() || 'Idea';
+        const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim() || 'Not active';
+        const HCLS = { 'On track': 'tag-positive', 'At risk': 'tag-warning', 'Off track': 'tag-negative', 'Not active': 'in-health-na' };
+        const team = pickedItems('in-team');
+        const objs = objectives.values().filter(v => v.trim());
+        const mets = metrics.values().filter(v => v.trim());
+        const coreOn = coreSwitchEl.checked;
+        const coreObj = pickedItems('in-core-objective')[0];
+        const sel1 = id => pickedItems(id)[0];
+        const log = activity[id] || [];
+        const last = log[log.length - 1];
+
+        viewEl.querySelector('#in-view-title').textContent = nameInput.value.trim() || 'Untitled initiative';
+        viewEl.querySelector('[data-view="stage"]').textContent = stage;
+        viewEl.querySelector('[data-view="edited"]').innerHTML = last
+          ? `Last edit was made ${timeAgo(last.at)} by <a href="#" data-view-dead>Matthew Vella</a>`
+          : '';
+
+        viewPanel.innerHTML = `
+          <dl class="in-view-rows">
+            ${row('Health', `<span class="tag tag-indicator ${HCLS[healthLabel] || 'in-health-na'}">${vEsc(healthLabel)}</span>`)}
+            ${row('Executive sponsor', sel1('in-sponsor') ? person(sel1('in-sponsor')) : EMPTY)}
+            ${row('Beneficiary function', sel1('in-beneficiary')
+              ? `<span class="in-view-person"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(sel1('in-beneficiary')))}</a><span class="in-view-person-role">Function</span></span></span>`
+              : EMPTY)}
+            ${row('Accountable owner', person(sel1('in-owner')))}
+            ${row('Project manager', person(sel1('in-pm')))}
+            ${row('Working team', team.length
+              ? `<span class="in-view-team"><span class="in-avatar-stack">${team.slice(0, 5).map(t => `<span class="avatar avatar-sm"><img src="${t.querySelector('img').src}" alt="" /></span>`).join('')}</span><span class="in-view-team-names">${team.map(t => vEsc(label(t))).join(', ')}</span></span>`
+              : EMPTY)}
+            ${row('Estimated duration', sel1('in-duration') ? vEsc(label(sel1('in-duration'))) : EMPTY)}
+            ${row('Start date', textOr(startInput.value))}
+            ${row('End date', textOr(endInput.value))}
+            ${document.getElementById('in-impact-initial') ? row('Initial impact date', sel1('in-impact-initial') ? vEsc(label(sel1('in-impact-initial'))) : EMPTY) : ''}
+            ${document.getElementById('in-impact-full') ? row('Full impact date', sel1('in-impact-full') ? vEsc(label(sel1('in-impact-full'))) : EMPTY) : ''}
+            ${row('Core strategy', coreOn ? `<span class="tag tag-blue">Core strategy</span>` : '<span class="in-view-empty">No</span>')}
+            ${coreOn ? row('Company strategic objective', coreObj ? vEsc(label(coreObj)) : EMPTY) : ''}
+          </dl>
+          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${textOr(desc.value)}</p></div>
+          <div class="in-view-block"><h3>Problem / Opportunity</h3><p class="in-view-text">${textOr(problem.value)}</p></div>
+          <div class="in-view-block"><h3>Objective(s)</h3>${objs.length ? `<ol class="in-view-list">${objs.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <div class="in-view-block"><h3>Success metrics</h3>${mets.length ? `<ol class="in-view-list">${mets.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <section class="in-view-section"><h3>Connections</h3>
+            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-calendar"/></svg></span><span class="in-view-conn-label">Cadenced meeting</span><span class="in-view-empty">Not connected</span></div>
+            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-slack"/></svg></span><span class="in-view-conn-label">Slack channels</span><span class="in-view-empty">Not connected</span></div>
+          </section>
+          <section class="in-view-section"><h3>Documents</h3><p class="in-view-text"><span class="in-view-empty">No documents yet</span></p></section>
+          <section class="in-view-section"><h3>Projects</h3><div><a class="in-view-link" href="#" data-view-dead>Add project</a></div></section>`;
+
+        activityPanel.innerHTML = log.length
+          ? `<ol class="in-view-activity">${[...log].reverse().map(e => `<li><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><span><strong>Matthew Vella</strong> ${vEsc(e.what)}<time>${new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</time></span></li>`).join('')}</ol>`
+          : `<p class="in-view-text"><span class="in-view-empty">No activity yet</span></p>`;
+      };
+      let viewId = null;
+      const setViewTab = tab => {
+        viewEl.querySelectorAll('[data-view-tab]').forEach(t => { const on = t.dataset.viewTab === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+        viewEl.querySelectorAll('[data-view-panel]').forEach(p => { p.hidden = p.dataset.viewPanel !== tab; });
+      };
+      window.inOpenView = id => {
+        const snap = drafts[id];
+        if (!snap) return;
+        restore(snap);      // into the closed edit form, then read back
+        renderView(id);
+        setViewTab('overview');
+        viewId = id;
+        if (viewEl.hidden) opener = document.activeElement;
+        viewEl.hidden = false;
+        viewEl.querySelector('.modal-close')?.focus();
+      };
+      viewEl.addEventListener('click', e => {
+        const tab = e.target.closest('[data-view-tab]');
+        if (tab) { setViewTab(tab.dataset.viewTab); return; }
+        if (e.target.closest('[data-view-dead]')) { e.preventDefault(); return; }
+        if (e.target.closest('[data-view-copy]')) { window.toast({ variant: 'success', message: 'Link copied.' }); return; }
+        if (e.target.closest('[data-view-edit]')) {
+          const id = viewId;
+          viewEl.hidden = true;
+          window.inOpenDraft(id, true);
+        }
+      });
+
       window.inOpenDraft = (id, published = false) => {
         const snap = drafts[id];
         if (!snap) return;
@@ -5846,11 +6042,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const published = readInitiative(false);
         const wasEditing = editingPublished;
         const savedId = window.inUpsertInitiative?.({ ...published, editable: true }, draftId);
-        if (savedId) drafts[savedId] = snapshot(); // keep it reopenable
+        if (savedId) {
+          drafts[savedId] = snapshot(); // keep it reopenable
+          (activity[savedId] ||= []).push({ what: wasEditing ? 'edited this initiative' : (draftId ? 'published this initiative from a draft' : 'created this initiative'), at: Date.now() });
+        }
         draftId = null;
         closeOverlay(document.getElementById('in-drawer-new'));
         window.toast({ variant: 'success', message: wasEditing ? `“${published.name}” updated.` : `“${published.name}” created.` });
         setMode(false);
+        // A new initiative lands on the table (row pinned first); open it from
+        // there. Saving an edit returns to view mode, where the edit started —
+        // after the edit drawer's close has finished handing focus back.
+        if (savedId && wasEditing) setTimeout(() => window.inOpenView(savedId), 120);
         nameInput.value = ''; updateDup();
         desc.value = ''; descTouched = false; updateDesc();
         problem.value = ''; problemCount.textContent = '0 / 500';
@@ -6211,9 +6414,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           : `<tr class="in-no-results"><td colspan="${span}">${
               // The filters can empty the table on their own, in which case
               // quoting the (empty) search box would read as a bug.
-              search.value.trim()
-                ? `No initiatives match “${esc(search.value.trim())}”.`
-                : 'No initiatives match these filters.'
+              !INITIATIVES.length
+                ? 'No initiatives yet. Use “Create Initiative” to add the first one.'
+                : search.value.trim()
+                  ? `No initiatives match “${esc(search.value.trim())}”.`
+                  : 'No initiatives match these filters.'
             }</td></tr>`;
         table.querySelectorAll('thead th[data-col]').forEach(th => th.toggleAttribute('data-col-hidden', state.hidden.has(th.dataset.col)));
       }
@@ -6223,6 +6428,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // updates the same row when a draft is saved again / published. The row
       // is pinned to the top of the table (see render).
       const countBadge = document.querySelector('.page-head-title .count-badge');
+      // For the ?states=1 switcher: re-render after it edits INITIATIVES.
+      window.inTableRender = () => { countBadge.textContent = INITIATIVES.length; render(); };
       window.inUpsertInitiative = (data, id) => {
         let n = id && INITIATIVES.find(x => x.id === id);
         if (n) Object.assign(n, data);
@@ -6247,7 +6454,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const openDraftRow = e => {
         const tr = e.target.closest('tr[data-editable]');
         if (!tr || e.target.closest('.row-toggle, .cell-actions')) return false;
-        window.inOpenDraft?.(tr.dataset.id, !tr.hasAttribute('data-draft'));
+        if (tr.hasAttribute('data-draft')) window.inOpenDraft?.(tr.dataset.id);
+        else window.inOpenView?.(tr.dataset.id);
         return true;
       };
       tbody.addEventListener('keydown', e => {
@@ -6798,6 +7006,143 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       addEventListener('scroll', () => { if (!panel.hidden) place(); }, true);
 
       render();
+    })();
+  </script>
+
+  <!-- Prototype state switcher — ?states=1. Each state reloads the page
+       (&state=…) and replays the steps to reach it, so every state starts
+       clean. -->
+  <div class="in-switcher" id="in-switcher" hidden>
+    <div class="in-switcher-head"><span>States</span><button class="in-switcher-toggle" type="button" aria-label="Collapse states">–</button></div>
+    <div class="in-switcher-body">
+      <div class="in-switcher-group"><span>Table</span>
+        <button type="button" data-state="default">Default</button>
+        <button type="button" data-state="with-rows">Drafts + created rows</button>
+        <button type="button" data-state="empty">No initiatives</button>
+        <button type="button" data-state="no-results">Search, no results</button>
+        <button type="button" data-state="long-text">Long text</button>
+      </div>
+      <div class="in-switcher-group"><span>Create drawer</span>
+        <button type="button" data-state="create-blank">Blank</button>
+        <button type="button" data-state="create-errors">Required errors</button>
+        <button type="button" data-state="create-duplicate">Duplicate notice</button>
+        <button type="button" data-state="create-filled">Filled, ready to create</button>
+      </div>
+      <div class="in-switcher-group"><span>Draft & edit</span>
+        <button type="button" data-state="draft-reopen">Draft reopened</button>
+        <button type="button" data-state="edit-mode">Edit (Save changes)</button>
+      </div>
+      <div class="in-switcher-group"><span>View mode</span>
+        <button type="button" data-state="view-full">View — all fields</button>
+        <button type="button" data-state="view-minimal">View — required only</button>
+        <button type="button" data-state="view-activity">View — activity log</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      if (params.get('states') !== '1') return;
+      const sw = document.getElementById('in-switcher');
+      sw.hidden = false;
+      const current = params.get('state') || 'default';
+      sw.querySelectorAll('[data-state]').forEach(b => {
+        b.classList.toggle('is-current', b.dataset.state === current);
+        b.addEventListener('click', () => {
+          const p = new URLSearchParams(location.search);
+          p.set('states', '1'); p.set('state', b.dataset.state);
+          location.search = p.toString();
+        });
+      });
+      const toggle = sw.querySelector('.in-switcher-toggle');
+      const setCollapsed = on => { sw.classList.toggle('is-collapsed', on); toggle.textContent = on ? '+' : '–'; try { sessionStorage.setItem('in-switcher-collapsed', on ? '1' : ''); } catch (_) {} };
+      try { if (sessionStorage.getItem('in-switcher-collapsed')) setCollapsed(true); } catch (_) {}
+      toggle.addEventListener('click', () => setCollapsed(!sw.classList.contains('is-collapsed')));
+
+      // ---- Steps, driven through the real UI ----
+      const W = ms => new Promise(r => setTimeout(r, ms));
+      const $ = sel => document.querySelector(sel);
+      const openCreate = async () => { $('[data-modal-open="in-drawer-new"]').click(); await W(250); };
+      const pick = (id, text) => {
+        const el = document.getElementById(id);
+        el.querySelector('.input-select-trigger').click();
+        [...el.querySelectorAll('.dropdown-item:not([hidden])')].find(i => !text || i.textContent.includes(text))?.click();
+        document.body.click();
+      };
+      const pickMany = (id, names) => {
+        const el = document.getElementById(id);
+        el.querySelector('.input-select-trigger').click();
+        names.forEach(n => [...el.querySelectorAll('.dropdown-item')].find(i => i.textContent.includes(n))?.click());
+        document.body.click();
+      };
+      const type = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); };
+      const setStage = name => { $('.in-stage-trigger').click(); [...document.querySelectorAll('.in-stage-menu .dropdown-item')].find(i => i.textContent === name)?.click(); };
+      const setRows = (id, values) => {
+        const root = document.getElementById(id);
+        while (root.querySelectorAll('.in-multi-row').length < values.length) root.querySelector('[data-multi-add]').click();
+        root.querySelectorAll('.in-multi-row input').forEach((inp, i) => { inp.value = values[i] || ''; });
+        root.querySelector('.in-multi-row input').dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      const fillRequired = name => {
+        type('in-name', name);
+        pick('in-sponsor', 'Aisha'); pick('in-beneficiary', 'Sales'); pick('in-pm', 'Nina');
+        pickMany('in-team', ['Daniel']); pick('in-duration', '1 quarter');
+        type('in-desc', 'A cross-functional push to give every initiative owner one place to set up, run and report on their work, replacing the weekly status-deck rebuild.');
+        type('in-problem', 'Owners rebuild status decks by hand every week, and leadership reads stale Google Sheets.');
+        setRows('in-objectives', ['One source of truth for initiatives']);
+        setRows('in-metrics', ['80% of initiatives updated weekly']);
+      };
+      const fillAll = name => {
+        fillRequired(name);
+        setStage('Execution');
+        pickMany('in-team', ['Priya', 'Tomas']);
+        pick('in-duration', '2 quarters');
+        pick('in-impact-initial', 'Q2 2027'); pick('in-impact-full', 'Q4 2027');
+        if (!document.getElementById('in-core').checked) document.getElementById('in-core').click();
+        pick('in-core-objective', 'World');
+        setRows('in-objectives', ['One source of truth for initiatives', 'Automate weekly reporting', 'Give leadership a live view']);
+        setRows('in-metrics', ['80% of initiatives updated weekly', 'Status decks retired', 'Forum runs from the dashboard']);
+      };
+      const create = async () => { $('[data-create-initiative]').click(); await W(600); };
+      // After Create you land on the table; the new row is pinned first.
+      const openFirstRow = async () => { $('#in-rows tr[data-editable]').click(); await W(300); };
+      const saveDraft = async () => { $('[data-save-draft]').click(); await W(400); };
+      const closeAll = async () => { document.querySelectorAll('.drawer-overlay:not([hidden]) [data-modal-close]').forEach(b => b.click()); await W(250); };
+      const LONG = 'Global Partner Enablement and Certification Programme for Strategic Channel Resellers Across Every Region';
+
+      const STATES = {
+        default: async () => {},
+        'with-rows': async () => {
+          await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await closeAll();
+          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-beneficiary', 'Operations'); await saveDraft();
+          await openCreate(); await saveDraft();
+        },
+        empty: async () => { INITIATIVES.length = 0; window.inTableRender(); },
+        'no-results': async () => { type('in-search', 'zzz no match'); },
+        'long-text': async () => {
+          await openCreate(); fillAll(LONG);
+          type('in-problem', 'Partners currently onboard through a patchwork of email threads, shared drives and one-off calls, so certification takes months, nobody can see where a partner is in the journey, and regional teams each reinvent the process — which means revenue from the channel is both slower and harder to forecast than it should be.');
+          await create(); await openFirstRow(); // long title + paragraphs in the view, long row in the table behind
+        },
+        'create-blank': async () => { await openCreate(); },
+        'create-errors': async () => { await openCreate(); $('[data-create-initiative]').click(); },
+        'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
+        'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },
+        'draft-reopen': async () => {
+          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-sponsor', 'Daniel'); pick('in-beneficiary', 'Operations');
+          await saveDraft(); $('#in-rows tr[data-draft]').click(); await W(300);
+        },
+        'edit-mode': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); $('[data-view-edit]').click(); await W(300); },
+        'view-full': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); },
+        'view-minimal': async () => { await openCreate(); fillRequired('Vendor scorecards'); await create(); await openFirstRow(); },
+        'view-activity': async () => {
+          await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow();
+          $('[data-view-edit]').click(); await W(300); type('in-name', 'Launch MVP Operationalize v2'); await create();
+          $('[data-view-tab="activity"]').click();
+        },
+      };
+      (STATES[current] || STATES.default)();
     })();
   </script>
 </body>
