@@ -50,11 +50,12 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   | 8 | Beneficiary function moved under Executive sponsor | **Built** — out of "More details", always visible |
   | 9 | Beneficiary function required | **Built** (required only). Slack-naming part **parked** — see open question 9 |
   | 10 | Start date defaults to today | **Built** — reset to today on every open (roadmap marked it "Already exists"; prototype had a hardcoded date) |
-  | 7 | Working Team | **Parked** — see open question 10 |
+  | 7 | Working team — multi-select people, required (≥ 1), under Project manager | **Built** — searchable photo picker (shared with Executive sponsor), checkmarks, stays open while picking; trigger shows up to 3 stacked avatars + "Name +N". Counts for both draft and publish. RACI relationship + FTE counts still open (question 10) |
   | 11 | Estimated duration — required, above Start date, fills End date | **Built** — < 1 month = +2 wks · 1 mo · 1–4 qtrs = +3/6/9/12 mo · 1 year / Requires scoping = +12 mo (End date always required — ID 18 decision). Start change recalculates; manual End date → Custom |
-  | 12 | Initial impact date — next 8 quarters | **Built, then parked** (commented out) — not in ID 18's list; purpose unclear. See open question 11 |
-  | 13 | Full impact date — next 8 quarters | **Built, then parked** (commented out) with ID 12 |
-  | 18 | Save & publish — required list | **Partly built** — enforced now: Name, Executive sponsor, Beneficiary function, Accountable owner, Project manager, Estimated duration, Start date, End date (+ Description's 100-char minimum). Problem / Opportunity (19), Objective(s) (20) and Success Metrics (21) added. Still to add: RACI/Working Team (ID 7, parked), Related Initiatives (22) |
+  | 12 | Initial impact date — next 8 quarters | **Built** — optional, after End date; current quarter + 7. (Parked 2026-10-01, restored 2026-10-02) |
+  | 13 | Full impact date — next 8 quarters | **Built** — optional; quarters before Initial hidden, cleared if now earlier. (Restored with ID 12) |
+  | 18 | Save & publish — required list | **Partly built** — enforced now: Name, Executive sponsor, Beneficiary function, Accountable owner, Project manager, Estimated duration, Start date, End date (+ Description's 100-char minimum). Problem / Opportunity (19), Objective(s) (20) and Success Metrics (21) added. Working team (7) added. Still to add: Related Initiatives (22) |
+  | 17 *(P3)* | Save as draft | **Built (button + check)** — far left of the drawer footer; checks the draft subset only (Name, people/function selects, duration, dates); success toast; drawer keeps its values. Not built: Draft status in the list / hidden-by-default views |
   | 19 | Problem / Opportunity — required, 2–3 lines | **Built** — below Description, ⓘ carries the roadmap helper text, 500-char cap with counter |
   | 20 | Objective(s) — required, 3 boxes, add / remove / reorder | **Built** — reusable multi-entry list: numbered rows, sample placeholders, + Add, × (last row protected), drag handle + Alt+↑/↓, Enter adds a row. Required = ≥ 1 filled |
   | 21 | Success metrics — required, 3 boxes, add / remove | **Built** — same list as Objective(s), numbered for consistency (user call; roadmap sample is unnumbered) |
@@ -200,8 +201,8 @@ Long text · Search, no results.
     implementing". Also: picker design (proposed: multi-select of the sponsor
     picker + removable avatar row) and how it feeds FTE counts.
 11. **IDs 12–13 Initial / Full impact date** — what do they relate to (impact
-    on what — revenue, an OKR, the objective)? Built and parked; uncomment the
-    block in features/initiatives to restore.
+    on what — revenue, an OKR, the objective)? Restored in the drawer as
+    optional fields while this is answered.
 
 ## Next
 

@@ -3920,11 +3920,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .dropdown-search .input-icon, .dropdown-search .input { width: 100%; }
     .dropdown-list .dropdown-item[hidden], .dropdown-empty[hidden] { display: none; }
     #in-duration .dropdown-item[hidden], #in-impact-full .dropdown-item[hidden] { display: none; }
+    /* Working team trigger — up to 3 overlapping photo avatars + summary.
+       designmd has no avatar group, so the stack is local. */
+    .in-avatar-stack { display: inline-flex; flex-shrink: 0; }
+    .in-avatar-stack .avatar { box-shadow: 0 0 0 2px var(--color-surface); }
+    .in-avatar-stack .avatar + .avatar { margin-left: -6px; }
     .in-tags-field { gap: var(--ic-space-1); }
     .in-add { display: inline-flex; align-items: center; gap: var(--ic-space-1); }
     /* Link-style action: ghost button in the link colour, no side inset. */
     .btn.in-link { color: var(--color-text-link); padding-inline: 0; }
     .btn.in-link:hover { background: transparent; text-decoration: underline; }
+    /* Save as draft sits far left; Cancel + Create stay right. */
+    .drawer-footer .in-draft-btn { margin-right: auto; }
     /* Multi-entry list (roadmap IDs 20–21) — numbered rows of single-line
        inputs with a drag handle and a remove button. Composed from designmd
        .input + .btn-icon-only; the row layout is local. */
@@ -4614,6 +4621,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <span class="field-hint is-error" id="in-pm-error" hidden>Add a project manager to create this initiative.</span>
             </div>
           </div>
+          <!-- TopTrack roadmap ID 7 — Working team, multi-select people,
+               required (≥ 1), under Project manager. Same searchable photo
+               picker as Executive sponsor; stays open while you pick. -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label">Working team</span>
+            <div class="field">
+              <div class="input-select" id="in-team" data-multi>
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" data-dropdown-search hidden>
+                  <div class="dropdown-search">
+                    <div class="input-icon input-icon-left">
+                      <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
+                    </div>
+                  </div>
+                  <div class="dropdown-list" data-dropdown-list>
+                    <button class="dropdown-item" type="button" data-initials="AK"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=47" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Aisha Khan</span><span class="dropdown-item-description">VP Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AJ"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Adan Jones</span><span class="dropdown-item-description">Head of Tech Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="DR"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Daniel Reyes</span><span class="dropdown-item-description">Engineering Lead</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MS"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Maria Santos</span><span class="dropdown-item-description">Marketing Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="NG"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=49" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="TW"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=53" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Tomas Weil</span><span class="dropdown-item-description">Data Analyst</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="PN"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=44" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Priya Nair</span><span class="dropdown-item-description">Customer Success Lead</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MV"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Matthew Vella</span><span class="dropdown-item-description">You</span></div></button>
+                    <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
+                  </div>
+                </div>
+              </div>
+              <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
+            </div>
+          </div>
           <!-- TopTrack roadmap ID 11 — Estimated duration, required, above
                Start date. Fills End date = Start date + duration; editing End
                date by hand flips it to Custom. -->
@@ -4656,10 +4694,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <span class="field-hint is-error" id="in-end-error" hidden>Add an end date to create this initiative.</span>
             </div>
           </label>
-          <!-- PARKED (2026-10-01) — TopTrack roadmap IDs 12–13, Initial / Full
-               impact date. Built, then commented out: not in ID 18's publish
-               list and it's not yet clear what they relate to. The script
-               skips them while they're commented out; uncomment to restore.
+          <!-- TopTrack roadmap IDs 12–13 — impact quarters (optional; not in
+               ID 18's publish list). Next 8 quarters from today, built in JS.
+               Full impact can't be earlier than Initial impact.
+               Restored 2026-10-02 after being parked. -->
           <div class="in-form-row">
             <span class="field-label in-label-tip">Initial impact date <span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
             <div class="input-select" id="in-impact-initial">
@@ -4674,7 +4712,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="dropdown-menu" hidden></div>
             </div>
           </div>
-          -->
         </div>
 
         <label class="field in-desc" data-char-min="100" data-char-limit="2000">
@@ -4826,6 +4863,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       </div>
       <footer class="drawer-footer">
+        <!-- TopTrack roadmap ID 17 (P3) — Save as draft. Checks only the
+             draft-required subset; publish (Create) checks the full ID 18 list. -->
+        <button class="btn btn-secondary in-draft-btn" type="button" data-save-draft>Save as draft</button>
         <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
         <button class="btn btn-primary" type="button" data-create-initiative>Create Initiative</button>
       </footer>
@@ -5248,9 +5288,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const ownerField = requiredSelect('in-owner', 'Add accountable owner');
       ownerField.keepOnReset = true; // defaults to the creator
       const pmField = requiredSelect('in-pm', 'Add project manager');
+      const teamField = requiredSelect('in-team', 'Add working team');
       const durationField = requiredSelect('in-duration', 'Add estimated duration');
       // ID 18 — everything required to publish, in form order.
-      const requiredSelects = [sponsorField, beneficiaryField, ownerField, pmField, durationField];
+      const requiredSelects = [sponsorField, beneficiaryField, ownerField, pmField, teamField, durationField];
 
       // Required dates (ID 18) — empty or unreadable text is an error.
       const requiredDate = id => {
@@ -5351,30 +5392,63 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const sponsor = sponsorField.el, sponsorTrigger = sponsorField.trigger;
       document.querySelectorAll('[data-modal-open="in-drawer-new"]').forEach(btn => btn.addEventListener('click', applyDuration));
 
-      // Search: filters name + role as you type; Enter picks the first match.
-      // Opening the menu focuses the search and starts it empty.
-      const sponsorSearch = sponsor.querySelector('[data-dropdown-search-input]');
-      const sponsorEmpty = sponsor.querySelector('[data-dropdown-empty]');
-      const filterSponsor = () => {
-        const q = sponsorSearch.value.trim().toLowerCase();
-        let shown = 0;
-        sponsor.querySelectorAll('[data-dropdown-list] .dropdown-item').forEach(i => {
-          const hit = !q || i.textContent.toLowerCase().includes(q);
-          i.hidden = !hit;
-          if (hit) shown++;
+      // Person-picker search (Executive sponsor, Working team): filters name
+      // + role as you type; Enter picks the first match. Opening the menu
+      // focuses the search and starts it empty.
+      const personSearch = el => {
+        const trigger = el.querySelector('.input-select-trigger');
+        const input = el.querySelector('[data-dropdown-search-input]');
+        const empty = el.querySelector('[data-dropdown-empty]');
+        const filter = () => {
+          const q = input.value.trim().toLowerCase();
+          let shown = 0;
+          el.querySelectorAll('[data-dropdown-list] .dropdown-item').forEach(i => {
+            const hit = !q || i.textContent.toLowerCase().includes(q);
+            i.hidden = !hit;
+            if (hit) shown++;
+          });
+          empty.hidden = shown > 0;
+        };
+        input.addEventListener('input', filter);
+        input.addEventListener('keydown', e => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          el.querySelector('[data-dropdown-list] .dropdown-item:not([hidden])')?.click();
         });
-        sponsorEmpty.hidden = shown > 0;
+        trigger.addEventListener('click', () => {
+          if (trigger.getAttribute('aria-expanded') !== 'true') return;
+          input.value = ''; filter();
+          requestAnimationFrame(() => input.focus());
+        });
       };
-      sponsorSearch.addEventListener('input', filterSponsor);
-      sponsorSearch.addEventListener('keydown', e => {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-        sponsor.querySelector('[data-dropdown-list] .dropdown-item:not([hidden])')?.click();
-      });
-      sponsorTrigger.addEventListener('click', () => {
-        if (sponsorTrigger.getAttribute('aria-expanded') !== 'true') return;
-        sponsorSearch.value = ''; filterSponsor();
-        requestAnimationFrame(() => sponsorSearch.focus());
+      personSearch(sponsor);
+
+      // Working team (ID 7) — multi-select. The shared select handler toggles
+      // items; this repaints the trigger as an avatar stack + "Name +N".
+      const team = document.getElementById('in-team');
+      personSearch(team);
+      const paintTeam = () => {
+        const trigger = team.querySelector('.input-select-trigger');
+        const value = trigger.querySelector('.input-select-value');
+        const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
+        trigger.querySelector('[data-select-avatar]')?.remove();
+        if (!picked.length) {
+          value.textContent = 'Add working team';
+          value.classList.add('input-select-placeholder');
+          return;
+        }
+        const stack = document.createElement('span');
+        stack.className = 'in-avatar-stack';
+        stack.setAttribute('data-select-avatar', '');
+        stack.innerHTML = picked.slice(0, 3).map(i => `<span class="avatar avatar-sm"><img src="${i.querySelector('img').src}" alt="" /></span>`).join('');
+        trigger.prepend(stack);
+        const first = picked[0].querySelector('.dropdown-item-label').textContent;
+        value.textContent = picked.length === 1 ? first : `${first} +${picked.length - 1}`;
+        value.classList.remove('input-select-placeholder');
+        trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
+      };
+      team.querySelector('.dropdown-menu').addEventListener('click', e => {
+        if (e.target.closest('.dropdown-item')) paintTeam();
       });
 
       // Multi-entry lists (roadmap IDs 20–21). Rows: number · input · drag
@@ -5495,6 +5569,72 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       problem.addEventListener('input', () => {
         problemCount.textContent = `${problem.value.length} / 500`;
         if (problem.value.trim()) setProblemError(false);
+      });
+
+      // Toast — global helper that spawns a notification in the top-right region.
+      //   toast({ variant: 'success', message: 'Saved.' })
+      //   toast({ variant: 'error', message: '…', behavior: 'persistent' })
+      //   toast({ variant: 'neutral', message: '…', behavior: 'action', action: { label: 'Undo', onClick: () => {…} } })
+      window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+        let region = document.querySelector('.toast-region');
+        if (!region) {
+          region = document.createElement('div');
+          region.className = 'toast-region';
+          region.setAttribute('aria-live', 'polite');
+          region.setAttribute('aria-atomic', 'false');
+          document.body.appendChild(region);
+        }
+        const defaultIcon = { neutral: 'info', info: 'info', success: 'done', warning: 'warning', error: 'exclamation-solid' }[variant] || 'info';
+        const el = document.createElement('div');
+        el.className = `toast toast-${variant} is-entering`;
+        el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+        // Neutral is a plain message toast — no leading icon and no action CTA.
+        const iconHTML   = (variant === 'neutral' && !icon) ? '' : `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg>`;
+        const actionHTML = (variant !== 'neutral' && behavior === 'action' && action) ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+        const closeHTML  = behavior !== 'timed' ? `<button type="button" class="btn btn-icon-only btn-ghost btn-xs toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>` : '';
+        el.innerHTML = `${iconHTML}<p class="toast-message"></p>${actionHTML}${closeHTML}`;
+        el.querySelector('.toast-message').textContent = message;
+        region.appendChild(el);
+        // Trigger entrance transition on next frame
+        requestAnimationFrame(() => el.classList.remove('is-entering'));
+
+        const dismiss = () => {
+          if (!el.isConnected) return;
+          el.classList.add('is-leaving');
+          const cleanup = () => el.remove();
+          el.addEventListener('transitionend', cleanup, { once: true });
+          setTimeout(cleanup, 400); // fallback if transitionend doesn't fire
+        };
+
+        el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+        if (behavior === 'action' && action) {
+          el.querySelector('.toast-action').addEventListener('click', () => {
+            try { action.onClick?.(); } catch (e) { /* swallow */ }
+            dismiss();
+          });
+        }
+        if (behavior === 'timed') {
+          setTimeout(dismiss, timeout);
+        }
+        return { dismiss };
+      };
+
+      // Save as draft (ID 17) — draft-required fields only: Name, the people
+      // and function selects, duration and dates. Problem / Opportunity,
+      // Objectives, Success metrics and Description's minimum wait for publish.
+      document.querySelector('[data-save-draft]')?.addEventListener('click', () => {
+        const nameMissing = !nameInput.value.trim();
+        const missingSelects = requiredSelects.filter(f => f.missing());
+        const badDates = requiredDates.filter(f => f.check());
+        if (nameMissing) setNameError(true);
+        missingSelects.forEach(f => f.setError(true));
+        // Clear any publish-only errors left from an earlier Create attempt.
+        descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+        const first = [...missingSelects, ...badDates][0];
+        if (nameMissing || first) { (nameMissing ? nameInput : first.trigger).focus(); return; }
+        const name = nameInput.value.trim();
+        closeOverlay(document.getElementById('in-drawer-new'));
+        window.toast({ variant: 'success', message: `“${name}” saved as a draft.` });
       });
 
       document.querySelector('[data-create-initiative]')?.addEventListener('click', () => {
