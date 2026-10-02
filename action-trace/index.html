@@ -1151,7 +1151,7 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
 <style>
   .rv-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:200;display:flex;align-items:center;gap:4px;
     background:var(--graphite-900);border-radius:22px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:13px;}
-  .rv-bar button{height:32px;border:none;border-radius:16px;background:none;color:#cfd4de;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;}
+  .rv-bar button{height:32px;border:none;border-radius:16px;background:none;color:#cfd4de;padding:0 14px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:13px;}
   .rv-bar button:hover{background:rgba(255,255,255,.08);color:#fff;}
   .rv-bar button.on{background:#fff;color:var(--graphite-900);font-weight:600;}
   .rv-bar .k{font-size:10px;opacity:.55;border:1px solid currentColor;border-radius:3px;padding:0 4px;line-height:14px;}
@@ -1210,10 +1210,16 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
   .rv-st.q .sp{animation-duration:2s;opacity:.6;}
   @keyframes rvspin{to{transform:rotate(360deg);}}
   .rv-bar .ver{color:#fff;background:var(--blue);border-radius:12px;padding:0 10px;height:24px;font-size:12px;}
+  /* Spotlight: the box stays clear, a huge spread shadow darkens the rest of the page */
+  .rv-spot{position:fixed;z-index:170;pointer-events:none;border-radius:6px;box-shadow:0 0 0 200vmax rgba(0,0,0,.7);transition:box-shadow .15s;}
+  .rv-spot.drawing{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:0;}
+  body.rv-spotmode #layers *, body.rv-spotmode #main *, body.rv-spotmode #pops *, body.rv-spotmode .leftbar *, body.rv-spotmode .topbar *, body.rv-spotmode{cursor:crosshair !important;}
+  body.rv-spotmode{user-select:none;}
   body.rv-side-open .flownav{display:none;}
 </style>
 <div id="rvPins" class="rv-pins"></div>
 <div id="rvHover" class="rv-hover hidden"><span class="lb"></span></div>
+<div id="rvSpot" class="rv-spot hidden"></div>
 <div id="rvBar" class="rv-bar"></div>
 <div id="rvSide"></div>
 <script>
@@ -1380,6 +1386,7 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
   }
   document.addEventListener('mousemove', e => {
     if (mode === 'interact') return;
+    if (mode === 'spot') return showHover(null);
     if (mode === 'edit') {
       const tn = textNodeAt(e.clientX, e.clientY);
       if (!tn) return showHover(null);
@@ -1390,6 +1397,33 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
     } else {
       const el = pickTarget(e.target); showHover(el, 'c', el ? label(el) : '');
     }
+  }, true);
+
+  /* ── Spotlight: drag a rectangle; everything outside it is dimmed to 70% black ── */
+  let spot = null, spotDrag = null;
+  function drawSpot() {
+    const el = $('#rvSpot'); const r = spotDrag || spot;
+    if (!r) { el.classList.add('hidden'); renderBar(); return; }
+    const x = Math.min(r.x0, r.x1), y = Math.min(r.y0, r.y1);
+    Object.assign(el.style, {left:x + 'px', top:y + 'px', width:Math.abs(r.x1 - r.x0) + 'px', height:Math.abs(r.y1 - r.y0) + 'px'});
+    el.classList.remove('hidden'); el.classList.toggle('drawing', !!spotDrag);
+  }
+  const clearSpot = () => { spot = spotDrag = null; drawSpot(); renderBar(); };
+  window.addEventListener('pointerdown', e => {
+    if (mode !== 'spot' || e.button !== 0 || e.target.closest(REVIEW_UI)) return;
+    e.stopPropagation(); e.preventDefault();
+    spotDrag = {x0:e.clientX, y0:e.clientY, x1:e.clientX, y1:e.clientY}; drawSpot();
+  }, true);
+  window.addEventListener('pointermove', e => {
+    if (!spotDrag) return;
+    spotDrag.x1 = e.clientX; spotDrag.y1 = e.clientY; drawSpot();
+  }, true);
+  window.addEventListener('pointerup', e => {
+    if (!spotDrag) return;
+    const r = spotDrag; spotDrag = null;
+    // A plain click (no real drag) clears the spotlight
+    spot = Math.abs(r.x1 - r.x0) > 6 && Math.abs(r.y1 - r.y0) > 6 ? r : null;
+    drawSpot(); renderBar();
   }, true);
 
   /* ── Intercept clicks in edit/comment mode so the prototype doesn't react ── */
@@ -1403,6 +1437,7 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
     if (mode === 'interact' || e.target.closest(REVIEW_UI) || e.target.closest('.rv-editing')) return;
     if (mode === 'edit' && e.target.closest('input,textarea,select,[contenteditable=true]')) return;
     e.stopPropagation(); e.preventDefault();
+    if (mode === 'spot') return;
     if (mode === 'edit') { const tn = textNodeAt(e.clientX, e.clientY); if (tn) { showHover(null); startEdit(tn); } return; }
     const el = pickTarget(e.target); if (!el) return;
     const b = el.getBoundingClientRect();
@@ -1433,7 +1468,7 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
 
   /* ── Toolbar ── */
   function setMode(m) {
-    mode = m; document.body.classList.toggle('rv-edit', m === 'edit'); document.body.classList.toggle('rv-comment', m === 'comment');
+    mode = m; document.body.classList.toggle('rv-edit', m === 'edit'); document.body.classList.toggle('rv-comment', m === 'comment'); document.body.classList.toggle('rv-spotmode', m === 'spot');
     showHover(null); if (m === 'comment') sideOpen = true; renderBar(); renderSide();
   }
   function renderBar() {
@@ -1442,6 +1477,8 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
       <button class="${mode === 'interact' ? 'on' : ''}" data-rv-mode="interact">Interact <span class="k">I</span></button>
       <button class="${mode === 'edit' ? 'on' : ''}" data-rv-mode="edit">Edit text <span class="k">E</span></button>
       <button class="${mode === 'comment' ? 'on' : ''}" data-rv-mode="comment">Comment <span class="k">C</span>${open ? `<span class="n">${open}</span>` : ''}</button>
+      <button class="${mode === 'spot' ? 'on' : ''}" data-rv-mode="spot">Spotlight <span class="k">S</span></button>
+      ${spot ? `<button data-rv="clear-spot" title="Remove the spotlight">✕ Clear spotlight</button>` : ''}
       <span class="sep"></span>
       <button data-rv="side" title="Show comments">${sideOpen ? 'Hide' : 'Show'} comments</button>
       ${edits ? `<button data-rv="reset" title="Undo all text edits">↺ ${edits} edit${edits > 1 ? 's' : ''}</button>` : ''}
@@ -1458,6 +1495,7 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
     if (act === 'cancel') { draft = null; renderSide(); placePins(); }
     if (act === 'post') postDraft();
     if (act === 'reload') reloadKeepingState();
+    if (act === 'clear-spot') clearSpot();
     if (act === 'retry') { e.stopPropagation(); const c = FB.comments.find(c => c.id === a.dataset.id); Object.assign(c, {status:'queued', resolved:false, requeuedAt:new Date().toISOString()}); delete c.error; save(); renderSide(); renderBar(); }
     if (act === 'filter') { filter = a.dataset.v; renderSide(); placePins(); }
     if (act === 'del') { e.stopPropagation(); deleted.add(a.dataset.id); FB.comments = FB.comments.filter(c => c.id !== a.dataset.id); save(); renderSide(); placePins(); renderBar(); }
@@ -1518,6 +1556,9 @@ goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
     if (k === 'e') setMode(mode === 'edit' ? 'interact' : 'edit');
     if (k === 'c') setMode(mode === 'comment' ? 'interact' : 'comment');
     if (k === 'i') setMode('interact');
+    if (k === 's') setMode(mode === 'spot' ? 'interact' : 'spot');
+    // Escape removes the spotlight first, then leaves the current mode
+    if (e.key === 'Escape' && spot) { e.stopImmediatePropagation(); clearSpot(); return; }
     if (e.key === 'Escape' && mode !== 'interact') { e.stopImmediatePropagation(); draft = null; setMode('interact'); placePins(); }
   }, true);
 
