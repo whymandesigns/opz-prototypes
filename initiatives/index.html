@@ -3932,6 +3932,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .btn.in-link:hover { background: transparent; text-decoration: underline; }
     /* Save as draft sits far left; Cancel + Create stay right. */
     .drawer-footer .in-draft-btn { margin-right: auto; }
+    /* Duplicate notice (ID 5). designmd gap: .alert's display: flex beats the
+       UA [hidden] rule, so hidden is restated. Two lines: claim, then match. */
+    .alert[hidden] { display: none; }
+    .in-dup-alert .alert-message { display: flex; flex-direction: column; gap: 2px; font: var(--type-body-sm); }
+    .in-dup-alert .alert-message strong { font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    .in-dup-match { color: var(--color-text-muted); }
+    .in-dup-link { color: var(--color-text-link); font-weight: var(--ic-weight-medium); text-decoration: none; }
+    .in-dup-link:hover { text-decoration: underline; }
+    .in-dup-link:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; border-radius: 2px; }
+    .drawer-footer .in-draft-btn[hidden] { display: none; }
+    /* With Save as draft hidden, keep Cancel + primary on the right. */
+    .drawer-footer .in-draft-btn[hidden] + .btn { margin-left: auto; }
+    /* Rows added from the drawer — a brief accent wash so the new row is
+       found, then it settles into the table. Drafts read slightly muted. */
+    @keyframes in-row-new { from { background: var(--color-accent-subtle); } to { background: transparent; } }
+    #in-rows tr.is-new > td { animation: in-row-new 2.4s var(--ic-ease-out); }
+    /* Draft rows — greyed out, except the Draft tag, which stays at full
+       strength so the row's state reads at a glance. */
+    #in-rows tr[data-draft] > td > * { opacity: 0.5; }
+    #in-rows tr[data-draft] > td[data-col="status"] > * { opacity: 1; }
+    #in-rows tr[data-editable] { cursor: pointer; }
+    #in-rows tr[data-editable]:not([data-draft]):hover > td { background: var(--color-surface-muted); }
+    #in-rows tr[data-draft]:hover > td > * { opacity: 0.75; }
+    #in-rows tr[data-draft]:hover > td[data-col="status"] > * { opacity: 1; }
+    #in-rows tr[data-editable]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
+    .tag-indicator.in-health-na { --tag-color: var(--color-text-subtle); }
+    /* Table owner avatars — designmd's square .avatar. Its fill matches the
+       zebra stripe (both surface-muted), so in the table it steps down to
+       surface-sunken to stay visible on striped and plain rows alike. */
+    #in-rows .cell-user .avatar { background: var(--color-surface-sunken); }
+    @media (prefers-reduced-motion: reduce) { #in-rows tr.is-new > td { animation: none; background: var(--color-accent-subtle); } }
     /* Multi-entry list (roadmap IDs 20–21) — numbered rows of single-line
        inputs with a drag handle and a remove button. Composed from designmd
        .input + .btn-icon-only; the row layout is local. */
@@ -4527,6 +4558,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </header>
       <div class="drawer-body in-form">
         <div class="in-form-rows">
+          <!-- TopTrack roadmap ID 5 — duplicate / related notice (designmd
+               .alert-info). Prototype: shows when the name mentions "partner"
+               and points at Partner Enablement Program (a table row); real
+               matching is a fuzzy search over name, description, objectives. -->
+          <div class="alert alert-info in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
+            <svg class="icon alert-icon"><use href="#i-info"/></svg>
+            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+          </div>
           <div class="in-form-row">
             <span class="field-label">Health</span>
             <div class="input-select">
@@ -5256,6 +5295,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         document.addEventListener('scroll', hide, true);
       })();
 
+      // Duplicate notice (ID 5) — prototype rule: a name containing "partner"
+      // matches the existing Partner Enablement Program. The match line reads
+      // that initiative's row, so status and owner can't drift from the table.
+      const dupAlert = document.getElementById('in-dup-alert');
+      const DUP = { trigger: /partner/i, name: 'Partner Enablement Program' };
+      const updateDup = () => {
+        const hit = DUP.trigger.test(nameInput.value);
+        dupAlert.hidden = !hit;
+        if (!hit) return;
+        const n = (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(x => x.name === DUP.name);
+        if (!n) return;
+        const match = dupAlert.querySelector('.in-dup-match');
+        match.querySelector('[data-dup-link]').textContent = n.name;
+        match.lastChild.textContent = ` · ${n.status} · Owned by ${n.owner.name}`;
+      };
+      nameInput.addEventListener('input', updateDup);
+      // The name is a link so the "go look at it first" path is visible.
+      // Placeholder for now — it doesn't navigate anywhere yet.
+      dupAlert.querySelector('[data-dup-link]').addEventListener('click', e => e.preventDefault());
+
       // Required single-selects (roadmap IDs 6, 9) — Create flags an empty
       // one in red; picking an option clears it; a successful Create resets it.
       const requiredSelect = (id, placeholder) => {
@@ -5551,8 +5610,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           dragging = null; clearMarks();
         });
 
+        const values = () => rows().map(li => li.querySelector('input').value);
+        const setValues = vals => {
+          if (!vals || !vals.length) { reset(); return; }
+          list.innerHTML = '';
+          vals.forEach((v, i) => { addRow(samples[i] || '').querySelector('input').value = v; });
+          setError(false);
+        };
         reset();
-        return { missing: () => !filled(), setError, reset, focus: () => list.querySelector('input').focus() };
+        return { missing: () => !filled(), setError, reset, focus: () => list.querySelector('input').focus(), values, setValues };
       };
       const objectives = multiList(document.getElementById('in-objectives'));
       const metrics = multiList(document.getElementById('in-metrics'));
@@ -5619,23 +5685,137 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         return { dismiss };
       };
 
-      // Save as draft (ID 17) — draft-required fields only: Name, the people
-      // and function selects, duration and dates. Problem / Opportunity,
-      // Objectives, Success metrics and Description's minimum wait for publish.
+      // Drawer → table: read the form into an initiative row. A draft keeps
+      // its row id so saving again, or publishing, updates the same row.
+      let draftId = null;
+      const HEALTH_FROM_LABEL = { 'On track': 'on', 'At risk': 'risk', 'Off track': 'off', 'Not active': 'na' };
+      const selectedOf = id => document.querySelector(`#${id} .dropdown-item.is-selected`);
+      const isoFrom = text => { const d = new Date(Date.parse(text)); return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+      const readInitiative = asDraft => {
+        const ownerItem = selectedOf('in-owner');
+        const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim();
+        const stage = document.querySelector('#in-drawer-new .in-stage-trigger')?.textContent.trim() || 'Idea';
+        return {
+          name: nameInput.value.trim() || 'Untitled initiative',
+          fn: selectedOf('in-beneficiary')?.textContent.trim() || '—',
+          status: asDraft ? 'Draft' : stage,
+          draft: asDraft,
+          health: HEALTH_FROM_LABEL[healthLabel] || 'na',
+          owner: {
+            name: ownerItem?.querySelector('.dropdown-item-label')?.textContent.trim() || 'Matthew Vella',
+            role: ownerItem?.querySelector('.dropdown-item-description')?.textContent.trim() || '',
+            initials: ownerItem?.dataset.initials || 'MV',
+          },
+          roadmap: isoFrom(endInput.value),
+          created: isoFrom(new Date().toDateString()),
+        };
+      };
+
+      // Save as draft (ID 17) — no validation: a draft can be saved at any
+      // point, even empty. Any errors left from an earlier Create attempt are
+      // cleared, since a draft isn't being checked.
       document.querySelector('[data-save-draft]')?.addEventListener('click', () => {
-        const nameMissing = !nameInput.value.trim();
-        const missingSelects = requiredSelects.filter(f => f.missing());
-        const badDates = requiredDates.filter(f => f.check());
-        if (nameMissing) setNameError(true);
-        missingSelects.forEach(f => f.setError(true));
-        // Clear any publish-only errors left from an earlier Create attempt.
+        setNameError(false);
+        requiredSelects.forEach(f => f.setError(false));
+        requiredDates.forEach(f => f.setError(false));
         descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
-        const first = [...missingSelects, ...badDates][0];
-        if (nameMissing || first) { (nameMissing ? nameInput : first.trigger).focus(); return; }
-        const name = nameInput.value.trim();
+        const data = { ...readInitiative(true), editable: true };
+        const name = data.name;
+        draftId = window.inUpsertInitiative?.(data, draftId) ?? draftId;
+        if (draftId) drafts[draftId] = snapshot();
         closeOverlay(document.getElementById('in-drawer-new'));
         window.toast({ variant: 'success', message: `“${name}” saved as a draft.` });
       });
+
+      // ---- Draft snapshots: reopen a draft row with everything it had ----
+      // A snapshot records the drawer: name, stage, every select's picks (by
+      // item index), dates, text, the Core strategy switch and the
+      // Objective / Success metric rows. Restoring replays the picks through
+      // the same handlers a click would, so triggers, avatars and dependent
+      // fields (End date, Full impact, the objective row) all follow.
+      const drawerEl = document.getElementById('in-drawer-new');
+      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')];
+      formSelects.forEach(el => {
+        const v = el.querySelector('.input-select-value');
+        el.dataset.ph = v?.classList.contains('input-select-placeholder') ? v.textContent : '';
+      });
+      const stageItems = () => [...drawerEl.querySelectorAll('.in-stage-menu .dropdown-item')];
+      const coreSwitchEl = document.getElementById('in-core');
+      const snapshot = () => ({
+        name: nameInput.value,
+        stage: stageItems().findIndex(i => i.classList.contains('is-selected')),
+        core: coreSwitchEl.checked,
+        selects: formSelects.map(el => [...el.querySelectorAll('.dropdown-item')]
+          .map((it, i) => it.classList.contains('is-selected') ? i : -1).filter(i => i >= 0)),
+        start: startInput.value, end: endInput.value,
+        desc: desc.value, problem: problem.value,
+        objectives: objectives.values(), metrics: metrics.values(),
+      });
+      const clearSelectFully = el => {
+        el.querySelectorAll('.dropdown-item').forEach(i => {
+          i.classList.remove('is-selected');
+          i.hidden = i.dataset.duration === 'custom';
+        });
+        el.querySelectorAll('[data-dropdown-search-input]').forEach(i => { i.value = ''; });
+        el.querySelector('[data-dropdown-empty]')?.setAttribute('hidden', '');
+        const trigger = el.querySelector('.input-select-trigger');
+        trigger.querySelector('[data-select-avatar]')?.remove();
+        const v = trigger.querySelector('.input-select-value');
+        if (el.dataset.ph) { v.textContent = el.dataset.ph; v.classList.add('input-select-placeholder'); }
+      };
+      const restore = snap => {
+        nameInput.value = snap.name;
+        updateDup();
+        if (snap.stage >= 0) stageItems()[snap.stage]?.click();
+        coreSwitchEl.checked = snap.core;
+        coreSwitchEl.dispatchEvent(new Event('change'));
+        formSelects.forEach((el, k) => {
+          clearSelectFully(el);
+          const items = [...el.querySelectorAll('.dropdown-item')];
+          (snap.selects[k] || []).forEach(i => { const it = items[i]; if (!it) return; it.hidden = false; it.click(); });
+        });
+        document.body.click(); // close anything a replayed click opened
+        startInput.value = snap.start;
+        endInput.value = snap.end;              // after the duration replay, which recalculates it
+        desc.value = snap.desc; desc.dispatchEvent(new Event('input'));
+        problem.value = snap.problem; problem.dispatchEvent(new Event('input'));
+        objectives.setValues(snap.objectives);
+        metrics.setValues(snap.metrics);
+        setNameError(false);
+        requiredSelects.forEach(f => f.setError(false));
+        requiredDates.forEach(f => f.setError(false));
+        descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+      };
+      const BLANK = snapshot();
+      // Snapshots for every row the drawer has made — drafts and published.
+      const drafts = {};
+      // Editing a published initiative: primary button reads "Save changes"
+      // and Save as draft is hidden (a published initiative can't go back to
+      // being a draft from here).
+      const createActionBtn = document.querySelector('[data-create-initiative]');
+      const draftBtn = document.querySelector('[data-save-draft]');
+      let editingPublished = false;
+      const setMode = published => {
+        editingPublished = published;
+        createActionBtn.textContent = published ? 'Save changes' : 'Create Initiative';
+        draftBtn.hidden = published;
+      };
+      const createBtnEl = document.querySelector('[data-modal-open="in-drawer-new"]');
+      // "Create Initiative" always starts a fresh initiative; drafts reopen
+      // from their row instead.
+      createBtnEl.addEventListener('click', () => {
+        draftId = null;
+        setMode(false);
+        restore({ ...BLANK, start: startInput.value });
+      });
+      window.inOpenDraft = (id, published = false) => {
+        const snap = drafts[id];
+        if (!snap) return;
+        createBtnEl.click();   // opens the drawer (and resets it)
+        restore(snap);
+        draftId = id;
+        setMode(published);
+      };
 
       document.querySelector('[data-create-initiative]')?.addEventListener('click', () => {
         const nameMissing = !nameInput.value.trim();
@@ -5663,8 +5843,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           else metrics.focus();
           return;
         }
+        const published = readInitiative(false);
+        const wasEditing = editingPublished;
+        const savedId = window.inUpsertInitiative?.({ ...published, editable: true }, draftId);
+        if (savedId) drafts[savedId] = snapshot(); // keep it reopenable
+        draftId = null;
         closeOverlay(document.getElementById('in-drawer-new'));
-        nameInput.value = '';
+        window.toast({ variant: 'success', message: wasEditing ? `“${published.name}” updated.` : `“${published.name}” created.` });
+        setMode(false);
+        nameInput.value = ''; updateDup();
         desc.value = ''; descTouched = false; updateDesc();
         problem.value = ''; problemCount.textContent = '0 / 500';
         objectives.reset(); metrics.reset();
@@ -5933,6 +6120,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       { name: 'Enterprise Sales Expansion', fn: 'Sales', status: 'Opportunity Assessment', health: 'on', owner: P.oc, roadmap: '2025-06-30', created: '2024-08-19',
         rob: { title: 'Pipeline Review', when: 'Oct 24 · 03:00pm', cadence: 'Weekly on Thursday' } },
       { name: 'Customer Health Scoring', fn: 'Customer Success', status: 'Done', health: 'on', owner: P.ak, roadmap: '2024-08-31', created: '2024-02-12' },
+      // The initiative the ID 5 duplicate notice points at when a new name
+      // mentions "partner".
+      { name: 'Partner Enablement Program', fn: 'Sales', status: 'In progress', health: 'on', owner: P.ak, roadmap: '2025-06-30', created: '2024-09-02',
+        rob: { title: 'Partner Council', when: 'Oct 30 · 01:00pm', cadence: 'Bi-weekly on Wednesday' },
+        children: [
+          { name: 'Partner tiering model', type: 'Project', fn: 'Sales', status: 'In progress', health: 'on', owner: P.oc, roadmap: 'Q4 2024', created: '2024-09-09' },
+          { name: 'Partner portal pilot', type: 'Project', fn: 'Product', status: 'Planning', health: 'risk', owner: P.ng, roadmap: 'Q1 2025', created: '2024-09-16' },
+        ] },
     ];
 
     (function () {
@@ -5941,7 +6136,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const search = document.getElementById('in-search');
       const sortDirBtn = document.getElementById('in-sort-dir');
       const OPTIONAL = ['status', 'health', 'owner', 'roadmap', 'rob', 'created'];
-      const HEALTH = { on: ['tag-positive', 'On track'], risk: ['tag-warning', 'At risk'], off: ['tag-negative', 'Off track'] };
+      const HEALTH = { on: ['tag-positive', 'On track'], risk: ['tag-warning', 'At risk'], off: ['tag-negative', 'Off track'], na: ['in-health-na', 'Not active'] };
       const state = { q: '', sort: 'created', asc: true, hidden: new Set(['created']), collapsed: new Set() };
 
       const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -5988,15 +6183,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const rob = n.rob
           ? `<div class="cell-meta"><span class="cell-meta-title">${esc(n.rob.title)}</span><span class="cell-meta-sub" title="${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}"><svg class="icon"><use href="#i-calendar-blank"/></svg><span class="in-clip">${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}</span></span></div>`
           : '<div class="cell-meta-sub">—</div>';
-        return `<tr data-level="${level}" data-id="${n.id}">
+        return `<tr data-level="${level}" data-id="${n.id}"${n.draft ? ' data-draft' : ''}${n.editable ? ` data-editable tabindex="0" aria-label="Open ${n.draft ? 'draft ' : ''}${esc(n.name)}"` : ''}>
           <td><div class="cell-title-row">${hasKids
               ? `<button class="row-toggle" type="button" aria-expanded="${open}" aria-label="Toggle children"><svg class="icon"><use href="#i-caret-right"/></svg></button>`
               : '<span class="row-toggle-spacer"></span>'}
             <div class="cell-title"><span class="cell-title-text">${esc(n.name)}</span><span class="cell-title-sub">${esc(n.type || 'Initiative')} · ${esc(n.fn)}</span></div></div></td>
-          ${col('status', `<span class="tag tag-light">${esc(n.status)}</span>`)}
+          ${col('status', `<span class="tag ${n.draft ? 'tag-dark' : 'tag-light'}">${esc(n.status)}</span>`)}
           ${col('health', `<span class="tag tag-indicator ${hCls}">${hLabel}</span>`)}
-          ${col('owner', `<div class="cell-user"><span class="cell-avatar">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
-          ${col('roadmap', `<div class="cell-meta-sub"><svg class="icon"><use href="#i-calendar-blank"/></svg>${fmtDate(n.roadmap)}</div>`)}
+          ${col('owner', `<div class="cell-user"><span class="avatar avatar-md">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
+          ${col('roadmap', n.roadmap ? `<div class="cell-meta-sub"><svg class="icon"><use href="#i-calendar-blank"/></svg>${fmtDate(n.roadmap)}</div>` : '<div class="cell-meta-sub">—</div>')}
           ${col('rob', rob)}
           ${col('created', `<div class="cell-meta-sub">${fmtDate(n.created)}</div>`)}
           <td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions for ${esc(n.name)}"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button></div></td>
@@ -6004,7 +6199,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       }
 
       function render() {
-        const list = sort(filter(INITIATIVES));
+        // Initiatives added from the drawer (drafts and newly created) are
+        // pinned above the rest, most recent action first, so whatever was just
+        // saved is always the first row. The chosen sort orders everything else.
+        const sorted = sort(filter(INITIATIVES));
+        const pinned = sorted.filter(n => n.pinnedAt).sort((a, b) => b.pinnedAt - a.pinnedAt);
+        const list = [...pinned, ...sorted.filter(n => !n.pinnedAt)];
         const span = 2 + OPTIONAL.filter(c => !state.hidden.has(c)).length;
         tbody.innerHTML = list.length
           ? list.map(n => rowHtml(n, 0)).join('')
@@ -6018,7 +6218,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         table.querySelectorAll('thead th[data-col]').forEach(th => th.toggleAttribute('data-col-hidden', state.hidden.has(th.dataset.col)));
       }
 
+      // Drawer → table (TopTrack set-up flow). Create and Save as draft call
+      // this with the drawer's values; it adds a top-level initiative, or
+      // updates the same row when a draft is saved again / published. The row
+      // is pinned to the top of the table (see render).
+      const countBadge = document.querySelector('.page-head-title .count-badge');
+      window.inUpsertInitiative = (data, id) => {
+        let n = id && INITIATIVES.find(x => x.id === id);
+        if (n) Object.assign(n, data);
+        else { n = { ...data, id: 'n' + (seq++) }; INITIATIVES.push(n); }
+        n.pinnedAt = Date.now(); // newest save / create goes to the top
+        countBadge.textContent = INITIATIVES.length;
+        // Clear filters that would hide it, so the new row is always seen.
+        if (state.q) { state.q = ''; search.value = ''; }
+        render();
+        const row = tbody.querySelector(`tr[data-id="${n.id}"]`);
+        if (row) {
+          row.classList.remove('is-new'); void row.offsetWidth; row.classList.add('is-new');
+          // After the drawer closes — it hands focus back to "Create
+          // Initiative", which would otherwise scroll the page back up.
+          setTimeout(() => row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }), 80);
+        }
+        return n.id;
+      };
+
+      // Rows made from the drawer (drafts and published) reopen it with
+      // everything they had.
+      const openDraftRow = e => {
+        const tr = e.target.closest('tr[data-editable]');
+        if (!tr || e.target.closest('.row-toggle, .cell-actions')) return false;
+        window.inOpenDraft?.(tr.dataset.id, !tr.hasAttribute('data-draft'));
+        return true;
+      };
+      tbody.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-editable]')) { e.preventDefault(); openDraftRow(e); }
+      });
+
       tbody.addEventListener('click', e => {
+        if (openDraftRow(e)) return;
         const toggle = e.target.closest('.row-toggle');
         if (!toggle || state.q) return;
         const id = toggle.closest('tr').dataset.id;
