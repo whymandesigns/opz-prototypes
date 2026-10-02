@@ -55,11 +55,25 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   | 12 | Initial impact date — next 8 quarters | **Built** — optional, after End date; current quarter + 7. (Parked 2026-10-01, restored 2026-10-02) |
   | 13 | Full impact date — next 8 quarters | **Built** — optional; quarters before Initial hidden, cleared if now earlier. (Restored with ID 12) |
   | 18 | Save & publish — required list | **Partly built** — enforced now: Name, Executive sponsor, Beneficiary function, Accountable owner, Project manager, Estimated duration, Start date, End date (+ Description's 100-char minimum). Problem / Opportunity (19), Objective(s) (20) and Success Metrics (21) added. Working team (7) added. Still to add: Related Initiatives (22) |
-  | 17 *(P3)* | Save as draft | **Built (button + check)** — far left of the drawer footer; checks the draft subset only (Name, people/function selects, duration, dates); success toast; drawer keeps its values. Not built: Draft status in the list / hidden-by-default views |
+  | 17 *(P3)* | Save as draft | **Built** — secondary button far left of the footer. **No validation** (2026-10-02): a draft saves at any point, even empty ("Untitled initiative"), and clears any errors on screen. Lands **pinned first** in the Initiatives table, greyed out, dark **Draft** tag; re-saving / publishing updates the same row. **Draft rows are clickable** (mouse or Enter): the drawer reopens with everything the draft had. "Create Initiative" always opens a blank form. Not built: hidden-by-default views |
   | 19 | Problem / Opportunity — required, 2–3 lines | **Built** — below Description, ⓘ carries the roadmap helper text, 500-char cap with counter |
   | 20 | Objective(s) — required, 3 boxes, add / remove / reorder | **Built** — reusable multi-entry list: numbered rows, sample placeholders, + Add, × (last row protected), drag handle + Alt+↑/↓, Enter adds a row. Required = ≥ 1 filled |
   | 21 | Success metrics — required, 3 boxes, add / remove | **Built** — same list as Objective(s), numbered for consistency (user call; roadmap sample is unnumbered) |
-  | 22, 5 | Remaining P1 field changes | Not started |
+  | 5 | Duplicate / related notice | **Built (prototype rule)** — designmd `.alert-info` above Health: "Sounds like this relates to another initiative already in TopTeam." Shows only when the name contains **"partner"** (any case), and points at **Partner Enablement Program** — a real seed row in the Initiatives table (Sales · In progress · Aisha Khan, 2 projects); the match line reads that row. Real fuzzy matching on name / description / objectives still to design with ID 22 |
+  | 22 | Related & duplicate initiatives section | Not started |
+
+  **Drawer → table (2026-10-02):** Create and Save as draft add the initiative to
+  the Initiatives table as a **top-level row** — name, Beneficiary function,
+  status (drawer stage, or *Draft*), health, Accountable owner, End date as
+  roadmap, today as created. Saving a draft again or publishing it updates the
+  same row (no duplicates). Count badge updates; the page scrolls to the row and
+  it flashes once. Success toast on both. **Ordering:** everything added from the
+  drawer (drafts and newly created) is pinned above the seed rows, most recent
+  action first — the row you just saved is always first, whatever the sort.
+  **Reopening:** every row the drawer made is clickable (mouse, or Enter / Space).
+  Drafts reopen in draft mode; published ones reopen in edit mode — primary
+  button reads **Save changes**, Save as draft is hidden, and saving updates the
+  same row (toast: "… updated."). Seed rows aren't editable yet.
 
   **ID 18 decisions (2026-10-01):** keep Health, Connections, More details and
   Core strategy (not in ID 18's list, but stay — optional). Keep Description
@@ -173,6 +187,7 @@ Long text · Search, no results.
 | `.tag-indicator` | Figma's Tag Rectangle has a resting grey fill; designmd's is transparent until hover | `background: var(--color-surface-muted)` on the legend tags |
 | `.alert`, `.btn` | `display: flex` beats `[hidden]` | `.alert[hidden] { display: none }` |
 | `[data-tooltip]` | CSS-only `::after` is clipped by scrolling containers (`.drawer-body` has `overflow-y: auto`) and never wraps | In drawers: pseudo-element off, same compact tooltip drawn in a fixed layer on `<body>`, wraps at 260px, flips/clamps to viewport (features/initiatives) |
+| `.cell-avatar` vs `.avatar` | Table rows still use the round `.cell-avatar`; the squared `.avatar` (radius 0) shares its `surface-muted` fill with `.table-wide`'s zebra stripe, so it vanishes on striped rows | Initiatives table uses `.avatar.avatar-md` with a `surface-sunken` fill (features/initiatives) |
 | `.input-select-trigger` | No `.is-error` state (`.input` has one) | Local `.input-select-trigger.is-error` mirroring `.input.is-error` (in features/initiatives) |
 | — | No meter / column chart component | Health bar + status chart are local, built on `--tag-color` / `--tag-text` |
 
