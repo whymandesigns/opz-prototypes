@@ -94,8 +94,9 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   **States switcher — `features/initiatives/?states=1`** (2026-10-02). Floating
   window, same look as toptrack's. Each state reloads with `&state=…` and
   replays the real UI steps, so every state starts clean:
-  - *Table:* Default · Drafts + created rows · No initiatives · Search, no
-    results · Long text
+  - *Table:* Default · Drafts + created rows *(No initiatives · Search, no
+    results · Long text — hidden from the menu 2026-10-02; still reachable via
+    `&state=empty` / `no-results` / `long-text`)*
   - *Create drawer:* Blank · Required errors · Duplicate notice · Filled, ready
     to create
   - *Draft & edit:* Draft reopened · Edit (Save changes)
