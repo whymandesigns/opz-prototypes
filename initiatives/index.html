@@ -363,6 +363,9 @@ body {
   border-radius: var(--ic-radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
+  /* No link underline when a button is rendered as an <a>. The deliberate
+   * .btn-ghost:hover underline below still wins on hover. */
+  text-decoration: none;
   transition: background var(--ic-duration-fast) var(--ic-ease),
               transform var(--ic-duration-fast) var(--ic-ease),
               box-shadow var(--ic-duration-fast) var(--ic-ease);
@@ -940,8 +943,11 @@ textarea.input {
   white-space: nowrap;
 }
 
-/* Wide variant — generous row height with zebra striping. */
-.table-wide tbody td { padding: var(--ic-space-5) var(--ic-space-4); }
+/* Wide variant — fixed 80px rows with zebra striping. Every row is the same
+ * height whether its cells are one- or two-line; vertical-align:middle centers
+ * the content, so the trimmed vertical padding just guards tall content. */
+.table-wide tbody tr { height: 80px; }
+.table-wide tbody td { padding: var(--ic-space-4) var(--ic-space-4); }
 .table-wide tbody tr:nth-child(even) td { background: var(--color-surface-muted); }
 
 /* Scroll container — wraps a .table to enable both axes of scrolling.
@@ -1421,7 +1427,7 @@ textarea.input {
   color: var(--color-text);
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.accordion-summary:hover { background: var(--color-surface-muted); }
+.accordion-summary:hover { background: var(--color-bg); }
 .accordion-summary:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
 .accordion-title { min-width: 0; }
 .accordion-chevron {
@@ -1695,7 +1701,10 @@ button.badge:focus-visible {
   justify-content: center;
   width: var(--avatar-size);
   height: var(--avatar-size);
-  border-radius: var(--ic-radius-sm);
+  border-radius: 0;
+  /* Chamfered bottom-left corner (Figma Avatar Core) — a 45° cut sized at 25%
+   * of the square, so it scales with every avatar size. */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 25% 100%, 0 75%);
   background: var(--color-surface-muted);
   color: var(--color-text-muted);
   font: var(--ic-weight-semibold) var(--avatar-text)/1 var(--ic-font-sans);
@@ -2028,6 +2037,44 @@ a.avatar:focus-visible {
 .slider-field { width: 56px; text-align: center; -moz-appearance: textfield; appearance: textfield; flex-shrink: 0; }
 .slider-field::-webkit-outer-spin-button,
 .slider-field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---------- Progress bar ----------
+ * Determinate progress: an 8px pill track with an accent fill sized by width.
+ * Optional trailing percentage label (.progress-value).
+ *
+ *   <div class="progress" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+ *     <div class="progress-track"><div class="progress-fill" style="width: 50%"></div></div>
+ *     <span class="progress-value">50%</span>          ← optional
+ *   </div>
+ */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: var(--ic-space-3);
+  width: 100%;
+}
+.progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-surface-sunken);
+  border-radius: var(--ic-radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--color-accent);
+  border-radius: var(--ic-radius-full);
+  transition: width var(--ic-duration-base) var(--ic-ease);
+}
+.progress-value {
+  flex-shrink: 0;
+  min-width: 34px;
+  text-align: right;
+  font: var(--ic-weight-semibold) var(--ic-text-xs)/1 var(--ic-font-sans);
+  color: var(--ic-palette-graphite-700);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---------- Modal ----------
  * Overlay + centered panel with header / body / footer. Sizes: xs/sm/md/lg/xl.
@@ -2541,6 +2588,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   cursor: pointer;
   font: var(--ic-weight-semibold) var(--ic-text-sm)/1.25 var(--ic-font-sans);
   color: var(--color-text-muted);
+  /* No link underline when a tab is rendered as an <a> (cross-page tab). */
+  text-decoration: none;
   white-space: nowrap;
   transition: color var(--ic-duration-fast) var(--ic-ease),
               border-color var(--ic-duration-fast) var(--ic-ease);
@@ -2665,6 +2714,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   color: var(--color-text-subtle);
 }
 .stepper-sep svg { font-size: 16px; }
+
+/* Label density variants.
+ * .stepper-current-only — numbers throughout, only the active step keeps its
+ *   label (a compact progress read that still names where you are).
+ * .stepper-compact — numbers only, no labels at all. */
+.stepper-current-only .stepper-label { display: none; }
+.stepper-current-only .stepper-step.is-current .stepper-label { display: inline; }
+.stepper-compact .stepper-label { display: none; }
+
+/* Responsive — on small screens collapse a full stepper to the current-only
+ * read (numbers throughout, label on the active step) so it fits without
+ * wrapping. Explicit .stepper-compact keeps its numbers-only form. */
+@media (max-width: 640px) {
+  .stepper:not(.stepper-compact) .stepper-label { display: none; }
+  .stepper:not(.stepper-compact) .stepper-step.is-current .stepper-label { display: inline; }
+}
 
 /* ---------- Tooltip ----------
  * CSS-only tooltip on any element via [data-tooltip="…"]. Default placement
@@ -3009,7 +3074,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding: 0 var(--ic-space-5);
   background: var(--ic-palette-graphite-800);
   color: var(--ic-palette-white);
+  /* Query container so the bar can collapse to a mobile layout based on its own
+   * width (works full-width in real use and inside the sized playground frame). */
+  container-type: inline-size;
 }
+/* Hamburger + page title + primary action — the collapsed mobile layout.
+ * The hamburger is the icon-button component (.btn.btn-icon-only.btn-ghost);
+ * this marker only controls when it shows (hidden on the wide bar, revealed by
+ * the container query below). */
+.topbar-menu { display: none; flex-shrink: 0; }
+.topbar-title {
+  display: none;
+  flex: 1; min-width: 0;
+  font: var(--ic-weight-semibold) var(--ic-text-md)/1 var(--ic-font-sans);
+  color: inherit;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.topbar-cta { display: none; flex-shrink: 0; }
 .topbar-brand {
   display: inline-flex;
   align-items: center;
@@ -3071,22 +3152,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   border-color: rgba(255, 255, 255, 0.30);
 }
 
-.topbar-avatar {
-  width: 32px; height: 32px;
-  border-radius: var(--ic-radius-sm);
-  overflow: hidden;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  background: var(--ic-palette-gray-300);
-  display: inline-flex; align-items: center; justify-content: center;
-  font: var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);
-  color: var(--ic-palette-graphite-800);
-}
-.topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+/* The account button is the avatar component (.avatar.avatar-md) — it already
+ * covers the button reset, hover dim and focus ring. */
 
 @media (max-width: 720px) {
   .topbar-search { width: 200px; }
+}
+
+/* Collapsed bar (≤768px, Picasso md edge): hamburger + page title on the left,
+ * a primary action on the right; the brand logo, search and account menu drop. */
+@container (max-width: 768px) {
+  /* Collapsed bar flips to a light surface with a dark H2 title. */
+  .topbar { background: var(--color-surface); color: var(--color-text); gap: var(--ic-space-3); }
+  .topbar .topbar-menu  { display: inline-flex; }
+  .topbar .topbar-title { display: block; font: var(--type-h2); }
+  .topbar .topbar-cta   { display: inline-flex; }
+  .topbar .topbar-brand,
+  .topbar .topbar-search,
+  .topbar .topbar-account { display: none; }
 }
 
 /* ---------- Dropdown menu ----------
@@ -3152,14 +3235,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-shrink: 0;
   color: var(--color-text-muted);
 }
-.dropdown-item-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--ic-radius-full);
-  flex-shrink: 0;
-  object-fit: cover;
-  background: var(--color-surface-muted);
-}
+/* The dropdown item avatar is the .avatar component (.avatar.avatar-md) — size,
+ * background, image fit and the cut corner all come from there. Only the flex
+ * reset is specific to sitting in a dropdown row. */
+.dropdown-item-avatar { flex-shrink: 0; }
 .dropdown-item-text {
   display: flex;
   flex-direction: column;
@@ -3262,6 +3341,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   font: var(--type-caption);
   color: var(--color-text-muted);
   padding: var(--ic-space-1) var(--ic-space-2);
+}
+
+/* Search-in-menu — a filter field pinned above a scrollable item list. Put the
+ * items in a .dropdown-list (scrolls independently) and a .dropdown-empty row
+ * for the no-results state. Filtering is wired by the [data-dropdown-search]
+ * handler in example.html. */
+.dropdown-search { padding: var(--ic-space-1); }
+.dropdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  max-height: 240px;
+}
+.dropdown-empty {
+  margin: 0;
+  padding: var(--ic-space-3);
+  text-align: center;
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
 }
 
 /* Generic dropdown wrapper — pairs a `.dropdown-trigger` with a `.dropdown-menu` */
@@ -3545,7 +3644,159 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        .btn, .input-select, .segmented), .table + .table-wide / .table-sheet with
        the cell helpers, .tag / .tag-indicator. Local rules are layout only. */
     .in-toolbar { margin-bottom: var(--ic-space-4); }
-    .in-toolbar .toolbar-search { flex: 0 1 364px; }
+
+    /* Applied-filter chips, between the toolbar and the table. */
+    .in-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--ic-space-2);
+      margin-bottom: var(--ic-space-4);
+    }
+    .in-chips[hidden] { display: none; }
+    /* A chip is an editable filter, not just a readout: its label opens the
+       same options the panel holds, so a filter can be changed in place. */
+    .in-chip { position: relative; }
+    .in-chip-label {
+      background: transparent; border: 0; padding: 0;
+      font: inherit; color: inherit; cursor: pointer;
+    }
+    .in-chip:has(.in-chip-label:hover),
+    .in-chip:has(.in-chip-label:focus-visible) { background: var(--color-surface-muted); }
+    /* A date filter has no option list, so its chip stays a plain readout. */
+    .in-chip-static { cursor: default; }
+    .in-chip-menu {
+      position: absolute;
+      top: calc(100% + var(--ic-space-1));
+      left: 0;
+      z-index: var(--ic-z-dropdown);
+      min-width: 220px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .in-chip-menu[hidden] { display: none; }
+    /* The filter list is short and fixed, so it shows whole; option lists keep
+       the cap, since some (Name) run to twenty-odd entries. */
+    .in-chip-menu.is-root { max-height: none; overflow-y: visible; }
+
+    /* Add-a-filter: a round chip that opens the filter list, then that
+       filter's options — the panel's two levels without opening the panel. */
+    .in-chip-adder { display: inline-flex; }
+    .in-chip-add {
+      width: 28px;
+      padding: 0;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-muted);
+    }
+    .in-chip-add:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .in-chip-add .icon { font-size: 14px; }
+    /* Level-two header: the way back to the filter list. */
+    .in-chip-back { color: var(--color-text-muted); }
+    .in-chip-back .dropdown-item-icon { font-size: 14px; }
+    /* Drill-in affordance on the filter list. Sized and coloured on the svg
+       itself: .icon carries its own colour, so a colour on the span is ignored. */
+    .in-chip-more { margin-left: auto; display: inline-flex; }
+    .in-chip-more .icon { width: 10px; height: 10px; color: var(--color-text-subtle); }
+
+    /* ---- Filters panel (Figma 20902:88195) ----
+       A floating panel, not a modal: no backdrop, so the table it is narrowing
+       stays visible behind it. Position is set in script from the Filter
+       button's rect, which is why it is fixed rather than absolute — no
+       ancestor can clip it. */
+    .in-filters {
+      position: fixed;
+      z-index: var(--ic-z-dropdown);
+      width: 780px;
+      max-width: calc(100vw - var(--ic-space-6));
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      background: var(--ic-palette-white);
+      border-radius: var(--ic-radius-md);
+      box-shadow: var(--ic-shadow-xl);
+      padding: var(--ic-space-5) var(--ic-space-7);
+    }
+    .in-filters[hidden] { display: none; }
+
+    /* The head doubles as the window's drag handle. */
+    .in-filters-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--ic-space-6);
+      margin-bottom: var(--ic-space-4);
+      cursor: grab; user-select: none;
+    }
+    .in-filters.is-dragging,
+    .in-filters.is-dragging .in-filters-head { cursor: grabbing; }
+    .in-filters-title {
+      font: var(--type-body-semibold);
+      color: var(--ic-palette-graphite-500);
+      margin: 0;
+    }
+    /* The one control in the head keeps its own cursor. */
+    .in-filters-clear {
+      background: transparent; border: 0; padding: 0; cursor: pointer;
+      font: var(--ic-weight-semibold) var(--ic-text-base)/1 var(--ic-font-sans);
+      color: var(--color-accent);
+    }
+    .in-filters-clear:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .in-filters-body { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    /* Fixed label column, field takes the rest. No row divider by design — the
+       label column already separates them, and rules only make a long panel
+       read longer. */
+    .in-f-row { display: flex; align-items: center; gap: var(--ic-space-6); }
+    .in-f-row.is-split { align-items: flex-start; }
+    .in-f-col { display: flex; align-items: center; gap: var(--ic-space-6); flex: 1 1 0; min-width: 0; }
+    .in-f-label {
+      width: 80px; flex-shrink: 0;
+      font: var(--ic-weight-regular) var(--ic-text-base)/22px var(--ic-font-sans);
+      color: var(--ic-palette-graphite-500);
+    }
+    /* Trailing labels on a multi-field row sit tight to their own field. */
+    .in-f-label.is-auto { width: auto; white-space: nowrap; }
+    .in-f-col:has(> .in-f-label.is-auto) { gap: var(--ic-space-4); }
+    .in-f-field { flex: 1 1 0; min-width: 0; }
+    .in-f-field .input-select-trigger { width: 100%; }
+    .in-f-field .dropdown-menu { max-height: 260px; overflow-y: auto; }
+
+    /* A native date input cannot carry a text placeholder and the design shows
+       empty fields, so these start as text and become date inputs on focus. */
+    .in-f-date .input { cursor: pointer; }
+    .in-f-date .input::-webkit-calendar-picker-indicator { display: none; }
+
+    .in-f-checks { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-6); }
+
+    /* Show Archived is the one rule in the panel: it sets the archive scope
+       rather than narrowing what is already in view, so it sits apart. */
+    .in-f-row-plain {
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--ic-space-4);
+    }
+    /* Full-size label here, unlike the 13px option labels above. */
+    .in-f-archived .checkbox-label {
+      font: var(--ic-weight-regular) var(--ic-text-base)/22px var(--ic-font-sans);
+      color: var(--ic-palette-graphite-500);
+    }
+    /* One line at every desktop width: the search gives way first (364px →
+       120px), then labels collapse to icons as the toolbar narrows. It only
+       wraps on phone-sized toolbars. */
+    .page-view[data-page="initiatives"] { container: in-page / inline-size; }
+    .in-toolbar { flex-wrap: nowrap; }
+    .in-toolbar .toolbar-search { flex: 1 1 364px; max-width: 364px; min-width: 120px; }
+    .in-toolbar > .btn, .in-toolbar .toolbar-end { flex-shrink: 0; }
+    .in-toolbar .toolbar-end { flex-wrap: nowrap; }
+    @container in-page (max-width: 960px) {
+      .in-toolbar .in-columns .input-select-value { display: none; }
+      .in-toolbar .in-columns .input-select-trigger { min-width: 0; }
+    }
+    @container in-page (max-width: 820px) {
+      .in-toolbar .in-tb-label { display: none; }
+      .in-toolbar > .btn { width: 32px; padding: 0; }
+    }
+    @container in-page (max-width: 560px) {
+      .in-toolbar { flex-wrap: wrap; }
+      .in-toolbar .toolbar-search { flex-basis: 100%; max-width: none; }
+      .in-toolbar .toolbar-end { flex-wrap: wrap; flex-shrink: 1; margin-left: 0; }
+    }
     /* Column picker lists every optional column — keep the trigger compact. */
     .in-columns .input-select-value { max-width: 128px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     /* designmd caps .table-scroll at 480px for the demo; here the page scrolls. */
@@ -3588,7 +3839,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     #in-drawer-new .drawer-header .modal-close { margin-top: var(--ic-space-1); }
     .in-name-input { font: var(--type-body-sm-semibold); }
     .in-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .in-drawer-tags { display: flex; gap: var(--ic-space-2); }
+    .in-drawer-tags { display: flex; align-items: center; gap: var(--ic-space-2); }
+    /* Stage tag is a trigger — same pill, button behaviour. */
+    .in-stage-trigger { border: 0; cursor: pointer; }
+    .in-stage-trigger:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+    .in-stage-menu { min-width: 220px; }
     .in-form { display: flex; flex-direction: column; gap: var(--ic-space-5); }
     /* The body scrolls — sections keep their height instead of shrinking to fit. */
     .in-form > * { flex-shrink: 0; }
@@ -3605,6 +3860,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-desc .editor-counter-ok[hidden] { display: none; }
     .in-label-tip { display: inline-flex; align-items: center; gap: var(--ic-space-1); }
     .in-tip { display: inline-flex; color: var(--color-text-subtle); cursor: help; }
+    /* Drawer tooltips — designmd's [data-tooltip] is a CSS ::after on the
+       trigger, so .drawer-body (overflow-y: auto) clips it. Inside drawers the
+       pseudo-element is switched off and the same tooltip is drawn in a fixed
+       layer on <body> instead (see the drawer-tooltip script). Visuals mirror
+       designmd's compact tooltip; long copy wraps instead of running off. */
+    .drawer [data-tooltip]::after, .drawer [data-tooltip]::before { display: none; }
+    .in-float-tip {
+      position: fixed; z-index: var(--ic-z-toast);
+      max-width: 260px; width: max-content;
+      padding: var(--ic-space-1) var(--ic-space-2);
+      border-radius: var(--ic-radius-sm);
+      background: var(--ic-palette-graphite-900); color: var(--color-text-inverse);
+      font: var(--type-caption); line-height: 1.35;
+      pointer-events: none; opacity: 0;
+      transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
+    }
+    .in-float-tip.is-visible { opacity: 1; }
     .in-section { border-top: 1px solid var(--color-border); padding-top: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-3); }
     .in-section-title { margin: 0; font: var(--type-body-sm-semibold); color: var(--color-text); }
     .in-conns { display: flex; flex-direction: column; gap: var(--ic-space-3); }
@@ -3630,11 +3902,137 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-details .accordion-summary { padding: 0; font-weight: var(--ic-weight-semibold); }
     .in-details-body { display: flex; flex-direction: column; gap: var(--ic-space-5); }
     .in-details-body > * { flex-shrink: 0; }
-    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-2) var(--ic-space-4); padding-top: var(--ic-space-3); }
+    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-4); padding-top: var(--ic-space-3); }
+    /* Fields revealed by an "+ Add…" link take a full line above the links. */
+    .in-reveal-row { flex-basis: 100%; }
+    .in-form-row[hidden], .in-add[hidden] { display: none; }
+    /* Rows with a hint under the control: top-align, label centred on the 32px control. */
+    .in-row-top { align-items: start; }
+    .in-row-top > .field-label { min-height: 32px; display: flex; align-items: center; }
+    /* designmd gap: .input has .is-error, .input-select-trigger doesn't.
+       Mirrors .input.is-error (red border + red focus ring). */
+    .input-select-trigger.is-error { border-color: var(--color-danger); }
+    .input-select-trigger.is-error:focus-visible,
+    .input-select-trigger.is-error[aria-expanded="true"] { border-color: var(--color-danger); box-shadow: 0 0 0 3px var(--color-danger-subtle); }
+    .field-hint[hidden] { display: none; }
+    /* designmd .dropdown-search — its input should span the menu, and hidden
+       items / the empty row must actually hide (display rules beat [hidden]). */
+    .dropdown-search .input-icon, .dropdown-search .input { width: 100%; }
+    .dropdown-list .dropdown-item[hidden], .dropdown-empty[hidden] { display: none; }
+    #in-duration .dropdown-item[hidden], #in-impact-full .dropdown-item[hidden] { display: none; }
+    /* Working team trigger — up to 3 overlapping photo avatars + summary.
+       designmd has no avatar group, so the stack is local. */
+    .in-avatar-stack { display: inline-flex; flex-shrink: 0; }
+    .in-avatar-stack .avatar { box-shadow: 0 0 0 2px var(--color-surface); }
+    .in-avatar-stack .avatar + .avatar { margin-left: -6px; }
+    .in-tags-field { gap: var(--ic-space-1); }
     .in-add { display: inline-flex; align-items: center; gap: var(--ic-space-1); }
     /* Link-style action: ghost button in the link colour, no side inset. */
     .btn.in-link { color: var(--color-text-link); padding-inline: 0; }
     .btn.in-link:hover { background: transparent; text-decoration: underline; }
+    /* Save as draft sits far left; Cancel + Create stay right. */
+    .drawer-footer .in-draft-btn { margin-right: auto; }
+
+    /* Prototype state switcher (?states=1) — same look as the other
+       prototypes' switchers (toptrack, performance-reviews, csv-export). */
+    /* Bottom-left, so it stays clear of the right-hand drawers it drives. */
+    .in-switcher { position: fixed; left: 16px; bottom: 16px; z-index: 999; width: 232px; background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--ic-radius-lg); box-shadow: var(--ic-shadow-lg); overflow: hidden; }
+    .in-switcher[hidden] { display: none; }
+    .in-switcher-head { display: flex; align-items: center; justify-content: space-between; padding: var(--ic-space-2) var(--ic-space-3); background: var(--ic-palette-graphite-800); color: var(--color-text-inverse); font: var(--ic-weight-semibold) var(--ic-text-xxs)/1.4 var(--ic-font-sans); letter-spacing: .06em; text-transform: uppercase; }
+    .in-switcher-toggle { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 2px 4px; }
+    .in-switcher-body { max-height: 64vh; overflow: auto; padding: var(--ic-space-2); display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .in-switcher.is-collapsed .in-switcher-body { display: none; }
+    .in-switcher-group { display: flex; flex-direction: column; gap: 4px; }
+    .in-switcher-group > span { font-size: var(--ic-text-xxs); text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-subtle); font-weight: var(--ic-weight-semibold); padding: 2px 4px 0; }
+    .in-switcher-group button { text-align: left; padding: 5px 8px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); color: var(--color-text); cursor: pointer; font: var(--type-body-sm); }
+    .in-switcher-group button:hover { background: var(--color-surface-muted); border-color: var(--color-border-strong); }
+    .in-switcher-group button.is-current { border-color: var(--color-accent); color: var(--color-accent); font-weight: var(--ic-weight-semibold); }
+
+    /* ===== View mode (Figma 20327:41665) =====
+       Header: title, Initiative + stage tags, last-edit line, link + close.
+       Body: Overview / Activity log tabs; label (192px) · value rows; long
+       text as paragraphs; Connections / Documents / Projects sections. */
+    .in-view-header { align-items: flex-start; }
+    .in-view-heading { display: flex; flex-direction: column; gap: var(--ic-space-1); min-width: 0; }
+    .in-view-title { margin: 0; font: var(--type-h3); color: var(--color-text); overflow-wrap: anywhere; }
+    .in-view-meta { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ic-space-2); }
+    .in-view-edited { font: var(--type-body-xs); color: var(--color-text-muted); }
+    .in-view-edited a, .in-view-link { color: var(--color-text-link); text-decoration: none; }
+    .in-view-edited a:hover, .in-view-link:hover { text-decoration: underline; }
+    .in-view-header-actions { display: flex; gap: var(--ic-space-2); flex-shrink: 0; }
+    .in-view-body { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .in-view-panel { display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .in-view-panel[hidden] { display: none; }
+    .in-view-rows { display: flex; flex-direction: column; gap: var(--ic-space-1); margin: 0; }
+    .in-view-row { display: grid; grid-template-columns: 192px minmax(0, 1fr); gap: var(--ic-space-2); align-items: center; min-height: 36px; }
+    .in-view-row dt { font: var(--type-body-sm); color: var(--color-text-muted); }
+    .in-view-row dd { margin: 0; font: var(--type-body-sm); color: var(--color-text); min-width: 0; }
+    .in-view-empty { color: var(--color-text-subtle); }
+    .in-view-person { display: inline-flex; align-items: center; gap: var(--ic-space-3); min-width: 0; }
+    .in-view-person-text { display: flex; flex-direction: column; min-width: 0; }
+    .in-view-person-name { color: var(--color-text-link); font-weight: var(--ic-weight-semibold); text-decoration: none; }
+    .in-view-person-name:hover { text-decoration: underline; }
+    .in-view-person-role { font: var(--type-body-xs); color: var(--color-text-muted); }
+    .in-view-team { display: flex; align-items: center; gap: var(--ic-space-3); flex-wrap: wrap; }
+    .in-view-team-names { color: var(--color-text); }
+    .in-view-block { display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    .in-view-block h3, .in-view-section h3 { margin: 0; font: var(--type-body-sm); color: var(--color-text-muted); font-weight: var(--ic-weight-regular); }
+    .in-view-section h3 { font: var(--type-body-semibold); color: var(--color-text); }
+    .in-view-text { margin: 0; font: var(--type-body); color: var(--color-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .in-view-list { margin: 0; padding-left: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-1); font: var(--type-body); color: var(--color-text); }
+    .in-view-section { display: flex; flex-direction: column; gap: var(--ic-space-2); border-top: 1px solid var(--color-border); padding-top: var(--ic-space-4); }
+    .in-view-conn { display: grid; grid-template-columns: 24px 160px minmax(0, 1fr); gap: var(--ic-space-2); align-items: center; font: var(--type-body-sm); }
+    .in-view-conn-icon { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ic-radius-sm); background: var(--color-surface-muted); color: var(--color-icon); }
+    .in-view-conn-label { color: var(--color-text-muted); }
+    .in-view-activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .in-view-activity li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--ic-space-3); align-items: start; font: var(--type-body-sm); }
+    .in-view-activity time { display: block; font: var(--type-body-xs); color: var(--color-text-muted); }
+    #in-drawer-view .drawer-footer { justify-content: flex-end; }
+    @media (max-width: 560px) { .in-view-row, .in-view-conn { grid-template-columns: minmax(0, 1fr); gap: 2px; } .in-view-conn-icon { display: none; } }
+    /* Duplicate notice (ID 5). designmd gap: .alert's display: flex beats the
+       UA [hidden] rule, so hidden is restated. Two lines: claim, then match. */
+    .alert[hidden] { display: none; }
+    .in-dup-alert .alert-message { display: flex; flex-direction: column; gap: 2px; font: var(--type-body-sm); }
+    .in-dup-alert .alert-message strong { font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    .in-dup-match { color: var(--color-text-muted); }
+    .in-dup-link { color: var(--color-text-link); font-weight: var(--ic-weight-medium); text-decoration: none; }
+    .in-dup-link:hover { text-decoration: underline; }
+    .in-dup-link:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; border-radius: 2px; }
+    .drawer-footer .in-draft-btn[hidden] { display: none; }
+    /* With Save as draft hidden, keep Cancel + primary on the right. */
+    .drawer-footer .in-draft-btn[hidden] + .btn { margin-left: auto; }
+    /* Rows added from the drawer — a brief accent wash so the new row is
+       found, then it settles into the table. Drafts read slightly muted. */
+    @keyframes in-row-new { from { background: var(--color-accent-subtle); } to { background: transparent; } }
+    #in-rows tr.is-new > td { animation: in-row-new 2.4s var(--ic-ease-out); }
+    /* Draft rows — greyed out, except the Draft tag, which stays at full
+       strength so the row's state reads at a glance. */
+    #in-rows tr[data-draft] > td > * { opacity: 0.5; }
+    #in-rows tr[data-draft] > td[data-col="status"] > * { opacity: 1; }
+    #in-rows tr[data-editable] { cursor: pointer; }
+    #in-rows tr[data-editable]:not([data-draft]):hover > td { background: var(--color-surface-muted); }
+    #in-rows tr[data-draft]:hover > td > * { opacity: 0.75; }
+    #in-rows tr[data-draft]:hover > td[data-col="status"] > * { opacity: 1; }
+    #in-rows tr[data-editable]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
+    .tag-indicator.in-health-na { --tag-color: var(--color-text-subtle); }
+    /* Table owner avatars — designmd's square .avatar. Its fill matches the
+       zebra stripe (both surface-muted), so in the table it steps down to
+       surface-sunken to stay visible on striped and plain rows alike. */
+    #in-rows .cell-user .avatar { background: var(--color-surface-sunken); }
+    @media (prefers-reduced-motion: reduce) { #in-rows tr.is-new > td { animation: none; background: var(--color-accent-subtle); } }
+    /* Multi-entry list (roadmap IDs 20–21) — numbered rows of single-line
+       inputs with a drag handle and a remove button. Composed from designmd
+       .input + .btn-icon-only; the row layout is local. */
+    .in-multi-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-2); }
+    .in-multi-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto auto; align-items: center; gap: var(--ic-space-2); border-radius: var(--ic-radius-sm); }
+    .in-multi-num { font: var(--type-body-sm); color: var(--color-text-subtle); text-align: right; font-variant-numeric: tabular-nums; }
+    .in-multi-row .input { width: 100%; }
+    .in-multi-handle { cursor: grab; color: var(--color-text-subtle); }
+    .in-multi-handle:active { cursor: grabbing; }
+    .in-multi-row.is-dragging { opacity: 0.4; }
+    .in-multi-row.is-drop-before { box-shadow: 0 -2px 0 var(--color-border-focus); }
+    .in-multi-row.is-drop-after  { box-shadow: 0 2px 0 var(--color-border-focus); }
+    .in-multi .in-add { align-self: flex-start; }
     /* URL links (Figma 20307:92906) — name + URL pairs, add as many as needed. */
     .in-links { display: flex; flex-direction: column; gap: var(--ic-space-2); align-items: flex-start; }
     .in-links-rows { display: flex; flex-direction: column; gap: var(--ic-space-2); width: 100%; }
@@ -4049,6 +4447,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-slack" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.88929 3.36143C4.96429 3.36143 4.20857 2.60571 4.20857 1.68071C4.20857 0.755714 4.96429 0 5.88929 0C6.81429 0 7.57 0.755714 7.57 1.68071V3.36143H5.88929ZM1.68071 11.7914C2.60571 11.7914 3.36143 11.0357 3.36143 10.1107V8.43H1.68071C0.755714 8.43 0 9.18571 0 10.1107C0 11.0357 0.755714 11.7914 1.68071 11.7914ZM5.88929 8.43C4.96429 8.43 4.20857 9.18571 4.20857 10.1107V14.3193C4.20857 15.2443 4.96429 16 5.88929 16C6.81429 16 7.57 15.2443 7.57 14.3193V10.1107C7.57 9.18571 6.81429 8.43 5.88929 8.43ZM7.57 5.88929C7.57 4.96429 6.81429 4.20857 5.88929 4.20857H1.68071C0.755714 4.20857 0 4.96429 0 5.88929C0 6.81429 0.755714 7.57 1.68071 7.57H5.88929C6.81429 7.57 7.57 6.81429 7.57 5.88929ZM12.6386 5.88929C12.6386 4.96429 13.3943 4.20857 14.3193 4.20857C15.2443 4.20857 16 4.96429 16 5.88929C16 6.81429 15.2443 7.57 14.3193 7.57H12.6386V5.88929ZM10.1107 7.57C11.0357 7.57 11.7914 6.81429 11.7914 5.88929V1.68071C11.7914 0.755714 11.0357 0 10.1107 0C9.18571 0 8.43 0.755714 8.43 1.68071V5.88929C8.43 6.81429 9.18571 7.57 10.1107 7.57ZM10.1107 12.6386C11.0357 12.6386 11.7914 13.3943 11.7914 14.3193C11.7914 15.2443 11.0357 16 10.1107 16C9.18571 16 8.43 15.2443 8.43 14.3193V12.6386H10.1107ZM8.43 10.1107C8.43 11.0357 9.18571 11.7914 10.1107 11.7914H14.3193C15.2443 11.7914 16 11.0357 16 10.1107C16 9.18571 15.2443 8.43 14.3193 8.43H10.1107C9.18571 8.43 8.43 9.18571 8.43 10.1107Z" fill="currentColor"/></symbol>
   <symbol id="i-jira-software" viewBox="0 0 16 16"><path d="M15.3204 7.55227L8.64688 0.667371L8 0L2.97644 5.18268L0.679604 7.55227C0.440132 7.79963 0.440132 8.20037 0.679604 8.44773L5.26918 13.1827L8 16L13.0236 10.8173L13.1013 10.7371L15.3204 8.44773C15.5599 8.20037 15.5599 7.79963 15.3204 7.55227ZM8 10.3654L5.70726 8L8 5.63464L10.2927 8L8 10.3654Z" fill="currentColor"/></symbol>
   <symbol id="i-google" viewBox="0 0 16 16"><path d="M8.16318 6.54547V9.64367H12.5565C12.3636 10.64 11.7847 11.4837 10.9164 12.051L13.5658 14.0656C15.1094 12.6692 15.9999 10.6183 15.9999 8.18192C15.9999 7.61466 15.948 7.06915 15.8515 6.54556L8.16318 6.54547Z" fill="#4285F4"/><path d="M3.58823 9.52273L2.9907 9.97099L0.875629 11.5855C2.21886 14.1964 4.97192 16.0001 8.16301 16.0001C10.367 16.0001 12.2149 15.2874 13.5656 14.0656L10.9162 12.051C10.189 12.531 9.2613 12.8219 8.16301 12.8219C6.04056 12.8219 4.23726 11.4183 3.59157 9.52735L3.58823 9.52273Z" fill="#34A853"/><path d="M0.875637 4.41457C0.319078 5.4909 0 6.70547 0 8C0 9.29453 0.319078 10.5091 0.875637 11.5854C0.875637 11.5927 3.59184 9.51996 3.59184 9.51996C3.42857 9.03996 3.33207 8.5309 3.33207 7.99992C3.33207 7.46893 3.42857 6.95987 3.59184 6.47987L0.875637 4.41457Z" fill="#FBBC05"/><path d="M8.16317 3.18547C9.36542 3.18547 10.4341 3.59273 11.2875 4.3782L13.6251 2.08731C12.2077 0.792781 10.3673 0 8.16317 0C4.97209 0 2.21886 1.79637 0.875629 4.41458L3.59175 6.48004C4.23735 4.5891 6.04073 3.18547 8.16317 3.18547Z" fill="#EA4335"/></symbol>
+  <symbol id="i-okr-custom" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10ZM8 9C7.44772 9 7 8.55228 7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8C9 8.55228 8.55228 9 8 9Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M13 8C13 10.7614 10.7614 13 8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3C10.7614 3 13 5.23858 13 8ZM4 8C4 10.2091 5.79086 12 8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4C5.79086 4 4 5.79086 4 8Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8ZM1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8Z" fill="currentColor"/><path vector-effect="non-scaling-stroke" d="M15.293 3L10.793 7.5H8.5V5.20703L13 0.707031L15.293 3Z" fill="white" stroke="currentColor"/></symbol>
 </svg>
 <!-- === /icons.svg === -->
 
@@ -4062,8 +4461,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <svg class="search-icon"><use href="#i-search"/></svg>
         <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
       </div>
-      <div class="dropdown">
-        <button class="topbar-avatar dropdown-trigger" aria-label="Account" aria-expanded="false" type="button">MV</button>
+      <div class="dropdown topbar-account">
+        <button class="avatar avatar-md dropdown-trigger" aria-label="Account" aria-expanded="false" type="button">MV</button>
         <div class="dropdown-menu dropdown-menu-end" hidden>
           <button class="dropdown-item" type="button">My profile</button>
           <button class="dropdown-item" type="button">Feedback</button>
@@ -4083,7 +4482,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <aside class="sidenav">
       <button class="sidenav-toggle" aria-label="Toggle navigation" type="button"><svg><use href="#i-chevron-left"/></svg></button>
       <ul class="sidenav-list">
-        <li><a class="sidenav-item" href="#" data-page="dashboard"><svg class="sidenav-item-icon"><use href="#i-dashboard"/></svg><span class="sidenav-item-label">Dashboard</span></a></li>
+        <li><a class="sidenav-item" href="../toptrack/" data-page="dashboard"><svg class="sidenav-item-icon"><use href="#i-dashboard"/></svg><span class="sidenav-item-label">Dashboard</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="processes"><svg class="sidenav-item-icon"><use href="#i-cpu-2"/></svg><span class="sidenav-item-label">Processes</span></a></li>
         <li><a class="sidenav-item is-active" href="#" data-page="initiatives" aria-current="page"><svg class="sidenav-item-icon"><use href="#i-initiatives"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="rob-meetings"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
@@ -4115,11 +4514,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <h1 class="page-head-heading">Initiatives</h1>
               <span class="count-badge count-badge-lg count-badge-secondary">24</span>
             </div>
-            <p class="page-head-subtitle">Plan, prioritize and track the initiatives moving your strategy forward.</p>
           </div>
           <div class="page-head-actions" data-cta-source="page-head-primary">
             <button class="btn btn-secondary" type="button" aria-label="Export as CSV"><svg class="icon icon-16 btn-cta-icon"><use href="#i-download"/></svg><span class="btn-cta-label">Export as CSV</span></button>
-            <button class="btn btn-primary" type="button" aria-label="New initiative" data-modal-open="in-drawer-new"><svg class="icon icon-16 btn-cta-icon"><use href="#i-plus"/></svg><span class="btn-cta-label">New initiative</span></button>
+            <button class="btn btn-primary" type="button" aria-label="Create Initiative" data-modal-open="in-drawer-new"><span class="btn-cta-label">Create Initiative</span></button>
           </div>
         </div>
 
@@ -4130,8 +4528,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
             <input class="input" type="search" id="in-search" placeholder="Search by name, owner or function" aria-label="Search initiatives">
           </div>
-          <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-filter"/></svg>Filter</button>
-          <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-code"/></svg>Advanced filters</button>
+          <button class="btn btn-secondary" type="button" aria-label="Filter" title="Filter"><svg class="icon"><use href="#i-filter"/></svg><span class="in-tb-label">Filter</span></button>
+          <button class="btn btn-secondary" type="button" aria-label="Query" title="Query"><svg class="icon"><use href="#i-code"/></svg><span class="in-tb-label">Query</span></button>
           <div class="toolbar-end">
             <div class="input-select is-auto in-columns" data-multi>
               <button class="input-select-trigger" aria-expanded="false" aria-label="Visible columns" type="button"><svg class="icon"><use href="#i-settings"/></svg><span class="input-select-value" id="in-columns-label">Status, Health, Accountability, Roadmap, RoB</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
@@ -4161,6 +4559,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
 
+        <!-- Applied filters — one chip per active filter, so what is narrowing
+             the table is visible without reopening the panel. Rendered from the
+             same state the panel writes to; removing a chip clears that filter. -->
+        <div class="in-chips" hidden data-in-chips>
+          <span class="in-chip in-chip-adder" data-in-adder>
+            <button class="chip in-chip-add" type="button" data-in-add-btn
+                    aria-label="Add filter" aria-haspopup="menu" aria-expanded="false">
+              <svg class="icon"><use href="#i-plus"/></svg>
+            </button>
+            <div class="dropdown-menu in-chip-menu" hidden data-in-add-menu></div>
+          </span>
+        </div>
+
         <!-- Initiative tree — rows rendered from INITIATIVES below -->
         <div class="table-scroll in-table-scroll">
           <table class="table table-wide in-table" id="in-table">
@@ -4185,7 +4596,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   </div>
 
   <!-- New initiative — designmd Drawer, Regular (560) variant, content from
-       Figma "Drawer / Regular" (20307:80788). -->
+       Figma "Drawer / Regular" (20307:80788).
+       TopTrack roadmap ID 1 (resolved 2026-10-01): this drawer IS the MVP
+       Initiative Set-Up / Edit UI — no separate set-up page. All Set-Up / Edit
+       roadmap rows land here. See features/toptrack/PLAN.md. -->
   <div class="drawer-overlay" id="in-drawer-new" hidden>
     <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="in-drawer-new-title">
       <header class="drawer-header">
@@ -4195,12 +4609,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <input class="input in-name-input" id="in-name" type="text" placeholder="Add initiative name" aria-label="Initiative name" aria-required="true" aria-describedby="in-name-error" autocomplete="off" />
             <span class="field-hint is-error" id="in-name-error" hidden>Add a name to create this initiative.</span>
           </div>
-          <div class="in-drawer-tags"><span class="tag tag-blue">Initiative</span><span class="tag tag-light">Idea</span></div>
+          <div class="in-drawer-tags"><span class="tag tag-blue">Initiative</span><div class="dropdown in-stage"><button class="tag tag-light dropdown-trigger in-stage-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Stage: Idea">Idea</button><div class="dropdown-menu dropdown-menu-start in-stage-menu" role="menu" hidden><button class="dropdown-item is-selected" type="button" role="menuitemradio" aria-checked="true">Idea</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Opportunity assessment</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Definition</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Execution</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Impact assessment</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Complete</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">On hold</button><button class="dropdown-item" type="button" role="menuitemradio" aria-checked="false">Cancelled</button></div></div></div>
         </div>
         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
       </header>
       <div class="drawer-body in-form">
         <div class="in-form-rows">
+          <!-- TopTrack roadmap ID 5 — duplicate / related notice (designmd
+               .alert-warning). Prototype: shows when the name mentions "partner"
+               and points at Partner Enablement Program (a table row); real
+               matching is a fuzzy search over name, description, objectives. -->
+          <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
+            <svg class="icon alert-icon"><use href="#i-warning"/></svg>
+            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+          </div>
           <div class="in-form-row">
             <span class="field-label">Health</span>
             <div class="input-select">
@@ -4213,9 +4635,60 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               </div>
             </div>
           </div>
-          <div class="in-form-row">
+          <!-- TopTrack roadmap ID 6 — Executive sponsor, required, above
+               Accountable owner. Same person select as the rows below. -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label">Executive sponsor</span>
+            <div class="field">
+              <div class="input-select" id="in-sponsor">
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Executive sponsor" aria-required="true" aria-describedby="in-sponsor-error" type="button"><span class="input-select-value input-select-placeholder">Add executive sponsor</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" data-dropdown-search hidden>
+                  <div class="dropdown-search">
+                    <div class="input-icon input-icon-left">
+                      <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
+                    </div>
+                  </div>
+                  <div class="dropdown-list" data-dropdown-list>
+                    <button class="dropdown-item" type="button" data-initials="AK"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=47" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Aisha Khan</span><span class="dropdown-item-description">VP Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AJ"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Adan Jones</span><span class="dropdown-item-description">Head of Tech Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="DR"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Daniel Reyes</span><span class="dropdown-item-description">Engineering Lead</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MS"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Maria Santos</span><span class="dropdown-item-description">Marketing Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="NG"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=49" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MV"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Matthew Vella</span><span class="dropdown-item-description">You</span></div></button>
+                    <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
+                  </div>
+                </div>
+              </div>
+              <span class="field-hint is-error" id="in-sponsor-error" hidden>Add an executive sponsor to create this initiative.</span>
+            </div>
+          </div>
+          <!-- TopTrack roadmap IDs 8–9 — Beneficiary function, moved up from
+               "More details" to sit under Executive sponsor, now required.
+               (Feeds Slack channel naming later — P2, ID 24.) -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label in-label-tip">Beneficiary function <span class="in-tip" data-tooltip="The function that benefits from the outcome." tabindex="0" aria-label="The function that benefits from the outcome."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+            <div class="field">
+              <div class="input-select" id="in-beneficiary">
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Beneficiary function" aria-required="true" aria-describedby="in-beneficiary-error" type="button"><span class="input-select-value input-select-placeholder">Add beneficiary function</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" hidden>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketing</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Sales</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Engineering</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Operations</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>People</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Finance</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Product</button>
+                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Customer Success</button>
+                </div>
+              </div>
+              <span class="field-hint is-error" id="in-beneficiary-error" hidden>Add a beneficiary function to create this initiative.</span>
+            </div>
+          </div>
+          <div class="in-form-row in-row-top">
             <span class="field-label">Accountable owner</span>
-            <div class="input-select">
+            <div class="field">
+            <div class="input-select" id="in-owner">
               <button class="input-select-trigger" aria-expanded="false" aria-label="Accountable owner" type="button"><span class="avatar avatar-sm" data-select-avatar>MV</span><span class="input-select-value">Matthew Vella</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
               <div class="dropdown-menu" hidden>
                 <button class="dropdown-item is-selected" type="button" data-initials="MV"><span class="avatar avatar-md">MV</span><div class="dropdown-item-text"><span class="dropdown-item-label">Matthew Vella</span><span class="dropdown-item-description">You</span></div></button>
@@ -4226,10 +4699,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <button class="dropdown-item" type="button" data-initials="NG"><span class="avatar avatar-md">NG</span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
               </div>
             </div>
+              <span class="field-hint is-error" id="in-owner-error" hidden>Add an accountable owner to create this initiative.</span>
+            </div>
           </div>
-          <div class="in-form-row">
+          <div class="in-form-row in-row-top">
             <span class="field-label">Project manager</span>
-            <div class="input-select">
+            <div class="field">
+            <div class="input-select" id="in-pm">
               <button class="input-select-trigger" aria-expanded="false" aria-label="Project manager" type="button"><span class="input-select-value input-select-placeholder">Add project manager</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
               <div class="dropdown-menu" hidden>
                 <button class="dropdown-item" type="button" data-initials="MS"><span class="avatar avatar-md">MS</span><div class="dropdown-item-text"><span class="dropdown-item-label">Maria Santos</span><span class="dropdown-item-description">Marketing Manager</span></div></button>
@@ -4238,21 +4714,100 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 <button class="dropdown-item" type="button" data-initials="NG"><span class="avatar avatar-md">NG</span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
               </div>
             </div>
+              <span class="field-hint is-error" id="in-pm-error" hidden>Add a project manager to create this initiative.</span>
+            </div>
           </div>
-          <label class="in-form-row">
+          <!-- TopTrack roadmap ID 7 — Working team, multi-select people,
+               required (≥ 1), under Project manager. Same searchable photo
+               picker as Executive sponsor; stays open while you pick. -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label">Working team</span>
+            <div class="field">
+              <div class="input-select" id="in-team" data-multi>
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" data-dropdown-search hidden>
+                  <div class="dropdown-search">
+                    <div class="input-icon input-icon-left">
+                      <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
+                    </div>
+                  </div>
+                  <div class="dropdown-list" data-dropdown-list>
+                    <button class="dropdown-item" type="button" data-initials="AK"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=47" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Aisha Khan</span><span class="dropdown-item-description">VP Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AJ"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Adan Jones</span><span class="dropdown-item-description">Head of Tech Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="DR"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Daniel Reyes</span><span class="dropdown-item-description">Engineering Lead</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MS"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Maria Santos</span><span class="dropdown-item-description">Marketing Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="NG"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=49" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="TW"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=53" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Tomas Weil</span><span class="dropdown-item-description">Data Analyst</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="PN"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=44" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Priya Nair</span><span class="dropdown-item-description">Customer Success Lead</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MV"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Matthew Vella</span><span class="dropdown-item-description">You</span></div></button>
+                    <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
+                  </div>
+                </div>
+              </div>
+              <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
+            </div>
+          </div>
+          <!-- TopTrack roadmap ID 11 — Estimated duration, required, above
+               Start date. Fills End date = Start date + duration; editing End
+               date by hand flips it to Custom. -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label">Estimated duration</span>
+            <div class="field">
+              <div class="input-select" id="in-duration">
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Estimated duration" aria-required="true" aria-describedby="in-duration-error" type="button"><span class="input-select-value input-select-placeholder">Add estimated duration</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" hidden>
+                  <button class="dropdown-item" type="button" data-duration="lt1m"><svg class="dropdown-item-check"><use href="#i-check"/></svg>&lt; 1 month</button>
+                  <button class="dropdown-item" type="button" data-duration="1m"><svg class="dropdown-item-check"><use href="#i-check"/></svg>1 month</button>
+                  <button class="dropdown-item" type="button" data-duration="1q"><svg class="dropdown-item-check"><use href="#i-check"/></svg>1 quarter</button>
+                  <button class="dropdown-item" type="button" data-duration="2q"><svg class="dropdown-item-check"><use href="#i-check"/></svg>2 quarters</button>
+                  <button class="dropdown-item" type="button" data-duration="3q"><svg class="dropdown-item-check"><use href="#i-check"/></svg>3 quarters</button>
+                  <button class="dropdown-item" type="button" data-duration="4q"><svg class="dropdown-item-check"><use href="#i-check"/></svg>4 quarters</button>
+                  <button class="dropdown-item" type="button" data-duration="1y"><svg class="dropdown-item-check"><use href="#i-check"/></svg>1 year / Requires scoping</button>
+                  <button class="dropdown-item" type="button" data-duration="custom" hidden><svg class="dropdown-item-check"><use href="#i-check"/></svg>Custom</button>
+                </div>
+              </div>
+              <span class="field-hint is-error" id="in-duration-error" hidden>Add an estimated duration to create this initiative.</span>
+            </div>
+          </div>
+          <label class="in-form-row in-row-top">
             <span class="field-label">Start date</span>
-            <div class="input-icon input-icon-left">
+            <div class="field">
+              <div class="input-icon input-icon-left">
               <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
-              <input class="input" type="text" value="Sep 16, 2025" placeholder="" />
+              <input class="input" type="text" id="in-start" value="" placeholder="Add start date" aria-label="Start date" aria-required="true" aria-describedby="in-start-error" />
+            </div>
+              <span class="field-hint is-error" id="in-start-error" hidden>Add a start date to create this initiative.</span>
             </div>
           </label>
-          <label class="in-form-row">
+          <label class="in-form-row in-row-top">
             <span class="field-label">End date</span>
-            <div class="input-icon input-icon-left">
+            <div class="field">
+              <div class="input-icon input-icon-left">
               <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
-              <input class="input" type="text" placeholder="Add end date" />
+              <input class="input" type="text" id="in-end" placeholder="Add end date" aria-label="End date" aria-required="true" aria-describedby="in-end-error" />
+            </div>
+              <span class="field-hint is-error" id="in-end-error" hidden>Add an end date to create this initiative.</span>
             </div>
           </label>
+          <!-- TopTrack roadmap IDs 12–13 — impact quarters (optional; not in
+               ID 18's publish list). Next 8 quarters from today, built in JS.
+               Full impact can't be earlier than Initial impact.
+               Restored 2026-10-02 after being parked. -->
+          <div class="in-form-row">
+            <span class="field-label in-label-tip">Initial impact date <span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+            <div class="input-select" id="in-impact-initial">
+              <button class="input-select-trigger" aria-expanded="false" aria-label="Initial impact date" type="button"><span class="input-select-value input-select-placeholder">Add quarter</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+          </div>
+          <div class="in-form-row">
+            <span class="field-label in-label-tip">Full impact date <span class="in-tip" data-tooltip="The quarter you expect the initiative to reach its full impact." tabindex="0" aria-label="The quarter you expect the initiative to reach its full impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+            <div class="input-select" id="in-impact-full">
+              <button class="input-select-trigger" aria-expanded="false" aria-label="Full impact date" type="button"><span class="input-select-value input-select-placeholder">Add quarter</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+              <div class="dropdown-menu" hidden></div>
+            </div>
+          </div>
         </div>
 
         <label class="field in-desc" data-char-min="100" data-char-limit="2000">
@@ -4263,6 +4818,56 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <span class="field-hint field-hint-end editor-counter" id="in-desc-count" aria-live="polite"><span class="editor-counter-text">0 / 2000</span><svg class="editor-counter-ok" hidden><use href="#i-check"/></svg></span>
           </span>
         </label>
+
+        <!-- TopTrack roadmap ID 19 — Problem / Opportunity, required, below
+             Description (Description stays — ID 18 decision). Expects 2–3 lines. -->
+        <label class="field in-problem">
+          <span class="field-label in-label-tip">Problem / Opportunity <span class="in-tip" data-tooltip="Describe the problem this project will solve or the opportunity it will address. Focus on the current gap, need, or potential impact—not the proposed solution." tabindex="0" aria-label="About problem / opportunity"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <textarea class="input" id="in-problem" rows="3" maxlength="500" placeholder="What gap, need or opportunity does this initiative address?" aria-required="true" aria-describedby="in-problem-error in-problem-count"></textarea>
+          <span class="field-hint-row">
+            <span class="field-hint is-error" id="in-problem-error" hidden>Describe the problem or opportunity to create this initiative.</span>
+            <span class="field-hint field-hint-end editor-counter" id="in-problem-count" aria-live="polite"><span class="editor-counter-text">0 / 500</span></span>
+          </span>
+        </label>
+
+        <!-- TopTrack roadmap ID 20 — Objective(s), required (≥ 1 filled).
+             Rows built by the multi-entry list script: number · text · drag
+             handle · remove. Starts with 3 rows showing sample placeholders. -->
+        <div class="field in-multi" id="in-objectives" data-noun="objective" data-samples='["Establish a scalable partner management model", "Increase activation of strategic partners", "Improve visibility into partner performance"]'>
+          <span class="field-label in-label-tip">Objective(s) <span class="in-tip" data-tooltip="What is this initiative or project intended to achieve? Describe the desired outcome, not the activities or deliverables." tabindex="0" aria-label="About objectives"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <ol class="in-multi-list" aria-label="Objectives"></ol>
+          <span class="field-hint is-error" id="in-objectives-error" hidden>Add at least one objective to create this initiative.</span>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-multi-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add objective</button></span>
+        </div>
+
+        <!-- TopTrack roadmap ID 21 — Success metrics, required (≥ 1 filled).
+             Same multi-entry list as Objective(s), numbered for consistency. -->
+        <div class="field in-multi" id="in-metrics" data-noun="success metric" data-samples='["75% of strategic partners activated within 90 days", "Partner management model adopted as the standard way of working", "Leadership has a consistent view of partner performance"]'>
+          <span class="field-label in-label-tip">Success metrics <span class="in-tip" data-tooltip="How will we know this initiative or project was successful? Define the measurable outcomes or indicators of success. Metrics can be quantitative or qualitative." tabindex="0" aria-label="About success metrics"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <ol class="in-multi-list" aria-label="Success metrics"></ol>
+          <span class="field-hint is-error" id="in-metrics-error" hidden>Add at least one success metric to create this initiative.</span>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-multi-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add success metric</button></span>
+        </div>
+
+        <!-- Core strategy — Figma "New!" (37186:491383). Roadmap rows 2–3:
+             an optional switch; when on, Company strategic objective appears.
+             Objectives come from the admin-managed list (roadmap row 4). -->
+        <div class="in-form-rows in-core">
+          <label class="in-form-row">
+            <span class="field-label">Core strategy</span>
+            <span class="switch"><input type="checkbox" class="switch-input" id="in-core" aria-controls="in-core-objective" /><span class="switch-track"></span></span>
+          </label>
+          <div class="in-form-row" id="in-core-objective" hidden>
+            <span class="field-label">Company strategic objective</span>
+            <div class="input-select">
+              <button class="input-select-trigger" aria-expanded="false" aria-label="Company strategic objective" type="button"><span class="input-select-value input-select-placeholder">Select an objective</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+              <div class="dropdown-menu" hidden>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">World-class Talent Operations</span><span class="dropdown-item-description">Owned by Mark Brinton</span></div></button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">Service Strategy Execution</span><span class="dropdown-item-description">Owned by Robert Orshaw</span></div></button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <section class="in-section">
           <h3 class="in-section-title">Connections</h3>
@@ -4315,7 +4920,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="accordion-group borders-none in-section in-details">
           <div class="accordion is-open">
             <button class="accordion-summary" type="button" aria-expanded="true"><span class="accordion-title" data-open-label="Less details" data-closed-label="More details">Less details</span><svg class="icon accordion-chevron"><use href="#i-chevron-down"/></svg></button>
-            <div class="accordion-details"><div class="in-details-body"><div class="in-adds"><span class="in-add"><button class="btn btn-ghost in-link" type="button"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add beneficiary function</button><span class="in-tip" data-tooltip="The function that benefits from the outcome." tabindex="0" aria-label="The function that benefits from the outcome."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
+            <div class="accordion-details"><div class="in-details-body"><div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
                 <section class="in-section">
                   <h3 class="in-section-title">Documents</h3>
                   <div class="dropzone-field" data-dropzone>
@@ -4354,10 +4959,215 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       </div>
       <footer class="drawer-footer">
+        <!-- TopTrack roadmap ID 17 (P3) — Save as draft. Checks only the
+             draft-required subset; publish (Create) checks the full ID 18 list. -->
+        <button class="btn btn-secondary in-draft-btn" type="button" data-save-draft>Save as draft</button>
         <button class="btn btn-secondary" data-modal-close type="button">Cancel</button>
         <button class="btn btn-primary" type="button" data-create-initiative>Create Initiative</button>
       </footer>
     </aside>
+  </div>
+
+  <!-- View mode — Figma "Drawer / Regular" (20327:41665), extended with the
+       TopTrack set-up fields. Read-only label/value rows filled from the
+       saved initiative; "Edit initiative" switches to the edit drawer. -->
+  <div class="drawer-overlay" id="in-drawer-view" hidden>
+    <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="in-view-title">
+      <header class="drawer-header in-view-header">
+        <div class="in-view-heading">
+          <h2 class="in-view-title" id="in-view-title"></h2>
+          <div class="in-view-meta">
+            <span class="tag tag-blue">Initiative</span>
+            <span class="tag tag-light" data-view="stage"></span>
+            <span class="in-view-edited" data-view="edited"></span>
+          </div>
+        </div>
+        <div class="in-view-header-actions">
+          <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy link" data-tooltip="Copy link" data-view-copy><svg class="icon"><use href="#i-link"/></svg></button>
+          <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button>
+        </div>
+      </header>
+      <div class="drawer-body in-view-body">
+        <div class="tabs" role="tablist" aria-label="Initiative">
+          <button class="tab is-active" role="tab" aria-selected="true" type="button" data-view-tab="overview">Overview</button>
+          <button class="tab" role="tab" aria-selected="false" type="button" data-view-tab="activity">Activity log</button>
+        </div>
+        <div class="in-view-panel" data-view-panel="overview" role="tabpanel"></div>
+        <div class="in-view-panel" data-view-panel="activity" role="tabpanel" hidden></div>
+      </div>
+      <footer class="drawer-footer">
+        <button class="btn btn-secondary" type="button" data-view-edit>Edit initiative</button>
+      </footer>
+    </aside>
+  </div>
+
+
+  <!-- Filters — Figma 20902:88195. Floats under the toolbar's Filter button
+       with no backdrop, so the table stays readable while you narrow it, and
+       drags by its head. Rows carry no divider; only Show Archived does, since
+       it changes the scope rather than narrowing what is already in view. -->
+  <div class="in-filters" id="in-filters" hidden role="dialog" aria-label="Filters">
+    <div class="in-filters-head">
+      <p class="in-filters-title">FILTERS</p>
+      <button class="in-filters-clear" type="button" data-in-f-clear>Clear All</button>
+    </div>
+
+    <div class="in-filters-body">
+          <div class="in-f-row">
+            <span class="in-f-label">Name</span>
+            <div class="input-select in-f-field" data-in-f="name" data-in-f-placeholder="All">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="All">
+                  <span class="input-select-value" data-in-f-value>All</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+          </div>
+          <div class="in-f-row is-split">
+            <div class="in-f-col">
+              <span class="in-f-label">Accountable Owner</span>
+              <div class="input-select in-f-field" data-in-f="owner" data-in-f-placeholder="Owner">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Owner">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Owner</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+            </div>
+            <div class="in-f-col">
+              <span class="in-f-label">Accountable Function</span>
+              <div class="input-select in-f-field" data-in-f="fn" data-in-f-placeholder="Function">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Function">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Function</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+            </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Beneficiary Function</span>
+            <div class="input-select in-f-field" data-in-f="beneficiary" data-in-f-placeholder="Function">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Function">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Function</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Type</span>
+            <div class="in-f-checks">
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="type" value="Focus Area" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Focus Area</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="type" value="Activity" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Activity</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="type" value="Sub-activity" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Sub-activity</span></label>
+              </div>
+          </div>
+          <div class="in-f-row is-split">
+            <div class="in-f-col">
+              <span class="in-f-label">RoB Meeting</span>
+              <div class="input-select in-f-field" data-in-f="rob" data-in-f-placeholder="Meeting">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Meeting">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Meeting</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+            </div>
+            <div class="in-f-col">
+              <span class="in-f-label">Divisions</span>
+              <div class="input-select in-f-field" data-in-f="divisions" data-in-f-placeholder="Function">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Function">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Function</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+            </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Public Label</span>
+            <div class="input-select in-f-field" data-in-f="label" data-in-f-placeholder="Label">
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Label">
+                  <span class="input-select-value input-select-placeholder" data-in-f-value>Label</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-in-f-options></div>
+              </div>
+          </div>
+          <div class="in-f-row is-split">
+            <div class="in-f-col">
+              <span class="in-f-label">Start Date</span>
+              <div class="input-icon input-icon-left in-f-field in-f-date">
+                <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+                <input class="input" type="text" aria-label="Start Date" data-in-f="start" data-in-f-date />
+              </div>
+            </div>
+            <div class="in-f-col">
+              <span class="in-f-label is-auto">End Date</span>
+              <div class="input-icon input-icon-left in-f-field in-f-date">
+                <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+                <input class="input" type="text" aria-label="End Date" data-in-f="end" data-in-f-date />
+              </div>
+            </div>
+            <div class="in-f-col">
+              <span class="in-f-label is-auto">Est. Delivery Date</span>
+              <div class="input-icon input-icon-left in-f-field in-f-date">
+                <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+                <input class="input" type="text" aria-label="Est. Delivery Date" data-in-f="delivery" data-in-f-date />
+              </div>
+            </div>
+          </div>
+          <div class="in-f-row is-split">
+            <div class="in-f-col">
+              <span class="in-f-label">Created At</span>
+              <div class="input-icon input-icon-left in-f-field in-f-date">
+                <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+                <input class="input" type="text" aria-label="Created At" data-in-f="created" data-in-f-date />
+              </div>
+            </div>
+            <div class="in-f-col">
+              <span class="in-f-label">Updated At</span>
+              <div class="input-icon input-icon-left in-f-field in-f-date">
+                <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+                <input class="input" type="text" aria-label="Updated At" data-in-f="updated" data-in-f-date />
+              </div>
+            </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Status</span>
+            <div class="in-f-checks">
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Idea" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Idea</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Opportunity Assessment" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Opportunity Assessment</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Definition" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Definition</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Execution" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Execution</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Impact Assessment" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Impact Assessment</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Complete" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Complete</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="On Hold" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">On Hold</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="status" value="Cancelled" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Cancelled</span></label>
+              </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Health</span>
+            <div class="in-f-checks">
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="health" value="At Risk" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">At Risk</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="health" value="Off Track" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Off Track</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="health" value="Not Active" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Not Active</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-in-f="health" value="On Track" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">On Track</span></label>
+              </div>
+          </div>
+          <div class="in-f-row">
+            <span class="in-f-label">Roadmap</span>
+            <div class="in-f-checks">
+                <label class="radio"><input type="radio" class="radio-input" name="roadmap" data-in-f="roadmap" value="Show All" checked /><span class="radio-circle"></span><span class="radio-label">Show All</span></label>
+                <label class="radio"><input type="radio" class="radio-input" name="roadmap" data-in-f="roadmap" value="Have Roadmap" /><span class="radio-circle"></span><span class="radio-label">Have Roadmap</span></label>
+                <label class="radio"><input type="radio" class="radio-input" name="roadmap" data-in-f="roadmap" value="Don't Have Roadmap" /><span class="radio-circle"></span><span class="radio-label">Don't Have Roadmap</span></label>
+              </div>
+          </div>
+      <div class="in-f-row in-f-row-plain">
+        <label class="checkbox in-f-archived"><input type="checkbox" class="checkbox-input" data-in-f="archived" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Show Archived</span></label>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -4426,12 +5236,34 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (o && e.target === o) closeOverlay(o);
       });
       document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') document.querySelectorAll(OVERLAY).forEach(closeOverlay);
+        if (e.key !== 'Escape') return;
+        // A menu open inside the drawer takes the Escape — close it, keep the drawer.
+        const openMenus = [...document.querySelectorAll('.drawer-overlay:not([hidden]) .dropdown-menu:not([hidden])')];
+        if (openMenus.length) {
+          openMenus.forEach(m => {
+            m.hidden = true;
+            m.parentElement.querySelector('[aria-expanded="true"]')?.setAttribute('aria-expanded', 'false');
+          });
+          return;
+        }
+        document.querySelectorAll(OVERLAY).forEach(closeOverlay);
       });
 
       // Drawer form — single-select inputs (person options carry their avatar
       // into the trigger), inline title edit, "Less / More details" accordion.
       const form = document.querySelector('.in-form');
+
+      // Core strategy switch — the objective row only exists while it's on.
+      // Turning it off keeps the pick, so flipping back doesn't lose it.
+      const coreSwitch = document.getElementById('in-core');
+      const coreObjective = document.getElementById('in-core-objective');
+      coreSwitch?.addEventListener('change', () => {
+        coreObjective.hidden = !coreSwitch.checked;
+        if (!coreSwitch.checked) {
+          coreObjective.querySelector('.dropdown-menu').hidden = true;
+          coreObjective.querySelector('.input-select-trigger').setAttribute('aria-expanded', 'false');
+        }
+      });
       form?.querySelectorAll('.input-select').forEach(sel => {
         const trigger = sel.querySelector('.input-select-trigger');
         const menu = sel.querySelector('.dropdown-menu');
@@ -4447,6 +5279,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         menu.addEventListener('click', e => {
           const item = e.target.closest('.dropdown-item');
           if (!item) return;
+          if (sel.hasAttribute('data-multi')) {
+            // Multi-select: toggle, list picks in the trigger, keep the menu open.
+            item.classList.toggle('is-selected');
+            const picked = [...menu.querySelectorAll('.dropdown-item.is-selected')].map(i => i.textContent.trim());
+            value.textContent = picked.join(', ');
+            value.classList.toggle('input-select-placeholder', !picked.length);
+            return;
+          }
           menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === item));
           value.textContent = (item.querySelector('.dropdown-item-label') || item).textContent.trim();
           value.classList.remove('input-select-placeholder');
@@ -4458,7 +5298,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               av.setAttribute('data-select-avatar', '');
               trigger.prepend(av);
             }
-            av.textContent = item.dataset.initials;
+            // Photo avatars (designmd .avatar > img) carry their photo across;
+            // initials-only items carry their initials.
+            const photo = item.querySelector('.avatar > img');
+            if (photo) av.innerHTML = `<img src="${photo.src}" alt="" />`;
+            else av.textContent = item.dataset.initials;
           }
           close();
         });
@@ -4502,20 +5346,788 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       desc.addEventListener('input', updateDesc);
       updateDesc();
 
+      // Start date (roadmap ID 10) — defaults to today every time the drawer
+      // opens, formatted like the rest of the app ("Oct 1, 2026").
+      const startInput = document.getElementById('in-start');
+      const todayLabel = () => new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const setStartToday = () => { startInput.value = todayLabel(); };
+      setStartToday();
+      document.querySelectorAll('[data-modal-open="in-drawer-new"]').forEach(btn => btn.addEventListener('click', setStartToday));
+
+      // Drawer tooltips — rendered in a fixed layer so the scrolling drawer
+      // body can't clip them. Top by default; flips below when there's no
+      // room, and clamps to the viewport sides.
+      (() => {
+        const tip = document.createElement('div');
+        tip.className = 'in-float-tip';
+        tip.setAttribute('role', 'tooltip');
+        document.body.append(tip);
+        let current = null;
+        const GAP = 6, EDGE = 8;
+        const show = el => {
+          current = el;
+          tip.textContent = el.getAttribute('data-tooltip');
+          tip.classList.remove('is-visible');
+          const r = el.getBoundingClientRect(), t = tip.getBoundingClientRect();
+          let top = r.top - t.height - GAP;
+          if (el.dataset.placement === 'bottom' || top < EDGE) top = r.bottom + GAP;
+          const left = Math.min(Math.max(r.left + r.width / 2 - t.width / 2, EDGE), innerWidth - t.width - EDGE);
+          tip.style.top = `${top}px`; tip.style.left = `${left}px`;
+          requestAnimationFrame(() => tip.classList.add('is-visible'));
+        };
+        const hide = () => { current = null; tip.classList.remove('is-visible'); };
+        const target = e => e.target.closest?.('.drawer [data-tooltip]');
+        document.addEventListener('mouseover', e => { const el = target(e); if (el && el !== current) show(el); });
+        document.addEventListener('mouseout', e => { const el = target(e); if (el && !el.contains(e.relatedTarget)) hide(); });
+        document.addEventListener('focusin', e => { const el = target(e); if (el) show(el); });
+        document.addEventListener('focusout', e => { if (target(e)) hide(); });
+        // Scrolling the drawer would leave the tip floating in the wrong place.
+        document.addEventListener('scroll', hide, true);
+      })();
+
+      // Duplicate notice (ID 5) — prototype rule: a name containing "partner"
+      // matches the existing Partner Enablement Program. The match line reads
+      // that initiative's row, so status and owner can't drift from the table.
+      const dupAlert = document.getElementById('in-dup-alert');
+      const DUP = { trigger: /partner/i, name: 'Partner Enablement Program' };
+      const updateDup = () => {
+        const hit = DUP.trigger.test(nameInput.value);
+        dupAlert.hidden = !hit;
+        if (!hit) return;
+        const n = (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(x => x.name === DUP.name);
+        if (!n) return;
+        const match = dupAlert.querySelector('.in-dup-match');
+        match.querySelector('[data-dup-link]').textContent = n.name;
+        match.lastChild.textContent = ` · ${n.status} · Owned by ${n.owner.name}`;
+      };
+      nameInput.addEventListener('input', updateDup);
+      // The name is a link so the "go look at it first" path is visible.
+      // Placeholder for now — it doesn't navigate anywhere yet.
+      dupAlert.querySelector('[data-dup-link]').addEventListener('click', e => e.preventDefault());
+
+      // Required single-selects (roadmap IDs 6, 9) — Create flags an empty
+      // one in red; picking an option clears it; a successful Create resets it.
+      const requiredSelect = (id, placeholder) => {
+        const el = document.getElementById(id);
+        const trigger = el.querySelector('.input-select-trigger');
+        const error = document.getElementById(`${id}-error`);
+        const setError = on => {
+          trigger.classList.toggle('is-error', on);
+          trigger.setAttribute('aria-invalid', String(on));
+          error.hidden = !on;
+        };
+        el.querySelector('.dropdown-menu').addEventListener('click', e => {
+          if (e.target.closest('.dropdown-item')) setError(false);
+        });
+        return {
+          el, trigger, setError,
+          missing: () => !el.querySelector('.dropdown-item.is-selected'),
+          reset: () => {
+            setError(false);
+            el.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+            trigger.querySelector('[data-select-avatar]')?.remove();
+            const v = trigger.querySelector('.input-select-value');
+            v.textContent = placeholder;
+            v.classList.add('input-select-placeholder');
+          },
+        };
+      };
+      const sponsorField = requiredSelect('in-sponsor', 'Add executive sponsor');
+      const beneficiaryField = requiredSelect('in-beneficiary', 'Add beneficiary function');
+      const ownerField = requiredSelect('in-owner', 'Add accountable owner');
+      ownerField.keepOnReset = true; // defaults to the creator
+      const pmField = requiredSelect('in-pm', 'Add project manager');
+      const teamField = requiredSelect('in-team', 'Add working team');
+      const durationField = requiredSelect('in-duration', 'Add estimated duration');
+      // ID 18 — everything required to publish, in form order.
+      const requiredSelects = [sponsorField, beneficiaryField, ownerField, pmField, teamField, durationField];
+
+      // Required dates (ID 18) — empty or unreadable text is an error.
+      const requiredDate = id => {
+        const input = document.getElementById(id);
+        const error = document.getElementById(`${id}-error`);
+        const base = error.textContent;
+        const setError = (on, msg = base) => {
+          input.classList.toggle('is-error', on);
+          input.setAttribute('aria-invalid', String(on));
+          error.textContent = msg; error.hidden = !on;
+        };
+        const problem = () => !input.value.trim() ? base : isNaN(Date.parse(input.value)) ? 'Enter a date like Oct 1, 2026.' : null;
+        input.addEventListener('input', () => { if (!problem()) setError(false); });
+        return { trigger: input, setError, missing: () => !!problem(), check: () => { const p = problem(); setError(!!p, p || base); return !!p; } };
+      };
+      const requiredDates = [requiredDate('in-start'), requiredDate('in-end')];
+
+      // Estimated duration (roadmap ID 11) → End date.
+      //   < 1 month = +2 weeks · 1 month = +1 · 1–4 quarters = +3/6/9/12 months
+      //   1 year / Requires scoping = +12 months (End date is always required, ID 18)
+      // Start date changes recalculate; typing an End date flips to Custom.
+      const endInput = document.getElementById('in-end');
+      const durationMenu = durationField.el.querySelector('.dropdown-menu');
+      const customItem = durationMenu.querySelector('[data-duration="custom"]');
+      const DURATION = { lt1m: { days: 14 }, '1m': { months: 1 }, '1q': { months: 3 }, '2q': { months: 6 }, '3q': { months: 9 }, '4q': { months: 12 }, '1y': { months: 12 } };
+      const fmtDate = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const addTo = (date, { days = 0, months = 0 }) => {
+        const d = new Date(date);
+        if (months) {
+          const day = d.getDate();
+          d.setDate(1); d.setMonth(d.getMonth() + months);
+          // Clamp: Jan 31 + 1 month = Feb 28/29, not Mar 3.
+          d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
+        }
+        d.setDate(d.getDate() + days);
+        return d;
+      };
+      const currentDuration = () => durationMenu.querySelector('.dropdown-item.is-selected')?.dataset.duration || null;
+      const applyDuration = () => {
+        const key = currentDuration();
+        if (!key || key === 'custom') return;
+        const rule = DURATION[key];
+        const start = new Date(Date.parse(startInput.value));
+        endInput.value = rule && !isNaN(start) ? fmtDate(addTo(start, rule)) : '';
+        if (endInput.value) requiredDates[1].setError(false); // auto-fill clears a stale error
+      };
+      durationMenu.addEventListener('click', e => {
+        const item = e.target.closest('.dropdown-item');
+        if (!item) return;
+        if (item !== customItem) customItem.hidden = true;
+        applyDuration();
+      });
+      startInput.addEventListener('input', applyDuration);
+      endInput.addEventListener('input', () => {
+        if (!currentDuration() || currentDuration() === 'custom') return;
+        customItem.hidden = false;
+        customItem.click(); // selects Custom through the shared select handler
+      });
+      // Impact quarters (roadmap IDs 12–13): current quarter + the next 7.
+      const quarterList = (() => {
+        const now = new Date();
+        let q = Math.floor(now.getMonth() / 3) + 1, y = now.getFullYear();
+        return Array.from({ length: 8 }, (_, i) => {
+          const label = `Q${q} ${y}`;
+          const idx = y * 4 + q;           // sortable
+          if (++q > 4) { q = 1; y++; }
+          return { label, idx };
+        });
+      })();
+      const impactInitial = document.getElementById('in-impact-initial');
+      const impactFull = document.getElementById('in-impact-full');
+      const impactOn = !!(impactInitial && impactFull); // rows parked → skip
+      if (impactOn) [impactInitial, impactFull].forEach(el => {
+        el.querySelector('.dropdown-menu').innerHTML = quarterList.map(({ label, idx }) =>
+          `<button class="dropdown-item" type="button" data-q="${idx}"><svg class="dropdown-item-check"><use href="#i-check"/></svg>${label}</button>`).join('');
+      });
+      const pickedQ = el => +(el.querySelector('.dropdown-item.is-selected')?.dataset.q || 0);
+      const clearSelect = (el, placeholder) => {
+        el.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+        const v = el.querySelector('.input-select-value');
+        v.textContent = placeholder; v.classList.add('input-select-placeholder');
+      };
+      // Picking Initial hides earlier quarters from Full, and clears Full if
+      // it was set earlier than the new Initial.
+      impactInitial?.querySelector('.dropdown-menu').addEventListener('click', e => {
+        if (!e.target.closest('.dropdown-item')) return;
+        const min = pickedQ(impactInitial);
+        impactFull.querySelectorAll('.dropdown-item').forEach(i => { i.hidden = +i.dataset.q < min; });
+        if (pickedQ(impactFull) && pickedQ(impactFull) < min) clearSelect(impactFull, 'Add quarter');
+      });
+      const resetImpact = () => {
+        if (!impactOn) return;
+        clearSelect(impactInitial, 'Add quarter'); clearSelect(impactFull, 'Add quarter');
+        impactFull.querySelectorAll('.dropdown-item').forEach(i => { i.hidden = false; });
+      };
+
+      const resetDuration = () => { customItem.hidden = true; endInput.value = ''; };
+      const sponsor = sponsorField.el, sponsorTrigger = sponsorField.trigger;
+      document.querySelectorAll('[data-modal-open="in-drawer-new"]').forEach(btn => btn.addEventListener('click', applyDuration));
+
+      // Person-picker search (Executive sponsor, Working team): filters name
+      // + role as you type; Enter picks the first match. Opening the menu
+      // focuses the search and starts it empty.
+      const personSearch = el => {
+        const trigger = el.querySelector('.input-select-trigger');
+        const input = el.querySelector('[data-dropdown-search-input]');
+        const empty = el.querySelector('[data-dropdown-empty]');
+        const filter = () => {
+          const q = input.value.trim().toLowerCase();
+          let shown = 0;
+          el.querySelectorAll('[data-dropdown-list] .dropdown-item').forEach(i => {
+            const hit = !q || i.textContent.toLowerCase().includes(q);
+            i.hidden = !hit;
+            if (hit) shown++;
+          });
+          empty.hidden = shown > 0;
+        };
+        input.addEventListener('input', filter);
+        input.addEventListener('keydown', e => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          el.querySelector('[data-dropdown-list] .dropdown-item:not([hidden])')?.click();
+        });
+        trigger.addEventListener('click', () => {
+          if (trigger.getAttribute('aria-expanded') !== 'true') return;
+          input.value = ''; filter();
+          requestAnimationFrame(() => input.focus());
+        });
+      };
+      personSearch(sponsor);
+
+      // Working team (ID 7) — multi-select. The shared select handler toggles
+      // items; this repaints the trigger as an avatar stack + "Name +N".
+      const team = document.getElementById('in-team');
+      personSearch(team);
+      const paintTeam = () => {
+        const trigger = team.querySelector('.input-select-trigger');
+        const value = trigger.querySelector('.input-select-value');
+        const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
+        trigger.querySelector('[data-select-avatar]')?.remove();
+        if (!picked.length) {
+          value.textContent = 'Add working team';
+          value.classList.add('input-select-placeholder');
+          return;
+        }
+        const stack = document.createElement('span');
+        stack.className = 'in-avatar-stack';
+        stack.setAttribute('data-select-avatar', '');
+        stack.innerHTML = picked.slice(0, 3).map(i => `<span class="avatar avatar-sm"><img src="${i.querySelector('img').src}" alt="" /></span>`).join('');
+        trigger.prepend(stack);
+        const first = picked[0].querySelector('.dropdown-item-label').textContent;
+        value.textContent = picked.length === 1 ? first : `${first} +${picked.length - 1}`;
+        value.classList.remove('input-select-placeholder');
+        trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
+      };
+      team.querySelector('.dropdown-menu').addEventListener('click', e => {
+        if (e.target.closest('.dropdown-item')) paintTeam();
+      });
+
+      // Multi-entry lists (roadmap IDs 20–21). Rows: number · input · drag
+      // handle · remove. The last row can't be removed. Drag by the handle;
+      // Alt+↑/↓ on a row's input (or ↑/↓ on the handle) moves it too.
+      const multiList = root => {
+        const list = root.querySelector('.in-multi-list');
+        const noun = root.dataset.noun;
+        const samples = JSON.parse(root.dataset.samples || '[]');
+        const error = root.querySelector('.field-hint.is-error');
+        const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const rows = () => [...list.children];
+        const renumber = () => {
+          const all = rows();
+          all.forEach((li, i) => {
+            li.querySelector('.in-multi-num').textContent = `${i + 1}.`;
+            li.querySelector('input').setAttribute('aria-label', `${noun[0].toUpperCase() + noun.slice(1)} ${i + 1}`);
+            li.querySelector('[data-multi-remove]').disabled = all.length === 1;
+          });
+        };
+        const addRow = (placeholder = '', focus = false) => {
+          const li = document.createElement('li');
+          li.className = 'in-multi-row';
+          li.innerHTML = `<span class="in-multi-num" aria-hidden="true"></span>`
+            + `<input class="input" type="text" maxlength="200" placeholder="${esc(placeholder)}" />`
+            + `<button class="btn btn-icon-only btn-ghost btn-xs in-multi-handle" type="button" aria-label="Reorder ${noun}" data-tooltip="Drag to reorder"><svg class="icon"><use href="#i-drag"/></svg></button>`
+            + `<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove ${noun}" data-multi-remove><svg class="icon"><use href="#i-x"/></svg></button>`;
+          list.append(li);
+          renumber();
+          if (focus) li.querySelector('input').focus();
+          return li;
+        };
+        const move = (li, dir) => {
+          const sib = dir < 0 ? li.previousElementSibling : li.nextElementSibling;
+          if (!sib) return;
+          dir < 0 ? sib.before(li) : sib.after(li);
+          renumber();
+        };
+        const filled = () => rows().some(li => li.querySelector('input').value.trim());
+        const setError = on => {
+          error.hidden = !on;
+          rows().forEach(li => li.querySelector('input').classList.toggle('is-error', on));
+        };
+        const reset = () => { list.innerHTML = ''; samples.forEach(p => addRow(p)); if (!samples.length) addRow(); setError(false); };
+
+        root.querySelector('[data-multi-add]').addEventListener('click', () => addRow('', true));
+        list.addEventListener('click', e => {
+          const rm = e.target.closest('[data-multi-remove]');
+          if (!rm || rm.disabled) return;
+          const li = rm.closest('li');
+          const next = li.nextElementSibling || li.previousElementSibling;
+          li.remove(); renumber();
+          next?.querySelector('input').focus();
+        });
+        list.addEventListener('input', () => { if (filled()) setError(false); });
+        list.addEventListener('keydown', e => {
+          const li = e.target.closest('li'); if (!li) return;
+          const onHandle = e.target.closest('.in-multi-handle');
+          if ((e.altKey || onHandle) && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            e.preventDefault();
+            move(li, e.key === 'ArrowUp' ? -1 : 1);
+            (onHandle ? li.querySelector('.in-multi-handle') : li.querySelector('input')).focus();
+          } else if (e.key === 'Enter' && e.target.matches('input')) {
+            e.preventDefault(); // Enter adds a row below, like a list editor
+            const nli = addRow('', true); li.after(nli); renumber();
+          }
+        });
+        // Drag by the handle only — the row becomes draggable while the
+        // handle is held, so selecting text in the input still works.
+        let dragging = null;
+        list.addEventListener('pointerdown', e => {
+          const h = e.target.closest('.in-multi-handle');
+          if (h) h.closest('li').draggable = true;
+        });
+        list.addEventListener('dragstart', e => {
+          dragging = e.target.closest('li');
+          if (!dragging) return;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', '');
+          requestAnimationFrame(() => dragging?.classList.add('is-dragging'));
+        });
+        const clearMarks = () => rows().forEach(li => li.classList.remove('is-drop-before', 'is-drop-after'));
+        list.addEventListener('dragover', e => {
+          if (!dragging) return;
+          e.preventDefault();
+          const li = e.target.closest('li'); clearMarks();
+          if (!li || li === dragging) return;
+          const r = li.getBoundingClientRect();
+          li.classList.add(e.clientY < r.top + r.height / 2 ? 'is-drop-before' : 'is-drop-after');
+        });
+        list.addEventListener('drop', e => {
+          if (!dragging) return;
+          e.preventDefault();
+          const li = e.target.closest('li');
+          if (li && li !== dragging) li.classList.contains('is-drop-before') ? li.before(dragging) : li.after(dragging);
+          clearMarks(); renumber();
+        });
+        list.addEventListener('dragend', () => {
+          if (dragging) { dragging.classList.remove('is-dragging'); dragging.draggable = false; }
+          dragging = null; clearMarks();
+        });
+
+        const values = () => rows().map(li => li.querySelector('input').value);
+        const setValues = vals => {
+          if (!vals || !vals.length) { reset(); return; }
+          list.innerHTML = '';
+          vals.forEach((v, i) => { addRow(samples[i] || '').querySelector('input').value = v; });
+          setError(false);
+        };
+        reset();
+        return { missing: () => !filled(), setError, reset, focus: () => list.querySelector('input').focus(), values, setValues };
+      };
+      const objectives = multiList(document.getElementById('in-objectives'));
+      const metrics = multiList(document.getElementById('in-metrics'));
+
+      // Problem / Opportunity (ID 19) — required free text with a 500 cap.
+      const problem = document.getElementById('in-problem');
+      const problemError = document.getElementById('in-problem-error');
+      const problemCount = document.querySelector('#in-problem-count .editor-counter-text');
+      const setProblemError = on => {
+        problem.classList.toggle('is-error', on);
+        problem.setAttribute('aria-invalid', String(on));
+        problemError.hidden = !on;
+      };
+      problem.addEventListener('input', () => {
+        problemCount.textContent = `${problem.value.length} / 500`;
+        if (problem.value.trim()) setProblemError(false);
+      });
+
+      // Toast — global helper that spawns a notification in the top-right region.
+      //   toast({ variant: 'success', message: 'Saved.' })
+      //   toast({ variant: 'error', message: '…', behavior: 'persistent' })
+      //   toast({ variant: 'neutral', message: '…', behavior: 'action', action: { label: 'Undo', onClick: () => {…} } })
+      window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
+        let region = document.querySelector('.toast-region');
+        if (!region) {
+          region = document.createElement('div');
+          region.className = 'toast-region';
+          region.setAttribute('aria-live', 'polite');
+          region.setAttribute('aria-atomic', 'false');
+          document.body.appendChild(region);
+        }
+        const defaultIcon = { neutral: 'info', info: 'info', success: 'done', warning: 'warning', error: 'exclamation-solid' }[variant] || 'info';
+        const el = document.createElement('div');
+        el.className = `toast toast-${variant} is-entering`;
+        el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+        // Neutral is a plain message toast — no leading icon and no action CTA.
+        const iconHTML   = (variant === 'neutral' && !icon) ? '' : `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg>`;
+        const actionHTML = (variant !== 'neutral' && behavior === 'action' && action) ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
+        const closeHTML  = behavior !== 'timed' ? `<button type="button" class="btn btn-icon-only btn-ghost btn-xs toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>` : '';
+        el.innerHTML = `${iconHTML}<p class="toast-message"></p>${actionHTML}${closeHTML}`;
+        el.querySelector('.toast-message').textContent = message;
+        region.appendChild(el);
+        // Trigger entrance transition on next frame
+        requestAnimationFrame(() => el.classList.remove('is-entering'));
+
+        const dismiss = () => {
+          if (!el.isConnected) return;
+          el.classList.add('is-leaving');
+          const cleanup = () => el.remove();
+          el.addEventListener('transitionend', cleanup, { once: true });
+          setTimeout(cleanup, 400); // fallback if transitionend doesn't fire
+        };
+
+        el.querySelector('.toast-close')?.addEventListener('click', dismiss);
+        if (behavior === 'action' && action) {
+          el.querySelector('.toast-action').addEventListener('click', () => {
+            try { action.onClick?.(); } catch (e) { /* swallow */ }
+            dismiss();
+          });
+        }
+        if (behavior === 'timed') {
+          setTimeout(dismiss, timeout);
+        }
+        return { dismiss };
+      };
+
+      // Drawer → table: read the form into an initiative row. A draft keeps
+      // its row id so saving again, or publishing, updates the same row.
+      let draftId = null;
+      const HEALTH_FROM_LABEL = { 'On track': 'on', 'At risk': 'risk', 'Off track': 'off', 'Not active': 'na' };
+      const selectedOf = id => document.querySelector(`#${id} .dropdown-item.is-selected`);
+      const isoFrom = text => { const d = new Date(Date.parse(text)); return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+      const readInitiative = asDraft => {
+        const ownerItem = selectedOf('in-owner');
+        const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim();
+        const stage = document.querySelector('#in-drawer-new .in-stage-trigger')?.textContent.trim() || 'Idea';
+        return {
+          name: nameInput.value.trim() || 'Untitled initiative',
+          fn: selectedOf('in-beneficiary')?.textContent.trim() || '—',
+          status: asDraft ? 'Draft' : stage,
+          draft: asDraft,
+          health: HEALTH_FROM_LABEL[healthLabel] || 'na',
+          owner: {
+            name: ownerItem?.querySelector('.dropdown-item-label')?.textContent.trim() || 'Matthew Vella',
+            role: ownerItem?.querySelector('.dropdown-item-description')?.textContent.trim() || '',
+            initials: ownerItem?.dataset.initials || 'MV',
+          },
+          roadmap: isoFrom(endInput.value),
+          created: isoFrom(new Date().toDateString()),
+        };
+      };
+
+      // Save as draft (ID 17) — no validation: a draft can be saved at any
+      // point, even empty. Any errors left from an earlier Create attempt are
+      // cleared, since a draft isn't being checked.
+      document.querySelector('[data-save-draft]')?.addEventListener('click', () => {
+        setNameError(false);
+        requiredSelects.forEach(f => f.setError(false));
+        requiredDates.forEach(f => f.setError(false));
+        descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+        const data = { ...readInitiative(true), editable: true };
+        const name = data.name;
+        draftId = window.inUpsertInitiative?.(data, draftId) ?? draftId;
+        if (draftId) { drafts[draftId] = snapshot(); (activity[draftId] ||= []).push({ what: 'saved a draft', at: Date.now() }); }
+        closeOverlay(document.getElementById('in-drawer-new'));
+        window.toast({ variant: 'success', message: `“${name}” saved as a draft.` });
+      });
+
+      // ---- Draft snapshots: reopen a draft row with everything it had ----
+      // A snapshot records the drawer: name, stage, every select's picks (by
+      // item index), dates, text, the Core strategy switch and the
+      // Objective / Success metric rows. Restoring replays the picks through
+      // the same handlers a click would, so triggers, avatars and dependent
+      // fields (End date, Full impact, the objective row) all follow.
+      const drawerEl = document.getElementById('in-drawer-new');
+      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')];
+      formSelects.forEach(el => {
+        const v = el.querySelector('.input-select-value');
+        el.dataset.ph = v?.classList.contains('input-select-placeholder') ? v.textContent : '';
+      });
+      const stageItems = () => [...drawerEl.querySelectorAll('.in-stage-menu .dropdown-item')];
+      const coreSwitchEl = document.getElementById('in-core');
+      const snapshot = () => ({
+        name: nameInput.value,
+        stage: stageItems().findIndex(i => i.classList.contains('is-selected')),
+        core: coreSwitchEl.checked,
+        selects: formSelects.map(el => [...el.querySelectorAll('.dropdown-item')]
+          .map((it, i) => it.classList.contains('is-selected') ? i : -1).filter(i => i >= 0)),
+        start: startInput.value, end: endInput.value,
+        desc: desc.value, problem: problem.value,
+        objectives: objectives.values(), metrics: metrics.values(),
+      });
+      const clearSelectFully = el => {
+        el.querySelectorAll('.dropdown-item').forEach(i => {
+          i.classList.remove('is-selected');
+          i.hidden = i.dataset.duration === 'custom';
+        });
+        el.querySelectorAll('[data-dropdown-search-input]').forEach(i => { i.value = ''; });
+        el.querySelector('[data-dropdown-empty]')?.setAttribute('hidden', '');
+        const trigger = el.querySelector('.input-select-trigger');
+        trigger.querySelector('[data-select-avatar]')?.remove();
+        const v = trigger.querySelector('.input-select-value');
+        if (el.dataset.ph) { v.textContent = el.dataset.ph; v.classList.add('input-select-placeholder'); }
+      };
+      const restore = snap => {
+        nameInput.value = snap.name;
+        updateDup();
+        if (snap.stage >= 0) stageItems()[snap.stage]?.click();
+        coreSwitchEl.checked = snap.core;
+        coreSwitchEl.dispatchEvent(new Event('change'));
+        formSelects.forEach((el, k) => {
+          clearSelectFully(el);
+          const items = [...el.querySelectorAll('.dropdown-item')];
+          (snap.selects[k] || []).forEach(i => { const it = items[i]; if (!it) return; it.hidden = false; it.click(); });
+        });
+        document.body.click(); // close anything a replayed click opened
+        startInput.value = snap.start;
+        endInput.value = snap.end;              // after the duration replay, which recalculates it
+        desc.value = snap.desc; desc.dispatchEvent(new Event('input'));
+        problem.value = snap.problem; problem.dispatchEvent(new Event('input'));
+        objectives.setValues(snap.objectives);
+        metrics.setValues(snap.metrics);
+        setNameError(false);
+        requiredSelects.forEach(f => f.setError(false));
+        requiredDates.forEach(f => f.setError(false));
+        descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+      };
+      const BLANK = snapshot();
+      // Snapshots for every row the drawer has made — drafts and published.
+      const drafts = {};
+      // Editing a published initiative: primary button reads "Save changes"
+      // and Save as draft is hidden (a published initiative can't go back to
+      // being a draft from here).
+      const createActionBtn = document.querySelector('[data-create-initiative]');
+      const draftBtn = document.querySelector('[data-save-draft]');
+      let editingPublished = false;
+      const setMode = published => {
+        editingPublished = published;
+        createActionBtn.textContent = published ? 'Save changes' : 'Create Initiative';
+        draftBtn.hidden = published;
+      };
+      const createBtnEl = document.querySelector('[data-modal-open="in-drawer-new"]');
+      // "Create Initiative" always starts a fresh initiative; drafts reopen
+      // from their row instead.
+      createBtnEl.addEventListener('click', () => {
+        draftId = null;
+        setMode(false);
+        restore({ ...BLANK, start: startInput.value });
+      });
+      // ---- View mode (Figma 20327:41665) ----
+      // Built from the drawer form: the saved snapshot is restored into the
+      // (closed) edit drawer, then read back as labels, avatars and text.
+      const viewEl = document.getElementById('in-drawer-view');
+      const viewPanel = viewEl.querySelector('[data-view-panel="overview"]');
+      const activityPanel = viewEl.querySelector('[data-view-panel="activity"]');
+      const activity = {}; // id → [{ what, at }]
+      const vEsc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const EMPTY = '<span class="in-view-empty">—</span>';
+      const pickedItems = id => [...document.querySelectorAll(`#${id} .dropdown-item.is-selected`)];
+      const label = it => (it.querySelector('.dropdown-item-label') || it).textContent.trim();
+      const person = it => {
+        if (!it) return '<span class="in-view-person"><span class="avatar avatar-md"><svg class="icon"><use href="#i-user"/></svg></span><span class="in-view-empty">To be assigned</span></span>';
+        const img = it.querySelector('.avatar img');
+        const av = img ? `<img src="${img.src}" alt="" />` : vEsc(it.dataset.initials || '');
+        const role = it.querySelector('.dropdown-item-description')?.textContent.trim();
+        return `<span class="in-view-person"><span class="avatar avatar-md">${av}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(it))}</a>${role ? `<span class="in-view-person-role">${vEsc(role)}</span>` : ''}</span></span>`;
+      };
+      const textOr = v => v && v.trim() ? vEsc(v.trim()) : EMPTY;
+      const row = (dt, dd) => `<div class="in-view-row"><dt>${dt}</dt><dd>${dd}</dd></div>`;
+      const timeAgo = t => {
+        const m = Math.round((Date.now() - t) / 60000);
+        return m < 1 ? 'just now' : m < 60 ? `${m} minute${m === 1 ? '' : 's'} ago` : `${Math.round(m / 60)} hours ago`;
+      };
+      const renderView = id => {
+        const stage = drawerEl.querySelector('.in-stage-trigger')?.textContent.trim() || 'Idea';
+        const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim() || 'Not active';
+        const HCLS = { 'On track': 'tag-positive', 'At risk': 'tag-warning', 'Off track': 'tag-negative', 'Not active': 'in-health-na' };
+        const team = pickedItems('in-team');
+        const objs = objectives.values().filter(v => v.trim());
+        const mets = metrics.values().filter(v => v.trim());
+        const coreOn = coreSwitchEl.checked;
+        const coreObj = pickedItems('in-core-objective')[0];
+        const sel1 = id => pickedItems(id)[0];
+        const log = activity[id] || [];
+        const last = log[log.length - 1];
+
+        viewEl.querySelector('#in-view-title').textContent = nameInput.value.trim() || 'Untitled initiative';
+        viewEl.querySelector('[data-view="stage"]').textContent = stage;
+        viewEl.querySelector('[data-view="edited"]').innerHTML = last
+          ? `Last edit was made ${timeAgo(last.at)} by <a href="#" data-view-dead>Matthew Vella</a>`
+          : '';
+
+        viewPanel.innerHTML = `
+          <dl class="in-view-rows">
+            ${row('Health', `<span class="tag tag-indicator ${HCLS[healthLabel] || 'in-health-na'}">${vEsc(healthLabel)}</span>`)}
+            ${row('Executive sponsor', sel1('in-sponsor') ? person(sel1('in-sponsor')) : EMPTY)}
+            ${row('Beneficiary function', sel1('in-beneficiary')
+              ? `<span class="in-view-person"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(sel1('in-beneficiary')))}</a><span class="in-view-person-role">Function</span></span></span>`
+              : EMPTY)}
+            ${row('Accountable owner', person(sel1('in-owner')))}
+            ${row('Project manager', person(sel1('in-pm')))}
+            ${row('Working team', team.length
+              ? `<span class="in-view-team"><span class="in-avatar-stack">${team.slice(0, 5).map(t => `<span class="avatar avatar-sm"><img src="${t.querySelector('img').src}" alt="" /></span>`).join('')}</span><span class="in-view-team-names">${team.map(t => vEsc(label(t))).join(', ')}</span></span>`
+              : EMPTY)}
+            ${row('Estimated duration', sel1('in-duration') ? vEsc(label(sel1('in-duration'))) : EMPTY)}
+            ${row('Start date', textOr(startInput.value))}
+            ${row('End date', textOr(endInput.value))}
+            ${document.getElementById('in-impact-initial') ? row('Initial impact date', sel1('in-impact-initial') ? vEsc(label(sel1('in-impact-initial'))) : EMPTY) : ''}
+            ${document.getElementById('in-impact-full') ? row('Full impact date', sel1('in-impact-full') ? vEsc(label(sel1('in-impact-full'))) : EMPTY) : ''}
+            ${row('Core strategy', coreOn ? `<span class="tag tag-blue">Core strategy</span>` : '<span class="in-view-empty">No</span>')}
+            ${coreOn ? row('Company strategic objective', coreObj ? vEsc(label(coreObj)) : EMPTY) : ''}
+          </dl>
+          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${textOr(desc.value)}</p></div>
+          <div class="in-view-block"><h3>Problem / Opportunity</h3><p class="in-view-text">${textOr(problem.value)}</p></div>
+          <div class="in-view-block"><h3>Objective(s)</h3>${objs.length ? `<ol class="in-view-list">${objs.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <div class="in-view-block"><h3>Success metrics</h3>${mets.length ? `<ol class="in-view-list">${mets.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <section class="in-view-section"><h3>Connections</h3>
+            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-calendar"/></svg></span><span class="in-view-conn-label">Cadenced meeting</span><span class="in-view-empty">Not connected</span></div>
+            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-slack"/></svg></span><span class="in-view-conn-label">Slack channels</span><span class="in-view-empty">Not connected</span></div>
+          </section>
+          <section class="in-view-section"><h3>Documents</h3><p class="in-view-text"><span class="in-view-empty">No documents yet</span></p></section>
+          <section class="in-view-section"><h3>Projects</h3><div><a class="in-view-link" href="#" data-view-dead>Add project</a></div></section>`;
+
+        activityPanel.innerHTML = log.length
+          ? `<ol class="in-view-activity">${[...log].reverse().map(e => `<li><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><span><strong>Matthew Vella</strong> ${vEsc(e.what)}<time>${new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</time></span></li>`).join('')}</ol>`
+          : `<p class="in-view-text"><span class="in-view-empty">No activity yet</span></p>`;
+      };
+      let viewId = null;
+      const setViewTab = tab => {
+        viewEl.querySelectorAll('[data-view-tab]').forEach(t => { const on = t.dataset.viewTab === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+        viewEl.querySelectorAll('[data-view-panel]').forEach(p => { p.hidden = p.dataset.viewPanel !== tab; });
+      };
+      window.inOpenView = id => {
+        const snap = drafts[id];
+        if (!snap) return;
+        restore(snap);      // into the closed edit form, then read back
+        renderView(id);
+        setViewTab('overview');
+        viewId = id;
+        if (viewEl.hidden) opener = document.activeElement;
+        viewEl.hidden = false;
+        viewEl.querySelector('.modal-close')?.focus();
+      };
+      viewEl.addEventListener('click', e => {
+        const tab = e.target.closest('[data-view-tab]');
+        if (tab) { setViewTab(tab.dataset.viewTab); return; }
+        if (e.target.closest('[data-view-dead]')) { e.preventDefault(); return; }
+        if (e.target.closest('[data-view-copy]')) { window.toast({ variant: 'success', message: 'Link copied.' }); return; }
+        if (e.target.closest('[data-view-edit]')) {
+          const id = viewId;
+          viewEl.hidden = true;
+          window.inOpenDraft(id, true);
+        }
+      });
+
+      window.inOpenDraft = (id, published = false) => {
+        const snap = drafts[id];
+        if (!snap) return;
+        createBtnEl.click();   // opens the drawer (and resets it)
+        restore(snap);
+        draftId = id;
+        setMode(published);
+      };
+
       document.querySelector('[data-create-initiative]')?.addEventListener('click', () => {
         const nameMissing = !nameInput.value.trim();
+        const missingSelects = requiredSelects.filter(f => f.missing());
+        const badDates = requiredDates.filter(f => f.check());
         descTouched = true; updateDesc();
         const descShort = desc.value.trim().length < DESC_MIN;
+        const problemMissing = !problem.value.trim();
+        const objectivesMissing = objectives.missing();
+        const metricsMissing = metrics.missing();
         if (nameMissing) setNameError(true);
-        if (nameMissing || descShort) { (nameMissing ? nameInput : desc).focus(); return; }
+        missingSelects.forEach(f => f.setError(true));
+        setProblemError(problemMissing);
+        objectives.setError(objectivesMissing);
+        metrics.setError(metricsMissing);
+        // Focus the first problem, in form order: name, selects up to the
+        // duration, then the dates, then the description.
+        const firstField = [...missingSelects, ...badDates][0];
+        if (nameMissing || firstField || descShort || problemMissing || objectivesMissing || metricsMissing) {
+          if (nameMissing) nameInput.focus();
+          else if (firstField) firstField.trigger.focus();
+          else if (descShort) desc.focus();
+          else if (problemMissing) problem.focus();
+          else if (objectivesMissing) objectives.focus();
+          else metrics.focus();
+          return;
+        }
+        const published = readInitiative(false);
+        const wasEditing = editingPublished;
+        const savedId = window.inUpsertInitiative?.({ ...published, editable: true }, draftId);
+        if (savedId) {
+          drafts[savedId] = snapshot(); // keep it reopenable
+          (activity[savedId] ||= []).push({ what: wasEditing ? 'edited this initiative' : (draftId ? 'published this initiative from a draft' : 'created this initiative'), at: Date.now() });
+        }
+        draftId = null;
         closeOverlay(document.getElementById('in-drawer-new'));
-        nameInput.value = '';
+        window.toast({ variant: 'success', message: wasEditing ? `“${published.name}” updated.` : `“${published.name}” created.` });
+        setMode(false);
+        // A new initiative lands on the table (row pinned first); open it from
+        // there. Saving an edit returns to view mode, where the edit started —
+        // after the edit drawer's close has finished handing focus back.
+        if (savedId && wasEditing) setTimeout(() => window.inOpenView(savedId), 120);
+        nameInput.value = ''; updateDup();
         desc.value = ''; descTouched = false; updateDesc();
+        problem.value = ''; problemCount.textContent = '0 / 500';
+        objectives.reset(); metrics.reset();
+        requiredSelects.forEach(f => { if (!f.keepOnReset) f.reset(); });
+        resetDuration(); resetImpact();
       });
       // Reopening starts clean.
       document.querySelectorAll('#in-drawer-new [data-modal-close]').forEach(b => b.addEventListener('click', () => {
-        setNameError(false); descTouched = false; updateDesc();
+        setNameError(false); requiredSelects.forEach(f => f.setError(false)); requiredDates.forEach(f => f.setError(false)); setProblemError(false); objectives.setError(false); metrics.setError(false); descTouched = false; updateDesc();
       }));
+
+      // "+ Add…" links with data-reveal swap themselves for their field row.
+      document.querySelectorAll('[data-reveal]').forEach(btn => btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const row = document.getElementById(btn.dataset.reveal);
+        row.hidden = false;
+        btn.closest('.in-add').hidden = true;
+        row.querySelector('.input-select-trigger')?.click();
+        row.querySelector('.input-select-trigger, .input, .input-tags-input')?.focus();
+      }));
+
+      // Tags — free-form chips (designmd .input-tags): Enter or comma adds,
+      // Backspace on an empty input or a chip's × removes.
+      document.querySelectorAll('.in-form .input-tags').forEach(wrap => {
+        const input = wrap.querySelector('.input-tags-input');
+        const hint = wrap.closest('.field')?.querySelector('.field-hint');
+        const setInvalid = on => { hint?.classList.toggle('is-error', on); input.setAttribute('aria-invalid', String(on)); };
+        const addTag = text => {
+          const t = text.trim().replace(/,+$/, '').trim();
+          if (!t) return true;
+          if (t.replace(/\s/g, '').length < 2) { setInvalid(true); return false; }
+          setInvalid(false);
+          const taken = [...wrap.querySelectorAll('.chip')].some(c => c.firstChild.textContent.toLowerCase() === t.toLowerCase());
+          if (taken) return true;
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.append(t);
+          chip.insertAdjacentHTML('beforeend', `<button class="chip-remove" aria-label="Remove ${t.replace(/"/g, '&quot;')}" type="button"><svg><use href="#i-x"/></svg></button>`);
+          input.before(chip);
+          return true;
+        };
+        input.addEventListener('input', () => setInvalid(false));
+        input.addEventListener('keydown', e => {
+          if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+            e.preventDefault();
+            if (addTag(input.value)) input.value = '';
+          } else if (e.key === 'Backspace' && !input.value) {
+            const chips = wrap.querySelectorAll('.chip');
+            chips[chips.length - 1]?.remove();
+          }
+        });
+        input.addEventListener('blur', () => { if (addTag(input.value)) input.value = ''; });
+        wrap.addEventListener('click', e => {
+          const rm = e.target.closest('.chip-remove');
+          if (rm) { rm.closest('.chip').remove(); input.focus(); return; }
+          if (e.target === wrap) input.focus();
+        });
+      });
+
+      // Stage tag — pick a stage from its menu; the pill shows the choice.
+      // (Open / close comes from the shared .dropdown wiring below.)
+      document.querySelectorAll('.in-stage').forEach(dd => {
+        const trigger = dd.querySelector('.in-stage-trigger');
+        dd.querySelectorAll('.dropdown-item').forEach(item => item.addEventListener('click', () => {
+          dd.querySelectorAll('.dropdown-item').forEach(i => {
+            i.classList.toggle('is-selected', i === item);
+            i.setAttribute('aria-checked', String(i === item));
+          });
+          trigger.textContent = item.textContent;
+          trigger.setAttribute('aria-label', 'Stage: ' + item.textContent);
+          trigger.focus();
+        }));
+      });
 
       // Accordion — toggle .is-open (+ aria-expanded); swap the summary label.
       document.addEventListener('click', e => {
@@ -4631,8 +6243,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         (next?.querySelector('.in-link-label') || document.querySelector('[data-add-link]')).focus();
       });
 
-      // Only Initiatives is built; other nav items are decorative.
-      sidenav.querySelectorAll('.sidenav-item[data-page]').forEach(link => {
+      // Only Initiatives is built here; Dashboard links to the TopTrack
+      // prototype (features/toptrack). Everything else is decorative.
+      sidenav.querySelectorAll('.sidenav-item[data-page][href="#"]').forEach(link => {
         link.addEventListener('click', e => e.preventDefault());
       });
 
@@ -4710,6 +6323,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       { name: 'Enterprise Sales Expansion', fn: 'Sales', status: 'Opportunity Assessment', health: 'on', owner: P.oc, roadmap: '2025-06-30', created: '2024-08-19',
         rob: { title: 'Pipeline Review', when: 'Oct 24 · 03:00pm', cadence: 'Weekly on Thursday' } },
       { name: 'Customer Health Scoring', fn: 'Customer Success', status: 'Done', health: 'on', owner: P.ak, roadmap: '2024-08-31', created: '2024-02-12' },
+      // The initiative the ID 5 duplicate notice points at when a new name
+      // mentions "partner".
+      { name: 'Partner Enablement Program', fn: 'Sales', status: 'In progress', health: 'on', owner: P.ak, roadmap: '2025-06-30', created: '2024-09-02',
+        rob: { title: 'Partner Council', when: 'Oct 30 · 01:00pm', cadence: 'Bi-weekly on Wednesday' },
+        children: [
+          { name: 'Partner tiering model', type: 'Project', fn: 'Sales', status: 'In progress', health: 'on', owner: P.oc, roadmap: 'Q4 2024', created: '2024-09-09' },
+          { name: 'Partner portal pilot', type: 'Project', fn: 'Product', status: 'Planning', health: 'risk', owner: P.ng, roadmap: 'Q1 2025', created: '2024-09-16' },
+        ] },
     ];
 
     (function () {
@@ -4718,7 +6339,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const search = document.getElementById('in-search');
       const sortDirBtn = document.getElementById('in-sort-dir');
       const OPTIONAL = ['status', 'health', 'owner', 'roadmap', 'rob', 'created'];
-      const HEALTH = { on: ['tag-positive', 'On track'], risk: ['tag-warning', 'At risk'], off: ['tag-negative', 'Off track'] };
+      const HEALTH = { on: ['tag-positive', 'On track'], risk: ['tag-warning', 'At risk'], off: ['tag-negative', 'Off track'], na: ['in-health-na', 'Not active'] };
       const state = { q: '', sort: 'created', asc: true, hidden: new Set(['created']), collapsed: new Set() };
 
       const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -4737,7 +6358,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       document.querySelector('.page-head-title .count-badge').textContent = INITIATIVES.length;
 
-      const matches = n => !state.q || [n.name, n.owner.name, n.fn].some(v => v.toLowerCase().includes(state.q));
+      const matches = n =>
+        (!state.q || [n.name, n.owner.name, n.fn].some(v => v.toLowerCase().includes(state.q)))
+        && passesFilters(n);
       // Keep a node if it or any descendant matches; a matching parent keeps its subtree.
       function filter(list) {
         return list.reduce((out, n) => {
@@ -4763,15 +6386,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const rob = n.rob
           ? `<div class="cell-meta"><span class="cell-meta-title">${esc(n.rob.title)}</span><span class="cell-meta-sub" title="${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}"><svg class="icon"><use href="#i-calendar-blank"/></svg><span class="in-clip">${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}</span></span></div>`
           : '<div class="cell-meta-sub">—</div>';
-        return `<tr data-level="${level}" data-id="${n.id}">
+        return `<tr data-level="${level}" data-id="${n.id}"${n.draft ? ' data-draft' : ''}${n.editable ? ` data-editable tabindex="0" aria-label="Open ${n.draft ? 'draft ' : ''}${esc(n.name)}"` : ''}>
           <td><div class="cell-title-row">${hasKids
               ? `<button class="row-toggle" type="button" aria-expanded="${open}" aria-label="Toggle children"><svg class="icon"><use href="#i-caret-right"/></svg></button>`
               : '<span class="row-toggle-spacer"></span>'}
             <div class="cell-title"><span class="cell-title-text">${esc(n.name)}</span><span class="cell-title-sub">${esc(n.type || 'Initiative')} · ${esc(n.fn)}</span></div></div></td>
-          ${col('status', `<span class="tag tag-light">${esc(n.status)}</span>`)}
+          ${col('status', `<span class="tag ${n.draft ? 'tag-dark' : 'tag-light'}">${esc(n.status)}</span>`)}
           ${col('health', `<span class="tag tag-indicator ${hCls}">${hLabel}</span>`)}
-          ${col('owner', `<div class="cell-user"><span class="cell-avatar">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
-          ${col('roadmap', `<div class="cell-meta-sub"><svg class="icon"><use href="#i-calendar-blank"/></svg>${fmtDate(n.roadmap)}</div>`)}
+          ${col('owner', `<div class="cell-user"><span class="avatar avatar-md">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
+          ${col('roadmap', n.roadmap ? `<div class="cell-meta-sub"><svg class="icon"><use href="#i-calendar-blank"/></svg>${fmtDate(n.roadmap)}</div>` : '<div class="cell-meta-sub">—</div>')}
           ${col('rob', rob)}
           ${col('created', `<div class="cell-meta-sub">${fmtDate(n.created)}</div>`)}
           <td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions for ${esc(n.name)}"><svg class="icon icon-16"><use href="#i-dots-three-vertical"/></svg></button></div></td>
@@ -4779,15 +6402,68 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       }
 
       function render() {
-        const list = sort(filter(INITIATIVES));
+        // Initiatives added from the drawer (drafts and newly created) are
+        // pinned above the rest, most recent action first, so whatever was just
+        // saved is always the first row. The chosen sort orders everything else.
+        const sorted = sort(filter(INITIATIVES));
+        const pinned = sorted.filter(n => n.pinnedAt).sort((a, b) => b.pinnedAt - a.pinnedAt);
+        const list = [...pinned, ...sorted.filter(n => !n.pinnedAt)];
         const span = 2 + OPTIONAL.filter(c => !state.hidden.has(c)).length;
         tbody.innerHTML = list.length
           ? list.map(n => rowHtml(n, 0)).join('')
-          : `<tr class="in-no-results"><td colspan="${span}">No initiatives match “${esc(search.value.trim())}”.</td></tr>`;
+          : `<tr class="in-no-results"><td colspan="${span}">${
+              // The filters can empty the table on their own, in which case
+              // quoting the (empty) search box would read as a bug.
+              !INITIATIVES.length
+                ? 'No initiatives yet. Use “Create Initiative” to add the first one.'
+                : search.value.trim()
+                  ? `No initiatives match “${esc(search.value.trim())}”.`
+                  : 'No initiatives match these filters.'
+            }</td></tr>`;
         table.querySelectorAll('thead th[data-col]').forEach(th => th.toggleAttribute('data-col-hidden', state.hidden.has(th.dataset.col)));
       }
 
+      // Drawer → table (TopTrack set-up flow). Create and Save as draft call
+      // this with the drawer's values; it adds a top-level initiative, or
+      // updates the same row when a draft is saved again / published. The row
+      // is pinned to the top of the table (see render).
+      const countBadge = document.querySelector('.page-head-title .count-badge');
+      // For the ?states=1 switcher: re-render after it edits INITIATIVES.
+      window.inTableRender = () => { countBadge.textContent = INITIATIVES.length; render(); };
+      window.inUpsertInitiative = (data, id) => {
+        let n = id && INITIATIVES.find(x => x.id === id);
+        if (n) Object.assign(n, data);
+        else { n = { ...data, id: 'n' + (seq++) }; INITIATIVES.push(n); }
+        n.pinnedAt = Date.now(); // newest save / create goes to the top
+        countBadge.textContent = INITIATIVES.length;
+        // Clear filters that would hide it, so the new row is always seen.
+        if (state.q) { state.q = ''; search.value = ''; }
+        render();
+        const row = tbody.querySelector(`tr[data-id="${n.id}"]`);
+        if (row) {
+          row.classList.remove('is-new'); void row.offsetWidth; row.classList.add('is-new');
+          // After the drawer closes — it hands focus back to "Create
+          // Initiative", which would otherwise scroll the page back up.
+          setTimeout(() => row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }), 80);
+        }
+        return n.id;
+      };
+
+      // Rows made from the drawer (drafts and published) reopen it with
+      // everything they had.
+      const openDraftRow = e => {
+        const tr = e.target.closest('tr[data-editable]');
+        if (!tr || e.target.closest('.row-toggle, .cell-actions')) return false;
+        if (tr.hasAttribute('data-draft')) window.inOpenDraft?.(tr.dataset.id);
+        else window.inOpenView?.(tr.dataset.id);
+        return true;
+      };
+      tbody.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-editable]')) { e.preventDefault(); openDraftRow(e); }
+      });
+
       tbody.addEventListener('click', e => {
+        if (openDraftRow(e)) return;
         const toggle = e.target.closest('.row-toggle');
         if (!toggle || state.q) return;
         const id = toggle.closest('tr').dataset.id;
@@ -4850,7 +6526,625 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         });
       });
 
+      // ---- Filters panel ----
+      // Floats under the Filter button, no backdrop. Only the filters whose
+      // vocabulary matches this table's data actually narrow it; see the
+      // FILTERED list below.
+      const panel   = document.getElementById('in-filters');
+      const filterBtn = [...document.querySelectorAll('.in-toolbar .btn')]
+        .find(b => b.getAttribute('aria-label') === 'Filter');
+      const f = { health: new Set(), status: new Set(), type: new Set(), roadmap: 'Show All' };
+
+      // Health labels in the panel vs the keys in the data.
+      const HEALTH_KEY = { 'At Risk': 'risk', 'Off Track': 'off', 'On Track': 'on' };
+      // This vocabulary names the three levels of the tree; the seed data still
+      // calls them Initiative / Project / Task.
+      const TYPE_KEY = { 'Focus Area': 'Initiative', 'Activity': 'Project', 'Sub-activity': 'Task' };
+
+      function passesFilters(n) {
+        // "All" on the Name select means no name filter at all.
+        if (f.name && f.name !== 'All' && n.name !== f.name) return false;
+        if (f.owner && n.owner.name !== f.owner) return false;
+        if (f.fn && n.fn !== f.fn) return false;
+        if (f.rob && n.rob?.title !== f.rob) return false;
+        if (f.created && n.created < f.created) return false;
+        if (f.health.size && ![...f.health].some(l => HEALTH_KEY[l] === n.health)) return false;
+        if (f.status.size && ![...f.status].some(l => l.toLowerCase() === String(n.status).toLowerCase())) return false;
+        if (f.type.size && ![...f.type].some(l => TYPE_KEY[l] === (n.type || 'Initiative'))) return false;
+        if (f.roadmap === 'Have Roadmap' && !n.roadmap) return false;
+        if (f.roadmap === "Don't Have Roadmap" && n.roadmap) return false;
+        return true;
+      }
+
+      // Options, read off the data so the menus cannot drift from the table.
+      const flat = [];
+      (function walk(list) { list.forEach(n => { flat.push(n); if (n.children) walk(n.children); }); })(INITIATIVES);
+      const uniq = arr => [...new Set(arr.filter(Boolean))].sort();
+      const OPTIONS = {
+        name: ['All', ...uniq(flat.map(n => n.name))],
+        owner: uniq(flat.map(n => n.owner.name)),
+        fn: uniq(flat.map(n => n.fn)),
+        beneficiary: uniq(flat.map(n => n.fn)),
+        rob: uniq(flat.map(n => n.rob?.title)),
+        // Divisions and Public Label have no equivalent on this page's data yet;
+        // the controls are built, but they do not narrow the table.
+        divisions: uniq(flat.map(n => n.fn)),
+        label: [],
+      };
+
+      panel.querySelectorAll('[data-in-f-options]').forEach(menu => {
+        const sel = menu.closest('[data-in-f]');
+        (OPTIONS[sel.dataset.inF] || []).forEach(label => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'dropdown-item';
+          b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>';
+          b.append(label);
+          menu.appendChild(b);
+        });
+      });
+
+      // Panel selects, wired here rather than by the toolbar handler above —
+      // that one owns sort and column state, which these must not touch.
+      panel.querySelectorAll('.input-select[data-in-f]').forEach(sel => {
+        const trigger = sel.querySelector('.input-select-trigger');
+        const menu    = sel.querySelector('.dropdown-menu');
+        const value   = sel.querySelector('[data-in-f-value]');
+        const close = () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          panel.querySelectorAll('.dropdown-menu').forEach(m => { if (m !== menu) m.hidden = true; });
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', String(open));
+        });
+        menu.addEventListener('click', (e) => {
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          e.stopPropagation();
+          menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === item));
+          value.textContent = item.textContent.trim();
+          value.classList.remove('input-select-placeholder');
+          f[sel.dataset.inF] = item.textContent.trim();
+          close();
+          syncChips();
+          render();
+        });
+      });
+
+      panel.addEventListener('input', (e) => {
+        const el = e.target.closest('[data-in-f]');
+        if (!el || el.classList.contains('input-select')) return;
+        const key = el.dataset.inF;
+        if (el.type === 'checkbox' && f[key] instanceof Set) {
+          el.checked ? f[key].add(el.value) : f[key].delete(el.value);
+        } else if (el.type === 'checkbox') {
+          // A lone checkbox (Show Archived) is a boolean, not a value set.
+          f[key] = el.checked;
+        } else if (el.type === 'radio') {
+          f[key] = el.value;
+        } else {
+          f[key] = el.value.trim();
+        }
+        syncChips();
+        render();
+      });
+
+      // A native date input cannot show a text placeholder, and the design asks
+      // for one. Each starts as text and becomes a real date field on focus,
+      // reverting when left empty so the placeholder comes back.
+      panel.querySelectorAll('[data-in-f-date]').forEach(d => {
+        d.addEventListener('focus', () => {
+          if (d.type !== 'text') return;
+          d.type = 'date';
+          // showPicker throws unless it is called off a user gesture (keyboard
+          // focus and scripted focus both count as not one); the field is a
+          // working date input either way, so a failure here is not an error.
+          try { d.showPicker?.(); } catch (_) { /* opens on click instead */ }
+        });
+        d.addEventListener('blur', () => { if (!d.value) d.type = 'text'; });
+      });
+
+      panel.querySelector('[data-in-f-clear]').addEventListener('click', () => {
+        panel.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; });
+        panel.querySelectorAll('input[type="search"]').forEach(i => { i.value = ''; });
+        // Date fields also go back to text, so the placeholder returns.
+        panel.querySelectorAll('[data-in-f-date]').forEach(i => { i.value = ''; i.type = 'text'; });
+        panel.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = r.value === 'Show All'; });
+        panel.querySelectorAll('.input-select[data-in-f]').forEach(sel => {
+          const value = sel.querySelector('[data-in-f-value]');
+          value.textContent = sel.dataset.inFPlaceholder;
+          // Name's resting value is a real choice ("All"), not a placeholder.
+          value.classList.toggle('input-select-placeholder', sel.dataset.inF !== 'name');
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+        });
+        Object.keys(f).forEach(k => { if (f[k] instanceof Set) f[k].clear(); else delete f[k]; });
+        f.roadmap = 'Show All';
+        syncChips();
+        render();
+      });
+
+      // ---- Applied-filter chips ----
+      // One chip per active filter, labelled from the panel's own label text so
+      // the two can never drift apart.
+      const chipBar = document.querySelector('[data-in-chips]');
+      const filterLabel = filterBtn.querySelector('.in-tb-label');
+      const LABELS = {};
+      const ORDER = [];
+      panel.querySelectorAll('[data-in-f]').forEach(el => {
+        const key = el.dataset.inF;
+        if (LABELS[key]) return;
+        const scope = el.closest('.in-f-col') || el.closest('.in-f-row');
+        LABELS[key] = scope?.querySelector('.in-f-label')?.textContent.trim() || key;
+        ORDER.push(key);   // DOM order, so chips read in the panel's own order
+      });
+      LABELS.archived = 'Show Archived';   // its row has no label column
+
+      // What reads as "set". Name rests on "All" and Roadmap on "Show All", so
+      // neither counts as a filter at its resting value.
+      const active = () => Object.entries(f).flatMap(([key, v]) => {
+        if (v instanceof Set) return v.size ? [[key, [...v].join(', ')]] : [];
+        if (key === 'archived') return v ? [[key, 'True']] : [];
+        if (key === 'roadmap') return v && v !== 'Show All' ? [[key, v]] : [];
+        if (key === 'name') return v && v !== 'All' ? [[key, v]] : [];
+        return v ? [[key, v]] : [];
+      }).sort((a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]));
+
+      // Removing a chip has to reset the control it came from, not just the
+      // state, or the panel would keep showing a filter that no longer applies.
+      const clearFilter = (key) => {
+        if (f[key] instanceof Set) {
+          f[key].clear();
+          panel.querySelectorAll(`input[data-in-f="${key}"]`).forEach(c => { c.checked = false; });
+          return;
+        }
+        if (key === 'roadmap') {
+          f.roadmap = 'Show All';
+          panel.querySelectorAll('input[data-in-f="roadmap"]').forEach(r => { r.checked = r.value === 'Show All'; });
+          return;
+        }
+        delete f[key];
+        const sel = panel.querySelector(`.input-select[data-in-f="${key}"]`);
+        if (sel) {
+          const v = sel.querySelector('[data-in-f-value]');
+          v.textContent = sel.dataset.inFPlaceholder;
+          v.classList.toggle('input-select-placeholder', key !== 'name');
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+        }
+        const input = panel.querySelector(`input[data-in-f="${key}"]`);
+        if (input) {
+          if (input.type === 'checkbox') input.checked = false;
+          else { input.value = ''; if (input.hasAttribute('data-in-f-date')) input.type = 'text'; }
+        }
+      };
+
+      // The options behind a chip are the panel's own controls for that filter,
+      // read live so the two lists can never disagree.
+      const optionsFor = (key) => {
+        if (key === 'archived') return ['True', 'False'];
+        const boxes = [...panel.querySelectorAll(`input[data-in-f="${key}"]`)]
+          .filter(i => i.type === 'checkbox' || i.type === 'radio');
+        if (boxes.length) return boxes.map(b => b.value);
+        const sel = panel.querySelector(`.input-select[data-in-f="${key}"]`);
+        if (sel) return [...sel.querySelectorAll('.dropdown-item')].map(i => i.textContent.trim());
+        return [];   // a date filter has nothing to pick from
+      };
+
+      // Write a value back to both the filter state and the panel control it
+      // came from, so the panel never shows something the chips contradict.
+      const setValue = (key, value, on) => {
+        if (f[key] instanceof Set) {
+          on ? f[key].add(value) : f[key].delete(value);
+          const box = panel.querySelector(`input[data-in-f="${key}"][value="${CSS.escape(value)}"]`);
+          if (box) box.checked = on;
+          return;
+        }
+        if (key === 'archived') {
+          const on2 = value === 'True';
+          f.archived = on2;
+          if (!on2) delete f.archived;
+          panel.querySelector('input[data-in-f="archived"]').checked = on2;
+          return;
+        }
+        if (key === 'roadmap') {
+          f.roadmap = value;
+          panel.querySelectorAll('input[data-in-f="roadmap"]').forEach(r => { r.checked = r.value === value; });
+          return;
+        }
+        f[key] = value;
+        const sel = panel.querySelector(`.input-select[data-in-f="${key}"]`);
+        if (sel) {
+          const v = sel.querySelector('[data-in-f-value]');
+          v.textContent = value;
+          v.classList.remove('input-select-placeholder');
+          sel.querySelectorAll('.dropdown-item')
+            .forEach(i => i.classList.toggle('is-selected', i.textContent.trim() === value));
+        }
+      };
+
+      const closeChipMenus = () => {
+        chipBar.querySelectorAll('.in-chip-menu').forEach(m => {
+          m.hidden = true;
+          const chip = m.closest('.in-chip');
+          chip?.querySelector('.in-chip-label')?.setAttribute('aria-expanded', 'false');
+          chip?.querySelector('[data-in-add-btn]')?.setAttribute('aria-expanded', 'false');
+        });
+      };
+
+      function syncChips() {
+        const list = active();
+        // Rebuild the chips only; the adder is markup, not a chip.
+        chipBar.querySelectorAll('.in-chip:not(.in-chip-adder)').forEach(c => c.remove());
+        list.forEach(([key, text]) => {
+          const chip = document.createElement('span');
+          chip.className = 'chip in-chip';
+          const options = optionsFor(key);
+          const multi = f[key] instanceof Set;
+          const caption = `${LABELS[key]}: ${text}`;
+
+          if (!options.length) {
+            const span = document.createElement('span');
+            span.className = 'in-chip-static';
+            span.textContent = caption;
+            chip.appendChild(span);
+          } else {
+            const label = document.createElement('button');
+            label.type = 'button';
+            label.className = 'in-chip-label';
+            label.textContent = caption;
+            label.setAttribute('aria-haspopup', 'listbox');
+            label.setAttribute('aria-expanded', 'false');
+
+            const menu = document.createElement('div');
+            menu.className = 'dropdown-menu in-chip-menu';
+            menu.hidden = true;
+
+            const isOn = (v) => multi ? f[key].has(v)
+              : key === 'archived' ? (v === 'True') === !!f.archived
+              : f[key] === v;
+
+            options.forEach(v => {
+              const item = document.createElement('button');
+              item.type = 'button';
+              item.className = 'dropdown-item' + (isOn(v) ? ' is-selected' : '');
+              item.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>';
+              item.append(v);
+              item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (multi) {
+                  const on = !f[key].has(v);
+                  setValue(key, v, on);
+                  // Emptying the set retires the chip, so rebuild; otherwise
+                  // update in place and leave the menu open to pick again.
+                  if (!f[key].size) { syncChips(); render(); return; }
+                  item.classList.toggle('is-selected', on);
+                  label.textContent = `${LABELS[key]}: ${[...f[key]].join(', ')}`;
+                  render();
+                  return;
+                }
+                setValue(key, v, true);
+                syncChips();
+                render();
+              });
+              menu.appendChild(item);
+            });
+
+            label.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const open = menu.hidden;
+              closeChipMenus();
+              menu.hidden = !open;
+              label.setAttribute('aria-expanded', String(open));
+            });
+
+            chip.append(label, menu);
+          }
+
+          const x = document.createElement('button');
+          x.type = 'button';
+          x.className = 'chip-remove';
+          x.setAttribute('aria-label', `Remove ${LABELS[key]} filter`);
+          x.innerHTML = '<svg><use href="#i-x"/></svg>';
+          x.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearFilter(key);
+            syncChips();
+            render();
+          });
+          // The menu must stay last so .in-chip-menu's sibling lookup holds.
+          chip.insertBefore(x, chip.querySelector('.in-chip-menu'));
+          chipBar.insertBefore(chip, adder);   // the adder stays last
+        });
+        chipBar.hidden = !list.length;
+        // The button carries the count, so the tally survives the panel closing.
+        filterLabel.textContent = list.length ? `Filters (${list.length})` : 'Filter';
+      }
+
+      // ---- Add a filter ----
+      // Level one lists the filters, level two that filter's options. Date
+      // filters are left out: they need a date field, not a list of choices.
+      const adder    = chipBar.querySelector('[data-in-adder]');
+      const addBtn   = chipBar.querySelector('[data-in-add-btn]');
+      const addMenu  = chipBar.querySelector('[data-in-add-menu]');
+
+      const item = (cls, iconHtml, text) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'dropdown-item' + (cls ? ' ' + cls : '');
+        if (iconHtml) b.innerHTML = iconHtml;
+        b.append(text);
+        return b;
+      };
+
+      // Level two — the chosen filter's own options.
+      const showOptions = (key) => {
+        addMenu.replaceChildren();
+        addMenu.classList.remove('is-root');
+        const back = item('in-chip-back',
+          '<svg class="dropdown-item-icon"><use href="#i-chevron-left"/></svg>', LABELS[key]);
+        back.addEventListener('click', (e) => { e.stopPropagation(); showFilters(); });
+        addMenu.append(back, Object.assign(document.createElement('hr'), { className: 'dropdown-divider' }));
+
+        const multi = f[key] instanceof Set;
+        const isOn = (v) => multi ? f[key].has(v)
+          : key === 'archived' ? (v === 'True') === !!f.archived
+          : f[key] === v;
+
+        optionsFor(key).forEach(v => {
+          const opt = item(isOn(v) ? 'is-selected' : '',
+            '<svg class="dropdown-item-check"><use href="#i-check"/></svg>', v);
+          opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (multi) {
+              const on = !f[key].has(v);
+              setValue(key, v, on);
+              opt.classList.toggle('is-selected', on);
+              syncChips();
+              render();
+              return;   // stay put, so several values can be picked at once
+            }
+            setValue(key, v, true);
+            closeChipMenus();
+            syncChips();
+            render();
+          });
+          addMenu.appendChild(opt);
+        });
+      };
+
+      // Level one — every filter that can be picked from a list.
+      const showFilters = () => {
+        addMenu.replaceChildren();
+        addMenu.classList.add('is-root');
+        ORDER.filter(k => optionsFor(k).length).forEach(key => {
+          const row = item('', '', LABELS[key]);
+          const caret = document.createElement('span');
+          caret.className = 'in-chip-more';
+          caret.innerHTML = '<svg class="icon"><use href="#i-caret-right"/></svg>';
+          row.appendChild(caret);
+          row.addEventListener('click', (e) => { e.stopPropagation(); showOptions(key); });
+          addMenu.appendChild(row);
+        });
+      };
+
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = addMenu.hidden;
+        closeChipMenus();
+        if (open) showFilters();
+        addMenu.hidden = !open;
+        addBtn.setAttribute('aria-expanded', String(open));
+      });
+
+      document.addEventListener('click', (e) => { if (!e.target.closest('.in-chip')) closeChipMenus(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeChipMenus(); });
+
+      syncChips();
+
+      // Anchored to the button rather than nested under it, so no ancestor's
+      // overflow can clip the panel. Re-measured whenever the page moves —
+      // until you drag it somewhere, after which the panel stays put.
+      let moved = false;
+      const clampLeft = (x) => Math.max(12, Math.min(x, innerWidth - panel.offsetWidth - 12));
+      const place = () => {
+        if (moved) return;
+        const r = filterBtn.getBoundingClientRect();
+        panel.style.top = `${r.bottom + 8}px`;
+        panel.style.left = `${clampLeft(r.left)}px`;
+      };
+
+      // Drag by the head. Bounds keep the handle on screen, so the panel can
+      // never be dropped somewhere it cannot be picked up again.
+      const head = panel.querySelector('.in-filters-head');
+      let drag = null;
+      let justDragged = false;
+      head.addEventListener('pointerdown', (e) => {
+        // Clear all is a button first and part of the handle never.
+        if (e.target.closest('button')) return;
+        const r = panel.getBoundingClientRect();
+        drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+        moved = true;
+        panel.classList.add('is-dragging');
+        head.setPointerCapture(e.pointerId);
+      });
+      head.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        e.preventDefault();
+        panel.style.left = `${clampLeft(e.clientX - drag.dx)}px`;
+        panel.style.top  = `${Math.max(12, Math.min(e.clientY - drag.dy, innerHeight - 48))}px`;
+      });
+      const endDrag = (e) => {
+        if (!drag) return;
+        drag = null;
+        panel.classList.remove('is-dragging');
+        head.releasePointerCapture?.(e.pointerId);
+        // The click that ends a drag would otherwise reach the close handler.
+        justDragged = true;
+        setTimeout(() => { justDragged = false; }, 0);
+      };
+      head.addEventListener('pointerup', endDrag);
+      head.addEventListener('pointercancel', endDrag);
+      const closePanel = () => {
+        panel.hidden = true;
+        filterBtn.setAttribute('aria-expanded', 'false');
+      };
+      filterBtn.setAttribute('aria-expanded', 'false');
+      filterBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.hidden = !panel.hidden;
+        filterBtn.setAttribute('aria-expanded', String(!panel.hidden));
+        // Opening from the button re-anchors it there; a panel left off-screen
+        // in a previous session would otherwise open out of sight.
+        if (!panel.hidden) { moved = false; place(); }
+      });
+      document.addEventListener('click', (e) => {
+        if (justDragged) return;
+        if (!panel.hidden && !panel.contains(e.target) && e.target !== filterBtn) closePanel();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+      addEventListener('resize', () => { if (!panel.hidden) place(); });
+      addEventListener('scroll', () => { if (!panel.hidden) place(); }, true);
+
       render();
+    })();
+  </script>
+
+  <!-- Prototype state switcher — ?states=1. Each state reloads the page
+       (&state=…) and replays the steps to reach it, so every state starts
+       clean. -->
+  <div class="in-switcher" id="in-switcher" hidden>
+    <div class="in-switcher-head"><span>States</span><button class="in-switcher-toggle" type="button" aria-label="Collapse states">–</button></div>
+    <div class="in-switcher-body">
+      <div class="in-switcher-group"><span>Table</span>
+        <button type="button" data-state="default">Default</button>
+        <button type="button" data-state="with-rows">Drafts + created rows</button>
+        <!-- Hidden 2026-10-02 (still reachable via &state=empty / no-results / long-text):
+        <button type="button" data-state="empty">No initiatives</button>
+        <button type="button" data-state="no-results">Search, no results</button>
+        <button type="button" data-state="long-text">Long text</button>
+        -->
+      </div>
+      <div class="in-switcher-group"><span>Create drawer</span>
+        <button type="button" data-state="create-blank">Blank</button>
+        <button type="button" data-state="create-errors">Required errors</button>
+        <button type="button" data-state="create-duplicate">Duplicate notice</button>
+        <button type="button" data-state="create-filled">Filled, ready to create</button>
+      </div>
+      <div class="in-switcher-group"><span>Draft & edit</span>
+        <button type="button" data-state="draft-reopen">Draft reopened</button>
+        <button type="button" data-state="edit-mode">Edit (Save changes)</button>
+      </div>
+      <div class="in-switcher-group"><span>View mode</span>
+        <button type="button" data-state="view-full">View — all fields</button>
+        <button type="button" data-state="view-minimal">View — required only</button>
+        <button type="button" data-state="view-activity">View — activity log</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      if (params.get('states') !== '1') return;
+      const sw = document.getElementById('in-switcher');
+      sw.hidden = false;
+      const current = params.get('state') || 'default';
+      sw.querySelectorAll('[data-state]').forEach(b => {
+        b.classList.toggle('is-current', b.dataset.state === current);
+        b.addEventListener('click', () => {
+          const p = new URLSearchParams(location.search);
+          p.set('states', '1'); p.set('state', b.dataset.state);
+          location.search = p.toString();
+        });
+      });
+      const toggle = sw.querySelector('.in-switcher-toggle');
+      const setCollapsed = on => { sw.classList.toggle('is-collapsed', on); toggle.textContent = on ? '+' : '–'; try { sessionStorage.setItem('in-switcher-collapsed', on ? '1' : ''); } catch (_) {} };
+      try { if (sessionStorage.getItem('in-switcher-collapsed')) setCollapsed(true); } catch (_) {}
+      toggle.addEventListener('click', () => setCollapsed(!sw.classList.contains('is-collapsed')));
+
+      // ---- Steps, driven through the real UI ----
+      const W = ms => new Promise(r => setTimeout(r, ms));
+      const $ = sel => document.querySelector(sel);
+      const openCreate = async () => { $('[data-modal-open="in-drawer-new"]').click(); await W(250); };
+      const pick = (id, text) => {
+        const el = document.getElementById(id);
+        el.querySelector('.input-select-trigger').click();
+        [...el.querySelectorAll('.dropdown-item:not([hidden])')].find(i => !text || i.textContent.includes(text))?.click();
+        document.body.click();
+      };
+      const pickMany = (id, names) => {
+        const el = document.getElementById(id);
+        el.querySelector('.input-select-trigger').click();
+        names.forEach(n => [...el.querySelectorAll('.dropdown-item')].find(i => i.textContent.includes(n))?.click());
+        document.body.click();
+      };
+      const type = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); };
+      const setStage = name => { $('.in-stage-trigger').click(); [...document.querySelectorAll('.in-stage-menu .dropdown-item')].find(i => i.textContent === name)?.click(); };
+      const setRows = (id, values) => {
+        const root = document.getElementById(id);
+        while (root.querySelectorAll('.in-multi-row').length < values.length) root.querySelector('[data-multi-add]').click();
+        root.querySelectorAll('.in-multi-row input').forEach((inp, i) => { inp.value = values[i] || ''; });
+        root.querySelector('.in-multi-row input').dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      const fillRequired = name => {
+        type('in-name', name);
+        pick('in-sponsor', 'Aisha'); pick('in-beneficiary', 'Sales'); pick('in-pm', 'Nina');
+        pickMany('in-team', ['Daniel']); pick('in-duration', '1 quarter');
+        type('in-desc', 'A cross-functional push to give every initiative owner one place to set up, run and report on their work, replacing the weekly status-deck rebuild.');
+        type('in-problem', 'Owners rebuild status decks by hand every week, and leadership reads stale Google Sheets.');
+        setRows('in-objectives', ['One source of truth for initiatives']);
+        setRows('in-metrics', ['80% of initiatives updated weekly']);
+      };
+      const fillAll = name => {
+        fillRequired(name);
+        setStage('Execution');
+        pickMany('in-team', ['Priya', 'Tomas']);
+        pick('in-duration', '2 quarters');
+        pick('in-impact-initial', 'Q2 2027'); pick('in-impact-full', 'Q4 2027');
+        if (!document.getElementById('in-core').checked) document.getElementById('in-core').click();
+        pick('in-core-objective', 'World');
+        setRows('in-objectives', ['One source of truth for initiatives', 'Automate weekly reporting', 'Give leadership a live view']);
+        setRows('in-metrics', ['80% of initiatives updated weekly', 'Status decks retired', 'Forum runs from the dashboard']);
+      };
+      const create = async () => { $('[data-create-initiative]').click(); await W(600); };
+      // After Create you land on the table; the new row is pinned first.
+      const openFirstRow = async () => { $('#in-rows tr[data-editable]').click(); await W(300); };
+      const saveDraft = async () => { $('[data-save-draft]').click(); await W(400); };
+      const closeAll = async () => { document.querySelectorAll('.drawer-overlay:not([hidden]) [data-modal-close]').forEach(b => b.click()); await W(250); };
+      const LONG = 'Global Partner Enablement and Certification Programme for Strategic Channel Resellers Across Every Region';
+
+      const STATES = {
+        default: async () => {},
+        'with-rows': async () => {
+          await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await closeAll();
+          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-beneficiary', 'Operations'); await saveDraft();
+          await openCreate(); await saveDraft();
+        },
+        empty: async () => { INITIATIVES.length = 0; window.inTableRender(); },
+        'no-results': async () => { type('in-search', 'zzz no match'); },
+        'long-text': async () => {
+          await openCreate(); fillAll(LONG);
+          type('in-problem', 'Partners currently onboard through a patchwork of email threads, shared drives and one-off calls, so certification takes months, nobody can see where a partner is in the journey, and regional teams each reinvent the process — which means revenue from the channel is both slower and harder to forecast than it should be.');
+          await create(); await openFirstRow(); // long title + paragraphs in the view, long row in the table behind
+        },
+        'create-blank': async () => { await openCreate(); },
+        'create-errors': async () => { await openCreate(); $('[data-create-initiative]').click(); },
+        'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
+        'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },
+        'draft-reopen': async () => {
+          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-sponsor', 'Daniel'); pick('in-beneficiary', 'Operations');
+          await saveDraft(); $('#in-rows tr[data-draft]').click(); await W(300);
+        },
+        'edit-mode': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); $('[data-view-edit]').click(); await W(300); },
+        'view-full': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); },
+        'view-minimal': async () => { await openCreate(); fillRequired('Vendor scorecards'); await create(); await openFirstRow(); },
+        'view-activity': async () => {
+          await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow();
+          $('[data-view-edit]').click(); await W(300); type('in-name', 'Launch MVP Operationalize v2'); await create();
+          $('[data-view-tab="activity"]').click();
+        },
+      };
+      (STATES[current] || STATES.default)();
     })();
   </script>
 </body>
