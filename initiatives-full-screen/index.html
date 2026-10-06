@@ -3968,14 +3968,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     [data-theme="dark"] #in-beneficiary .dropdown-item-label { color: var(--color-text); }
     [data-theme="dark"] #in-beneficiary .dropdown-item-description { color: var(--color-text-muted); }
 
-    /* Working team picks — cards under the select, Figma 35817:242899
-       ("Reporting - User"): white, 1px gray-500 border, 4px radius, 48px
-       tall (7px padding + 1px border puts the photo 8px in), 32px square photo. Name 14/18 black; job title on the second
-       line in grey (#84888E) at the design's 12/14 secondary-line size.
-       minmax(200px) fits three per row at the full form width. */
-    .in-team-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--ic-space-2); margin-top: var(--ic-space-2); }
-    .in-team-cards[hidden] { display: none; }
-    .in-team-card { display: flex; align-items: flex-start; gap: var(--ic-space-2); min-width: 0; padding: 7px; border: 1px solid #C4C6CA; border-radius: 4px; background: #fff; }
+    /* Working team picks — cards, Figma 35817:242899 ("Reporting - User"):
+       32px square photo, name 14/18 black over the job title 12/14 grey.
+       Border matches the input fields, square corners. 48px tall (7px
+       padding + 1px border puts the photo 8px in). minmax(200px) fits three
+       per row at the full form width. */
+    .in-team-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--ic-space-2); }
+    .in-team-card { display: flex; align-items: flex-start; gap: var(--ic-space-2); min-width: 0; padding: 7px; border: 1px solid var(--color-border); border-radius: 0; background: var(--color-surface); }
     .in-team-card .avatar { --avatar-size: 32px; --avatar-text: var(--ic-text-sm); border-radius: 0; flex: none; }
     .in-team-card .avatar img { border-radius: 0; }
     .in-team-card-text { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; height: 32px; }
@@ -3985,9 +3984,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-team-card-remove .icon { width: 12px; height: 12px; }
     .in-team-card-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
     .in-team-card-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
-    [data-theme="dark"] .in-team-card { background: var(--color-surface); border-color: var(--color-border-strong); }
     [data-theme="dark"] .in-team-card-name { color: var(--color-text); }
     [data-theme="dark"] .in-team-card-role { color: var(--color-text-muted); }
+    /* "+ Add team member" — the Figma Button Action link (38130:118593), no
+       border or padding of its own; it takes the next grid cell after the
+       last card, centred on the 48px card row. On click the search field
+       takes over the same cell; the people menu drops below it. */
+    .in-team-add { position: relative; display: flex; align-items: center; min-width: 0; height: 48px; }
+    .in-team-add [hidden] { display: none !important; }
+    .in-team-add .btn.in-link { height: 32px; justify-content: flex-start; }
+    .in-team-search { width: 100%; }
+    .in-team-search .input { width: 100%; height: 32px; }
+    .in-team-menu { position: absolute; top: calc(100% + 4px); left: 0; width: 320px; max-height: 320px; overflow-y: auto; z-index: 20; }
+    .in-team-menu .dropdown-item { flex-shrink: 0; }
+    /* Picked people are left out of the results, so no check column. */
+    .in-team-menu .dropdown-item-check { display: none; }
+    /* The trigger is only kept for the shared select logic — .input-select-trigger's
+       display: flex beats the UA [hidden] rule, so hide it explicitly. */
+    .in-team > .input-select-trigger[hidden] { display: none; }
+    /* Centre the "Working team" label on the 48px tiles, not a 32px input. */
+    .in-form-row:has(> .field > #in-team) > .field-label { min-height: 48px; }
+    /* Required-field error lands on the hidden trigger — show it on the tile. */
+    .in-team:has(.input-select-trigger.is-error) .in-team-add .btn.in-link { color: var(--color-danger); }
+    .in-team:has(.input-select-trigger.is-error) .in-team-search .input { border-color: var(--color-danger); }
 
     /* Working team trigger — up to 3 overlapping photo avatars + summary.
        designmd has no avatar group, so the stack is local. */
@@ -5242,15 +5261,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="in-form-row in-row-top">
             <span class="field-label">Working team</span>
             <div class="field">
-              <div class="input-select" id="in-team" data-multi>
-                <button class="input-select-trigger" aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
-                <div class="dropdown-menu" data-dropdown-search hidden>
-                  <div class="dropdown-search">
-                    <div class="input-icon input-icon-left">
+              <!-- Working team: picked people as cards, then "+ Add team member"
+                   (Figma 38130:118593, the Button Action link). The button turns
+                   into a search field; typing filters the people menu below it,
+                   and a pick adds a card. The trigger stays (hidden) so the
+                   shared select logic, validation and drafts keep working. -->
+              <div class="input-select in-team" id="in-team" data-multi>
+                <button class="input-select-trigger" hidden aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="in-team-cards" id="in-team-cards" aria-label="Working team members">
+                  <div class="in-team-add" data-team-add-slot>
+                    <button class="btn btn-ghost in-link" type="button" data-team-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add team member</button>
+                    <div class="input-icon input-icon-left in-team-search" hidden>
                       <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people to add" autocomplete="off" data-team-search />
                     </div>
-                  </div>
+                    <div class="dropdown-menu in-team-menu" hidden>
                   <div class="dropdown-list" data-dropdown-list>
                     <!-- People from managers.csv (Full Name, Job Title, Avatar URL). -->
                     <button class="dropdown-item" type="button" data-initials="AE"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjcxOTEsInB1ciI6ImJsb2JfaWQifX0=--60464fff1b323a7f956c2de7865ca1612b816f26/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/2024%20&#x27;headshot&#x27;%20cropped%202.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Abbie Emeigh</span><span class="dropdown-item-description">Director of Learning &amp; Development</span></div></button>
@@ -5399,9 +5424,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     <button class="dropdown-item" type="button" data-initials="ÁV"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwOTcsInB1ciI6ImJsb2JfaWQifX0=--e097d59dcd563089ba4c8bd833e12e685199501c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Alvaro_Viscardi_Avatar.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Álvaro Viscardi</span><span class="dropdown-item-description">Enterprise Matching Team Lead</span></div></button>
                     <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
                   </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="in-team-cards" id="in-team-cards" aria-label="Working team members" hidden></div>
               <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
             </div>
           </div>
@@ -6298,7 +6324,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // Working team (ID 7) — multi-select. The shared select handler toggles
       // items; this repaints the trigger as an avatar stack + "Name +N".
       const team = document.getElementById('in-team');
-      personSearch(team);
       const paintTeam = () => {
         const trigger = team.querySelector('.input-select-trigger');
         const value = trigger.querySelector('.input-select-value');
@@ -6315,26 +6340,69 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         value.classList.remove('input-select-placeholder');
         trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
       };
-      // Picked people as small cards under the select (photo · name over title).
+      // Picked people as cards (photo · name over title), always followed by
+      // the "+ Add team member" tile.
       const teamCards = document.getElementById('in-team-cards');
+      const addSlot = team.querySelector('[data-team-add-slot]');
       const paintTeamCards = () => {
         const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
-        teamCards.hidden = !picked.length;
         const items = [...team.querySelectorAll('.dropdown-item')];
-        teamCards.innerHTML = picked.map(i => {
+        teamCards.querySelectorAll('.in-team-card').forEach(c => c.remove());
+        addSlot.insertAdjacentHTML('beforebegin', picked.map(i => {
           const name = i.querySelector('.dropdown-item-label').textContent;
           return `<div class="in-team-card" data-initials="${i.dataset.initials}"><span class="avatar">${i.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
-        }).join('');
+        }).join(''));
       };
       // ✕ on a card unpicks that person — same path as unticking them in the menu.
       teamCards.addEventListener('click', e => {
         const btn = e.target.closest('[data-team-remove]');
         if (!btn) return;
         team.querySelectorAll('.dropdown-item')[+btn.dataset.teamRemove]?.click();
-        teamCards.querySelector('[data-team-remove]')?.focus();
+        (teamCards.querySelector('[data-team-remove]') || addBtn).focus();
       });
-      team.querySelector('.dropdown-menu').addEventListener('click', e => {
-        if (e.target.closest('.dropdown-item')) paintTeam();
+
+      // "+ Add team member" → search field in the same tile. Typing shows
+      // matching people (already-picked ones left out) in the menu below;
+      // a pick adds the card and the button returns after it.
+      const addBtn = addSlot.querySelector('[data-team-add]');
+      const searchWrap = addSlot.querySelector('.in-team-search');
+      const teamSearch = addSlot.querySelector('[data-team-search]');
+      const teamMenu = addSlot.querySelector('.dropdown-menu');
+      const teamEmpty = teamMenu.querySelector('[data-dropdown-empty]');
+      const teamItems = () => [...teamMenu.querySelectorAll('.dropdown-item')];
+      const filterTeam = () => {
+        const q = teamSearch.value.trim().toLowerCase();
+        let shown = 0;
+        teamItems().forEach(i => {
+          const hit = !!q && !i.classList.contains('is-selected')
+            && i.querySelector('.dropdown-item-label').textContent.toLowerCase().includes(q);
+          i.hidden = !hit; shown += hit;
+        });
+        teamEmpty.hidden = !q || shown > 0;
+        teamMenu.hidden = !q;
+      };
+      const openTeamSearch = () => {
+        addBtn.hidden = true; searchWrap.hidden = false;
+        teamSearch.value = ''; filterTeam(); teamSearch.focus();
+      };
+      const closeTeamSearch = ({ focus = false } = {}) => {
+        if (searchWrap.hidden) return;
+        teamSearch.value = ''; searchWrap.hidden = true; teamMenu.hidden = true;
+        teamItems().forEach(i => { i.hidden = false; }); teamEmpty.hidden = true;
+        addBtn.hidden = false;
+        if (focus) addBtn.focus();
+      };
+      addBtn.addEventListener('click', e => { e.stopPropagation(); openTeamSearch(); });
+      teamSearch.addEventListener('input', filterTeam);
+      teamSearch.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); teamItems().find(i => !i.hidden)?.click(); }
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeTeamSearch({ focus: true }); }
+      });
+      document.addEventListener('click', e => { if (!addSlot.contains(e.target)) closeTeamSearch(); });
+      teamMenu.addEventListener('click', e => {
+        if (!e.target.closest('.dropdown-item')) return;
+        paintTeam();
+        if (!searchWrap.hidden) closeTeamSearch({ focus: true });
       });
       // Reset, draft reopen and the states harness change picks without a
       // click — watch the items' selected class so the cards always follow.
