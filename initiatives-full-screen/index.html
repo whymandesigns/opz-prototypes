@@ -3920,6 +3920,70 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .dropdown-search .input-icon, .dropdown-search .input { width: 100%; }
     .dropdown-list .dropdown-item[hidden], .dropdown-empty[hidden] { display: none; }
     #in-duration .dropdown-item[hidden], #in-impact-full .dropdown-item[hidden] { display: none; }
+    /* Beneficiary function menu — Figma 19419:44205. Each option: function
+       icon · name (13/20) over its place in the org (11/16, graphite-700,
+       "Team in X → Y" paths use the long-arrow icon). Hover and the picked
+       option fill blue-100; hover also shows the "view" icon on the right. */
+    #in-beneficiary .dropdown-menu {
+      padding: var(--ic-space-2) 0;
+      border: 0;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.04), 0 8px 12px -3px rgba(0,0,0,.08), 0 4px 8px -2px rgba(0,0,0,.04);
+      max-height: 328px;
+      overflow-y: auto;
+      gap: 0;
+    }
+    #in-beneficiary .dropdown-item {
+      flex-shrink: 0; /* the menu is a flex column — scroll, don't squash */
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--ic-space-2);
+      width: 100%;
+      min-height: 0;
+      padding: 6px 16px;
+      border: 0;
+      border-radius: 0;
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+    }
+    #in-beneficiary .dropdown-item:hover,
+    #in-beneficiary .dropdown-item:focus-visible,
+    #in-beneficiary .dropdown-item.is-selected { background: var(--ic-palette-blue-100); }
+    #in-beneficiary .dropdown-item:focus-visible { outline: none; }
+    .in-fn-icon { width: 16px; height: 16px; flex: none; align-self: flex-start; margin-top: 2px; }
+    .in-fn-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-right: 20px; }
+    #in-beneficiary .dropdown-item-label { font-family: var(--ic-font-sans); font-size: 13px; line-height: 20px; font-weight: var(--ic-weight-regular); color: #000; }
+    #in-beneficiary .dropdown-item-description { display: flex; align-items: center; gap: 4px; font-family: var(--ic-font-sans); font-size: 11px; line-height: 16px; color: #455065; white-space: nowrap; }
+    .in-fn-arrow { width: 16px; height: 16px; flex: none; }
+    .in-fn-view { position: absolute; right: 16px; top: 50%; width: 12px; height: 12px; margin-top: -6px; opacity: 0; }
+    #in-beneficiary .dropdown-item:hover .in-fn-view,
+    #in-beneficiary .dropdown-item:focus-visible .in-fn-view { opacity: 1; }
+    [data-theme="dark"] #in-beneficiary .dropdown-menu,
+    [data-theme="dark"] #in-beneficiary .dropdown-item { background: var(--color-surface); }
+    [data-theme="dark"] #in-beneficiary .dropdown-item:hover,
+    [data-theme="dark"] #in-beneficiary .dropdown-item.is-selected { background: var(--color-surface-muted); }
+    [data-theme="dark"] #in-beneficiary .dropdown-item-label { color: var(--color-text); }
+    [data-theme="dark"] #in-beneficiary .dropdown-item-description { color: var(--color-text-muted); }
+
+    /* Working team picks — small cards under the select (photo · name over
+       title), light grey border; auto-fill so 8+ people wrap into rows. */
+    .in-team-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--ic-space-2); margin-top: var(--ic-space-2); }
+    .in-team-cards[hidden] { display: none; }
+    .in-team-card { display: flex; align-items: center; gap: var(--ic-space-2); min-width: 0; padding: 4px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); }
+    .in-team-card-text { display: flex; flex-direction: column; min-width: 0; }
+    /* Name + title fit the 24px photo (12 + 12), so the card is exactly
+       4px padding around the photo — no extra space above or below it. */
+    .in-team-card-name { font: var(--type-body-xs-semibold); line-height: 12px; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .in-team-card-role { font-size: var(--ic-text-xxs); line-height: 12px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .in-team-card-text { flex: 1; }
+    .in-team-card-remove { flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: var(--ic-radius-sm); background: transparent; color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .in-team-card-remove .icon { width: 12px; height: 12px; }
+    .in-team-card-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .in-team-card-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+
     /* Working team trigger — up to 3 overlapping photo avatars + summary.
        designmd has no avatar group, so the stack is local. */
     .in-avatar-stack { display: inline-flex; flex-shrink: 0; }
@@ -4017,6 +4081,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       display: block;
       background: var(--color-surface);
     }
+    /* Keep the standard shell: the create view starts under the 56px topbar
+       and right of the sidenav (236px, or the 62px compact rail), so both
+       stay visible and usable while creating. */
+    #in-drawer-new {
+      top: 56px;
+      left: 236px;
+      transition: left var(--ic-duration-base) var(--ic-ease);
+    }
+    body:has(.sidenav.is-compact) #in-drawer-new { left: 62px; }
+    /* The collapse toggle straddles the sidenav's right edge — keep it above
+       the create view so it stays clickable. */
+    body:has(#in-drawer-new:not([hidden])) .sidenav-toggle { z-index: calc(var(--ic-z-modal) + 1); }
     #in-drawer-new > .drawer {
       max-width: none;
       width: 100%;
@@ -4031,6 +4107,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-cs-name-row { display: flex; align-items: flex-start; gap: var(--ic-space-3); }
     .in-cs-name-row > .in-name-field { flex: 1; min-width: 0; }
     .in-cs-close { flex: none; color: var(--color-text-muted); }
+    /* Title input matches the form column below (grid minus the 200px TOC
+       rail and its gap); the close button pins 32px from the screen's right edge. */
+    #in-drawer-new .drawer-header { position: relative; }
+    #in-drawer-new .in-cs-name-row > .in-name-field { flex: none; width: calc(100% - 200px - var(--ic-space-7)); }
+    #in-drawer-new .drawer-header .in-cs-close { position: absolute; top: var(--ic-space-5); right: 32px; }
+    @media (max-width: 1100px) {
+      #in-drawer-new .in-cs-name-row > .in-name-field { width: calc(100% - 40px); }
+    }
     .in-cs-close:hover { color: var(--color-text); }
     /* --color-text-muted lands at 2.27:1 on the dark panel, under the 3:1 WCAG
        minimum for controls — and this is the only dismiss affordance. Same
@@ -4526,6 +4610,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-users-three" viewBox="0 0 24 24"><use href="#i-focus-group"/></symbol>
   <symbol id="i-warning-octagon" viewBox="0 0 24 24"><use href="#i-exclamation-solid"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><use href="#i-close"/></symbol>
+  <!-- Beneficiary function menu icons — exported from Figma 19419:44205. -->
+  <symbol id="i-fn-function" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 0C6.52724 0 5.33333 1.19391 5.33333 2.66667C5.33333 3.95678 6.24947 5.03291 7.46667 5.27999V7.46667H2.13333V10.6667H0V16H5.33333V10.6667H3.2V8.53333H12.8V10.6667H10.6667V16H16V10.6667H13.8667V7.46667H8.53333V5.27999C9.75053 5.03291 10.6667 3.95678 10.6667 2.66667C10.6667 1.19391 9.47276 0 8 0ZM8.00002 4.26667C8.88368 4.26667 9.60002 3.55032 9.60002 2.66667C9.60002 1.78301 8.88368 1.06667 8.00002 1.06667C7.11636 1.06667 6.40002 1.78301 6.40002 2.66667C6.40002 3.55032 7.11636 4.26667 8.00002 4.26667ZM1.06667 11.7333H4.26667V14.9333H1.06667V11.7333ZM11.7333 11.7333H14.9333V14.9333H11.7333V11.7333Z" fill="#455065"/></symbol>
+  <symbol id="i-fn-arrow" viewBox="0 0 16 16"><path d="M9.79289 5.5L12.2929 8H2V9H12.2929L9.79289 11.5L10.5 12.2071L14.2071 8.5L10.5 4.79289L9.79289 5.5Z" fill="#455065"/></symbol>
+  <symbol id="i-fn-view" viewBox="0 0 12 12"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.75 1.5V10.5V11.25H1.5H10.5H11.25V10.5V6.75H10.5V10.5H1.5V1.5H5.25V0.75H1.5H0.75V1.5ZM10.5 4.5V2.03033L6.375 6.15533L5.84467 5.625L9.96967 1.5H7.5V0.75H10.5H11.25V1.5V4.5H10.5Z" fill="#455065"/></symbol>
   <symbol id="i-gift" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="2.99994" y="12.1819" width="17.9996" height="10.4998" stroke="currentColor"/> <path vector-effect="non-scaling-stroke" d="M8.99967 6.36398L7.23194 4.59625C6.4509 3.81522 6.4509 2.54891 7.23194 1.76788L7.58548 1.41433C8.36652 0.6333 9.63282 0.6333 10.4139 1.41433L11.9996 3.00011" stroke="currentColor" stroke-width="0.99998"/> <path vector-effect="non-scaling-stroke" d="M15.5626 6.16551L16.1592 5.5689L17.1315 4.59664C17.9125 3.81561 17.9125 2.54931 17.1315 1.76827L16.7779 1.4147C15.9969 0.633681 14.7306 0.63367 13.9496 1.41468L12.1818 3.1824" stroke="currentColor" stroke-width="0.99998" stroke-linecap="round"/> <rect vector-effect="non-scaling-stroke" x="1.49997" y="6.182" width="20.9996" height="5.99988" stroke="currentColor"/> <path vector-effect="non-scaling-stroke" d="M11.9998 3.18206L11.9998 22.6817" stroke="currentColor" stroke-width="0.99998"/></symbol>
   <symbol id="i-happy-emoji" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M12 23.5C18.3513 23.5 23.5 18.3513 23.5 12C23.5 5.64873 18.3513 0.5 12 0.5C5.64873 0.5 0.5 5.64873 0.5 12C0.5 18.3513 5.64873 23.5 12 23.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M8.5 9V6" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15.5 9V6" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M5.32996 12.5C5.70996 15.87 8.52996 18.5 12 18.5C15.47 18.5 18.3 15.87 18.67 12.5H5.32996Z" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
   <symbol id="i-sad-emoji" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M12 23.5C18.3513 23.5 23.5 18.3513 23.5 12C23.5 5.64873 18.3513 0.5 12 0.5C5.64873 0.5 0.5 5.64873 0.5 12C0.5 18.3513 5.64873 23.5 12 23.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M6 12L9 11.25" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15 11.25L18 12" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15.75 17.25C15.75 17.25 14.25 15.75 12 15.75C9.75 15.75 8.25 17.25 8.25 17.25" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
@@ -4753,12 +4841,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </div>
                   <div class="dropdown-list" data-dropdown-list>
-                    <button class="dropdown-item" type="button" data-initials="AK"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=47" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Aisha Khan</span><span class="dropdown-item-description">VP Operations</span></div></button>
-                    <button class="dropdown-item" type="button" data-initials="AJ"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=12" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Adan Jones</span><span class="dropdown-item-description">Head of Tech Services</span></div></button>
-                    <button class="dropdown-item" type="button" data-initials="DR"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=33" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Daniel Reyes</span><span class="dropdown-item-description">Engineering Lead</span></div></button>
-                    <button class="dropdown-item" type="button" data-initials="MS"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=45" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Maria Santos</span><span class="dropdown-item-description">Marketing Manager</span></div></button>
-                    <button class="dropdown-item" type="button" data-initials="NG"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=49" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Nina Gupta</span><span class="dropdown-item-description">Product Manager</span></div></button>
-                    <button class="dropdown-item" type="button" data-initials="MV"><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Matthew Vella</span><span class="dropdown-item-description">You</span></div></button>
+                    <!-- People from avp_plus_roles.csv (Full Name, Job Title, Avatar URL). -->
+                    <button class="dropdown-item" type="button" data-initials="TD"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTUsInB1ciI6ImJsb2JfaWQifX0=--704a7be23f20fc5e185b5c6136d82bc0eb5c9978/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/ezgif-2-afa7826d4492.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Taso Du Val</span><span class="dropdown-item-description">CEO</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="HA"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyNjAwLCJwdXIiOiJibG9iX2lkIn19--1be6caad62770984e230a67fffc326ed06d2779a/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJKUEciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--376aa00361bde990f0a2a691d274997ee965f7ce/Hemant%20headshot.JPG" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Hemant Adhikari</span><span class="dropdown-item-description">CEO, HireGlobal</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="PC"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwOTY0LCJwdXIiOiJibG9iX2lkIn19--b694ebcb3e4daf777a4fac066140ab917a05300f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/1769467300006.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Paul Cioni</span><span class="dropdown-item-description">CTO, Technology Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="JM"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwNDc0LCJwdXIiOiJibG9iX2lkIn19--f922ebacb93c719b4ef24cd80bd492bdf7f0bd2b/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/JeffProfile.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Jeff Mills</span><span class="dropdown-item-description">Chief Customer Officer, AI Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="CA"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NTI0ODEsInB1ciI6ImJsb2JfaWQifX0=--e8ff80120780ca6101672d1119fe76bd2c27884d/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Picture.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Carlos Aguirre</span><span class="dropdown-item-description">Chief Financial Officer</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AY"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyMjY3LCJwdXIiOiJibG9iX2lkIn19--728705505f17e8d86875ce673d054baf6972bcc2/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/portrait_square_fullhead.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Alex Yarotsky</span><span class="dropdown-item-description">Chief Operating Officer</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="ML"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQxMzU2LCJwdXIiOiJibG9iX2lkIn19--17972874389b37163577b61a1e586dfb00f3acea/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/b2d384de4ff8ebec.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Michelle Labbe</span><span class="dropdown-item-description">Chief People Officer</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="IP"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzcwLCJwdXIiOiJibG9iX2lkIn19--a8e3f8a28a69c9b1231d397478b708e9c93b7efa/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/b53c3e0396429723dd5fb9b33fce3ed3" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Ismael Peinado</span><span class="dropdown-item-description">Chief Technology Officer</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="BT"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjcwLCJwdXIiOiJibG9iX2lkIn19--34207ae2f1cf32c71aadd7af9d3e62a623619189/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Bill_Tsingos_photo_(1).jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Bill Tsingos</span><span class="dropdown-item-description">General Counsel</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="RO"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwNzEyLCJwdXIiOiJibG9iX2lkIn19--1c58e603eff83fb94ef66e79da4f7b3e7163a5f4/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/1000000118.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Robert Orshaw</span><span class="dropdown-item-description">EVP, Services &amp; CEO, Tech Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MB"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyNTM3LCJwdXIiOiJibG9iX2lkIn19--bd8f4d417700efb41739b16984c55d2f9bff3679/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/IMG_5967.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Malik Ben-Yousef</span><span class="dropdown-item-description">EVP, Industries</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="LB"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDExNzcsInB1ciI6ImJsb2JfaWQifX0=--7ca42362e6ce95da5c3def1dd576620c8971543c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Luiz.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Luiz Baia</span><span class="dropdown-item-description">SVP of Marketing Strategy</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="PT"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MzM1MTIsInB1ciI6ImJsb2JfaWQifX0=--cc9516ed2668e53e8c6850605706d4e80c14bf3d/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJKUEciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--376aa00361bde990f0a2a691d274997ee965f7ce/Paul%20-%20HS.JPG" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Paul Timmermann</span><span class="dropdown-item-description">SVP, Product</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="JW"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQxOTA5LCJwdXIiOiJibG9iX2lkIn19--6465addbbe8f2bfb5d03a6cf177700b638bc5bd5/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/1DD54763-BB59-4625-9F26-380B0B3DF81F.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Josh Whitham</span><span class="dropdown-item-description">SVP, Staffing</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="YM"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQxMjYwLCJwdXIiOiJibG9iX2lkIn19--afe310075f8f0ef34d72331f97419774d21f010e/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/1759591755781.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Yaz Madanat</span><span class="dropdown-item-description">VP &amp; Managing Director</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="CC"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MjMyNDYsInB1ciI6ImJsb2JfaWQifX0=--9da82dbd1a1dd0acf31d6b83a4efd9eb27998d0c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/IMG_0891-square.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Carly Coleman</span><span class="dropdown-item-description">VP Fulfillment</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AH"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MzM3NTIsInB1ciI6ImJsb2JfaWQifX0=--f2c6c38e817a5fe3e1d7ba69d1b3f6323d3b1f30/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/20210321-9N4A7780.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Ashley Hanzivasilis</span><span class="dropdown-item-description">VP Operations, HireGlobal and Staffing</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="SS"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NTMzNzksInB1ciI6ImJsb2JfaWQifX0=--a89db085e40f41ecefe85ffe0cd4edf20cdb86f3/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Steve%20Headshot.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Steve Schirr</span><span class="dropdown-item-description">VP Talent Operations - Capabilities</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="TA"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTEzMCwicHVyIjoiYmxvYl9pZCJ9fQ==--8e1cf6e4ff2f630567ac160f6e22b1e9e0a99243/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/663b6b9a5bf021e5b468df13920872a9" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Travis Anderson</span><span class="dropdown-item-description">VP of Business Analytics</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="KB"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjE4LCJwdXIiOiJibG9iX2lkIn19--0bdca3f882165c7296a8a73b2dcde69a537ddbdf/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Keith_Berlin_Photo.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Keith Berlin</span><span class="dropdown-item-description">VP of Events</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="KS"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6Njk3NjEsInB1ciI6ImJsb2JfaWQifX0=--8ea2b081d36f7e21d52127377ad816730e7855d4/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/IMG_0789.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Kimberly Sommers</span><span class="dropdown-item-description">VP of Financial Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="TS"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjIxMTAsInB1ciI6ImJsb2JfaWQifX0=--5ed32cb6efcbb0f20175e4d0f1b805a047180517/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/Headshot.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Todd Silverstein</span><span class="dropdown-item-description">VP of Performance Marketing</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="NP"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjI5MjQsInB1ciI6ImJsb2JfaWQifX0=--cc38d2347fb3c3f113e9496c6615fedc30523009/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Slackpicture.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Neil Pickard</span><span class="dropdown-item-description">VP, Industry GTM</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="SC"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyMjgwLCJwdXIiOiJibG9iX2lkIn19--ce58497c2f242394d156d4e8979cf7f4c6f8e8b0/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Updated%20HS.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Stacy Campbell</span><span class="dropdown-item-description">VP, Industry Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MI"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzA4ODIsInB1ciI6ImJsb2JfaWQifX0=--02c79d1e2642795a542d13db5a68ec13e3dfb5b9/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/1000006091.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Mohsin Imran</span><span class="dropdown-item-description">VP, Mergers &amp; Acquisitions</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="CG"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwOTI4LCJwdXIiOiJibG9iX2lkIn19--897e265236d35829145a0ae5a0fb80ec37eb0f95/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/cg%20profile%20pic.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Chris Gartner</span><span class="dropdown-item-description">VP, Pursuit Operations</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AL"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzM5NDQsInB1ciI6ImJsb2JfaWQifX0=--87922c30b360b190c0f3a9f6cbb6d046d68e4748/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/AL_Headshot.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Alex Long</span><span class="dropdown-item-description">GM, BFSI, Healthcare &amp; Life Sciences</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="NB"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwMjY5LCJwdXIiOiJibG9iX2lkIn19--636e6d2569335bb829bc5f2767dc3fcf7c8ab605/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Screenshot%202026-01-05%20at%205.11.26-PM.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Noah Beltran</span><span class="dropdown-item-description">GM, Communication, Media, Entertainment and Technology</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="CD"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQxNzY1LCJwdXIiOiJibG9iX2lkIn19--0bf0c117f031177c94d63f029540960e3aa9dd5a/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/E01HSMSV622-U08256N8W5S-4b66219310de-512.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Chris Daniel</span><span class="dropdown-item-description">GM, Consumer Products &amp; Services</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="RK"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzM0MjEsInB1ciI6ImJsb2JfaWQifX0=--8d7fdfbede67d279915dfaa36661d8e5db8d01b5/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Raymond_Kaminski_Headshot_Large.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Raymond Kaminski</span><span class="dropdown-item-description">GM, ExpertCrowd</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="MM"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyMDgzLCJwdXIiOiJibG9iX2lkIn19--a70b97698b46e8fc875f76c5df4068e26ecbb3e7/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/image001.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Matt Mayberry</span><span class="dropdown-item-description">GM, Insurance</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="SP"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzI3MDQsInB1ciI6ImJsb2JfaWQifX0=--d7b6c9b5d88578a98658bc718ee4fce8daf75521/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/SP2.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Stefan Pajkovic</span><span class="dropdown-item-description">GM, New Business Unit</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="SZ"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzQ4NDksInB1ciI6ImJsb2JfaWQifX0=--a13fa08f15741b2cda32c7425ebaa94d3f5f4164/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--6ff766d03f191a943478e01f3f4992f9973dbc70/Sohaib%20pic.png" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Sohaib Zahid</span><span class="dropdown-item-description">GM, New Business Unit</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="JE"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwMzgyLCJwdXIiOiJibG9iX2lkIn19--7a4c70dcd6a59fdeedcf63551d993b05a6dfe77c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/PXL_20260113_011029393~2.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">John Edwar</span><span class="dropdown-item-description">GM, Toptal Resume</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="VV"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQyOTI1LCJwdXIiOiJibG9iX2lkIn19--a3bf8ec09325fc317b0c20795a7d34a7267c3f26/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGVnIiwicmVzaXplX3RvX2ZpbGwiOlszNTIsMzUyXX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--9a2612897c51f8abd315f5829780df63131f514d/Facetune_28-09-2026-09-34-16.jpeg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Vignesh Veerasamy</span><span class="dropdown-item-description">General Manager, Management Consulting</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="HM"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MzE3MTgsInB1ciI6ImJsb2JfaWQifX0=--9168ec999b48e73e06936e1d28afd1f6f3bfd17c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Hari%20Mahadevan%20(10).jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Hari Mahadevan</span><span class="dropdown-item-description">AVP of Talent Network</span></div></button>
+                    <button class="dropdown-item" type="button" data-initials="AZ"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTM4MCwicHVyIjoiYmxvYl9pZCJ9fQ==--6641f41ae087726fee24f8ac0611b9eef48f2178/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/data" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Adina Zoltan</span><span class="dropdown-item-description">AVP, Content Marketing</span></div></button>
                     <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
                   </div>
                 </div>
@@ -4774,16 +4894,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="field">
               <div class="input-select" id="in-beneficiary">
                 <button class="input-select-trigger" aria-expanded="false" aria-label="Beneficiary function" aria-required="true" aria-describedby="in-beneficiary-error" type="button"><span class="input-select-value input-select-placeholder">Add beneficiary function</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
-                <div class="dropdown-menu" hidden>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketing</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Sales</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Engineering</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Operations</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>People</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Finance</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Product</button>
-                  <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Customer Success</button>
-                </div>
+                <!-- Options rendered from IN_FUNCTIONS (script) in the Figma
+                     19419:44205 layout: icon · name over org path. -->
+                <div class="dropdown-menu" data-fn-menu hidden></div>
               </div>
               <span class="field-hint is-error" id="in-beneficiary-error" hidden>Add a beneficiary function to create this initiative.</span>
             </div>
@@ -4848,6 +4961,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                   </div>
                 </div>
               </div>
+              <div class="in-team-cards" id="in-team-cards" aria-label="Working team members" hidden></div>
               <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
             </div>
           </div>
@@ -5377,6 +5491,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       // Drawer form — single-select inputs (person options carry their avatar
       // into the trigger), inline title edit, "Less / More details" accordion.
+      // Beneficiary function options (Figma 19419:44205). `path` renders as
+      // "Team in X → Y"; otherwise `type` is the subtitle. Rendered before the
+      // shared select wiring below, which reads the items on click.
+      const IN_FUNCTIONS = [
+        { name: 'AI Services', type: 'Function' },
+        { name: 'Business Analytics', type: 'Function' },
+        { name: 'Customer', type: 'Function' },
+        { name: 'Engineering', type: 'Function' },
+        { name: 'Finance', type: 'Function' },
+        { name: 'Legal', type: 'Function' },
+        { name: 'Marketing', type: 'Function' },
+        { name: 'Mergers & Acquisitions', type: 'Function' },
+        { name: 'New Business', type: 'Function' },
+        { name: 'Operations', type: 'Function' },
+        { name: 'People', type: 'Function' },
+        { name: 'Product Management', type: 'Function' },
+        { name: 'Services', type: 'Function' },
+        { name: 'Staffing', type: 'Function' },
+        { name: 'Talent Operations', type: 'Function' },
+      ];
+      const fnMenu = document.querySelector('[data-fn-menu]');
+      if (fnMenu) fnMenu.innerHTML = IN_FUNCTIONS.map(f => `<button class="dropdown-item" type="button"><svg class="in-fn-icon" aria-hidden="true"><use href="#i-fn-function"/></svg><span class="in-fn-text"><span class="dropdown-item-label">${f.name.replace(/&/g, '&amp;')}</span><span class="dropdown-item-description">${f.path ? `${f.path[0]}<svg class="in-fn-arrow" aria-hidden="true"><use href="#i-fn-arrow"/></svg>${f.path[1]}` : f.type}</span></span><svg class="in-fn-view" aria-hidden="true"><use href="#i-fn-view"/></svg></button>`).join('');
+
       const form = document.querySelector('.in-form');
 
       // Core strategy switch — the objective row only exists while it's on.
@@ -5698,6 +5835,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
       personSearch(sponsor);
 
+      // Executive sponsor photos live on team.toptal.net and need a Toptal
+      // login — when one can't load, the avatar falls back to initials.
+      // Broken photo → initials, here and in the trigger avatar it's copied into.
+      const toInitials = img => {
+        const ini = img.closest('.dropdown-item')?.dataset.initials
+          || sponsor.querySelector('.dropdown-item.is-selected')?.dataset.initials || '';
+        img.replaceWith(document.createTextNode(ini));
+      };
+      document.addEventListener('error', e => {
+        if (e.target instanceof HTMLImageElement && e.target.closest('#in-sponsor')) toInitials(e.target);
+      }, true);
+      // The markup's photos start loading before this script runs — catch any
+      // that already failed.
+      sponsor.querySelectorAll('img').forEach(img => { if (img.complete && !img.naturalWidth) toInitials(img); });
+
       // Working team (ID 7) — multi-select. The shared select handler toggles
       // items; this repaints the trigger as an avatar stack + "Name +N".
       const team = document.getElementById('in-team');
@@ -5712,19 +5864,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           value.classList.add('input-select-placeholder');
           return;
         }
-        const stack = document.createElement('span');
-        stack.className = 'in-avatar-stack';
-        stack.setAttribute('data-select-avatar', '');
-        stack.innerHTML = picked.slice(0, 3).map(i => `<span class="avatar avatar-sm"><img src="${i.querySelector('img').src}" alt="" /></span>`).join('');
-        trigger.prepend(stack);
+        // No avatars in the trigger — the cards below already show who's picked.
         const first = picked[0].querySelector('.dropdown-item-label').textContent;
         value.textContent = picked.length === 1 ? first : `${first} +${picked.length - 1}`;
         value.classList.remove('input-select-placeholder');
         trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
       };
+      // Picked people as small cards under the select (photo · name over title).
+      const teamCards = document.getElementById('in-team-cards');
+      const paintTeamCards = () => {
+        const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
+        teamCards.hidden = !picked.length;
+        const items = [...team.querySelectorAll('.dropdown-item')];
+        teamCards.innerHTML = picked.map(i => {
+          const name = i.querySelector('.dropdown-item-label').textContent;
+          return `<div class="in-team-card"><span class="avatar avatar-sm"><img src="${i.querySelector('img').src}" alt="" /></span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
+        }).join('');
+      };
+      // ✕ on a card unpicks that person — same path as unticking them in the menu.
+      teamCards.addEventListener('click', e => {
+        const btn = e.target.closest('[data-team-remove]');
+        if (!btn) return;
+        team.querySelectorAll('.dropdown-item')[+btn.dataset.teamRemove]?.click();
+        teamCards.querySelector('[data-team-remove]')?.focus();
+      });
       team.querySelector('.dropdown-menu').addEventListener('click', e => {
         if (e.target.closest('.dropdown-item')) paintTeam();
       });
+      // Reset, draft reopen and the states harness change picks without a
+      // click — watch the items' selected class so the cards always follow.
+      // (Observer callbacks already batch per task, so one repaint per change burst.)
+      new MutationObserver(paintTeamCards).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
 
       // Multi-entry lists (roadmap IDs 20–21). Rows: number · input · drag
       // handle · remove. The last row can't be removed. Drag by the handle;
@@ -5913,7 +6083,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const stage = document.querySelector('#in-drawer-new .in-stage-trigger')?.textContent.trim() || 'Idea';
         return {
           name: nameInput.value.trim() || 'Untitled initiative',
-          fn: selectedOf('in-beneficiary')?.textContent.trim() || '—',
+          fn: selectedOf('in-beneficiary')?.querySelector('.dropdown-item-label')?.textContent.trim() || '—',
           status: asDraft ? 'Draft' : stage,
           draft: asDraft,
           health: HEALTH_FROM_LABEL[healthLabel] || 'na',
@@ -7239,7 +7409,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const pick = (id, text) => {
         const el = document.getElementById(id);
         el.querySelector('.input-select-trigger').click();
-        [...el.querySelectorAll('.dropdown-item:not([hidden])')].find(i => !text || i.textContent.includes(text))?.click();
+        // Exact label first — "Operations" must not land on "… in Business Operations".
+        const items = [...el.querySelectorAll('.dropdown-item:not([hidden])')];
+        (items.find(i => text && i.querySelector('.dropdown-item-label')?.textContent.trim() === text)
+          || items.find(i => !text || i.textContent.includes(text)))?.click();
         document.body.click();
       };
       const pickMany = (id, names) => {
@@ -7258,7 +7431,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       };
       const fillRequired = name => {
         type('in-name', name);
-        pick('in-sponsor', 'Aisha'); pick('in-beneficiary', 'Sales'); pick('in-pm', 'Nina');
+        pick('in-sponsor', 'Taso Du Val'); pick('in-beneficiary', 'Customer'); pick('in-pm', 'Nina');
         pickMany('in-team', ['Daniel']); pick('in-duration', '1 quarter');
         type('in-desc', 'A cross-functional push to give every initiative owner one place to set up, run and report on their work, replacing the weekly status-deck rebuild.');
         type('in-problem', 'Owners rebuild status decks by hand every week, and leadership reads stale Google Sheets.');
@@ -7302,7 +7475,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
         'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },
         'draft-reopen': async () => {
-          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-sponsor', 'Daniel'); pick('in-beneficiary', 'Operations');
+          await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-sponsor', 'Paul Cioni'); pick('in-beneficiary', 'Operations');
           await saveDraft(); $('#in-rows tr[data-draft]').click(); await W(300);
         },
         'edit-mode': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); $('[data-view-edit]').click(); await W(300); },
