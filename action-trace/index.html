@@ -127,7 +127,7 @@
   .conn-ic{width:28px;height:28px;border-radius:4px;background:var(--gray-100);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
   .conn-title{font-weight:600;font-size:14px;line-height:22px;}
   .conn-sub{font-size:13px;line-height:20px;color:var(--graphite-700);}
-  .connect-btn{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;border:none;background:none;color:var(--blue);font-weight:600;font-size:14px;}
+  .connect-btn{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;padding:0;border:none;background:none;color:var(--blue);font-weight:600;font-size:14px;}
   .conn-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 16px 56px;align-items:center;font-size:13px;}
   .dd{position:absolute;left:-1px;right:-1px;top:calc(100% - 4px);background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 8px 12px -3px rgba(0,0,0,.08),0 4px 8px -2px rgba(0,0,0,.04);z-index:5;overflow:hidden;}
   .dd-proc{padding:12px 16px;}
@@ -171,7 +171,7 @@
   .progress{display:flex;align-items:center;gap:8px;margin-top:4px;}
   .progress .bar{flex:1;height:4px;border-radius:2px;background:var(--gray-200);overflow:hidden;}
   .progress .bar i{display:block;height:100%;width:32%;background:linear-gradient(90deg,var(--blue),var(--green));}
-  .vconn{border:1px solid var(--gray-300);border-radius:4px;padding:14px 14px;margin-bottom:12px;}
+  .vconn{border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-bottom:12px;}
   .vconn .h{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:10px;}
   .vconn .b{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px;}
   .deck-card{border:1px solid var(--gray-300);border-radius:4px;overflow:hidden;}
@@ -406,6 +406,9 @@
   .fs-create .conn-title{color:#000;}
   .fs-create .conn-sub{color:#455065;}
   .fs-create .connect-btn{gap:4px;font-size:14px;line-height:14px;height:24px;align-self:center;}
+  /* The 16px chevron glyph spans only its middle 8px — tuck the box in so the
+     glyph's edge lines up with the Edit link and counts below it. */
+  .fs-create .connect-btn svg,.dd-link svg:last-child{margin-right:-4px;}
   .fs-create .conn-chips{padding-left:56px;}
   .fs-create .owner{gap:8px;padding-bottom:16px;margin-bottom:16px;}
   .fs-create .owner > div > div:first-child{font-size:14px;line-height:22px;color:#000;}
@@ -955,7 +958,7 @@ function renderCreate() {
                 <label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>
                 ${c.proc === k ? `<div class="dd-steps">${p.steps.map(s => `<label class="check sm"><input type="checkbox" data-step="${s.id}" ${c.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div>` : ''}
               </div>`).join('')}
-              <div class="dd-foot"><span class="muted">${atReady ? `<span class="asg-stepno">Step 1 of 2</span>${c.steps.length} step${c.steps.length === 1 ? '' : 's'} selected` : '<span class="asg-stepno">Step 1 of 2</span>Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
+              <div class="dd-foot"><span class="muted"><span class="asg-stepno">Step 1 of 2</span>${atReady ? '' : 'Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
           </div>
           ${simpleConn('slack', slackLogo(20), 'Slack', 'Create or add Slack channels to sync conversations with this meeting', ['#-actiontrace-invoicing-process','#-rob-invoices-rampup','+ Create new channel'], `<label class="check" style="margin-top:8px;font-size:13px"><input type="checkbox" ${c.slackNA ? 'checked' : ''} data-act="slack-na" /><span class="box"></span>Not Applicable</label>`)}
           ${simpleConn('init', ic.rocket(18), 'Initiatives', 'Connect to the Initiative this work advances', ['Supplier Invoice Management','Engineering Weekly','CRM Optimization and Expansion'])}
