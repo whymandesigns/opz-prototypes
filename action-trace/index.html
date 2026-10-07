@@ -206,7 +206,7 @@
   .node.on small{color:#c9d5ff;}
   .node.on::after{content:"";position:absolute;top:-.45em;right:-.45em;width:.9em;height:.9em;border-radius:50%;
     background:#3aa0ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 5.2l1.6 1.6 3.4-3.6' stroke='white' stroke-width='1.4' fill='none'/%3E%3C/svg%3E") center/100% no-repeat;}
-  .mw{display:flex;gap:1.2em;}
+  .mw{display:flex;flex-wrap:nowrap;gap:1.2em;overflow:hidden;}
   .mw .grp{display:flex;gap:1em;}
   .mw .mgr{width:5.6em;}
   .mw .cols{display:flex;gap:1.6em;border-left:1px solid #4a63b8;padding-left:.8em;}
@@ -378,6 +378,163 @@
   .flownav .menu button:hover{background:rgba(255,255,255,.08);}
   .flownav .menu button.on{background:rgba(3,176,128,.18);color:#fff;}
   .flownav .menu button i{font-style:normal;color:#9aa3b5;width:18px;text-align:right;flex-shrink:0;}
+
+  /* ───────── Create modal — matched to Figma 36606:69656 ─────────
+     Header 24/32 padding, 20/30 title, 8px between the [ROB] mark and the
+     title, pencil 16px after. Body 16px below the header; columns 740 · 388 ·
+     200 with 24px gaps. Section headings 16/24 then 8px (Agenda, Connections)
+     or 16px (Details, Owner, Participants). Cards #EBECED, 8px radius. */
+  .fs-create .fs-head{height:79px;padding-top:0;padding-bottom:0;}
+  .fs-create .fs-head h1{gap:8px;}
+  .fs-create .fs-head h1 .icon-btn{margin-left:8px;width:16px;height:16px;}
+  .fs-create .fs-body{padding:16px 32px 24px;}
+  .fs-create #c-details{padding-bottom:16px;margin-bottom:31px;}
+  .fs-create #c-details > label.field{margin-top:20px !important;}
+  .fs-create #c-details .grid2 .check{margin-top:-4px;height:24px;}
+  .fs-create #c-details .grid2 > div > div[style*="margin-top:12px"]{margin-top:8px !important;}
+  .fs-create .rte .ed{min-height:137px;padding:8px 16px 7px;}
+  .fs-create .rte + .hint{margin-top:4px;}
+  .fs-create #c-agenda{border-bottom:0;padding-bottom:0;margin-bottom:14px;}
+  .fs-create #c-agenda h2.sec,.fs-create #c-connections h2.sec{margin-bottom:8px;}
+  .fs-create .count{background:#fff;border-color:#d8d9dc;color:#455065;font-size:10px;line-height:12px;padding:4px;}
+  .fs-create .empty-box{border:1px dashed #ebeced;border-radius:8px;padding:15px 16px;gap:8px;font-size:12px;line-height:18px;color:#455065;}
+  .fs-create .add-link{margin-top:8px;gap:4px;height:24px;font-size:14px;line-height:14px;}
+  .fs-create .conn{border-color:#ebeced;border-radius:8px;}
+  .fs-create .conn-head{gap:8px;align-items:center;padding:15px 16px;}
+  .fs-create .conn-ic{width:32px;height:32px;background:#f3f4f6;border:1px solid #ebeced;border-radius:4px;}
+  .fs-create .conn-title{color:#000;}
+  .fs-create .conn-sub{color:#455065;}
+  .fs-create .connect-btn{gap:4px;font-size:14px;line-height:14px;height:24px;align-self:center;}
+  .fs-create .conn-chips{padding-left:56px;}
+  .fs-create .owner{gap:8px;padding-bottom:16px;margin-bottom:16px;}
+  .fs-create .owner > div > div:first-child{font-size:14px;line-height:22px;color:#000;}
+  .fs-create .owner > div > div:last-child{font-size:13px !important;line-height:18px;color:#455065;}
+  .fs-create .col-people > .field{margin-bottom:0;}
+  .fs-create .col-people > div[style*="margin-top:12px"]{margin-top:16px !important;display:flex;flex-direction:column;gap:16px;}
+  .fs-create .person{padding:0;min-height:42px;}
+  .fs-create .person .nm{font-weight:600;color:#000;}
+  .fs-create .person .rl{color:#455065;}
+  .fs-create .person .badge{background:#eafbf5;color:#03b080;font-size:12px;}
+  .fs-create .side-link{gap:8px;padding:8px 16px;color:#455065;line-height:22px;}
+  .fs-create .side-link.active{color:#000;background:#f3f4f6;}
+  .fs-create .fs-foot .btn{font-size:13px;line-height:16px;padding:8px 16px;min-width:60px;justify-content:center;}
+  .fs-create .fs-foot .btn:not(.primary){border-color:#d8d9dc;color:#000;}
+  .fs-create .fs-foot .btn.primary{background:#00cc83;border-color:#00cc83;}
+  .fs-create .fs-foot .btn.primary:hover{background:#00b574;}
+  .fs-create .dd-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid #ebeced;background:#fff;font-size:13px;}
+
+  /* ───────── Managers & workers step ───────── */
+  .btn.sm{height:28px;padding:0 12px;font-size:13px;}
+  .btn:disabled{opacity:.45;cursor:default;}
+  .link-btn{border:none;background:none;padding:0;color:var(--blue);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .link-btn:hover{text-decoration:underline;}
+  .link-btn.sm{font-size:12px;}
+  .muted-link{color:var(--graphite-700);font-weight:400;}
+  .ghost-btn{border-color:transparent;color:var(--graphite-700);font-weight:400;}
+  .ghost-btn:hover{border-color:var(--gray-400);}
+  .icon-btn.sm{width:24px;height:24px;}
+  .asg-stepno{display:inline-block;font-size:11px;line-height:16px;font-weight:600;color:var(--blue);background:var(--blue-100);border-radius:10px;padding:0 8px;margin-right:8px;vertical-align:1px;}
+  .p-ava{width:32px;height:32px;object-fit:cover;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);font-size:11px;font-weight:600;color:var(--graphite-700);}
+  .p-ava.xs{width:20px;height:20px;font-size:9px;}
+  .w-ava{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#e8ecf7;color:#3a4f8a;font-size:10px;font-weight:600;}
+  .w-ava.xs{width:20px;height:20px;font-size:8px;}
+  .asg-cnt{font-size:11px;color:var(--graphite-700);background:var(--gray-100);border-radius:9px;padding:1px 7px;white-space:nowrap;}
+
+  .asg-sum{display:flex;align-items:center;gap:12px;padding:0 16px 16px 56px;font-size:13px;}
+  .vconn .asg-sum{padding:12px 0 0;margin-top:12px;border-top:1px solid var(--gray-200);}
+  .asg-sum-l{color:var(--graphite-700);flex-shrink:0;width:64px;}
+  .asg-sum-v{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;flex:1;min-width:0;}
+  .asg-sum-g{display:inline-flex;align-items:center;gap:6px;}
+  .asg-sum-g b{font-weight:600;}
+  .asg-sum-g i{font-style:normal;color:var(--graphite-700);}
+
+  .asg{border-top:1px solid #ebeced;padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;}
+  .asg-modal .asg{border-top:0;padding:0;}
+  .asg-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .asg-top > b{font-size:14px;line-height:22px;}
+  .seg2{display:inline-flex;border:1px dashed #e0a14a;border-radius:6px;padding:2px;background:#fffaf2;}
+  .seg2 button{border:none;background:none;border-radius:4px;padding:3px 10px;font-size:12px;line-height:16px;color:var(--graphite-700);white-space:nowrap;}
+  .seg2 button.on{background:#fff;color:var(--graphite-900);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.12);}
+  .asg-foot{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid #ebeced;font-size:13px;}
+  .asg-foot > .muted{margin-right:8px;}
+  .asg-foot .grow{flex:1;}
+
+  .asg-row{display:flex;align-items:center;gap:8px;height:32px;padding:0 4px 0 8px;border-radius:4px;font-size:13px;}
+  .asg-row:hover{background:var(--gray-100);}
+  .asg-wn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .asg-arrow{width:24px;height:24px;border:1px solid var(--gray-300);border-radius:4px;background:#fff;color:var(--graphite-700);display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
+  .asg-arrow:hover:not(:disabled){border-color:var(--blue);color:var(--blue);background:var(--blue-100);}
+  .asg-arrow:disabled{opacity:.3;cursor:default;}
+  .asg-empty{font-size:12px;color:var(--gray-600);padding:14px 8px;text-align:center;display:flex;justify-content:center;gap:4px;align-items:center;}
+  .asg-sel{position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;height:28px;border:1px solid var(--gray-400);border-radius:4px;background:#fff;padding:0 22px 0 8px;font-size:13px;}
+  .asg-sel select{appearance:none;border:none;background:transparent;font:inherit;width:100%;min-width:0;outline:none;cursor:pointer;color:var(--graphite-900);font-weight:600;}
+  .asg-sel.ph select{color:var(--blue);}
+  .asg-sel svg{position:absolute;right:5px;pointer-events:none;color:var(--graphite-700);}
+  .asg-newlink{font-size:12px;}
+  .asg-sel.sm{flex:0 0 auto;height:24px;font-size:12px;padding:0 18px 0 6px;border-color:var(--gray-300);}
+  .asg-sel.sm select{font-weight:400;color:var(--blue);}
+  .asg-hintline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;}
+  .asg-new{display:flex;flex-direction:column;gap:6px;width:100%;}
+  .asg-in{height:28px;border:1px solid var(--gray-400);border-radius:4px;padding:0 8px;font:inherit;font-size:13px;outline:none;width:100%;}
+  .asg-in:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-200);}
+  .asg-in.err{border-color:var(--red);}
+  .asg-new-f{display:flex;justify-content:flex-end;align-items:center;gap:12px;}
+
+  /* A · columns — manager tabs, then Unassigned | selected manager */
+  .asg-a{display:flex;flex-direction:column;gap:10px;}
+  .asg-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+  .asg-col{border:1px solid var(--gray-300);border-radius:8px;background:#fff;display:flex;flex-direction:column;max-height:400px;min-height:160px;}
+  .asg-col.un{background:#fafafa;}
+  .asg-col.target{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-200);}
+  .asg-col.add{border-style:dashed;background:transparent;justify-content:center;}
+  .asg-col-h{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--gray-200);min-height:44px;}
+  .asg-col-h > b{font-size:13px;flex:1;}
+  .asg-col-b{overflow:auto;padding:4px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px 8px;align-content:start;}
+  .asg-col-b .asg-empty{grid-column:1/-1;}
+  /* B · pick a manager, click workers */
+  .asg-brush{display:flex;flex-direction:column;gap:10px;}
+  .asg-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;}
+  .asg-pills .asg-sel{flex:0 0 auto;width:168px;}
+  .asg-pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 6px 0 4px;border:1px solid var(--gray-300);border-radius:15px;background:#fff;font-size:13px;--c:var(--blue);}
+  .asg-pill .p-ava{border-radius:50%;}
+  .asg-pill.on{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb, var(--c) 25%, transparent);font-weight:600;}
+  .asg-pill-x{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--graphite-700);}
+  .asg-pill-x:hover{background:var(--gray-100);}
+  .asg-hintline{font-size:12px;}
+  .asg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:6px;max-height:380px;overflow:auto;padding-bottom:2px;}
+  .asg-wchip{display:flex;align-items:center;gap:6px;height:32px;padding:0 6px;border:1px solid var(--gray-300);border-radius:6px;background:#fff;font-size:12px;text-align:left;--c:var(--gray-500);}
+  .asg-wchip > span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .asg-wchip.has{border-color:var(--c);}
+  .asg-wchip.mine{background:color-mix(in srgb, var(--c) 10%, #fff);}
+  .asg-wchip em{font-style:normal;font-size:9px;font-weight:700;color:#fff;background:var(--c);border-radius:8px;padding:1px 5px;}
+  .asg-wchip:disabled{opacity:.5;cursor:default;}
+  .asg-wchip:not(:disabled):hover{border-color:var(--c);}
+
+  /* C · select & assign */
+  .asg-shuttle{display:grid;grid-template-columns:1fr 176px 1fr;gap:12px;align-items:stretch;}
+  .asg-pane{border:1px solid var(--gray-300);border-radius:8px;background:#fff;display:flex;flex-direction:column;max-height:400px;}
+  .asg-pane-h{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--gray-200);font-size:13px;min-height:44px;}
+  .asg-search{margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:var(--gray-600);}
+  .asg-search input{border:none;outline:none;width:84px;font:inherit;font-size:12px;}
+  .asg-pane-b{overflow:auto;padding:4px;display:flex;flex-direction:column;gap:1px;min-height:120px;}
+  .asg-ck{display:inline-flex;}
+  .asg-ck input{display:none;}
+  .asg-ck .box{width:16px;height:16px;border-radius:3px;border:1px solid var(--gray-500);background:#fff;display:inline-flex;align-items:center;justify-content:center;}
+  .asg-ck input:checked + .box{background:var(--blue);border-color:var(--blue);}
+  .asg-ck input:checked + .box::after{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);}
+  .asg-row.sel-row{cursor:pointer;}
+  .asg-row.sel-row.on{background:var(--blue-100);}
+  .asg-mid{display:flex;flex-direction:column;justify-content:center;gap:8px;}
+  .asg-mid .asg-sel{flex:0 0 auto;}
+  .asg-group{margin-bottom:6px;}
+  .asg-group-h{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:12px;background:#fafafa;border-radius:4px;}
+  .asg-group-h b{flex:1;}
+
+  /* Edit modal (meeting view) */
+  .asg-modal{position:absolute;left:50%;top:40px;bottom:40px;transform:translateX(-50%);width:900px;max-width:calc(100% - 32px);background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;}
+  .asg-modal-h{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #ebeced;}
+  .asg-modal-h > div{display:flex;align-items:center;gap:8px;font-size:16px;}
+  .asg-modal-b{flex:1;overflow:auto;padding:20px 24px;}
 </style>
 </head>
 <body>
@@ -477,8 +634,8 @@ const P = {
   collete:{n:'Collete Parker',r:'SVP, Product',img:'collete-parker.png'},
   kate:{n:'Kate Ottavio Kent',r:'Developer',img:'kate-kent.png'},
   jane:{n:'Jane Eveland',r:'Developer',img:'jane-eveland.png'},
-  emily:{n:'Emily Smith',r:'ActionTrace Manager',img:'emily-smith.png',at:true},
-  james:{n:'James Black',r:'ActionTrace Manager',img:'james-black.png',at:true},
+  emily:{n:'Emily Smith',r:'AI Specialist',img:'emily-smith.png',at:true},
+  james:{n:'James Black',r:'AI Specialist',img:'james-black.png',at:true},
   michal:{n:'Michal Brown',r:'PM',img:'michal-brown.png'},
 };
 const BASE_PARTICIPANTS = ['bot','keith','rick','tile','collete','kate','jane'];
@@ -508,8 +665,8 @@ const PROCESSES = {
 const cap = s => s.replace(/\b\w/g, c => c.toUpperCase());
 
 const WORKERS = {
-  emily:['Sophia Martinez','Liam Chen','Ava Robinson','Ethan Patel','Mia Thompson','Noah Smith','Isabella Johnson','Lucas Brown','Amelia Williams'],
-  james:['Emily Carter','Michael Thompson','Sophia Leen','David Patel','Olivia Brown','Evelyn Harper','Olivia Brown','Mark Talk','Adam Lawren','Liam Johnson','Sophie Leen','Oliver Brown','Ava Wilson','Noah Smith','Mia Davis','Ethan Evans','Isabella Martinez','James Garcia','Charlotte Rodriguez'],
+  emily:['Sophia Martinez','Liam Chen','Ava Robinson','Ethan Patel','Mia Thompson','Noah Clarke','Isabella Johnson','Lucas Brown','Amelia Williams'],
+  james:['Emily Carter','Michael Thompson','Sophia Leen','David Patel','Olivia Brown','Evelyn Harper','Olivia Grant','Mark Talk','Adam Lawren','Liam Johnson','Sophie Leen','Oliver Brown','Ava Wilson','Noah Smith','Mia Davis','Ethan Evans','Isabella Martinez','James Garcia','Charlotte Rodriguez'],
 };
 const DUR = {james:[15,17,21,19,22,32,14,18,17,12,18,22,41,32,22,19,17,14,27], emily:[24,16,29,18,21,33,15,20,26]};
 const RECORDINGS = [];
@@ -571,30 +728,179 @@ function deckFlow(proc, sel) {
   const P_ = PROCESSES[proc];
   return `<div class="flow">${P_.rows.map(r => `<div class="row ${r.length > 1 ? 'pair' : ''}">${r.map(id => { const s = stepName(proc, id); return `<div class="node ${sel.includes(id) ? 'on' : ''}" title="${esc(s.n)}"><b>${esc(cap(s.n))}</b><small>${esc(s.sys)}</small></div>`; }).join('')}</div>`).join('')}</div>`;
 }
-function deckManagers() {
+// Deck · Managers & Workers — the mockup's layout: a manager cell, then
+// columns of up to 10 workers. A slide holds 5 columns; groups are packed
+// whole, so a manager and their workers are never split across slides.
+// Only a group too big for one slide continues on the next, with the
+// manager repeated ("cont.").
+const DECK_ROWS = 10, DECK_COLS = 5;
+function deckPeoplePages(assign) {
+  const pages = []; let cur = [], used = 0;
+  for (const g of groupsOf(assign)) {
+    const chunks = []; for (let i = 0; i < g.workers.length; i += DECK_ROWS) chunks.push(g.workers.slice(i, i + DECK_ROWS));
+    const need = 1 + chunks.length;
+    if (need > DECK_COLS) {
+      if (cur.length) { pages.push(cur); cur = []; used = 0; }
+      for (let i = 0; i < chunks.length; i += DECK_COLS - 1) pages.push([{...g, chunks:chunks.slice(i, i + DECK_COLS - 1), cont:i > 0}]);
+      continue;
+    }
+    if (used + need > DECK_COLS && cur.length) { pages.push(cur); cur = []; used = 0; }
+    cur.push({...g, chunks}); used += need;
+  }
+  if (cur.length) pages.push(cur);
+  return pages.length ? pages : [[]];
+}
+function deckManagers(m, pg = 0) {
+  const pages = deckPeoplePages(m.assign); const page = pages[Math.min(pg, pages.length - 1)];
   const col = arr => `<div>${arr.map(w => `<div class="p"><b>${esc(w)}</b><span>Worker</span></div>`).join('')}</div>`;
-  const grp = m => { const ws = WORKERS[m]; const half = Math.ceil(ws.length / 2); const cols = ws.length > 10 ? [ws.slice(0, half), ws.slice(half)] : [ws];
-    return `<div class="grp"><div class="mgr p"><b>${P[m].n}</b><span>Manager</span></div><div class="cols">${cols.map(col).join('')}</div></div>`; };
-  return `<div class="mw">${grp('emily')}${grp('james')}</div>`;
+  return `<div class="mw">${page.map(g => `<div class="grp"><div class="mgr p"><b>${g.mgr ? esc(P[g.mgr].n) : 'Unassigned'}</b><span>${!g.mgr ? 'No manager yet' : g.owner ? 'RoB owner · Manager' : 'Manager'}${g.cont ? ' (cont.)' : ''}</span></div><div class="cols">${g.chunks.map(col).join('')}</div></div>`).join('') || '<div class="p"><span>No workers in scope</span></div>'}</div>`;
 }
 function deckPages(m) {
-  const steps = procSteps(m);
-  return [
-    {t:'Managers & Workers', html:deckManagers()},
-    {t:'Systems in scope', html:`<div class="kv">${[...new Set(PROCESSES[m.proc].steps.map(s => s.sys))].map(sys => `<span>${sys}</span><b>${PROCESSES[m.proc].steps.filter(s => s.sys === sys).map(s => cap(s.n)).join(', ')}</b>`).join('')}</div>`},
-    {t:'Recording coverage by step', html:`<div class="cov">${steps.map((s, i) => { const pct = [72, 54, 38, 61, 45][i % 5]; return `<div class="r"><span>${cap(s.n)}</span><div class="t"><i style="width:${pct}%"></i></div><span>${pct}%</span></div>`; }).join('')}</div>`},
-    {t:'Review status', html:`<div class="kv"><span>Recordings</span><b>76 total · 24 reviewed</b><span>Annotations</span><b>25 across 11 recordings</b><span>Last review</span><b>May 12, 2026 by James Black</b><span>Objective</span><b>≥90% of in-scope recordings reviewed</b></div>`},
-  ];
+  return deckPeoplePages(m.assign).map((_, i) => ({t:'Managers & Workers', html:deckManagers(m, i)}));
 }
 function deck(m, key, {stepsTitle = 'Steps for', showLeft = true, rightTitle} = {}) {
-  const pages = deckPages(m); const pg = S.deckPage[key] || 0; const cur = pages[pg];
+  const pages = deckPages(m); const pg = Math.min(S.deckPage[key] || 0, pages.length - 1); const cur = pages[pg];
   return `<div class="deck" data-deck="${key}">
     ${showLeft ? `<div class="left"><div class="${stepsTitle.startsWith('Steps for') ? 'cap' : 'ttl'}" style="${stepsTitle.startsWith('Steps for') ? '' : 'margin-bottom:2.6em'}">${stepsTitle}</div>${stepsTitle.startsWith('Steps for') ? `<div class="ttl">${PROCESSES[m.proc].name}</div>` : ''}${deckFlow(m.proc, m.steps)}</div>` : ''}
-    <div class="right"><div class="ttl"><span>${pg === 0 && rightTitle ? rightTitle : cur.t}</span><span class="dots">${pages.map((_, i) => `<i class="${i === pg ? 'on' : ''}" data-deck-go="${key}:${i}"></i>`).join('')}</span></div>
+    <div class="right"><div class="ttl"><span>${rightTitle || cur.t}</span><span class="dots">${pages.map((_, i) => `<i class="${i === pg ? 'on' : ''}" data-deck-go="${key}:${i}"></i>`).join('')}</span></div>
       <div>${cur.html}</div>
       <div class="pager"><button data-deck-go="${key}:${pg - 1}" ${pg === 0 ? 'disabled' : ''}>${ic.chevL(16)}</button><button data-deck-go="${key}:${pg + 1}" ${pg === pages.length - 1 ? 'disabled' : ''}>${ic.chevR(16)}</button></div>
       ${A_MARK}
     </div></div>`;
+}
+
+/* ───────────────────────── Managers & workers ─────────────────────────
+   Which manager leads each worker, so a reviewer knows who to talk to.
+   assign = { mgrs:[personKey…], map:{ workerName: personKey } }.
+   Workers not in the map are unassigned. Skipping the step assigns everyone
+   to the RoB owner instead. Managers come from the meeting's participants,
+   or are added as new people. */
+const OWNER = 'john';
+const WORKER_LIST = [...WORKERS.emily, ...WORKERS.james].filter((w, i, a) => a.indexOf(w) === i).sort((a, b) => a.localeCompare(b));
+const ADDED_MANAGERS = [];
+const managerPool = () => [OWNER, ...BASE_PARTICIPANTS.filter(k => !P[k].bot), ...AT_MANAGERS, ...ADDED_MANAGERS];
+const DEMO_ASSIGN = () => ({ mgrs:['emily','james'], map:Object.fromEntries([...WORKERS.emily.map(w => [w,'emily']), ...WORKERS.james.map(w => [w,'james'])]) });
+const SKIP_ASSIGN = () => ({ mgrs:[OWNER], map:Object.fromEntries(WORKER_LIST.map(w => [w, OWNER])) });
+const initials = n => n.split(/\s+/).map(x => x[0]).slice(0, 2).join('').toUpperCase();
+const managerOf = (assign, w) => (assign && assign.map[w]) || null;
+const assignedCount = a => WORKER_LIST.filter(w => managerOf(a, w)).length;
+// [{mgr, workers, owner}] in manager order, then {mgr:null} for anyone unassigned
+const groupsOf = assign => {
+  const mgrs = assign ? assign.mgrs.filter(m => WORKER_LIST.some(w => assign.map[w] === m)) : [];
+  const g = mgrs.map(m => ({mgr:m, workers:WORKER_LIST.filter(w => managerOf(assign, w) === m), owner:m === OWNER}));
+  const rest = WORKER_LIST.filter(w => !managerOf(assign, w));
+  if (rest.length) g.push({mgr:null, workers:rest});
+  return g;
+};
+const cleanAssign = d => { const map = Object.fromEntries(Object.entries(d.map).filter(([, m]) => m)); return {mgrs:d.mgrs.filter(m => Object.values(map).includes(m)), map}; };
+const cloneAssign = a => a ? {mgrs:[...a.mgrs], map:{...a.map}} : {mgrs:[], map:{}};
+const MGR_COLORS = ['#204ecf','#03b080','#e09200','#9b51e0','#d42551','#0e9aa7'];
+let ASSIGN_UI = 'a';
+try { ASSIGN_UI = localStorage.getItem('at-assign-ui') || 'a'; } catch {}
+Object.assign(ic, {
+  arrowR: s => I('<path d="M3 8h10M9 4l4 4-4 4"/>', s),
+  arrowL: s => I('<path d="M13 8H3M7 4L3 8l4 4"/>', s),
+});
+S.meeting.assign = DEMO_ASSIGN();   // the demo meeting starts with the two ActionTrace teams
+S.asg = null;                       // open step: {draft, ctx, target, active, mid, sel, q, newOpen, newName, newTitle}
+
+const wAvatar = (w, cls = '') => `<span class="w-ava ${cls}">${initials(w)}</span>`;
+const pAvatar = (k, cls = '') => P[k].img ? `<img class="p-ava ${cls}" src="assets/${P[k].img}" alt="" />` : `<span class="p-ava ${cls}">${initials(P[k].n)}</span>`;
+
+// Read-out on the connection cards (create + meeting view).
+function assignSummary(assign, {editAct}) {
+  const gs = groupsOf(assign); const named = gs.filter(g => g.mgr); const un = gs.find(g => !g.mgr)?.workers.length || 0;
+  if (!named.length) return `<div class="asg-sum"><span class="asg-sum-l">Managers</span><span class="asg-sum-v muted">${WORKER_LIST.length} workers · none assigned yet</span><button class="link-btn" data-act="${editAct}">Assign managers</button></div>`;
+  return `<div class="asg-sum"><span class="asg-sum-l">Managers</span><span class="asg-sum-v">${named.map(g => `<span class="asg-sum-g">${pAvatar(g.mgr, 'xs')}<b>${esc(P[g.mgr].n)}</b>${g.owner ? '<i>(RoB owner)</i>' : ''}<span class="muted">· ${g.workers.length}</span></span>`).join('')}${un ? `<span class="asg-sum-g muted">${un} unassigned</span>` : ''}</span><button class="link-btn" data-act="${editAct}">Edit</button></div>`;
+}
+
+// The step — same panel inside the create flow and in the "Edit" modal.
+function assignPanel() {
+  const A = S.asg; const n = assignedCount(A.draft);
+  const opts = [['a','A · Columns'],['b','B · Pick manager, click workers'],['c','C · Select & assign']];
+  const body = ASSIGN_UI === 'b' ? asgBrush() : ASSIGN_UI === 'c' ? asgShuttle() : asgColumns();
+  return `<div class="asg" data-asg-root>
+    <div class="asg-top"><b>Assign workers to managers</b><div class="seg2" title="Prototype only — three ways to do the same thing">${opts.map(([k, l]) => `<button class="${ASSIGN_UI === k ? 'on' : ''}" data-asg-ui="${k}">${l}</button>`).join('')}</div></div>
+    ${body}
+    <div class="asg-foot"><span class="muted">${n} of ${WORKER_LIST.length} assigned</span>
+      ${A.ctx === 'create' ? `<button class="btn" data-asg="back">${ic.chevL(14)} Back</button>` : ''}
+      <span class="grow"></span>
+      ${A.ctx === 'create' ? `<button class="btn ghost-btn" data-asg="skip" title="You can change this later">Skip · everyone reports to ${esc(P[OWNER].n.split(' ')[0])}</button>` : `<button class="btn" data-asg="cancel">Cancel</button>`}
+      <button class="btn primary" data-asg="done">${A.ctx === 'create' ? 'Done' : 'Save'}</button>
+    </div></div>`;
+}
+
+// Manager chooser: participants (+ anyone added), then "+ Add new manager…".
+function mgrSelect(attr, current, {placeholder, all} = {}) {
+  const used = all ? [] : S.asg.draft.mgrs.filter(m => m !== current);
+  const opts = managerPool().filter(k => !used.includes(k));
+  return `<label class="asg-sel ${current ? '' : 'ph'}"><select ${attr}>${placeholder ? `<option value="" ${current ? '' : 'selected'} disabled>${placeholder}</option>` : ''}${opts.map(k => `<option value="${k}" ${k === current ? 'selected' : ''}>${esc(P[k].n)}${k === OWNER ? ' (RoB owner)' : ''}</option>`).join('')}<option disabled>──────────</option><option value="__new">+ Add new manager…</option></select>${ic.chevD(14)}</label>`;
+}
+// "Move all to…" for a whole group: `from` is a manager key or '__un' (unassigned).
+function moveAllSelect(from, label = 'Move all to…') {
+  const d = S.asg.draft;
+  const to = [...(from === '__un' ? [] : [['__un', 'Unassigned']]), ...managerPool().filter(k => k !== from).map(k => [k, P[k].n + (k === OWNER ? ' (RoB owner)' : '')])];
+  return `<label class="asg-sel sm"><select data-asg-moveall="${from}"><option value="" selected disabled>${label}</option>${to.map(([k, n]) => `<option value="${k}">${esc(n)}</option>`).join('')}</select>${ic.chevD(12)}</label>`;
+}
+const newMgrLink = where => `<button class="link-btn asg-newlink" data-asg="new" data-where="${where}">${ic.plus(14)} New manager</button>`;
+function newMgrForm(where) {
+  return `<div class="asg-new" data-asg-pop><input id="asgNewName" class="asg-in" placeholder="Full name" value="${esc(S.asg.newName || '')}" autocomplete="off" /><input id="asgNewTitle" class="asg-in" placeholder="Job title (optional)" value="${esc(S.asg.newTitle || '')}" autocomplete="off" /><div class="asg-new-f"><button class="link-btn muted-link" data-asg="new-cancel">Cancel</button><button class="btn sm primary" data-asg="new-save" data-where="${where}">Add</button></div></div>`;
+}
+
+// Option A — columns: pick the manager in the tabs on top; the left column is
+// Unassigned, the right column is that manager's. → moves a worker across,
+// ← moves them back. Only two columns are ever on screen, so the target
+// never scrolls out of view.
+function asgColumns() {
+  const A = S.asg, d = A.draft;
+  const un = WORKER_LIST.filter(w => !d.map[w]);
+  const target = d.mgrs.includes(A.target) ? A.target : d.mgrs[0] || null;
+  const ws = target ? WORKER_LIST.filter(w => d.map[w] === target) : [];
+  const row = (w, isUn) => `<div class="asg-row">${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span><button class="asg-arrow" data-asg-move="${esc(w)}" data-mgr="${isUn ? (target || '') : ''}" ${isUn && !target ? 'disabled' : ''} title="${isUn ? (target ? 'Assign to ' + esc(P[target].n) : 'Add a manager first') : 'Back to unassigned'}">${isUn ? ic.arrowR(14) : ic.arrowL(14)}</button></div>`;
+  return `<div class="asg-a">
+    <div class="asg-pills">
+      ${d.mgrs.map(m => `<button class="asg-pill ${m === target ? 'on' : ''}" data-asg-tab="${m}">${pAvatar(m, 'xs')}${esc(P[m].n)}<span class="asg-cnt">${WORKER_LIST.filter(w => d.map[w] === m).length}</span><span class="asg-pill-x" data-asg-rmcol="${m}" title="Remove manager — their workers go back to unassigned">${ic.close(10)}</span></button>`).join('')}
+      ${A.newOpen === 'col' ? newMgrForm('col') : `${mgrSelect('data-asg-addcol', null, {placeholder:'+ Add manager'})}${newMgrLink('col')}`}
+    </div>
+    <div class="asg-two">
+      <div class="asg-col un"><div class="asg-col-h"><b>Unassigned</b><span class="asg-cnt">${un.length}</span>${un.length && target ? `<button class="link-btn sm" data-asg="move-all" data-mgr="${target}">All ${ic.arrowR(12)}</button>` : ''}</div>
+        <div class="asg-col-b">${un.map(w => row(w, true)).join('') || '<span class="asg-empty">Everyone is assigned</span>'}</div></div>
+      ${target ? `<div class="asg-col target"><div class="asg-col-h">${pAvatar(target, 'xs')}<b>${esc(P[target].n)}</b><span class="asg-cnt">${ws.length}</span>${ws.length ? moveAllSelect(target) : ''}</div>
+        <div class="asg-col-b">${ws.map(w => row(w, false)).join('') || `<span class="asg-empty">Click ${ic.arrowR(12)} on a worker to assign them to ${esc(P[target].n.split(' ')[0])}</span>`}</div></div>`
+      : `<div class="asg-col add"><span class="asg-empty">Add a manager above to start assigning</span></div>`}
+    </div>
+  </div>`;
+}
+
+// Option B — pick a manager, then click workers to assign them (click again to unassign).
+function asgBrush() {
+  const A = S.asg, d = A.draft;
+  const active = d.mgrs.includes(A.active) ? A.active : d.mgrs[0] || null;
+  const color = m => MGR_COLORS[Math.max(0, d.mgrs.indexOf(m)) % MGR_COLORS.length];
+  return `<div class="asg-brush">
+    <div class="asg-pills"><span class="muted">Assigning to</span>
+      ${d.mgrs.map(m => `<button class="asg-pill ${m === active ? 'on' : ''}" style="--c:${color(m)}" data-asg-active="${m}">${pAvatar(m, 'xs')}${esc(P[m].n)}<span class="asg-cnt">${WORKER_LIST.filter(w => d.map[w] === m).length}</span><span class="asg-pill-x" data-asg-rmcol="${m}" title="Remove">${ic.close(10)}</span></button>`).join('')}
+      ${A.newOpen === 'pill' ? newMgrForm('pill') : `${mgrSelect('data-asg-addpill', null, {placeholder:'+ Add manager'})}${newMgrLink('pill')}`}
+    </div>
+    <div class="asg-hintline muted">${active ? `Click workers to assign them to <b>${esc(P[active].n)}</b> — click again to unassign.${WORKER_LIST.some(w => !d.map[w]) ? ` <button class="link-btn sm" data-asg="move-all" data-mgr="${active}">All unassigned ${ic.arrowR(12)} ${esc(P[active].n.split(' ')[0])}</button>` : ''}${WORKER_LIST.some(w => d.map[w] === active) ? moveAllSelect(active, `Move all of ${esc(P[active].n.split(' ')[0])}'s to…`) : ''}` : 'Add a manager, then click workers.'}</div>
+    <div class="asg-grid">${WORKER_LIST.map(w => { const m = d.map[w]; return `<button class="asg-wchip ${m ? 'has' : ''} ${m === active ? 'mine' : ''}" style="${m ? '--c:' + color(m) : ''}" data-asg-paint="${esc(w)}" ${active ? '' : 'disabled'}>${wAvatar(w, 'xs')}<span>${esc(w)}</span>${m ? `<em title="${esc(P[m].n)}">${initials(P[m].n)}</em>` : ''}</button>`; }).join('')}</div>
+  </div>`;
+}
+
+// Option C — select workers on the left, choose a manager, Assign →.
+function asgShuttle() {
+  const A = S.asg, d = A.draft; const sel = A.sel || []; const q = (A.q || '').toLowerCase();
+  const un = WORKER_LIST.filter(w => !d.map[w]); const shown = un.filter(w => w.toLowerCase().includes(q));
+  const mid = managerPool().includes(A.mid) ? A.mid : null;
+  const groups = d.mgrs.map(m => ({m, ws:WORKER_LIST.filter(w => d.map[w] === m)})).filter(g => g.ws.length);
+  return `<div class="asg-shuttle">
+    <div class="asg-pane"><div class="asg-pane-h"><label class="asg-ck"><input type="checkbox" data-asg-all ${shown.length && shown.every(w => sel.includes(w)) ? 'checked' : ''} /><span class="box"></span></label><b>Unassigned</b><span class="asg-cnt">${un.length}</span><span class="asg-search">${ic.search(12)}<input id="asgQ" placeholder="Search" value="${esc(A.q || '')}" autocomplete="off" /></span></div>
+      <div class="asg-pane-b">${shown.map(w => `<label class="asg-row sel-row ${sel.includes(w) ? 'on' : ''}"><span class="asg-ck"><input type="checkbox" data-asg-row="${esc(w)}" ${sel.includes(w) ? 'checked' : ''} /><span class="box"></span></span>${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span></label>`).join('') || `<span class="asg-empty">${un.length ? 'No match' : 'Everyone is assigned'}</span>`}</div></div>
+    <div class="asg-mid">${A.newOpen === 'mid' ? newMgrForm('mid') : `${mgrSelect('data-asg-mid', mid, {placeholder:'Choose manager', all:true})}${newMgrLink('mid')}`}
+      <button class="btn primary sm" data-asg="assign-sel" ${sel.length && mid ? '' : 'disabled'}>Assign${sel.length ? ' ' + sel.length : ''} ${ic.arrowR(14)}</button></div>
+    <div class="asg-pane"><div class="asg-pane-h"><b>Assigned</b><span class="asg-cnt">${assignedCount(d)}</span></div>
+      <div class="asg-pane-b">${groups.map(g => `<div class="asg-group"><div class="asg-group-h">${pAvatar(g.m, 'xs')}<b>${esc(P[g.m].n)}</b><span class="asg-cnt">${g.ws.length}</span>${moveAllSelect(g.m)}</div>${g.ws.map(w => `<div class="asg-row">${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span><button class="asg-arrow" data-asg-move="${esc(w)}" data-mgr="" title="Back to unassigned">${ic.close(12)}</button></div>`).join('')}</div>`).join('') || '<span class="asg-empty">Tick workers on the left, choose a manager, then Assign</span>'}</div></div>
+  </div>`;
 }
 
 /* ───────────────────────── Left nav + pages ───────────────────────── */
@@ -624,16 +930,17 @@ function renderMain() {
 
 /* ───────────────────────── Create meeting (screen 1) ───────────────────────── */
 function newCreateState() {
-  return {date:'2026-06-15', start:'14:30', end:'15:30', proc:null, steps:[], atOpen:false, openDD:null, slack:null, slackNA:false, init:null, bau:null, newPeople:[], section:'details'};
+  return {date:'2026-06-15', start:'14:30', end:'15:30', proc:null, steps:[], assign:null, asgOpen:false, asgDone:false, asgSkipped:false, atOpen:false, openDD:null, slack:null, slackNA:false, init:null, bau:null, newPeople:[], section:'details'};
 }
 function renderCreate() {
   const c = S.create; const parts = [...BASE_PARTICIPANTS, ...(c.steps.length ? AT_MANAGERS : [])];
-  const atSummary = c.proc && c.steps.length && !c.atOpen ? `<div class="conn-chips"><span>${PROCESSES[c.proc].name}</span>${procSteps(c).map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>` : '';
+  const atReady = c.proc && c.steps.length;
+  const atSummary = atReady && !c.atOpen && !c.asgOpen ? `<div class="conn-chips"><span>${PROCESSES[c.proc].name}</span>${procSteps(c).map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${c.asgDone ? assignSummary(c.assign, {editAct:'asg-edit-create'}) : `<div class="asg-sum"><span class="asg-sum-l">Managers</span><span class="asg-sum-v muted">Not set yet</span><button class="link-btn" data-act="asg-edit-create">Assign managers</button></div>`}` : '';
   const simpleConn = (key, icon, title, sub, opts, extra = '') => `<div class="conn" data-conn="${key}"><div class="conn-head"><span class="conn-ic">${icon}</span><div><div class="conn-title">${title}</div><div class="conn-sub">${sub}</div>${extra}</div>
       <button class="connect-btn" data-dd="${key}">${c[key] ? 'Change' : 'Connect'} ${c.openDD === key ? ic.chevU(14) : ic.chevD(14)}</button></div>
       ${c[key] ? `<div class="conn-chips"><span class="link">${c[key]}</span><button class="icon-btn" style="width:20px;height:20px" data-clear="${key}">${ic.close(12)}</button></div>` : ''}
       ${c.openDD === key ? `<div class="dd dd-list">${opts.map(o => `<button data-pick="${key}" data-val="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}</div>`;
-  return `<div class="scrim"></div><div class="fs-modal" role="dialog" aria-label="New RoB meeting">
+  return `<div class="scrim"></div><div class="fs-modal fs-create" role="dialog" aria-label="New RoB meeting">
     <div class="fs-head"><h1>${robTitle(esc(S.meeting.title), 24)} <button class="icon-btn" title="Rename">${ic.pencil(16)}</button></h1><div class="spacer"></div><button class="icon-btn" data-act="close-create">${ic.close(16)}</button></div>
     <div class="fs-body" id="createBody">
       <div class="col-main">
@@ -660,13 +967,15 @@ function renderCreate() {
         <section id="c-connections" style="padding-bottom:40px">
           <h2 class="sec">Connections</h2>
           <div class="conn" data-conn="at">
-            <div class="conn-head"><span class="conn-ic" style="background:none">${AT_BIG(28)}</span><div><div class="conn-title">Action Trace</div><div class="conn-sub">Select processes and its steps to review</div></div>
-              <button class="connect-btn" data-act="toggle-at">${c.proc && c.steps.length ? 'Edit' : 'Connect'} ${c.atOpen ? ic.chevU(14) : ic.chevD(14)}</button></div>
+            <div class="conn-head"><span class="conn-ic">${AT_BIG(20)}</span><div><div class="conn-title">Action Trace</div><div class="conn-sub">Select processes and its steps to review</div></div>
+              ${c.asgOpen ? '' : `<button class="connect-btn" data-act="toggle-at">${atReady ? 'Edit' : 'Connect'} ${c.atOpen ? ic.chevU(16) : ic.chevD(16)}</button>`}</div>
             ${atSummary}
+            ${c.asgOpen ? assignPanel() : ''}
             ${c.atOpen ? `<div class="dd">${Object.entries(PROCESSES).map(([k, p]) => `<div class="dd-proc ${c.proc === k ? 'on' : ''}">
                 <label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>
                 ${c.proc === k ? `<div class="dd-steps">${p.steps.map(s => `<label class="check sm"><input type="checkbox" data-step="${s.id}" ${c.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div>` : ''}
-              </div>`).join('')}</div>` : ''}
+              </div>`).join('')}
+              <div class="dd-foot"><span class="muted">${atReady ? `<span class="asg-stepno">Step 1 of 2</span>${c.steps.length} step${c.steps.length === 1 ? '' : 's'} selected` : '<span class="asg-stepno">Step 1 of 2</span>Pick a process and the steps to review'}</span><button class="btn primary sm" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
           </div>
           ${simpleConn('slack', slackLogo(20), 'Slack', 'Create or add Slack channels to sync conversations with this meeting', ['#-actiontrace-invoicing-process','#-rob-invoices-rampup','+ Create new channel'], `<label class="check" style="margin-top:8px;font-size:13px"><input type="checkbox" ${c.slackNA ? 'checked' : ''} data-act="slack-na" /><span class="box"></span>Not Applicable</label>`)}
           ${simpleConn('init', ic.rocket(18), 'Initiatives', 'Connect to the Initiative this work advances', ['Supplier Invoice Management','Engineering Weekly','CRM Optimization and Expansion'])}
@@ -679,7 +988,7 @@ function renderCreate() {
         <h2 class="sec">Participants <span class="count">${parts.length}</span></h2>
         <div class="field" style="color:var(--gray-600)">Select participants<span class="caret">${ic.updown(14)}</span></div>
         <div style="margin-top:12px">${parts.map(k => personRow(k, 'R', c.newPeople.includes(k) ? 'new' : '')).join('')}</div>
-        ${c.steps.length ? `<div class="hint" style="display:flex;gap:6px;align-items:center">${AT} ActionTrace managers for the selected steps were added automatically.</div>` : ''}
+        ${c.steps.length ? `<div class="hint" style="display:flex;gap:6px;align-items:center">${AT} ActionTrace AI specialists for the selected steps were added automatically.</div>` : ''}
       </div>
       <div class="col-side">
         ${[['info','Details','c-details'],['list','Agenda items','c-agenda'],['links','Connections','c-connections']].map(([i, l, t]) => `<button class="side-link ${c.section === t ? 'active' : ''}" data-scroll="${t}">${ic[i](16)}${l}</button>`).join('')}
@@ -724,13 +1033,13 @@ function renderMeeting() {
           <h2 class="sec" style="font-size:14px">ActionTrace Deck</h2>
           <div class="deck-card">${deck(m, 'meet', {})}
             <div class="deck-stats">
-              <span class="s">${ic.video(16)}76 recordings</span><span class="s">${ic.user(16)}30 workers</span><span class="s">${ic.eye(16)}52 Views</span><button class="btn" data-act="open-rec">Review</button>
-              <span class="s">${ic.layers(16)}${steps.length} steps</span><span class="s">${ic.managers(16)}2 managers</span><span class="s">${ic.comment(16)}25 Annotations</span>
+              <span class="s">${ic.video(16)}76 recordings</span><span class="s">${ic.user(16)}${WORKER_LIST.length} workers</span><span class="s">${ic.eye(16)}52 Views</span><button class="btn" data-act="open-rec">Review</button>
+              <span class="s">${ic.layers(16)}${steps.length} steps</span><span class="s">${ic.managers(16)}${groupsOf(m.assign).filter(g => g.mgr).length} manager${groupsOf(m.assign).filter(g => g.mgr).length === 1 ? '' : 's'}</span><span class="s">${ic.comment(16)}25 Annotations</span>
             </div></div>
         </section>
         <section id="m-connections" class="sec-block">
           <h2 class="sec" style="font-size:14px">Connections</h2>
-          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><span class="proc-link" data-act="open-raci">${PROCESSES[m.proc].name} Process</span>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div></div>
+          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><span class="proc-link" data-act="open-raci">${PROCESSES[m.proc].name} Process</span>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
           <div class="vconn"><div class="h"><span class="conn-ic">${slackLogo(18)}</span>Slack</div><div class="b">${slackLogo(14)}<a href="#" onclick="return false">#-actiontrace-invoicing-process</a><span class="tag">Default</span></div></div>
           <div class="vconn"><div class="h"><span class="conn-ic">${ic.rocket(16)}</span>Initiatives</div><div class="b"><span class="proc-link" data-act="open-initiative">Supplier Invoice Management</span><span class="tag">Initiative</span></div></div>
         </section>
@@ -820,14 +1129,19 @@ function renderRaci() {
 
 /* ───────────────────────── Recordings modal (screens 4–9) ───────────────────────── */
 function newRecState() {
-  return {mgrs:['james'], workers:null, steps:[...S.meeting.steps], from:'2026-05-10', to:'2026-05-12',
+  const keys = recMgrKeys();
+  return {mgrs:[keys.includes('james') ? 'james' : keys[0]], workers:null, steps:[...S.meeting.steps], from:'2026-05-10', to:'2026-05-12',
     sel:null, t:0, playing:false, speed:1, openFilter:null, ann:null, diagOpen:false, hoverSeg:null, hoverMarker:null, pinTip:null};
 }
 function recFiltered() {
   const r = S.rec;
-  return RECORDINGS.filter(x => r.mgrs.includes(x.mgr) && (!r.workers || r.workers.includes(x.id)));
+  return RECORDINGS.filter(x => r.mgrs.includes(recMgr(x)) && (!r.workers || r.workers.includes(x.id)));
 }
 function curRec() { return RECORDINGS.find(x => x.id === S.rec.sel); }
+// A recording's manager follows the meeting's manager/worker assignment.
+const recMgr = x => managerOf(S.meeting.assign, x.worker) || '_none';
+const recMgrKeys = () => groupsOf(S.meeting.assign).map(g => g.mgr || '_none');
+const mgrNameOf = k => k === '_none' ? 'Unassigned' : P[k].n;
 function segs(rec) {
   // Selected steps share the recording timeline; boundaries are fixed per recording.
   const steps = PROCESSES[S.meeting.proc].steps.filter(s => S.rec.steps.includes(s.id));
@@ -837,8 +1151,8 @@ function segs(rec) {
 }
 function renderRec() {
   const r = S.rec; const list = recFiltered(); const rec = curRec();
-  const allWorkers = RECORDINGS.filter(x => r.mgrs.includes(x.mgr));
-  const mgrLabel = r.mgrs.length === 2 ? 'All managers' : r.mgrs.length ? r.mgrs.map(k => P[k].n).join(', ') : 'Select manager';
+  const allWorkers = RECORDINGS.filter(x => r.mgrs.includes(recMgr(x)));
+  const mgrLabel = r.mgrs.length > 1 && r.mgrs.length === recMgrKeys().length ? 'All managers' : r.mgrs.length ? r.mgrs.map(mgrNameOf).join(', ') : 'Select manager';
   const wLabel = !r.workers ? 'All workers' : `${r.workers.length} worker${r.workers.length === 1 ? '' : 's'}`;
   const steps = procSteps(S.meeting);
   const sLabel = r.steps.length === steps.length ? `All ${steps.length} steps` : `${r.steps.length} of ${steps.length} steps`;
@@ -847,7 +1161,7 @@ function renderRec() {
   return `<div class="scrim" data-act="close-rec"></div><div class="rec-modal" role="dialog" aria-label="Recordings">
     <div class="rec-head"><div class="t"><h1>${esc(S.meeting.title)}</h1><button class="diag-btn ${r.diagOpen ? 'on' : ''}" id="diagBtn" title="Steps Diagram and Users, Managers Diagram">${ic.managers(16)}</button><span style="flex:1"></span><button class="icon-btn" data-act="close-rec">${ic.close(16)}</button></div>
       <div class="filters">
-        ${filt('mgr', 'Manager', mgrLabel, AT_MANAGERS.slice().reverse().map(k => [k, P[k].n, r.mgrs.includes(k)]))}
+        ${filt('mgr', 'Manager', mgrLabel, recMgrKeys().map(k => [k, mgrNameOf(k), r.mgrs.includes(k)]))}
         ${filt('worker', 'Worker', wLabel, allWorkers.map(x => [x.id, x.worker, !r.workers || r.workers.includes(x.id)]))}
         ${filt('steps', 'Steps', sLabel, steps.map(s => [s.id, cap(s.n), r.steps.includes(s.id)]))}
         <div><label>From</label><label class="field" style="height:40px">${ic.cal(18)}<input type="date" value="${r.from}" data-rf="from" /></label></div>
@@ -859,7 +1173,7 @@ function renderRec() {
       </div>
       <div class="rec-right"><div class="rlist-wrap">
         <table class="rlist"><thead><tr><th>Worker /<br>Manager</th><th>Recorder at /<br>Duration</th><th>Steps Covered</th></tr></thead>
-        <tbody>${list.map(x => `<tr class="${x.id === r.sel ? 'sel' : ''}" data-rec="${x.id}"><td><b>${esc(x.worker)}${x.feedback ? '<span class="rv" title="Feedback added"></span>' : ''}</b>${P[x.mgr].n}</td><td>${x.date}<br>(0m ${x.dur}s)</td><td><span class="ell">${steps.filter(s => r.steps.includes(s.id)).map(s => cap(s.n)).join(', ')}</span></td></tr>`).join('')}</tbody></table>
+        <tbody>${list.map(x => `<tr class="${x.id === r.sel ? 'sel' : ''}" data-rec="${x.id}"><td><b>${esc(x.worker)}${x.feedback ? '<span class="rv" title="Feedback added"></span>' : ''}</b>${mgrNameOf(recMgr(x))}</td><td>${x.date}<br>(0m ${x.dur}s)</td><td><span class="ell">${steps.filter(s => r.steps.includes(s.id)).map(s => cap(s.n)).join(', ')}</span></td></tr>`).join('')}</tbody></table>
         ${list.length ? '' : '<div class="none-msg">No recordings match these filters.</div>'}
       </div></div>
     </div></div>`;
@@ -886,7 +1200,7 @@ function playerHTML(rec) {
         <button class="sp" data-act="speed">${r.speed}×</button><button class="fsb" data-act="fs">${ic.fullscreen(20)}</button></div>
       ${r.ann ? annHTML(rec) : ''}
     </div>
-    <div class="meta">Worker: <b>${esc(rec.worker)}</b><span class="vs"></span>Manager: <b>${P[rec.mgr].n}</b><span class="vs"></span>Recorded at: <b>${rec.date}</b></div>
+    <div class="meta">Worker: <b>${esc(rec.worker)}</b><span class="vs"></span>Manager: <b>${mgrNameOf(recMgr(rec))}</b><span class="vs"></span>Recorded at: <b>${rec.date}</b></div>
     <div class="stepbar" id="stepbar">${sg.map((s, i) => `${i ? '<span class="ln"></span>' : ''}<div class="stepcard ${s === cur ? 'cur' : ''}" data-stepcard="${i}"><span class="badge">Current Step</span><span class="n"><b>${cap(s.n)}</b> Step</span><span class="s">${s.sys}</span></div>`).join('')}</div>
     <div class="fb-label">Summary Feedback</div>
     <div class="rte">${rteToolbar()}<div class="ed" id="fbEd" contenteditable="true" data-placeholder="Specify your summary feedback" style="min-height:124px">${rec.feedback}</div></div>`;
@@ -899,6 +1213,13 @@ function annHTML(rec) {
     <div class="f">${a.idx != null ? '<button class="btn danger-link" data-act="ann-delete">Delete</button>' : ''}<span class="grow"></span><button class="btn" data-act="ann-cancel">Cancel</button><button class="btn primary" data-act="ann-save">Save</button></div></div>`;
 }
 
+function renderAssignModal() {
+  return `<div class="scrim" data-asg="cancel"></div><div class="asg-modal" role="dialog" aria-label="Managers and workers">
+    <div class="asg-modal-h"><div>${AT_BIG(20)}<b>Managers &amp; workers</b><span class="muted">· ${esc(PROCESSES[S.meeting.proc].name)}</span></div><button class="icon-btn" data-asg="cancel" aria-label="Close">${ic.close(16)}</button></div>
+    <div class="asg-modal-b">${assignPanel()}</div>
+  </div>`;
+}
+
 /* ───────────────────────── Render orchestration ───────────────────────── */
 function render() {
   renderNav(); renderMain();
@@ -908,10 +1229,13 @@ function render() {
   if (S.initDrawer) L.push(['init', renderInitiative()]);
   if (S.raci) L.push(['raci', renderRaci()]);
   if (S.rec) L.push(['rec', renderRec()]);
+  if (S.asg && S.asg.ctx === 'meeting') L.push(['assign', renderAssignModal()]);
   // Preserve scroll positions of scrollable bodies across re-renders
-  const keep = ['#createBody', '#meetBody', '#recBody'].map(s => [s, $(s)?.scrollTop]);
+  const keep = ['#createBody', '#meetBody', '#recBody', '.asg-modal-b', '.asg-table-wrap', '.asg-pop-list'].map(s => [s, $(s)?.scrollTop]);
+  const focusId = document.activeElement?.id; const caret = document.activeElement?.selectionStart;
   $('#layers').innerHTML = L.map(([k, h], i) => `<div class="layer" data-layer="${k}" style="z-index:${10 + i}">${h}</div>`).join('');
   keep.forEach(([s, v]) => { if (v != null && $(s)) $(s).scrollTop = v; });
+  if (focusId && $('#' + focusId)) { const f = $('#' + focusId); f.focus(); if (caret != null && f.setSelectionRange) f.setSelectionRange(caret, caret); }
   renderDiagPop(); renderFlowNav();
   window.afterRender?.();
 }
@@ -966,6 +1290,7 @@ function hideTip() { const t = $('#tlTip'); if (t) t.innerHTML = ''; }
 /* ───────────────────────── Flow navigator ───────────────────────── */
 const FLOW = [
   [1,'New ROB · Action Trace processes adding'],
+  [1.5,'New ROB · Assign workers to managers (3 options)'],
   [2,'ROB · Action Trace added'],
   [3,'Initiative · Action Trace connector view mode'],
   [4,'Recordings modal · Recording not selected'],
@@ -977,17 +1302,22 @@ const FLOW = [
   [10,'RACI sidebar with AT collaborators'],
 ];
 let flowMenu = false;
+const flowLabel = n => n === 1.5 ? '1b' : String(n);
+const flowIdx = () => FLOW.findIndex(([n]) => n === S.flowStep);
 function renderFlowNav() {
-  $('#flownav').innerHTML = `${flowMenu ? `<div class="menu"><div class="h">Figma flow · Action Trace integration</div>${FLOW.map(([n, l]) => `<button class="${S.flowStep === n ? 'on' : ''}" data-flow="${n}"><i>${n}</i>${l}</button>`).join('')}</div>` : ''}
-    <button class="pill" data-act="flow-menu"><span class="n">${S.flowStep || '–'}/10</span>${S.flowStep ? FLOW[S.flowStep - 1][1] : 'Free navigation'}<span class="nav"><span data-flow-step="-1">${ic.chevL(12)}</span><span data-flow-step="1">${ic.chevR(12)}</span></span></button>`;
+  const i = flowIdx();
+  $('#flownav').innerHTML = `${flowMenu ? `<div class="menu"><div class="h">Figma flow · Action Trace integration</div>${FLOW.map(([n, l]) => `<button class="${S.flowStep === n ? 'on' : ''}" data-flow="${n}"><i>${flowLabel(n)}</i>${l}</button>`).join('')}</div>` : ''}
+    <button class="pill" data-act="flow-menu"><span class="n">${i >= 0 ? `${flowLabel(S.flowStep)}` : '–'}</span>${i >= 0 ? FLOW[i][1] : 'Free navigation'}<span class="nav"><span data-flow-step="-1">${ic.chevL(12)}</span><span data-flow-step="1">${ic.chevR(12)}</span></span></button>`;
 }
 function goFlow(n) {
-  n = Math.max(1, Math.min(10, n)); S.flowStep = n; flowMenu = false;
+  if (!FLOW.some(([x]) => x === n)) n = 1;
+  S.flowStep = n; flowMenu = false; S.asg = null;
   if (S.rec) S.rec.playing = false;
   Object.assign(S, {create:null, meetingOpen:false, initDrawer:false, raci:null, rec:null, page:'meetings'});
   $('#pops').innerHTML = '';
   const rec = RECORDINGS[0];
   if (n === 1) S.create = newCreateState();
+  if (n === 1.5) { S.create = Object.assign(newCreateState(), {proc:'po', steps:['match','disc','gl']}); }
   if (n === 2) S.meetingOpen = true;
   if (n === 3) { S.page = 'initiatives'; S.initDrawer = true; }
   if (n >= 4 && n <= 9) { S.meetingOpen = true; S.rec = newRecState(); }
@@ -996,11 +1326,87 @@ function goFlow(n) {
   if (n === 9) { rec.feedback = rec.feedback || FEEDBACK_SAMPLE; }
   if (n === 10) { S.meetingOpen = true; S.raci = {locked:false, showInformed:false, compact:false}; }
   render();
+  if (n === 1.5) { openAssign('create'); $('#c-connections')?.scrollIntoView({block:'start'}); }
   if (n === 5) play();
   if (n === 6) { S.rec.hoverSeg = 2; render(); const sg = segs(rec)[2]; showTip(`Step ${sg.idx}: ${cap(sg.n)}`, (sg.a + sg.b) / 2); S.rec.hoverSeg = null; }
   if (n === 7) { S.rec.hoverMarker = 2; render(); showTip(rec.anns[2].text, rec.anns[2].t); S.rec.hoverMarker = null; }
   if (n === 9) { const b = $('#recBody'); if (b) b.scrollTop = 140; }
 }
+
+/* ───────────────────────── Events: managers & workers step ───────────────────────── */
+function openAssign(ctx) {
+  const src = ctx === 'create' ? S.create.assign : S.meeting.assign;
+  S.asg = {draft:cloneAssign(src), ctx, target:null, active:null, mid:null, sel:[], q:'', newOpen:null, newName:'', newTitle:''};
+  if (ctx === 'create') { S.create.atOpen = false; S.create.asgOpen = true; }
+  render();
+}
+function closeAssign(result) {   // undefined = cancel · 'skip' = everyone to the RoB owner · object = save
+  const A = S.asg; if (!A) return;
+  if (A.ctx === 'create') {
+    const c = S.create;
+    if (result === 'skip') { c.assign = SKIP_ASSIGN(); c.asgDone = true; c.asgSkipped = true; }
+    else if (result) { c.assign = result; c.asgDone = true; c.asgSkipped = false; }
+    c.asgOpen = false;
+  } else if (result && result !== 'skip') S.meeting.assign = result;
+  S.asg = null; render();
+}
+const asgSet = (w, m) => { const d = S.asg.draft; if (!m) delete d.map[w]; else { d.map[w] = m; if (!d.mgrs.includes(m)) d.mgrs.push(m); } };
+const asgReplaceMgr = (old, nw) => { const A = S.asg, d = A.draft; d.mgrs = d.mgrs.map(m => m === old ? nw : m); Object.keys(d.map).forEach(w => { if (d.map[w] === old) d.map[w] = nw; }); if (A.target === old) A.target = nw; if (A.active === old) A.active = nw; };
+const asgAddMgr = (k, where) => { const A = S.asg, d = A.draft;
+  if (where === 'col') { if (!d.mgrs.includes(k)) d.mgrs.push(k); A.target = k; }
+  else if (where.startsWith('col:')) asgReplaceMgr(where.slice(4), k);
+  else if (where === 'pill') { if (!d.mgrs.includes(k)) d.mgrs.push(k); A.active = k; }
+  else if (where === 'mid') A.mid = k;
+};
+document.addEventListener('click', e => {
+  const A = S.asg; if (!A) return;
+  if (A.newOpen && !e.target.closest('[data-asg-pop],[data-asg="new"]')) { A.newOpen = null; render(); }
+  const t = e.target.closest('[data-asg],[data-asg-ui],[data-asg-rmcol],[data-asg-move],[data-asg-active],[data-asg-paint],[data-asg-tab]');
+  if (!t) return;
+  const d = t.dataset; const draft = A.draft;
+  if (d.asgUi) { ASSIGN_UI = d.asgUi; try { localStorage.setItem('at-assign-ui', ASSIGN_UI); } catch {} A.newOpen = null; A.sel = []; A.q = ''; render(); return; }
+  if (d.asgRmcol) { e.stopPropagation(); const m = d.asgRmcol; draft.mgrs = draft.mgrs.filter(x => x !== m); Object.keys(draft.map).forEach(w => { if (draft.map[w] === m) delete draft.map[w]; }); render(); return; }
+  if (d.asgMove != null) { e.stopPropagation(); asgSet(d.asgMove, d.mgr || null); render(); return; }
+  if (d.asgActive) { A.active = d.asgActive; render(); return; }
+  if (d.asgPaint != null) { const act = draft.mgrs.includes(A.active) ? A.active : draft.mgrs[0]; if (!act) return; asgSet(d.asgPaint, draft.map[d.asgPaint] === act ? null : act); render(); return; }
+  if (d.asgTab) { A.target = d.asgTab; render(); return; }
+  switch (d.asg) {
+    case 'move-all': WORKER_LIST.filter(w => !draft.map[w]).forEach(w => asgSet(w, d.mgr)); render(); break;
+    case 'assign-sel': (A.sel || []).forEach(w => asgSet(w, A.mid)); A.sel = []; render(); break;
+    case 'new': A.newOpen = d.where; A.newName = ''; A.newTitle = ''; render(); $('#asgNewName')?.focus(); break;
+    case 'new-cancel': A.newOpen = null; render(); break;
+    case 'new-save': {
+      const name = ($('#asgNewName')?.value || '').trim(); const title = ($('#asgNewTitle')?.value || '').trim();
+      if (!name) { $('#asgNewName')?.classList.add('err'); $('#asgNewName')?.focus(); break; }
+      const key = 'new' + Date.now().toString(36);
+      P[key] = {n:name, r:title || 'Manager', added:true}; ADDED_MANAGERS.push(key);
+      asgAddMgr(key, d.where); A.newOpen = null; render(); break;
+    }
+    case 'back': S.create.asgOpen = false; S.create.atOpen = true; S.asg = null; render(); break;
+    case 'skip': closeAssign('skip'); break;
+    case 'cancel': closeAssign(); break;
+    case 'done': closeAssign(cleanAssign(draft)); break;
+  }
+});
+document.addEventListener('change', e => {
+  const A = S.asg; if (!A) return; const t = e.target; const d = t.dataset; const v = t.value;
+  const pick = (where, apply) => { if (v === '__new') { A.newOpen = where; A.newName = ''; A.newTitle = ''; render(); $('#asgNewName')?.focus(); } else if (v) { apply(v); render(); } };
+  if (d.asgColmgr) pick('col:' + d.asgColmgr, k => asgReplaceMgr(d.asgColmgr, k));
+  else if (t.matches('[data-asg-addcol]')) pick('col', k => asgAddMgr(k, 'col'));
+  else if (t.matches('[data-asg-addpill]')) pick('pill', k => asgAddMgr(k, 'pill'));
+  else if (t.matches('[data-asg-mid]')) pick('mid', k => { A.mid = k; });
+  else if (d.asgMoveall) { const from = d.asgMoveall; const to = v === '__un' ? null : v; if (!v) return;
+    WORKER_LIST.filter(w => from === '__un' ? !A.draft.map[w] : A.draft.map[w] === from).forEach(w => asgSet(w, to)); render(); }
+  else if (d.asgRow) { A.sel = t.checked ? [...new Set([...(A.sel || []), d.asgRow])] : (A.sel || []).filter(w => w !== d.asgRow); render(); }
+  else if (t.matches('[data-asg-all]')) { const q = (A.q || '').toLowerCase(); const rows = WORKER_LIST.filter(w => !A.draft.map[w] && w.toLowerCase().includes(q)); A.sel = t.checked ? rows : []; render(); }
+});
+document.addEventListener('input', e => {
+  if (!S.asg) return;
+  if (e.target.id === 'asgQ') { S.asg.q = e.target.value; render(); }
+  if (e.target.id === 'asgNewName') { S.asg.newName = e.target.value; e.target.classList.remove('err'); }
+  if (e.target.id === 'asgNewTitle') S.asg.newTitle = e.target.value;
+});
+document.addEventListener('keydown', e => { if (S.asg && e.key === 'Enter' && (e.target.id === 'asgNewName' || e.target.id === 'asgNewTitle')) { e.preventDefault(); $('[data-asg="new-save"]')?.click(); } });
 
 /* ───────────────────────── Events ───────────────────────── */
 document.addEventListener('click', e => {
@@ -1013,7 +1419,7 @@ document.addEventListener('click', e => {
   if (!t) return;
   const d = t.dataset;
 
-  if (d.flowStep) { e.stopPropagation(); goFlow((S.flowStep || 1) + Number(d.flowStep)); return; }
+  if (d.flowStep) { e.stopPropagation(); const i = Math.max(0, flowIdx()); goFlow(FLOW[Math.max(0, Math.min(FLOW.length - 1, i + Number(d.flowStep)))][0]); return; }
   if (d.flow) { goFlow(Number(d.flow)); return; }
   if (d.page) { S.page = d.page; S.flowStep = d.page === 'initiatives' ? null : S.flowStep; render(); return; }
   if (d.init != null) { if (d.init === '0') { S.initDrawer = true; S.flowStep = 3; } render(); return; }
@@ -1033,8 +1439,8 @@ document.addEventListener('click', e => {
   if (t.id === 'diagBtn') { S.rec.diagOpen = !S.rec.diagOpen; render(); return; }
   if (d.filter) { if (e.target.closest('.msel')) return; S.rec.openFilter = S.rec.openFilter === d.filter ? null : d.filter; render(); return; }
   if (d.fpick) { e.stopPropagation(); const r = S.rec; const v = d.val;
-    if (d.fpick === 'mgr') { r.mgrs = r.mgrs.includes(v) ? r.mgrs.filter(x => x !== v) : [...r.mgrs, v]; r.workers = null; if (curRec() && !r.mgrs.includes(curRec().mgr)) { r.sel = null; r.playing = false; } }
-    if (d.fpick === 'worker') { const all = RECORDINGS.filter(x => r.mgrs.includes(x.mgr)).map(x => x.id); let cur = r.workers || all; cur = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]; r.workers = cur.length === all.length ? null : cur; }
+    if (d.fpick === 'mgr') { r.mgrs = r.mgrs.includes(v) ? r.mgrs.filter(x => x !== v) : [...r.mgrs, v]; r.workers = null; if (curRec() && !r.mgrs.includes(recMgr(curRec()))) { r.sel = null; r.playing = false; } }
+    if (d.fpick === 'worker') { const all = RECORDINGS.filter(x => r.mgrs.includes(recMgr(x))).map(x => x.id); let cur = r.workers || all; cur = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]; r.workers = cur.length === all.length ? null : cur; }
     if (d.fpick === 'steps') { r.steps = r.steps.includes(v) ? (r.steps.length > 1 ? r.steps.filter(x => x !== v) : r.steps) : [...r.steps, v]; }
     r.openFilter = d.fpick; render(); return; }
   if (d.rec) { const r = S.rec; if (r.sel !== d.rec) { r.sel = d.rec; r.t = 0; r.ann = null; } S.flowStep = 5; play(); return; }
@@ -1047,11 +1453,15 @@ document.addEventListener('click', e => {
     case 'new-meeting': S.create = newCreateState(); S.initDrawer = false; S.flowStep = 1; render(); break;
     case 'close-create': S.create = null; S.meetingOpen = false; S.flowStep = null; render(); break;
     case 'toggle-at': S.create.atOpen = !S.create.atOpen; S.create.openDD = null; render(); break;
+    case 'at-next': S.flowStep = 1.5; openAssign('create'); break;
+    case 'asg-edit-create': openAssign('create'); break;
+    case 'asg-edit-meeting': openAssign('meeting'); break;
     case 'slack-na': S.create.slackNA = t.checked; break;
     case 'create-meeting': {
       const c = S.create;
       Object.assign(S.meeting, {date:c.date, start:c.start, end:c.end, created:true});
-      if (c.proc && c.steps.length) Object.assign(S.meeting, {proc:c.proc, steps:[...c.steps]});
+      // Never assigned (or skipped) → the RoB owner manages every worker.
+      if (c.proc && c.steps.length) Object.assign(S.meeting, {proc:c.proc, steps:[...c.steps], assign:c.asgDone ? c.assign : null});
       S.create = null; S.meetingOpen = true; S.page = 'meetings'; S.flowStep = 2; render(); break;
     }
     case 'open-meeting': S.meetingOpen = true; S.initDrawer = false; S.page = 'meetings'; S.flowStep = 2; render(); break;
@@ -1132,19 +1542,20 @@ document.addEventListener('mouseover', e => {
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,[contenteditable]')) return;
   if (e.key === 'Escape') {
+    if (S.asg && S.asg.newOpen) { S.asg.newOpen = null; render(); return; }
+    if (S.asg && S.asg.ctx === 'meeting') { closeAssign(); return; }
     if (S.rec?.ann) { S.rec.ann = null; } else if (S.rec?.openFilter || S.rec?.diagOpen) { S.rec.openFilter = null; S.rec.diagOpen = false; }
     else if (S.rec) { S.rec = null; $('#pops').innerHTML = ''; } else if (S.raci) S.raci = null; else if (S.initDrawer) S.initDrawer = false;
     else if (S.create) S.create = null; else if (S.meetingOpen) S.meetingOpen = false;
     render();
   }
   if (e.key === ' ' && S.rec && curRec() && !S.rec.ann) { e.preventDefault(); S.rec.playing ? pause() : play(); }
-  if (e.key === 'ArrowRight' && e.altKey) goFlow((S.flowStep || 0) + 1);
-  if (e.key === 'ArrowLeft' && e.altKey) goFlow((S.flowStep || 2) - 1);
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.altKey) { const i = Math.max(0, flowIdx()); goFlow(FLOW[Math.max(0, Math.min(FLOW.length - 1, i + (e.key === 'ArrowRight' ? 1 : -1)))][0]); }
 });
 window.addEventListener('resize', () => { if (S.rec?.diagOpen) renderDiagPop(); });
 
 /* Boot: start at step 1 of the Figma flow, or at ?step=N */
-goFlow(Number(new URLSearchParams(location.search).get('step')) || 1);
+goFlow(Number(String(new URLSearchParams(location.search).get('step') || '1').replace('1b', '1.5')) || 1);
 </script>
 
 <!-- ───────────────────────── Review layer: inline text edits + comments ───────────────────────── -->
