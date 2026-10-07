@@ -129,13 +129,14 @@
   .conn-sub{font-size:13px;line-height:20px;color:var(--graphite-700);}
   .connect-btn{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;border:none;background:none;color:var(--blue);font-weight:600;font-size:14px;}
   .conn-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 16px 56px;align-items:center;font-size:13px;}
-  .dd{position:absolute;left:-1px;right:-1px;top:calc(100% - 4px);background:#fff;border:1px solid var(--gray-300);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:5;overflow:hidden;}
+  .dd{position:absolute;left:-1px;right:-1px;top:calc(100% - 4px);background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 8px 12px -3px rgba(0,0,0,.08),0 4px 8px -2px rgba(0,0,0,.04);z-index:5;overflow:hidden;}
   .dd-proc{padding:12px 16px;}
   .dd-proc.on{background:var(--blue-100);}
   .dd-steps{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;gap:6px 16px;padding:8px 0 4px 24px;}
   .dd-steps .check{font-size:11px;color:var(--graphite-700);}
-  .dd-list button{display:flex;width:100%;align-items:center;gap:8px;padding:10px 16px;border:none;background:#fff;text-align:left;font-size:14px;}
-  .dd-list button:hover{background:var(--gray-100);}
+  .dd-list{padding:8px 0;}
+  .dd-list button{display:flex;width:100%;align-items:center;gap:8px;padding:5px 12px;border:none;background:#fff;text-align:left;font-size:14px;line-height:22px;}
+  .dd-list button:hover{background:var(--blue-100);}
 
   /* People column */
   .owner{display:flex;align-items:center;gap:8px;padding-bottom:16px;border-bottom:1px solid var(--gray-200);margin-bottom:24px;}
@@ -240,9 +241,9 @@
   .filters label{display:block;font-size:14px;line-height:22px;font-weight:600;margin-bottom:6px;}
   .filters .field{height:40px;padding:0 12px;gap:10px;cursor:pointer;}
   .filters .field.open{border-color:var(--graphite-700);}
-  .msel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:30;padding:6px 0;max-height:236px;overflow:auto;cursor:default;}
+  .msel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 8px 12px -3px rgba(0,0,0,.08),0 4px 8px -2px rgba(0,0,0,.04);z-index:30;padding:8px 0;max-height:300px;overflow:auto;cursor:default;}
   .msel button{display:flex;align-items:center;gap:14px;width:100%;border:none;background:#fff;padding:5px 16px;font-size:14px;line-height:22px;text-align:left;}
-  .msel button:hover{background:var(--gray-100);}
+  .msel button:hover,.msel button.on{background:var(--blue-100);}
   .msel button .ck{width:12px;color:var(--graphite-700);visibility:hidden;}
   .msel button.on .ck{visibility:visible;}
   .rec-body{flex:1;display:flex;gap:16px;padding:24px 32px 0;min-height:0;overflow:auto;}
@@ -417,28 +418,52 @@
   .fs-create .person .badge{background:#eafbf5;color:#03b080;font-size:12px;}
   .fs-create .side-link{gap:8px;padding:8px 16px;color:#455065;line-height:22px;}
   .fs-create .side-link.active{color:#000;background:#f3f4f6;}
-  .fs-create .fs-foot .btn{font-size:13px;line-height:16px;padding:8px 16px;min-width:60px;justify-content:center;}
-  .fs-create .fs-foot .btn:not(.primary){border-color:#d8d9dc;color:#000;}
-  .fs-create .fs-foot .btn.primary{background:#00cc83;border-color:#00cc83;}
   .fs-create .fs-foot .btn.primary:hover{background:#00b574;}
   .fs-create .dd-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid #ebeced;background:#fff;font-size:13px;}
 
-  /* ───────── Managers & workers step ───────── */
-  .btn.sm{height:28px;padding:0 12px;font-size:13px;}
+  /* ───────── Managers & workers step ─────────
+     Built from the prototype's own controls: .field selects (32px, gray-400,
+     up/down caret), .btn (32px), link buttons 14/600 with 16px icons, .check
+     boxes, .count badges, square avatars, 8px cards with gray-200 borders. */
   .btn:disabled{opacity:.45;cursor:default;}
-  .link-btn{border:none;background:none;padding:0;color:var(--blue);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .fs-create .btn,.asg-modal .btn{font-size:13px;line-height:16px;padding:8px 16px;min-width:60px;justify-content:center;}
+  .fs-create .btn:not(.primary),.asg-modal .btn:not(.primary){border-color:#d8d9dc;color:#000;}
+  .fs-create .btn.primary,.asg-modal .btn.primary{background:#00cc83;border-color:#00cc83;}
+  .link-btn{border:none;background:none;padding:0;height:24px;color:var(--blue);font-weight:600;font-size:14px;line-height:14px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
   .link-btn:hover{text-decoration:underline;}
-  .link-btn.sm{font-size:12px;}
+  .link-btn.sm{font-size:13px;}
   .muted-link{color:var(--graphite-700);font-weight:400;}
-  .ghost-btn{border-color:transparent;color:var(--graphite-700);font-weight:400;}
-  .ghost-btn:hover{border-color:var(--gray-400);}
   .icon-btn.sm{width:24px;height:24px;}
   .asg-stepno{display:inline-block;font-size:11px;line-height:16px;font-weight:600;color:var(--blue);background:var(--blue-100);border-radius:10px;padding:0 8px;margin-right:8px;vertical-align:1px;}
-  .p-ava{width:32px;height:32px;object-fit:cover;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);font-size:11px;font-weight:600;color:var(--graphite-700);}
+  .p-ava{width:32px;height:32px;object-fit:cover;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border-radius:2px;background:var(--gray-200);font-size:12px;font-weight:600;color:var(--gray-600);}
   .p-ava.xs{width:20px;height:20px;font-size:9px;}
-  .w-ava{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#e8ecf7;color:#3a4f8a;font-size:10px;font-weight:600;}
-  .w-ava.xs{width:20px;height:20px;font-size:8px;}
-  .asg-cnt{font-size:11px;color:var(--graphite-700);background:var(--gray-100);border-radius:9px;padding:1px 7px;white-space:nowrap;}
+  .w-ava{width:24px;height:24px;border-radius:2px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);color:var(--gray-600);font-size:10px;font-weight:600;}
+  .w-ava.xs{width:20px;height:20px;font-size:9px;}
+  /* Dropdown — trigger is a .field; the panel follows the Figma Dropdown spec */
+  .dd-wrap{position:relative;min-width:0;}
+  .dd-trigger{width:100%;text-align:left;font:inherit;cursor:pointer;padding-right:32px;}
+  .dd-trigger:hover{border-color:var(--gray-600);}
+  .dd-trigger.open{border-color:var(--blue);box-shadow:0 0 0 3px rgba(32,78,207,.2);}
+  .dd-trigger.ph .dd-val{color:var(--gray-600);}
+  .dd-val{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dd-wrap.right .menu{left:auto;right:0;}
+  .dd-link{height:24px;}
+  .dd-link svg:last-child{transition:transform .15s;}
+  .dd-link.open svg:last-child{transform:rotate(180deg);}
+  .menu{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;max-height:300px;overflow:auto;z-index:40;background:#fff;border-radius:4px;padding:8px 0;
+    box-shadow:0 0 0 1px rgba(0,0,0,.04),0 8px 12px -3px rgba(0,0,0,.08),0 4px 8px -2px rgba(0,0,0,.04);}
+  .dd-link + .menu{min-width:220px;}
+  .menu-i{display:flex;align-items:center;gap:8px;width:100%;min-width:144px;border:none;background:#fff;padding:5px 12px;font:inherit;font-size:14px;line-height:22px;color:#000;text-align:left;white-space:nowrap;cursor:pointer;}
+  .menu.people .menu-i{padding:6px 16px;}
+  .menu-i:hover,.menu-i.on{background:var(--blue-100);}
+  .menu-i.menu-act{color:var(--blue);font-weight:600;}
+  .menu-h{padding:10px 16px 4px;font-size:12px;line-height:18px;font-weight:600;color:#000;}
+  .menu-sep{height:1px;margin:4px 0;background:var(--gray-200);}
+  .menu-ava{width:24px;height:24px;object-fit:cover;flex-shrink:0;border-radius:2px;}
+  .menu-ava.ini{display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);color:var(--gray-600);font-size:10px;font-weight:600;}
+  .menu-note{margin-left:auto;padding-left:12px;font-size:12px;color:var(--graphite-700);}
+  .field.ph select{color:var(--gray-600);}
+  .field.err{border-color:var(--red);}
 
   .asg-sum{display:flex;flex-direction:column;gap:4px;padding:0 16px 16px 56px;font-size:13px;}
   .vconn .asg-sum{padding:12px 0 0;margin-top:12px;border-top:1px solid var(--gray-200);}
@@ -448,95 +473,56 @@
   .asg-sum-list .person .nm{font-weight:600;}
   .asg-sum-cnt{margin-left:auto;color:var(--graphite-700);font-size:13px;white-space:nowrap;}
   .asg-sum-none{padding:6px 0;}
-  .ava.ini{display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);color:var(--graphite-700);font-size:13px;font-weight:600;}
+  .ava.ini{display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);color:var(--gray-600);font-size:13px;font-weight:600;}
 
-  .asg{border-top:1px solid #ebeced;padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;}
+  .asg{border-top:1px solid var(--gray-200);padding:16px;display:flex;flex-direction:column;gap:16px;}
   .asg-modal .asg{border-top:0;padding:0;}
   .asg-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .asg-top > b{font-size:14px;line-height:22px;}
-  .seg2{display:inline-flex;border:1px dashed #e0a14a;border-radius:6px;padding:2px;background:#fffaf2;}
-  .seg2 button{border:none;background:none;border-radius:4px;padding:3px 10px;font-size:12px;line-height:16px;color:var(--graphite-700);white-space:nowrap;}
-  .seg2 button.on{background:#fff;color:var(--graphite-900);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.12);}
-  .asg-foot{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid #ebeced;font-size:13px;}
-  .asg-foot > .muted{margin-right:8px;}
+  .asg-foot{display:flex;align-items:center;gap:16px;padding-top:16px;border-top:1px solid var(--gray-200);font-size:13px;}
   .asg-foot .grow{flex:1;}
 
-  .asg-row{display:flex;align-items:center;gap:8px;height:32px;padding:0 4px 0 8px;border-radius:4px;font-size:13px;}
-  .asg-row:hover{background:var(--gray-100);}
+  .asg-row{display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 8px;border:none;border-radius:4px;background:transparent;font:inherit;font-size:14px;color:var(--graphite-900);text-align:left;cursor:pointer;}
+  .asg-row:hover:not(:disabled){background:var(--blue-100);}
+  .asg-row:hover:not(:disabled) .asg-arrow{color:var(--blue);}
+  .asg-row:disabled{cursor:default;}
+  .asg-row:disabled .asg-arrow{opacity:.3;}
   .asg-wn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .asg-arrow{width:24px;height:24px;border:1px solid var(--gray-300);border-radius:4px;background:#fff;color:var(--graphite-700);display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
-  .asg-arrow:hover:not(:disabled){border-color:var(--blue);color:var(--blue);background:var(--blue-100);}
-  .asg-arrow:disabled{opacity:.3;cursor:default;}
-  .asg-empty{font-size:12px;color:var(--gray-600);padding:14px 8px;text-align:center;display:flex;justify-content:center;gap:4px;align-items:center;}
-  .asg-sel{position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;height:28px;border:1px solid var(--gray-400);border-radius:4px;background:#fff;padding:0 22px 0 8px;font-size:13px;}
-  .asg-sel select{appearance:none;border:none;background:transparent;font:inherit;width:100%;min-width:0;outline:none;cursor:pointer;color:var(--graphite-900);font-weight:600;}
-  .asg-sel.ph select{color:var(--blue);}
-  .asg-sel svg{position:absolute;right:5px;pointer-events:none;color:var(--graphite-700);}
-  .asg-newlink{font-size:12px;}
-  .asg-sel.sm{flex:0 0 auto;height:24px;font-size:12px;padding:0 18px 0 6px;border-color:var(--gray-300);}
-  .asg-sel.sm select{font-weight:400;color:var(--blue);}
-  .asg-hintline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;}
-  .asg-new{display:flex;flex-direction:column;gap:6px;width:100%;}
-  .asg-in{height:28px;border:1px solid var(--gray-400);border-radius:4px;padding:0 8px;font:inherit;font-size:13px;outline:none;width:100%;}
-  .asg-in:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-200);}
-  .asg-in.err{border-color:var(--red);}
-  .asg-new-f{display:flex;justify-content:flex-end;align-items:center;gap:12px;}
+  .asg-arrow{color:var(--graphite-700);display:inline-flex;align-items:center;flex-shrink:0;}
+  .asg-empty{font-size:13px;color:var(--gray-600);padding:16px 8px;text-align:center;display:flex;justify-content:center;gap:4px;align-items:center;}
+  .asg-new{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;}
+  .asg-new-t{font-size:14px;line-height:22px;font-weight:600;}
+  .asg-new-row{display:flex;align-items:center;gap:8px;}
+  .asg-new-row .field{flex:1;min-width:0;padding:0 10px;}
+  .asg-new-row .field input{flex:1;min-width:0;border:none;outline:none;background:transparent;font:inherit;color:inherit;height:100%;}
 
-  /* A · columns — manager tabs, then Unassigned | selected manager */
-  .asg-a{display:flex;flex-direction:column;gap:10px;}
-  .asg-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
-  .asg-col{border:1px solid var(--gray-300);border-radius:8px;background:#fff;display:flex;flex-direction:column;max-height:400px;min-height:160px;}
-  .asg-col.un{background:#fafafa;}
-  .asg-col.target{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-200);}
+  /* Manager tabs: .field-shaped chips, selected = blue border + blue-100 */
+  .asg-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;}
+  .asg-pills > .muted{font-size:13px;}
+  .asg-col-h .dd-wrap{margin-left:auto;}
+  .asg-pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 6px 0 6px;border:1px solid var(--gray-400);border-radius:4px;background:#fff;font-size:14px;color:var(--graphite-900);--c:var(--blue);}
+  .asg-pill:hover{border-color:var(--gray-600);}
+  .asg-pill.on{border-color:var(--blue);background:var(--blue-100);font-weight:600;}
+  .asg-pill-x{width:20px;height:20px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;color:var(--graphite-700);}
+  .asg-pill-x:hover{background:var(--gray-200);}
+
+  /* Columns — manager tabs, then Unassigned | selected manager */
+  .asg-a{display:flex;flex-direction:column;gap:12px;}
+  .asg-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;}
+  .asg-col{border:1px solid var(--gray-200);border-radius:8px;background:#fff;display:flex;flex-direction:column;height:400px;}
+  .asg-col.target{border-color:var(--blue);}
   .asg-col.add{border-style:dashed;background:transparent;justify-content:center;}
-  .asg-col-h{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--gray-200);min-height:44px;}
-  .asg-col-h > b{font-size:13px;flex:1;}
-  .asg-col-b{overflow:auto;padding:4px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px 8px;align-content:start;}
+  .asg-col-h{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--gray-200);min-height:48px;}
+  .asg-col-h > b{font-size:14px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .asg-col-b{flex:1;overflow:auto;padding:4px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px 8px;align-content:start;}
   .asg-col-b .asg-empty{grid-column:1/-1;}
-  /* B · pick a manager, click workers */
-  .asg-brush{display:flex;flex-direction:column;gap:10px;}
-  .asg-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;}
-  .asg-pills .asg-sel{flex:0 0 auto;width:168px;}
-  .asg-pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 6px 0 4px;border:1px solid var(--gray-300);border-radius:15px;background:#fff;font-size:13px;--c:var(--blue);}
-  .asg-pill .p-ava{border-radius:50%;}
-  .asg-pill.on{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb, var(--c) 25%, transparent);font-weight:600;}
-  .asg-pill-x{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--graphite-700);}
-  .asg-pill-x:hover{background:var(--gray-100);}
-  .asg-hintline{font-size:12px;}
-  .asg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:6px;max-height:380px;overflow:auto;padding-bottom:2px;}
-  .asg-wchip{display:flex;align-items:center;gap:6px;height:32px;padding:0 6px;border:1px solid var(--gray-300);border-radius:6px;background:#fff;font-size:12px;text-align:left;--c:var(--gray-500);}
-  .asg-wchip > span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .asg-wchip.has{border-color:var(--c);}
-  .asg-wchip.mine{background:color-mix(in srgb, var(--c) 10%, #fff);}
-  .asg-wchip em{font-style:normal;font-size:9px;font-weight:700;color:#fff;background:var(--c);border-radius:8px;padding:1px 5px;}
-  .asg-wchip:disabled{opacity:.5;cursor:default;}
-  .asg-wchip:not(:disabled):hover{border-color:var(--c);}
-
-  /* C · select & assign */
-  .asg-shuttle{display:grid;grid-template-columns:1fr 176px 1fr;gap:12px;align-items:stretch;}
-  .asg-pane{border:1px solid var(--gray-300);border-radius:8px;background:#fff;display:flex;flex-direction:column;max-height:400px;}
-  .asg-pane-h{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--gray-200);font-size:13px;min-height:44px;}
-  .asg-search{margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:var(--gray-600);}
-  .asg-search input{border:none;outline:none;width:84px;font:inherit;font-size:12px;}
-  .asg-pane-b{overflow:auto;padding:4px;display:flex;flex-direction:column;gap:1px;min-height:120px;}
-  .asg-ck{display:inline-flex;}
-  .asg-ck input{display:none;}
-  .asg-ck .box{width:16px;height:16px;border-radius:3px;border:1px solid var(--gray-500);background:#fff;display:inline-flex;align-items:center;justify-content:center;}
-  .asg-ck input:checked + .box{background:var(--blue);border-color:var(--blue);}
-  .asg-ck input:checked + .box::after{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);}
-  .asg-row.sel-row{cursor:pointer;}
-  .asg-row.sel-row.on{background:var(--blue-100);}
-  .asg-mid{display:flex;flex-direction:column;justify-content:center;gap:8px;}
-  .asg-mid .asg-sel{flex:0 0 auto;}
-  .asg-group{margin-bottom:6px;}
-  .asg-group-h{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:12px;background:#fafafa;border-radius:4px;}
-  .asg-group-h b{flex:1;}
 
   /* Edit modal (meeting view) */
   .asg-modal{position:absolute;left:50%;top:40px;bottom:40px;transform:translateX(-50%);width:900px;max-width:calc(100% - 32px);background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;}
-  .asg-modal-h{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #ebeced;}
-  .asg-modal-h > div{display:flex;align-items:center;gap:8px;font-size:16px;}
-  .asg-modal-b{flex:1;overflow:auto;padding:20px 24px;}
+  .asg-modal-h{display:flex;align-items:center;justify-content:space-between;padding:24px 32px;border-bottom:1px solid var(--gray-200);}
+  .asg-modal-h > div{display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;font-weight:600;}
+  .asg-modal-h > div .muted{font-weight:400;}
+  .asg-modal-b{flex:1;overflow:auto;padding:24px 32px;}
 </style>
 </head>
 <body>
@@ -771,6 +757,28 @@ function deck(m, key, {stepsTitle = 'Steps for', showLeft = true, rightTitle} = 
     </div></div>`;
 }
 
+/* ───────────────────────── Dropdown menu (Figma Dropdown) ─────────────────────────
+   One custom menu for every select in the prototype: a .field-shaped trigger
+   with the ⇅ caret, and a white 4px panel with the Level-5 shadow, 14/22
+   items, blue-100 hover/selected, 12px semibold section headers, 24px
+   avatars for people. S.ddOpen holds the open menu's id; DD_ON[id] (or the
+   id's prefix before ':') handles the picked value. */
+const DD_ON = {};
+const ddHandle = (id, v) => (DD_ON[id] || DD_ON[id.split(':')[0]])?.(v, id.split(':').slice(1).join(':'));
+function ddMenu(id, items, {value = null, label = null, placeholder = '', icon = '', cls = '', menuCls = '', link = false} = {}) {
+  const open = S.ddOpen === id;
+  const cur = items.find(i => i.value != null && i.value === value);
+  const text = label ?? (cur ? (cur.label ?? cur.text) : placeholder);
+  const trigger = link
+    ? `<button class="link-btn dd-link ${open ? 'open' : ''}" type="button" data-ddt="${id}" aria-expanded="${open}">${icon}${esc(text)}${ic.chevD(16)}</button>`
+    : `<button class="field dd-trigger ${open ? 'open' : ''} ${cur || label ? '' : 'ph'}" type="button" data-ddt="${id}" aria-expanded="${open}">${icon}<span class="dd-val">${esc(text)}</span><span class="caret">${ic.updown(14)}</span></button>`;
+  return `<div class="dd-wrap ${cls}">${trigger}
+    ${open ? `<div class="menu ${menuCls}">${items.map(i => i.header != null ? `<div class="menu-h">${esc(i.header)}</div>` : i.divider ? '<div class="menu-sep"></div>'
+      : `<button class="menu-i ${i.value === value ? 'on' : ''} ${i.cls || ''}" type="button" data-ddi="${id}" data-val="${esc(i.value)}">${i.html || esc(i.label ?? i.text)}</button>`).join('')}</div>` : ''}</div>`;
+}
+// People items — 24px avatar + name (Figma 30587:143876)
+const ddPerson = k => `${P[k].img ? `<img class="menu-ava" src="assets/${P[k].img}" alt="" />` : `<span class="menu-ava ini">${initials(P[k].n)}</span>`}<span>${esc(P[k].n)}</span>`;
+
 /* ───────────────────────── Managers & workers ─────────────────────────
    Which manager leads each worker, so a reviewer knows who to talk to.
    assign = { mgrs:[personKey…], map:{ workerName: personKey } }.
@@ -796,9 +804,6 @@ const groupsOf = assign => {
 };
 const cleanAssign = d => { const map = Object.fromEntries(Object.entries(d.map).filter(([, m]) => m)); return {mgrs:d.mgrs.filter(m => Object.values(map).includes(m)), map}; };
 const cloneAssign = a => a ? {mgrs:[...a.mgrs], map:{...a.map}} : {mgrs:[], map:{}};
-const MGR_COLORS = ['#204ecf','#03b080','#e09200','#9b51e0','#d42551','#0e9aa7'];
-let ASSIGN_UI = 'a';
-try { ASSIGN_UI = localStorage.getItem('at-assign-ui') || 'a'; } catch {}
 Object.assign(ic, {
   arrowR: s => I('<path d="M3 8h10M9 4l4 4-4 4"/>', s),
   arrowL: s => I('<path d="M13 8H3M7 4L3 8l4 4"/>', s),
@@ -824,38 +829,34 @@ function assignSummary(assign, {editAct}) {
 
 // The step — same panel inside the create flow and in the "Edit" modal.
 function assignPanel() {
-  const A = S.asg; const n = assignedCount(A.draft);
-  const opts = [['a','A · Columns'],['b','B · Pick manager, click workers'],['c','C · Select & assign']];
-  const body = ASSIGN_UI === 'b' ? asgBrush() : ASSIGN_UI === 'c' ? asgShuttle() : asgColumns();
+  const A = S.asg;
   return `<div class="asg" data-asg-root>
-    <div class="asg-top"><b>Assign workers to managers</b><div class="seg2" title="Prototype only — three ways to do the same thing">${opts.map(([k, l]) => `<button class="${ASSIGN_UI === k ? 'on' : ''}" data-asg-ui="${k}">${l}</button>`).join('')}</div></div>
-    ${body}
-    <div class="asg-foot"><span class="muted">${n} of ${WORKER_LIST.length} assigned</span>
+    <div class="asg-top"><b>Assign workers to managers</b></div>
+    ${asgColumns()}
+    <div class="asg-foot">
       ${A.ctx === 'create' ? `<button class="btn" data-asg="back">${ic.chevL(14)} Back</button>` : ''}
       <span class="grow"></span>
-      ${A.ctx === 'create' ? `<button class="btn ghost-btn" data-asg="skip" title="You can change this later">Skip · everyone reports to ${esc(P[OWNER].n.split(' ')[0])}</button>` : `<button class="btn" data-asg="cancel">Cancel</button>`}
+      ${A.ctx === 'create' ? `<button class="btn" data-asg="skip" title="You can change this later">Skip · everyone reports to ${esc(P[OWNER].n.split(' ')[0])}</button>` : `<button class="btn" data-asg="cancel">Cancel</button>`}
       <button class="btn primary" data-asg="done">${A.ctx === 'create' ? 'Done' : 'Save'}</button>
     </div></div>`;
 }
 
-// Manager chooser: participants (+ anyone added), then "+ Add new manager…".
-function mgrSelect(attr, current, {placeholder, all} = {}) {
+// Manager chooser: participants (+ anyone added) as people items, then "+ Add new manager…".
+function mgrMenu(id, current, {placeholder, all} = {}) {
   const used = all ? [] : S.asg.draft.mgrs.filter(m => m !== current);
-  const opts = managerPool().filter(k => !used.includes(k));
-  return `<label class="asg-sel ${current ? '' : 'ph'}"><select ${attr}>${placeholder ? `<option value="" ${current ? '' : 'selected'} disabled>${placeholder}</option>` : ''}${opts.map(k => `<option value="${k}" ${k === current ? 'selected' : ''}>${esc(P[k].n)}${k === OWNER ? ' (RoB owner)' : ''}</option>`).join('')}<option disabled>──────────</option><option value="__new">+ Add new manager…</option></select>${ic.chevD(14)}</label>`;
+  const items = managerPool().filter(k => !used.includes(k)).map(k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:`${ddPerson(k)}${k === OWNER ? '<span class="menu-note">RoB owner</span>' : ''}`}));
+  return ddMenu(id, [...items, {divider:true}, {value:'__new', label:'+ Add new manager…', cls:'menu-act'}], {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
 }
 // "Move all to…" for a whole group: `from` is a manager key or '__un' (unassigned).
-function moveAllSelect(from, label = 'Move all to…') {
-  const d = S.asg.draft;
-  const to = [...(from === '__un' ? [] : [['__un', 'Unassigned']]), ...managerPool().filter(k => k !== from).map(k => [k, P[k].n + (k === OWNER ? ' (RoB owner)' : '')])];
-  return `<label class="asg-sel sm"><select data-asg-moveall="${from}"><option value="" selected disabled>${label}</option>${to.map(([k, n]) => `<option value="${k}">${esc(n)}</option>`).join('')}</select>${ic.chevD(12)}</label>`;
+function moveAllMenu(from, label = 'Move all to…') {
+  const to = [...(from === '__un' ? [] : [{value:'__un', label:'Unassigned'}]), ...managerPool().filter(k => k !== from).map(k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:ddPerson(k)}))];
+  return ddMenu('moveall:' + from, to, {label, cls:'right', menuCls:'people', link:true});
 }
-const newMgrLink = where => `<button class="link-btn asg-newlink" data-asg="new" data-where="${where}">${ic.plus(14)} New manager</button>`;
 function newMgrForm(where) {
-  return `<div class="asg-new" data-asg-pop><input id="asgNewName" class="asg-in" placeholder="Full name" value="${esc(S.asg.newName || '')}" autocomplete="off" /><input id="asgNewTitle" class="asg-in" placeholder="Job title (optional)" value="${esc(S.asg.newTitle || '')}" autocomplete="off" /><div class="asg-new-f"><button class="link-btn muted-link" data-asg="new-cancel">Cancel</button><button class="btn sm primary" data-asg="new-save" data-where="${where}">Add</button></div></div>`;
+  return `<div class="asg-new" data-asg-pop><div class="asg-new-t">Add new manager</div><div class="asg-new-row"><label class="field"><input id="asgNewName" placeholder="Full name" value="${esc(S.asg.newName || '')}" autocomplete="off" /></label><label class="field"><input id="asgNewTitle" placeholder="Job title (optional)" value="${esc(S.asg.newTitle || '')}" autocomplete="off" /></label><button class="btn" data-asg="new-cancel">Cancel</button><button class="btn primary" data-asg="new-save" data-where="${where}">Add manager</button></div></div>`;
 }
 
-// Option A — columns: pick the manager in the tabs on top; the left column is
+// Assign step — columns: pick the manager in the tabs on top; the left column is
 // Unassigned, the right column is that manager's. → moves a worker across,
 // ← moves them back. Only two columns are ever on screen, so the target
 // never scrolls out of view.
@@ -864,50 +865,21 @@ function asgColumns() {
   const un = WORKER_LIST.filter(w => !d.map[w]);
   const target = d.mgrs.includes(A.target) ? A.target : d.mgrs[0] || null;
   const ws = target ? WORKER_LIST.filter(w => d.map[w] === target) : [];
-  const row = (w, isUn) => `<div class="asg-row">${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span><button class="asg-arrow" data-asg-move="${esc(w)}" data-mgr="${isUn ? (target || '') : ''}" ${isUn && !target ? 'disabled' : ''} title="${isUn ? (target ? 'Assign to ' + esc(P[target].n) : 'Add a manager first') : 'Back to unassigned'}">${isUn ? ic.arrowR(14) : ic.arrowL(14)}</button></div>`;
+  // Whole row is the control: click sends the worker across (→) or back (←).
+  const row = (w, isUn) => `<button class="asg-row" type="button" data-asg-move="${esc(w)}" data-mgr="${isUn ? (target || '') : ''}" ${isUn && !target ? 'disabled' : ''} title="${isUn ? (target ? 'Assign to ' + esc(P[target].n) : 'Add a manager first') : 'Back to unassigned'}">${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span><span class="asg-arrow">${isUn ? ic.arrowR(16) : ic.arrowL(16)}</span></button>`;
   return `<div class="asg-a">
     <div class="asg-pills">
-      ${d.mgrs.map(m => `<button class="asg-pill ${m === target ? 'on' : ''}" data-asg-tab="${m}">${pAvatar(m, 'xs')}${esc(P[m].n)}<span class="asg-cnt">${WORKER_LIST.filter(w => d.map[w] === m).length}</span><span class="asg-pill-x" data-asg-rmcol="${m}" title="Remove manager — their workers go back to unassigned">${ic.close(10)}</span></button>`).join('')}
-      ${A.newOpen === 'col' ? newMgrForm('col') : `${mgrSelect('data-asg-addcol', null, {placeholder:'+ Add manager'})}${newMgrLink('col')}`}
+      ${d.mgrs.map(m => `<button class="asg-pill ${m === target ? 'on' : ''}" data-asg-tab="${m}">${pAvatar(m, 'xs')}${esc(P[m].n)}<span class="count">${WORKER_LIST.filter(w => d.map[w] === m).length}</span><span class="asg-pill-x" data-asg-rmcol="${m}" title="Remove manager — their workers go back to unassigned">${ic.close(10)}</span></button>`).join('')}
+      ${A.newOpen ? '' : mgrMenu('addcol', null, {placeholder:'Add manager'})}
     </div>
+    ${A.newOpen === 'col' ? newMgrForm('col') : ''}
     <div class="asg-two">
-      <div class="asg-col un"><div class="asg-col-h"><b>Unassigned</b><span class="asg-cnt">${un.length}</span>${un.length && target ? `<button class="link-btn sm" data-asg="move-all" data-mgr="${target}">All ${ic.arrowR(12)}</button>` : ''}</div>
+      <div class="asg-col un"><div class="asg-col-h"><b>Unassigned</b><span class="count">${un.length}</span>${un.length && target ? `<button class="link-btn sm" data-asg="move-all" data-mgr="${target}">All ${ic.arrowR(16)}</button>` : ''}</div>
         <div class="asg-col-b">${un.map(w => row(w, true)).join('') || '<span class="asg-empty">Everyone is assigned</span>'}</div></div>
-      ${target ? `<div class="asg-col target"><div class="asg-col-h">${pAvatar(target, 'xs')}<b>${esc(P[target].n)}</b><span class="asg-cnt">${ws.length}</span>${ws.length ? moveAllSelect(target) : ''}</div>
-        <div class="asg-col-b">${ws.map(w => row(w, false)).join('') || `<span class="asg-empty">Click ${ic.arrowR(12)} on a worker to assign them to ${esc(P[target].n.split(' ')[0])}</span>`}</div></div>`
+      ${target ? `<div class="asg-col target"><div class="asg-col-h">${pAvatar(target, 'xs')}<b>${esc(P[target].n)}</b><span class="count">${ws.length}</span>${ws.length ? moveAllMenu(target, 'Move all to') : ''}</div>
+        <div class="asg-col-b">${ws.map(w => row(w, false)).join('') || `<span class="asg-empty">Click a worker on the left to assign them to ${esc(P[target].n.split(' ')[0])}</span>`}</div></div>`
       : `<div class="asg-col add"><span class="asg-empty">Add a manager above to start assigning</span></div>`}
     </div>
-  </div>`;
-}
-
-// Option B — pick a manager, then click workers to assign them (click again to unassign).
-function asgBrush() {
-  const A = S.asg, d = A.draft;
-  const active = d.mgrs.includes(A.active) ? A.active : d.mgrs[0] || null;
-  const color = m => MGR_COLORS[Math.max(0, d.mgrs.indexOf(m)) % MGR_COLORS.length];
-  return `<div class="asg-brush">
-    <div class="asg-pills"><span class="muted">Assigning to</span>
-      ${d.mgrs.map(m => `<button class="asg-pill ${m === active ? 'on' : ''}" style="--c:${color(m)}" data-asg-active="${m}">${pAvatar(m, 'xs')}${esc(P[m].n)}<span class="asg-cnt">${WORKER_LIST.filter(w => d.map[w] === m).length}</span><span class="asg-pill-x" data-asg-rmcol="${m}" title="Remove">${ic.close(10)}</span></button>`).join('')}
-      ${A.newOpen === 'pill' ? newMgrForm('pill') : `${mgrSelect('data-asg-addpill', null, {placeholder:'+ Add manager'})}${newMgrLink('pill')}`}
-    </div>
-    <div class="asg-hintline muted">${active ? `Click workers to assign them to <b>${esc(P[active].n)}</b> — click again to unassign.${WORKER_LIST.some(w => !d.map[w]) ? ` <button class="link-btn sm" data-asg="move-all" data-mgr="${active}">All unassigned ${ic.arrowR(12)} ${esc(P[active].n.split(' ')[0])}</button>` : ''}${WORKER_LIST.some(w => d.map[w] === active) ? moveAllSelect(active, `Move all of ${esc(P[active].n.split(' ')[0])}'s to…`) : ''}` : 'Add a manager, then click workers.'}</div>
-    <div class="asg-grid">${WORKER_LIST.map(w => { const m = d.map[w]; return `<button class="asg-wchip ${m ? 'has' : ''} ${m === active ? 'mine' : ''}" style="${m ? '--c:' + color(m) : ''}" data-asg-paint="${esc(w)}" ${active ? '' : 'disabled'}>${wAvatar(w, 'xs')}<span>${esc(w)}</span>${m ? `<em title="${esc(P[m].n)}">${initials(P[m].n)}</em>` : ''}</button>`; }).join('')}</div>
-  </div>`;
-}
-
-// Option C — select workers on the left, choose a manager, Assign →.
-function asgShuttle() {
-  const A = S.asg, d = A.draft; const sel = A.sel || []; const q = (A.q || '').toLowerCase();
-  const un = WORKER_LIST.filter(w => !d.map[w]); const shown = un.filter(w => w.toLowerCase().includes(q));
-  const mid = managerPool().includes(A.mid) ? A.mid : null;
-  const groups = d.mgrs.map(m => ({m, ws:WORKER_LIST.filter(w => d.map[w] === m)})).filter(g => g.ws.length);
-  return `<div class="asg-shuttle">
-    <div class="asg-pane"><div class="asg-pane-h"><label class="asg-ck"><input type="checkbox" data-asg-all ${shown.length && shown.every(w => sel.includes(w)) ? 'checked' : ''} /><span class="box"></span></label><b>Unassigned</b><span class="asg-cnt">${un.length}</span><span class="asg-search">${ic.search(12)}<input id="asgQ" placeholder="Search" value="${esc(A.q || '')}" autocomplete="off" /></span></div>
-      <div class="asg-pane-b">${shown.map(w => `<label class="asg-row sel-row ${sel.includes(w) ? 'on' : ''}"><span class="asg-ck"><input type="checkbox" data-asg-row="${esc(w)}" ${sel.includes(w) ? 'checked' : ''} /><span class="box"></span></span>${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span></label>`).join('') || `<span class="asg-empty">${un.length ? 'No match' : 'Everyone is assigned'}</span>`}</div></div>
-    <div class="asg-mid">${A.newOpen === 'mid' ? newMgrForm('mid') : `${mgrSelect('data-asg-mid', mid, {placeholder:'Choose manager', all:true})}${newMgrLink('mid')}`}
-      <button class="btn primary sm" data-asg="assign-sel" ${sel.length && mid ? '' : 'disabled'}>Assign${sel.length ? ' ' + sel.length : ''} ${ic.arrowR(14)}</button></div>
-    <div class="asg-pane"><div class="asg-pane-h"><b>Assigned</b><span class="asg-cnt">${assignedCount(d)}</span></div>
-      <div class="asg-pane-b">${groups.map(g => `<div class="asg-group"><div class="asg-group-h">${pAvatar(g.m, 'xs')}<b>${esc(P[g.m].n)}</b><span class="asg-cnt">${g.ws.length}</span>${moveAllSelect(g.m)}</div>${g.ws.map(w => `<div class="asg-row">${wAvatar(w, 'xs')}<span class="asg-wn">${esc(w)}</span><button class="asg-arrow" data-asg-move="${esc(w)}" data-mgr="" title="Back to unassigned">${ic.close(12)}</button></div>`).join('')}</div>`).join('') || '<span class="asg-empty">Tick workers on the left, choose a manager, then Assign</span>'}</div></div>
   </div>`;
 }
 
@@ -938,7 +910,7 @@ function renderMain() {
 
 /* ───────────────────────── Create meeting (screen 1) ───────────────────────── */
 function newCreateState() {
-  return {date:'2026-06-15', start:'14:30', end:'15:30', proc:null, steps:[], assign:null, asgOpen:false, asgDone:false, asgSkipped:false, atOpen:false, openDD:null, slack:null, slackNA:false, init:null, bau:null, newPeople:[], section:'details'};
+  return {date:'2026-06-15', start:'14:30', end:'15:30', tz:'(GMT-04:00) New York', recur:'Every week on a Friday', busy:'Busy', org:'Talent AI', proc:null, steps:[], assign:null, asgOpen:false, asgDone:false, asgSkipped:false, atOpen:false, openDD:null, slack:null, slackNA:false, init:null, bau:null, newPeople:[], section:'details'};
 }
 function renderCreate() {
   const c = S.create; const parts = [...BASE_PARTICIPANTS, ...(c.steps.length ? AT_MANAGERS : [])];
@@ -957,11 +929,11 @@ function renderCreate() {
           <div class="grid2">
             <label class="field">${ic.cal(16)}<input type="date" value="${c.date}" data-cf="date" /></label>
             <div style="display:flex;align-items:center;gap:12px"><label class="field" style="width:112px">${'<input type="time" value="' + c.start + '" data-cf="start" />'}<span style="position:absolute;right:10px;pointer-events:none" class="muted">${ic.clock(16)}</span></label><span class="muted" style="font-size:13px">to</span><label class="field" style="width:112px"><input type="time" value="${c.end}" data-cf="end" /><span style="position:absolute;right:10px;pointer-events:none" class="muted">${ic.clock(16)}</span></label><span class="link" style="font-weight:600;margin-left:auto">Find Time</span></div>
-            <label class="field">${ic.globe(16)}<select><option>(GMT-04:00) New York</option><option>(GMT+00:00) London</option><option>(GMT+01:00) Berlin</option></select><span class="caret">${ic.updown(14)}</span></label>
-            <label class="field">${ic.repeat(16)}<select><option>Every week on a Friday</option><option>Every two weeks on a Friday</option><option>Does not repeat</option></select><span class="caret">${ic.updown(14)}</span></label>
+            ${ddMenu('tz', ['(GMT-04:00) New York','(GMT+00:00) London','(GMT+01:00) Berlin','(GMT+05:30) Mumbai'].map(v => ({value:v, label:v})), {value:c.tz, icon:ic.globe(16)})}
+            ${ddMenu('recur', ['Every week on a Friday','Every two weeks on a Friday','Every month on the first Friday','Does not repeat'].map(v => ({value:v, label:v})), {value:c.recur, icon:ic.repeat(16)})}
             <div><div class="field disabled">${ic.video(16)}https://zoom.us/j/••••••••••••<span class="pill-blue">Auto-created</span></div><div style="margin-top:12px"><label class="check"><input type="checkbox" checked /><span class="box"></span>Auto-recording</label></div></div>
-            <div><label class="field">${ic.case(16)}<select><option>Busy</option><option>Free</option></select><span class="caret">${ic.updown(14)}</span></label><div class="hint">Controls whether this blocks the slot on participants calendars.</div></div>
-            <label class="field">${ic.org(16)}<select><option>Talent AI</option><option>Finance Operations</option></select><span class="caret">${ic.updown(14)}</span></label><div></div>
+            <div>${ddMenu('busy', ['Busy','Free'].map(v => ({value:v, label:v})), {value:c.busy, icon:ic.case(16)})}<div class="hint">Controls whether this blocks the slot on participants calendars.</div></div>
+            ${ddMenu('org', ['Talent AI','Finance Operations','Customer Success'].map(v => ({value:v, label:v})), {value:c.org, icon:ic.org(16)})}<div></div>
           </div>
           <div class="rte" style="margin-top:24px">${rteToolbar()}<div class="ed" contenteditable="true" data-placeholder="Add a description">A regular review of the invoicing process to track performance, identify issues or delays, and align on improvements, ownership, and next steps.</div></div>
           <div class="hint">600 characters left <span style="color:var(--green)">✓</span></div>
@@ -983,7 +955,7 @@ function renderCreate() {
                 <label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>
                 ${c.proc === k ? `<div class="dd-steps">${p.steps.map(s => `<label class="check sm"><input type="checkbox" data-step="${s.id}" ${c.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div>` : ''}
               </div>`).join('')}
-              <div class="dd-foot"><span class="muted">${atReady ? `<span class="asg-stepno">Step 1 of 2</span>${c.steps.length} step${c.steps.length === 1 ? '' : 's'} selected` : '<span class="asg-stepno">Step 1 of 2</span>Pick a process and the steps to review'}</span><button class="btn primary sm" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
+              <div class="dd-foot"><span class="muted">${atReady ? `<span class="asg-stepno">Step 1 of 2</span>${c.steps.length} step${c.steps.length === 1 ? '' : 's'} selected` : '<span class="asg-stepno">Step 1 of 2</span>Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
           </div>
           ${simpleConn('slack', slackLogo(20), 'Slack', 'Create or add Slack channels to sync conversations with this meeting', ['#-actiontrace-invoicing-process','#-rob-invoices-rampup','+ Create new channel'], `<label class="check" style="margin-top:8px;font-size:13px"><input type="checkbox" ${c.slackNA ? 'checked' : ''} data-act="slack-na" /><span class="box"></span>Not Applicable</label>`)}
           ${simpleConn('init', ic.rocket(18), 'Initiatives', 'Connect to the Initiative this work advances', ['Supplier Invoice Management','Engineering Weekly','CRM Optimization and Expansion'])}
@@ -1027,13 +999,13 @@ function renderMeeting() {
           <div class="det-grid">
             <div class="det">${ic.cal(16)}${fmtDate(m.date,{weekday:'long',month:'long',day:'numeric'})}</div>
             <div class="det">${ic.clock(16)}${fmtTime(m.start)} &nbsp;-&nbsp; ${fmtTime(m.end)}</div>
-            <div class="det">${ic.globe(16)}(GMT-04:00) New York</div>
-            <div class="det">${ic.repeat(16)}Every week on a Friday <span class="tag ghost" style="gap:4px"><span class="dot" style="background:var(--amber);width:6px;height:6px"></span>High</span></div>
+            <div class="det">${ic.globe(16)}${esc(m.tz || '(GMT-04:00) New York')}</div>
+            <div class="det">${ic.repeat(16)}${esc(m.recur || 'Every week on a Friday')} <span class="tag ghost" style="gap:4px"><span class="dot" style="background:var(--amber);width:6px;height:6px"></span>High</span></div>
             <div class="det">${ic.video(16)}<a href="#" onclick="return false">https://zoom.us/j/98859055013</a><span class="muted">${ic.copy(14)}</span></div>
-            <div class="det">${ic.case(16)}Busy</div>
+            <div class="det">${ic.case(16)}${esc(m.busy || 'Busy')}</div>
             <div class="det full"><label class="check" style="font-size:13px"><input type="checkbox" checked /><span class="box"></span>Auto-recording</label></div>
             <div class="det full">${ic.info(16)}<span style="color:var(--graphite-900)">A regular review of the invoicing process to track performance, identify issues or delays, and align on improvements, ownership, and next steps.</span></div>
-            <div class="det full">${ic.org(16)}<a href="#" onclick="return false">Talent AI</a></div>
+            <div class="det full">${ic.org(16)}<a href="#" onclick="return false">${esc(m.org || 'Talent AI')}</a></div>
             <div class="det full">${ic.target(16)}<div style="flex:1"><div style="color:var(--graphite-900)">≥90% of in-scope recordings reviewed</div><div>Objective: Make PO matching and GL coding recordings reliable AI training data • Q4 / 2026</div><div class="progress"><b style="color:var(--graphite-900);font-size:12px">32%</b><div class="bar"><i></i></div></div></div></div>
           </div>
         </section>
@@ -1298,7 +1270,7 @@ function hideTip() { const t = $('#tlTip'); if (t) t.innerHTML = ''; }
 /* ───────────────────────── Flow navigator ───────────────────────── */
 const FLOW = [
   [1,'New ROB · Action Trace processes adding'],
-  [1.5,'New ROB · Assign workers to managers (3 options)'],
+  [1.5,'New ROB · Assign workers to managers'],
   [2,'ROB · Action Trace added'],
   [3,'Initiative · Action Trace connector view mode'],
   [4,'Recordings modal · Recording not selected'],
@@ -1321,7 +1293,7 @@ function goFlow(n) {
   if (!FLOW.some(([x]) => x === n)) n = 1;
   S.flowStep = n; flowMenu = false; S.asg = null;
   if (S.rec) S.rec.playing = false;
-  Object.assign(S, {create:null, meetingOpen:false, initDrawer:false, raci:null, rec:null, page:'meetings'});
+  Object.assign(S, {create:null, meetingOpen:false, initDrawer:false, raci:null, rec:null, page:'meetings', ddOpen:null});
   $('#pops').innerHTML = '';
   const rec = RECORDINGS[0];
   if (n === 1) S.create = newCreateState();
@@ -1341,10 +1313,25 @@ function goFlow(n) {
   if (n === 9) { const b = $('#recBody'); if (b) b.scrollTop = 140; }
 }
 
+/* ───────────────────────── Events: dropdown menus ───────────────────────── */
+Object.assign(DD_ON, {
+  tz: v => { S.create.tz = v; }, recur: v => { S.create.recur = v; }, busy: v => { S.create.busy = v; }, org: v => { S.create.org = v; },
+  addcol: v => { const A = S.asg; if (v === '__new') { A.newOpen = 'col'; A.newName = ''; A.newTitle = ''; setTimeout(() => $('#asgNewName')?.focus()); } else asgAddMgr(v, 'col'); },
+  moveall: (v, from) => { const to = v === '__un' ? null : v; WORKER_LIST.filter(w => from === '__un' ? !S.asg.draft.map[w] : S.asg.draft.map[w] === from).forEach(w => asgSet(w, to)); },
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-ddt],[data-ddi]');
+  if (S.ddOpen && !e.target.closest('.dd-wrap')) { S.ddOpen = null; render(); }
+  if (!t) return;
+  e.stopPropagation();
+  if (t.dataset.ddt) { S.ddOpen = S.ddOpen === t.dataset.ddt ? null : t.dataset.ddt; render(); return; }
+  const id = t.dataset.ddi; S.ddOpen = null; ddHandle(id, t.dataset.val); render();
+}, true);
+
 /* ───────────────────────── Events: managers & workers step ───────────────────────── */
 function openAssign(ctx) {
   const src = ctx === 'create' ? S.create.assign : S.meeting.assign;
-  S.asg = {draft:cloneAssign(src), ctx, target:null, active:null, mid:null, sel:[], q:'', newOpen:null, newName:'', newTitle:''};
+  S.asg = {draft:cloneAssign(src), ctx, target:null, newOpen:null, newName:'', newTitle:''};
   if (ctx === 'create') { S.create.atOpen = false; S.create.asgOpen = true; }
   render();
 }
@@ -1359,33 +1346,27 @@ function closeAssign(result) {   // undefined = cancel · 'skip' = everyone to t
   S.asg = null; render();
 }
 const asgSet = (w, m) => { const d = S.asg.draft; if (!m) delete d.map[w]; else { d.map[w] = m; if (!d.mgrs.includes(m)) d.mgrs.push(m); } };
-const asgReplaceMgr = (old, nw) => { const A = S.asg, d = A.draft; d.mgrs = d.mgrs.map(m => m === old ? nw : m); Object.keys(d.map).forEach(w => { if (d.map[w] === old) d.map[w] = nw; }); if (A.target === old) A.target = nw; if (A.active === old) A.active = nw; };
+const asgReplaceMgr = (old, nw) => { const A = S.asg, d = A.draft; d.mgrs = d.mgrs.map(m => m === old ? nw : m); Object.keys(d.map).forEach(w => { if (d.map[w] === old) d.map[w] = nw; }); if (A.target === old) A.target = nw; };
 const asgAddMgr = (k, where) => { const A = S.asg, d = A.draft;
   if (where === 'col') { if (!d.mgrs.includes(k)) d.mgrs.push(k); A.target = k; }
   else if (where.startsWith('col:')) asgReplaceMgr(where.slice(4), k);
-  else if (where === 'pill') { if (!d.mgrs.includes(k)) d.mgrs.push(k); A.active = k; }
-  else if (where === 'mid') A.mid = k;
 };
 document.addEventListener('click', e => {
   const A = S.asg; if (!A) return;
   if (A.newOpen && !e.target.closest('[data-asg-pop],[data-asg="new"]')) { A.newOpen = null; render(); }
-  const t = e.target.closest('[data-asg],[data-asg-ui],[data-asg-rmcol],[data-asg-move],[data-asg-active],[data-asg-paint],[data-asg-tab]');
+  const t = e.target.closest('[data-asg],[data-asg-rmcol],[data-asg-move],[data-asg-tab]');
   if (!t) return;
   const d = t.dataset; const draft = A.draft;
-  if (d.asgUi) { ASSIGN_UI = d.asgUi; try { localStorage.setItem('at-assign-ui', ASSIGN_UI); } catch {} A.newOpen = null; A.sel = []; A.q = ''; render(); return; }
   if (d.asgRmcol) { e.stopPropagation(); const m = d.asgRmcol; draft.mgrs = draft.mgrs.filter(x => x !== m); Object.keys(draft.map).forEach(w => { if (draft.map[w] === m) delete draft.map[w]; }); render(); return; }
   if (d.asgMove != null) { e.stopPropagation(); asgSet(d.asgMove, d.mgr || null); render(); return; }
-  if (d.asgActive) { A.active = d.asgActive; render(); return; }
-  if (d.asgPaint != null) { const act = draft.mgrs.includes(A.active) ? A.active : draft.mgrs[0]; if (!act) return; asgSet(d.asgPaint, draft.map[d.asgPaint] === act ? null : act); render(); return; }
   if (d.asgTab) { A.target = d.asgTab; render(); return; }
   switch (d.asg) {
     case 'move-all': WORKER_LIST.filter(w => !draft.map[w]).forEach(w => asgSet(w, d.mgr)); render(); break;
-    case 'assign-sel': (A.sel || []).forEach(w => asgSet(w, A.mid)); A.sel = []; render(); break;
     case 'new': A.newOpen = d.where; A.newName = ''; A.newTitle = ''; render(); $('#asgNewName')?.focus(); break;
     case 'new-cancel': A.newOpen = null; render(); break;
     case 'new-save': {
       const name = ($('#asgNewName')?.value || '').trim(); const title = ($('#asgNewTitle')?.value || '').trim();
-      if (!name) { $('#asgNewName')?.classList.add('err'); $('#asgNewName')?.focus(); break; }
+      if (!name) { $('#asgNewName')?.closest('.field')?.classList.add('err'); $('#asgNewName')?.focus(); break; }
       const key = 'new' + Date.now().toString(36);
       P[key] = {n:name, r:title || 'Manager', added:true}; ADDED_MANAGERS.push(key);
       asgAddMgr(key, d.where); A.newOpen = null; render(); break;
@@ -1398,20 +1379,11 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const A = S.asg; if (!A) return; const t = e.target; const d = t.dataset; const v = t.value;
-  const pick = (where, apply) => { if (v === '__new') { A.newOpen = where; A.newName = ''; A.newTitle = ''; render(); $('#asgNewName')?.focus(); } else if (v) { apply(v); render(); } };
-  if (d.asgColmgr) pick('col:' + d.asgColmgr, k => asgReplaceMgr(d.asgColmgr, k));
-  else if (t.matches('[data-asg-addcol]')) pick('col', k => asgAddMgr(k, 'col'));
-  else if (t.matches('[data-asg-addpill]')) pick('pill', k => asgAddMgr(k, 'pill'));
-  else if (t.matches('[data-asg-mid]')) pick('mid', k => { A.mid = k; });
-  else if (d.asgMoveall) { const from = d.asgMoveall; const to = v === '__un' ? null : v; if (!v) return;
-    WORKER_LIST.filter(w => from === '__un' ? !A.draft.map[w] : A.draft.map[w] === from).forEach(w => asgSet(w, to)); render(); }
-  else if (d.asgRow) { A.sel = t.checked ? [...new Set([...(A.sel || []), d.asgRow])] : (A.sel || []).filter(w => w !== d.asgRow); render(); }
-  else if (t.matches('[data-asg-all]')) { const q = (A.q || '').toLowerCase(); const rows = WORKER_LIST.filter(w => !A.draft.map[w] && w.toLowerCase().includes(q)); A.sel = t.checked ? rows : []; render(); }
+  void t; void d; void v;
 });
 document.addEventListener('input', e => {
   if (!S.asg) return;
-  if (e.target.id === 'asgQ') { S.asg.q = e.target.value; render(); }
-  if (e.target.id === 'asgNewName') { S.asg.newName = e.target.value; e.target.classList.remove('err'); }
+  if (e.target.id === 'asgNewName') { S.asg.newName = e.target.value; e.target.closest('.field')?.classList.remove('err'); }
   if (e.target.id === 'asgNewTitle') S.asg.newTitle = e.target.value;
 });
 document.addEventListener('keydown', e => { if (S.asg && e.key === 'Enter' && (e.target.id === 'asgNewName' || e.target.id === 'asgNewTitle')) { e.preventDefault(); $('[data-asg="new-save"]')?.click(); } });
@@ -1467,7 +1439,7 @@ document.addEventListener('click', e => {
     case 'slack-na': S.create.slackNA = t.checked; break;
     case 'create-meeting': {
       const c = S.create;
-      Object.assign(S.meeting, {date:c.date, start:c.start, end:c.end, created:true});
+      Object.assign(S.meeting, {date:c.date, start:c.start, end:c.end, tz:c.tz, recur:c.recur, busy:c.busy, org:c.org, created:true});
       // Never assigned (or skipped) → the RoB owner manages every worker.
       if (c.proc && c.steps.length) Object.assign(S.meeting, {proc:c.proc, steps:[...c.steps], assign:c.asgDone ? c.assign : null});
       S.create = null; S.meetingOpen = true; S.page = 'meetings'; S.flowStep = 2; render(); break;
@@ -1550,6 +1522,7 @@ document.addEventListener('mouseover', e => {
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,[contenteditable]')) return;
   if (e.key === 'Escape') {
+    if (S.ddOpen) { S.ddOpen = null; render(); return; }
     if (S.asg && S.asg.newOpen) { S.asg.newOpen = null; render(); return; }
     if (S.asg && S.asg.ctx === 'meeting') { closeAssign(); return; }
     if (S.rec?.ann) { S.rec.ann = null; } else if (S.rec?.openFilter || S.rec?.diagOpen) { S.rec.openFilter = null; S.rec.diagOpen = false; }
