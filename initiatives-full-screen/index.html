@@ -288,7 +288,7 @@
   --color-info-subtle:    var(--ic-palette-blue-100);
 
   /* ---- Overlays ---- */
-  --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
+  --color-overlay:        rgba(0, 0, 0, 0.5); /* black @ 50% — matches TopTeam's drawer/modal scrim */
 
   /* ---- Type roles (size + line height paired) ---- */
   --type-h1: var(--ic-weight-semibold) var(--ic-text-2xl)/var(--ic-lh-h1) var(--ic-font-sans);
@@ -4076,6 +4076,46 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-view-activity li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--ic-space-3); align-items: start; font: var(--type-body-sm); }
     .in-view-activity time { display: block; font: var(--type-body-xs); color: var(--color-text-muted); }
     #in-drawer-view .drawer-footer { justify-content: flex-end; }
+
+    /* View drawer spacing — matched to the TopTeam initiative sidebar
+       (production screenshot, 2026-10-07). Header 16/24/16/32 with the
+       16px title 4px over the tags line; body 32px sides, tabs 16px from
+       the header rule and 12px over the rows; 14px labels and values, value
+       column at 208px, 12px between rows (person rows 48px tall); labels sit
+       8px over long text; sections are ruled, 16px inside, 16px headings. */
+    #in-drawer-view .drawer-header { padding: var(--ic-space-4) var(--ic-space-5) var(--ic-space-4) var(--ic-space-6); }
+    #in-drawer-view .in-view-heading { gap: var(--ic-space-1); }
+    #in-drawer-view .in-view-header-actions { gap: var(--ic-space-2); }
+    #in-drawer-view .drawer-body { padding: 18px var(--ic-space-6) var(--ic-space-5); }
+    #in-drawer-view .in-view-body { gap: var(--ic-space-3); }
+    #in-drawer-view .in-view-panel { gap: var(--ic-space-4); }
+    #in-drawer-view .in-view-rows { gap: var(--ic-space-3); }
+    #in-drawer-view .in-view-row { grid-template-columns: 200px minmax(0, 1fr); gap: var(--ic-space-2); min-height: 32px; }
+    #in-drawer-view .in-view-row:has(.in-view-person) { min-height: 48px; }
+    #in-drawer-view .in-view-row dt,
+    #in-drawer-view .in-view-row dd { font: var(--ic-weight-regular) var(--ic-text-sm)/20px var(--ic-font-sans); }
+    #in-drawer-view .in-view-block { gap: var(--ic-space-2); }
+    #in-drawer-view .in-view-block h3 { font: var(--ic-weight-regular) var(--ic-text-sm)/20px var(--ic-font-sans); color: var(--color-text-muted); }
+    #in-drawer-view .in-view-section { gap: var(--ic-space-4); padding: var(--ic-space-4) 0; border-top: 1px solid var(--color-border); }
+    #in-drawer-view .in-view-section:last-child { border-bottom: 1px solid var(--color-border); }
+    #in-drawer-view .in-view-section h3 { font: var(--type-body-semibold); color: var(--color-text); }
+    /* Type sizes measured from the same sidebar (Proxima Nova text widths):
+       title 16/600 · last-edit 12/400 · tabs 13 (active 600, inactive 400) ·
+       row labels and values 13/400 · names 13/600 over 12/400 roles ·
+       long text 14/400 · section headings 14/600. Header tags 4px sides. */
+    #in-drawer-view .in-view-meta .tag { padding-inline: var(--ic-space-1); }
+    /* Header icons, same sidebar: link glyph ~16×10, close glyph ~8×8 (the
+       ✕ fills 10/13 of its box, so a 10px box). Buttons stay 24px. */
+    #in-drawer-view [data-view-copy] svg { width: 16px; height: 16px; }
+    #in-drawer-view .modal-close svg { width: 10px; height: 10px; }
+    #in-drawer-view .in-view-edited { font-size: var(--ic-text-xs); line-height: 18px; }
+    #in-drawer-view .tab { font-size: var(--ic-text-sm); font-weight: var(--ic-weight-regular); }
+    #in-drawer-view .tab.is-active { font-weight: var(--ic-weight-semibold); }
+    #in-drawer-view .in-view-person-name { color: var(--color-text); font-size: var(--ic-text-sm); line-height: 20px; }
+    #in-drawer-view .in-view-person-role { font-size: var(--ic-text-xs); line-height: 18px; }
+    /* Working team — the same cards as the create form (photo · name over
+       title), two per row across the panel; no ✕ in view mode. */
+    #in-drawer-view .in-view-team-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--ic-space-2); }
     @media (max-width: 560px) { .in-view-row, .in-view-conn { grid-template-columns: minmax(0, 1fr); gap: 2px; } .in-view-conn-icon { display: none; } }
     /* Duplicate notice (ID 5). designmd gap: .alert's display: flex beats the
        UA [hidden] rule, so hidden is restated. Two lines: claim, then match. */
@@ -6306,10 +6346,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       // login — when one can't load, the avatar falls back to initials.
       // Broken photo → initials, here and in the trigger avatar it's copied into.
       // Same for the Working team list (managers.csv) and its cards.
-      const PHOTO_PICKERS = '#in-sponsor, #in-owner, #in-pm, #in-team, #in-team-cards';
+      const PHOTO_PICKERS = '#in-sponsor, #in-owner, #in-pm, #in-team, #in-team-cards, #in-drawer-view';
       const toInitials = img => {
         const picker = img.closest('#in-sponsor, #in-owner, #in-pm, #in-team');
-        const ini = img.closest('.dropdown-item, .in-team-card')?.dataset.initials
+        const ini = img.closest('.dropdown-item, .in-team-card, .in-view-person')?.dataset.initials
           || img.closest('.dropdown-item')?.dataset.initials
           || picker?.querySelector('.dropdown-item.is-selected')?.dataset.initials || '';
         img.replaceWith(document.createTextNode(ini));
@@ -6723,7 +6763,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const img = it.querySelector('.avatar img');
         const av = img ? `<img src="${img.src}" alt="" />` : vEsc(it.dataset.initials || '');
         const role = it.querySelector('.dropdown-item-description')?.textContent.trim();
-        return `<span class="in-view-person"><span class="avatar avatar-md">${av}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(it))}</a>${role ? `<span class="in-view-person-role">${vEsc(role)}</span>` : ''}</span></span>`;
+        return `<span class="in-view-person" data-initials="${vEsc(it.dataset.initials || '')}"><span class="avatar avatar-md">${av}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(it))}</a>${role ? `<span class="in-view-person-role">${vEsc(role)}</span>` : ''}</span></span>`;
       };
       const textOr = v => v && v.trim() ? vEsc(v.trim()) : EMPTY;
       const row = (dt, dd) => `<div class="in-view-row"><dt>${dt}</dt><dd>${dd}</dd></div>`;
@@ -6759,15 +6799,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               : EMPTY)}
             ${row('Accountable owner', person(sel1('in-owner')))}
             ${row('Project manager', person(sel1('in-pm')))}
-            ${row('Working team', team.length
-              ? `<span class="in-view-team"><span class="in-avatar-stack">${team.slice(0, 5).map(t => `<span class="avatar avatar-sm"><img src="${t.querySelector('img').src}" alt="" /></span>`).join('')}</span><span class="in-view-team-names">${team.map(t => vEsc(label(t))).join(', ')}</span></span>`
-              : EMPTY)}
+          </dl>
+          <div class="in-view-block"><h3>Working team</h3>${team.length
+            ? `<div class="in-view-team-cards">${team.map(t => `<div class="in-team-card" data-initials="${vEsc(t.dataset.initials || '')}"><span class="avatar">${t.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${vEsc(label(t))}</span><span class="in-team-card-role">${vEsc(t.querySelector('.dropdown-item-description')?.textContent.trim() || '')}</span></span></div>`).join('')}</div>`
+            : `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <dl class="in-view-rows">
             ${row('Estimated duration', sel1('in-duration') ? vEsc(label(sel1('in-duration'))) : EMPTY)}
             ${row('Start date', textOr(startInput.value))}
             ${row('End date', textOr(endInput.value))}
             ${document.getElementById('in-impact-initial') ? row('Initial impact date', sel1('in-impact-initial') ? vEsc(label(sel1('in-impact-initial'))) : EMPTY) : ''}
             ${document.getElementById('in-impact-full') ? row('Full impact date', sel1('in-impact-full') ? vEsc(label(sel1('in-impact-full'))) : EMPTY) : ''}
-            ${row('Core strategy', coreOn ? `<span class="tag tag-blue">Core strategy</span>` : '<span class="in-view-empty">No</span>')}
+            ${row('Core strategy', `<span class="tag tag-indicator ${coreOn ? 'tag-positive' : 'in-health-na'}">${coreOn ? 'On' : 'Off'}</span>`)}
             ${coreOn ? row('Company strategic objective', coreObj ? vEsc(label(coreObj)) : EMPTY) : ''}
           </dl>
           <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${textOr(desc.value)}</p></div>
