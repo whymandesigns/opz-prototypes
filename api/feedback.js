@@ -20,7 +20,12 @@
 import { neon } from '@neondatabase/serverless';
 import { read, applyOps, cleanPath } from '../lib/feedback-db.mjs';
 
-const sql = process.env.DATABASE_URL ? neon(process.env.DATABASE_URL) : null;
+// Build the client defensively: the driver puts the whole connection string
+// (password included) into its error message, so a throw here must never reach
+// the client. Any failure is logged server-side and reported generically.
+let sql = null, sqlError = null;
+try { if (process.env.DATABASE_URL) sql = neon(process.env.DATABASE_URL); }
+catch (e) { sqlError = e; console.error('feedback: could not build the database client —', e?.message); }
 // lib/feedback-db.mjs speaks (text, params) => { rows }; Neon's http driver
 // takes the same shape through sql.query().
 const query = async (text, params) => ({ rows: await sql.query(text, params) });
@@ -29,7 +34,9 @@ const query = async (text, params) => ({ rows: await sql.query(text, params) });
 export function createHandler(q) {
   return async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (!q) return res.status(503).json({ error: 'Store not configured: add a Neon database to this Vercel project (DATABASE_URL).' });
+  if (!q) return res.status(503).json({ error: sqlError
+      ? 'DATABASE_URL is set but not a usable Postgres connection string. See the function logs.'
+      : 'Store not configured: add a Neon database to this Vercel project (DATABASE_URL).' });
   try {
     const body = req.method === 'POST' ? (typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}) : {};
     const p = cleanPath(req.method === 'POST' ? body.p : req.query?.p);
@@ -45,8 +52,10 @@ export function createHandler(q) {
     }
     res.status(405).end();
   } catch (e) {
+    // Log the detail, return none of it: driver errors quote the connection
+    // string, and this endpoint is public.
     console.error('feedback', e);
-    res.status(500).json({ error: String(e?.message || e) });
+    res.status(500).json({ error: 'Store error. See the function logs.' });
   }
   };
 }
