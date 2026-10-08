@@ -1,0 +1,18 @@
+{
+  "name": "opz-prototypes",
+  "private": true,
+  "type": "module",
+  "description": "Prototypes + the review bar's feedback API (Vercel serverless + Neon Postgres).",
+  "scripts": {
+    "schema": "psql \"$DATABASE_URL\" -f db/schema.sql",
+    "test:db": "node tools/feedback-db.test.mjs"
+  },
+  "dependencies": {
+    "@neon/config": "^1.8.6",
+    "@neon/env": "^1.5.3",
+    "@neondatabase/serverless": "^1.2.0"
+  },
+  "devDependencies": {
+    "pg": "^8.13.1"
+  }
+}
