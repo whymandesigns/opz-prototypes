@@ -914,7 +914,7 @@ function renderMain() {
     $('#main').innerHTML = `<h1 class="page-title">Initiatives</h1>
       <div class="toolbar"><div class="search-input">${ic.search(16)}Search by name, owner or function</div><button class="btn-outline">${ic.filter(16)}Filter</button><button class="btn-outline">${ic.code(16)}Query</button></div>
       <table class="itable"><thead><tr><th>Name &nbsp;<span class="link" style="font-weight:600">Expand All</span></th><th>Status</th><th>Health</th><th>Accountability</th></tr></thead><tbody>
-      ${INITIATIVES.map(([n, st, o, r], i) => `<tr class="row ${i === 0 && S.initDrawer ? 'sel' : ''}" data-init="${i}"><td><div style="display:flex;gap:10px;align-items:flex-start"><span class="muted" style="margin-top:2px">${ic.chevD(14)}</span><div><div class="iname">${esc(n)}</div><span class="tag ghost">Initiative</span></div></div></td><td><span class="tag ghost">${st}</span></td><td><span class="dot"></span></td><td><div style="display:flex;gap:8px;align-items:center">${i === 0 ? `<img class="ava sm" src="assets/john-appleseed.png" />` : `<span class="lw">LW</span>`}<div><div style="font-size:14px;line-height:20px">${o}</div><div style="font-size:11px;line-height:16px" class="muted">${r}</div></div></div></td></tr>`).join('')}
+      ${INITIATIVES.map(([n, st, o, r], i) => `<tr class="row ${S.initDrawer && (S.initSel || 0) === i ? 'sel' : ''}" data-init="${i}"><td><div style="display:flex;gap:10px;align-items:flex-start"><span class="muted" style="margin-top:2px">${ic.chevD(14)}</span><div><div class="iname">${esc(n)}</div><span class="tag ghost">Initiative</span></div></div></td><td><span class="tag ghost">${st}</span></td><td><span class="dot"></span></td><td><div style="display:flex;gap:8px;align-items:center">${i === 0 ? `<img class="ava sm" src="assets/john-appleseed.png" />` : `<span class="lw">LW</span>`}<div><div style="font-size:14px;line-height:20px">${o}</div><div style="font-size:11px;line-height:16px" class="muted">${r}</div></div></div></td></tr>`).join('')}
       </tbody></table>`;
   } else {
     const m = S.meeting;
@@ -1070,35 +1070,38 @@ function renderMeeting() {
 /* ───────────────────────── Initiative drawer (screen 3) ───────────────────────── */
 function renderInitiative() {
   const m = S.meeting;
+  const [name, stage, owner, role] = INITIATIVES[S.initSel || 0];
+  const first = (S.initSel || 0) === 0;
   const robLine = (t, when, rec, open) => `<div class="mt">${ic.cal(16)}<span class="link" ${open ? 'data-act="open-meeting"' : ''}>[ ${robTag(14)} ROB ] ${t}</span></div><div class="when">${when}<span class="tag">${rec}</span></div>`;
+  const addLink = text => `<button class="add-link" style="margin-top:8px">${ic.plus(14)}${text}</button>`;
+  const none = '<span class="muted">Not connected</span>';
   return `<div class="scrim" data-act="close-initiative"></div><div class="drawer idrawer">
-    <div class="hd"><div class="r1"><h3>Supplier Invoice Management</h3><button class="icon-btn">${ic.link(18)}</button><button class="icon-btn" data-act="close-initiative">${ic.close(16)}</button></div>
-      <div class="sub"><span class="tag blue">Initiative</span><span class="tag">Execution</span>Last edit was made 16 hours ago by <a href="#" onclick="return false">Collete Parker</a></div>
+    <div class="hd"><div class="r1"><h3>${esc(name)}</h3><button class="icon-btn">${ic.link(18)}</button><button class="icon-btn" data-act="close-initiative">${ic.close(16)}</button></div>
+      <div class="sub"><span class="tag blue">Process</span><span class="tag">${esc(stage)}</span>Last edit was made 16 hours ago by <a href="#" onclick="return false">Collete Parker</a></div>
       <div class="tabs"><button class="on">Overview</button><button>Activity Log</button></div></div>
     <div class="bd">
-      <div class="kvrow"><span>Health</span><span class="v">Active</span></div>
-      <div class="kvrow"><span>Accountable owner</span><div class="mini-p"><img class="ava sm" src="assets/john-appleseed.png" /><div><div class="n">John Appleseed</div><div class="r">Principal AI Expert</div></div></div></div>
-      <div class="kvrow" style="margin-top:4px"><span>Project manager</span><div class="mini-p"><img class="ava sm" src="assets/tile-tampakas.png" /><div><div class="n">Tile Tampakas</div><div class="r">Project Manager</div></div></div></div>
-      <div class="kvrow"><span>Start date</span><span class="v">Jun 15, 2026</span></div>
+      <div class="kvrow"><span>Accountable owner</span><div class="mini-p">${first ? '<img class="ava sm" src="assets/john-appleseed.png" />' : `<span class="lw">${esc(owner.split(' ').map(w => w[0]).join('').slice(0, 2))}</span>`}<div><div class="n">${esc(owner)}</div><div class="r">${esc(role)}</div></div></div></div>
       <div class="kvrow"><span>End date</span><span class="v">Jun 15, 2027</span></div>
-      <div class="kvrow"><span>Health</span><span class="v" style="display:flex;gap:8px;align-items:center"><span class="tag ghost" style="gap:4px;font-weight:600;color:var(--graphite-800)"><span class="dot" style="width:6px;height:6px"></span>On Track</span>14 days in current status</span></div>
       <div style="margin-top:8px;font-size:13px" class="muted">Description</div>
       <div style="margin-top:4px;font-size:13px;padding-bottom:16px;border-bottom:1px solid var(--gray-200)">Receive, validate, code, approve and pay supplier invoices in SAP S/4HANA.</div>
       <h2 class="sec" style="font-size:14px;margin:16px 0 8px">Connections</h2>
-      <div class="iconn"><div class="k"><span class="conn-ic">${ic.cal(16)}</span>Cadenced Meeting</div><div class="v"><a href="#" onclick="return false">[RoB][Initiative] Invoices &amp; Payroll Ramp-up</a><div class="when">Jul 22 • 4:00pm<span class="tag">Every week on Tuesday until Jul 29...</span></div></div></div>
-      <div class="iconn"><div class="k"><span class="conn-ic">${slackLogo(16)}</span>Slack Channels</div><div class="v"><span class="dot" style="width:6px;height:6px"></span> <a href="#" onclick="return false">#-rob-invoices-rampup</a> <span class="tag">Default</span></div></div>
-      <div class="iconn"><div class="k">${AT_BIG(20)}Action Trace</div><div class="v">
+      <div class="iconn"><div class="k"><span class="conn-ic">${slackLogo(16)}</span>Slack channels</div><div class="v">${first ? `<span class="dot" style="width:6px;height:6px"></span> <a href="#" onclick="return false">#-rob-invoices-rampup</a> <span class="tag">Default</span>` : none}</div></div>
+      <div class="iconn"><div class="k"><span class="conn-ic">${ic.cal(16)}</span>RoB meetings</div><div class="v">${first ? `<a href="#" onclick="return false">[RoB][Initiative] Invoices &amp; Payroll Ramp-up</a><div class="when">Jul 22 • 4:00pm<span class="tag">Every week on Tuesday until Jul 29...</span></div>` : none}</div></div>
+      <div class="iconn"><div class="k">${AT_BIG(20)}Action Trace</div><div class="v">${first ? `
         <span class="proc-link" data-hover-deck="po">PO Invoice Processing</span><div class="muted" style="color:var(--graphite-900)">Updated on Sep 22</div>
         ${m.created ? robLine(esc(m.title), `${fmtDate(m.date,{month:'short',day:'numeric'})} • ${fmtTime(m.start).replace(' PM','pm').replace(' AM','am')}`, 'Every week on Friday', true) : ''}
         ${robLine('PO Invoice · Approval &amp; Payment', 'Oct 1 • 4:00pm', 'Every week on Tuesday')}
         <div style="height:16px"></div>
         <span class="proc-link" data-hover-deck="nonpo">Non-PO Invoice Processing</span><div style="color:var(--graphite-900)">Updated on Sep 21</div>
         ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}
-        <button class="add-link" style="margin-top:16px" data-act="new-meeting">${ic.plus(14)}Add [ ${robTag(14)} ROB ] Meeting</button>
+        <button class="add-link" style="margin-top:16px" data-act="new-meeting">${ic.plus(14)}Add [ ${robTag(14)} ROB ] Meeting</button>` : none}
       </div></div>
-      <h2 class="sec" style="font-size:14px;margin:24px 0 8px;padding-top:24px;border-top:1px solid var(--gray-200)">Documents</h2>
-      ${['Roadmap 2026-09-18','Roadmap 2026-09-11'].map(d => `<div style="display:flex;gap:10px;align-items:center;padding:6px 0">${ic.clip(16)}<a href="#" onclick="return false">${d}</a></div>`).join('')}
-      <div style="display:flex;gap:10px;align-items:center;padding:6px 0">${ic.globe(16)}<a href="#" onclick="return false">Impact Assessment</a>${ic.ext(14)}</div>
+      ${addLink('Add processes')}
+      <div class="kvrow" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)"><span>Beneficiary function</span><span class="v"><a href="#" onclick="return false">Finance</a></span></div>
+      <h2 class="sec" style="font-size:14px;margin:16px 0 8px">Documents</h2>
+      ${first ? ['Roadmap 2026-09-18','Roadmap 2026-09-11'].map(d => `<div style="display:flex;gap:10px;align-items:center;padding:6px 0">${ic.clip(16)}<a href="#" onclick="return false">${d}</a></div>`).join('') + `<div style="display:flex;gap:10px;align-items:center;padding:6px 0">${ic.globe(16)}<a href="#" onclick="return false">Impact Assessment</a>${ic.ext(14)}</div>` : '<div class="muted" style="font-size:13px">No documents yet</div>'}
+      <h2 class="sec" style="font-size:14px;margin:24px 0 8px;padding-top:24px;border-top:1px solid var(--gray-200)">Activities</h2>
+      ${addLink('Add activity')}
     </div></div>`;
 }
 
@@ -1435,7 +1438,7 @@ document.addEventListener('click', e => {
   if (d.flowStep) { e.stopPropagation(); const i = Math.max(0, flowIdx()); goFlow(FLOW[Math.max(0, Math.min(FLOW.length - 1, i + Number(d.flowStep)))][0]); return; }
   if (d.flow) { goFlow(Number(d.flow)); return; }
   if (d.page) { S.page = d.page; S.flowStep = d.page === 'initiatives' ? null : S.flowStep; render(); return; }
-  if (d.init != null) { if (d.init === '0') { S.initDrawer = true; S.flowStep = 3; } render(); return; }
+  if (d.init != null) { S.initSel = Number(d.init); S.initDrawer = true; S.flowStep = 3; render(); return; }
   if (d.deckGo) { const [k, i] = d.deckGo.split(':'); S.deckPage[k] = Number(i);
     if (k === 'init') { const proc = $('#pops [data-pop=init]')?.dataset.proc; const a = $(`[data-hover-deck=${proc}]`); if (a) showInitDeck(a, proc); return; }
     render(); return; }

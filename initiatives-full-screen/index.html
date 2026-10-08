@@ -4075,7 +4075,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-view-activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-3); }
     .in-view-activity li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--ic-space-3); align-items: start; font: var(--type-body-sm); }
     .in-view-activity time { display: block; font: var(--type-body-xs); color: var(--color-text-muted); }
-    #in-drawer-view .drawer-footer { justify-content: flex-end; }
+    #in-drawer-view .drawer-footer { justify-content: flex-end; gap: var(--ic-space-4); }
+    .in-view-add { display: inline-flex; align-items: center; gap: var(--ic-space-1); font-weight: var(--ic-weight-semibold); }
+    .in-view-docs { display: flex; flex-direction: column; gap: var(--ic-space-2); }
+    .in-view-doc { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
 
     /* View drawer spacing — matched to the TopTeam initiative sidebar
        (production screenshot, 2026-10-07). Header 16/24/16/32 with the
@@ -4254,11 +4257,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        strength so the row's state reads at a glance. */
     #in-rows tr[data-draft] > td > * { opacity: 0.5; }
     #in-rows tr[data-draft] > td[data-col="status"] > * { opacity: 1; }
-    #in-rows tr[data-editable] { cursor: pointer; }
-    #in-rows tr[data-editable]:not([data-draft]):hover > td { background: var(--color-surface-muted); }
+    #in-rows tr[data-id] { cursor: pointer; }
+    #in-rows tr[data-id]:not([data-draft]):hover > td { background: var(--color-surface-muted); }
     #in-rows tr[data-draft]:hover > td > * { opacity: 0.75; }
     #in-rows tr[data-draft]:hover > td[data-col="status"] > * { opacity: 1; }
-    #in-rows tr[data-editable]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
+    #in-rows tr[data-id]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
     .tag-indicator.in-health-na { --tag-color: var(--color-text-subtle); }
     /* Table owner avatars — designmd's square .avatar. Its fill matches the
        zebra stripe (both surface-muted), so in the table it steps down to
@@ -5723,7 +5726,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="in-view-heading">
           <h2 class="in-view-title" id="in-view-title"></h2>
           <div class="in-view-meta">
-            <span class="tag tag-blue">Initiative</span>
+            <span class="tag tag-blue">Process</span>
             <span class="tag tag-light" data-view="stage"></span>
             <span class="in-view-edited" data-view="edited"></span>
           </div>
@@ -5742,6 +5745,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="in-view-panel" data-view-panel="activity" role="tabpanel" hidden></div>
       </div>
       <footer class="drawer-footer">
+        <button class="btn btn-secondary" type="button" data-view-dead>Archive</button>
         <button class="btn btn-secondary" type="button" data-view-edit>Edit initiative</button>
       </footer>
     </aside>
@@ -6771,6 +6775,34 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const m = Math.round((Date.now() - t) / 60000);
         return m < 1 ? 'just now' : m < 60 ? `${m} minute${m === 1 ? '' : 's'} ago` : `${Math.round(m / 60)} hours ago`;
       };
+      // Drawer body from plain data — used by the form-backed view and by seeded rows.
+      const renderViewPanel = ({ownerHtml, end, desc, slack, rob, beneficiary, links}) => {
+        const conn = (icon, name, value) => `<div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#${icon}"/></svg></span><span class="in-view-conn-label">${name}</span><span>${value}</span></div>`;
+        const linkList = arr => arr.length ? arr.map(v => `<a class="in-view-link" href="#" data-view-dead>${vEsc(v)}</a>`).join(', ') : '<span class="in-view-empty">Not connected</span>';
+        const addLink = text => `<a class="in-view-link in-view-add" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-plus"/></svg>${text}</a>`;
+        // Drawer layout follows the Process drawer mockup (Figma 38284:42276):
+        // owner · end date · description · connections · beneficiary · documents · activities.
+        viewPanel.innerHTML = `
+          <dl class="in-view-rows">
+            ${row('Accountable owner', ownerHtml)}
+            ${row('End date', end || EMPTY)}
+          </dl>
+          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${desc || EMPTY}</p></div>
+          <section class="in-view-section"><h3>Connections</h3>
+            ${conn('i-slack', 'Slack channels', linkList(slack))}
+            ${conn('i-calendar', 'RoB meetings', linkList(rob))}
+            ${conn('i-process', 'Action Trace', '<span class="in-view-empty">Not connected</span>')}
+            <div>${addLink('Add processes')}</div>
+          </section>
+          <section class="in-view-section">
+            <dl class="in-view-rows">
+              ${row('Beneficiary function', beneficiary ? `<a class="in-view-link" href="#" data-view-dead>${vEsc(beneficiary)}</a>` : EMPTY)}
+            </dl>
+            <h3>Documents</h3>
+            ${links.length ? `<div class="in-view-docs">${links.map(l => `<a class="in-view-link in-view-doc" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-attachment"/></svg>${vEsc(l)}</a>`).join('')}</div>` : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`}
+          </section>
+          <section class="in-view-section"><h3>Activities</h3><div>${addLink('Add activity')}</div></section>`;
+      };
       const renderView = id => {
         const stage = drawerEl.querySelector('.in-stage-trigger')?.textContent.trim() || 'Idea';
         const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim() || 'Not active';
@@ -6790,38 +6822,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           ? `Last edit was made ${timeAgo(last.at)} by <a href="#" data-view-dead>Matthew Vella</a>`
           : '';
 
-        viewPanel.innerHTML = `
-          <dl class="in-view-rows">
-            ${row('Health', `<span class="tag tag-indicator ${HCLS[healthLabel] || 'in-health-na'}">${vEsc(healthLabel)}</span>`)}
-            ${row('Executive sponsor', sel1('in-sponsor') ? person(sel1('in-sponsor')) : EMPTY)}
-            ${row('Beneficiary function', sel1('in-beneficiary')
-              ? `<span class="in-view-person"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(label(sel1('in-beneficiary')))}</a><span class="in-view-person-role">Function</span></span></span>`
-              : EMPTY)}
-            ${row('Accountable owner', person(sel1('in-owner')))}
-            ${row('Project manager', person(sel1('in-pm')))}
-          </dl>
-          <div class="in-view-block"><h3>Working team</h3>${team.length
-            ? `<div class="in-view-team-cards">${team.map(t => `<div class="in-team-card" data-initials="${vEsc(t.dataset.initials || '')}"><span class="avatar">${t.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${vEsc(label(t))}</span><span class="in-team-card-role">${vEsc(t.querySelector('.dropdown-item-description')?.textContent.trim() || '')}</span></span></div>`).join('')}</div>`
-            : `<p class="in-view-text">${EMPTY}</p>`}</div>
-          <dl class="in-view-rows">
-            ${row('Estimated duration', sel1('in-duration') ? vEsc(label(sel1('in-duration'))) : EMPTY)}
-            ${row('Start date', textOr(startInput.value))}
-            ${row('End date', textOr(endInput.value))}
-            ${document.getElementById('in-impact-initial') ? row('Initial impact date', sel1('in-impact-initial') ? vEsc(label(sel1('in-impact-initial'))) : EMPTY) : ''}
-            ${document.getElementById('in-impact-full') ? row('Full impact date', sel1('in-impact-full') ? vEsc(label(sel1('in-impact-full'))) : EMPTY) : ''}
-            ${row('Core strategy', `<span class="tag tag-indicator ${coreOn ? 'tag-positive' : 'in-health-na'}">${coreOn ? 'On' : 'Off'}</span>`)}
-            ${coreOn ? row('Company strategic objective', coreObj ? vEsc(label(coreObj)) : EMPTY) : ''}
-          </dl>
-          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${textOr(desc.value)}</p></div>
-          <div class="in-view-block"><h3>Problem / Opportunity</h3><p class="in-view-text">${textOr(problem.value)}</p></div>
-          <div class="in-view-block"><h3>Objective(s)</h3>${objs.length ? `<ol class="in-view-list">${objs.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
-          <div class="in-view-block"><h3>Success metrics</h3>${mets.length ? `<ol class="in-view-list">${mets.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`}</div>
-          <section class="in-view-section"><h3>Connections</h3>
-            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-calendar"/></svg></span><span class="in-view-conn-label">Cadenced meeting</span><span class="in-view-empty">Not connected</span></div>
-            <div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#i-slack"/></svg></span><span class="in-view-conn-label">Slack channels</span><span class="in-view-empty">Not connected</span></div>
-          </section>
-          <section class="in-view-section"><h3>Documents</h3><p class="in-view-text"><span class="in-view-empty">No documents yet</span></p></section>
-          <section class="in-view-section"><h3>Projects</h3><div><a class="in-view-link" href="#" data-view-dead>Add project</a></div></section>`;
+        // Connections and documents come from the create form's pickers / link rows.
+        const picked = key => [...document.querySelectorAll(`.in-conn-wrap[data-conn="${key}"] .dropdown-item.is-selected .dropdown-item-label`)].map(l => l.textContent.trim());
+        const links = [...document.querySelectorAll('.in-link-row')].map(r => ({label:r.querySelector('.in-link-label').value.trim(), url:r.querySelector('.in-link-url').value.trim()})).filter(l => l.label || l.url);
+        renderViewPanel({
+          ownerHtml: person(sel1('in-owner')),
+          end: endInput.value.trim() ? vEsc(endInput.value.trim()) : '',
+          desc: desc.value.trim() ? vEsc(desc.value.trim()) : '',
+          slack: picked('slack'), rob: picked('rob'),
+          beneficiary: sel1('in-beneficiary') ? label(sel1('in-beneficiary')) : '',
+          links: links.map(l => l.label || l.url),
+        });
 
         activityPanel.innerHTML = log.length
           ? `<ol class="in-view-activity">${[...log].reverse().map(e => `<li><span class="avatar avatar-md"><img src="https://i.pravatar.cc/240?img=68" alt="" /></span><span><strong>Matthew Vella</strong> ${vEsc(e.what)}<time>${new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</time></span></li>`).join('')}</ol>`
@@ -6832,6 +6843,26 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         viewEl.querySelectorAll('[data-view-tab]').forEach(t => { const on = t.dataset.viewTab === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
         viewEl.querySelectorAll('[data-view-panel]').forEach(p => { p.hidden = p.dataset.viewPanel !== tab; });
       };
+      const roadmapLabel = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? new Date(v + 'T00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : (v || '');
+      window.inOpenViewNode = n => {
+        if (!n) return;
+        viewEl.querySelector('#in-view-title').textContent = n.name;
+        viewEl.querySelector('[data-view="stage"]').textContent = n.status || 'Idea';
+        viewEl.querySelector('[data-view="edited"]').innerHTML = '';
+        const o = n.owner || {};
+        renderViewPanel({
+          ownerHtml: o.name ? `<span class="in-view-person" data-initials="${vEsc(o.initials || '')}"><span class="avatar avatar-md">${vEsc(o.initials || '')}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(o.name)}</a>${o.role ? `<span class="in-view-person-role">${vEsc(o.role)}</span>` : ''}</span></span>` : person(null),
+          end: vEsc(roadmapLabel(n.roadmap)), desc: n.desc ? vEsc(n.desc) : '',
+          slack: [], rob: n.rob?.title ? [n.rob.title] : [], beneficiary: n.fn || '', links: [],
+        });
+        activityPanel.innerHTML = `<p class="in-view-text"><span class="in-view-empty">No activity yet</span></p>`;
+        setViewTab('overview');
+        viewId = null;
+        viewEl.querySelector('[data-view-edit]').hidden = true;   // no form data to edit for a seeded row
+        if (viewEl.hidden) opener = document.activeElement;
+        viewEl.hidden = false;
+        viewEl.querySelector('.modal-close')?.focus();
+      };
       window.inOpenView = id => {
         const snap = drafts[id];
         if (!snap) return;
@@ -6839,6 +6870,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         renderView(id);
         setViewTab('overview');
         viewId = id;
+        viewEl.querySelector('[data-view-edit]').hidden = false;
         if (viewEl.hidden) opener = document.activeElement;
         viewEl.hidden = false;
         viewEl.querySelector('.modal-close')?.focus();
@@ -7305,7 +7337,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const rob = n.rob
           ? `<div class="cell-meta"><span class="cell-meta-title">${esc(n.rob.title)}</span><span class="cell-meta-sub" title="${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}"><svg class="icon"><use href="#i-calendar-blank"/></svg><span class="in-clip">${[n.rob.when, n.rob.cadence].filter(Boolean).map(esc).join(' · ')}</span></span></div>`
           : '<div class="cell-meta-sub">—</div>';
-        return `<tr data-level="${level}" data-id="${n.id}"${n.draft ? ' data-draft' : ''}${n.editable ? ` data-editable tabindex="0" aria-label="Open ${n.draft ? 'draft ' : ''}${esc(n.name)}"` : ''}>
+        return `<tr data-level="${level}" data-id="${n.id}"${n.draft ? ' data-draft' : ''}${n.editable ? ' data-editable' : ''} tabindex="0" aria-label="Open ${n.draft ? 'draft ' : ''}${esc(n.name)}">
           <td><div class="cell-title-row">${hasKids
               ? `<button class="row-toggle" type="button" aria-expanded="${open}" aria-label="Toggle children"><svg class="icon"><use href="#i-caret-right"/></svg></button>`
               : '<span class="row-toggle-spacer"></span>'}
@@ -7370,15 +7402,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       // Rows made from the drawer (drafts and published) reopen it with
       // everything they had.
+      // Any row opens the drawer: rows made in the prototype reopen their form
+      // data; seeded rows show what the table knows about them.
+      const nodeById = id => { let f = null; (function w(l) { l.forEach(n => { if (n.id === id) f = n; if (n.children) w(n.children); }); })(INITIATIVES); return f; };
       const openDraftRow = e => {
-        const tr = e.target.closest('tr[data-editable]');
-        if (!tr || e.target.closest('.row-toggle, .cell-actions')) return false;
+        const tr = e.target.closest('tr[data-id]');
+        if (!tr || e.target.closest('.row-toggle, .cell-actions, a, button')) return false;
         if (tr.hasAttribute('data-draft')) window.inOpenDraft?.(tr.dataset.id);
-        else window.inOpenView?.(tr.dataset.id);
+        else if (tr.hasAttribute('data-editable')) window.inOpenView?.(tr.dataset.id);
+        else window.inOpenViewNode?.(nodeById(tr.dataset.id));
         return true;
       };
       tbody.addEventListener('keydown', e => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-editable]')) { e.preventDefault(); openDraftRow(e); }
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-id]')) { e.preventDefault(); openDraftRow(e); }
       });
 
       tbody.addEventListener('click', e => {
