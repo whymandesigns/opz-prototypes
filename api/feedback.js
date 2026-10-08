@@ -48,6 +48,8 @@ export function createHandler(q) {
       const want = process.env.REVIEW_TOKEN;
       if (want && req.headers['x-review-token'] !== want) return res.status(401).json({ error: 'bad or missing review token' });
       if (JSON.stringify(body).length > 200000) return res.status(413).json({ error: 'too large' });
+      // One request should not be able to write hundreds of rows.
+      if (Array.isArray(body.ops) && body.ops.length > 50) return res.status(413).json({ error: 'too many operations in one request' });
       return res.status(200).json(await applyOps(q, p, body.ops));
     }
     res.status(405).end();

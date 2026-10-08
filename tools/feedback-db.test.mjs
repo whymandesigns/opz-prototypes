@@ -81,6 +81,27 @@ await applyOps(query, P, [{ t:'comment', c:{ id:'j2', n:1, text:'b' } }]);
 doc = await read(query, P);
 ok('duplicate imported number is reassigned, nothing dropped', doc.comments.length === 2);
 
+// --- security regressions ---
+await reset();
+// hostile ids must never be stored (they land in HTML attributes client-side)
+for (const bad of ['x" onmouseover="alert(1)', '<img src=x onerror=alert(1)>', 'a'.repeat(65), '', 'has space']) {
+  await applyOps(query, P, [{ t:'comment', c:{ id: bad, text:'xss' } }]);
+}
+doc = await read(query, P);
+ok('hostile comment ids are rejected', doc.comments.length === 0);
+
+// well-formed ids still work
+await applyOps(query, P, [{ t:'comment', c:{ id:'ok_id-123', text:'fine' } }]);
+ok('valid id still accepted', (await read(query, P)).comments.length === 1);
+
+// delete only accepts well-formed ids
+await applyOps(query, P, [{ t:'del', id:'bad id" onx=' }]);
+ok('delete ignores a malformed id', (await read(query, P)).comments.length === 1);
+
+// oversized edit keys rejected
+await applyOps(query, P, [{ t:'edit', k:'k'.repeat(400), v:{orig:'a',text:'b'} }]);
+ok('oversized edit key rejected', Object.keys((await read(query, P)).edits).length === 0);
+
 await reset();
 await pool.end();
 console.log(failed ? `\n${failed} failing` : '\nall passing');
