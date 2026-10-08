@@ -283,6 +283,12 @@
   .meta b{color:var(--graphite-900);font-weight:600;}
   .meta .vs{width:1px;height:14px;background:var(--gray-400);}
   .stepbar{background:var(--gray-100);border-radius:4px;padding:16px;display:flex;align-items:center;}
+  /* More than 3 steps: keep the 3-step card width (240px) and scroll sideways. */
+  .stepbar.many{overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--gray-500) transparent;}
+  .stepbar.many::-webkit-scrollbar{height:6px;}
+  .stepbar.many::-webkit-scrollbar-thumb{background:var(--gray-500);border-radius:3px;}
+  .stepbar.many .stepcard{flex:0 0 240px;}
+  .stepbar.many .ln{flex:0 0 24px;}
   .stepbar .ln{flex:0 0 24px;border-top:1px dashed var(--gray-500);}
   .stepcard{flex:1;height:52px;background:#fff;border:1px solid transparent;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:border-color .15s;}
   .stepcard:hover{border-color:var(--gray-400);}
@@ -1190,7 +1196,7 @@ function playerHTML(rec) {
       ${r.ann ? annHTML(rec) : ''}
     </div>
     <div class="meta">Worker: <b>${esc(rec.worker)}</b><span class="vs"></span>Manager: <b>${mgrNameOf(recMgr(rec))}</b><span class="vs"></span>Recorded at: <b>${rec.date}</b></div>
-    <div class="stepbar" id="stepbar">${sg.map((s, i) => `${i ? '<span class="ln"></span>' : ''}<div class="stepcard ${s === cur ? 'cur' : ''}" data-stepcard="${i}"><span class="badge">Current Step</span><span class="n"><b>${cap(s.n)}</b> Step</span><span class="s">${s.sys}</span></div>`).join('')}</div>
+    <div class="stepbar ${sg.length > 3 ? 'many' : ''}" id="stepbar">${sg.map((s, i) => `${i ? '<span class="ln"></span>' : ''}<div class="stepcard ${s === cur ? 'cur' : ''}" data-stepcard="${i}"><span class="badge">Current Step</span><span class="n"><b>${cap(s.n)}</b> Step</span><span class="s">${s.sys}</span></div>`).join('')}</div>
     <div class="fb-label">Summary Feedback</div>
     <div class="rte">${rteToolbar()}<div class="ed" id="fbEd" contenteditable="true" data-placeholder="Specify your summary feedback" style="min-height:124px">${rec.feedback}</div></div>`;
 }
