@@ -1,76 +1,54 @@
-// Hosted store for the review bar — a Vercel serverless function.
+// /api/feedback — the review bar's shared store, on Neon Postgres.
 //
-// Copy this file to `api/feedback.js` in the repository that Vercel deploys
-// your prototypes from (the folder that holds <prototype>/index.html). Vercel
-// picks up `api/*.js` automatically; no package.json or build step needed.
+// Same contract as the local file store (designmd/tools/serve.mjs), so review.js
+// does not know or care which one it is talking to:
+//   GET  /api/feedback?p=/action-trace/   -> { edits, comments, updated }
+//   POST /api/feedback  { p, ops }        -> the merged document
+// Ops are documented in lib/feedback-db.mjs.
 //
-// Storage: a Redis database from the Vercel Marketplace (Upstash, free tier is
-// plenty). Vercel → your project → Storage → Create Database → Upstash Redis →
-// connect to the project. That injects KV_REST_API_URL / KV_REST_API_TOKEN
-// (or UPSTASH_REDIS_REST_URL / _TOKEN); redeploy once and the bar switches
-// from "Local only" to "Shared".
+// Setup (once):
+//   1. Vercel -> this project -> Storage -> Create Database -> Neon Postgres.
+//      That injects DATABASE_URL.
+//   2. psql "$DATABASE_URL" -f db/schema.sql
+//   3. Redeploy. The bar switches from "Local only" to "Shared".
+// Until DATABASE_URL exists this answers 503 and the bar keeps working locally,
+// queueing its changes until the store appears.
 //
-// API (same contract as tools/serve.mjs locally):
-//   GET  /api/feedback?p=/action-trace/     → { edits, comments, updated }
-//   POST /api/feedback  { p, ops }           → merged document
-// Ops are documented in tools/feedback-store.mjs; the merge below is a copy of it.
+// Writes can be gated with REVIEW_TOKEN: set it in the Vercel project and the
+// bar will ask reviewers for it once. Reads stay open. Leave it unset to allow
+// anyone with the link to comment.
+import { neon } from '@neondatabase/serverless';
+import { read, applyOps, cleanPath } from '../lib/feedback-db.mjs';
 
-const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const sql = process.env.DATABASE_URL ? neon(process.env.DATABASE_URL) : null;
+// lib/feedback-db.mjs speaks (text, params) => { rows }; Neon's http driver
+// takes the same shape through sql.query().
+const query = async (text, params) => ({ rows: await sql.query(text, params) });
 
-async function redis(cmd) {
-  const r = await fetch(URL_, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify(cmd) });
-  if (!r.ok) throw new Error('store ' + r.status);
-  const j = await r.json(); if (j.error) throw new Error(j.error);
-  return j.result;
-}
-
-const EMPTY = () => ({ edits: {}, comments: [] });
-function applyOps(doc, ops) {
-  doc = { edits: { ...(doc?.edits || {}) }, comments: [...(doc?.comments || [])] };
-  for (const o of Array.isArray(ops) ? ops : []) {
-    if (o?.t === 'comment' && o.c && typeof o.c.id === 'string') {
-      const i = doc.comments.findIndex(c => c.id === o.c.id);
-      const c = { ...(doc.comments[i] || {}), ...o.c };
-      if (typeof c.text === 'string') c.text = c.text.slice(0, 5000);
-      if (!c.n) c.n = doc.comments.reduce((m, x) => Math.max(m, x.n || 0), 0) + 1;
-      if (i < 0) { if (doc.comments.length < 1000) doc.comments.push(c); } else doc.comments[i] = c;
-    } else if (o?.t === 'del' && typeof o.id === 'string') {
-      doc.comments = doc.comments.filter(c => c.id !== o.id);
-    } else if (o?.t === 'edit' && typeof o.k === 'string') {
-      if (o.v && typeof o.v === 'object') { if (Object.keys(doc.edits).length < 2000) doc.edits[o.k] = o.v; }
-      else delete doc.edits[o.k];
-    } else if (o?.t === 'edits:clear') {
-      doc.edits = {};
-    }
-  }
-  doc.updated = new Date().toISOString();
-  return doc;
-}
-const cleanPath = p => {
-  p = String(p || '').replace(/index\.html$/, '');
-  if (!p.startsWith('/') || p.includes('..') || p.length > 200) return null;
-  return p.endsWith('/') ? p : p + '/';
-};
-
-module.exports = async (req, res) => {
+// Exported as a factory so the tests can drive it against a throwaway database.
+export function createHandler(q) {
+  return async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (!URL_ || !TOKEN) return res.status(503).json({ error: 'Store not configured: connect an Upstash Redis database to this Vercel project.' });
+  if (!q) return res.status(503).json({ error: 'Store not configured: add a Neon database to this Vercel project (DATABASE_URL).' });
   try {
     const body = req.method === 'POST' ? (typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}) : {};
     const p = cleanPath(req.method === 'POST' ? body.p : req.query?.p);
     if (!p) return res.status(400).json({ error: 'bad prototype path' });
-    const key = 'rv:' + p;
-    const read = async () => { const v = await redis(['GET', key]); try { return v ? JSON.parse(v) : EMPTY(); } catch { return EMPTY(); } };
-    if (req.method === 'GET') return res.status(200).json(await read());
+
+    if (req.method === 'GET') return res.status(200).json(await read(q, p));
+
     if (req.method === 'POST') {
+      const want = process.env.REVIEW_TOKEN;
+      if (want && req.headers['x-review-token'] !== want) return res.status(401).json({ error: 'bad or missing review token' });
       if (JSON.stringify(body).length > 200000) return res.status(413).json({ error: 'too large' });
-      const doc = applyOps(await read(), body.ops);
-      await redis(['SET', key, JSON.stringify(doc)]);
-      return res.status(200).json(doc);
+      return res.status(200).json(await applyOps(q, p, body.ops));
     }
     res.status(405).end();
   } catch (e) {
-    res.status(500).json({ error: String(e.message || e) });
+    console.error('feedback', e);
+    res.status(500).json({ error: String(e?.message || e) });
   }
-};
+  };
+}
+
+export default createHandler(sql ? query : null);

@@ -2,3 +2,12 @@
 .DS_Store
 **/.DS_Store
 action-trace/versions/
+
+# Node / Vercel
+node_modules/
+.vercel/
+
+# Local review-bar store (the dev server writes these; archive deliberately with
+# tools/feedback-sync.mjs pull, which is when they should be committed)
+.neon
+.env.local
