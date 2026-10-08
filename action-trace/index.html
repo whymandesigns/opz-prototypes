@@ -284,7 +284,7 @@
   .meta .vs{width:1px;height:14px;background:var(--gray-400);}
   .stepbar{background:var(--gray-100);border-radius:4px;padding:16px;display:flex;align-items:center;}
   /* More than 3 steps: keep the 3-step card width (240px) and scroll sideways. */
-  .stepbar.many{overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--gray-500) transparent;}
+  .stepbar.many{position:relative;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--gray-500) transparent;}
   .stepbar.many::-webkit-scrollbar{height:6px;}
   .stepbar.many::-webkit-scrollbar-thumb{background:var(--gray-500);border-radius:3px;}
   .stepbar.many .stepcard{flex:0 0 240px;}
@@ -860,13 +860,18 @@ function assignPanel() {
 function mgrMenu(id, current, {placeholder, all} = {}) {
   const used = all ? [] : S.asg.draft.mgrs.filter(m => m !== current);
   const items = managerPool().filter(k => !used.includes(k)).map(k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:`${ddPerson(k)}${k === OWNER ? '<span class="menu-note">RoB owner</span>' : ''}`}));
-  return ddMenu(id, [...items, {divider:true}, {value:'__new', label:'+ Add new manager…', cls:'menu-act'}], {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
+  // "Add new manager" is parked for now — restore by putting the two entries back into the list:
+  // return ddMenu(id, [...items, {divider:true}, {value:'__new', label:'+ Add new manager…', cls:'menu-act'}], {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
+  return ddMenu(id, items, {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
 }
 // "Move all to…" for a whole group: `from` is a manager key or '__un' (unassigned).
 function moveAllMenu(from, label = 'Move all to…') {
   const to = [...(from === '__un' ? [] : [{value:'__un', label:'Unassigned'}]), ...managerPool().filter(k => k !== from).map(k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:ddPerson(k)}))];
   return ddMenu('moveall:' + from, to, {label, cls:'right', menuCls:'people', link:true});
 }
+// Parked: the "Add new manager" form. Still wired (DD_ON.addcol handles '__new',
+// the new/new-save/new-cancel actions below) but unreachable while the menu entry
+// above is commented out.
 function newMgrForm(where) {
   return `<div class="asg-new" data-asg-pop><div class="asg-new-t">Add new manager</div><div class="asg-new-row"><label class="field"><input id="asgNewName" placeholder="Full name" value="${esc(S.asg.newName || '')}" autocomplete="off" /></label><label class="field"><input id="asgNewTitle" placeholder="Job title (optional)" value="${esc(S.asg.newTitle || '')}" autocomplete="off" /></label><button class="btn" data-asg="new-cancel">Cancel</button><button class="btn primary" data-asg="new-save" data-where="${where}">Add manager</button></div></div>`;
 }
@@ -1202,7 +1207,7 @@ function playerHTML(rec) {
 }
 function annHTML(rec) {
   const a = S.rec.ann;
-  return `<div class="ann" style="right:16px;bottom:0" id="annPop"><div class="h">Annotation<button class="icon-btn" style="width:20px;height:20px" data-act="ann-cancel">${ic.close(12)}</button></div>
+  return `<div class="ann" style="right:0;bottom:0" id="annPop"><div class="h">Annotation<button class="icon-btn" style="width:20px;height:20px" data-act="ann-cancel">${ic.close(12)}</button></div>
     <div class="times"><div><label>Start Time (-10s)</label><span class="tf">${ic.clock(14)}<input value="${hms(a.start)}" data-annf="start" /></span></div><div><label>End Time</label><span class="tf">${ic.clock(14)}<input value="${hms(a.end)}" data-annf="end" /></span></div></div>
     <div class="ta"><textarea maxlength="280" placeholder="Describe what happened" id="annText">${esc(a.text)}</textarea><div class="cnt" id="annCnt">${a.text.length} / 280</div></div>
     <div class="f">${a.idx != null ? '<button class="btn danger-link" data-act="ann-delete">Delete</button>' : ''}<span class="grow"></span><button class="btn" data-act="ann-cancel">Cancel</button><button class="btn primary" data-act="ann-save">Save</button></div></div>`;
@@ -1232,6 +1237,7 @@ function render() {
   keep.forEach(([s, v]) => { if (v != null && $(s)) $(s).scrollTop = v; });
   if (focusId && $('#' + focusId)) { const f = $('#' + focusId); f.focus(); if (caret != null && f.setSelectionRange) f.setSelectionRange(caret, caret); }
   renderDiagPop(); renderFlowNav();
+  if ($('#stepbar')) { const bar = $('#stepbar'), el = bar.querySelector('.stepcard.cur'); if (el && bar.classList.contains('many')) { const r = el.offsetLeft + el.offsetWidth + 16; if (r > bar.clientWidth) bar.scrollLeft = r - bar.clientWidth; } }
   window.afterRender?.();
 }
 
@@ -1242,9 +1248,19 @@ function tickUI() {
   $('#played').style.width = p * 100 + '%'; $('#phead').style.left = p * 100 + '%';
   $('#ptime').textContent = `${hms(r.t)} / ${hms(rec.dur)}`;
   const sg = segs(rec); const ci = Math.max(0, sg.findIndex(s => p >= s.a && p < s.b)); const cur = ci === -1 ? sg.length - 1 : ci;
-  document.querySelectorAll('.stepcard').forEach((el, i) => el.classList.toggle('cur', i === (p >= 1 ? sg.length - 1 : cur)));
+  const curIdx = p >= 1 ? sg.length - 1 : cur; let changed = false;
+  document.querySelectorAll('.stepcard').forEach((el, i) => { const on = i === curIdx; if (on && !el.classList.contains('cur')) changed = true; el.classList.toggle('cur', on); });
+  // With more than 3 steps the bar scrolls — keep the current card in view when it changes.
+  if (changed) scrollStepIntoView();
   // subtle "camera" drift so the frame feels like footage
   const img = $('#frameImg'); if (img) img.style.transform = `scale(${1 + p * .06}) translate(${-p * 8}px, ${-p * 4}px)`;
+}
+function scrollStepIntoView() {
+  const bar = $('#stepbar'); const el = bar?.querySelector('.stepcard.cur');
+  if (!bar || !el || !bar.classList.contains('many')) return;
+  const left = el.offsetLeft - 16, right = el.offsetLeft + el.offsetWidth + 16;
+  if (left < bar.scrollLeft) bar.scrollLeft = Math.max(0, left);
+  else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth;
 }
 let raf = null, last = 0;
 function loop(ts) {
