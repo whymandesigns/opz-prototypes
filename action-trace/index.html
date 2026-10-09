@@ -487,6 +487,10 @@
 
   .asg-sum{display:flex;flex-direction:column;gap:4px;padding:0 16px 16px 56px;font-size:13px;}
   .vconn .asg-sum{padding:12px 0 0;margin-top:12px;border-top:1px solid var(--gray-200);}
+  .vconn .h .connect-btn{margin-left:auto;}
+  .vsteps{margin-top:12px;border:1px solid var(--gray-200);border-radius:6px;background:var(--gray-50);}
+  .vsteps .dd-steps{padding:12px 16px 8px;}
+  .vsteps-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px;font-size:13px;}
   .asg-sum-h{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--graphite-700);}
   .asg-sum-h .connect-btn{margin-left:auto;}
   .asg-sum-list{display:flex;flex-direction:column;}
@@ -1056,7 +1060,9 @@ function renderMeeting() {
         </section>
         <section id="m-connections" class="sec-block">
           <h2 class="sec" style="font-size:14px">Connections</h2>
-          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><a class="proc-link proc-ext" href="#" onclick="return false">${PROCESSES[m.proc].name} Process${ic.ext(14)}</a>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
+          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace<button class="connect-btn" data-act="meeting-steps">Edit steps ${S.meetingStepsOpen ? ic.chevU(16) : ic.chevD(16)}</button></div><div class="b"><a class="proc-link proc-ext" href="#" onclick="return false">${PROCESSES[m.proc].name} Process${ic.ext(14)}</a>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>
+            ${S.meetingStepsOpen ? `<div class="vsteps"><div class="dd-steps">${PROCESSES[m.proc].steps.map(s => `<label class="check sm"><input type="checkbox" data-mstep="${s.id}" ${m.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div><div class="vsteps-foot"><span class="muted">${m.steps.length} step${m.steps.length === 1 ? '' : 's'} selected</span><button class="btn primary" data-act="meeting-steps">Done</button></div></div>` : ''}
+            ${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
           <div class="vconn"><div class="h"><span class="conn-ic">${slackLogo(18)}</span>Slack</div><div class="b">${slackLogo(14)}<a href="#" onclick="return false">#-actiontrace-invoicing-process</a><span class="tag">Default</span></div></div>
           <div class="vconn"><div class="h"><span class="conn-ic">${ic.process(16)}</span>Processes</div><div class="b"><span class="proc-link" data-act="open-initiative">Supplier Invoice Management</span><span class="tag">Process</span></div></div>
         </section>
@@ -1488,6 +1494,7 @@ document.addEventListener('click', e => {
     case 'at-next': S.flowStep = 1.5; openAssign('create'); break;
     case 'asg-edit-create': openAssign('create'); break;
     case 'asg-edit-meeting': openAssign('meeting'); break;
+    case 'meeting-steps': S.meetingStepsOpen = !S.meetingStepsOpen; render(); break;
     case 'slack-na': S.create.slackNA = t.checked; break;
     case 'create-meeting': {
       const c = S.create;
@@ -1528,6 +1535,11 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.dataset.proc) { S.create.proc = t.dataset.proc; S.create.steps = []; render(); }
+  if (t.dataset.mstep) {   // meeting view: edit the reviewed steps in place (keep at least one)
+    const m = S.meeting; const next = t.checked ? [...m.steps, t.dataset.mstep] : m.steps.filter(x => x !== t.dataset.mstep);
+    if (next.length) m.steps = PROCESSES[m.proc].steps.map(s => s.id).filter(id => next.includes(id));
+    render(); return;
+  }
   if (t.dataset.step) {
     const c = S.create; const had = c.steps.length;
     c.steps = t.checked ? [...c.steps, t.dataset.step] : c.steps.filter(x => x !== t.dataset.step);
