@@ -227,7 +227,7 @@
   .pop.down::after{top:-5px;left:var(--ax,40px);}
   .pop.up::after{bottom:-5px;left:var(--ax,200px);}
   .pop-mini{padding:6px;box-sizing:content-box;}
-  .deck-mini{height:365px;}   /* 7 rows + title + pager: fixed so paging never shifts the box */
+  .deck-mini{height:292px;}   /* 5 rows + title + pager: fixed so paging never shifts the box */
   .deck-mini .right{padding:1.8em 1.6em 1.4em;}
   .deck-mini .right .ttl{margin-bottom:1.2em;}
   .deck-mini .pager{padding-top:1.2em;}
@@ -1321,7 +1321,7 @@ function showInitDeck(target, proc) {
   // Nearly the drawer's full width, fixed height so paging never shifts the box.
   const drawer = target.closest('.idrawer'); const w = drawer ? drawer.clientWidth - 48 : 508;
   const m = {...S.meeting, proc, steps: proc === S.meeting.proc ? S.meeting.steps : ['capture','gl']};
-  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:0;top:0;visibility:hidden;width:${w}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users · ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`, size:{rows:7, cols:4}}).replace('class="deck"', 'class="deck deck-mini" style="font-size:12px;border-radius:2px"')}</div>`;
+  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:0;top:0;visibility:hidden;width:${w}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users · ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`, size:{rows:5, cols:4}}).replace('class="deck"', 'class="deck deck-mini" style="font-size:12px;border-radius:2px"')}</div>`;
   positionInitDeck(); $('#pops [data-pop=init]').style.visibility = '';
 }
 // Keep the preview glued to its link: re-run on every scroll and resize.
