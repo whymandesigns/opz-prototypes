@@ -5726,7 +5726,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="in-view-heading">
           <h2 class="in-view-title" id="in-view-title"></h2>
           <div class="in-view-meta">
-            <span class="tag tag-blue">Process</span>
+            <span class="tag tag-blue">Initiative</span>
             <span class="tag tag-light" data-view="stage"></span>
             <span class="in-view-edited" data-view="edited"></span>
           </div>
@@ -6776,37 +6776,47 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         return m < 1 ? 'just now' : m < 60 ? `${m} minute${m === 1 ? '' : 's'} ago` : `${Math.round(m / 60)} hours ago`;
       };
       // Drawer body from plain data — used by the form-backed view and by seeded rows.
-      const renderViewPanel = ({ownerHtml, end, desc, slack, rob, beneficiary, links}) => {
+      // Layout matches the TopTeam initiative sidebar (production, 2026-10-07).
+      const HCLS = { 'On track': 'tag-positive', 'At risk': 'tag-warning', 'Off track': 'tag-negative', 'Not active': 'in-health-na' };
+      const renderViewPanel = d => {
+        const list = arr => arr.length ? `<ol class="in-view-list">${arr.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`;
         const conn = (icon, name, value) => `<div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#${icon}"/></svg></span><span class="in-view-conn-label">${name}</span><span>${value}</span></div>`;
         const linkList = arr => arr.length ? arr.map(v => `<a class="in-view-link" href="#" data-view-dead>${vEsc(v)}</a>`).join(', ') : '<span class="in-view-empty">Not connected</span>';
-        const addLink = text => `<a class="in-view-link in-view-add" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-plus"/></svg>${text}</a>`;
-        // Drawer layout follows the Process drawer mockup (Figma 38284:42276):
-        // owner · end date · description · connections · beneficiary · documents · activities.
         viewPanel.innerHTML = `
           <dl class="in-view-rows">
-            ${row('Accountable owner', ownerHtml)}
-            ${row('End date', end || EMPTY)}
+            ${row('Health', `<span class="tag tag-indicator ${HCLS[d.health] || 'in-health-na'}">${vEsc(d.health || 'Not active')}</span>`)}
+            ${row('Executive sponsor', d.sponsorHtml || EMPTY)}
+            ${row('Beneficiary function', d.beneficiary
+              ? `<span class="in-view-person"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(d.beneficiary)}</a><span class="in-view-person-role">Function</span></span></span>`
+              : EMPTY)}
+            ${row('Accountable owner', d.ownerHtml || person(null))}
+            ${row('Project manager', d.pmHtml || person(null))}
           </dl>
-          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${desc || EMPTY}</p></div>
+          <div class="in-view-block"><h3>Working team</h3>${d.teamHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>
+          <dl class="in-view-rows">
+            ${row('Estimated duration', d.duration ? vEsc(d.duration) : EMPTY)}
+            ${row('Start date', d.start ? vEsc(d.start) : EMPTY)}
+            ${row('End date', d.end ? vEsc(d.end) : EMPTY)}
+            ${d.impact ? row('Initial impact date', d.impactInitial ? vEsc(d.impactInitial) : EMPTY) + row('Full impact date', d.impactFull ? vEsc(d.impactFull) : EMPTY) : ''}
+            ${row('Core strategy', `<span class="tag tag-indicator ${d.coreOn ? 'tag-positive' : 'in-health-na'}">${d.coreOn ? 'On' : 'Off'}</span>`)}
+            ${d.coreOn ? row('Company strategic objective', d.coreObj ? vEsc(d.coreObj) : EMPTY) : ''}
+          </dl>
+          <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${d.desc ? vEsc(d.desc) : EMPTY}</p></div>
+          <div class="in-view-block"><h3>Problem / Opportunity</h3><p class="in-view-text">${d.problem ? vEsc(d.problem) : EMPTY}</p></div>
+          <div class="in-view-block"><h3>Objective(s)</h3>${list(d.objs || [])}</div>
+          <div class="in-view-block"><h3>Success metrics</h3>${list(d.mets || [])}</div>
           <section class="in-view-section"><h3>Connections</h3>
-            ${conn('i-slack', 'Slack channels', linkList(slack))}
-            ${conn('i-calendar', 'RoB meetings', linkList(rob))}
-            ${conn('i-process', 'Action Trace', '<span class="in-view-empty">Not connected</span>')}
-            <div>${addLink('Add processes')}</div>
+            ${conn('i-calendar', 'Cadenced meeting', linkList(d.rob || []))}
+            ${conn('i-slack', 'Slack channels', linkList(d.slack || []))}
           </section>
-          <section class="in-view-section">
-            <dl class="in-view-rows">
-              ${row('Beneficiary function', beneficiary ? `<a class="in-view-link" href="#" data-view-dead>${vEsc(beneficiary)}</a>` : EMPTY)}
-            </dl>
-            <h3>Documents</h3>
-            ${links.length ? `<div class="in-view-docs">${links.map(l => `<a class="in-view-link in-view-doc" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-attachment"/></svg>${vEsc(l)}</a>`).join('')}</div>` : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`}
-          </section>
-          <section class="in-view-section"><h3>Activities</h3><div>${addLink('Add activity')}</div></section>`;
+          <section class="in-view-section"><h3>Documents</h3>${(d.links || []).length
+            ? `<div class="in-view-docs">${d.links.map(l => `<a class="in-view-link in-view-doc" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-attachment"/></svg>${vEsc(l)}</a>`).join('')}</div>`
+            : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`}</section>
+          <section class="in-view-section"><h3>Projects</h3><div><a class="in-view-link in-view-add" href="#" data-view-dead>Add project</a></div></section>`;
       };
       const renderView = id => {
         const stage = drawerEl.querySelector('.in-stage-trigger')?.textContent.trim() || 'Idea';
         const healthLabel = document.querySelector('#in-drawer-new .input-select-trigger[aria-label="Health"] .input-select-value')?.textContent.trim() || 'Not active';
-        const HCLS = { 'On track': 'tag-positive', 'At risk': 'tag-warning', 'Off track': 'tag-negative', 'Not active': 'in-health-na' };
         const team = pickedItems('in-team');
         const objs = objectives.values().filter(v => v.trim());
         const mets = metrics.values().filter(v => v.trim());
@@ -6826,11 +6836,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const picked = key => [...document.querySelectorAll(`.in-conn-wrap[data-conn="${key}"] .dropdown-item.is-selected .dropdown-item-label`)].map(l => l.textContent.trim());
         const links = [...document.querySelectorAll('.in-link-row')].map(r => ({label:r.querySelector('.in-link-label').value.trim(), url:r.querySelector('.in-link-url').value.trim()})).filter(l => l.label || l.url);
         renderViewPanel({
-          ownerHtml: person(sel1('in-owner')),
-          end: endInput.value.trim() ? vEsc(endInput.value.trim()) : '',
-          desc: desc.value.trim() ? vEsc(desc.value.trim()) : '',
-          slack: picked('slack'), rob: picked('rob'),
+          health: healthLabel,
+          sponsorHtml: sel1('in-sponsor') ? person(sel1('in-sponsor')) : '',
           beneficiary: sel1('in-beneficiary') ? label(sel1('in-beneficiary')) : '',
+          ownerHtml: person(sel1('in-owner')), pmHtml: person(sel1('in-pm')),
+          teamHtml: team.length
+            ? `<div class="in-view-team-cards">${team.map(t => `<div class="in-team-card" data-initials="${vEsc(t.dataset.initials || '')}"><span class="avatar">${t.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${vEsc(label(t))}</span><span class="in-team-card-role">${vEsc(t.querySelector('.dropdown-item-description')?.textContent.trim() || '')}</span></span></div>`).join('')}</div>`
+            : '',
+          duration: sel1('in-duration') ? label(sel1('in-duration')) : '',
+          start: startInput.value.trim(), end: endInput.value.trim(),
+          impact: !!(document.getElementById('in-impact-initial') || document.getElementById('in-impact-full')),
+          impactInitial: sel1('in-impact-initial') ? label(sel1('in-impact-initial')) : '',
+          impactFull: sel1('in-impact-full') ? label(sel1('in-impact-full')) : '',
+          coreOn, coreObj: coreObj ? label(coreObj) : '',
+          desc: desc.value, problem: problem.value, objs, mets,
+          rob: picked('rob'), slack: picked('slack'),
           links: links.map(l => l.label || l.url),
         });
 
@@ -6844,16 +6864,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         viewEl.querySelectorAll('[data-view-panel]').forEach(p => { p.hidden = p.dataset.viewPanel !== tab; });
       };
       const roadmapLabel = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? new Date(v + 'T00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : (v || '');
+      const HEALTH_LABEL = { on: 'On track', risk: 'At risk', off: 'Off track', na: 'Not active' };
+      const nodePerson = o => o && o.name
+        ? `<span class="in-view-person" data-initials="${vEsc(o.initials || '')}"><span class="avatar avatar-md">${vEsc(o.initials || '')}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(o.name)}</a>${o.role ? `<span class="in-view-person-role">${vEsc(o.role)}</span>` : ''}</span></span>`
+        : person(null);
       window.inOpenViewNode = n => {
         if (!n) return;
         viewEl.querySelector('#in-view-title').textContent = n.name;
         viewEl.querySelector('[data-view="stage"]').textContent = n.status || 'Idea';
         viewEl.querySelector('[data-view="edited"]').innerHTML = '';
-        const o = n.owner || {};
         renderViewPanel({
-          ownerHtml: o.name ? `<span class="in-view-person" data-initials="${vEsc(o.initials || '')}"><span class="avatar avatar-md">${vEsc(o.initials || '')}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(o.name)}</a>${o.role ? `<span class="in-view-person-role">${vEsc(o.role)}</span>` : ''}</span></span>` : person(null),
-          end: vEsc(roadmapLabel(n.roadmap)), desc: n.desc ? vEsc(n.desc) : '',
-          slack: [], rob: n.rob?.title ? [n.rob.title] : [], beneficiary: n.fn || '', links: [],
+          health: HEALTH_LABEL[n.health] || 'Not active',
+          beneficiary: n.fn || '', ownerHtml: nodePerson(n.owner), pmHtml: nodePerson(n.pm),
+          start: roadmapLabel(n.created), end: roadmapLabel(n.roadmap),
+          coreOn: false, desc: n.desc || '', problem: '', objs: [], mets: [],
+          rob: n.rob?.title ? [n.rob.title] : [], slack: [], links: [],
         });
         activityPanel.innerHTML = `<p class="in-view-text"><span class="in-view-empty">No activity yet</span></p>`;
         setViewTab('overview');
