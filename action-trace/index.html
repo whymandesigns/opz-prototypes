@@ -227,7 +227,10 @@
   .pop.down::after{top:-5px;left:var(--ax,40px);}
   .pop.up::after{bottom:-5px;left:var(--ax,200px);}
   .pop-mini{padding:6px;box-sizing:content-box;}
-  .pop-mini .pop-scale{transform:scale(.5);transform-origin:0 0;}
+  .deck-mini .right{padding:1.8em 1.6em 1.4em;}
+  .deck-mini .right .ttl{margin-bottom:1.2em;}
+  .deck-mini .pager{padding-top:1.2em;}
+  .deck-mini .wm{right:1.6em;bottom:1.4em;}
   .tip{position:absolute;z-index:40;background:#262d3d;color:#fff;font-size:13px;line-height:18px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;transform:translateX(-50%);}
   .tip.sm{font-size:9px;line-height:12px;padding:2px 6px;}
 
@@ -757,32 +760,32 @@ function deckFlow(proc, sel) {
 // Only a group too big for one slide continues on the next, with the
 // manager repeated ("cont.").
 const DECK_ROWS = 10, DECK_COLS = 5;
-function deckPeoplePages(assign) {
+function deckPeoplePages(assign, rows = DECK_ROWS, cols = DECK_COLS) {
   const pages = []; let cur = [], used = 0;
   for (const g of groupsOf(assign)) {
-    const chunks = []; for (let i = 0; i < g.workers.length; i += DECK_ROWS) chunks.push(g.workers.slice(i, i + DECK_ROWS));
+    const chunks = []; for (let i = 0; i < g.workers.length; i += rows) chunks.push(g.workers.slice(i, i + rows));
     const need = 1 + chunks.length;
-    if (need > DECK_COLS) {
+    if (need > cols) {
       if (cur.length) { pages.push(cur); cur = []; used = 0; }
-      for (let i = 0; i < chunks.length; i += DECK_COLS - 1) pages.push([{...g, chunks:chunks.slice(i, i + DECK_COLS - 1), cont:i > 0}]);
+      for (let i = 0; i < chunks.length; i += cols - 1) pages.push([{...g, chunks:chunks.slice(i, i + cols - 1), cont:i > 0}]);
       continue;
     }
-    if (used + need > DECK_COLS && cur.length) { pages.push(cur); cur = []; used = 0; }
+    if (used + need > cols && cur.length) { pages.push(cur); cur = []; used = 0; }
     cur.push({...g, chunks}); used += need;
   }
   if (cur.length) pages.push(cur);
   return pages.length ? pages : [[]];
 }
-function deckManagers(m, pg = 0) {
-  const pages = deckPeoplePages(m.assign); const page = pages[Math.min(pg, pages.length - 1)];
+function deckManagers(m, pg = 0, size) {
+  const pages = deckPeoplePages(m.assign, size?.rows, size?.cols); const page = pages[Math.min(pg, pages.length - 1)];
   const col = arr => `<div>${arr.map(w => `<div class="p"><b>${esc(w)}</b><span>Worker</span></div>`).join('')}</div>`;
   return `<div class="mw">${page.map(g => `<div class="grp"><div class="mgr p"><b>${g.mgr ? esc(P[g.mgr].n) : 'Unassigned'}</b><span>${!g.mgr ? 'No manager yet' : g.owner ? 'RoB owner · Manager' : 'Manager'}${g.cont ? ' (cont.)' : ''}</span></div><div class="cols">${g.chunks.map(col).join('')}</div></div>`).join('') || '<div class="p"><span>No workers in scope</span></div>'}</div>`;
 }
-function deckPages(m) {
-  return deckPeoplePages(m.assign).map((_, i) => ({t:'Managers & Workers', html:deckManagers(m, i)}));
+function deckPages(m, size) {
+  return deckPeoplePages(m.assign, size?.rows, size?.cols).map((_, i) => ({t:'Managers & Workers', html:deckManagers(m, i, size)}));
 }
-function deck(m, key, {stepsTitle = 'Steps for', showLeft = true, rightTitle} = {}) {
-  const pages = deckPages(m); const pg = Math.min(S.deckPage[key] || 0, pages.length - 1); const cur = pages[pg];
+function deck(m, key, {stepsTitle = 'Steps for', showLeft = true, rightTitle, size} = {}) {
+  const pages = deckPages(m, size); const pg = Math.min(S.deckPage[key] || 0, pages.length - 1); const cur = pages[pg];
   return `<div class="deck" data-deck="${key}">
     ${showLeft ? `<div class="left"><div class="${stepsTitle.startsWith('Steps for') ? 'cap' : 'ttl'}" style="${stepsTitle.startsWith('Steps for') ? '' : 'margin-bottom:2.6em'}">${stepsTitle}</div>${stepsTitle.startsWith('Steps for') ? `<div class="ttl">${PROCESSES[m.proc].name}</div>` : ''}${deckFlow(m.proc, m.steps)}</div>` : ''}
     <div class="right"><div class="ttl"><span>${rightTitle || cur.t}</span><span class="dots">${pages.map((_, i) => `<i class="${i === pg ? 'on' : ''}" data-deck-go="${key}:${i}"></i>`).join('')}</span></div>
@@ -1307,15 +1310,26 @@ function renderDiagPop() {
   host.innerHTML = `<div class="pop down" data-pop="diag" style="left:${left}px;top:${b.bottom + 10}px;width:800px;--ax:${b.left - left + 6}px">${deck(S.meeting, 'diag', {stepsTitle:'Steps included for Recordings<br>of Invoicing Process', rightTitle:'Managers &amp; Users'}).replace('class="deck"', 'class="deck" style="font-size:11.5px;border-radius:2px"')}</div>`;
 }
 function showInitDeck(target, proc) {
-  // Half-size preview of the deck, anchored to the process link (arrow under its first words).
-  const b = target.getBoundingClientRect(); const full = 516, w = full / 2, pad = 6;
+  // Compact preview of the deck anchored to the process link: half the width, same
+  // type size, so fewer people per page and more pages to step through.
+  const w = 270;
   const m = {...S.meeting, proc, steps: proc === S.meeting.proc ? S.meeting.steps : ['capture','gl']};
-  const left = Math.max(8, Math.min(window.innerWidth - w - pad * 2 - 8, b.left - 12));
-  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:${left}px;top:0;visibility:hidden;width:${w}px;--ax:${b.left - left + 14}px"><div class="pop-scale" style="width:${full}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users for Recordings of ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`}).replace('class="deck"', 'class="deck" style="font-size:10.5px;border-radius:2px"')}</div></div>`;
-  const el = $('#pops [data-pop=init]'), inner = el.querySelector('.pop-scale');
-  el.style.height = `${inner.offsetHeight / 2}px`;
-  el.style.top = `${Math.max(8, b.top - el.offsetHeight - 10)}px`; el.style.visibility = '';
+  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:0;top:0;visibility:hidden;width:${w}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users · ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`, size:{rows:7, cols:2}}).replace('class="deck"', 'class="deck deck-mini" style="font-size:12px;border-radius:2px"')}</div>`;
+  positionInitDeck(); $('#pops [data-pop=init]').style.visibility = '';
 }
+// Keep the preview glued to its link: re-run on every scroll and resize.
+function positionInitDeck() {
+  const el = $('#pops [data-pop=init]'); if (!el) return;
+  const link = $(`[data-hover-deck="${el.dataset.proc}"]`); if (!link) return hideInitDeck();
+  const b = link.getBoundingClientRect(), w = el.offsetWidth, pad = 6;
+  const host = link.closest('.bd')?.getBoundingClientRect();
+  if (host && (b.bottom < host.top || b.top > host.bottom)) return hideInitDeck();   // link scrolled out of view
+  const left = Math.max(8, Math.min(window.innerWidth - w - 8, b.left - 12));
+  el.style.left = `${left}px`; el.style.top = `${Math.max(8, b.top - el.offsetHeight - 10)}px`; el.style.setProperty('--ax', `${b.left - left + 14 - pad}px`);
+}
+document.addEventListener('scroll', () => positionInitDeck(), true);
+document.addEventListener('wheel', () => setTimeout(positionInitDeck, 0), {capture:true, passive:true});
+window.addEventListener('resize', () => positionInitDeck());
 function hideInitDeck() { $('#pops [data-pop=init]')?.remove(); }
 
 function showTip(html, xPct, cls = '') {
