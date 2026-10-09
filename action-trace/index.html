@@ -486,6 +486,7 @@
   .asg-sum{display:flex;flex-direction:column;gap:4px;padding:0 16px 16px 56px;font-size:13px;}
   .vconn .asg-sum{padding:12px 0 0;margin-top:12px;border-top:1px solid var(--gray-200);}
   .asg-sum-h{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--graphite-700);}
+  .asg-sum-h .connect-btn{margin-left:auto;}
   .asg-sum-list{display:flex;flex-direction:column;}
   .asg-sum-list .person{padding:8px 0;min-height:auto;}
   .asg-sum-list .person .nm{font-weight:600;}
@@ -538,7 +539,8 @@
   /* Edit modal (meeting view) */
   .asg-modal{position:absolute;left:50%;top:40px;bottom:40px;transform:translateX(-50%);width:900px;max-width:calc(100% - 32px);background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;}
   .asg-modal-h{display:flex;align-items:center;justify-content:space-between;padding:24px 32px;border-bottom:1px solid var(--gray-200);}
-  .asg-modal-h > div{display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;font-weight:600;}
+  .asg-modal-h{height:79px;padding-top:0;padding-bottom:0;}
+  .asg-modal-h > div{display:flex;align-items:center;gap:8px;font-size:20px;line-height:30px;font-weight:600;}
   .asg-modal-h > div .muted{font-weight:400;}
   .asg-modal-b{flex:1;overflow:auto;padding:24px 32px;}
 </style>
@@ -845,9 +847,9 @@ function assignSummary(assign, {editAct}) {
   const gs = groupsOf(assign); const un = gs.find(g => !g.mgr)?.workers.length || 0;
   // Managers with workers, plus any manager added in the step who has none yet.
   const named = [...gs.filter(g => g.mgr), ...atManagersOf(assign).filter(m => !gs.some(g => g.mgr === m)).map(m => ({mgr:m, workers:[], owner:false}))];
-  const head = (btn) => `<div class="asg-sum-h"><span>Managers</span><button class="link-btn" data-act="${editAct}">${btn}</button></div>`;
-  if (!named.length) return `<div class="asg-sum">${head('Assign managers')}<div class="asg-sum-none muted">${WORKER_LIST.length} workers · none assigned yet</div></div>`;
-  return `<div class="asg-sum">${head('Edit')}<div class="asg-sum-list">
+  const head = (btn) => `<div class="asg-sum-h"><span>Managers</span><button class="connect-btn" data-act="${editAct}">${btn} ${ic.chevD(16)}</button></div>`;
+  if (!named.length) return `<div class="asg-sum">${head('Edit workers and managers')}<div class="asg-sum-none muted">${WORKER_LIST.length} workers · none assigned yet</div></div>`;
+  return `<div class="asg-sum">${head('Edit workers and managers')}<div class="asg-sum-list">
     ${named.map(g => `<div class="person">${avatar(g.mgr)}<div><div class="nm">${esc(P[g.mgr].n)}${g.owner ? '' : AT}</div><div class="rl">${esc(P[g.mgr].r)}${g.owner ? ' · RoB owner' : ''}</div></div><span class="asg-sum-cnt">${g.workers.length} worker${g.workers.length === 1 ? '' : 's'}</span></div>`).join('')}
     ${un ? `<div class="asg-sum-none muted">${un} worker${un === 1 ? '' : 's'} unassigned</div>` : ''}
   </div></div>`;
@@ -950,7 +952,7 @@ function newCreateState() {
 function renderCreate() {
   const c = S.create; const cAssign = liveAssign('create', c.assign); const parts = participantsOf(cAssign);
   const atReady = c.proc && c.steps.length;
-  const atSummary = atReady && !c.atOpen && !c.asgOpen ? `<div class="conn-chips"><span>${PROCESSES[c.proc].name}</span>${procSteps(c).map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${c.asgDone ? assignSummary(c.assign, {editAct:'asg-edit-create'}) : `<div class="asg-sum"><span class="asg-sum-l">Managers</span><span class="asg-sum-v muted">Not set yet</span><button class="link-btn" data-act="asg-edit-create">Assign managers</button></div>`}` : '';
+  const atSummary = atReady && !c.atOpen && !c.asgOpen ? `<div class="conn-chips"><span>${PROCESSES[c.proc].name}</span>${procSteps(c).map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${c.asgDone ? assignSummary(c.assign, {editAct:'asg-edit-create'}) : `<div class="asg-sum"><span class="asg-sum-l">Managers</span><span class="asg-sum-v muted">Not set yet</span><button class="connect-btn" data-act="asg-edit-create">Assign managers ${ic.chevD(16)}</button></div>`}` : '';
   const simpleConn = (key, icon, title, sub, opts, extra = '') => `<div class="conn" data-conn="${key}"><div class="conn-head"><span class="conn-ic">${icon}</span><div><div class="conn-title">${title}</div><div class="conn-sub">${sub}</div>${extra}</div>
       <button class="connect-btn" data-dd="${key}">${c[key] ? 'Change' : 'Connect'} ${c.openDD === key ? ic.chevU(14) : ic.chevD(14)}</button></div>
       ${c[key] ? `<div class="conn-chips"><span class="link">${c[key]}</span><button class="icon-btn" style="width:20px;height:20px" data-clear="${key}">${ic.close(12)}</button></div>` : ''}
@@ -983,7 +985,7 @@ function renderCreate() {
           <h2 class="sec">Connections</h2>
           <div class="conn" data-conn="at">
             <div class="conn-head"><span class="conn-ic">${AT_BIG(20)}</span><div><div class="conn-title">Action Trace</div><div class="conn-sub">${c.procLocked ? `Select the steps of ${PROCESSES[c.proc].name} to review` : 'Select processes and its steps to review'}</div></div>
-              ${c.asgOpen ? '' : `<button class="connect-btn" data-act="toggle-at">${atReady ? 'Edit' : 'Connect'} ${c.atOpen ? ic.chevU(16) : ic.chevD(16)}</button>`}</div>
+              ${c.asgOpen ? '' : `<button class="connect-btn" data-act="toggle-at">${atReady ? 'Edit steps' : 'Connect'} ${c.atOpen ? ic.chevU(16) : ic.chevD(16)}</button>`}</div>
             ${atSummary}
             ${c.asgOpen ? assignPanel() : ''}
             ${c.atOpen ? `<div class="dd">${Object.entries(PROCESSES).filter(([k]) => !c.procLocked || k === c.proc).map(([k, p]) => `<div class="dd-proc ${c.proc === k ? 'on' : ''}">
@@ -1106,8 +1108,7 @@ function renderInitiative() {
         ${robLine('PO Invoice · Approval &amp; Payment', 'Oct 1 • 4:00pm', 'Every week on Tuesday')}
         <div style="height:16px"></div>
         <div class="proc-row"><span class="proc-link" data-hover-deck="nonpo">Non-PO Invoice Processing</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="nonpo" data-tip="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="nonpo" data-tip="Add RoB meeting">${ic.calPlus(16)}</button></span></div><div style="color:var(--graphite-900)">Updated on Sep 21</div>
-        ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}
-        <button class="add-link" style="margin-top:16px" data-act="new-meeting">${ic.plus(14)}Add [ ${robTag(14)} ROB ] Meeting</button>` : none}
+        ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}` : none}
       </div></div>
       ${addLink('Add processes')}
       <div class="kvrow" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)"><span>Beneficiary function</span><span class="v"><a href="#" onclick="return false">Finance</a></span></div>
@@ -1231,7 +1232,7 @@ function annHTML(rec) {
 
 function renderAssignModal() {
   return `<div class="scrim" data-asg="cancel"></div><div class="asg-modal" role="dialog" aria-label="Managers and workers">
-    <div class="asg-modal-h"><div>${AT_BIG(20)}<b>Managers &amp; workers</b><span class="muted">· ${esc(PROCESSES[S.asg.proc || S.meeting.proc].name)}</span></div><button class="icon-btn" data-asg="cancel" aria-label="Close">${ic.close(16)}</button></div>
+    <div class="asg-modal-h"><div>${AT_BIG(24)}<b>Managers &amp; workers</b><span class="muted">· ${esc(PROCESSES[S.asg.proc || S.meeting.proc].name)}</span></div><button class="icon-btn" data-asg="cancel" aria-label="Close">${ic.close(16)}</button></div>
     <div class="asg-modal-b">${assignPanel()}</div>
   </div>`;
 }
@@ -1480,7 +1481,7 @@ document.addEventListener('click', e => {
   switch (d.act) {
     case 'flow-menu': flowMenu = !flowMenu; renderFlowNav(); break;
     case 'new-meeting': S.create = newCreateState(); S.initDrawer = false; S.flowStep = 1; render(); break;
-    case 'close-create': S.create = null; S.meetingOpen = false; S.flowStep = null; render(); break;
+    case 'close-create': { const back = S.create?.fromDrawer; S.create = null; S.meetingOpen = false; S.flowStep = back ? 3 : null; if (back) { S.page = 'processes'; S.initDrawer = true; } render(); break; }
     case 'toggle-at': S.create.atOpen = !S.create.atOpen; S.create.openDD = null; render(); break;
     case 'at-next': S.flowStep = 1.5; openAssign('create'); break;
     case 'asg-edit-create': openAssign('create'); break;
@@ -1504,7 +1505,7 @@ document.addEventListener('click', e => {
     case 'raci-compact': S.raci.compact = true; render(); break;
     case 'raci-comfy': S.raci.compact = false; render(); break;
     case 'proc-people': openAssign('proc', d.proc); break;
-    case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, procLocked:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
+    case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, procLocked:true, fromDrawer:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
     case 'open-initiative': S.meetingOpen = false; S.page = 'processes'; S.initDrawer = true; S.flowStep = 3; render(); break;
     case 'close-initiative': S.initDrawer = false; hideInitDeck(); S.flowStep = null; render(); break;
     case 'pp': S.rec.playing ? pause() : play(); break;
