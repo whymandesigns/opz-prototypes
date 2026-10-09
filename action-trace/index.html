@@ -1600,7 +1600,9 @@ document.addEventListener('keydown', e => {
 window.addEventListener('resize', () => { if (S.rec?.diagOpen) renderDiagPop(); });
 
 /* Boot: start at step 1 of the Figma flow, or at ?step=N */
-goFlow(Number(String(new URLSearchParams(location.search).get('step') || '1').replace('1b', '1.5')) || 1);
+{ const q = new URLSearchParams(location.search);
+  if (q.get('page')) { Object.assign(S, {create:null, meetingOpen:false, initDrawer:false, raci:null, rec:null, flowStep:null, page:q.get('page')}); render(); }   // ?page=processes · initiatives · meetings
+  else goFlow(Number(String(q.get('step') || '1').replace('1b', '1.5')) || 1); }
 </script>
 
 <script>
