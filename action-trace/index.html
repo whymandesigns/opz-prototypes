@@ -964,7 +964,7 @@ function renderCreate() {
       ${c[key] ? `<div class="conn-chips"><span class="link">${c[key]}</span><button class="icon-btn" style="width:20px;height:20px" data-clear="${key}">${ic.close(12)}</button></div>` : ''}
       ${c.openDD === key ? `<div class="dd dd-list">${opts.map(o => `<button data-pick="${key}" data-val="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}</div>`;
   return `<div class="scrim"></div><div class="fs-modal fs-create" role="dialog" aria-label="New RoB meeting">
-    <div class="fs-head"><h1>${robTitle(esc(S.meeting.title), 24)} <button class="icon-btn" title="Rename">${ic.pencil(16)}</button></h1><div class="spacer"></div><button class="icon-btn" data-act="close-create">${ic.close(16)}</button></div>
+    <div class="fs-head"><h1>${robTitle(esc(c.title || S.meeting.title), 24)} <button class="icon-btn" title="Rename">${ic.pencil(16)}</button></h1><div class="spacer"></div><button class="icon-btn" data-act="close-create">${ic.close(16)}</button></div>
     <div class="fs-body" id="createBody">
       <div class="col-main">
         <section id="c-details" class="sec-block">
@@ -1498,7 +1498,7 @@ document.addEventListener('click', e => {
     case 'slack-na': S.create.slackNA = t.checked; break;
     case 'create-meeting': {
       const c = S.create;
-      Object.assign(S.meeting, {date:c.date, start:c.start, end:c.end, tz:c.tz, recur:c.recur, busy:c.busy, org:c.org, created:true});
+      Object.assign(S.meeting, {date:c.date, start:c.start, end:c.end, tz:c.tz, recur:c.recur, busy:c.busy, org:c.org, created:true}, c.title ? {title:c.title} : {});
       // Never assigned (or skipped) → the RoB owner manages every worker.
       if (c.proc && c.steps.length) Object.assign(S.meeting, {proc:c.proc, steps:[...c.steps], assign:c.asgDone ? c.assign : null});
       S.create = null; S.meetingOpen = true; S.page = 'meetings'; S.flowStep = 2; render(); break;
@@ -1514,7 +1514,7 @@ document.addEventListener('click', e => {
     case 'raci-compact': S.raci.compact = true; render(); break;
     case 'raci-comfy': S.raci.compact = false; render(); break;
     case 'proc-people': openAssign('proc', d.proc); break;
-    case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, procLocked:true, fromDrawer:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
+    case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, title:`${PROCESSES[d.proc].name} · Review`, procLocked:true, fromDrawer:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
     case 'open-initiative': S.meetingOpen = false; S.page = 'processes'; S.initDrawer = true; S.flowStep = 3; render(); break;
     case 'close-initiative': S.initDrawer = false; hideInitDeck(); S.flowStep = null; render(); break;
     case 'pp': S.rec.playing ? pause() : play(); break;
