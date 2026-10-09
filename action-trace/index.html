@@ -865,10 +865,9 @@ function assignSummary(assign, {editAct}) {
 function assignPanel() {
   const A = S.asg;
   return `<div class="asg" data-asg-root>
-    <div class="asg-top"><b>Assign workers to managers</b></div>
+    <div class="asg-top"><b>Assign workers to managers</b>${A.ctx === 'create' ? `<button class="connect-btn" data-asg="cancel" title="Close without saving">Edit workers and managers ${ic.chevU(16)}</button>` : ''}</div>
     ${asgColumns()}
     <div class="asg-foot">
-      ${A.ctx === 'create' ? `<button class="btn" data-asg="back">${ic.chevL(14)} Back</button>` : ''}
       <span class="grow"></span>
       ${A.ctx === 'create' ? `<button class="btn" data-asg="skip" title="You can change this later">Skip · everyone reports to ${esc(P[OWNER].n.split(' ')[0])}</button>` : `<button class="btn" data-asg="cancel">Cancel</button>`}
       <button class="btn primary" data-asg="done">${A.ctx === 'create' ? 'Done' : 'Save'}</button>
@@ -997,7 +996,7 @@ function renderCreate() {
                 ${c.procLocked ? `<div class="dd-proc-name">${p.name}</div>` : `<label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>`}
                 ${c.proc === k ? `<div class="dd-steps">${p.steps.map(s => `<label class="check sm"><input type="checkbox" data-step="${s.id}" ${c.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div>` : ''}
               </div>`).join('')}
-              <div class="dd-foot"><span class="muted"><span class="asg-stepno">Step 1 of 2</span>${atReady ? '' : c.procLocked ? 'Pick the steps to review' : 'Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
+              <div class="dd-foot"><span class="muted">${atReady ? '' : c.procLocked ? 'Pick the steps to review' : 'Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
           </div>
           ${simpleConn('slack', slackLogo(20), 'Slack', 'Create or add Slack channels to sync conversations with this meeting', ['#-actiontrace-invoicing-process','#-rob-invoices-rampup','+ Create new channel'], `<label class="check" style="margin-top:8px;font-size:13px"><input type="checkbox" ${c.slackNA ? 'checked' : ''} data-act="slack-na" /><span class="box"></span>Not Applicable</label>`)}
         </section>
