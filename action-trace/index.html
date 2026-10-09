@@ -433,6 +433,11 @@
      glyph's edge lines up with the Edit link and counts below it. */
   .fs-create .connect-btn svg,.dd-link svg:last-child{margin-right:-4px;}
   .fs-create .conn-chips{padding-left:56px;}
+  /* Everything inside the Action Trace card shares the 56px content edge (16px pad + 32px icon + 8px gap) */
+  .fs-create .conn[data-conn="at"] .dd-proc{padding-left:56px;}
+  .fs-create .conn[data-conn="at"] .dd-steps{padding-left:0;}
+  .fs-create .conn[data-conn="at"] .dd-foot{padding-left:56px;}
+  .fs-create .conn[data-conn="at"] .asg{padding-left:56px;}
   .fs-create .owner{gap:8px;padding-bottom:16px;margin-bottom:16px;}
   .fs-create .owner > div > div:first-child{font-size:14px;line-height:22px;color:#000;}
   .fs-create .owner > div > div:last-child{font-size:13px !important;line-height:18px;color:#455065;}
