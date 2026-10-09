@@ -370,6 +370,8 @@
   .iconn .v .when{display:flex;align-items:center;gap:8px;}
   .proc-link{color:var(--blue);cursor:pointer;}
   .dd-proc-name{font-size:14px;font-weight:600;line-height:20px;}
+  .proc-ext{display:inline-flex;align-items:center;gap:4px;text-decoration:none;}
+  .proc-ext:hover{text-decoration:underline;}
   .proc-row{display:flex;align-items:center;gap:8px;}
   .proc-row .proc-acts{display:inline-flex;gap:2px;margin-left:auto;}
   .proc-row .icon-btn{width:28px;height:28px;position:relative;color:var(--graphite-700);}
@@ -1054,7 +1056,7 @@ function renderMeeting() {
         </section>
         <section id="m-connections" class="sec-block">
           <h2 class="sec" style="font-size:14px">Connections</h2>
-          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><span class="proc-link" data-act="open-raci">${PROCESSES[m.proc].name} Process</span>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
+          <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><a class="proc-link proc-ext" href="#" onclick="return false">${PROCESSES[m.proc].name} Process${ic.ext(14)}</a>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
           <div class="vconn"><div class="h"><span class="conn-ic">${slackLogo(18)}</span>Slack</div><div class="b">${slackLogo(14)}<a href="#" onclick="return false">#-actiontrace-invoicing-process</a><span class="tag">Default</span></div></div>
           <div class="vconn"><div class="h"><span class="conn-ic">${ic.process(16)}</span>Processes</div><div class="b"><span class="proc-link" data-act="open-initiative">Supplier Invoice Management</span><span class="tag">Process</span></div></div>
         </section>
