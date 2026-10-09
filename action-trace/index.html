@@ -369,6 +369,15 @@
   .iconn .v .mt{display:flex;align-items:center;gap:6px;margin-top:4px;}
   .iconn .v .when{display:flex;align-items:center;gap:8px;}
   .proc-link{color:var(--blue);cursor:pointer;}
+  .dd-proc-name{font-size:14px;font-weight:600;line-height:20px;}
+  .proc-row{display:flex;align-items:center;gap:8px;}
+  .proc-row .proc-acts{display:inline-flex;gap:2px;margin-left:auto;}
+  .proc-row .icon-btn{width:28px;height:28px;position:relative;color:var(--graphite-700);}
+  .proc-row .icon-btn:hover{color:var(--graphite-900);background:var(--gray-100);}
+  /* Tooltip: data-tip, shown above the control */
+  [data-tip]{position:relative;}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);background:#262d3d;color:#fff;font-size:12px;line-height:16px;padding:4px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;z-index:50;}
+  [data-tip]:hover::before{content:"";position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);border:5px solid transparent;border-top-color:#262d3d;pointer-events:none;z-index:50;}
   .proc-link:hover{text-decoration:underline;}
   .rob-tag{display:inline-flex;align-items:center;gap:2px;}
 
@@ -701,6 +710,7 @@ const S = {
   },
   meetingOpen:true,
   initDrawer:false,
+  procAssign:{},            // managers & workers per process, edited from the Process drawer
   raci:null,                // {locked, showInformed, compact}
   rec:null,                 // recordings modal state
   flowStep:2,
@@ -820,6 +830,7 @@ const cleanAssign = d => { const map = Object.fromEntries(Object.entries(d.map).
 const cloneAssign = a => a ? {mgrs:[...a.mgrs], map:{...a.map}} : {mgrs:[], map:{}};
 Object.assign(ic, {
   arrowR: s => I('<path d="M3 8h10M9 4l4 4-4 4"/>', s),
+  calPlus: s => I('<path d="M13 8.5V4a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h5.5M2 6.5h11M5 1.5v3M10 1.5v3M12.5 10.5v4M10.5 12.5h4"/>', s),
   arrowL: s => I('<path d="M13 8H3M7 4L3 8l4 4"/>', s),
 });
 S.meeting.assign = DEMO_ASSIGN();   // the demo meeting starts with the two ActionTrace teams
@@ -905,7 +916,7 @@ function asgColumns() {
 
 /* ───────────────────────── Left nav + pages ───────────────────────── */
 function renderNav() {
-  const items = [['process','Process'],['rocket','Initiatives','initiatives'],['cal','RoB Meetings','meetings'],['target','OKRs'],['people','People'],['team','Team']];
+  const items = [['process','Processes','processes'],['rocket','Initiatives','initiatives'],['cal','RoB Meetings','meetings'],['target','OKRs'],['people','People'],['team','Team']];
   $('#leftnav').innerHTML = items.map(([i, l, p]) => `<button class="nav-item ${p && S.page === p ? 'active' : ''}" ${p ? `data-page="${p}"` : ''}>${ic[i](18)}${l}</button>`).join('');
   document.querySelectorAll('.leftbar > .nav-item[data-ic]').forEach(b => { if (!b.dataset.done) { b.insertAdjacentHTML('afterbegin', ic[b.dataset.ic](18)); b.dataset.done = 1; } });
 }
@@ -913,8 +924,12 @@ function renderMain() {
   if (S.page === 'initiatives') {
     $('#main').innerHTML = `<h1 class="page-title">Initiatives</h1>
       <div class="toolbar"><div class="search-input">${ic.search(16)}Search by name, owner or function</div><button class="btn-outline">${ic.filter(16)}Filter</button><button class="btn-outline">${ic.code(16)}Query</button></div>
+      <div class="empty-box" style="margin-top:8px">${ic.rocket(16)}No initiatives yet</div>`;
+  } else if (S.page === 'processes') {
+    $('#main').innerHTML = `<h1 class="page-title">Processes</h1>
+      <div class="toolbar"><div class="search-input">${ic.search(16)}Search by name, owner or function</div><button class="btn-outline">${ic.filter(16)}Filter</button><button class="btn-outline">${ic.code(16)}Query</button></div>
       <table class="itable"><thead><tr><th>Name &nbsp;<span class="link" style="font-weight:600">Expand All</span></th><th>Status</th><th>Health</th><th>Accountability</th></tr></thead><tbody>
-      ${INITIATIVES.map(([n, st, o, r], i) => `<tr class="row ${S.initDrawer && (S.initSel || 0) === i ? 'sel' : ''}" data-init="${i}"><td><div style="display:flex;gap:10px;align-items:flex-start"><span class="muted" style="margin-top:2px">${ic.chevD(14)}</span><div><div class="iname">${esc(n)}</div><span class="tag ghost">Initiative</span></div></div></td><td><span class="tag ghost">${st}</span></td><td><span class="dot"></span></td><td><div style="display:flex;gap:8px;align-items:center">${i === 0 ? `<img class="ava sm" src="assets/john-appleseed.png" />` : `<span class="lw">LW</span>`}<div><div style="font-size:14px;line-height:20px">${o}</div><div style="font-size:11px;line-height:16px" class="muted">${r}</div></div></div></td></tr>`).join('')}
+      ${INITIATIVES.map(([n, st, o, r], i) => `<tr class="row ${S.initDrawer && (S.initSel || 0) === i ? 'sel' : ''}" data-init="${i}"><td><div style="display:flex;gap:10px;align-items:flex-start"><span class="muted" style="margin-top:2px">${ic.chevD(14)}</span><div><div class="iname">${esc(n)}</div><span class="tag ghost">Process</span></div></div></td><td><span class="tag ghost">${st}</span></td><td><span class="dot"></span></td><td><div style="display:flex;gap:8px;align-items:center">${i === 0 ? `<img class="ava sm" src="assets/john-appleseed.png" />` : `<span class="lw">LW</span>`}<div><div style="font-size:14px;line-height:20px">${o}</div><div style="font-size:11px;line-height:16px" class="muted">${r}</div></div></div></td></tr>`).join('')}
       </tbody></table>`;
   } else {
     const m = S.meeting;
@@ -967,19 +982,17 @@ function renderCreate() {
         <section id="c-connections" style="padding-bottom:40px">
           <h2 class="sec">Connections</h2>
           <div class="conn" data-conn="at">
-            <div class="conn-head"><span class="conn-ic">${AT_BIG(20)}</span><div><div class="conn-title">Action Trace</div><div class="conn-sub">Select processes and its steps to review</div></div>
+            <div class="conn-head"><span class="conn-ic">${AT_BIG(20)}</span><div><div class="conn-title">Action Trace</div><div class="conn-sub">${c.procLocked ? `Select the steps of ${PROCESSES[c.proc].name} to review` : 'Select processes and its steps to review'}</div></div>
               ${c.asgOpen ? '' : `<button class="connect-btn" data-act="toggle-at">${atReady ? 'Edit' : 'Connect'} ${c.atOpen ? ic.chevU(16) : ic.chevD(16)}</button>`}</div>
             ${atSummary}
             ${c.asgOpen ? assignPanel() : ''}
-            ${c.atOpen ? `<div class="dd">${Object.entries(PROCESSES).map(([k, p]) => `<div class="dd-proc ${c.proc === k ? 'on' : ''}">
-                <label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>
+            ${c.atOpen ? `<div class="dd">${Object.entries(PROCESSES).filter(([k]) => !c.procLocked || k === c.proc).map(([k, p]) => `<div class="dd-proc ${c.proc === k ? 'on' : ''}">
+                ${c.procLocked ? `<div class="dd-proc-name">${p.name}</div>` : `<label class="radio"><input type="radio" name="proc" value="${k}" ${c.proc === k ? 'checked' : ''} data-proc="${k}" /><span class="ring"></span>${p.name}</label>`}
                 ${c.proc === k ? `<div class="dd-steps">${p.steps.map(s => `<label class="check sm"><input type="checkbox" data-step="${s.id}" ${c.steps.includes(s.id) ? 'checked' : ''} /><span class="box"></span>${s.n}</label>`).join('')}</div>` : ''}
               </div>`).join('')}
-              <div class="dd-foot"><span class="muted"><span class="asg-stepno">Step 1 of 2</span>${atReady ? '' : 'Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
+              <div class="dd-foot"><span class="muted"><span class="asg-stepno">Step 1 of 2</span>${atReady ? '' : c.procLocked ? 'Pick the steps to review' : 'Pick a process and the steps to review'}</span><button class="btn primary" data-act="at-next" ${atReady ? '' : 'disabled'}>Next: managers &amp; workers ${ic.chevR(14)}</button></div></div>` : ''}
           </div>
           ${simpleConn('slack', slackLogo(20), 'Slack', 'Create or add Slack channels to sync conversations with this meeting', ['#-actiontrace-invoicing-process','#-rob-invoices-rampup','+ Create new channel'], `<label class="check" style="margin-top:8px;font-size:13px"><input type="checkbox" ${c.slackNA ? 'checked' : ''} data-act="slack-na" /><span class="box"></span>Not Applicable</label>`)}
-          ${simpleConn('init', ic.rocket(18), 'Initiatives', 'Connect to the Initiative this work advances', ['Supplier Invoice Management','Engineering Weekly','CRM Optimization and Expansion'])}
-          ${simpleConn('bau', ic.bau(18), 'Business as Usual', 'Connect to the recurring BAU this work belongs to', ['Month-end Close','Vendor Master Maintenance'])}
         </section>
       </div>
       <div class="col-people">
@@ -1041,7 +1054,7 @@ function renderMeeting() {
           <h2 class="sec" style="font-size:14px">Connections</h2>
           <div class="vconn"><div class="h">${AT_BIG(24)}ActionTrace</div><div class="b"><span class="proc-link" data-act="open-raci">${PROCESSES[m.proc].name} Process</span>${steps.map(s => `<span class="tag">${cap(s.n)}</span>`).join('')}</div>${assignSummary(m.assign, {editAct:'asg-edit-meeting'})}</div>
           <div class="vconn"><div class="h"><span class="conn-ic">${slackLogo(18)}</span>Slack</div><div class="b">${slackLogo(14)}<a href="#" onclick="return false">#-actiontrace-invoicing-process</a><span class="tag">Default</span></div></div>
-          <div class="vconn"><div class="h"><span class="conn-ic">${ic.rocket(16)}</span>Initiatives</div><div class="b"><span class="proc-link" data-act="open-initiative">Supplier Invoice Management</span><span class="tag">Initiative</span></div></div>
+          <div class="vconn"><div class="h"><span class="conn-ic">${ic.process(16)}</span>Processes</div><div class="b"><span class="proc-link" data-act="open-initiative">Supplier Invoice Management</span><span class="tag">Process</span></div></div>
         </section>
         <section id="m-agenda" class="sec-block">
           <h2 class="sec" style="font-size:14px">Agenda items <span class="count">0</span><span style="margin-left:auto" class="muted">${ic.plus(14)}</span></h2>
@@ -1086,13 +1099,13 @@ function renderInitiative() {
       <div style="margin-top:4px;font-size:13px;padding-bottom:16px;border-bottom:1px solid var(--gray-200)">Receive, validate, code, approve and pay supplier invoices in SAP S/4HANA.</div>
       <h2 class="sec" style="font-size:14px;margin:16px 0 8px">Connections</h2>
       <div class="iconn"><div class="k"><span class="conn-ic">${slackLogo(16)}</span>Slack channels</div><div class="v">${first ? `<span class="dot" style="width:6px;height:6px"></span> <a href="#" onclick="return false">#-rob-invoices-rampup</a> <span class="tag">Default</span>` : none}</div></div>
-      <div class="iconn"><div class="k"><span class="conn-ic">${ic.cal(16)}</span>RoB meetings</div><div class="v">${first ? `<a href="#" onclick="return false">[RoB][Initiative] Invoices &amp; Payroll Ramp-up</a><div class="when">Jul 22 • 4:00pm<span class="tag">Every week on Tuesday until Jul 29...</span></div>` : none}</div></div>
+      <div class="iconn"><div class="k"><span class="conn-ic">${ic.cal(16)}</span>RoB meetings</div><div class="v">${first ? `<a href="#" onclick="return false">[RoB][Process] Invoices &amp; Payroll Ramp-up</a><div class="when">Jul 22 • 4:00pm<span class="tag">Every week on Tuesday until Jul 29...</span></div>` : none}</div></div>
       <div class="iconn"><div class="k">${AT_BIG(20)}Action Trace</div><div class="v">${first ? `
-        <span class="proc-link" data-hover-deck="po">PO Invoice Processing</span><div class="muted" style="color:var(--graphite-900)">Updated on Sep 22</div>
+        <div class="proc-row"><span class="proc-link" data-hover-deck="po">PO Invoice Processing</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="po" data-tip="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="po" data-tip="Add RoB meeting">${ic.calPlus(16)}</button></span></div><div class="muted" style="color:var(--graphite-900)">Updated on Sep 22</div>
         ${m.created ? robLine(esc(m.title), `${fmtDate(m.date,{month:'short',day:'numeric'})} • ${fmtTime(m.start).replace(' PM','pm').replace(' AM','am')}`, 'Every week on Friday', true) : ''}
         ${robLine('PO Invoice · Approval &amp; Payment', 'Oct 1 • 4:00pm', 'Every week on Tuesday')}
         <div style="height:16px"></div>
-        <span class="proc-link" data-hover-deck="nonpo">Non-PO Invoice Processing</span><div style="color:var(--graphite-900)">Updated on Sep 21</div>
+        <div class="proc-row"><span class="proc-link" data-hover-deck="nonpo">Non-PO Invoice Processing</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="nonpo" data-tip="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="nonpo" data-tip="Add RoB meeting">${ic.calPlus(16)}</button></span></div><div style="color:var(--graphite-900)">Updated on Sep 21</div>
         ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}
         <button class="add-link" style="margin-top:16px" data-act="new-meeting">${ic.plus(14)}Add [ ${robTag(14)} ROB ] Meeting</button>` : none}
       </div></div>
@@ -1218,7 +1231,7 @@ function annHTML(rec) {
 
 function renderAssignModal() {
   return `<div class="scrim" data-asg="cancel"></div><div class="asg-modal" role="dialog" aria-label="Managers and workers">
-    <div class="asg-modal-h"><div>${AT_BIG(20)}<b>Managers &amp; workers</b><span class="muted">· ${esc(PROCESSES[S.meeting.proc].name)}</span></div><button class="icon-btn" data-asg="cancel" aria-label="Close">${ic.close(16)}</button></div>
+    <div class="asg-modal-h"><div>${AT_BIG(20)}<b>Managers &amp; workers</b><span class="muted">· ${esc(PROCESSES[S.asg.proc || S.meeting.proc].name)}</span></div><button class="icon-btn" data-asg="cancel" aria-label="Close">${ic.close(16)}</button></div>
     <div class="asg-modal-b">${assignPanel()}</div>
   </div>`;
 }
@@ -1232,7 +1245,7 @@ function render() {
   if (S.initDrawer) L.push(['init', renderInitiative()]);
   if (S.raci) L.push(['raci', renderRaci()]);
   if (S.rec) L.push(['rec', renderRec()]);
-  if (S.asg && S.asg.ctx === 'meeting') L.push(['assign', renderAssignModal()]);
+  if (S.asg && S.asg.ctx !== 'create') L.push(['assign', renderAssignModal()]);
   // Preserve scroll positions of scrollable bodies across re-renders
   const keep = ['#createBody', '#meetBody', '#recBody', '.asg-modal-b', '.asg-table-wrap', '.asg-pop-list'].map(s => [s, $(s)?.scrollTop]);
   const focusId = document.activeElement?.id; const caret = document.activeElement?.selectionStart;
@@ -1304,7 +1317,7 @@ const FLOW = [
   [1,'New ROB · Action Trace processes adding'],
   [1.5,'New ROB · Assign workers to managers'],
   [2,'ROB · Action Trace added'],
-  [3,'Initiative · Action Trace connector view mode'],
+  [3,'Process · Action Trace connector view mode'],
   [4,'Recordings modal · Recording not selected'],
   [5,'Recordings modal · Recording selected, video started'],
   [6,'Recordings modal · Steps on timeline hover'],
@@ -1331,7 +1344,7 @@ function goFlow(n) {
   if (n === 1) S.create = newCreateState();
   if (n === 1.5) { S.create = Object.assign(newCreateState(), {proc:'po', steps:['match','disc','gl']}); }
   if (n === 2) S.meetingOpen = true;
-  if (n === 3) { S.page = 'initiatives'; S.initDrawer = true; }
+  if (n === 3) { S.page = 'processes'; S.initDrawer = true; }
   if (n >= 4 && n <= 9) { S.meetingOpen = true; S.rec = newRecState(); }
   if (n >= 5 && n <= 9) { S.rec.sel = rec.id; S.rec.t = 4; }
   if (n === 8) { S.rec.t = 12; S.rec.ann = {idx:null, start:2, end:12, text:'Worker hesitated on form field before submitting'}; }
@@ -1361,9 +1374,9 @@ document.addEventListener('click', e => {
 }, true);
 
 /* ───────────────────────── Events: managers & workers step ───────────────────────── */
-function openAssign(ctx) {
-  const src = ctx === 'create' ? S.create.assign : S.meeting.assign;
-  S.asg = {draft:cloneAssign(src), ctx, target:null, newOpen:null, newName:'', newTitle:''};
+function openAssign(ctx, proc) {
+  const src = ctx === 'create' ? S.create.assign : ctx === 'proc' ? (S.procAssign[proc] ?? (proc === S.meeting.proc ? S.meeting.assign : null)) : S.meeting.assign;
+  S.asg = {draft:cloneAssign(src), ctx, proc, target:null, newOpen:null, newName:'', newTitle:''};
   if (ctx === 'create') { S.create.atOpen = false; S.create.asgOpen = true; }
   render();
 }
@@ -1376,6 +1389,8 @@ function closeAssign(result) {   // undefined = cancel · 'skip' = everyone to t
     else if (result) { c.assign = result; c.asgDone = true; c.asgSkipped = false; }
     c.newPeople = participantsOf(c.assign).filter(k => !before.includes(k));
     c.asgOpen = false;
+  } else if (A.ctx === 'proc') {
+    if (result && result !== 'skip') { S.procAssign[A.proc] = result; if (A.proc === S.meeting.proc) S.meeting.assign = result; }
   } else if (result && result !== 'skip') S.meeting.assign = result;
   S.asg = null; render();
 }
@@ -1488,7 +1503,9 @@ document.addEventListener('click', e => {
     case 'raci-informed': S.raci.showInformed = !S.raci.showInformed; render(); break;
     case 'raci-compact': S.raci.compact = true; render(); break;
     case 'raci-comfy': S.raci.compact = false; render(); break;
-    case 'open-initiative': S.meetingOpen = false; S.page = 'initiatives'; S.initDrawer = true; S.flowStep = 3; render(); break;
+    case 'proc-people': openAssign('proc', d.proc); break;
+    case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, procLocked:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
+    case 'open-initiative': S.meetingOpen = false; S.page = 'processes'; S.initDrawer = true; S.flowStep = 3; render(); break;
     case 'close-initiative': S.initDrawer = false; hideInitDeck(); S.flowStep = null; render(); break;
     case 'pp': S.rec.playing ? pause() : play(); break;
     case 'speed': S.rec.speed = {1:1.5, 1.5:2, 2:1}[S.rec.speed]; render(); break;
@@ -1558,7 +1575,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (S.ddOpen) { S.ddOpen = null; render(); return; }
     if (S.asg && S.asg.newOpen) { S.asg.newOpen = null; render(); return; }
-    if (S.asg && S.asg.ctx === 'meeting') { closeAssign(); return; }
+    if (S.asg && S.asg.ctx !== 'create') { closeAssign(); return; }
     if (S.rec?.ann) { S.rec.ann = null; } else if (S.rec?.openFilter || S.rec?.diagOpen) { S.rec.openFilter = null; S.rec.diagOpen = false; }
     else if (S.rec) { S.rec = null; $('#pops').innerHTML = ''; } else if (S.raci) S.raci = null; else if (S.initDrawer) S.initDrawer = false;
     else if (S.create) S.create = null; else if (S.meetingOpen) S.meetingOpen = false;
