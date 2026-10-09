@@ -227,6 +227,7 @@
   .pop.down::after{top:-5px;left:var(--ax,40px);}
   .pop.up::after{bottom:-5px;left:var(--ax,200px);}
   .pop-mini{padding:6px;box-sizing:content-box;}
+  .deck-mini{height:365px;}   /* 7 rows + title + pager: fixed so paging never shifts the box */
   .deck-mini .right{padding:1.8em 1.6em 1.4em;}
   .deck-mini .right .ttl{margin-bottom:1.2em;}
   .deck-mini .pager{padding-top:1.2em;}
@@ -1312,9 +1313,10 @@ function renderDiagPop() {
 function showInitDeck(target, proc) {
   // Compact preview of the deck anchored to the process link: half the width, same
   // type size, so fewer people per page and more pages to step through.
-  const w = 270;
+  // Nearly the drawer's full width, fixed height so paging never shifts the box.
+  const drawer = target.closest('.idrawer'); const w = drawer ? drawer.clientWidth - 48 : 508;
   const m = {...S.meeting, proc, steps: proc === S.meeting.proc ? S.meeting.steps : ['capture','gl']};
-  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:0;top:0;visibility:hidden;width:${w}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users · ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`, size:{rows:7, cols:2}}).replace('class="deck"', 'class="deck deck-mini" style="font-size:12px;border-radius:2px"')}</div>`;
+  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:0;top:0;visibility:hidden;width:${w}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users · ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`, size:{rows:7, cols:4}}).replace('class="deck"', 'class="deck deck-mini" style="font-size:12px;border-radius:2px"')}</div>`;
   positionInitDeck(); $('#pops [data-pop=init]').style.visibility = '';
 }
 // Keep the preview glued to its link: re-run on every scroll and resize.
@@ -1324,7 +1326,8 @@ function positionInitDeck() {
   const b = link.getBoundingClientRect(), w = el.offsetWidth, pad = 6;
   const host = link.closest('.bd')?.getBoundingClientRect();
   if (host && (b.bottom < host.top || b.top > host.bottom)) return hideInitDeck();   // link scrolled out of view
-  const left = Math.max(8, Math.min(window.innerWidth - w - 8, b.left - 12));
+  const drawer = link.closest('.idrawer')?.getBoundingClientRect();
+  const left = drawer ? drawer.left + 24 - pad : Math.max(8, Math.min(window.innerWidth - w - 8 - pad * 2, b.left - 12));
   el.style.left = `${left}px`; el.style.top = `${Math.max(8, b.top - el.offsetHeight - 10)}px`; el.style.setProperty('--ax', `${b.left - left + 14 - pad}px`);
 }
 document.addEventListener('scroll', () => positionInitDeck(), true);
