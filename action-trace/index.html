@@ -226,6 +226,8 @@
   .pop::after{content:"";position:absolute;width:12px;height:12px;background:#262d3d;transform:rotate(45deg);}
   .pop.down::after{top:-5px;left:var(--ax,40px);}
   .pop.up::after{bottom:-5px;left:var(--ax,200px);}
+  .pop-mini{padding:6px;box-sizing:content-box;}
+  .pop-mini .pop-scale{transform:scale(.5);transform-origin:0 0;}
   .tip{position:absolute;z-index:40;background:#262d3d;color:#fff;font-size:13px;line-height:18px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;transform:translateX(-50%);}
   .tip.sm{font-size:9px;line-height:12px;padding:2px 6px;}
 
@@ -1305,11 +1307,14 @@ function renderDiagPop() {
   host.innerHTML = `<div class="pop down" data-pop="diag" style="left:${left}px;top:${b.bottom + 10}px;width:800px;--ax:${b.left - left + 6}px">${deck(S.meeting, 'diag', {stepsTitle:'Steps included for Recordings<br>of Invoicing Process', rightTitle:'Managers &amp; Users'}).replace('class="deck"', 'class="deck" style="font-size:11.5px;border-radius:2px"')}</div>`;
 }
 function showInitDeck(target, proc) {
-  const b = target.getBoundingClientRect(); const w = 516;
+  // Half-size preview of the deck, anchored to the process link (arrow under its first words).
+  const b = target.getBoundingClientRect(); const full = 516, w = full / 2, pad = 6;
   const m = {...S.meeting, proc, steps: proc === S.meeting.proc ? S.meeting.steps : ['capture','gl']};
-  const left = Math.min(window.innerWidth - w - 16, b.left - 200);
-  $('#pops').innerHTML = `<div class="pop up" data-pop="init" data-proc="${proc}" style="left:${left}px;top:0;visibility:hidden;width:${w}px;--ax:${b.left - left + 6}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users for Recordings of ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`}).replace('class="deck"', 'class="deck" style="font-size:10.5px;border-radius:2px"')}</div>`;
-  const el = $('#pops [data-pop=init]'); el.style.top = `${Math.max(8, b.top - el.offsetHeight - 12)}px`; el.style.visibility = '';
+  const left = Math.max(8, Math.min(window.innerWidth - w - pad * 2 - 8, b.left - 12));
+  $('#pops').innerHTML = `<div class="pop up pop-mini" data-pop="init" data-proc="${proc}" style="left:${left}px;top:0;visibility:hidden;width:${w}px;--ax:${b.left - left + 14}px"><div class="pop-scale" style="width:${full}px">${deck(m, 'init', {showLeft:false, rightTitle:`Managers &amp; Users for Recordings of ${proc === 'po' ? 'Invoicing' : 'Non-PO'} Process`}).replace('class="deck"', 'class="deck" style="font-size:10.5px;border-radius:2px"')}</div></div>`;
+  const el = $('#pops [data-pop=init]'), inner = el.querySelector('.pop-scale');
+  el.style.height = `${inner.offsetHeight / 2}px`;
+  el.style.top = `${Math.max(8, b.top - el.offsetHeight - 10)}px`; el.style.visibility = '';
 }
 function hideInitDeck() { $('#pops [data-pop=init]')?.remove(); }
 
@@ -1581,7 +1586,7 @@ document.addEventListener('mouseover', e => {
   const h = e.target.closest('[data-hover-deck]');
   if (h) { clearTimeout(hoverTimer); showInitDeck(h, h.dataset.hoverDeck); return; }
   if (e.target.closest('[data-pop=init]')) { clearTimeout(hoverTimer); return; }
-  if ($('#pops [data-pop=init]')) { clearTimeout(hoverTimer); hoverTimer = setTimeout(hideInitDeck, 180); }
+  if ($('#pops [data-pop=init]')) { clearTimeout(hoverTimer); hoverTimer = setTimeout(hideInitDeck, 250); }
 });
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,[contenteditable]')) return;
