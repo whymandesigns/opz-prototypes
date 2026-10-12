@@ -288,7 +288,7 @@
   --color-info-subtle:    var(--ic-palette-blue-100);
 
   /* ---- Overlays ---- */
-  --color-overlay:        rgba(0, 0, 0, 0.5); /* black @ 50% — matches TopTeam's drawer/modal scrim */
+  --color-overlay:        rgba(38, 45, 61, 0.5); /* graphite-900 @ 50% — for modal scrims */
 
   /* ---- Type roles (size + line height paired) ---- */
   --type-h1: var(--ic-weight-semibold) var(--ic-text-2xl)/var(--ic-lh-h1) var(--ic-font-sans);
@@ -3363,6 +3363,97 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   color: var(--color-text-muted);
 }
 
+/* ---------- Date picker ----------
+ * Calendar popover on a date field. The field is the usual .input-icon
+ * (calendar glyph left); the panel is built and wired by the [data-datepicker]
+ * handler in example.html — header (‹ Month Year ›), weekday row, a 6×7 day
+ * grid, and a Today / Clear footer.
+ *
+ *   <div class="datepicker" data-datepicker>
+ *     <div class="input-icon input-icon-left">
+ *       <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
+ *       <input class="input datepicker-input" type="text" placeholder="Select date" autocomplete="off" />
+ *     </div>
+ *   </div>
+ *
+ * Options (attributes on .datepicker):
+ *   data-min="2026-10-01"      earliest pickable day (ISO)
+ *   data-min-from="#start-id"  earliest = the date in another date field (ranges)
+ *   data-align="end"           right-align the panel to the field
+ * Picking a day writes "Oct 12, 2026" into the input and fires input + change,
+ * so form logic listening to the field reacts as if it were typed.
+ * States: day .is-today · .is-selected · .is-outside (other month) · :disabled.
+ */
+.datepicker { position: relative; }
+.datepicker > .input-icon,
+.datepicker .datepicker-input { width: 100%; }
+.datepicker-panel {
+  position: absolute;
+  top: calc(100% + var(--ic-space-1));
+  left: 0;
+  z-index: var(--ic-z-dropdown);
+  width: 280px;
+  padding: var(--ic-space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ic-space-2);
+}
+.datepicker-panel[hidden] { display: none; }
+.datepicker[data-align="end"] .datepicker-panel { left: auto; right: 0; }
+.datepicker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ic-space-2);
+}
+.datepicker-month {
+  font: var(--type-body-sm-semibold);
+  color: var(--color-text);
+}
+/* Next arrow is the left chevron flipped — the sprite has no chevron-right. */
+.datepicker-next .icon { transform: scaleX(-1); }
+.datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.datepicker-dow {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--type-caption);
+  color: var(--color-text-subtle);
+}
+.datepicker-day {
+  height: 32px;
+  border: 0;
+  border-radius: var(--ic-radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font: var(--type-body-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease);
+}
+.datepicker-day:hover { background: var(--color-surface-muted); }
+.datepicker-day:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
+.datepicker-day.is-outside { color: var(--color-text-subtle); }
+.datepicker-day.is-today { font-weight: var(--ic-weight-semibold); box-shadow: inset 0 0 0 1px var(--color-border-strong); }
+.datepicker-day.is-selected,
+.datepicker-day.is-selected:hover { background: var(--color-accent); color: var(--color-text-inverse); box-shadow: none; }
+.datepicker-day:disabled { color: var(--color-text-subtle); opacity: 0.4; cursor: not-allowed; background: transparent; }
+.datepicker-foot {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--ic-space-2);
+}
+
 /* Generic dropdown wrapper — pairs a `.dropdown-trigger` with a `.dropdown-menu` */
 .dropdown {
   position: relative;
@@ -3628,6 +3719,118 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .map-pop-link { color: var(--color-text-link); text-decoration: none; font: var(--type-body-sm-semibold); }
 .map-pop-link:hover { text-decoration: underline; }
 .map-pop-note { font: var(--type-body-xs); color: var(--color-text-muted); }
+
+    /* === review.css === */
+/* review.css — the review bar (author/reviewer tooling).
+ *
+ * Auto-inlined into every prototype by inline.py together with review.js, but
+ * NOT part of the three-layer design system chain. It is dormant until the
+ * prototype is opened with `?review=1` (the choice is remembered per page;
+ * `?review=0` turns it off again).
+ *
+ * What it gives reviewers, from a bar at the bottom of the page:
+ *   Interact   – use the prototype normally
+ *   Edit text  – click any text and retype it (persisted, reapplied after re-renders)
+ *   Comment    – click any element and leave a note on it; pins + side panel
+ *   Spotlight  – drag a rectangle; everything outside it is dimmed
+ *
+ * Everything is namespaced `.rv-*` and self-coloured (no dependency on the
+ * host page's tokens) so it works on any prototype, old or new.
+ */
+
+.rv-bar,.rv-side,.rv-hover,.rv-pin,.rv-outline,.rv-spot{
+  --rv-ink:#1d2433;--rv-ink-2:#455065;--rv-muted:#8a93a6;--rv-line:#d8d9dc;--rv-line-soft:#ebeced;
+  --rv-blue:#204ecf;--rv-blue-soft:#edf1fd;--rv-orange:#ff8a3d;--rv-green:#00cc83;--rv-red:#d93e3e;
+  font-family:"Proxima Nova",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--rv-ink);box-sizing:border-box;}
+.rv-bar *,.rv-side *{box-sizing:border-box;}
+.rv-hidden{display:none !important;}
+
+/* Floating toggle — bottom right of every page, even when the bar is off */
+.rv-toggle{position:fixed;right:20px;bottom:20px;z-index:2200;width:44px;height:44px;border-radius:50%;border:1px solid #d8d9dc;background:#fff;color:#1d2433;
+  display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .12s,background .12s;}
+.rv-toggle:hover{transform:scale(1.06);}
+.rv-toggle.on{background:#1d2433;border-color:#1d2433;color:#fff;}
+body.rv-side-open .rv-toggle{display:none;}
+body.rv-edit .rv-toggle,body.rv-comment .rv-toggle,body.rv-spotmode .rv-toggle{cursor:pointer !important;}
+
+/* Bar */
+.rv-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2000;display:flex;align-items:center;gap:4px;
+  background:#1d2433;border-radius:22px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:13px;}
+.rv-bar button{height:32px;border:none;border-radius:16px;background:none;color:#cfd4de;padding:0 14px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;cursor:pointer;}
+.rv-bar button:hover{background:rgba(255,255,255,.08);color:#fff;}
+.rv-bar button.on{background:#fff;color:#1d2433;font-weight:600;}
+.rv-bar .k{font-size:10px;opacity:.55;border:1px solid currentColor;border-radius:3px;padding:0 4px;line-height:14px;}
+.rv-bar .n{background:var(--rv-orange);color:#fff;border-radius:9px;font-size:10px;font-weight:700;padding:0 6px;line-height:16px;}
+.rv-bar .st{color:var(--rv-muted);font-size:11px;padding:0 10px 0 6px;white-space:nowrap;}
+.rv-bar .sep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 2px;}
+
+/* Hover highlight */
+.rv-hover{position:fixed;z-index:1900;pointer-events:none;border:2px solid var(--rv-blue);border-radius:3px;background:rgba(32,78,207,.06);transition:all .05s;}
+.rv-hover.c{border-color:var(--rv-orange);background:rgba(255,138,61,.08);}
+.rv-hover .lb{position:absolute;left:-2px;top:-20px;background:var(--rv-blue);color:#fff;font-size:10px;line-height:18px;padding:0 6px;border-radius:3px 3px 0 0;white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis;}
+.rv-hover.c .lb{background:var(--rv-orange);}
+
+/* Mode cursors (the review UI itself keeps its own cursors) */
+body.rv-edit,body.rv-edit *{cursor:text !important;}
+body.rv-comment,body.rv-comment *,body.rv-spotmode,body.rv-spotmode *{cursor:crosshair !important;}
+body.rv-edit .rv-bar *,body.rv-comment .rv-bar *,body.rv-spotmode .rv-bar *,body.rv-edit .rv-side *,body.rv-comment .rv-side *,body.rv-spotmode .rv-side *,.rv-pin{cursor:pointer !important;}
+body.rv-edit .rv-side textarea,body.rv-comment .rv-side textarea{cursor:text !important;}
+body.rv-spotmode{user-select:none;}
+.rv-editing{outline:2px solid var(--rv-blue);outline-offset:2px;border-radius:2px;background:rgba(32,78,207,.08);white-space:pre-wrap;min-width:8px;display:inline-block;}
+
+/* Pins */
+.rv-pins{position:fixed;inset:0;pointer-events:none;z-index:1800;}
+.rv-pin{position:fixed;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50% 50% 50% 2px;background:var(--rv-orange);color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;}
+.rv-pin.done{background:var(--rv-green);}
+.rv-pin.sel{transform:scale(1.2);}
+.rv-outline{position:fixed;z-index:1790;pointer-events:none;border:2px dashed var(--rv-orange);border-radius:3px;}
+
+/* Side panel */
+.rv-side{position:fixed;top:0;right:0;bottom:0;width:360px;z-index:2100;background:#fff;border-left:1px solid var(--rv-line);box-shadow:-8px 0 30px rgba(0,0,0,.12);
+  display:flex;flex-direction:column;font-size:13px;line-height:19px;animation:rvin .18s ease-out;}
+@keyframes rvin{from{transform:translateX(24px);}}
+.rv-side .h{display:flex;align-items:center;gap:8px;padding:16px 16px 12px;border-bottom:1px solid var(--rv-line-soft);}
+.rv-side .h b{font-size:15px;flex:1;}
+.rv-side .x{width:24px;height:24px;border:none;background:none;border-radius:4px;color:var(--rv-ink-2);font-size:16px;line-height:1;cursor:pointer;}
+.rv-side .x:hover{background:var(--rv-line-soft);}
+.rv-side .tabs2{display:flex;gap:4px;padding:8px 16px;border-bottom:1px solid var(--rv-line-soft);}
+.rv-side .tabs2 button{border:1px solid var(--rv-line);background:#fff;border-radius:12px;padding:0 10px;height:24px;font:inherit;font-size:12px;color:var(--rv-ink-2);cursor:pointer;}
+.rv-side .tabs2 button.on{background:#2b3446;border-color:#2b3446;color:#fff;}
+.rv-side .body{flex:1;overflow:auto;padding:12px 16px;}
+.rv-compose{border:1px solid #ffb98a;background:#fff8f3;border-radius:6px;padding:12px;margin-bottom:16px;}
+.rv-target{font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:16px;background:#fff;border:1px solid var(--rv-line);border-radius:4px;padding:6px 8px;color:var(--rv-ink-2);word-break:break-word;}
+.rv-compose textarea{width:100%;min-height:88px;margin-top:10px;border:1px solid var(--rv-line);border-radius:4px;padding:8px 10px;font:inherit;resize:vertical;outline:none;background:#fff;color:var(--rv-ink);}
+.rv-compose textarea:focus{border-color:var(--rv-orange);}
+.rv-compose .f{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;align-items:center;}
+.rv-compose .f .hint{margin:0 auto 0 0;color:var(--rv-muted);font-size:11px;}
+.rv-side .btn{height:32px;padding:0 14px;border:1px solid var(--rv-line);border-radius:4px;background:#fff;color:var(--rv-ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.rv-side .btn:hover{border-color:var(--rv-muted);}
+.rv-side .btn.primary{background:var(--rv-blue);border-color:var(--rv-blue);color:#fff;}
+.rv-c{border:1px solid var(--rv-line-soft);border-radius:6px;padding:10px 12px;margin-bottom:10px;cursor:pointer;}
+.rv-c:hover{border-color:var(--rv-line);}
+.rv-c.sel{border-color:var(--rv-orange);box-shadow:0 0 0 2px rgba(255,138,61,.15);}
+.rv-c .t{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rv-c .num{width:20px;height:20px;border-radius:50% 50% 50% 2px;background:var(--rv-orange);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rv-c.done .num{background:var(--rv-green);}
+.rv-c .el{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--rv-ink-2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rv-c .msg{white-space:pre-wrap;color:var(--rv-ink);}
+.rv-c .meta2{display:flex;gap:10px;align-items:center;margin-top:8px;font-size:11px;color:var(--rv-muted);}
+.rv-c .meta2 button{border:none;background:none;padding:0;font:inherit;font-size:11px;color:var(--rv-blue);cursor:pointer;}
+.rv-c .meta2 button.del{color:var(--rv-red);}
+.rv-c .res{margin-top:8px;padding:6px 8px;background:#e6faf2;border-radius:4px;font-size:12px;color:#05704f;}
+.rv-side .foot{border-top:1px solid var(--rv-line-soft);padding:12px 16px;font-size:12px;color:var(--rv-ink-2);}
+.rv-side .foot .btn{height:28px;font-size:12px;margin-top:8px;}
+.rv-empty{color:var(--rv-muted);text-align:center;padding:32px 8px;}
+
+/* Spotlight: the box stays clear, a huge spread shadow darkens the rest of the page */
+.rv-spot{position:fixed;z-index:1700;pointer-events:none;border-radius:6px;box-shadow:0 0 0 200vmax rgba(0,0,0,.7);transition:box-shadow .15s;}
+.rv-spot.drawing{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:0;}
+
+/* Side panel footer: author name + inline "change" button */
+.rv-side .foot b{color:var(--rv-ink);}
+.rv-side .foot button:not(.btn){border:none;background:none;padding:0;font:inherit;font-size:12px;color:var(--rv-blue);cursor:pointer;}
+.rv-c .meta2 b{color:var(--rv-ink-2);font-weight:600;}
 
   </style>
   <style>
@@ -4175,10 +4378,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-cs-name-row > .in-name-field { flex: 1; min-width: 0; }
     .in-cs-close { flex: none; color: var(--color-text-muted); }
     /* Title input matches the form column below (grid minus the 200px TOC
-       rail and its gap); the close button pins 32px from the screen's right edge. */
+       rail and its gap); the close button pins to the content's right edge. */
     #in-drawer-new .drawer-header { position: relative; }
     #in-drawer-new .in-cs-name-row > .in-name-field { flex: none; width: calc(100% - 200px - var(--ic-space-7)); }
-    #in-drawer-new .drawer-header .in-cs-close { position: absolute; top: var(--ic-space-5); right: 32px; }
+    /* Close sticks to the content's right edge (same cap as the padding
+       below), so on wide screens it stays with the form instead of drifting
+       to the far side of the display. */
+    #in-drawer-new .drawer-header .in-cs-close { position: absolute; top: var(--ic-space-5); right: max(var(--ic-space-6), calc(100% - 1120px - var(--ic-space-6))); }
     @media (max-width: 1100px) {
       #in-drawer-new .in-cs-name-row > .in-name-field { width: calc(100% - 40px); }
     }
@@ -4188,14 +4394,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        correction the file already makes for .btn-icon-only.btn-secondary. */
     [data-theme="dark"] .in-cs-close { color: var(--color-text); }
 
-    /* Centre the content on wide screens — edge-to-edge fields across a 2560px
-       display would otherwise stretch the whole way. Symmetric padding does it
-       without touching the sections' own flex behaviour: centring via
-       align-items collapses the grid to its content width instead. */
+    /* Cap the content at 1120px (form column + TOC rail) and anchor it left:
+       on wide screens the extra space goes to the right instead of stretching
+       the fields across a 2560px display. Done with padding so the sections'
+       own flex behaviour is untouched — header, body and footer share it, so
+       the title, form and footer actions all keep one right edge. */
     #in-drawer-new .drawer-header,
     #in-drawer-new .drawer-body,
     #in-drawer-new .drawer-footer {
-      padding-inline: max(var(--ic-space-6), calc((100% - 1120px) / 2));
+      padding-left: var(--ic-space-6);
+      padding-right: max(var(--ic-space-6), calc(100% - 1120px - var(--ic-space-6)));
     }
 
     /* Body — form column + sticky TOC rail (the RoB .cm-grid pattern). */
@@ -4205,12 +4413,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       gap: var(--ic-space-7);
       align-items: start;
     }
-    .in-cs-col { min-width: 0; display: flex; flex-direction: column; gap: var(--ic-space-7); }
-    .in-cs { scroll-margin-top: var(--ic-space-4); }
+    /* Spacing rhythm: 24px between topic sections (General, Timeline, …),
+       16px between fields inside a section — headline to first field
+       included, hence the title's own margin is zeroed below. */
+    .in-cs-col { min-width: 0; display: flex; flex-direction: column; gap: var(--ic-space-5); }
+    .in-cs { scroll-margin-top: var(--ic-space-4); display: flex; flex-direction: column; gap: var(--ic-space-4); }
+    .in-cs .in-form-rows { gap: var(--ic-space-4); }
+    /* Connections nests an .in-section (border-top + 24px padding, its own
+       gap) — flattened here so it follows the same rhythm as the others. */
+    #in-cs-connections > .in-section,
+    #in-cs-documents > .in-section { border-top: 0; padding-top: 0; gap: var(--ic-space-4); }
+    .in-cs .in-conns { gap: var(--ic-space-4); }
     .in-cs-title {
       font: var(--type-h3);
       color: var(--color-text);
-      margin: 0 0 var(--ic-space-4);
+      margin: 0;
       padding-bottom: var(--ic-space-2);
       border-bottom: 1px solid var(--color-border);
     }
@@ -4677,10 +4894,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-users-three" viewBox="0 0 24 24"><use href="#i-focus-group"/></symbol>
   <symbol id="i-warning-octagon" viewBox="0 0 24 24"><use href="#i-exclamation-solid"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><use href="#i-close"/></symbol>
-  <!-- Beneficiary function menu icons — exported from Figma 19419:44205. -->
-  <symbol id="i-fn-function" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 0C6.52724 0 5.33333 1.19391 5.33333 2.66667C5.33333 3.95678 6.24947 5.03291 7.46667 5.27999V7.46667H2.13333V10.6667H0V16H5.33333V10.6667H3.2V8.53333H12.8V10.6667H10.6667V16H16V10.6667H13.8667V7.46667H8.53333V5.27999C9.75053 5.03291 10.6667 3.95678 10.6667 2.66667C10.6667 1.19391 9.47276 0 8 0ZM8.00002 4.26667C8.88368 4.26667 9.60002 3.55032 9.60002 2.66667C9.60002 1.78301 8.88368 1.06667 8.00002 1.06667C7.11636 1.06667 6.40002 1.78301 6.40002 2.66667C6.40002 3.55032 7.11636 4.26667 8.00002 4.26667ZM1.06667 11.7333H4.26667V14.9333H1.06667V11.7333ZM11.7333 11.7333H14.9333V14.9333H11.7333V11.7333Z" fill="#455065"/></symbol>
-  <symbol id="i-fn-arrow" viewBox="0 0 16 16"><path d="M9.79289 5.5L12.2929 8H2V9H12.2929L9.79289 11.5L10.5 12.2071L14.2071 8.5L10.5 4.79289L9.79289 5.5Z" fill="#455065"/></symbol>
-  <symbol id="i-fn-view" viewBox="0 0 12 12"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.75 1.5V10.5V11.25H1.5H10.5H11.25V10.5V6.75H10.5V10.5H1.5V1.5H5.25V0.75H1.5H0.75V1.5ZM10.5 4.5V2.03033L6.375 6.15533L5.84467 5.625L9.96967 1.5H7.5V0.75H10.5H11.25V1.5V4.5H10.5Z" fill="#455065"/></symbol>
   <symbol id="i-gift" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="2.99994" y="12.1819" width="17.9996" height="10.4998" stroke="currentColor"/> <path vector-effect="non-scaling-stroke" d="M8.99967 6.36398L7.23194 4.59625C6.4509 3.81522 6.4509 2.54891 7.23194 1.76788L7.58548 1.41433C8.36652 0.6333 9.63282 0.6333 10.4139 1.41433L11.9996 3.00011" stroke="currentColor" stroke-width="0.99998"/> <path vector-effect="non-scaling-stroke" d="M15.5626 6.16551L16.1592 5.5689L17.1315 4.59664C17.9125 3.81561 17.9125 2.54931 17.1315 1.76827L16.7779 1.4147C15.9969 0.633681 14.7306 0.63367 13.9496 1.41468L12.1818 3.1824" stroke="currentColor" stroke-width="0.99998" stroke-linecap="round"/> <rect vector-effect="non-scaling-stroke" x="1.49997" y="6.182" width="20.9996" height="5.99988" stroke="currentColor"/> <path vector-effect="non-scaling-stroke" d="M11.9998 3.18206L11.9998 22.6817" stroke="currentColor" stroke-width="0.99998"/></symbol>
   <symbol id="i-happy-emoji" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M12 23.5C18.3513 23.5 23.5 18.3513 23.5 12C23.5 5.64873 18.3513 0.5 12 0.5C5.64873 0.5 0.5 5.64873 0.5 12C0.5 18.3513 5.64873 23.5 12 23.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M8.5 9V6" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15.5 9V6" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M5.32996 12.5C5.70996 15.87 8.52996 18.5 12 18.5C15.47 18.5 18.3 15.87 18.67 12.5H5.32996Z" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
   <symbol id="i-sad-emoji" viewBox="0 0 24 24"><g> <path vector-effect="non-scaling-stroke" d="M12 23.5C18.3513 23.5 23.5 18.3513 23.5 12C23.5 5.64873 18.3513 0.5 12 0.5C5.64873 0.5 0.5 5.64873 0.5 12C0.5 18.3513 5.64873 23.5 12 23.5Z" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M6 12L9 11.25" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15 11.25L18 12" stroke="currentColor" stroke-miterlimit="10"/> <path vector-effect="non-scaling-stroke" d="M15.75 17.25C15.75 17.25 14.25 15.75 12 15.75C9.75 15.75 8.25 17.25 8.25 17.25" stroke="currentColor" stroke-miterlimit="10"/> </g></symbol>
@@ -5504,20 +5717,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <label class="in-form-row in-row-top">
             <span class="field-label">Start date</span>
             <div class="field">
+              <div class="datepicker" data-datepicker>
               <div class="input-icon input-icon-left">
               <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
-              <input class="input" type="text" id="in-start" value="" placeholder="Add start date" aria-label="Start date" aria-required="true" aria-describedby="in-start-error" />
+              <input class="input datepicker-input" type="text" id="in-start" value="" placeholder="Add start date" aria-label="Start date" aria-required="true" aria-describedby="in-start-error" />
             </div>
+              </div>
               <span class="field-hint is-error" id="in-start-error" hidden>Add a start date to create this initiative.</span>
             </div>
           </label>
           <label class="in-form-row in-row-top">
             <span class="field-label">End date</span>
             <div class="field">
+              <div class="datepicker" data-datepicker data-min-from="#in-start">
               <div class="input-icon input-icon-left">
               <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
-              <input class="input" type="text" id="in-end" placeholder="Add end date" aria-label="End date" aria-required="true" aria-describedby="in-end-error" />
+              <input class="input datepicker-input" type="text" id="in-end" placeholder="Add end date" aria-label="End date" aria-required="true" aria-describedby="in-end-error" />
             </div>
+              </div>
               <span class="field-hint is-error" id="in-end-error" hidden>Add an end date to create this initiative.</span>
             </div>
           </label>
@@ -5606,7 +5823,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </section>
         <section class="in-cs" id="in-cs-connections">
         <section class="in-section">
-          <h3 class="in-section-title">Connections</h3>
+          <h3 class="in-cs-title">Connections</h3>
           <div class="in-conns">
             <div class="in-conn-wrap" data-conn="slack">
               <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -5654,12 +5871,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </section>
         </section>
         <section class="in-cs" id="in-cs-more">
-        <div class="accordion-group borders-none in-section in-details">
-          <div class="accordion is-open">
-            <button class="accordion-summary" type="button" aria-expanded="true"><span class="accordion-title" data-open-label="Less details" data-closed-label="More details">Less details</span><svg class="icon accordion-chevron"><use href="#i-chevron-down"/></svg></button>
-            <div class="accordion-details"><div class="in-details-body"><div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
+          <!-- Was a "More / Less details" accordion; now an always-open section
+               with a headline, like General / Timeline / Description. -->
+          <h3 class="in-cs-title">More details</h3>
+          <div class="in-details-body"><div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
+
+          </div>
+        </section>
+        <section class="in-cs" id="in-cs-documents">
                 <section class="in-section">
-                  <h3 class="in-section-title">Documents</h3>
+                  <h3 class="in-cs-title">Documents</h3>
                   <div class="dropzone-field" data-dropzone>
                     <label class="dropzone">
                       <input class="dropzone-input" type="file" multiple aria-label="Upload documents">
@@ -5685,14 +5906,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                     </div>
                   </template>
                 </section>
-
-                <section class="in-section">
-                  <h3 class="in-section-title">Projects</h3>
-                  <p class="in-locked"><svg class="icon icon-16"><use href="#i-lock"/></svg>You can add Projects after you create this initiative.</p>
-                </section>
-            </div></div>
-          </div>
-        </div>
+        </section>
+        <section class="in-cs" id="in-cs-projects">
+          <h3 class="in-cs-title">Projects</h3>
+          <p class="in-locked"><svg class="icon icon-16"><use href="#i-lock"/></svg>You can add Projects after you create this initiative.</p>
         </section>
           </div>
           <nav class="in-cs-toc" aria-label="Form sections" data-in-toc>
@@ -5702,6 +5919,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <a class="in-cs-toc-item" href="#in-cs-strategy" data-in-toc-target="in-cs-strategy"><svg class="icon"><use href="#i-okr"/></svg>Strategy</a>
             <a class="in-cs-toc-item" href="#in-cs-connections" data-in-toc-target="in-cs-connections"><svg class="icon"><use href="#i-connectors"/></svg>Connections</a>
             <a class="in-cs-toc-item" href="#in-cs-more" data-in-toc-target="in-cs-more"><svg class="icon"><use href="#i-settings"/></svg>More details</a>
+            <a class="in-cs-toc-item" href="#in-cs-documents" data-in-toc-target="in-cs-documents"><svg class="icon"><use href="#i-attachment"/></svg>Documents</a>
+            <a class="in-cs-toc-item" href="#in-cs-projects" data-in-toc-target="in-cs-projects"><svg class="icon"><use href="#i-folder"/></svg>Projects</a>
           </nav>
         </div>
 
@@ -6477,7 +6696,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           li.innerHTML = `<span class="in-multi-num" aria-hidden="true"></span>`
             + `<input class="input" type="text" maxlength="200" placeholder="${esc(placeholder)}" />`
             + `<button class="btn btn-icon-only btn-ghost btn-xs in-multi-handle" type="button" aria-label="Reorder ${noun}" data-tooltip="Drag to reorder"><svg class="icon"><use href="#i-drag"/></svg></button>`
-            + `<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove ${noun}" data-multi-remove><svg class="icon"><use href="#i-x"/></svg></button>`;
+            + `<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove ${noun}" data-multi-remove><svg class="icon"><use href="#i-trash"/></svg></button>`;
           list.append(li);
           renumber();
           if (focus) li.querySelector('input').focus();
@@ -7987,6 +8206,151 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       render();
     })();
+  </script>
+
+  <script>
+    // designmd date picker handler (example.html) — copied as-is.
+    // Date picker — calendar popover on any [data-datepicker] field (see the
+    // .datepicker block in components.css). Self-contained: copy this block
+    // into a prototype as-is. Opens on focus / click / ↓; ←↑→↓ move by day /
+    // week, PageUp/PageDown by month, Home/End to week edges, Enter picks,
+    // Escape closes. Picking writes "Oct 12, 2026" and fires input + change.
+    (function () {
+      const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const DOW = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']; // weeks start Monday
+      const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const day0 = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const parse = v => {
+        if (!v || !String(v).trim()) return null;
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v).trim());
+        const d = m ? new Date(+m[1], m[2] - 1, +m[3]) : new Date(Date.parse(v));
+        return isNaN(d) ? null : day0(d);
+      };
+
+      document.querySelectorAll('[data-datepicker]').forEach(dp => {
+        const input = dp.querySelector('.datepicker-input') || dp.querySelector('input');
+        if (!input || dp.dataset.dpReady) return;
+        dp.dataset.dpReady = '1';
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('aria-haspopup', 'dialog');
+        input.setAttribute('aria-expanded', 'false');
+
+        const panel = document.createElement('div');
+        panel.className = 'datepicker-panel';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-label', 'Choose date');
+        panel.hidden = true;
+        panel.innerHTML = `
+          <div class="datepicker-head">
+            <button class="btn btn-icon-only btn-ghost btn-xs datepicker-prev" type="button" aria-label="Previous month"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+            <span class="datepicker-month" aria-live="polite"></span>
+            <button class="btn btn-icon-only btn-ghost btn-xs datepicker-next" type="button" aria-label="Next month"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+          </div>
+          <div class="datepicker-grid" role="grid"></div>
+          <div class="datepicker-foot">
+            <button class="btn btn-ghost btn-xs" type="button" data-dp-today>Today</button>
+            <button class="btn btn-ghost btn-xs" type="button" data-dp-clear>Clear</button>
+          </div>`;
+        dp.appendChild(panel);
+        const grid = panel.querySelector('.datepicker-grid');
+        const label = panel.querySelector('.datepicker-month');
+        let view = null;   // first of the month on show
+        let focus = null;  // day with the roving focus
+
+        const minDate = () => {
+          if (dp.dataset.minFrom) return parse(document.querySelector(dp.dataset.minFrom)?.value);
+          return parse(dp.dataset.min);
+        };
+        const render = () => {
+          const sel = parse(input.value), today = day0(new Date()), min = minDate();
+          label.textContent = `${MONTHS[view.getMonth()]} ${view.getFullYear()}`;
+          const lead = (view.getDay() + 6) % 7; // Monday-first offset
+          const start = new Date(view.getFullYear(), view.getMonth(), 1 - lead);
+          let html = DOW.map(d => `<span class="datepicker-dow" aria-hidden="true">${d}</span>`).join('');
+          for (let i = 0; i < 42; i++) {
+            const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+            const cls = ['datepicker-day'];
+            if (d.getMonth() !== view.getMonth()) cls.push('is-outside');
+            if (+d === +today) cls.push('is-today');
+            if (sel && +d === +sel) cls.push('is-selected');
+            const off = min && d < min;
+            const isFocus = focus && +d === +focus;
+            html += `<button class="${cls.join(' ')}" type="button" data-date="${iso(d)}" tabindex="${isFocus ? 0 : -1}"${off ? ' disabled' : ''} aria-label="${fmt(d)}"${sel && +d === +sel ? ' aria-selected="true"' : ''}>${d.getDate()}</button>`;
+          }
+          grid.innerHTML = html;
+          const prevEnd = new Date(view.getFullYear(), view.getMonth(), 0);
+          panel.querySelector('.datepicker-prev').disabled = !!(min && prevEnd < min);
+          panel.querySelector('[data-dp-today]').disabled = !!(min && today < min);
+        };
+        const open = (focusGrid = false) => {
+          if (!panel.hidden) return;
+          document.querySelectorAll('.datepicker-panel:not([hidden])').forEach(p => { p.hidden = true; });
+          const sel = parse(input.value), min = minDate(), today = day0(new Date());
+          focus = sel || (min && today < min ? min : today);
+          view = new Date(focus.getFullYear(), focus.getMonth(), 1);
+          render();
+          panel.hidden = false;
+          input.setAttribute('aria-expanded', 'true');
+          if (focusGrid) grid.querySelector('[tabindex="0"]')?.focus();
+        };
+        const close = (refocus = false) => {
+          if (panel.hidden) return;
+          panel.hidden = true;
+          input.setAttribute('aria-expanded', 'false');
+          if (refocus) input.focus();
+        };
+        const pick = d => {
+          input.value = d ? fmt(d) : '';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          close(true);
+        };
+        const moveFocus = d => {
+          const min = minDate();
+          if (min && d < min) d = min;
+          focus = d;
+          if (d.getMonth() !== view.getMonth() || d.getFullYear() !== view.getFullYear()) view = new Date(d.getFullYear(), d.getMonth(), 1);
+          render();
+          grid.querySelector('[tabindex="0"]')?.focus();
+        };
+
+        input.addEventListener('focus', () => open());
+        input.addEventListener('click', () => open());
+        dp.querySelector('.input-icon-glyph')?.addEventListener('click', () => { input.focus(); open(); });
+        input.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); panel.hidden ? open(true) : grid.querySelector('[tabindex="0"]')?.focus(); }
+          else if (e.key === 'Escape' && !panel.hidden) { e.stopPropagation(); close(); }
+        });
+        // Typing a valid date jumps the open calendar to it.
+        input.addEventListener('input', e => {
+          if (!e.isTrusted || panel.hidden) return;
+          const d = parse(input.value);
+          if (d) { focus = d; view = new Date(d.getFullYear(), d.getMonth(), 1); render(); }
+        });
+        panel.addEventListener('click', e => {
+          const day = e.target.closest('.datepicker-day');
+          if (day && !day.disabled) { pick(parse(day.dataset.date)); return; }
+          if (e.target.closest('.datepicker-prev')) { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render(); return; }
+          if (e.target.closest('.datepicker-next')) { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render(); return; }
+          if (e.target.closest('[data-dp-today]')) { pick(day0(new Date())); return; }
+          if (e.target.closest('[data-dp-clear]')) pick(null);
+        });
+        grid.addEventListener('keydown', e => {
+          if (!e.target.matches('.datepicker-day')) return;
+          const d = parse(e.target.dataset.date);
+          const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+          if (step) { e.preventDefault(); moveFocus(new Date(d.getFullYear(), d.getMonth(), d.getDate() + step)); }
+          else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); moveFocus(new Date(d.getFullYear(), d.getMonth() + (e.key === 'PageUp' ? -1 : 1), d.getDate())); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); const dow = (d.getDay() + 6) % 7; moveFocus(new Date(d.getFullYear(), d.getMonth(), d.getDate() + (e.key === 'Home' ? -dow : 6 - dow))); }
+          else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+        });
+        panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); } });
+        document.addEventListener('click', e => { if (!dp.contains(e.target)) close(); });
+        dp.addEventListener('focusout', e => { if (!dp.contains(e.relatedTarget) && e.relatedTarget) close(); });
+      });
+    })();
+
   </script>
 
   <!-- Prototype state switcher — ?states=1. Each state reloads the page
