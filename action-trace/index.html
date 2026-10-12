@@ -493,6 +493,23 @@
   .menu-ava{width:24px;height:24px;object-fit:cover;flex-shrink:0;border-radius:2px;}
   .menu-ava.ini{display:inline-flex;align-items:center;justify-content:center;background:var(--gray-200);color:var(--gray-600);font-size:10px;font-weight:600;}
   .menu-note{margin-left:auto;padding-left:12px;font-size:12px;color:var(--graphite-700);}
+  /* Search field pinned to the top of a people menu — default list below, type to search the whole directory */
+  .menu.search{min-width:300px;padding-top:0;}
+  .menu-search{position:sticky;top:0;z-index:1;background:#fff;padding:8px 8px 4px;}
+  .menu-search .field{height:32px;gap:8px;padding:0 10px;color:var(--gray-600);}
+  .menu-search input{color:var(--graphite-900);}
+  .menu-search input::placeholder{color:var(--gray-600);}
+  .menu-empty{padding:8px 16px 10px;font-size:13px;line-height:18px;color:var(--gray-600);}
+
+  /* Confirm pop-up — unassigned workers go to the RoB owner */
+  .cf-modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:480px;max-width:calc(100% - 32px);background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.25);display:flex;flex-direction:column;}
+  .cf-h{padding:24px 32px 8px;font-size:20px;line-height:30px;font-weight:600;}
+  .cf-b{padding:0 32px 24px;font-size:14px;line-height:22px;color:var(--graphite-700);}
+  .cf-b b{color:var(--graphite-900);}
+  .cf-f{display:flex;justify-content:flex-end;gap:12px;padding:16px 32px;border-top:1px solid var(--gray-200);}
+  .cf-modal .btn{font-size:13px;line-height:16px;padding:8px 16px;min-width:60px;justify-content:center;}
+  .cf-modal .btn:not(.primary){border-color:#d8d9dc;color:#000;}
+  .cf-modal .btn.primary{background:#00cc83;border-color:#00cc83;}
   .field.ph select{color:var(--gray-600);}
   .field.err{border-color:var(--red);}
 
@@ -663,6 +680,14 @@ const P = {
   emily:{n:'Emily Smith',r:'AI Specialist',img:'emily-smith.png'},
   james:{n:'James Black',r:'AI Specialist',img:'james-black.png'},
   michal:{n:'Michal Brown',r:'PM',img:'michal-brown.png'},
+  // Directory — managers who are not participants of this meeting; found through the search in "Add manager"
+  priya:{n:'Priya Nair',r:'Engineering Manager'},
+  omar:{n:'Omar Haddad',r:'Finance Operations Lead'},
+  lena:{n:'Lena Fischer',r:'Accounts Payable Manager'},
+  diego:{n:'Diego Alvarez',r:'Shared Services Manager'},
+  sara:{n:'Sara Lindqvist',r:'Procurement Manager'},
+  tomasz:{n:'Tomasz Nowak',r:'Process Excellence Lead'},
+  hana:{n:'Hana Sato',r:'Controller'},
 };
 const BASE_PARTICIPANTS = ['bot','keith','rick','tile','collete','kate','jane'];
 
@@ -809,7 +834,7 @@ function deck(m, key, {stepsTitle = 'Steps for', showLeft = true, rightTitle, si
    id's prefix before ':') handles the picked value. */
 const DD_ON = {};
 const ddHandle = (id, v) => (DD_ON[id] || DD_ON[id.split(':')[0]])?.(v, id.split(':').slice(1).join(':'));
-function ddMenu(id, items, {value = null, label = null, placeholder = '', icon = '', cls = '', menuCls = '', link = false} = {}) {
+function ddMenu(id, items, {value = null, label = null, placeholder = '', icon = '', cls = '', menuCls = '', link = false, search = null} = {}) {
   const open = S.ddOpen === id;
   const cur = items.find(i => i.value != null && i.value === value);
   const text = label ?? (cur ? (cur.label ?? cur.text) : placeholder);
@@ -817,7 +842,7 @@ function ddMenu(id, items, {value = null, label = null, placeholder = '', icon =
     ? `<button class="link-btn dd-link ${open ? 'open' : ''}" type="button" data-ddt="${id}" aria-expanded="${open}">${icon}${esc(text)}${ic.chevD(16)}</button>`
     : `<button class="field dd-trigger ${open ? 'open' : ''} ${cur || label ? '' : 'ph'}" type="button" data-ddt="${id}" aria-expanded="${open}">${icon}<span class="dd-val">${esc(text)}</span><span class="caret">${ic.updown(14)}</span></button>`;
   return `<div class="dd-wrap ${cls}">${trigger}
-    ${open ? `<div class="menu ${menuCls}">${items.map(i => i.header != null ? `<div class="menu-h">${esc(i.header)}</div>` : i.divider ? '<div class="menu-sep"></div>'
+    ${open ? `<div class="menu ${menuCls} ${search ? 'search' : ''}">${search ? `<div class="menu-search"><label class="field">${ic.search(16)}<input id="ddSearch" placeholder="${esc(search)}" value="${esc(S.ddQ || '')}" autocomplete="off" /></label></div>` : ''}${items.map(i => i.header != null ? `<div class="menu-h">${esc(i.header)}</div>` : i.empty != null ? `<div class="menu-empty">${esc(i.empty)}</div>` : i.divider ? '<div class="menu-sep"></div>'
       : `<button class="menu-i ${i.value === value ? 'on' : ''} ${i.cls || ''}" type="button" data-ddi="${id}" data-val="${esc(i.value)}">${i.html || esc(i.label ?? i.text)}</button>`).join('')}</div>` : ''}</div>`;
 }
 // People items — 24px avatar + name (Figma 30587:143876)
@@ -887,12 +912,21 @@ function assignPanel() {
 }
 
 // Manager chooser: participants (+ anyone added) as people items, then "+ Add new manager…".
+// Participants (+ anyone added) are the default list; typing in the search field
+// looks across the whole directory, so any manager can be picked.
+const DIRECTORY = () => Object.keys(P).filter(k => !P[k].bot);
 function mgrMenu(id, current, {placeholder, all} = {}) {
   const used = all ? [] : S.asg.draft.mgrs.filter(m => m !== current);
-  const items = managerPool().filter(k => !used.includes(k)).map(k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:`${ddPerson(k)}${k === OWNER ? '<span class="menu-note">RoB owner</span>' : ''}`}));
+  const q = (S.ddOpen === id ? S.ddQ || '' : '').trim().toLowerCase();
+  // Name matches rank ahead of role matches ("pri" → Priya Nair before "Principal AI Expert").
+  const rank = k => !q ? 0 : P[k].n.toLowerCase().includes(q) ? 1 : P[k].r.toLowerCase().includes(q) ? 2 : 0;
+  const hit = k => rank(k) > 0 || !q;
+  const item = k => ({value:k, label:P[k].n + (k === OWNER ? ' (RoB owner)' : ''), html:`${ddPerson(k)}${k === OWNER ? '<span class="menu-note">RoB owner</span>' : ''}`});
+  const people = (q ? DIRECTORY() : managerPool()).filter(k => !used.includes(k) && hit(k)).sort((a, b) => rank(a) - rank(b));
+  const items = people.length ? [{header:q ? 'Directory' : 'Participants'}, ...people.map(item)] : [{empty:`No one matches "${q}"`}];
   // "Add new manager" is parked for now — restore by putting the two entries back into the list:
   // return ddMenu(id, [...items, {divider:true}, {value:'__new', label:'+ Add new manager…', cls:'menu-act'}], {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
-  return ddMenu(id, items, {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16)});
+  return ddMenu(id, items, {value:current, placeholder, menuCls:'people', link:true, icon:ic.plus(16), search:'Search managers'});
 }
 // "Move all to…" for a whole group: `from` is a manager key or '__un' (unassigned).
 function moveAllMenu(from, label = 'Move all to…') {
@@ -1254,6 +1288,16 @@ function renderAssignModal() {
   </div>`;
 }
 
+// Pop-up before saving when workers are still unassigned: OK sends them to
+// the RoB owner and saves; Cancel returns to the step so they can be assigned.
+function renderAsgConfirm() {
+  const un = S.asg.confirm; const one = un.length === 1;
+  return `<div class="scrim" data-asg="confirm-cancel"></div><div class="cf-modal" role="alertdialog" aria-label="Unassigned workers">
+    <div class="cf-h">${un.length} worker${one ? ' is' : 's are'} still unassigned</div>
+    <div class="cf-b">${one ? 'This worker' : 'These workers'} will be assigned to <b>${esc(P[OWNER].n)}</b>, the RoB owner. Cancel to go back and assign them to a different manager.</div>
+    <div class="cf-f"><button class="btn" data-asg="confirm-cancel">Cancel</button><button class="btn primary" data-asg="confirm-ok">OK</button></div></div>`;
+}
+
 /* ───────────────────────── Render orchestration ───────────────────────── */
 function render() {
   renderNav(); renderMain();
@@ -1264,6 +1308,7 @@ function render() {
   if (S.raci) L.push(['raci', renderRaci()]);
   if (S.rec) L.push(['rec', renderRec()]);
   if (S.asg && S.asg.ctx !== 'create') L.push(['assign', renderAssignModal()]);
+  if (S.asg && S.asg.confirm) L.push(['confirm', renderAsgConfirm()]);
   // Preserve scroll positions of scrollable bodies across re-renders
   const keep = ['#createBody', '#meetBody', '#recBody', '.asg-modal-b', '.asg-table-wrap', '.asg-pop-list'].map(s => [s, $(s)?.scrollTop]);
   const focusId = document.activeElement?.id; const caret = document.activeElement?.selectionStart;
@@ -1403,9 +1448,16 @@ document.addEventListener('click', e => {
   if (S.ddOpen && !e.target.closest('.dd-wrap')) { S.ddOpen = null; render(); }
   if (!t) return;
   e.stopPropagation();
-  if (t.dataset.ddt) { S.ddOpen = S.ddOpen === t.dataset.ddt ? null : t.dataset.ddt; render(); return; }
+  if (t.dataset.ddt) { S.ddOpen = S.ddOpen === t.dataset.ddt ? null : t.dataset.ddt; S.ddQ = ''; render(); $('#ddSearch')?.focus(); return; }
   const id = t.dataset.ddi; S.ddOpen = null; ddHandle(id, t.dataset.val); render();
 }, true);
+
+document.addEventListener('input', e => { if (e.target.id === 'ddSearch') { S.ddQ = e.target.value; render(); } });
+document.addEventListener('keydown', e => {
+  if (e.target.id !== 'ddSearch') return;
+  if (e.key === 'Escape') { S.ddOpen = null; render(); }
+  else if (e.key === 'Enter') { e.preventDefault(); $('.menu .menu-i')?.click(); }
+});
 
 /* ───────────────────────── Events: managers & workers step ───────────────────────── */
 function openAssign(ctx, proc) {
@@ -1431,6 +1483,8 @@ function closeAssign(result) {   // undefined = cancel · 'skip' = everyone to t
 const asgSet = (w, m) => { const d = S.asg.draft; if (!m) delete d.map[w]; else { d.map[w] = m; if (!d.mgrs.includes(m)) d.mgrs.push(m); } };
 const asgReplaceMgr = (old, nw) => { const A = S.asg, d = A.draft; d.mgrs = d.mgrs.map(m => m === old ? nw : m); Object.keys(d.map).forEach(w => { if (d.map[w] === old) d.map[w] = nw; }); if (A.target === old) A.target = nw; };
 const asgAddMgr = (k, where) => { const A = S.asg, d = A.draft;
+  // Someone outside the meeting's participants becomes a participant with the ActionTrace badge the moment they're picked.
+  if (k !== OWNER && !BASE_PARTICIPANTS.includes(k) && !P[k].added) { P[k].added = true; ADDED_MANAGERS.push(k); if (A.ctx === 'create') S.create.newPeople = [k]; }
   if (where === 'col') { if (!d.mgrs.includes(k)) d.mgrs.push(k); A.target = k; }
   else if (where.startsWith('col:')) asgReplaceMgr(where.slice(4), k);
 };
@@ -1457,7 +1511,9 @@ document.addEventListener('click', e => {
     case 'back': S.create.asgOpen = false; S.create.atOpen = true; S.asg = null; render(); break;
     case 'skip': closeAssign('skip'); break;
     case 'cancel': closeAssign(); break;
-    case 'done': closeAssign(cleanAssign(draft)); break;
+    case 'done': { const un = WORKER_LIST.filter(w => !draft.map[w]); if (un.length) { A.confirm = un; render(); } else closeAssign(cleanAssign(draft)); break; }
+    case 'confirm-ok': { const r = cleanAssign(draft); WORKER_LIST.filter(w => !r.map[w]).forEach(w => { r.map[w] = OWNER; }); if (!r.mgrs.includes(OWNER)) r.mgrs.push(OWNER); closeAssign(r); break; }
+    case 'confirm-cancel': A.confirm = null; render(); break;
   }
 });
 document.addEventListener('change', e => {
@@ -1614,6 +1670,7 @@ document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,[contenteditable]')) return;
   if (e.key === 'Escape') {
     if (S.ddOpen) { S.ddOpen = null; render(); return; }
+    if (S.asg && S.asg.confirm) { S.asg.confirm = null; render(); return; }
     if (S.asg && S.asg.newOpen) { S.asg.newOpen = null; render(); return; }
     if (S.asg && S.asg.ctx !== 'create') { closeAssign(); return; }
     if (S.rec?.ann) { S.rec.ann = null; } else if (S.rec?.openFilter || S.rec?.diagOpen) { S.rec.openFilter = null; S.rec.diagOpen = false; }
