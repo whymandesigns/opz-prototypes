@@ -4416,23 +4416,23 @@ body.rv-spotmode{user-select:none;}
        sidenav are covered too. */
     /* :not([hidden]) matters — a bare #id display rule outranks the system's
        .drawer-overlay[hidden] { display: none } and the modal never closes. */
-    #in-drawer-new:not([hidden]) {
+    :is(#in-drawer-new, #in-drawer-view):not([hidden]) {
       display: block;
       background: var(--color-surface);
     }
     /* Keep the standard shell: the create view starts under the 56px topbar
        and right of the sidenav (236px, or the 62px compact rail), so both
        stay visible and usable while creating. */
-    #in-drawer-new {
+    :is(#in-drawer-new, #in-drawer-view) {
       top: 56px;
       left: 236px;
       transition: left var(--ic-duration-base) var(--ic-ease);
     }
-    body:has(.sidenav.is-compact) #in-drawer-new { left: 62px; }
+    body:has(.sidenav.is-compact) :is(#in-drawer-new, #in-drawer-view) { left: 62px; }
     /* The collapse toggle straddles the sidenav's right edge — keep it above
        the create view so it stays clickable. */
-    body:has(#in-drawer-new:not([hidden])) .sidenav-toggle { z-index: calc(var(--ic-z-modal) + 1); }
-    #in-drawer-new > .drawer {
+    body:has(:is(#in-drawer-new, #in-drawer-view):not([hidden])) .sidenav-toggle { z-index: calc(var(--ic-z-modal) + 1); }
+    :is(#in-drawer-new, #in-drawer-view) > .drawer {
       max-width: none;
       width: 100%;
       height: 100%;
@@ -4440,6 +4440,11 @@ body.rv-spotmode{user-select:none;}
       box-shadow: none;
       border-left: 0;
     }
+    /* The whole page scrolls (header included); only the footer actions stay
+       pinned. .drawer is the scroller, so the TOC's sticky top tracks it. */
+    :is(#in-drawer-new, #in-drawer-view) > .drawer { overflow-y: auto; }
+    :is(#in-drawer-new, #in-drawer-view) .drawer-body { flex: none; overflow: visible; }
+    :is(#in-drawer-new, #in-drawer-view) .drawer-footer { position: sticky; bottom: 0; margin-top: auto; background: var(--color-surface); z-index: 2; }
 
     /* Header — close sits on the name row so it reads as part of the title;
        the tags stay under the input, clear of it. */
@@ -4448,7 +4453,7 @@ body.rv-spotmode{user-select:none;}
     .in-cs-close { flex: none; color: var(--color-text-muted); }
     /* Title input matches the form column below (grid minus the 200px TOC
        rail and its gap); the close button pins to the content's right edge. */
-    #in-drawer-new .drawer-header { position: relative; }
+    :is(#in-drawer-new, #in-drawer-view) .drawer-header { position: relative; }
     #in-drawer-new .in-cs-name-row > .in-name-field { flex: none; width: calc(100% - 200px - var(--ic-space-7)); }
     /* Close sticks to the content's right edge (same cap as the padding
        below), so on wide screens it stays with the form instead of drifting
@@ -4468,9 +4473,9 @@ body.rv-spotmode{user-select:none;}
        the fields across a 2560px display. Done with padding so the sections'
        own flex behaviour is untouched — header, body and footer share it, so
        the title, form and footer actions all keep one right edge. */
-    #in-drawer-new .drawer-header,
-    #in-drawer-new .drawer-body,
-    #in-drawer-new .drawer-footer {
+    :is(#in-drawer-new, #in-drawer-view) .drawer-header,
+    :is(#in-drawer-new, #in-drawer-view) .drawer-body,
+    :is(#in-drawer-new, #in-drawer-view) .drawer-footer {
       padding-left: var(--ic-space-6);
       padding-right: max(var(--ic-space-6), calc(100% - 1120px - var(--ic-space-6)));
     }
@@ -4528,7 +4533,16 @@ body.rv-spotmode{user-select:none;}
     .in-cs-toc-item .icon { font-size: 16px; flex: none; }
 
     /* Footer actions align with the form column, not the TOC rail. */
-    #in-drawer-new .drawer-footer > * { max-width: none; }
+    :is(#in-drawer-new, #in-drawer-view) .drawer-footer > * { max-width: none; }
+    /* View mode — same full-page frame as create: actions pin to the
+       content's right edge like the create close button. */
+    #in-drawer-view .in-view-header-actions { position: absolute; top: var(--ic-space-5); right: max(var(--ic-space-6), calc(100% - 1120px - var(--ic-space-6))); }
+    #in-drawer-view .in-view-heading { padding-right: 96px; }
+    #in-drawer-view .in-view-title { font: var(--type-h2); }
+    #in-drawer-view .in-cs-grid { padding-top: var(--ic-space-2); }
+    .in-cs-grid[hidden] { display: none; }
+    #in-drawer-view .in-cs .in-view-rows { gap: var(--ic-space-3); }
+
 
     @media (max-width: 1100px) {
       .in-cs-grid { grid-template-columns: 1fr; }
@@ -4562,6 +4576,8 @@ body.rv-spotmode{user-select:none;}
     .in-multi-num { font: var(--type-body-sm); color: var(--color-text-subtle); text-align: right; font-variant-numeric: tabular-nums; }
     .in-multi-row .input { width: 100%; }
     .in-multi-handle { cursor: grab; color: var(--color-text-subtle); }
+    /* A single row has nothing to reorder. */
+    .in-multi-row:only-child .in-multi-handle { visibility: hidden; }
     .in-multi-handle:active { cursor: grabbing; }
     .in-multi-row.is-dragging { opacity: 0.4; }
     .in-multi-row.is-drop-before { box-shadow: 0 -2px 0 var(--color-border-focus); }
@@ -5893,8 +5909,8 @@ body.rv-spotmode{user-select:none;}
         </div>
         </section>
         <!-- RACI — matrix: org units as rows, Accountable / Responsible /
-             Consulted / Informed as columns. Accountable comes from the
-             Accountable owner field (General); R/C/I are added with the footer
+             Consulted / Informed as columns. Accountable starts from the
+             Accountable owner field (General) and can be overridden; R/C/I are added with the footer
              row: pick a member under a role and their team fills in. Optional. -->
         <section class="in-cs" id="in-cs-raci">
           <h3 class="in-cs-title in-raci-title">RACI
@@ -5926,8 +5942,8 @@ body.rv-spotmode{user-select:none;}
                     <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
-                  <td><div class="input-select in-raci-a">
-                    <button class="input-select-trigger" aria-expanded="false" type="button" disabled><span class="input-select-value input-select-placeholder">Set by Accountable owner</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                  <td><div class="input-select in-raci-a" data-dropdown-search>
+                    <button class="input-select-trigger" aria-expanded="false" type="button" aria-label="Change Accountable"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                   <td><div class="input-select in-raci-pick" data-raci-role="R" data-dropdown-search>
@@ -6088,7 +6104,19 @@ body.rv-spotmode{user-select:none;}
           <button class="tab is-active" role="tab" aria-selected="true" type="button" data-view-tab="overview">Overview</button>
           <button class="tab" role="tab" aria-selected="false" type="button" data-view-tab="activity">Activity log</button>
         </div>
-        <div class="in-view-panel" data-view-panel="overview" role="tabpanel"></div>
+        <div class="in-cs-grid" data-view-panel="overview" role="tabpanel">
+          <div class="in-cs-col in-view-panel" data-view-sections></div>
+          <nav class="in-cs-toc" data-in-toc aria-label="Initiative sections">
+            <a class="in-cs-toc-item is-active" href="#in-vs-general" data-in-toc-target="in-vs-general"><svg class="icon"><use href="#i-legal-info"/></svg>General</a>
+            <a class="in-cs-toc-item" href="#in-vs-timeline" data-in-toc-target="in-vs-timeline"><svg class="icon"><use href="#i-calendar"/></svg>Timeline</a>
+            <a class="in-cs-toc-item" href="#in-vs-description" data-in-toc-target="in-vs-description"><svg class="icon"><use href="#i-list-unordered"/></svg>Description</a>
+            <a class="in-cs-toc-item" href="#in-vs-strategy" data-in-toc-target="in-vs-strategy"><svg class="icon"><use href="#i-okr"/></svg>Strategy</a>
+            <a class="in-cs-toc-item" href="#in-vs-raci" data-in-toc-target="in-vs-raci"><svg class="icon"><use href="#i-table"/></svg>RACI</a>
+            <a class="in-cs-toc-item" href="#in-vs-connections" data-in-toc-target="in-vs-connections"><svg class="icon"><use href="#i-connectors"/></svg>Connections</a>
+            <a class="in-cs-toc-item" href="#in-vs-documents" data-in-toc-target="in-vs-documents"><svg class="icon"><use href="#i-attachment"/></svg>Documents</a>
+            <a class="in-cs-toc-item" href="#in-vs-projects" data-in-toc-target="in-vs-projects"><svg class="icon"><use href="#i-folder"/></svg>Projects</a>
+          </nav>
+        </div>
         <div class="in-view-panel" data-view-panel="activity" role="tabpanel" hidden></div>
       </div>
       <footer class="drawer-footer">
@@ -6809,11 +6837,12 @@ body.rv-spotmode{user-select:none;}
       new MutationObserver(paintTeamCards).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
 
       // ===== RACI matrix =====
-      // Rows are org units; columns A / R / C / I. Accountable mirrors the
-      // Accountable owner field and sits in that person's team row. R / C / I
+      // Rows are org units; columns A / R / C / I. Accountable starts from the
+      // Accountable owner field (overridable in the footer) and sits in that
+      // person's team row. R / C / I
       // come from the footer: pick a member under a role and they join their
-      // own team's row (the Org Unit select shows it). "To be defined" uses the
-      // team chosen in that select. Limits: A 1, each of R/C/I 20, 40 total.
+      // own team's row (the Org Unit select shows it). In view mode an empty
+      // role column reads "Unassigned". Limits: A 1, each of R/C/I 20, 40 total.
       // Prototype data: org units are made up; a person's team is inferred
       // from their job title.
       (() => {
@@ -6850,13 +6879,12 @@ body.rv-spotmode{user-select:none;}
             `<button class="dropdown-item" type="button" data-unit="${esc(u.name)}"><svg class="dropdown-item-icon"><use href="#${unitIcon(u.sub)}"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${esc(u.name)}</span><span class="dropdown-item-description">${esc(u.sub)}</span></div></button>`).join('')}</div>
           <div class="dropdown-empty" data-dropdown-empty hidden>No teams found</div>`;
         personSearch(teamSel);
-        // Member options: "To be defined" + the Working team people list, searchable.
+        // Member options: the Working team people list, searchable.
         const peopleHtml = team.querySelector('[data-dropdown-list]').innerHTML;
         picks.forEach(sel => {
           sel.querySelector('.dropdown-menu').innerHTML = `
             <div class="dropdown-search"><div class="input-icon input-icon-left"><svg class="icon input-icon-glyph"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input /></div></div>
             <div class="dropdown-list" data-dropdown-list>
-              <button class="dropdown-item" type="button" data-tbd data-initials=""><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md in-raci-tbd-av"><svg class="icon"><use href="#i-user"/></svg></span><div class="dropdown-item-text"><span class="dropdown-item-label">To be defined</span><span class="dropdown-item-description">Placeholder until someone is named</span></div></button>
               ${peopleHtml}
             </div>`;
           sel.querySelectorAll('.is-selected').forEach(i => i.classList.remove('is-selected'));
@@ -6865,11 +6893,23 @@ body.rv-spotmode{user-select:none;}
           personSearch(sel);
         });
 
-        const personOf = item => item.hasAttribute('data-tbd')
-          ? { name: 'To be defined', title: '', initials: '', img: '', tbd: true }
-          : { name: item.querySelector('.dropdown-item-label').textContent.trim(), title: item.querySelector('.dropdown-item-description')?.textContent.trim() || '',
-              initials: item.dataset.initials || '', img: item.querySelector('.avatar img')?.getAttribute('src') || '' };
+        // Accountable picker — people only (one named owner, no placeholder).
+        const aSel = root.querySelector('.in-raci-a');
+        aSel.querySelector('.dropdown-menu').innerHTML = `
+          <div class="dropdown-search"><div class="input-icon input-icon-left"><svg class="icon input-icon-glyph"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input /></div></div>
+          <div class="dropdown-list" data-dropdown-list>${peopleHtml}</div>`;
+        aSel.querySelectorAll('.is-selected').forEach(i => i.classList.remove('is-selected'));
+        aSel.querySelectorAll('.dropdown-item-check').forEach(c => c.remove());
+        aSel.querySelectorAll('[data-dropdown-empty]').forEach(e => { e.hidden = true; });
+        personSearch(aSel);
+
+        const personOf = item => ({ name: item.querySelector('.dropdown-item-label').textContent.trim(), title: item.querySelector('.dropdown-item-description')?.textContent.trim() || '',
+              initials: item.dataset.initials || '', img: item.querySelector('.avatar img')?.getAttribute('src') || '' });
+        // Accountable = the Accountable owner field (General) unless overridden
+        // here; picking a new owner up top clears the override.
+        let aOverride = null; // { unit, role: 'A', person } | false (removed) | null (follow owner)
         const owner = () => {
+          if (aOverride !== null) return aOverride || null;
           const it = document.querySelector('#in-owner .dropdown-item.is-selected');
           if (!it) return null;
           const p = personOf(it);
@@ -6880,16 +6920,26 @@ body.rv-spotmode{user-select:none;}
         const avatar = p => p.tbd
           ? '<span class="avatar avatar-md in-raci-tbd-av"><svg class="icon"><use href="#i-user"/></svg></span>'
           : `<span class="avatar avatar-md">${p.img ? `<img src="${esc(p.img)}" alt="" />` : esc(p.initials)}</span>`;
-        const personHtml = (e, i, editable) => `<div class="in-raci-person${e.person.tbd ? ' is-tbd' : ''}" data-initials="${esc(e.person.initials)}">${avatar(e.person)}<span class="in-raci-person-text"><span class="in-raci-person-name" title="${esc(e.person.name)}">${esc(e.person.name)}</span>${e.person.title ? `<span class="in-raci-person-role" title="${esc(e.person.title)}">${esc(e.person.title)}</span>` : ''}</span>${editable && i >= 0 ? `<button class="in-raci-remove" type="button" data-raci-remove="${i}" aria-label="Remove ${esc(e.person.name)}"><svg class="icon"><use href="#i-x"/></svg></button>` : ''}</div>`;
-        const rowsHtml = (list, editable) => {
+        const personHtml = (e, i, editable) => `<div class="in-raci-person${e.person.tbd ? ' is-tbd' : ''}" data-initials="${esc(e.person.initials)}">${avatar(e.person)}<span class="in-raci-person-text"><span class="in-raci-person-name" title="${esc(e.person.name)}">${esc(e.person.name)}</span>${e.person.title ? `<span class="in-raci-person-role" title="${esc(e.person.title)}">${esc(e.person.title)}</span>` : ''}</span>${editable && (i >= 0 || e.role === 'A') ? `<button class="in-raci-remove" type="button" data-raci-remove="${e.role === 'A' ? 'A' : i}" aria-label="Remove ${esc(e.person.name)}"><svg class="icon"><use href="#i-x"/></svg></button>` : ''}</div>`;
+        // View mode (unassigned = true): a role column nobody fills shows one
+        // "Unassigned" placeholder spanning all rows.
+        const UNASSIGNED = { role: '', person: { name: 'Unassigned', title: '', initials: '', img: '', tbd: true } };
+        const rowsHtml = (list, editable, unassigned = false) => {
           // Informed hidden — teams that only have Informed people drop out too.
           if (document.getElementById('in-raci-informed').getAttribute('aria-pressed') === 'false') list = list.filter(e => e.role !== 'I');
           const order = [...new Set(list.map(e => e.unit))];
-          if (!order.length) return `<tr class="in-raci-empty"><td colspan="5">No one added yet. Pick a team member under a role — their team fills in automatically.</td></tr>`;
-          return order.map(u => {
+          const visibleRoles = isInformed() ? ROLES : ROLES.filter(r => r !== 'I');
+          if (!order.length) return unassigned
+            ? `<tr><th scope="row"><span class="in-raci-unit-sub">—</span></th>${visibleRoles.map(() => `<td>${personHtml(UNASSIGNED, -1, false)}</td>`).join('')}</tr>`
+            : `<tr class="in-raci-empty"><td colspan="5">No one added yet. Pick a team member under a role — their team fills in automatically.</td></tr>`;
+          const emptyRoles = unassigned ? ROLES.filter(r => !list.some(e => e.role === r)) : [];
+          return order.map((u, rowIdx) => {
             const meta = UNITS.find(x => x.name === u) || { name: u, sub: '' };
-            const cells = ROLES.map(r => `<td>${list.map((e, idx) => ({ e, idx })).filter(({ e }) => e.unit === u && e.role === r)
-              .map(({ e }) => personHtml(e, e.role === 'A' ? -1 : entries.indexOf(e), editable)).join('')}</td>`).join('');
+            const cells = (unassigned ? visibleRoles : ROLES).map(r => {
+              if (emptyRoles.includes(r)) return rowIdx ? '' : `<td rowspan="${order.length}" class="in-raci-unassigned">${personHtml(UNASSIGNED, -1, false)}</td>`;
+              return `<td>${list.filter(e => e.unit === u && e.role === r)
+                .map(e => personHtml(e, e.role === 'A' ? -1 : entries.indexOf(e), editable)).join('')}</td>`;
+            }).join('');
             return `<tr><th scope="row"><div class="in-raci-unit-cell"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#${unitIcon(meta.sub)}"/></svg></span><span class="in-raci-person-text"><span class="in-raci-unit" title="${esc(meta.name)}">${esc(meta.name)}</span><span class="in-raci-unit-sub" title="${esc(meta.sub)}">${esc(meta.sub)}</span></span></div></th>${cells}</tr>`;
           }).join('');
         };
@@ -6908,10 +6958,6 @@ body.rv-spotmode{user-select:none;}
             if (tip) { sel.setAttribute('data-tooltip', tip); trig.setAttribute('aria-expanded', 'false'); sel.querySelector('.dropdown-menu').hidden = true; }
             else sel.removeAttribute('data-tooltip');
           });
-          // Accountable is capped at 1 and comes from the owner field — say so on hover.
-          const aSel = root.querySelector('.in-raci-a');
-          if (owner()) aSel.setAttribute('data-tooltip', 'Max limit reached for Accountable');
-          else aSel.removeAttribute('data-tooltip');
         };
         // Show a team in the footer Org Unit select (filled from the picked person).
         const setTeam = unit => {
@@ -6938,22 +6984,37 @@ body.rv-spotmode{user-select:none;}
             sel.querySelector('.dropdown-menu').hidden = true;
           });
           const person = personOf(item);
-          // A named person joins their own team's row; "To be defined" has no
-          // team, so it uses the team picked in the Org Unit select.
-          const unit = person.tbd ? selectedTeam() : unitFor(person.title);
-          if (!unit) { window.toast?.({ variant: 'warning', message: 'Select a team for “To be defined”.' }); return; }
+          // The person joins their own team's row.
+          const unit = unitFor(person.title);
           setTeam(unit);
           if (all().length >= TOTAL) { window.toast?.({ variant: 'warning', message: `RACI is full — up to ${TOTAL} people.` }); return; }
           if (entries.filter(x => x.role === role).length >= LIMIT[role]) { window.toast?.({ variant: 'warning', message: `Up to ${LIMIT[role]} people per role.` }); return; }
-          if (!person.tbd && entries.some(x => x.role === role && x.unit === unit && x.person.name === person.name)) return;
+          if (entries.some(x => x.role === role && x.unit === unit && x.person.name === person.name)) return;
           entries.push({ unit, role, person });
           render();
         }));
+        aSel.querySelector('.dropdown-menu').addEventListener('click', e => {
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          setTimeout(() => {
+            resetPick(aSel);
+            aSel.querySelector('.input-select-trigger').setAttribute('aria-expanded', 'false');
+            aSel.querySelector('.dropdown-menu').hidden = true;
+          });
+          const person = personOf(item);
+          aOverride = { unit: unitFor(person.title), role: 'A', person };
+          setTeam(aOverride.unit);
+          render();
+        });
+        document.querySelector('#in-owner .dropdown-menu').addEventListener('click', e => {
+          if (e.target.closest('.dropdown-item')) { aOverride = null; setTimeout(render); }
+        });
         teamSel.querySelector('.dropdown-menu').addEventListener('click', e => { if (e.target.closest('.dropdown-item')) setTimeout(render); });
         tbody.addEventListener('click', e => {
           const btn = e.target.closest('[data-raci-remove]');
           if (!btn) return;
-          entries.splice(+btn.dataset.raciRemove, 1);
+          if (btn.dataset.raciRemove === 'A') aOverride = false; // stays empty until someone is picked
+          else entries.splice(+btn.dataset.raciRemove, 1);
           render();
           root.querySelector('[data-raci-remove]')?.focus();
         });
@@ -6977,12 +7038,13 @@ body.rv-spotmode{user-select:none;}
           get: () => entries.map(e => ({ ...e, person: { ...e.person } })),
           set: list => { entries = (list || []).map(e => ({ ...e, person: { ...e.person } })); render(); },
           informed: () => isInformed(),
+          getA: () => aOverride ? { ...aOverride, person: { ...aOverride.person } } : aOverride,
+          setA: a => { aOverride = a ? { ...a, person: { ...a.person } } : a === false ? false : null; render(); },
           setInformed: on => { setInformed(on !== false); render(); },
         };
         window.inRaciViewHtml = () => {
           const list = all();
-          if (!list.length) return '';
-          return `<div class="in-view-block"><h3>RACI</h3><div class="in-raci-matrix is-readonly${isInformed() ? '' : ' no-informed'}"><div class="table-scroll in-raci-scroll"><table class="table in-raci-table"><colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup><thead><tr><th scope="col">Org Unit</th><th scope="col">Accountable</th><th scope="col">Responsible</th><th scope="col">Consulted</th><th scope="col">Informed</th></tr></thead><tbody>${rowsHtml(list, false)}</tbody></table></div></div></div>`;
+          return `<div class="in-raci-matrix is-readonly${isInformed() ? '' : ' no-informed'}"><div class="table-scroll in-raci-scroll"><table class="table in-raci-table"><colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup><thead><tr><th scope="col">Org Unit</th><th scope="col">Accountable</th><th scope="col">Responsible</th><th scope="col">Consulted</th><th scope="col">Informed</th></tr></thead><tbody>${rowsHtml(list, false, true)}</tbody></table></div></div>`;
         };
         render();
       })();
@@ -7028,9 +7090,11 @@ body.rv-spotmode{user-select:none;}
           error.hidden = !on;
           rows().forEach(li => li.querySelector('input').classList.toggle('is-error', on));
         };
-        const reset = () => { list.innerHTML = ''; samples.forEach(p => addRow(p)); if (!samples.length) addRow(); setError(false); };
+        // One row to start (only one is required); the samples feed the
+        // placeholders of rows added later, in order.
+        const reset = () => { list.innerHTML = ''; addRow(samples[0] || ''); setError(false); };
 
-        root.querySelector('[data-multi-add]').addEventListener('click', () => addRow('', true));
+        root.querySelector('[data-multi-add]').addEventListener('click', () => addRow(samples[rows().length] || '', true));
         list.addEventListener('click', e => {
           const rm = e.target.closest('[data-multi-remove]');
           if (!rm || rm.disabled) return;
@@ -7049,7 +7113,7 @@ body.rv-spotmode{user-select:none;}
             (onHandle ? li.querySelector('.in-multi-handle') : li.querySelector('input')).focus();
           } else if (e.key === 'Enter' && e.target.matches('input')) {
             e.preventDefault(); // Enter adds a row below, like a list editor
-            const nli = addRow('', true); li.after(nli); renumber();
+            const nli = addRow(samples[rows().length] || '', true); li.after(nli); renumber();
           }
         });
         // Drag by the handle only — the row becomes draggable while the
@@ -7227,7 +7291,7 @@ body.rv-spotmode{user-select:none;}
         start: startInput.value, end: endInput.value,
         desc: desc.value, problem: problem.value,
         objectives: objectives.values(), metrics: metrics.values(),
-        raci: window.inRaci?.get() || [], raciInformed: window.inRaci ? window.inRaci.informed() : true,
+        raci: window.inRaci?.get() || [], raciA: window.inRaci ? window.inRaci.getA() : null, raciInformed: window.inRaci ? window.inRaci.informed() : true,
       });
       const clearSelectFully = el => {
         el.querySelectorAll('.dropdown-item').forEach(i => {
@@ -7261,6 +7325,7 @@ body.rv-spotmode{user-select:none;}
         metrics.setValues(snap.metrics);
         window.inRaci?.set(snap.raci);
         window.inRaci?.setInformed(snap.raciInformed);
+        window.inRaci?.setA(snap.raciA);
         setNameError(false);
         requiredSelects.forEach(f => f.setError(false));
         requiredDates.forEach(f => f.setError(false));
@@ -7295,7 +7360,7 @@ body.rv-spotmode{user-select:none;}
       // Built from the drawer form: the saved snapshot is restored into the
       // (closed) edit drawer, then read back as labels, avatars and text.
       const viewEl = document.getElementById('in-drawer-view');
-      const viewPanel = viewEl.querySelector('[data-view-panel="overview"]');
+      const viewPanel = viewEl.querySelector('[data-view-sections]');
       const activityPanel = viewEl.querySelector('[data-view-panel="activity"]');
       const activity = {}; // id → [{ what, at }]
       const vEsc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -7322,8 +7387,9 @@ body.rv-spotmode{user-select:none;}
         const list = arr => arr.length ? `<ol class="in-view-list">${arr.map(o => `<li>${vEsc(o)}</li>`).join('')}</ol>` : `<p class="in-view-text">${EMPTY}</p>`;
         const conn = (icon, name, value) => `<div class="in-view-conn"><span class="in-view-conn-icon"><svg class="icon icon-16"><use href="#${icon}"/></svg></span><span class="in-view-conn-label">${name}</span><span>${value}</span></div>`;
         const linkList = arr => arr.length ? arr.map(v => `<a class="in-view-link" href="#" data-view-dead>${vEsc(v)}</a>`).join(', ') : '<span class="in-view-empty">Not connected</span>';
-        viewPanel.innerHTML = `
-          <dl class="in-view-rows">
+        const sec = (id, title, body) => `<section class="in-cs" id="in-vs-${id}"><h3 class="in-cs-title">${title}</h3>${body}</section>`;
+        viewPanel.innerHTML = [
+          sec('general', 'General', `<dl class="in-view-rows">
             ${row('Health', `<span class="tag tag-indicator ${HCLS[d.health] || 'in-health-na'}">${vEsc(d.health || 'Not active')}</span>`)}
             ${row('Executive sponsor', d.sponsorHtml || EMPTY)}
             ${row('Beneficiary function', d.beneficiary
@@ -7332,28 +7398,31 @@ body.rv-spotmode{user-select:none;}
             ${row('Accountable owner', d.ownerHtml || person(null))}
             ${row('Project manager', d.pmHtml || person(null))}
           </dl>
-          <div class="in-view-block"><h3>Working team</h3>${d.teamHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>
-          ${d.raciHtml || ''}
-          <dl class="in-view-rows">
+          <div class="in-view-block"><h3>Working team</h3>${d.teamHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>`),
+          sec('timeline', 'Timeline', `<dl class="in-view-rows">
             ${row('Estimated duration', d.duration ? vEsc(d.duration) : EMPTY)}
             ${row('Start date', d.start ? vEsc(d.start) : EMPTY)}
             ${row('End date', d.end ? vEsc(d.end) : EMPTY)}
             ${d.impact ? row('Initial impact date', d.impactInitial ? vEsc(d.impactInitial) : EMPTY) + row('Full impact date', d.impactFull ? vEsc(d.impactFull) : EMPTY) : ''}
-            ${row('Core strategy', `<span class="tag tag-indicator ${d.coreOn ? 'tag-positive' : 'in-health-na'}">${d.coreOn ? 'On' : 'Off'}</span>`)}
-            ${d.coreOn ? row('Company strategic objective', d.coreObj ? vEsc(d.coreObj) : EMPTY) : ''}
-          </dl>
+          </dl>`),
+          sec('description', 'Description', `
           <div class="in-view-block"><h3>Description</h3><p class="in-view-text">${d.desc ? vEsc(d.desc) : EMPTY}</p></div>
           <div class="in-view-block"><h3>Problem / Opportunity</h3><p class="in-view-text">${d.problem ? vEsc(d.problem) : EMPTY}</p></div>
           <div class="in-view-block"><h3>Objective(s)</h3>${list(d.objs || [])}</div>
-          <div class="in-view-block"><h3>Success metrics</h3>${list(d.mets || [])}</div>
-          <section class="in-view-section"><h3>Connections</h3>
+          <div class="in-view-block"><h3>Success metrics</h3>${list(d.mets || [])}</div>`),
+          sec('strategy', 'Strategy', `<dl class="in-view-rows">
+            ${row('Core strategy', `<span class="tag tag-indicator ${d.coreOn ? 'tag-positive' : 'in-health-na'}">${d.coreOn ? 'On' : 'Off'}</span>`)}
+            ${d.coreOn ? row('Company strategic objective', d.coreObj ? vEsc(d.coreObj) : EMPTY) : ''}
+          </dl>`),
+          sec('raci', 'RACI', d.raciHtml || `<p class="in-view-text">${EMPTY}</p>`),
+          sec('connections', 'Connections', `
             ${conn('i-calendar', 'Cadenced meeting', linkList(d.rob || []))}
-            ${conn('i-slack', 'Slack channels', linkList(d.slack || []))}
-          </section>
-          <section class="in-view-section"><h3>Documents</h3>${(d.links || []).length
+            ${conn('i-slack', 'Slack channels', linkList(d.slack || []))}`),
+          sec('documents', 'Documents', (d.links || []).length
             ? `<div class="in-view-docs">${d.links.map(l => `<a class="in-view-link in-view-doc" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-attachment"/></svg>${vEsc(l)}</a>`).join('')}</div>`
-            : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`}</section>
-          <section class="in-view-section"><h3>Projects</h3><div><a class="in-view-link in-view-add" href="#" data-view-dead>Add project</a></div></section>`;
+            : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`),
+          sec('projects', 'Projects', `<div><a class="in-view-link in-view-add" href="#" data-view-dead>Add project</a></div>`),
+        ].join('');
       };
       const renderView = id => {
         const stage = drawerEl.querySelector('.in-stage-trigger')?.textContent.trim() || 'Idea';
@@ -7428,6 +7497,8 @@ body.rv-spotmode{user-select:none;}
         viewEl.querySelector('[data-view-edit]').hidden = true;   // no form data to edit for a seeded row
         if (viewEl.hidden) opener = document.activeElement;
         viewEl.hidden = false;
+        viewEl.querySelector('.drawer').scrollTop = 0;
+        viewEl.querySelectorAll('.in-cs-toc-item').forEach((l, i) => l.classList.toggle('is-active', i === 0));
         viewEl.querySelector('.modal-close')?.focus();
       };
       window.inOpenView = id => {
@@ -7440,6 +7511,8 @@ body.rv-spotmode{user-select:none;}
         viewEl.querySelector('[data-view-edit]').hidden = false;
         if (viewEl.hidden) opener = document.activeElement;
         viewEl.hidden = false;
+        viewEl.querySelector('.drawer').scrollTop = 0;
+        viewEl.querySelectorAll('.in-cs-toc-item').forEach((l, i) => l.classList.toggle('is-active', i === 0));
         viewEl.querySelector('.modal-close')?.focus();
       };
       viewEl.addEventListener('click', e => {
@@ -7742,14 +7815,16 @@ body.rv-spotmode{user-select:none;}
       // ===== Full-screen create — TOC rail =====
     // Same behaviour as the RoB meeting TOC: click scrolls the section to the
     // top of the scroll container, and scrolling marks the section whose top
-    // has crossed 40% down the container. .drawer-body is the scroller here.
-    (function () {
-      const view = document.getElementById('in-drawer-new');
+    // has crossed 40% down the container. The .drawer itself is the scroller.
+    // Shared by create and view; view sections are re-rendered on every open,
+    // so targets are looked up when needed rather than cached.
+    ['in-drawer-new', 'in-drawer-view'].forEach(viewId => {
+      const view = document.getElementById(viewId);
       const toc = view?.querySelector('[data-in-toc]');
-      const body = view?.querySelector('.drawer-body');
+      const body = view?.querySelector('.drawer');
       if (!toc || !body) return;
       const links = [...toc.querySelectorAll('.in-cs-toc-item')];
-      const targets = links.map(l => view.querySelector('#' + l.dataset.inTocTarget)).filter(Boolean);
+      const getTargets = () => links.map(l => view.querySelector('#' + l.dataset.inTocTarget)).filter(Boolean);
       const offsetIn = el => el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
 
       // A click pins that section until the reader scrolls themselves. A timer
@@ -7773,6 +7848,7 @@ body.rv-spotmode{user-select:none;}
 
       body.addEventListener('scroll', () => {
         if (pinned) return;
+        const targets = getTargets();
         const y = body.scrollTop + body.clientHeight * 0.4;
         let active = targets[0];
         for (const t of targets) if (offsetIn(t) <= y) active = t;
@@ -7782,7 +7858,7 @@ body.rv-spotmode{user-select:none;}
         if (body.scrollTop <= 4) active = targets[0];
         setActive(active?.id);
       });
-    })();
+    });
   </script>
 
   <script>
