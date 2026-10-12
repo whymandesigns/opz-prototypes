@@ -4234,15 +4234,15 @@ body.rv-spotmode{user-select:none;}
     .in-raci-guide-link { display: inline-flex; align-items: center; gap: var(--ic-space-1); padding: 0; border: 0; background: none; color: var(--color-text-link); font: var(--type-body-sm); cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
     .in-raci-guide-link:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; border-radius: 2px; }
     .in-raci-matrix { display: flex; flex-direction: column; gap: var(--ic-space-2); }
-    .in-raci-scroll { max-height: none; overflow: visible; }
+    .in-raci-scroll { max-height: none; overflow: visible; border-radius: var(--ic-radius-md); }
     .in-raci-table { width: 100%; table-layout: fixed; }
     .in-raci-table .in-raci-col-unit { width: 20%; }
-    .in-raci-table thead th { font: var(--type-body-sm-semibold); color: var(--color-text); }
+    .in-raci-table thead th { font: var(--type-body-sm-semibold); font-size: var(--ic-text-xs); color: var(--color-text); }
     .in-raci-max { font-weight: var(--ic-weight-regular); color: var(--color-text-muted); }
     /* Compact rows — 54px: 8px padding around a 32px avatar / two single-line labels. */
     .in-raci-table tbody tr { height: 54px; }
     .in-raci-table tbody th, .in-raci-table tbody td { vertical-align: middle; padding: var(--ic-space-2) var(--ic-space-3); white-space: normal; border-bottom: 1px solid var(--color-border); }
-    .in-raci-scroll .in-raci-table thead th { position: static; padding-inline: var(--ic-space-3); white-space: normal; }
+    .in-raci-scroll .in-raci-table thead th { position: static; height: 32px; padding: 0 var(--ic-space-3); line-height: 16px; white-space: normal; }
     .in-raci-table tbody th { text-align: left; font-weight: var(--ic-weight-regular); }
     .in-raci-person-text { flex: 1; }
     .in-raci-unit-cell { display: flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
@@ -4267,8 +4267,8 @@ body.rv-spotmode{user-select:none;}
     .in-raci-add .input-select { width: 100%; }
     .in-raci-add .input-select-trigger:disabled { background: var(--color-surface-muted); cursor: not-allowed; }
     /* Disabled buttons swallow hover — let it reach the wrapper's tooltip. */
-    .in-raci-a .input-select-trigger:disabled { pointer-events: none; }
-    .in-raci-a[data-tooltip] { cursor: not-allowed; }
+    .in-raci-add .input-select-trigger:disabled { pointer-events: none; }
+    .in-raci-add .input-select[data-tooltip] { cursor: not-allowed; }
     .in-raci-add .dropdown-menu { min-width: 320px; }
     .in-raci-team .dropdown-item { gap: var(--ic-space-3); }
     .in-raci-team .dropdown-item-icon { color: var(--color-text); }
@@ -6897,7 +6897,17 @@ body.rv-spotmode{user-select:none;}
           tbody.innerHTML = rowsHtml(all(), true);
           const n = all().length;
           countEl.innerHTML = `<strong>${n}</strong> ${n === 1 ? 'person' : 'people'} added (max ${TOTAL})`;
-          picks.forEach(sel => sel.querySelector('.input-select-trigger').setAttribute('aria-label', `Add ${{ R: 'Responsible', C: 'Consulted', I: 'Informed' }[sel.dataset.raciRole]}`));
+          // Role at its cap (20), or RACI at 40 → disable that picker; hover explains.
+          picks.forEach(sel => {
+            const role = sel.dataset.raciRole, name = { R: 'Responsible', C: 'Consulted', I: 'Informed' }[role];
+            const trig = sel.querySelector('.input-select-trigger');
+            const tip = entries.filter(x => x.role === role).length >= LIMIT[role] ? `Max limit reached for ${name}`
+              : n >= TOTAL ? `Max limit reached (${TOTAL} people)` : '';
+            trig.disabled = !!tip;
+            trig.setAttribute('aria-label', tip ? `${name}: ${tip}` : `Add ${name}`);
+            if (tip) { sel.setAttribute('data-tooltip', tip); trig.setAttribute('aria-expanded', 'false'); sel.querySelector('.dropdown-menu').hidden = true; }
+            else sel.removeAttribute('data-tooltip');
+          });
           // Accountable is capped at 1 and comes from the owner field — say so on hover.
           const aSel = root.querySelector('.in-raci-a');
           if (owner()) aSel.setAttribute('data-tooltip', 'Max limit reached for Accountable');
