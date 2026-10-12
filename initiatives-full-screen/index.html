@@ -4116,7 +4116,7 @@ body.rv-spotmode{user-select:none;}
     .in-details .accordion-summary { padding: 0; font-weight: var(--ic-weight-semibold); }
     .in-details-body { display: flex; flex-direction: column; gap: var(--ic-space-5); }
     .in-details-body > * { flex-shrink: 0; }
-    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-4); padding-top: var(--ic-space-3); }
+    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-4); }
     /* Fields revealed by an "+ Add…" link take a full line above the links. */
     .in-reveal-row { flex-basis: 100%; }
     .in-form-row[hidden], .in-add[hidden] { display: none; }
@@ -4200,24 +4200,16 @@ body.rv-spotmode{user-select:none;}
     .in-team-card-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
     [data-theme="dark"] .in-team-card-name { color: var(--color-text); }
     [data-theme="dark"] .in-team-card-role { color: var(--color-text-muted); }
-    /* "+ Add team member" — the Figma Button Action link (38130:118593), no
-       border or padding of its own; it takes the next grid cell after the
-       last card, centred on the 48px card row. On click the search field
-       takes over the same cell; the people menu drops below it. */
-    .in-team-add { position: relative; display: flex; align-items: center; min-width: 0; height: 48px; }
-    .in-team-add [hidden] { display: none !important; }
+    /* Empty: the select trigger only. With picks: cards + "+ Add team member"
+       tile, and the trigger steps aside (the menu then opens under the cards). */
+    .in-team-cards { margin-top: 0; }
+    .in-team:not(:has(.in-team-card)) .in-team-cards { display: none; }
+    .in-team:has(.in-team-card) > .input-select-trigger { display: none; }
+    .in-team-add { display: flex; align-items: center; min-width: 0; height: 48px; }
     .in-team-add .btn.in-link { height: 32px; justify-content: flex-start; }
-    .in-team-search { width: 100%; }
-    .in-team-search .input { width: 100%; height: 32px; }
-    .in-team-menu { position: absolute; top: calc(100% + 4px); left: 0; width: 320px; max-height: 320px; overflow-y: auto; z-index: 20; }
-    .in-team-menu .dropdown-item { flex-shrink: 0; }
-    /* Picked people are left out of the results, so no check column. */
-    .in-team-menu .dropdown-item-check { display: none; }
-    /* The trigger is only kept for the shared select logic — .input-select-trigger's
-       display: flex beats the UA [hidden] rule, so hide it explicitly. */
-    .in-team > .input-select-trigger[hidden] { display: none; }
-    /* Centre the "Working team" label on the 48px tiles, not a 32px input. */
-    .in-form-row:has(> .field > #in-team) > .field-label { min-height: 48px; }
+    /* Label lines up with the trigger (32px) or the card row (48px). */
+    .in-form-row:has(> .field > #in-team) > .field-label { min-height: 32px; }
+    .in-form-row:has(> .field > #in-team .in-team-card) > .field-label { min-height: 48px; }
 
     /* ===== RACI matrix =====
        Org units as rows, A / R / C / I as columns (designmd .table); people
@@ -4277,8 +4269,6 @@ body.rv-spotmode{user-select:none;}
     .in-raci-count strong { color: var(--color-text); font-weight: var(--ic-weight-semibold); }
     .in-raci-matrix.is-readonly .in-raci-person:hover { background: transparent; }
     /* Required-field error lands on the hidden trigger — show it on the tile. */
-    .in-team:has(.input-select-trigger.is-error) .in-team-add .btn.in-link { color: var(--color-danger); }
-    .in-team:has(.input-select-trigger.is-error) .in-team-search .input { border-color: var(--color-danger); }
 
     /* Working team trigger — up to 3 overlapping photo avatars + summary.
        designmd has no avatar group, so the stack is local. */
@@ -5599,7 +5589,8 @@ body.rv-spotmode{user-select:none;}
             </div>
           </div>
           <!-- TopTrack roadmap ID 7 — Working team, multi-select people,
-               required (≥ 1), under Project manager. Same searchable photo
+               required (≥ 1), under Project manager. A searchable multi-select
+               like Project manager; picked people show as cards below it. Same searchable photo
                picker as Executive sponsor; stays open while you pick. -->
           <div class="in-form-row in-row-top">
             <span class="field-label">Working team</span>
@@ -5610,15 +5601,14 @@ body.rv-spotmode{user-select:none;}
                    and a pick adds a card. The trigger stays (hidden) so the
                    shared select logic, validation and drafts keep working. -->
               <div class="input-select in-team" id="in-team" data-multi>
-                <button class="input-select-trigger" hidden aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
-                <div class="in-team-cards" id="in-team-cards" aria-label="Working team members">
-                  <div class="in-team-add" data-team-add-slot>
-                    <button class="btn btn-ghost in-link" type="button" data-team-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add team member</button>
-                    <div class="input-icon input-icon-left in-team-search" hidden>
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" data-dropdown-search hidden>
+                  <div class="dropdown-search">
+                    <div class="input-icon input-icon-left">
                       <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                      <input class="input" type="search" placeholder="Search people" aria-label="Search people to add" autocomplete="off" data-team-search />
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
                     </div>
-                    <div class="dropdown-menu in-team-menu" hidden>
+                  </div>
                   <div class="dropdown-list" data-dropdown-list>
                     <!-- People from managers.csv (Full Name, Job Title, Avatar URL). -->
                     <button class="dropdown-item" type="button" data-initials="AE"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjcxOTEsInB1ciI6ImJsb2JfaWQifX0=--60464fff1b323a7f956c2de7865ca1612b816f26/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/2024%20&#x27;headshot&#x27;%20cropped%202.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Abbie Emeigh</span><span class="dropdown-item-description">Director of Learning &amp; Development</span></div></button>
@@ -5767,9 +5757,8 @@ body.rv-spotmode{user-select:none;}
                     <button class="dropdown-item" type="button" data-initials="ÁV"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwOTcsInB1ciI6ImJsb2JfaWQifX0=--e097d59dcd563089ba4c8bd833e12e685199501c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Alvaro_Viscardi_Avatar.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Álvaro Viscardi</span><span class="dropdown-item-description">Enterprise Matching Team Lead</span></div></button>
                     <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
                   </div>
-                    </div>
-                  </div>
                 </div>
+                <div class="in-team-cards" id="in-team-cards" aria-label="Working team members"><div class="in-team-add"><button class="btn btn-ghost in-link" type="button" data-team-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add team member</button></div></div>
               </div>
               <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
             </div>
@@ -5777,6 +5766,8 @@ body.rv-spotmode{user-select:none;}
           <!-- TopTrack roadmap ID 11 — Estimated duration, required, above
                Start date. Fills End date = Start date + duration; editing End
                date by hand flips it to Custom. -->
+          <!-- Optional extras (was the More details section): business lines, tags. -->
+          <div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
           </div>
         </section>
         <section class="in-cs" id="in-cs-timeline">
@@ -6013,14 +6004,6 @@ body.rv-spotmode{user-select:none;}
           </div>
         </section>
         </section>
-        <section class="in-cs" id="in-cs-more">
-          <!-- Was a "More / Less details" accordion; now an always-open section
-               with a headline, like General / Timeline / Description. -->
-          <h3 class="in-cs-title">More details</h3>
-          <div class="in-details-body"><div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
-
-          </div>
-        </section>
         <section class="in-cs" id="in-cs-documents">
                 <section class="in-section">
                   <h3 class="in-cs-title">Documents</h3>
@@ -6062,7 +6045,6 @@ body.rv-spotmode{user-select:none;}
             <a class="in-cs-toc-item" href="#in-cs-strategy" data-in-toc-target="in-cs-strategy"><svg class="icon"><use href="#i-okr"/></svg>Strategy</a>
             <a class="in-cs-toc-item" href="#in-cs-raci" data-in-toc-target="in-cs-raci"><svg class="icon"><use href="#i-table"/></svg>RACI</a>
             <a class="in-cs-toc-item" href="#in-cs-connections" data-in-toc-target="in-cs-connections"><svg class="icon"><use href="#i-connectors"/></svg>Connections</a>
-            <a class="in-cs-toc-item" href="#in-cs-more" data-in-toc-target="in-cs-more"><svg class="icon"><use href="#i-settings"/></svg>More details</a>
             <a class="in-cs-toc-item" href="#in-cs-documents" data-in-toc-target="in-cs-documents"><svg class="icon"><use href="#i-attachment"/></svg>Documents</a>
             <a class="in-cs-toc-item" href="#in-cs-projects" data-in-toc-target="in-cs-projects"><svg class="icon"><use href="#i-folder"/></svg>Projects</a>
           </nav>
@@ -6767,15 +6749,13 @@ body.rv-spotmode{user-select:none;}
         value.classList.remove('input-select-placeholder');
         trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
       };
-      // Picked people as cards (photo · name over title), always followed by
-      // the "+ Add team member" tile.
+      // Picked people as cards (photo · name over title) under the select.
       const teamCards = document.getElementById('in-team-cards');
-      const addSlot = team.querySelector('[data-team-add-slot]');
       const paintTeamCards = () => {
         const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
         const items = [...team.querySelectorAll('.dropdown-item')];
         teamCards.querySelectorAll('.in-team-card').forEach(c => c.remove());
-        addSlot.insertAdjacentHTML('beforebegin', picked.map(i => {
+        teamCards.querySelector('.in-team-add').insertAdjacentHTML('beforebegin', picked.map(i => {
           const name = i.querySelector('.dropdown-item-label').textContent;
           return `<div class="in-team-card" data-initials="${i.dataset.initials}"><span class="avatar">${i.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
         }).join(''));
@@ -6785,56 +6765,22 @@ body.rv-spotmode{user-select:none;}
         const btn = e.target.closest('[data-team-remove]');
         if (!btn) return;
         team.querySelectorAll('.dropdown-item')[+btn.dataset.teamRemove]?.click();
-        (teamCards.querySelector('[data-team-remove]') || addBtn).focus();
+        // Cards repaint on the next tick (observer) — focus after that.
+        setTimeout(() => (teamCards.querySelector('[data-team-remove]') || team.querySelector('.input-select-trigger')).focus());
+      });
+      // Once someone is picked the select gives way to the cards plus
+      // "+ Add team member", which opens the same searchable menu below them.
+      teamCards.querySelector('[data-team-add]').addEventListener('click', e => {
+        e.stopPropagation();
+        team.querySelector('.input-select-trigger').click();
+        team.querySelector('[data-dropdown-search-input]')?.focus();
       });
 
-      // "+ Add team member" → search field in the same tile. Typing shows
-      // matching people (already-picked ones left out) in the menu below;
-      // a pick adds the card and the button returns after it.
-      const addBtn = addSlot.querySelector('[data-team-add]');
-      const searchWrap = addSlot.querySelector('.in-team-search');
-      const teamSearch = addSlot.querySelector('[data-team-search]');
-      const teamMenu = addSlot.querySelector('.dropdown-menu');
-      const teamEmpty = teamMenu.querySelector('[data-dropdown-empty]');
-      const teamItems = () => [...teamMenu.querySelectorAll('.dropdown-item')];
-      const filterTeam = () => {
-        const q = teamSearch.value.trim().toLowerCase();
-        let shown = 0;
-        teamItems().forEach(i => {
-          const hit = !!q && !i.classList.contains('is-selected')
-            && i.querySelector('.dropdown-item-label').textContent.toLowerCase().includes(q);
-          i.hidden = !hit; shown += hit;
-        });
-        teamEmpty.hidden = !q || shown > 0;
-        teamMenu.hidden = !q;
-      };
-      const openTeamSearch = () => {
-        addBtn.hidden = true; searchWrap.hidden = false;
-        teamSearch.value = ''; filterTeam(); teamSearch.focus();
-      };
-      const closeTeamSearch = ({ focus = false } = {}) => {
-        if (searchWrap.hidden) return;
-        teamSearch.value = ''; searchWrap.hidden = true; teamMenu.hidden = true;
-        teamItems().forEach(i => { i.hidden = false; }); teamEmpty.hidden = true;
-        addBtn.hidden = false;
-        if (focus) addBtn.focus();
-      };
-      addBtn.addEventListener('click', e => { e.stopPropagation(); openTeamSearch(); });
-      teamSearch.addEventListener('input', filterTeam);
-      teamSearch.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); teamItems().find(i => !i.hidden)?.click(); }
-        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeTeamSearch({ focus: true }); }
-      });
-      document.addEventListener('click', e => { if (!addSlot.contains(e.target)) closeTeamSearch(); });
-      teamMenu.addEventListener('click', e => {
-        if (!e.target.closest('.dropdown-item')) return;
-        paintTeam();
-        if (!searchWrap.hidden) closeTeamSearch({ focus: true });
-      });
+      personSearch(team);
       // Reset, draft reopen and the states harness change picks without a
       // click — watch the items' selected class so the cards always follow.
       // (Observer callbacks already batch per task, so one repaint per change burst.)
-      new MutationObserver(paintTeamCards).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+      new MutationObserver(() => { paintTeamCards(); paintTeam(); }).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
 
       // ===== RACI matrix =====
       // Rows are org units; columns A / R / C / I. Accountable starts from the
@@ -7330,6 +7276,7 @@ body.rv-spotmode{user-select:none;}
         requiredSelects.forEach(f => f.setError(false));
         requiredDates.forEach(f => f.setError(false));
         descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+        window.inSyncReveals?.();
       };
       // Accountable owner defaults to the creator (signed-in user), so every
       // fresh initiative — and the RACI Accountable cell — starts with them.
@@ -7598,6 +7545,15 @@ body.rv-spotmode{user-select:none;}
         row.querySelector('.input-select-trigger')?.click();
         row.querySelector('.input-select-trigger, .input, .input-tags-input')?.focus();
       }));
+      // Keep a revealed row in sync with its data: open when it holds values
+      // (draft reopen, view → edit) or has an error; back to its link when
+      // empty on a fresh form.
+      window.inSyncReveals = () => document.querySelectorAll('[data-reveal]').forEach(btn => {
+        const row = document.getElementById(btn.dataset.reveal);
+        const filled = !!row.querySelector('.dropdown-item.is-selected, .tag, .is-error:not([hidden])');
+        row.hidden = !filled;
+        btn.closest('.in-add').hidden = filled;
+      });
 
       // Tags — free-form chips (designmd .input-tags): Enter or comma adds,
       // Backspace on an empty input or a chip's × removes.
