@@ -4080,6 +4080,17 @@ body.rv-spotmode{user-select:none;}
       transition: opacity var(--ic-duration-fast) var(--ic-ease) 80ms;
     }
     .in-float-tip.is-visible { opacity: 1; }
+    /* Regular style ([data-tooltip-style="regular"]) — mirrors designmd's
+       regular tooltip: white surface, wrapping body text, Level 4 shadow. */
+    .in-float-tip.is-regular.is-rich { max-width: 420px; }
+    .in-tip-list { margin: 0; padding-left: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    .in-tip-list strong { font-weight: var(--ic-weight-semibold); color: var(--color-text); }
+    .in-float-tip.is-regular {
+      max-width: 240px; padding: var(--ic-space-4);
+      background: var(--color-surface); color: var(--ic-palette-graphite-500);
+      font: var(--type-body-sm);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.24), 0 0 32px rgba(0, 0, 0, 0.12);
+    }
     .in-section { border-top: 1px solid var(--color-border); padding-top: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-3); }
     .in-section-title { margin: 0; font: var(--type-body-sm-semibold); color: var(--color-text); }
     .in-conns { display: flex; flex-direction: column; gap: var(--ic-space-3); }
@@ -4207,6 +4218,64 @@ body.rv-spotmode{user-select:none;}
     .in-team > .input-select-trigger[hidden] { display: none; }
     /* Centre the "Working team" label on the 48px tiles, not a 32px input. */
     .in-form-row:has(> .field > #in-team) > .field-label { min-height: 48px; }
+
+    /* ===== RACI matrix =====
+       Org units as rows, A / R / C / I as columns (designmd .table); people
+       as photo · bold name over title; footer row adds people. Square
+       avatars, like the Working team cards. */
+    .in-raci-title { display: flex; align-items: center; gap: var(--ic-space-3); }
+    .in-raci-tools { display: inline-flex; align-items: center; gap: var(--ic-space-5); margin-left: auto; }
+    /* Link-style toggle — blue 500, regular weight, like RACI Guide. */
+    .in-raci-toggle.btn-ghost { gap: var(--ic-space-1); padding-inline: 0; color: var(--ic-palette-blue-500); font: var(--type-body-sm); }
+    .in-raci-toggle.btn-ghost:hover { color: var(--ic-palette-blue-500); text-decoration: underline; text-underline-offset: 3px; }
+    /* Informed column hidden — 5th column in head, body, footer and colgroup. */
+    .in-raci-matrix.no-informed col:nth-child(5),
+    .in-raci-matrix.no-informed tr > :nth-child(5) { display: none; }
+    .in-raci-guide-link { display: inline-flex; align-items: center; gap: var(--ic-space-1); padding: 0; border: 0; background: none; color: var(--color-text-link); font: var(--type-body-sm); cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
+    .in-raci-guide-link:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; border-radius: 2px; }
+    .in-raci-matrix { display: flex; flex-direction: column; gap: var(--ic-space-2); }
+    .in-raci-scroll { max-height: none; overflow: visible; }
+    .in-raci-table { width: 100%; table-layout: fixed; }
+    .in-raci-table .in-raci-col-unit { width: 20%; }
+    .in-raci-table thead th { font: var(--type-body-sm-semibold); color: var(--color-text); }
+    .in-raci-max { font-weight: var(--ic-weight-regular); color: var(--color-text-muted); }
+    /* Compact rows — 54px: 8px padding around a 32px avatar / two single-line labels. */
+    .in-raci-table tbody tr { height: 54px; }
+    .in-raci-table tbody th, .in-raci-table tbody td { vertical-align: middle; padding: var(--ic-space-2) var(--ic-space-3); white-space: normal; border-bottom: 1px solid var(--color-border); }
+    .in-raci-scroll .in-raci-table thead th { position: static; padding-inline: var(--ic-space-3); white-space: normal; }
+    .in-raci-table tbody th { text-align: left; font-weight: var(--ic-weight-regular); }
+    .in-raci-person-text { flex: 1; }
+    .in-raci-unit-cell { display: flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+    .in-raci-unit-cell .avatar { flex: none; }
+    .in-raci-unit { display: block; font: var(--type-body-sm); color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 18px; }
+    .in-raci-unit-sub { display: block; font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 18px; }
+    .in-raci-person { position: relative; display: flex; align-items: center; gap: var(--ic-space-2); min-width: 0; padding: 0; border-radius: var(--ic-radius-sm); }
+    .in-raci-person + .in-raci-person { margin-top: var(--ic-space-2); }
+    .in-raci-person .avatar { flex: none; }
+    .in-raci-person-text { display: flex; flex-direction: column; min-width: 0; }
+    .in-raci-person-name { font: var(--type-body-sm-semibold); color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 18px; }
+    .in-raci-person-role { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 18px; }
+    .in-raci-person.is-tbd .in-raci-person-name { font-weight: var(--ic-weight-regular); color: var(--color-text-muted); }
+    .in-raci-tbd-av { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
+    .in-raci-remove { position: absolute; top: 50%; right: var(--ic-space-1); transform: translateY(-50%); width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--ic-radius-full); background: var(--color-surface); box-shadow: var(--ic-shadow-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; }
+    .in-raci-person:hover { background: var(--color-surface-muted); }
+    .in-raci-person:hover .in-raci-remove, .in-raci-remove:focus-visible { opacity: 1; }
+    .in-raci-remove:hover { background: var(--color-surface-sunken); color: var(--color-text); }
+    .in-raci-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    .in-raci-empty td { color: var(--color-text-subtle); font: var(--type-body-sm); }
+    .in-raci-add td { padding: var(--ic-space-3) var(--ic-space-2); vertical-align: middle; border-top: 1px solid var(--color-border); }
+    .in-raci-add .input-select { width: 100%; }
+    .in-raci-add .input-select-trigger:disabled { background: var(--color-surface-muted); cursor: not-allowed; }
+    /* Disabled buttons swallow hover — let it reach the wrapper's tooltip. */
+    .in-raci-a .input-select-trigger:disabled { pointer-events: none; }
+    .in-raci-a[data-tooltip] { cursor: not-allowed; }
+    .in-raci-add .dropdown-menu { min-width: 320px; }
+    .in-raci-team .dropdown-item { gap: var(--ic-space-3); }
+    .in-raci-team .dropdown-item-icon { color: var(--color-text); }
+    .in-raci-add .dropdown-list { max-height: 260px; }
+    .in-raci-count { margin: 0; text-align: right; font: var(--type-body-xs); color: var(--color-text-muted); }
+    .in-raci-count strong { color: var(--color-text); font-weight: var(--ic-weight-semibold); }
+    .in-raci-matrix.is-readonly .in-raci-person:hover { background: transparent; }
     /* Required-field error lands on the hidden trigger — show it on the tile. */
     .in-team:has(.input-select-trigger.is-error) .in-team-add .btn.in-link { color: var(--color-danger); }
     .in-team:has(.input-select-trigger.is-error) .in-team-search .input { border-color: var(--color-danger); }
@@ -5194,6 +5263,8 @@ body.rv-spotmode{user-select:none;}
                     </div>
                   </div>
                   <div class="dropdown-list" data-dropdown-list>
+                    <!-- Creator — the signed-in user (topbar "MV"); preselected on create. -->
+                    <button class="dropdown-item" type="button" data-initials="MV" data-creator data-unit="Product"><span class="avatar avatar-md">MV</span><div class="dropdown-item-text"><span class="dropdown-item-label">Matt Vella</span><span class="dropdown-item-description">You · Initiative creator</span></div></button>
                     <!-- People from managers.csv (Full Name, Job Title, Avatar URL). -->
                     <button class="dropdown-item" type="button" data-initials="AE"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjcxOTEsInB1ciI6ImJsb2JfaWQifX0=--60464fff1b323a7f956c2de7865ca1612b816f26/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/2024%20&#x27;headshot&#x27;%20cropped%202.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Abbie Emeigh</span><span class="dropdown-item-description">Director of Learning &amp; Development</span></div></button>
                     <button class="dropdown-item" type="button" data-initials="AA"><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NzEzOTYsInB1ciI6ImJsb2JfaWQifX0=--9ceab8501b549c5070f4cec8480e36024f355fa3/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/20250223_154259_3.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Abed Al Kalaji</span><span class="dropdown-item-description">Senior Director, Business Analytics</span></div></button>
@@ -5821,6 +5892,62 @@ body.rv-spotmode{user-select:none;}
           </div>
         </div>
         </section>
+        <!-- RACI — matrix: org units as rows, Accountable / Responsible /
+             Consulted / Informed as columns. Accountable comes from the
+             Accountable owner field (General); R/C/I are added with the footer
+             row: pick a member under a role and their team fills in. Optional. -->
+        <section class="in-cs" id="in-cs-raci">
+          <h3 class="in-cs-title in-raci-title">RACI
+            <button class="in-raci-guide-link" type="button" data-tooltip="People added to RACI must match the respective Slack channel. It's best to avoid assigning the same person as both Accountable and Responsible. Typically, direct reports are Responsible, while managers are Accountable." data-tooltip-style="regular" data-tooltip-content="in-raci-guide-tip" data-placement="bottom" aria-describedby="in-raci-guide-text"><svg class="icon icon-16"><use href="#i-info"/></svg>RACI Guide</button>
+            <template id="in-raci-guide-tip"><ul class="in-tip-list">
+              <li>People added to RACI must match the respective Slack channel.</li>
+              <li>It's best to avoid assigning the same person as both <strong>Accountable</strong> and <strong>Responsible</strong>.</li>
+              <li>Typically, direct reports are <strong>Responsible</strong>, while managers are <strong>Accountable</strong>.</li>
+            </ul></template>
+            <span class="visually-hidden" id="in-raci-guide-text" hidden>People added to RACI must match the respective Slack channel. It's best to avoid assigning the same person as both Accountable and Responsible. Typically, direct reports are Responsible, while managers are Accountable.</span>
+            <span class="in-raci-tools">
+              <button class="btn btn-ghost in-raci-toggle" type="button" id="in-raci-informed" aria-pressed="true" aria-controls="in-raci"><svg class="icon icon-16"><use href="#i-eye"/></svg><span data-raci-informed-label>Hide Informed</span></button>
+            </span>
+          </h3>
+          <div class="in-raci-matrix" id="in-raci">
+            <div class="table-scroll in-raci-scroll">
+              <table class="table in-raci-table">
+                <colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup>
+                <thead><tr>
+                  <th scope="col">Org Unit</th>
+                  <th scope="col">Accountable <span class="in-raci-max">(max 1)</span></th>
+                  <th scope="col">Responsible <span class="in-raci-max">(max 20)</span></th>
+                  <th scope="col">Consulted <span class="in-raci-max">(max 20)</span></th>
+                  <th scope="col">Informed <span class="in-raci-max">(max 20)</span></th>
+                </tr></thead>
+                <tbody data-raci-rows></tbody>
+                <tfoot><tr class="in-raci-add">
+                  <td><div class="input-select in-raci-team">
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <div class="dropdown-menu" hidden></div>
+                  </div></td>
+                  <td><div class="input-select in-raci-a">
+                    <button class="input-select-trigger" aria-expanded="false" type="button" disabled><span class="input-select-value input-select-placeholder">Set by Accountable owner</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <div class="dropdown-menu" hidden></div>
+                  </div></td>
+                  <td><div class="input-select in-raci-pick" data-raci-role="R" data-dropdown-search>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <div class="dropdown-menu" hidden></div>
+                  </div></td>
+                  <td><div class="input-select in-raci-pick" data-raci-role="C" data-dropdown-search>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <div class="dropdown-menu" hidden></div>
+                  </div></td>
+                  <td><div class="input-select in-raci-pick" data-raci-role="I" data-dropdown-search>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <div class="dropdown-menu" hidden></div>
+                  </div></td>
+                </tr></tfoot>
+              </table>
+            </div>
+            <p class="in-raci-count" data-raci-count aria-live="polite"></p>
+          </div>
+        </section>
         <section class="in-cs" id="in-cs-connections">
         <section class="in-section">
           <h3 class="in-cs-title">Connections</h3>
@@ -5917,6 +6044,7 @@ body.rv-spotmode{user-select:none;}
             <a class="in-cs-toc-item" href="#in-cs-timeline" data-in-toc-target="in-cs-timeline"><svg class="icon"><use href="#i-calendar"/></svg>Timeline</a>
             <a class="in-cs-toc-item" href="#in-cs-description" data-in-toc-target="in-cs-description"><svg class="icon"><use href="#i-list-unordered"/></svg>Description</a>
             <a class="in-cs-toc-item" href="#in-cs-strategy" data-in-toc-target="in-cs-strategy"><svg class="icon"><use href="#i-okr"/></svg>Strategy</a>
+            <a class="in-cs-toc-item" href="#in-cs-raci" data-in-toc-target="in-cs-raci"><svg class="icon"><use href="#i-table"/></svg>RACI</a>
             <a class="in-cs-toc-item" href="#in-cs-connections" data-in-toc-target="in-cs-connections"><svg class="icon"><use href="#i-connectors"/></svg>Connections</a>
             <a class="in-cs-toc-item" href="#in-cs-more" data-in-toc-target="in-cs-more"><svg class="icon"><use href="#i-settings"/></svg>More details</a>
             <a class="in-cs-toc-item" href="#in-cs-documents" data-in-toc-target="in-cs-documents"><svg class="icon"><use href="#i-attachment"/></svg>Documents</a>
@@ -6358,11 +6486,19 @@ body.rv-spotmode{user-select:none;}
         const GAP = 6, EDGE = 8;
         const show = el => {
           current = el;
-          tip.textContent = el.getAttribute('data-tooltip');
+          // Rich content (lists, bold) comes from a <template> named by
+          // data-tooltip-content; data-tooltip stays as the plain fallback.
+          const tpl = el.dataset.tooltipContent && document.getElementById(el.dataset.tooltipContent);
+          if (tpl) tip.replaceChildren(tpl.content.cloneNode(true));
+          else tip.textContent = el.getAttribute('data-tooltip');
+          tip.classList.toggle('is-rich', !!tpl);
           tip.classList.remove('is-visible');
+          const regular = el.dataset.tooltipStyle === 'regular';
+          tip.classList.toggle('is-regular', regular);
+          const gap = regular ? 12 : GAP;
           const r = el.getBoundingClientRect(), t = tip.getBoundingClientRect();
-          let top = r.top - t.height - GAP;
-          if (el.dataset.placement === 'bottom' || top < EDGE) top = r.bottom + GAP;
+          let top = r.top - t.height - gap;
+          if (el.dataset.placement === 'bottom' || top < EDGE) top = r.bottom + gap;
           const left = Math.min(Math.max(r.left + r.width / 2 - t.width / 2, EDGE), innerWidth - t.width - EDGE);
           tip.style.top = `${top}px`; tip.style.left = `${left}px`;
           requestAnimationFrame(() => tip.classList.add('is-visible'));
@@ -6569,9 +6705,9 @@ body.rv-spotmode{user-select:none;}
       // login — when one can't load, the avatar falls back to initials.
       // Broken photo → initials, here and in the trigger avatar it's copied into.
       // Same for the Working team list (managers.csv) and its cards.
-      const PHOTO_PICKERS = '#in-sponsor, #in-owner, #in-pm, #in-team, #in-team-cards, #in-drawer-view';
+      const PHOTO_PICKERS = '#in-sponsor, #in-owner, #in-pm, #in-team, #in-team-cards, .in-raci-matrix, #in-drawer-view';
       const toInitials = img => {
-        const picker = img.closest('#in-sponsor, #in-owner, #in-pm, #in-team');
+        const picker = img.closest('#in-sponsor, #in-owner, #in-pm, #in-team, .in-raci-matrix');
         const ini = img.closest('.dropdown-item, .in-team-card, .in-view-person')?.dataset.initials
           || img.closest('.dropdown-item')?.dataset.initials
           || picker?.querySelector('.dropdown-item.is-selected')?.dataset.initials || '';
@@ -6671,6 +6807,175 @@ body.rv-spotmode{user-select:none;}
       // click — watch the items' selected class so the cards always follow.
       // (Observer callbacks already batch per task, so one repaint per change burst.)
       new MutationObserver(paintTeamCards).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+      // ===== RACI matrix =====
+      // Rows are org units; columns A / R / C / I. Accountable mirrors the
+      // Accountable owner field and sits in that person's team row. R / C / I
+      // come from the footer: pick a member under a role and they join their
+      // own team's row (the Org Unit select shows it). "To be defined" uses the
+      // team chosen in that select. Limits: A 1, each of R/C/I 20, 40 total.
+      // Prototype data: org units are made up; a person's team is inferred
+      // from their job title.
+      (() => {
+        const UNITS = [
+          ['Accounting', 'Sub-team in Finance'], ['Business Analytics', 'Subfunction in Operations'], ['Customer Success', 'Team in Services'],
+          ['Delivery', 'Team in Services'], ['Finance', 'Function'], ['Leadership', 'Function'], ['Legal', 'Function'],
+          ['Marketing', 'Function'], ['Marketing Strategy', 'Team in Marketing'], ['Partner Growth', 'Team in Services'],
+          ['Partnerships', 'Team in Services'], ['Platform Engineering', 'Team in Technology'], ['Product', 'Function'],
+          ['Sales', 'Function'], ['Talent Operations', 'Function'],
+        ].map(([name, sub]) => ({ name, sub }));
+        const unitFor = title => {
+          const t = (title || '').toLowerCase();
+          const rules = [[/deliver/, 'Delivery'], [/partner/, 'Partnerships'], [/engineer|technical|developer|platform|architect/, 'Platform Engineering'],
+            [/analytic|data/, 'Business Analytics'], [/financ|cfo|account/, 'Finance'], [/legal|counsel/, 'Legal'], [/market|brand|content/, 'Marketing Strategy'],
+            [/sales|revenue|account exec/, 'Sales'], [/talent|recruit|people|learning/, 'Talent Operations'], [/product|design/, 'Product'], [/customer|success|support/, 'Customer Success']];
+          return (rules.find(([re]) => re.test(t)) || [, 'Leadership'])[1];
+        };
+        const LIMIT = { R: 20, C: 20, I: 20 }, TOTAL = 40;
+        const ROLES = ['A', 'R', 'C', 'I'];
+        const root = document.getElementById('in-raci');
+        const tbody = root.querySelector('[data-raci-rows]');
+        const countEl = root.querySelector('[data-raci-count]');
+        const teamSel = root.querySelector('.in-raci-team');
+        const picks = [...root.querySelectorAll('.in-raci-pick')];
+        const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        let entries = []; // { unit, role: 'R'|'C'|'I', person: { name, title, initials, img, tbd } }
+
+        // Team options
+        // Org-unit icon by type (designmd iconography): Team · Function · Subfunction / Sub-team.
+        const unitIcon = sub => /^(sub)/i.test(sub) ? 'i-subfunction' : /^function/i.test(sub) ? 'i-function' : 'i-team';
+        teamSel.querySelector('.dropdown-menu').innerHTML = `
+          <div class="dropdown-search"><div class="input-icon input-icon-left"><svg class="icon input-icon-glyph"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Search teams" aria-label="Search teams" autocomplete="off" data-dropdown-search-input /></div></div>
+          <div class="dropdown-list" data-dropdown-list>${UNITS.map(u =>
+            `<button class="dropdown-item" type="button" data-unit="${esc(u.name)}"><svg class="dropdown-item-icon"><use href="#${unitIcon(u.sub)}"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${esc(u.name)}</span><span class="dropdown-item-description">${esc(u.sub)}</span></div></button>`).join('')}</div>
+          <div class="dropdown-empty" data-dropdown-empty hidden>No teams found</div>`;
+        personSearch(teamSel);
+        // Member options: "To be defined" + the Working team people list, searchable.
+        const peopleHtml = team.querySelector('[data-dropdown-list]').innerHTML;
+        picks.forEach(sel => {
+          sel.querySelector('.dropdown-menu').innerHTML = `
+            <div class="dropdown-search"><div class="input-icon input-icon-left"><svg class="icon input-icon-glyph"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input /></div></div>
+            <div class="dropdown-list" data-dropdown-list>
+              <button class="dropdown-item" type="button" data-tbd data-initials=""><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md in-raci-tbd-av"><svg class="icon"><use href="#i-user"/></svg></span><div class="dropdown-item-text"><span class="dropdown-item-label">To be defined</span><span class="dropdown-item-description">Placeholder until someone is named</span></div></button>
+              ${peopleHtml}
+            </div>`;
+          sel.querySelectorAll('.is-selected').forEach(i => i.classList.remove('is-selected'));
+          sel.querySelectorAll('.dropdown-item-check').forEach(c => c.remove()); // picks add a row, nothing stays checked
+          sel.querySelectorAll('[data-dropdown-empty]').forEach(e => { e.hidden = true; });
+          personSearch(sel);
+        });
+
+        const personOf = item => item.hasAttribute('data-tbd')
+          ? { name: 'To be defined', title: '', initials: '', img: '', tbd: true }
+          : { name: item.querySelector('.dropdown-item-label').textContent.trim(), title: item.querySelector('.dropdown-item-description')?.textContent.trim() || '',
+              initials: item.dataset.initials || '', img: item.querySelector('.avatar img')?.getAttribute('src') || '' };
+        const owner = () => {
+          const it = document.querySelector('#in-owner .dropdown-item.is-selected');
+          if (!it) return null;
+          const p = personOf(it);
+          return { unit: it.dataset.unit || unitFor(p.title), role: 'A', person: p };
+        };
+        const all = () => { const a = owner(); return a ? [a, ...entries] : [...entries]; };
+        const selectedTeam = () => teamSel.querySelector('.dropdown-item.is-selected')?.dataset.unit || null;
+        const avatar = p => p.tbd
+          ? '<span class="avatar avatar-md in-raci-tbd-av"><svg class="icon"><use href="#i-user"/></svg></span>'
+          : `<span class="avatar avatar-md">${p.img ? `<img src="${esc(p.img)}" alt="" />` : esc(p.initials)}</span>`;
+        const personHtml = (e, i, editable) => `<div class="in-raci-person${e.person.tbd ? ' is-tbd' : ''}" data-initials="${esc(e.person.initials)}">${avatar(e.person)}<span class="in-raci-person-text"><span class="in-raci-person-name" title="${esc(e.person.name)}">${esc(e.person.name)}</span>${e.person.title ? `<span class="in-raci-person-role" title="${esc(e.person.title)}">${esc(e.person.title)}</span>` : ''}</span>${editable && i >= 0 ? `<button class="in-raci-remove" type="button" data-raci-remove="${i}" aria-label="Remove ${esc(e.person.name)}"><svg class="icon"><use href="#i-x"/></svg></button>` : ''}</div>`;
+        const rowsHtml = (list, editable) => {
+          // Informed hidden — teams that only have Informed people drop out too.
+          if (document.getElementById('in-raci-informed').getAttribute('aria-pressed') === 'false') list = list.filter(e => e.role !== 'I');
+          const order = [...new Set(list.map(e => e.unit))];
+          if (!order.length) return `<tr class="in-raci-empty"><td colspan="5">No one added yet. Pick a team member under a role — their team fills in automatically.</td></tr>`;
+          return order.map(u => {
+            const meta = UNITS.find(x => x.name === u) || { name: u, sub: '' };
+            const cells = ROLES.map(r => `<td>${list.map((e, idx) => ({ e, idx })).filter(({ e }) => e.unit === u && e.role === r)
+              .map(({ e }) => personHtml(e, e.role === 'A' ? -1 : entries.indexOf(e), editable)).join('')}</td>`).join('');
+            return `<tr><th scope="row"><div class="in-raci-unit-cell"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#${unitIcon(meta.sub)}"/></svg></span><span class="in-raci-person-text"><span class="in-raci-unit" title="${esc(meta.name)}">${esc(meta.name)}</span><span class="in-raci-unit-sub" title="${esc(meta.sub)}">${esc(meta.sub)}</span></span></div></th>${cells}</tr>`;
+          }).join('');
+        };
+        const render = () => {
+          tbody.innerHTML = rowsHtml(all(), true);
+          const n = all().length;
+          countEl.innerHTML = `<strong>${n}</strong> ${n === 1 ? 'person' : 'people'} added (max ${TOTAL})`;
+          picks.forEach(sel => sel.querySelector('.input-select-trigger').setAttribute('aria-label', `Add ${{ R: 'Responsible', C: 'Consulted', I: 'Informed' }[sel.dataset.raciRole]}`));
+          // Accountable is capped at 1 and comes from the owner field — say so on hover.
+          const aSel = root.querySelector('.in-raci-a');
+          if (owner()) aSel.setAttribute('data-tooltip', 'Max limit reached for Accountable');
+          else aSel.removeAttribute('data-tooltip');
+        };
+        // Show a team in the footer Org Unit select (filled from the picked person).
+        const setTeam = unit => {
+          teamSel.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i.dataset.unit === unit));
+          const v = teamSel.querySelector('.input-select-value');
+          v.textContent = unit || 'Select team';
+          v.classList.toggle('input-select-placeholder', !unit);
+        };
+        const resetPick = sel => {
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
+          sel.querySelector('[data-select-avatar]')?.remove();
+          const v = sel.querySelector('.input-select-value');
+          v.textContent = 'Select Team Member'; v.classList.add('input-select-placeholder');
+        };
+        picks.forEach(sel => sel.querySelector('.dropdown-menu').addEventListener('click', e => {
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          const role = sel.dataset.raciRole;
+          // Close the menu and clear the trigger once the shared handler has run.
+          setTimeout(() => {
+            resetPick(sel);
+            const trig = sel.querySelector('.input-select-trigger');
+            trig.setAttribute('aria-expanded', 'false');
+            sel.querySelector('.dropdown-menu').hidden = true;
+          });
+          const person = personOf(item);
+          // A named person joins their own team's row; "To be defined" has no
+          // team, so it uses the team picked in the Org Unit select.
+          const unit = person.tbd ? selectedTeam() : unitFor(person.title);
+          if (!unit) { window.toast?.({ variant: 'warning', message: 'Select a team for “To be defined”.' }); return; }
+          setTeam(unit);
+          if (all().length >= TOTAL) { window.toast?.({ variant: 'warning', message: `RACI is full — up to ${TOTAL} people.` }); return; }
+          if (entries.filter(x => x.role === role).length >= LIMIT[role]) { window.toast?.({ variant: 'warning', message: `Up to ${LIMIT[role]} people per role.` }); return; }
+          if (!person.tbd && entries.some(x => x.role === role && x.unit === unit && x.person.name === person.name)) return;
+          entries.push({ unit, role, person });
+          render();
+        }));
+        teamSel.querySelector('.dropdown-menu').addEventListener('click', e => { if (e.target.closest('.dropdown-item')) setTimeout(render); });
+        tbody.addEventListener('click', e => {
+          const btn = e.target.closest('[data-raci-remove]');
+          if (!btn) return;
+          entries.splice(+btn.dataset.raciRemove, 1);
+          render();
+          root.querySelector('[data-raci-remove]')?.focus();
+        });
+        // Accountable follows the Accountable owner field.
+        new MutationObserver(render).observe(document.querySelector('#in-owner'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+        // Show / hide the Informed column (people in it are kept, just not shown).
+        const informedSw = document.getElementById('in-raci-informed');
+        const isInformed = () => informedSw.getAttribute('aria-pressed') !== 'false';
+        // Eye = column showing, eye-slash = hidden; the label names the action.
+        const setInformed = on => {
+          informedSw.setAttribute('aria-pressed', String(on));
+          informedSw.querySelector('use').setAttribute('href', on ? '#i-eye' : '#i-eye-slash');
+          informedSw.querySelector('[data-raci-informed-label]').textContent = on ? 'Hide Informed' : 'Show Informed';
+          root.classList.toggle('no-informed', !on);
+        };
+        informedSw.addEventListener('click', () => { setInformed(!isInformed()); render(); });
+
+        // Hooks for drafts (snapshot / restore) and view mode.
+        window.inRaci = {
+          get: () => entries.map(e => ({ ...e, person: { ...e.person } })),
+          set: list => { entries = (list || []).map(e => ({ ...e, person: { ...e.person } })); render(); },
+          informed: () => isInformed(),
+          setInformed: on => { setInformed(on !== false); render(); },
+        };
+        window.inRaciViewHtml = () => {
+          const list = all();
+          if (!list.length) return '';
+          return `<div class="in-view-block"><h3>RACI</h3><div class="in-raci-matrix is-readonly${isInformed() ? '' : ' no-informed'}"><div class="table-scroll in-raci-scroll"><table class="table in-raci-table"><colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup><thead><tr><th scope="col">Org Unit</th><th scope="col">Accountable</th><th scope="col">Responsible</th><th scope="col">Consulted</th><th scope="col">Informed</th></tr></thead><tbody>${rowsHtml(list, false)}</tbody></table></div></div></div>`;
+        };
+        render();
+      })();
 
       // Multi-entry lists (roadmap IDs 20–21). Rows: number · input · drag
       // handle · remove. The last row can't be removed. Drag by the handle;
@@ -6896,7 +7201,7 @@ body.rv-spotmode{user-select:none;}
       // the same handlers a click would, so triggers, avatars and dependent
       // fields (End date, Full impact, the objective row) all follow.
       const drawerEl = document.getElementById('in-drawer-new');
-      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')];
+      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')].filter(el => !el.closest('.in-raci-matrix'));
       formSelects.forEach(el => {
         const v = el.querySelector('.input-select-value');
         el.dataset.ph = v?.classList.contains('input-select-placeholder') ? v.textContent : '';
@@ -6912,6 +7217,7 @@ body.rv-spotmode{user-select:none;}
         start: startInput.value, end: endInput.value,
         desc: desc.value, problem: problem.value,
         objectives: objectives.values(), metrics: metrics.values(),
+        raci: window.inRaci?.get() || [], raciInformed: window.inRaci ? window.inRaci.informed() : true,
       });
       const clearSelectFully = el => {
         el.querySelectorAll('.dropdown-item').forEach(i => {
@@ -6943,11 +7249,16 @@ body.rv-spotmode{user-select:none;}
         problem.value = snap.problem; problem.dispatchEvent(new Event('input'));
         objectives.setValues(snap.objectives);
         metrics.setValues(snap.metrics);
+        window.inRaci?.set(snap.raci);
+        window.inRaci?.setInformed(snap.raciInformed);
         setNameError(false);
         requiredSelects.forEach(f => f.setError(false));
         requiredDates.forEach(f => f.setError(false));
         descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
       };
+      // Accountable owner defaults to the creator (signed-in user), so every
+      // fresh initiative — and the RACI Accountable cell — starts with them.
+      document.querySelector('#in-owner [data-creator]')?.click();
       const BLANK = snapshot();
       // Snapshots for every row the drawer has made — drafts and published.
       const drafts = {};
@@ -7012,6 +7323,7 @@ body.rv-spotmode{user-select:none;}
             ${row('Project manager', d.pmHtml || person(null))}
           </dl>
           <div class="in-view-block"><h3>Working team</h3>${d.teamHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>
+          ${d.raciHtml || ''}
           <dl class="in-view-rows">
             ${row('Estimated duration', d.duration ? vEsc(d.duration) : EMPTY)}
             ${row('Start date', d.start ? vEsc(d.start) : EMPTY)}
@@ -7062,6 +7374,7 @@ body.rv-spotmode{user-select:none;}
           teamHtml: team.length
             ? `<div class="in-view-team-cards">${team.map(t => `<div class="in-team-card" data-initials="${vEsc(t.dataset.initials || '')}"><span class="avatar">${t.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${vEsc(label(t))}</span><span class="in-team-card-role">${vEsc(t.querySelector('.dropdown-item-description')?.textContent.trim() || '')}</span></span></div>`).join('')}</div>`
             : '',
+          raciHtml: window.inRaciViewHtml ? window.inRaciViewHtml() : '',
           duration: sel1('in-duration') ? label(sel1('in-duration')) : '',
           start: startInput.value.trim(), end: endInput.value.trim(),
           impact: !!(document.getElementById('in-impact-initial') || document.getElementById('in-impact-full')),
