@@ -5247,7 +5247,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="cell-title"><span class="cell-title-text">${esc(n.name)}</span><span class="cell-title-sub">${esc(n.type || 'Initiative')} · ${esc(n.fn)}</span></div></div></td>
           ${col('status', `<span class="tag tag-light">${esc(n.status)}</span>`)}
           ${col('health', `<span class="tag tag-indicator ${hCls}">${hLabel}</span>`)}
-          ${col('owner', `<div class="cell-user"><span class="cell-avatar">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
+          ${col('owner', `<div class="cell-user"><span class="avatar avatar-md">${n.owner.initials}</span><div class="cell-user-meta"><span class="cell-user-name">${esc(n.owner.name)}</span><span class="cell-user-role">${esc(n.owner.role)}</span></div></div>`)}
           ${col('roadmap', `<div class="cell-meta-sub"><svg class="icon"><use href="#i-calendar-blank"/></svg>${fmtDate(n.roadmap)}</div>`)}
           ${col('rob', rob)}
           ${col('created', `<div class="cell-meta-sub">${fmtDate(n.created)}</div>`)}
