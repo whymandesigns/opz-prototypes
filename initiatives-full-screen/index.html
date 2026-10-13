@@ -4083,6 +4083,15 @@ body.rv-spotmode{user-select:none;}
     /* Regular style ([data-tooltip-style="regular"]) — mirrors designmd's
        regular tooltip: white surface, wrapping body text, Level 4 shadow. */
     .in-float-tip.is-regular.is-rich { max-width: 420px; }
+    /* Caret — designmd's regular tooltip caret: a 10px rotated square whose
+       shadowed half pokes out of the bubble; ::after covers the inner half.
+       Above the trigger it points down, below it points up. */
+    .in-float-tip.is-regular::before,
+    .in-float-tip.is-regular::after { content: ''; position: absolute; left: var(--caret-x, 50%); background: var(--color-surface); pointer-events: none; }
+    .in-float-tip.is-regular::before { width: 10px; height: 10px; box-shadow: 0 0 4px rgba(0, 0, 0, 0.24); transform: translateX(-50%) rotate(45deg); bottom: -5px; }
+    .in-float-tip.is-regular::after { width: 16px; height: 8px; transform: translateX(-50%); bottom: 0; }
+    .in-float-tip.is-regular.is-below::before { bottom: auto; top: -5px; }
+    .in-float-tip.is-regular.is-below::after { bottom: auto; top: 0; }
     .in-tip-list { margin: 0; padding-left: var(--ic-space-5); display: flex; flex-direction: column; gap: var(--ic-space-1); }
     .in-tip-list strong { font-weight: var(--ic-weight-semibold); color: var(--color-text); }
     .in-float-tip.is-regular {
@@ -4116,7 +4125,7 @@ body.rv-spotmode{user-select:none;}
     .in-details .accordion-summary { padding: 0; font-weight: var(--ic-weight-semibold); }
     .in-details-body { display: flex; flex-direction: column; gap: var(--ic-space-5); }
     .in-details-body > * { flex-shrink: 0; }
-    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-4); padding-top: var(--ic-space-3); }
+    .in-adds { display: flex; flex-wrap: wrap; gap: var(--ic-space-4); }
     /* Fields revealed by an "+ Add…" link take a full line above the links. */
     .in-reveal-row { flex-basis: 100%; }
     .in-form-row[hidden], .in-add[hidden] { display: none; }
@@ -4200,31 +4209,25 @@ body.rv-spotmode{user-select:none;}
     .in-team-card-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
     [data-theme="dark"] .in-team-card-name { color: var(--color-text); }
     [data-theme="dark"] .in-team-card-role { color: var(--color-text-muted); }
-    /* "+ Add team member" — the Figma Button Action link (38130:118593), no
-       border or padding of its own; it takes the next grid cell after the
-       last card, centred on the 48px card row. On click the search field
-       takes over the same cell; the people menu drops below it. */
-    .in-team-add { position: relative; display: flex; align-items: center; min-width: 0; height: 48px; }
-    .in-team-add [hidden] { display: none !important; }
+    /* Empty: the select trigger only. With picks: cards + "+ Add team member"
+       tile, and the trigger steps aside (the menu then opens under the cards). */
+    .in-team-cards { margin-top: 0; }
+    .in-team:not(:has(.in-team-card)) .in-team-cards { display: none; }
+    .in-team:has(.in-team-card) > .input-select-trigger { display: none; }
+    .in-team-add { display: flex; align-items: center; min-width: 0; height: 48px; }
     .in-team-add .btn.in-link { height: 32px; justify-content: flex-start; }
-    .in-team-search { width: 100%; }
-    .in-team-search .input { width: 100%; height: 32px; }
-    .in-team-menu { position: absolute; top: calc(100% + 4px); left: 0; width: 320px; max-height: 320px; overflow-y: auto; z-index: 20; }
-    .in-team-menu .dropdown-item { flex-shrink: 0; }
-    /* Picked people are left out of the results, so no check column. */
-    .in-team-menu .dropdown-item-check { display: none; }
-    /* The trigger is only kept for the shared select logic — .input-select-trigger's
-       display: flex beats the UA [hidden] rule, so hide it explicitly. */
-    .in-team > .input-select-trigger[hidden] { display: none; }
-    /* Centre the "Working team" label on the 48px tiles, not a 32px input. */
-    .in-form-row:has(> .field > #in-team) > .field-label { min-height: 48px; }
+    /* Label lines up with the trigger (32px) or the card row (48px). */
+    .in-form-row:has(> .field > #in-team) > .field-label { min-height: 32px; }
+    .in-form-row:has(> .field > #in-team .in-team-card) > .field-label { min-height: 48px; }
 
     /* ===== RACI matrix =====
        Org units as rows, A / R / C / I as columns (designmd .table); people
        as photo · bold name over title; footer row adds people. Square
        avatars, like the Working team cards. */
     .in-raci-title { display: flex; align-items: center; gap: var(--ic-space-3); }
-    .in-raci-tools { display: inline-flex; align-items: center; gap: var(--ic-space-5); margin-left: auto; }
+    .in-raci-tools { display: inline-flex; align-items: center; gap: var(--ic-space-5); }
+    .in-raci-tools:not(:has(*)) { display: none; } /* empty while the Informed toggle is hidden */
+    .in-raci-title .in-raci-guide-link { margin-left: auto; }
     /* Link-style toggle — blue 500, regular weight, like RACI Guide. */
     .in-raci-toggle.btn-ghost { gap: var(--ic-space-1); padding-inline: 0; color: var(--ic-palette-blue-500); font: var(--type-body-sm); }
     .in-raci-toggle.btn-ghost:hover { color: var(--ic-palette-blue-500); text-decoration: underline; text-underline-offset: 3px; }
@@ -4277,8 +4280,6 @@ body.rv-spotmode{user-select:none;}
     .in-raci-count strong { color: var(--color-text); font-weight: var(--ic-weight-semibold); }
     .in-raci-matrix.is-readonly .in-raci-person:hover { background: transparent; }
     /* Required-field error lands on the hidden trigger — show it on the tile. */
-    .in-team:has(.input-select-trigger.is-error) .in-team-add .btn.in-link { color: var(--color-danger); }
-    .in-team:has(.input-select-trigger.is-error) .in-team-search .input { border-color: var(--color-danger); }
 
     /* Working team trigger — up to 3 overlapping photo avatars + summary.
        designmd has no avatar group, so the stack is local. */
@@ -4463,6 +4464,18 @@ body.rv-spotmode{user-select:none;}
       #in-drawer-new .in-cs-name-row > .in-name-field { width: calc(100% - 40px); }
     }
     .in-cs-close:hover { color: var(--color-text); }
+    .in-leave-text { margin: 0; font: var(--type-body-sm); color: var(--color-text-muted); }
+    /* Above the full-screen create page (same z-index, so lift it). */
+    #in-leave-modal { z-index: calc(var(--ic-z-modal) + 2); }
+    /* Header variant B (?header=breadcrumb) — breadcrumb trail on top, no ✕. */
+    .in-cs-crumbs { display: none; margin-bottom: 0; } /* the heading's 8px gap alone sets the space to the name */
+    .in-header-breadcrumb .in-cs-crumbs { display: flex; }
+    .in-header-breadcrumb #in-drawer-new .in-cs-close { display: none; }
+    /* …and no Initiative tag — the breadcrumb already says it. Stage stays. */
+    /* …and the stage lives in General as Status, so the tag row goes. */
+    .in-status-row { display: none; }
+    .in-header-breadcrumb .in-status-row { display: grid; }
+    .in-header-breadcrumb #in-drawer-new .in-drawer-tags { display: none; }
     /* --color-text-muted lands at 2.27:1 on the dark panel, under the 3:1 WCAG
        minimum for controls — and this is the only dismiss affordance. Same
        correction the file already makes for .btn-icon-only.btn-secondary. */
@@ -5155,6 +5168,12 @@ body.rv-spotmode{user-select:none;}
       <header class="drawer-header">
         <div class="in-drawer-heading">
           <h2 class="in-visually-hidden" id="in-drawer-new-title">New initiative</h2>
+          <!-- Header variant B (?header=breadcrumb): breadcrumb above the name
+               input, no close button — "Initiatives" leads back instead. -->
+          <nav class="breadcrumbs in-cs-crumbs" aria-label="Breadcrumb">
+            <a class="breadcrumb" href="#" data-modal-close>Initiatives</a>
+            <span class="breadcrumb is-current" aria-current="page" data-crumb-current>New initiative</span>
+          </nav>
           <div class="in-cs-name-row">
             <div class="field in-name-field">
               <input class="input in-name-input" id="in-name" type="text" placeholder="Add initiative name" aria-label="Initiative name" aria-required="true" aria-describedby="in-name-error" autocomplete="off" />
@@ -5178,6 +5197,25 @@ body.rv-spotmode{user-select:none;}
           <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
             <svg class="icon alert-icon"><use href="#i-warning"/></svg>
             <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+          </div>
+          <!-- Header variant B (?header=breadcrumb): the stage moves out of the
+               header tags into this Status field. Mirrors the header stage
+               menu, which stays the source of truth for drafts and view. -->
+          <div class="in-form-row in-status-row">
+            <span class="field-label">Status</span>
+            <div class="input-select in-stage-select" id="in-status">
+              <button class="input-select-trigger" aria-expanded="false" aria-label="Status" type="button"><span class="input-select-value">Idea</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+              <div class="dropdown-menu" hidden>
+                <button class="dropdown-item is-selected" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Idea</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Opportunity assessment</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Definition</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Execution</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Impact assessment</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Complete</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>On hold</button>
+                <button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Cancelled</button>
+              </div>
+            </div>
           </div>
           <div class="in-form-row">
             <span class="field-label">Health</span>
@@ -5599,7 +5637,8 @@ body.rv-spotmode{user-select:none;}
             </div>
           </div>
           <!-- TopTrack roadmap ID 7 — Working team, multi-select people,
-               required (≥ 1), under Project manager. Same searchable photo
+               required (≥ 1), under Project manager. A searchable multi-select
+               like Project manager; picked people show as cards below it. Same searchable photo
                picker as Executive sponsor; stays open while you pick. -->
           <div class="in-form-row in-row-top">
             <span class="field-label">Working team</span>
@@ -5610,15 +5649,14 @@ body.rv-spotmode{user-select:none;}
                    and a pick adds a card. The trigger stays (hidden) so the
                    shared select logic, validation and drafts keep working. -->
               <div class="input-select in-team" id="in-team" data-multi>
-                <button class="input-select-trigger" hidden aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
-                <div class="in-team-cards" id="in-team-cards" aria-label="Working team members">
-                  <div class="in-team-add" data-team-add-slot>
-                    <button class="btn btn-ghost in-link" type="button" data-team-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add team member</button>
-                    <div class="input-icon input-icon-left in-team-search" hidden>
+                <button class="input-select-trigger" aria-expanded="false" aria-label="Working team" aria-required="true" aria-describedby="in-team-error" type="button"><span class="input-select-value input-select-placeholder">Add working team</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu" data-dropdown-search hidden>
+                  <div class="dropdown-search">
+                    <div class="input-icon input-icon-left">
                       <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                      <input class="input" type="search" placeholder="Search people" aria-label="Search people to add" autocomplete="off" data-team-search />
+                      <input class="input" type="search" placeholder="Search people" aria-label="Search people" autocomplete="off" data-dropdown-search-input />
                     </div>
-                    <div class="dropdown-menu in-team-menu" hidden>
+                  </div>
                   <div class="dropdown-list" data-dropdown-list>
                     <!-- People from managers.csv (Full Name, Job Title, Avatar URL). -->
                     <button class="dropdown-item" type="button" data-initials="AE"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NjcxOTEsInB1ciI6ImJsb2JfaWQifX0=--60464fff1b323a7f956c2de7865ca1612b816f26/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/2024%20&#x27;headshot&#x27;%20cropped%202.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Abbie Emeigh</span><span class="dropdown-item-description">Director of Learning &amp; Development</span></div></button>
@@ -5767,9 +5805,8 @@ body.rv-spotmode{user-select:none;}
                     <button class="dropdown-item" type="button" data-initials="ÁV"><svg class="dropdown-item-check"><use href="#i-check"/></svg><span class="avatar avatar-md"><img src="https://team.toptal.net/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTQwOTcsInB1ciI6ImJsb2JfaWQifX0=--e097d59dcd563089ba4c8bd833e12e685199501c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fZmlsbCI6WzM1MiwzNTJdfSwicHVyIjoidmFyaWF0aW9uIn19--84257f050381d82143eee47e8e61e6bd11288af0/Alvaro_Viscardi_Avatar.jpg" alt="" /></span><div class="dropdown-item-text"><span class="dropdown-item-label">Álvaro Viscardi</span><span class="dropdown-item-description">Enterprise Matching Team Lead</span></div></button>
                     <p class="dropdown-empty" data-dropdown-empty hidden>No people match</p>
                   </div>
-                    </div>
-                  </div>
                 </div>
+                <div class="in-team-cards" id="in-team-cards" aria-label="Working team members"><div class="in-team-add"><button class="btn btn-ghost in-link" type="button" data-team-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add team member</button></div></div>
               </div>
               <span class="field-hint is-error" id="in-team-error" hidden>Add at least one working team member to create this initiative.</span>
             </div>
@@ -5777,6 +5814,8 @@ body.rv-spotmode{user-select:none;}
           <!-- TopTrack roadmap ID 11 — Estimated duration, required, above
                Start date. Fills End date = Start date + duration; editing End
                date by hand flips it to Custom. -->
+          <!-- Optional extras (was the More details section): business lines, tags. -->
+          <div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
           </div>
         </section>
         <section class="in-cs" id="in-cs-timeline">
@@ -5829,19 +5868,25 @@ body.rv-spotmode{user-select:none;}
                ID 18's publish list). Next 8 quarters from today, built in JS.
                Full impact can't be earlier than Initial impact.
                Restored 2026-10-02 after being parked. -->
-          <div class="in-form-row">
+          <!-- Optional impact dates — "+ Add …" links like Business lines / Tags;
+               a row opens on click, or by itself when it holds a quarter. -->
+          <div class="in-adds">
+          <div class="in-form-row in-reveal-row" id="in-row-impact-initial" hidden>
             <span class="field-label in-label-tip">Initial impact date <span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
             <div class="input-select" id="in-impact-initial">
               <button class="input-select-trigger" aria-expanded="false" aria-label="Initial impact date" type="button"><span class="input-select-value input-select-placeholder">Add quarter</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
               <div class="dropdown-menu" hidden></div>
             </div>
           </div>
-          <div class="in-form-row">
+          <div class="in-form-row in-reveal-row" id="in-row-impact-full" hidden>
             <span class="field-label in-label-tip">Full impact date <span class="in-tip" data-tooltip="The quarter you expect the initiative to reach its full impact." tabindex="0" aria-label="The quarter you expect the initiative to reach its full impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
             <div class="input-select" id="in-impact-full">
               <button class="input-select-trigger" aria-expanded="false" aria-label="Full impact date" type="button"><span class="input-select-value input-select-placeholder">Add quarter</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
               <div class="dropdown-menu" hidden></div>
             </div>
+          </div>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-initial"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add initial impact date</button><span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-full"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add full impact date</button><span class="in-tip" data-tooltip="The quarter you expect the initiative to reach its full impact." tabindex="0" aria-label="The quarter you expect the initiative to reach its full impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
           </div>
           </div>
         </section>
@@ -5914,7 +5959,7 @@ body.rv-spotmode{user-select:none;}
              row: pick a member under a role and their team fills in. Optional. -->
         <section class="in-cs" id="in-cs-raci">
           <h3 class="in-cs-title in-raci-title">RACI
-            <button class="in-raci-guide-link" type="button" data-tooltip="People added to RACI must match the respective Slack channel. It's best to avoid assigning the same person as both Accountable and Responsible. Typically, direct reports are Responsible, while managers are Accountable." data-tooltip-style="regular" data-tooltip-content="in-raci-guide-tip" data-placement="bottom" aria-describedby="in-raci-guide-text"><svg class="icon icon-16"><use href="#i-info"/></svg>RACI Guide</button>
+            <button class="in-raci-guide-link" type="button" data-tooltip="People added to RACI must match the respective Slack channel. It's best to avoid assigning the same person as both Accountable and Responsible. Typically, direct reports are Responsible, while managers are Accountable." data-tooltip-style="regular" data-tooltip-content="in-raci-guide-tip" data-placement="bottom" aria-describedby="in-raci-guide-text"><svg class="icon icon-16"><use href="#i-info"/></svg>RACI guide</button>
             <template id="in-raci-guide-tip"><ul class="in-tip-list">
               <li>People added to RACI must match the respective Slack channel.</li>
               <li>It's best to avoid assigning the same person as both <strong>Accountable</strong> and <strong>Responsible</strong>.</li>
@@ -5922,7 +5967,10 @@ body.rv-spotmode{user-select:none;}
             </ul></template>
             <span class="visually-hidden" id="in-raci-guide-text" hidden>People added to RACI must match the respective Slack channel. It's best to avoid assigning the same person as both Accountable and Responsible. Typically, direct reports are Responsible, while managers are Accountable.</span>
             <span class="in-raci-tools">
+              <!-- Hidden for now (2026-10-13) — Show / Hide Informed toggle. The JS
+                   copes with it missing (Informed then always shows).
               <button class="btn btn-ghost in-raci-toggle" type="button" id="in-raci-informed" aria-pressed="true" aria-controls="in-raci"><svg class="icon icon-16"><use href="#i-eye"/></svg><span data-raci-informed-label>Hide Informed</span></button>
+              -->
             </span>
           </h3>
           <div class="in-raci-matrix" id="in-raci">
@@ -5930,7 +5978,7 @@ body.rv-spotmode{user-select:none;}
               <table class="table in-raci-table">
                 <colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup>
                 <thead><tr>
-                  <th scope="col">Org Unit</th>
+                  <th scope="col">Org unit</th>
                   <th scope="col">Accountable <span class="in-raci-max">(max 1)</span></th>
                   <th scope="col">Responsible <span class="in-raci-max">(max 20)</span></th>
                   <th scope="col">Consulted <span class="in-raci-max">(max 20)</span></th>
@@ -5943,19 +5991,19 @@ body.rv-spotmode{user-select:none;}
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                   <td><div class="input-select in-raci-a" data-dropdown-search>
-                    <button class="input-select-trigger" aria-expanded="false" type="button" aria-label="Change Accountable"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <button class="input-select-trigger" aria-expanded="false" type="button" aria-label="Change Accountable"><span class="input-select-value input-select-placeholder">Select team member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                   <td><div class="input-select in-raci-pick" data-raci-role="R" data-dropdown-search>
-                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select team member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                   <td><div class="input-select in-raci-pick" data-raci-role="C" data-dropdown-search>
-                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select team member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                   <td><div class="input-select in-raci-pick" data-raci-role="I" data-dropdown-search>
-                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select Team Member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                    <button class="input-select-trigger" aria-expanded="false" type="button"><span class="input-select-value input-select-placeholder">Select team member</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                     <div class="dropdown-menu" hidden></div>
                   </div></td>
                 </tr></tfoot>
@@ -6013,14 +6061,6 @@ body.rv-spotmode{user-select:none;}
           </div>
         </section>
         </section>
-        <section class="in-cs" id="in-cs-more">
-          <!-- Was a "More / Less details" accordion; now an always-open section
-               with a headline, like General / Timeline / Description. -->
-          <h3 class="in-cs-title">More details</h3>
-          <div class="in-details-body"><div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
-
-          </div>
-        </section>
         <section class="in-cs" id="in-cs-documents">
                 <section class="in-section">
                   <h3 class="in-cs-title">Documents</h3>
@@ -6062,7 +6102,6 @@ body.rv-spotmode{user-select:none;}
             <a class="in-cs-toc-item" href="#in-cs-strategy" data-in-toc-target="in-cs-strategy"><svg class="icon"><use href="#i-okr"/></svg>Strategy</a>
             <a class="in-cs-toc-item" href="#in-cs-raci" data-in-toc-target="in-cs-raci"><svg class="icon"><use href="#i-table"/></svg>RACI</a>
             <a class="in-cs-toc-item" href="#in-cs-connections" data-in-toc-target="in-cs-connections"><svg class="icon"><use href="#i-connectors"/></svg>Connections</a>
-            <a class="in-cs-toc-item" href="#in-cs-more" data-in-toc-target="in-cs-more"><svg class="icon"><use href="#i-settings"/></svg>More details</a>
             <a class="in-cs-toc-item" href="#in-cs-documents" data-in-toc-target="in-cs-documents"><svg class="icon"><use href="#i-attachment"/></svg>Documents</a>
             <a class="in-cs-toc-item" href="#in-cs-projects" data-in-toc-target="in-cs-projects"><svg class="icon"><use href="#i-folder"/></svg>Projects</a>
           </nav>
@@ -6126,6 +6165,25 @@ body.rv-spotmode{user-select:none;}
     </aside>
   </div>
 
+
+  <!-- Leave guard — shown when the create / edit page is left (breadcrumb,
+       ✕, Cancel or Escape) with changes since it opened. designmd .modal. -->
+  <div class="modal-overlay" id="in-leave-modal" hidden role="alertdialog" aria-modal="true" aria-labelledby="in-leave-title" aria-describedby="in-leave-text">
+    <div class="modal modal-sm">
+      <header class="modal-header">
+        <h2 class="modal-title" id="in-leave-title">Leave without saving?</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" aria-label="Keep editing" data-leave="stay"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <p class="in-leave-text" id="in-leave-text">You’ll lose your progress on this initiative. Save it as a draft to pick it up later.</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-leave="stay">Keep editing</button>
+        <button class="btn btn-secondary" type="button" data-leave="draft">Save as draft</button>
+        <button class="btn btn-danger" type="button" data-leave="discard">Discard and leave</button>
+      </footer>
+    </div>
+  </div>
 
   <!-- Filters — Figma 20902:88195. Floats under the toolbar's Filter button
        with no backdrop, so the table stays readable while you narrow it, and
@@ -6356,7 +6414,7 @@ body.rv-spotmode{user-select:none;}
       });
       document.addEventListener('click', e => {
         const btn = e.target.closest('[data-modal-close]');
-        if (btn) { closeOverlay(btn.closest(OVERLAY)); return; }
+        if (btn) { if (btn.matches('a')) e.preventDefault(); closeOverlay(btn.closest(OVERLAY)); return; }
         const o = e.target.closest(OVERLAY);
         if (o && e.target === o) closeOverlay(o);
       });
@@ -6526,9 +6584,14 @@ body.rv-spotmode{user-select:none;}
           const gap = regular ? 12 : GAP;
           const r = el.getBoundingClientRect(), t = tip.getBoundingClientRect();
           let top = r.top - t.height - gap;
-          if (el.dataset.placement === 'bottom' || top < EDGE) top = r.bottom + gap;
+          const below = el.dataset.placement === 'bottom' || top < EDGE;
+          if (below) top = r.bottom + gap;
           const left = Math.min(Math.max(r.left + r.width / 2 - t.width / 2, EDGE), innerWidth - t.width - EDGE);
           tip.style.top = `${top}px`; tip.style.left = `${left}px`;
+          // Regular style's caret points at the trigger's centre, even when
+          // the bubble is nudged in from the viewport edge.
+          tip.classList.toggle('is-below', below);
+          tip.style.setProperty('--caret-x', `${Math.min(Math.max(r.left + r.width / 2 - left, 14), t.width - 14)}px`);
           requestAnimationFrame(() => tip.classList.add('is-visible'));
         };
         const hide = () => { current = null; tip.classList.remove('is-visible'); };
@@ -6767,15 +6830,13 @@ body.rv-spotmode{user-select:none;}
         value.classList.remove('input-select-placeholder');
         trigger.setAttribute('aria-label', `Working team: ${picked.map(i => i.querySelector('.dropdown-item-label').textContent).join(', ')}`);
       };
-      // Picked people as cards (photo · name over title), always followed by
-      // the "+ Add team member" tile.
+      // Picked people as cards (photo · name over title) under the select.
       const teamCards = document.getElementById('in-team-cards');
-      const addSlot = team.querySelector('[data-team-add-slot]');
       const paintTeamCards = () => {
         const picked = [...team.querySelectorAll('.dropdown-item.is-selected')];
         const items = [...team.querySelectorAll('.dropdown-item')];
         teamCards.querySelectorAll('.in-team-card').forEach(c => c.remove());
-        addSlot.insertAdjacentHTML('beforebegin', picked.map(i => {
+        teamCards.querySelector('.in-team-add').insertAdjacentHTML('beforebegin', picked.map(i => {
           const name = i.querySelector('.dropdown-item-label').textContent;
           return `<div class="in-team-card" data-initials="${i.dataset.initials}"><span class="avatar">${i.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
         }).join(''));
@@ -6785,56 +6846,22 @@ body.rv-spotmode{user-select:none;}
         const btn = e.target.closest('[data-team-remove]');
         if (!btn) return;
         team.querySelectorAll('.dropdown-item')[+btn.dataset.teamRemove]?.click();
-        (teamCards.querySelector('[data-team-remove]') || addBtn).focus();
+        // Cards repaint on the next tick (observer) — focus after that.
+        setTimeout(() => (teamCards.querySelector('[data-team-remove]') || team.querySelector('.input-select-trigger')).focus());
+      });
+      // Once someone is picked the select gives way to the cards plus
+      // "+ Add team member", which opens the same searchable menu below them.
+      teamCards.querySelector('[data-team-add]').addEventListener('click', e => {
+        e.stopPropagation();
+        team.querySelector('.input-select-trigger').click();
+        team.querySelector('[data-dropdown-search-input]')?.focus();
       });
 
-      // "+ Add team member" → search field in the same tile. Typing shows
-      // matching people (already-picked ones left out) in the menu below;
-      // a pick adds the card and the button returns after it.
-      const addBtn = addSlot.querySelector('[data-team-add]');
-      const searchWrap = addSlot.querySelector('.in-team-search');
-      const teamSearch = addSlot.querySelector('[data-team-search]');
-      const teamMenu = addSlot.querySelector('.dropdown-menu');
-      const teamEmpty = teamMenu.querySelector('[data-dropdown-empty]');
-      const teamItems = () => [...teamMenu.querySelectorAll('.dropdown-item')];
-      const filterTeam = () => {
-        const q = teamSearch.value.trim().toLowerCase();
-        let shown = 0;
-        teamItems().forEach(i => {
-          const hit = !!q && !i.classList.contains('is-selected')
-            && i.querySelector('.dropdown-item-label').textContent.toLowerCase().includes(q);
-          i.hidden = !hit; shown += hit;
-        });
-        teamEmpty.hidden = !q || shown > 0;
-        teamMenu.hidden = !q;
-      };
-      const openTeamSearch = () => {
-        addBtn.hidden = true; searchWrap.hidden = false;
-        teamSearch.value = ''; filterTeam(); teamSearch.focus();
-      };
-      const closeTeamSearch = ({ focus = false } = {}) => {
-        if (searchWrap.hidden) return;
-        teamSearch.value = ''; searchWrap.hidden = true; teamMenu.hidden = true;
-        teamItems().forEach(i => { i.hidden = false; }); teamEmpty.hidden = true;
-        addBtn.hidden = false;
-        if (focus) addBtn.focus();
-      };
-      addBtn.addEventListener('click', e => { e.stopPropagation(); openTeamSearch(); });
-      teamSearch.addEventListener('input', filterTeam);
-      teamSearch.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); teamItems().find(i => !i.hidden)?.click(); }
-        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeTeamSearch({ focus: true }); }
-      });
-      document.addEventListener('click', e => { if (!addSlot.contains(e.target)) closeTeamSearch(); });
-      teamMenu.addEventListener('click', e => {
-        if (!e.target.closest('.dropdown-item')) return;
-        paintTeam();
-        if (!searchWrap.hidden) closeTeamSearch({ focus: true });
-      });
+      personSearch(team);
       // Reset, draft reopen and the states harness change picks without a
       // click — watch the items' selected class so the cards always follow.
       // (Observer callbacks already batch per task, so one repaint per change burst.)
-      new MutationObserver(paintTeamCards).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+      new MutationObserver(() => { paintTeamCards(); paintTeam(); }).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
 
       // ===== RACI matrix =====
       // Rows are org units; columns A / R / C / I. Accountable starts from the
@@ -6926,7 +6953,7 @@ body.rv-spotmode{user-select:none;}
         const UNASSIGNED = { role: '', person: { name: 'Unassigned', title: '', initials: '', img: '', tbd: true } };
         const rowsHtml = (list, editable, unassigned = false) => {
           // Informed hidden — teams that only have Informed people drop out too.
-          if (document.getElementById('in-raci-informed').getAttribute('aria-pressed') === 'false') list = list.filter(e => e.role !== 'I');
+          if (document.getElementById('in-raci-informed')?.getAttribute('aria-pressed') === 'false') list = list.filter(e => e.role !== 'I');
           const order = [...new Set(list.map(e => e.unit))];
           const visibleRoles = isInformed() ? ROLES : ROLES.filter(r => r !== 'I');
           if (!order.length) return unassigned
@@ -6970,7 +6997,7 @@ body.rv-spotmode{user-select:none;}
           sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
           sel.querySelector('[data-select-avatar]')?.remove();
           const v = sel.querySelector('.input-select-value');
-          v.textContent = 'Select Team Member'; v.classList.add('input-select-placeholder');
+          v.textContent = 'Select team member'; v.classList.add('input-select-placeholder');
         };
         picks.forEach(sel => sel.querySelector('.dropdown-menu').addEventListener('click', e => {
           const item = e.target.closest('.dropdown-item');
@@ -7023,15 +7050,16 @@ body.rv-spotmode{user-select:none;}
 
         // Show / hide the Informed column (people in it are kept, just not shown).
         const informedSw = document.getElementById('in-raci-informed');
-        const isInformed = () => informedSw.getAttribute('aria-pressed') !== 'false';
+        const isInformed = () => informedSw?.getAttribute('aria-pressed') !== 'false';
         // Eye = column showing, eye-slash = hidden; the label names the action.
         const setInformed = on => {
+          if (!informedSw) return;
           informedSw.setAttribute('aria-pressed', String(on));
           informedSw.querySelector('use').setAttribute('href', on ? '#i-eye' : '#i-eye-slash');
           informedSw.querySelector('[data-raci-informed-label]').textContent = on ? 'Hide Informed' : 'Show Informed';
           root.classList.toggle('no-informed', !on);
         };
-        informedSw.addEventListener('click', () => { setInformed(!isInformed()); render(); });
+        informedSw?.addEventListener('click', () => { setInformed(!isInformed()); render(); });
 
         // Hooks for drafts (snapshot / restore) and view mode.
         window.inRaci = {
@@ -7044,7 +7072,7 @@ body.rv-spotmode{user-select:none;}
         };
         window.inRaciViewHtml = () => {
           const list = all();
-          return `<div class="in-raci-matrix is-readonly${isInformed() ? '' : ' no-informed'}"><div class="table-scroll in-raci-scroll"><table class="table in-raci-table"><colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup><thead><tr><th scope="col">Org Unit</th><th scope="col">Accountable</th><th scope="col">Responsible</th><th scope="col">Consulted</th><th scope="col">Informed</th></tr></thead><tbody>${rowsHtml(list, false, true)}</tbody></table></div></div>`;
+          return `<div class="in-raci-matrix is-readonly${isInformed() ? '' : ' no-informed'}"><div class="table-scroll in-raci-scroll"><table class="table in-raci-table"><colgroup><col class="in-raci-col-unit" /><col /><col /><col /><col /></colgroup><thead><tr><th scope="col">Org unit</th><th scope="col">Accountable</th><th scope="col">Responsible</th><th scope="col">Consulted</th><th scope="col">Informed</th></tr></thead><tbody>${rowsHtml(list, false, true)}</tbody></table></div></div>`;
         };
         render();
       })();
@@ -7090,9 +7118,10 @@ body.rv-spotmode{user-select:none;}
           error.hidden = !on;
           rows().forEach(li => li.querySelector('input').classList.toggle('is-error', on));
         };
-        // One row to start (only one is required); the samples feed the
-        // placeholders of rows added later, in order.
-        const reset = () => { list.innerHTML = ''; addRow(samples[0] || ''); setError(false); };
+        // Rows to start: one per sample (3) on the default header; just one on
+        // the breadcrumb variant (?header=breadcrumb). Only one must be filled.
+        const minRows = () => new URLSearchParams(location.search).get('header') === 'breadcrumb' ? 1 : Math.max(samples.length, 1);
+        const reset = () => { list.innerHTML = ''; for (let i = 0; i < minRows(); i++) addRow(samples[i] || ''); setError(false); };
 
         root.querySelector('[data-multi-add]').addEventListener('click', () => addRow(samples[rows().length] || '', true));
         list.addEventListener('click', e => {
@@ -7153,9 +7182,13 @@ body.rv-spotmode{user-select:none;}
 
         const values = () => rows().map(li => li.querySelector('input').value);
         const setValues = vals => {
-          if (!vals || !vals.length) { reset(); return; }
+          // Drop trailing blanks, then pad back up to the starting row count.
+          const kept = [...(vals || [])];
+          while (kept.length && !kept[kept.length - 1].trim()) kept.pop();
+          if (!kept.length) { reset(); return; }
+          while (kept.length < minRows()) kept.push('');
           list.innerHTML = '';
-          vals.forEach((v, i) => { addRow(samples[i] || '').querySelector('input').value = v; });
+          kept.forEach((v, i) => { addRow(samples[i] || '').querySelector('input').value = v; });
           setError(false);
         };
         reset();
@@ -7229,6 +7262,7 @@ body.rv-spotmode{user-select:none;}
       // Drawer → table: read the form into an initiative row. A draft keeps
       // its row id so saving again, or publishing, updates the same row.
       let draftId = null;
+      let leaveBaseline = null; // snapshot JSON when the form was last opened / saved
       const HEALTH_FROM_LABEL = { 'On track': 'on', 'At risk': 'risk', 'Off track': 'off', 'Not active': 'na' };
       const selectedOf = id => document.querySelector(`#${id} .dropdown-item.is-selected`);
       const isoFrom = text => { const d = new Date(Date.parse(text)); return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -7275,7 +7309,7 @@ body.rv-spotmode{user-select:none;}
       // the same handlers a click would, so triggers, avatars and dependent
       // fields (End date, Full impact, the objective row) all follow.
       const drawerEl = document.getElementById('in-drawer-new');
-      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')].filter(el => !el.closest('.in-raci-matrix'));
+      const formSelects = [...drawerEl.querySelectorAll('.in-form .input-select')].filter(el => !el.closest('.in-raci-matrix') && !el.matches('.in-stage-select'));
       formSelects.forEach(el => {
         const v = el.querySelector('.input-select-value');
         el.dataset.ph = v?.classList.contains('input-select-placeholder') ? v.textContent : '';
@@ -7330,11 +7364,14 @@ body.rv-spotmode{user-select:none;}
         requiredSelects.forEach(f => f.setError(false));
         requiredDates.forEach(f => f.setError(false));
         descTouched = false; updateDesc(); setProblemError(false); objectives.setError(false); metrics.setError(false);
+        window.inSyncReveals?.();
+        leaveBaseline = JSON.stringify(snapshot()); // "unchanged" = this state
       };
       // Accountable owner defaults to the creator (signed-in user), so every
       // fresh initiative — and the RACI Accountable cell — starts with them.
       document.querySelector('#in-owner [data-creator]')?.click();
       const BLANK = snapshot();
+      leaveBaseline = JSON.stringify(BLANK);
       // Snapshots for every row the drawer has made — drafts and published.
       const drafts = {};
       // Editing a published initiative: primary button reads "Save changes"
@@ -7346,6 +7383,7 @@ body.rv-spotmode{user-select:none;}
       const setMode = published => {
         editingPublished = published;
         createActionBtn.textContent = published ? 'Save changes' : 'Create Initiative';
+        drawerEl.querySelector('[data-crumb-current]').textContent = published ? 'Edit initiative' : 'New initiative';
         draftBtn.hidden = published;
       };
       const createBtnEl = document.querySelector('[data-modal-open="in-drawer-new"]');
@@ -7589,6 +7627,53 @@ body.rv-spotmode{user-select:none;}
         setNameError(false); requiredSelects.forEach(f => f.setError(false)); requiredDates.forEach(f => f.setError(false)); setProblemError(false); objectives.setError(false); metrics.setError(false); descTouched = false; updateDesc();
       }));
 
+      // Leave guard — the breadcrumb, ✕, Cancel or Escape on a form with changes
+      // since it opened asks first (Keep editing / Save as draft / Discard and
+      // leave). window.inSkipLeaveGuard lets the
+      // states harness close without asking.
+      (() => {
+        const modal = document.getElementById('in-leave-modal');
+        const isDirty = () => leaveBaseline !== null && JSON.stringify(snapshot()) !== leaveBaseline;
+        let pending = null; // the close control to re-click once confirmed
+        const ask = ctrl => {
+          pending = ctrl;
+          modal.querySelector('[data-leave="draft"]').hidden = editingPublished;
+          modal.querySelector('#in-leave-text').textContent = editingPublished
+            ? 'Your changes to this initiative won’t be saved.'
+            : 'You’ll lose your progress on this initiative. Save it as a draft to pick it up later.';
+          modal.hidden = false;
+          modal.querySelector('[data-leave="stay"].btn-secondary').focus();
+        };
+        const finish = how => {
+          modal.hidden = true;
+          const ctrl = pending; pending = null;
+          if (how === 'stay') { nameInput.focus(); return; }
+          if (how === 'draft') { document.querySelector('[data-save-draft]')?.click(); return; }
+          leaveBaseline = null; // discard: let the close through
+          ctrl?.click();
+        };
+        modal.addEventListener('click', e => {
+          const b = e.target.closest('[data-leave]');
+          if (b) finish(b.dataset.leave);
+          else if (e.target === modal) finish('stay');
+        });
+        // Capture phase, so the shared overlay handler never sees a guarded close.
+        document.addEventListener('click', e => {
+          const ctrl = e.target.closest('#in-drawer-new .in-cs-close, #in-drawer-new .in-cs-crumbs [data-modal-close], #in-drawer-new .drawer-footer [data-modal-close]');
+          if (!ctrl || window.inSkipLeaveGuard || !isDirty()) return;
+          e.preventDefault(); e.stopImmediatePropagation();
+          ask(ctrl);
+        }, true);
+        document.addEventListener('keydown', e => {
+          if (e.key !== 'Escape') return;
+          if (!modal.hidden) { e.stopImmediatePropagation(); finish('stay'); return; }
+          if (drawerEl.hidden || window.inSkipLeaveGuard || !isDirty()) return;
+          if (drawerEl.querySelector('.dropdown-menu:not([hidden])')) return; // Escape closes the menu first
+          e.stopImmediatePropagation();
+          ask(drawerEl.querySelector('.in-cs-close'));
+        }, true);
+      })();
+
       // "+ Add…" links with data-reveal swap themselves for their field row.
       document.querySelectorAll('[data-reveal]').forEach(btn => btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -7598,6 +7683,15 @@ body.rv-spotmode{user-select:none;}
         row.querySelector('.input-select-trigger')?.click();
         row.querySelector('.input-select-trigger, .input, .input-tags-input')?.focus();
       }));
+      // Keep a revealed row in sync with its data: open when it holds values
+      // (draft reopen, view → edit) or has an error; back to its link when
+      // empty on a fresh form.
+      window.inSyncReveals = () => document.querySelectorAll('[data-reveal]').forEach(btn => {
+        const row = document.getElementById(btn.dataset.reveal);
+        const filled = !!row.querySelector('.dropdown-item.is-selected, .tag, .is-error:not([hidden])');
+        row.hidden = !filled;
+        btn.closest('.in-add').hidden = filled;
+      });
 
       // Tags — free-form chips (designmd .input-tags): Enter or comma adds,
       // Backspace on an empty input or a chip's × removes.
@@ -7648,8 +7742,23 @@ body.rv-spotmode{user-select:none;}
           });
           trigger.textContent = item.textContent;
           trigger.setAttribute('aria-label', 'Stage: ' + item.textContent);
-          trigger.focus();
+          if (!syncingStatus) trigger.focus();
+          paintStatus(item.textContent);
         }));
+      });
+      // Status field (breadcrumb header variant) ↔ header stage menu.
+      const statusSel = document.getElementById('in-status');
+      let syncingStatus = false;
+      function paintStatus(name) {
+        if (!statusSel) return;
+        statusSel.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i.textContent.trim() === name));
+        statusSel.querySelector('.input-select-value').textContent = name;
+      }
+      statusSel?.querySelector('.dropdown-menu').addEventListener('click', e => {
+        const item = e.target.closest('.dropdown-item');
+        if (!item) return;
+        const match = [...document.querySelectorAll('#in-drawer-new .in-stage-menu .dropdown-item')].find(i => i.textContent.trim() === item.textContent.trim());
+        syncingStatus = true; match?.click(); syncingStatus = false;
       });
 
       // Accordion — toggle .is-open (+ aria-expanded); swap the summary label.
@@ -7803,7 +7912,9 @@ body.rv-spotmode{user-select:none;}
         if (view.hidden) return;
         const left = field.getBoundingClientRect().left;
         // Single-column (≤1100px) layouts: stop short of the close button.
-        const right = Math.min(col.getBoundingClientRect().right, close.getBoundingClientRect().left - 8);
+        // Breadcrumb variant has no close button — run to the column edge.
+        const closeLeft = close.offsetParent ? close.getBoundingClientRect().left - 8 : Infinity;
+        const right = Math.min(col.getBoundingClientRect().right, closeLeft);
         field.style.width = `${Math.max(0, right - left)}px`;
       };
       new ResizeObserver(sync).observe(col);
@@ -8767,10 +8878,15 @@ body.rv-spotmode{user-select:none;}
         <button type="button" data-state="long-text">Long text</button>
         -->
       </div>
+      <div class="in-switcher-group"><span>Header variant</span>
+        <button type="button" data-header-variant="">Default — close button</button>
+        <button type="button" data-header-variant="breadcrumb">Breadcrumb</button>
+      </div>
       <div class="in-switcher-group"><span>Create drawer</span>
         <button type="button" data-state="create-blank">Blank</button>
         <button type="button" data-state="create-errors">Required errors</button>
         <button type="button" data-state="create-duplicate">Duplicate notice</button>
+        <button type="button" data-state="create-leave">Leave — unsaved changes</button>
         <button type="button" data-state="create-filled">Filled, ready to create</button>
       </div>
       <div class="in-switcher-group"><span>Draft & edit</span>
@@ -8786,6 +8902,21 @@ body.rv-spotmode{user-select:none;}
   </div>
 
   <script>
+    // Header variant — ?header=breadcrumb swaps the create header's ✕ for an
+    // "Initiatives › New initiative" breadcrumb. Works with or without ?states.
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const variant = params.get('header') || '';
+      document.body.classList.toggle('in-header-breadcrumb', variant === 'breadcrumb');
+      document.querySelectorAll('[data-header-variant]').forEach(b => {
+        b.classList.toggle('is-current', b.dataset.headerVariant === variant);
+        b.addEventListener('click', () => {
+          const p = new URLSearchParams(location.search);
+          b.dataset.headerVariant ? p.set('header', b.dataset.headerVariant) : p.delete('header');
+          location.search = p.toString();
+        });
+      });
+    })();
     (function () {
       const params = new URLSearchParams(location.search);
       if (params.get('states') !== '1') return;
@@ -8856,7 +8987,7 @@ body.rv-spotmode{user-select:none;}
       // After Create you land on the table; the new row is pinned first.
       const openFirstRow = async () => { $('#in-rows tr[data-editable]').click(); await W(300); };
       const saveDraft = async () => { $('[data-save-draft]').click(); await W(400); };
-      const closeAll = async () => { document.querySelectorAll('.drawer-overlay:not([hidden]) [data-modal-close]').forEach(b => b.click()); await W(250); };
+      const closeAll = async () => { window.inSkipLeaveGuard = true; document.querySelectorAll('.drawer-overlay:not([hidden]) [data-modal-close]').forEach(b => b.click()); window.inSkipLeaveGuard = false; await W(250); };
       const LONG = 'Global Partner Enablement and Certification Programme for Strategic Channel Resellers Across Every Region';
 
       const STATES = {
@@ -8876,6 +9007,7 @@ body.rv-spotmode{user-select:none;}
         'create-blank': async () => { await openCreate(); },
         'create-errors': async () => { await openCreate(); $('[data-create-initiative]').click(); },
         'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
+        'create-leave': async () => { await openCreate(); type('in-name', 'Vendor scorecards'); $('#in-drawer-new .in-cs-close').click(); },
         'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },
         'draft-reopen': async () => {
           await openCreate(); type('in-name', 'Vendor scorecards'); pick('in-sponsor', 'Paul Cioni'); pick('in-beneficiary', 'Operations');
