@@ -4043,7 +4043,8 @@ body.rv-spotmode{user-select:none;}
     .in-conn-item-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .in-conn-item-remove.btn-icon-only { flex: none; color: var(--ic-palette-red-500); }
     .in-conn-item-remove.btn-icon-only:hover { color: var(--ic-palette-red-500); background: var(--color-danger-subtle); }
-    .in-dup-linkit { margin-left: var(--ic-space-2); height: auto; padding: 0; vertical-align: baseline; }
+    /* "Link it" sits in the alert's right-hand actions slot (designmd .alert-actions). */
+    .in-dup-linkit { height: auto; padding: 0; white-space: nowrap; }
     .in-dup-linkit:disabled { color: var(--color-text-muted); cursor: default; text-decoration: none; }
     /* "Less details" accordion sits flush with the section — no inset. */
     /* .accordion-group is rounded — square it so the top rule is a straight divider. */
@@ -4445,6 +4446,12 @@ body.rv-spotmode{user-select:none;}
     #in-cs-documents > .in-section { border-top: 0; padding-top: 0; gap: var(--ic-space-4); }
     .in-cs .in-conns { gap: var(--ic-space-4); }
     /* Layout v2 — RACI sits inside People under its own sub-heading. */
+    /* Related initiatives as an input (layout v2): trigger + menu as wide as
+       the field, picks listed under it. The card-only rules don't apply. */
+    .in-related-select .in-conn-menu { left: 0; right: 0; top: 32px; margin-top: var(--ic-space-1); } /* under the 32px trigger, above the picks */
+    .in-related-select.has-picks .in-conn-body { display: block; }
+    .in-related-select .in-related-trigger[aria-expanded="true"] { border-color: var(--color-border-focus); box-shadow: var(--ic-shadow-focus, 0 0 0 3px var(--color-accent-subtle)); }
+    .in-related-picks { padding: var(--ic-space-3) 0 0; }
     .in-raci-block { display: flex; flex-direction: column; gap: var(--ic-space-4); margin-top: var(--ic-space-2); }
     #in-cs-people .in-raci-title { font: var(--type-body-semibold); border-bottom: 0; padding-bottom: 0; }
     .in-cs-title {
@@ -5132,7 +5139,8 @@ body.rv-spotmode{user-select:none;}
                matching is a fuzzy search over name, description, objectives. -->
           <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
             <svg class="icon alert-icon"><use href="#i-warning"/></svg>
-            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span><button class="btn btn-ghost in-link in-dup-linkit" type="button" data-dup-linkit><svg class="icon icon-16"><use href="#i-plus"/></svg>Link it</button></p>
+            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+            <div class="alert-actions"><button class="btn btn-ghost in-link in-dup-linkit" type="button" data-dup-linkit><svg class="icon icon-16"><use href="#i-plus"/></svg>Link it</button></div>
           </div>
           <!-- Header variant B (?header=breadcrumb): the stage moves out of the
                header tags into this Status field. Mirrors the header stage
@@ -5242,25 +5250,24 @@ body.rv-spotmode{user-select:none;}
           </div>
           <!-- Layout v2 (initiatives-breadcrumb): Related initiatives and Core
                strategy live in General; the Strategy section is gone. -->
-          <div class="in-gen-related">
-            <!-- Related initiatives (roadmap ID 22) — manual links to other
-                 top-level initiatives. Optional; links are two-way (B shows A
-                 once A links B). Fuzzy search / suggestions are out of scope. -->
-            <div class="in-conn-wrap" data-conn="related">
-              <div class="card in-conn-card">
-                <button class="in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-initiatives"/></svg></span>
-                  <span class="in-conn-text"><span class="in-conn-title">Related initiatives</span><span class="in-conn-body" data-default="Link initiatives that relate to or depend on this one">Link initiatives that relate to or depend on this one</span></span>
-                </button>
-                <ul class="in-conn-list" data-related-list aria-label="Linked initiatives" hidden></ul>
-              </div>
-              <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
-                <div class="input-icon input-icon-left">
-                  <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                  <input class="input" type="search" placeholder="Search initiatives" aria-label="Search initiatives" autocomplete="off" />
+          <!-- Related initiatives (roadmap ID 22) — a searchable multi-select
+               field like Beneficiary function: manual links to other
+               top-level initiatives, two-way (B shows A once A links B).
+               Picks list under the input (blue name, meta, red trash). -->
+          <div class="in-form-row in-row-top">
+            <span class="field-label">Related initiatives</span>
+            <div class="field">
+              <div class="in-conn-wrap in-related-select" data-conn="related">
+                <button class="input-select-trigger in-related-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Related initiatives"><span class="input-select-value input-select-placeholder in-conn-body" data-default="Add related initiatives">Add related initiatives</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <div class="dropdown-menu in-conn-menu" hidden>
+                  <div class="input-icon input-icon-left">
+                    <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                    <input class="input" type="search" placeholder="Search initiatives" aria-label="Search initiatives" autocomplete="off" />
+                  </div>
+                  <div class="in-conn-options" role="listbox" aria-multiselectable="true"></div>
+                  <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
                 </div>
-                <div class="in-conn-options" role="listbox" aria-multiselectable="true"></div>
-                <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
+                <ul class="in-conn-list in-related-picks" data-related-list aria-label="Linked initiatives" hidden></ul>
               </div>
             </div>
           </div>
@@ -7827,7 +7834,7 @@ body.rv-spotmode{user-select:none;}
       const connWraps = [...document.querySelectorAll('.in-conn-wrap')];
       const closeConn = wrap => {
         wrap.querySelector('.in-conn-menu').hidden = true;
-        wrap.querySelector('.in-conn').setAttribute('aria-expanded', 'false');
+        wrap.querySelector('.in-conn, .in-related-trigger').setAttribute('aria-expanded', 'false');
       };
       connWraps.forEach(wrap => {
         const cfg = CONNECTIONS[wrap.dataset.conn];
@@ -7894,7 +7901,7 @@ body.rv-spotmode{user-select:none;}
       (() => {
         const wrap = document.querySelector('.in-conn-wrap[data-conn="related"]');
         if (!wrap) return;
-        const card = wrap.querySelector('.in-conn');
+        const card = wrap.querySelector('.in-conn, .in-related-trigger');
         const menu = wrap.querySelector('.in-conn-menu');
         const search = menu.querySelector('input');
         const list = menu.querySelector('.in-conn-options');
@@ -7910,7 +7917,9 @@ body.rv-spotmode{user-select:none;}
         let picked = [];
         const paint = () => {
           picked = picked.filter(id => byId(id));
-          body.textContent = picked.length ? `${picked.length} initiative${picked.length === 1 ? '' : 's'} linked` : body.dataset.default;
+          // Input-style trigger: "Name +N" once picked, placeholder otherwise.
+          body.textContent = picked.length ? `${byId(picked[0]).name}${picked.length > 1 ? ` +${picked.length - 1}` : ''}` : body.dataset.default;
+          body.classList.toggle('input-select-placeholder', !picked.length);
           chosen.innerHTML = picked.map(id => { const n = byId(id); return `<li class="in-conn-item"><span class="in-conn-item-text"><a class="in-conn-item-name" href="#" data-related-open>${esc(n.name)}</a><span class="in-conn-item-meta">${esc(meta(n))}</span></span><button class="btn btn-icon-only btn-ghost in-conn-item-remove" type="button" data-related-remove="${n.id}" aria-label="Remove link to ${esc(n.name)}"><svg class="icon"><use href="#i-trash"/></svg></button></li>`; }).join('');
           chosen.hidden = !picked.length;
           wrap.classList.toggle('has-picks', picked.length > 0); // header shows the title only
@@ -9134,9 +9143,9 @@ body.rv-spotmode{user-select:none;}
         'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
         'create-related': async () => {
           await openCreate(); type('in-name', 'Partner portal');
-          $('.in-conn-wrap[data-conn="related"] .in-conn').click(); await W(100);
+          $('.in-conn-wrap[data-conn="related"] .in-related-trigger').click(); await W(100);
           [...document.querySelectorAll('.in-conn-wrap[data-conn="related"] .dropdown-item')].filter(i => /Customer Health|Self-serve/.test(i.textContent)).forEach(i => i.click());
-          document.body.click(); $('.in-gen-related').scrollIntoView({ block: 'center' });
+          document.body.click(); $('.in-related-select').scrollIntoView({ block: 'center' });
         },
         'create-leave': async () => { await openCreate(); type('in-name', 'Vendor scorecards'); $('#in-drawer-new .in-cs-close').click(); },
         'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },

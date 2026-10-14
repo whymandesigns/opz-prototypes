@@ -4040,7 +4040,8 @@ body.rv-spotmode{user-select:none;}
     .in-conn-item-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .in-conn-item-remove.btn-icon-only { flex: none; color: var(--ic-palette-red-500); }
     .in-conn-item-remove.btn-icon-only:hover { color: var(--ic-palette-red-500); background: var(--color-danger-subtle); }
-    .in-dup-linkit { margin-left: var(--ic-space-2); height: auto; padding: 0; vertical-align: baseline; }
+    /* "Link it" sits in the alert's right-hand actions slot (designmd .alert-actions). */
+    .in-dup-linkit { height: auto; padding: 0; white-space: nowrap; }
     .in-dup-linkit:disabled { color: var(--color-text-muted); cursor: default; text-decoration: none; }
     /* "Less details" accordion sits flush with the section — no inset. */
     /* .accordion-group is rounded — square it so the top rule is a straight divider. */
@@ -5126,7 +5127,8 @@ body.rv-spotmode{user-select:none;}
                matching is a fuzzy search over name, description, objectives. -->
           <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
             <svg class="icon alert-icon"><use href="#i-warning"/></svg>
-            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span><button class="btn btn-ghost in-link in-dup-linkit" type="button" data-dup-linkit><svg class="icon icon-16"><use href="#i-plus"/></svg>Link it</button></p>
+            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+            <div class="alert-actions"><button class="btn btn-ghost in-link in-dup-linkit" type="button" data-dup-linkit><svg class="icon icon-16"><use href="#i-plus"/></svg>Link it</button></div>
           </div>
           <!-- Header variant B (?header=breadcrumb): the stage moves out of the
                header tags into this Status field. Mirrors the header stage
