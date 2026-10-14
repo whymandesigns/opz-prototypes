@@ -4401,6 +4401,11 @@ body.rv-spotmode{user-select:none;}
     .in-status-row { display: none; }
     .in-header-breadcrumb .in-status-row { display: grid; }
     .in-header-breadcrumb #in-drawer-new .in-drawer-tags { display: none; }
+    /* View mode follows the same variant: breadcrumb on top, no ✕, no tags
+       (the last-edit line stays); Status leads General. */
+    .in-header-breadcrumb #in-drawer-view .in-cs-crumbs { margin-bottom: var(--ic-space-1); }
+    .in-header-breadcrumb #in-drawer-view .modal-close { display: none; }
+    .in-header-breadcrumb #in-drawer-view .in-view-meta > .tag { display: none; }
     /* --color-text-muted lands at 2.27:1 on the dark panel, under the 3:1 WCAG
        minimum for controls — and this is the only dismiss affordance. Same
        correction the file already makes for .btn-icon-only.btn-secondary. */
@@ -6080,6 +6085,12 @@ body.rv-spotmode{user-select:none;}
     <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="in-view-title">
       <header class="drawer-header in-view-header">
         <div class="in-view-heading">
+          <!-- Header variant B (?header=breadcrumb) — same as the create page:
+               breadcrumb instead of ✕, no tags; the stage shows as Status. -->
+          <nav class="breadcrumbs in-cs-crumbs" aria-label="Breadcrumb">
+            <a class="breadcrumb" href="#" data-modal-close>Initiatives</a>
+            <span class="breadcrumb is-current" aria-current="page" data-view-crumb></span>
+          </nav>
           <h2 class="in-view-title" id="in-view-title"></h2>
           <div class="in-view-meta">
             <span class="tag tag-blue">Initiative</span>
@@ -7393,6 +7404,7 @@ body.rv-spotmode{user-select:none;}
         const sec = (id, title, body) => `<section class="in-cs" id="in-vs-${id}"><h3 class="in-cs-title">${title}</h3>${body}</section>`;
         viewPanel.innerHTML = [
           sec('general', 'General', `<dl class="in-view-rows">
+            ${document.body.classList.contains('in-header-breadcrumb') ? row('Status', `<span class="tag tag-light">${vEsc(viewEl.querySelector('[data-view="stage"]').textContent || 'Idea')}</span>`) : ''}
             ${row('Health', `<span class="tag tag-indicator ${HCLS[d.health] || 'in-health-na'}">${vEsc(d.health || 'Not active')}</span>`)}
             ${row('Executive sponsor', d.sponsorHtml || EMPTY)}
             ${row('Beneficiary function', d.beneficiary
@@ -7443,6 +7455,7 @@ body.rv-spotmode{user-select:none;}
         const last = log[log.length - 1];
 
         viewEl.querySelector('#in-view-title').textContent = nameInput.value.trim() || 'Untitled initiative';
+        viewEl.querySelector('[data-view-crumb]').textContent = viewEl.querySelector('#in-view-title').textContent;
         viewEl.querySelector('[data-view="stage"]').textContent = stage;
         viewEl.querySelector('[data-view="edited"]').innerHTML = last
           ? `Last edit was made ${timeAgo(last.at)} by <a href="#" data-view-dead>Matthew Vella</a>`
@@ -7490,6 +7503,7 @@ body.rv-spotmode{user-select:none;}
       window.inOpenViewNode = n => {
         if (!n) return;
         viewEl.querySelector('#in-view-title').textContent = n.name;
+        viewEl.querySelector('[data-view-crumb]').textContent = n.name;
         viewEl.querySelector('[data-view="stage"]').textContent = n.status || 'Idea';
         viewEl.querySelector('[data-view="edited"]').innerHTML = '';
         renderViewPanel({
