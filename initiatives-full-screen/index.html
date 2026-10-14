@@ -4021,16 +4021,25 @@ body.rv-spotmode{user-select:none;}
     .in-conn-text { display: flex; flex-direction: column; min-width: 0; }
     .in-conn-title { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); color: var(--color-text); }
     .in-conn-body { font: var(--type-caption); color: var(--color-text-muted); }
-    /* Related initiatives (ID 22) — picks listed under the card. */
-    .in-related-list { list-style: none; margin: var(--ic-space-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-1); }
-    .in-related-list[hidden] { display: none; }
-    .in-related-item { display: flex; align-items: center; gap: var(--ic-space-2); padding: var(--ic-space-2) var(--ic-space-3); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); color: var(--color-text-muted); }
-    .in-related-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .in-related-name { font: var(--type-body-sm-semibold); color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .in-related-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .in-related-remove { flex: none; width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--ic-radius-full); background: transparent; color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
-    .in-related-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .in-related-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    /* Connection cards — one card: the header button, then what's linked
+       inside it (blue name, detail line, red trash). Shared by Slack, RoB
+       meetings, Jira and Related initiatives (ID 22). */
+    .in-conn-card { padding: 0; overflow: hidden; }
+    .in-conn-card > .in-conn { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    /* Hover / open tints the whole card (header + linked rows), not just the header. */
+    .in-conn-card { transition: background var(--ic-duration-fast) var(--ic-ease); }
+    .in-conn-card:hover, .in-conn-card:has(> .in-conn[aria-expanded="true"]) { background: var(--color-surface-muted); }
+    .in-conn-card > .in-conn:hover { background: transparent; }
+    .in-conn-wrap.has-picks .in-conn-body { display: none; }
+    .in-conn-list { list-style: none; margin: 0; padding: 0 var(--ic-space-4) var(--ic-space-4); display: flex; flex-direction: column; gap: var(--ic-space-3); }
+    .in-conn-list[hidden] { display: none; }
+    .in-conn-item { display: flex; align-items: center; gap: var(--ic-space-3); }
+    .in-conn-item-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .in-conn-item-name { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; align-self: flex-start; max-width: 100%; }
+    .in-conn-item-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .in-conn-item-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .in-conn-item-remove.btn-icon-only { flex: none; color: var(--ic-palette-red-500); }
+    .in-conn-item-remove.btn-icon-only:hover { color: var(--ic-palette-red-500); background: var(--color-danger-subtle); }
     .in-dup-linkit { margin-left: var(--ic-space-2); height: auto; padding: 0; vertical-align: baseline; }
     .in-dup-linkit:disabled { color: var(--color-text-muted); cursor: default; text-decoration: none; }
     /* "Less details" accordion sits flush with the section — no inset. */
@@ -5933,10 +5942,13 @@ body.rv-spotmode{user-select:none;}
           <h3 class="in-cs-title">Connections</h3>
           <div class="in-conns">
             <div class="in-conn-wrap" data-conn="slack">
-              <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-slack"/></svg></span>
-                <span class="in-conn-text"><span class="in-conn-title">Slack</span><span class="in-conn-body" data-default="Create or add Slack channels to sync conversations with this initiative">Create or add Slack channels to sync conversations with this initiative</span></span>
-              </button>
+              <div class="card in-conn-card">
+                <button class="in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-slack"/></svg></span>
+                  <span class="in-conn-text"><span class="in-conn-title">Slack</span><span class="in-conn-body" data-default="Create or add Slack channels to sync conversations with this initiative">Create or add Slack channels to sync conversations with this initiative</span></span>
+                </button>
+                <ul class="in-conn-list" data-conn-list aria-label="Linked" hidden></ul>
+              </div>
               <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
                 <div class="input-icon input-icon-left">
                   <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
@@ -5947,10 +5959,13 @@ body.rv-spotmode{user-select:none;}
               </div>
             </div>
             <div class="in-conn-wrap" data-conn="rob">
-              <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-calendar"/></svg></span>
-                <span class="in-conn-text"><span class="in-conn-title">RoB meetings</span><span class="in-conn-body" data-default="Keep your team aligned with recurring meetings.">Keep your team aligned with recurring meetings.</span></span>
-              </button>
+              <div class="card in-conn-card">
+                <button class="in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-calendar"/></svg></span>
+                  <span class="in-conn-text"><span class="in-conn-title">RoB meetings</span><span class="in-conn-body" data-default="Keep your team aligned with recurring meetings.">Keep your team aligned with recurring meetings.</span></span>
+                </button>
+                <ul class="in-conn-list" data-conn-list aria-label="Linked" hidden></ul>
+              </div>
               <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
                 <div class="input-icon input-icon-left">
                   <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
@@ -5961,10 +5976,13 @@ body.rv-spotmode{user-select:none;}
               </div>
             </div>
             <div class="in-conn-wrap" data-conn="jira">
-              <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-jira-software"/></svg></span>
-                <span class="in-conn-text"><span class="in-conn-title">Jira</span><span class="in-conn-body" data-default="Link your initiative to Jira to bridge planning and execution">Link your initiative to Jira to bridge planning and execution</span></span>
-              </button>
+              <div class="card in-conn-card">
+                <button class="in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-jira-software"/></svg></span>
+                  <span class="in-conn-text"><span class="in-conn-title">Jira</span><span class="in-conn-body" data-default="Link your initiative to Jira to bridge planning and execution">Link your initiative to Jira to bridge planning and execution</span></span>
+                </button>
+                <ul class="in-conn-list" data-conn-list aria-label="Linked" hidden></ul>
+              </div>
               <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
                 <div class="input-icon input-icon-left">
                   <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
@@ -5978,10 +5996,13 @@ body.rv-spotmode{user-select:none;}
                  top-level initiatives. Optional; links are two-way (B shows A
                  once A links B). Fuzzy search / suggestions are out of scope. -->
             <div class="in-conn-wrap" data-conn="related">
-              <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-initiatives"/></svg></span>
-                <span class="in-conn-text"><span class="in-conn-title">Related initiatives</span><span class="in-conn-body" data-default="Link initiatives that relate to or depend on this one">Link initiatives that relate to or depend on this one</span></span>
-              </button>
+              <div class="card in-conn-card">
+                <button class="in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-initiatives"/></svg></span>
+                  <span class="in-conn-text"><span class="in-conn-title">Related initiatives</span><span class="in-conn-body" data-default="Link initiatives that relate to or depend on this one">Link initiatives that relate to or depend on this one</span></span>
+                </button>
+                <ul class="in-conn-list" data-related-list aria-label="Linked initiatives" hidden></ul>
+              </div>
               <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
                 <div class="input-icon input-icon-left">
                   <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
@@ -5990,7 +6011,6 @@ body.rv-spotmode{user-select:none;}
                 <div class="in-conn-options" role="listbox" aria-multiselectable="true"></div>
                 <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
               </div>
-              <ul class="in-related-list" data-related-list aria-label="Linked initiatives"></ul>
             </div>
           </div>
         </section>
@@ -7788,6 +7808,7 @@ body.rv-spotmode{user-select:none;}
         const list = menu.querySelector('.in-conn-options');
         const empty = menu.querySelector('.in-conn-empty');
         const body = wrap.querySelector('.in-conn-body');
+        const chosen = wrap.querySelector('[data-conn-list]');
         list.innerHTML = cfg.options.map(([label, desc]) =>
           `<button class="dropdown-item" type="button" role="option" aria-selected="false"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${label}</span><span class="dropdown-item-description">${desc}</span></div></button>`).join('');
         const items = [...list.children];
@@ -7811,18 +7832,34 @@ body.rv-spotmode{user-select:none;}
           const on = !item.classList.contains('is-selected');
           item.classList.toggle('is-selected', on);
           item.setAttribute('aria-selected', String(on));
-          const picked = items.filter(i => i.classList.contains('is-selected')).map(i => i.querySelector('.dropdown-item-label').textContent);
-          body.textContent = picked.length
-            ? `${picked.length} ${cfg.noun[picked.length === 1 ? 0 : 1]} linked · ${picked.join(', ')}`
-            : body.dataset.default;
+          paint();
         }));
+        // Picks list inside the card — blue name, its detail line, red trash.
+        const paint = () => {
+          const picked = items.filter(i => i.classList.contains('is-selected'));
+          chosen.innerHTML = picked.map(i => {
+            const label = i.querySelector('.dropdown-item-label').textContent;
+            const desc = i.querySelector('.dropdown-item-description')?.textContent || '';
+            return `<li class="in-conn-item"><span class="in-conn-item-text"><a class="in-conn-item-name" href="#" data-conn-open>${label}</a>${desc ? `<span class="in-conn-item-meta">${desc}</span>` : ''}</span><button class="btn btn-icon-only btn-ghost in-conn-item-remove" type="button" data-conn-remove="${items.indexOf(i)}" aria-label="Remove ${label}"><svg class="icon"><use href="#i-trash"/></svg></button></li>`;
+          }).join('');
+          chosen.hidden = !picked.length;
+          wrap.classList.toggle('has-picks', picked.length > 0);
+          body.textContent = body.dataset.default;
+        };
+        chosen.addEventListener('click', e => {
+          if (e.target.closest('[data-conn-open]')) { e.preventDefault(); return; }
+          const btn = e.target.closest('[data-conn-remove]');
+          if (!btn) return;
+          items[+btn.dataset.connRemove].click(); // same path as unticking it in the menu
+          (chosen.querySelector('[data-conn-remove]') || card).focus();
+        });
         wrap.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { e.stopPropagation(); closeConn(wrap); card.focus(); } });
       });
       document.addEventListener('click', () => connWraps.forEach(closeConn));
 
       // Related initiatives (roadmap ID 22) — options are the table's
       // published top-level initiatives (no drafts, not this one). Picks list
-      // under the card with a remove ✕; they're saved with drafts and become
+      // inside the card (blue title · meta · red trash), like RoB meetings; they're saved with drafts and become
       // two-way links (window.inLinks) when the initiative is created / saved.
       (() => {
         const wrap = document.querySelector('.in-conn-wrap[data-conn="related"]');
@@ -7844,8 +7881,9 @@ body.rv-spotmode{user-select:none;}
         const paint = () => {
           picked = picked.filter(id => byId(id));
           body.textContent = picked.length ? `${picked.length} initiative${picked.length === 1 ? '' : 's'} linked` : body.dataset.default;
-          chosen.innerHTML = picked.map(id => { const n = byId(id); return `<li class="in-related-item"><svg class="icon icon-16"><use href="#i-initiatives"/></svg><span class="in-related-text"><span class="in-related-name">${esc(n.name)}</span><span class="in-related-meta">${esc(meta(n))}</span></span><button class="in-related-remove" type="button" data-related-remove="${n.id}" aria-label="Remove link to ${esc(n.name)}"><svg class="icon"><use href="#i-x"/></svg></button></li>`; }).join('');
+          chosen.innerHTML = picked.map(id => { const n = byId(id); return `<li class="in-conn-item"><span class="in-conn-item-text"><a class="in-conn-item-name" href="#" data-related-open>${esc(n.name)}</a><span class="in-conn-item-meta">${esc(meta(n))}</span></span><button class="btn btn-icon-only btn-ghost in-conn-item-remove" type="button" data-related-remove="${n.id}" aria-label="Remove link to ${esc(n.name)}"><svg class="icon"><use href="#i-trash"/></svg></button></li>`; }).join('');
           chosen.hidden = !picked.length;
+          wrap.classList.toggle('has-picks', picked.length > 0); // header shows the title only
           list.querySelectorAll('.dropdown-item').forEach(i => { const on = picked.includes(i.dataset.id); i.classList.toggle('is-selected', on); i.setAttribute('aria-selected', String(on)); });
           window.inDupSync?.();
         };
@@ -7878,6 +7916,7 @@ body.rv-spotmode{user-select:none;}
         });
         search.addEventListener('input', filter);
         chosen.addEventListener('click', e => {
+          if (e.target.closest('[data-related-open]')) { e.preventDefault(); return; } // no navigation mid-form
           const btn = e.target.closest('[data-related-remove]');
           if (!btn) return;
           picked = picked.filter(x => x !== btn.dataset.relatedRemove);
