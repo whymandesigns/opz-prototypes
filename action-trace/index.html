@@ -578,11 +578,31 @@
   .asg-modal-h > div b{font-weight:600;}
   .asg-modal-h > div .muted{font-weight:400;}
   .asg-modal-b{flex:1;overflow:auto;padding:24px 32px;}
+  /* ── Version badge (top right) ─────────────────────────────────────
+     Which deployment is this? Filled from /api/version: on Vercel that is the
+     commit the deployment was built from, locally the checkout's HEAD. Solid
+     dark pill so it reads on the topbar and on the full-screen layers alike;
+     sits left of the 48px close-button zone those layers use. Compact (SHA
+     only) until hovered, then it shows branch + environment. */
+  .verbadge{position:fixed;top:14px;right:64px;z-index:1200;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;
+    background:rgba(24,30,42,.92);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.85);font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    text-decoration:none;letter-spacing:.01em;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:background .15s,color .15s;}
+  .verbadge[hidden]{display:none;}
+  .verbadge:hover,.verbadge:focus-visible{background:rgba(24,30,42,1);color:#fff;text-decoration:none;}
+  .verbadge .dot{width:6px;height:6px;border-radius:50%;background:#58c47f;flex:none;}
+  .verbadge.is-preview .dot{background:#f5b74a;}
+  .verbadge.is-local .dot{background:#7aa7ff;}
+  .verbadge.is-unknown .dot{background:rgba(255,255,255,.3);}
+  .verbadge .ref{color:rgba(255,255,255,.5);display:none;}
+  .verbadge:hover .ref,.verbadge:focus-visible .ref{display:inline;}
+  .verbadge .dirty{color:#f5b74a;}
+  .verbadge.is-copied{background:rgba(46,125,79,.95);color:#fff;}
 </style>
 </head>
 <body>
 
 <div class="topbar"><div class="brand"><img src="assets/operationalize-o.svg" alt="" />perationalize</div></div>
+<a class="verbadge is-unknown" id="verbadge" title="Loading version…" hidden><span class="dot"></span><span class="id">version</span></a>
 <div class="shell">
   <aside class="leftbar">
     <div class="grow" id="leftnav"></div>
@@ -1687,6 +1707,36 @@ window.addEventListener('resize', () => { if (S.rec?.diagOpen) renderDiagPop(); 
 { const q = new URLSearchParams(location.search);
   if (q.get('page')) { Object.assign(S, {create:null, meetingOpen:false, initDrawer:false, raci:null, rec:null, flowStep:null, page:q.get('page')}); render(); }   // ?page=processes · initiatives · meetings
   else goFlow(Number(String(q.get('step') || '1').replace('1b', '1.5')) || 1); }
+</script>
+
+<script>
+/* Version badge: ask /api/version which commit this is (Vercel build metadata on
+   the hosted site, git HEAD from designmd/tools/serve.mjs locally). Click copies
+   the full SHA; the pill links to the commit on GitHub when there is one. */
+(async () => {
+  const el = document.getElementById('verbadge'); if (!el) return;
+  const id = el.querySelector('.id');
+  let v = null;
+  try { const r = await fetch('/api/version', { cache: 'no-store' }); if (r.ok) v = await r.json(); } catch (_) {}
+  el.hidden = false;
+  if (!v || !v.short) {
+    el.className = 'verbadge is-unknown'; id.textContent = 'version unknown';
+    el.title = 'No /api/version here — open the prototype through the Icarus dev server or the Vercel site.';
+    return;
+  }
+  const env = v.env === 'production' ? 'prod' : v.env;
+  el.className = 'verbadge' + (v.env === 'local' ? ' is-local' : v.env === 'preview' ? ' is-preview' : v.env === 'production' ? '' : ' is-unknown');
+  id.innerHTML = `${v.short}${v.dirty ? '<span class="dirty">*</span>' : ''} <span class="ref">· ${[v.ref, env].filter(Boolean).join(' · ')}</span>`;
+  el.title = [v.message, v.dirty ? 'Uncommitted changes in the working tree' : null, v.sha, v.deployment, 'Click to copy the SHA'].filter(Boolean).join('\n');
+  if (v.repo) { el.href = `https://github.com/${v.repo}/commit/${v.sha}`; el.target = '_blank'; el.rel = 'noopener'; }
+  el.addEventListener('click', async e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;           // modifier-click keeps the link behaviour
+    e.preventDefault();
+    try { await navigator.clipboard.writeText(v.sha); } catch (_) {}
+    el.classList.add('is-copied'); const was = id.innerHTML; id.textContent = 'copied ' + v.short;
+    setTimeout(() => { el.classList.remove('is-copied'); id.innerHTML = was; }, 1200);
+  });
+})();
 </script>
 
 <script>
