@@ -402,6 +402,8 @@
   .flownav .menu button:hover{background:rgba(255,255,255,.08);}
   .flownav .menu button.on{background:rgba(3,176,128,.18);color:#fff;}
   .flownav .menu button i{font-style:normal;color:#9aa3b5;width:18px;text-align:right;flex-shrink:0;}
+  .flownav .menu a.canvas{display:flex;align-items:center;gap:8px;margin:6px 2px 0;padding:8px 10px;border-top:1px solid rgba(255,255,255,.12);color:#8FD3FF;text-decoration:none;font-size:12px;border-radius:4px;}
+  .flownav .menu a.canvas:hover{background:rgba(255,255,255,.08);}
 
   /* ───────── Create modal — matched to Figma 36606:69656 ─────────
      Header 24/32 padding, 20/30 title, 8px between the [ROB] mark and the
@@ -1430,7 +1432,7 @@ const flowLabel = n => n === 1.5 ? '1b' : String(n);
 const flowIdx = () => FLOW.findIndex(([n]) => n === S.flowStep);
 function renderFlowNav() {
   const i = flowIdx();
-  $('#flownav').innerHTML = `${flowMenu ? `<div class="menu"><div class="h">Figma flow · Action Trace integration</div>${FLOW.map(([n, l]) => `<button class="${S.flowStep === n ? 'on' : ''}" data-flow="${n}"><i>${flowLabel(n)}</i>${l}</button>`).join('')}</div>` : ''}
+  $('#flownav').innerHTML = `${flowMenu ? `<div class="menu"><div class="h">Figma flow · Action Trace integration</div>${FLOW.map(([n, l]) => `<button class="${S.flowStep === n ? 'on' : ''}" data-flow="${n}"><i>${flowLabel(n)}</i>${l}</button>`).join('')}<a class="canvas" href="flow/" target="_blank">${ic.chevR(12)}Open the flow canvas — every screen the code can reach, on one zoomable map</a></div>` : ''}
     <button class="pill" data-act="flow-menu"><span class="n">${i >= 0 ? `${flowLabel(S.flowStep)}` : '–'}</span>${i >= 0 ? FLOW[i][1] : 'Free navigation'}<span class="nav"><span data-flow-step="-1">${ic.chevL(12)}</span><span data-flow-step="1">${ic.chevR(12)}</span></span></button>`;
 }
 function goFlow(n) {
@@ -1743,7 +1745,7 @@ window.addEventListener('resize', () => { if (S.rec?.diagOpen) renderDiagPop(); 
 /* Review bar host adapter (review.js, enabled with ?review=1): name screens by flow step,
    let "Go to" jump to them, and address elements inside the layers the prototype re-renders. */
 window.REVIEW = {
-  screen: () => ({ id: S.flowStep, name: S.flowStep ? `Screen ${S.flowStep} · ${FLOW[S.flowStep - 1][1]}` : `${S.page} · free navigation` }),
+  screen: () => ({ id: S.flowStep, name: S.flowStep ? `Screen ${flowLabel(S.flowStep)} · ${(FLOW.find(([n]) => n === S.flowStep) || [])[1] || ''}` : `${S.page} · free navigation` }),
   goto: id => { if (id) goFlow(id); },
   roots: '[data-layer], [data-pop], #main, .leftbar, .topbar',
   key: el => el.id === 'main' ? 'main:' + S.page : null,   // #main's content depends on the page shown
