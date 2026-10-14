@@ -3544,8 +3544,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-shrink: 0;
 }
 
-/* The annotation tool's CSS lives in devtools.css — author tooling, not a
- * user-facing UI primitive. See design.md §7 for the four-file inline order. */
 
     /* === devtools.css === */
 /* devtools.css — author/dev tooling only.
@@ -3554,113 +3552,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  * design system (tokens.css → semantic.css → components.css), but it is
  * explicitly NOT part of that layer chain — nothing here is a user-facing
  * UI primitive. Everything is dormant until the matching trigger fires
- * (e.g. ?notes=1 in the URL for the annotation tool).
+ * (e.g. the map overlay's toggle).
  *
  * Rules of thumb:
  * - Reach for this file when adding something authors/devs use to *build*
- *   prototypes (annotation overlays, grid debug toggles, coachmark editors,
+ *   prototypes (debug overlays, grid toggles, coachmark editors,
  *   responsive frame previewers).
  * - Anything end users see (buttons, cards, alerts, status colors) belongs
  *   in components.css.
- * - Keep selectors namespaced (`.annot-*`, `.grid-debug-*`, …) so they
+ * - Keep selectors namespaced (`.map-*`, `.grid-debug-*`, …) so they
  *   can't collide with feature CSS.
  */
-
-/* ---------- Annotation tool ----------
- * In-page batch annotation overlay. Enable on any prototype by appending
- * ?notes=1 to the URL. The matching JS lives in the example.html script
- * block (delegated handlers — copy that whole block into every prototype).
- *
- * Usage flow:
- *   1. Click "Inspect" → cursor becomes crosshair, hovering outlines elements.
- *   2. Click an element → numbered pin + popover with a textarea opens.
- *   3. Type the note, Enter to save (Shift+Enter for newline, Esc cancels).
- *   4. Repeat. "Copy batch" puts all notes onto the clipboard as one payload.
- *   5. Paste back to your coding agent to execute all changes in a single turn.
- *
- * Notes clear on reload (no persistence). Selectors use the shortest readable
- * form (#id > unique class > tag.class > parent path).
- */
-.annot-toolbar {
-  position: fixed; bottom: 16px; right: 16px;
-  z-index: 99999;
-  display: flex; gap: 6px; align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--ic-radius-md);
-  padding: var(--ic-space-1) var(--ic-space-2);
-  box-shadow: var(--ic-shadow-lg);
-  font: var(--type-body-sm);
-}
-.annot-toolbar button {
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 4px 10px;
-  border-radius: var(--ic-radius-sm);
-  cursor: pointer;
-  font: inherit;
-}
-.annot-toolbar button:disabled { opacity: 0.4; cursor: default; }
-.annot-toolbar button.is-active {
-  background: var(--color-accent);
-  color: var(--ic-palette-white);
-  border-color: var(--color-accent);
-}
-.annot-toolbar .annot-count {
-  padding: 0 var(--ic-space-2);
-  color: var(--color-text-muted);
-  font: var(--type-caption);
-}
-.annot-mode,
-.annot-mode * { cursor: crosshair !important; }
-.annot-mode *:hover {
-  outline: 2px solid var(--color-accent) !important;
-  outline-offset: -2px;
-}
-.annot-pin {
-  position: absolute;
-  z-index: 99998;
-  width: 20px; height: 20px;
-  background: var(--color-accent);
-  color: var(--ic-palette-white);
-  border-radius: 50%;
-  display: grid; place-items: center;
-  font: 600 11px/1 var(--ic-font-sans);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  pointer-events: none;
-}
-.annot-popover {
-  position: absolute;
-  z-index: 100000;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--ic-radius-md);
-  padding: var(--ic-space-3);
-  box-shadow: var(--ic-shadow-xl);
-  width: 280px;
-  font: var(--type-body-sm);
-}
-.annot-popover textarea {
-  width: 100%;
-  min-height: 64px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--ic-radius-sm);
-  padding: 6px 8px;
-  font: inherit;
-  resize: vertical;
-  box-sizing: border-box;
-}
-.annot-popover-meta { margin-bottom: 6px; }
-.annot-popover-meta code {
-  font: var(--type-mono);
-  font-size: 11px;
-  background: var(--color-surface-muted);
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-.annot-popover-text { color: var(--color-text-muted); font-size: 11px; margin: 4px 0 6px; }
-.annot-popover-hint { color: var(--color-text-subtle); font-size: 11px; margin-top: 4px; }
 
 /* ============================================================
    Component-map inspector (?map=1)
@@ -4119,6 +4021,18 @@ body.rv-spotmode{user-select:none;}
     .in-conn-text { display: flex; flex-direction: column; min-width: 0; }
     .in-conn-title { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold); color: var(--color-text); }
     .in-conn-body { font: var(--type-caption); color: var(--color-text-muted); }
+    /* Related initiatives (ID 22) — picks listed under the card. */
+    .in-related-list { list-style: none; margin: var(--ic-space-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--ic-space-1); }
+    .in-related-list[hidden] { display: none; }
+    .in-related-item { display: flex; align-items: center; gap: var(--ic-space-2); padding: var(--ic-space-2) var(--ic-space-3); border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); color: var(--color-text-muted); }
+    .in-related-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .in-related-name { font: var(--type-body-sm-semibold); color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .in-related-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .in-related-remove { flex: none; width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--ic-radius-full); background: transparent; color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .in-related-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
+    .in-related-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    .in-dup-linkit { margin-left: var(--ic-space-2); height: auto; padding: 0; vertical-align: baseline; }
+    .in-dup-linkit:disabled { color: var(--color-text-muted); cursor: default; text-decoration: none; }
     /* "Less details" accordion sits flush with the section — no inset. */
     /* .accordion-group is rounded — square it so the top rule is a straight divider. */
     .in-details { gap: 0; border-radius: 0; }
@@ -4349,6 +4263,8 @@ body.rv-spotmode{user-select:none;}
     .in-view-activity li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--ic-space-3); align-items: start; font: var(--type-body-sm); }
     .in-view-activity time { display: block; font: var(--type-body-xs); color: var(--color-text-muted); }
     #in-drawer-view .drawer-footer { justify-content: flex-end; gap: var(--ic-space-4); }
+    /* .btn's display: flex beats the UA [hidden] rule — seeded rows hide Edit. */
+    #in-drawer-view .drawer-footer .btn[hidden] { display: none; }
     .in-view-add { display: inline-flex; align-items: center; gap: var(--ic-space-1); font-weight: var(--ic-weight-semibold); }
     .in-view-docs { display: flex; flex-direction: column; gap: var(--ic-space-2); }
     .in-view-doc { display: inline-flex; align-items: center; gap: var(--ic-space-2); }
@@ -5196,7 +5112,7 @@ body.rv-spotmode{user-select:none;}
                matching is a fuzzy search over name, description, objectives. -->
           <div class="alert alert-warning in-dup-alert" id="in-dup-alert" role="status" aria-live="polite" hidden>
             <svg class="icon alert-icon"><use href="#i-warning"/></svg>
-            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span></p>
+            <p class="alert-message"><strong>Sounds like this relates to another initiative already in TopTeam.</strong><span class="in-dup-match"><a class="in-dup-link" href="#" data-dup-link>Partner Enablement Program</a> · In progress · Owned by Aisha Khan</span><button class="btn btn-ghost in-link in-dup-linkit" type="button" data-dup-linkit><svg class="icon icon-16"><use href="#i-plus"/></svg>Link it</button></p>
           </div>
           <!-- Header variant B (?header=breadcrumb): the stage moves out of the
                header tags into this Status field. Mirrors the header stage
@@ -6058,6 +5974,24 @@ body.rv-spotmode{user-select:none;}
                 <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
               </div>
             </div>
+            <!-- Related initiatives (roadmap ID 22) — manual links to other
+                 top-level initiatives. Optional; links are two-way (B shows A
+                 once A links B). Fuzzy search / suggestions are out of scope. -->
+            <div class="in-conn-wrap" data-conn="related">
+              <button class="card in-conn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="in-conn-icon"><svg class="icon icon-24"><use href="#i-initiatives"/></svg></span>
+                <span class="in-conn-text"><span class="in-conn-title">Related initiatives</span><span class="in-conn-body" data-default="Link initiatives that relate to or depend on this one">Link initiatives that relate to or depend on this one</span></span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-start in-conn-menu" hidden>
+                <div class="input-icon input-icon-left">
+                  <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                  <input class="input" type="search" placeholder="Search initiatives" aria-label="Search initiatives" autocomplete="off" />
+                </div>
+                <div class="in-conn-options" role="listbox" aria-multiselectable="true"></div>
+                <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
+              </div>
+              <ul class="in-related-list" data-related-list aria-label="Linked initiatives"></ul>
+            </div>
           </div>
         </section>
         </section>
@@ -6623,6 +6557,15 @@ body.rv-spotmode{user-select:none;}
       // The name is a link so the "go look at it first" path is visible.
       // Placeholder for now — it doesn't navigate anywhere yet.
       dupAlert.querySelector('[data-dup-link]').addEventListener('click', e => e.preventDefault());
+      // "Link it" (ID 22) — adds the matched initiative to Related initiatives.
+      const dupLinkIt = dupAlert.querySelector('[data-dup-linkit]');
+      const dupNode = () => (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(x => x.name === DUP.name);
+      window.inDupSync = () => {
+        const linked = !!dupNode() && !!window.inRelated?.has(dupNode().id);
+        dupLinkIt.disabled = linked;
+        dupLinkIt.innerHTML = linked ? '<svg class="icon icon-16"><use href="#i-check"/></svg>Linked' : '<svg class="icon icon-16"><use href="#i-plus"/></svg>Link it';
+      };
+      dupLinkIt.addEventListener('click', () => { const n = dupNode(); if (n) window.inRelated?.add(n.id); });
 
       // Required single-selects (roadmap IDs 6, 9) — Create flags an empty
       // one in red; picking an option clears it; a successful Create resets it.
@@ -7325,6 +7268,7 @@ body.rv-spotmode{user-select:none;}
         start: startInput.value, end: endInput.value,
         desc: desc.value, problem: problem.value,
         objectives: objectives.values(), metrics: metrics.values(),
+        related: window.inRelated?.get() || [],
         raci: window.inRaci?.get() || [], raciA: window.inRaci ? window.inRaci.getA() : null, raciInformed: window.inRaci ? window.inRaci.informed() : true,
       });
       const clearSelectFully = el => {
@@ -7359,6 +7303,7 @@ body.rv-spotmode{user-select:none;}
         metrics.setValues(snap.metrics);
         window.inRaci?.set(snap.raci);
         window.inRaci?.setInformed(snap.raciInformed);
+        window.inRelated?.set(snap.related);
         window.inRaci?.setA(snap.raciA);
         setNameError(false);
         requiredSelects.forEach(f => f.setError(false));
@@ -7455,7 +7400,10 @@ body.rv-spotmode{user-select:none;}
           sec('raci', 'RACI', d.raciHtml || `<p class="in-view-text">${EMPTY}</p>`),
           sec('connections', 'Connections', `
             ${conn('i-calendar', 'Cadenced meeting', linkList(d.rob || []))}
-            ${conn('i-slack', 'Slack channels', linkList(d.slack || []))}`),
+            ${conn('i-slack', 'Slack channels', linkList(d.slack || []))}
+            ${conn('i-initiatives', 'Related initiatives', (d.related || []).length
+              ? d.related.map(r => `<a class="in-view-link" href="#" data-view-related="${vEsc(r.id)}">${vEsc(r.name)}</a>`).join(', ')
+              : '<span class="in-view-empty">Not linked</span>')}`),
           sec('documents', 'Documents', (d.links || []).length
             ? `<div class="in-view-docs">${d.links.map(l => `<a class="in-view-link in-view-doc" href="#" data-view-dead><svg class="icon icon-16"><use href="#i-attachment"/></svg>${vEsc(l)}</a>`).join('')}</div>`
             : `<p class="in-view-text"><span class="in-view-empty">No documents yet</span></p>`),
@@ -7499,7 +7447,7 @@ body.rv-spotmode{user-select:none;}
           impactFull: sel1('in-impact-full') ? label(sel1('in-impact-full')) : '',
           coreOn, coreObj: coreObj ? label(coreObj) : '',
           desc: desc.value, problem: problem.value, objs, mets,
-          rob: picked('rob'), slack: picked('slack'),
+          rob: picked('rob'), slack: picked('slack'), related: relatedOf(id),
           links: links.map(l => l.label || l.url),
         });
 
@@ -7517,6 +7465,8 @@ body.rv-spotmode{user-select:none;}
       const nodePerson = o => o && o.name
         ? `<span class="in-view-person" data-initials="${vEsc(o.initials || '')}"><span class="avatar avatar-md">${vEsc(o.initials || '')}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(o.name)}</a>${o.role ? `<span class="in-view-person-role">${vEsc(o.role)}</span>` : ''}</span></span>`
         : person(null);
+      // Two-way links (ID 22) as { id, name } for the view's Connections row.
+      const relatedOf = id => (window.inLinks?.of(id) || []).map(rid => (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(n => n.id === rid)).filter(Boolean).map(n => ({ id: n.id, name: n.name }));
       window.inOpenViewNode = n => {
         if (!n) return;
         viewEl.querySelector('#in-view-title').textContent = n.name;
@@ -7527,7 +7477,7 @@ body.rv-spotmode{user-select:none;}
           beneficiary: n.fn || '', ownerHtml: nodePerson(n.owner), pmHtml: nodePerson(n.pm),
           start: roadmapLabel(n.created), end: roadmapLabel(n.roadmap),
           coreOn: false, desc: n.desc || '', problem: '', objs: [], mets: [],
-          rob: n.rob?.title ? [n.rob.title] : [], slack: [], links: [],
+          rob: n.rob?.title ? [n.rob.title] : [], slack: [], links: [], related: relatedOf(n.id),
         });
         activityPanel.innerHTML = `<p class="in-view-text"><span class="in-view-empty">No activity yet</span></p>`;
         setViewTab('overview');
@@ -7556,6 +7506,13 @@ body.rv-spotmode{user-select:none;}
       viewEl.addEventListener('click', e => {
         const tab = e.target.closest('[data-view-tab]');
         if (tab) { setViewTab(tab.dataset.viewTab); return; }
+        const rel = e.target.closest('[data-view-related]');
+        if (rel) {
+          e.preventDefault();
+          const n = (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(x => x.id === rel.dataset.viewRelated);
+          if (n?.editable && drafts[n.id]) window.inOpenView(n.id); else window.inOpenViewNode(n);
+          return;
+        }
         if (e.target.closest('[data-view-dead]')) { e.preventDefault(); return; }
         if (e.target.closest('[data-view-copy]')) { window.toast({ variant: 'success', message: 'Link copied.' }); return; }
         if (e.target.closest('[data-view-edit]')) {
@@ -7572,6 +7529,9 @@ body.rv-spotmode{user-select:none;}
         restore(snap);
         draftId = id;
         setMode(published);
+        // A published initiative's links live in the two-way store — another
+        // initiative may have linked it since it was saved.
+        if (published) { window.inRelated?.set(window.inLinks?.of(id)); leaveBaseline = JSON.stringify(snapshot()); }
       };
 
       document.querySelector('[data-create-initiative]')?.addEventListener('click', () => {
@@ -7604,6 +7564,7 @@ body.rv-spotmode{user-select:none;}
         const wasEditing = editingPublished;
         const savedId = window.inUpsertInitiative?.({ ...published, editable: true }, draftId);
         if (savedId) {
+          window.inLinks?.set(savedId, window.inRelated?.get() || []); // two-way (ID 22)
           drafts[savedId] = snapshot(); // keep it reopenable
           (activity[savedId] ||= []).push({ what: wasEditing ? 'edited this initiative' : (draftId ? 'published this initiative from a draft' : 'created this initiative'), at: Date.now() });
         }
@@ -7618,7 +7579,7 @@ body.rv-spotmode{user-select:none;}
         nameInput.value = ''; updateDup();
         desc.value = ''; descTouched = false; updateDesc();
         problem.value = ''; problemCount.textContent = '0 / 500';
-        objectives.reset(); metrics.reset();
+        objectives.reset(); metrics.reset(); window.inRelated?.set([]);
         requiredSelects.forEach(f => { if (!f.keepOnReset) f.reset(); });
         resetDuration(); resetImpact();
       });
@@ -7820,6 +7781,7 @@ body.rv-spotmode{user-select:none;}
       };
       connWraps.forEach(wrap => {
         const cfg = CONNECTIONS[wrap.dataset.conn];
+        if (!cfg) return; // Related initiatives has its own picker below
         const card = wrap.querySelector('.in-conn');
         const menu = wrap.querySelector('.in-conn-menu');
         const search = menu.querySelector('input');
@@ -7857,6 +7819,80 @@ body.rv-spotmode{user-select:none;}
         wrap.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { e.stopPropagation(); closeConn(wrap); card.focus(); } });
       });
       document.addEventListener('click', () => connWraps.forEach(closeConn));
+
+      // Related initiatives (roadmap ID 22) — options are the table's
+      // published top-level initiatives (no drafts, not this one). Picks list
+      // under the card with a remove ✕; they're saved with drafts and become
+      // two-way links (window.inLinks) when the initiative is created / saved.
+      (() => {
+        const wrap = document.querySelector('.in-conn-wrap[data-conn="related"]');
+        if (!wrap) return;
+        const card = wrap.querySelector('.in-conn');
+        const menu = wrap.querySelector('.in-conn-menu');
+        const search = menu.querySelector('input');
+        const list = menu.querySelector('.in-conn-options');
+        const empty = menu.querySelector('.in-conn-empty');
+        const body = wrap.querySelector('.in-conn-body');
+        const chosen = wrap.querySelector('[data-related-list]');
+        const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const HEALTH = { on: 'On track', risk: 'At risk', off: 'Off track', na: 'Not active' };
+        const all = () => (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []);
+        const pool = () => all().filter(n => !n.draft && n.id !== draftId);
+        const byId = id => all().find(n => n.id === id);
+        const meta = n => [n.status, HEALTH[n.health] || 'Not active', n.owner?.name].filter(Boolean).join(' · ');
+        let picked = [];
+        const paint = () => {
+          picked = picked.filter(id => byId(id));
+          body.textContent = picked.length ? `${picked.length} initiative${picked.length === 1 ? '' : 's'} linked` : body.dataset.default;
+          chosen.innerHTML = picked.map(id => { const n = byId(id); return `<li class="in-related-item"><svg class="icon icon-16"><use href="#i-initiatives"/></svg><span class="in-related-text"><span class="in-related-name">${esc(n.name)}</span><span class="in-related-meta">${esc(meta(n))}</span></span><button class="in-related-remove" type="button" data-related-remove="${n.id}" aria-label="Remove link to ${esc(n.name)}"><svg class="icon"><use href="#i-x"/></svg></button></li>`; }).join('');
+          chosen.hidden = !picked.length;
+          list.querySelectorAll('.dropdown-item').forEach(i => { const on = picked.includes(i.dataset.id); i.classList.toggle('is-selected', on); i.setAttribute('aria-selected', String(on)); });
+          window.inDupSync?.();
+        };
+        const renderOptions = () => {
+          list.innerHTML = pool().map(n => `<button class="dropdown-item" type="button" role="option" aria-selected="false" data-id="${n.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${esc(n.name)}</span><span class="dropdown-item-description">${esc(meta(n))}</span></div></button>`).join('');
+          paint();
+        };
+        const filter = () => {
+          const q = search.value.trim().toLowerCase();
+          let shown = 0;
+          list.querySelectorAll('.dropdown-item').forEach(i => { const hit = i.querySelector('.dropdown-item-label').textContent.toLowerCase().includes(q); i.hidden = !hit; shown += hit; });
+          empty.hidden = shown > 0;
+        };
+        card.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          connWraps.forEach(w => { if (w !== wrap) closeConn(w); });
+          if (open) renderOptions();
+          menu.hidden = !open;
+          card.setAttribute('aria-expanded', String(open));
+          if (open) { search.value = ''; filter(); search.focus(); }
+        });
+        menu.addEventListener('click', e => {
+          e.stopPropagation();
+          const item = e.target.closest('.dropdown-item');
+          if (!item) return;
+          const id = item.dataset.id;
+          picked = picked.includes(id) ? picked.filter(x => x !== id) : [...picked, id];
+          paint();
+        });
+        search.addEventListener('input', filter);
+        chosen.addEventListener('click', e => {
+          const btn = e.target.closest('[data-related-remove]');
+          if (!btn) return;
+          picked = picked.filter(x => x !== btn.dataset.relatedRemove);
+          paint();
+          (chosen.querySelector('[data-related-remove]') || card).focus();
+        });
+        wrap.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { e.stopPropagation(); closeConn(wrap); card.focus(); } });
+        window.inRelated = {
+          get: () => [...picked],
+          set: ids => { picked = [...(ids || [])]; paint(); },
+          add: id => { if (!picked.includes(id)) { picked = [...picked, id]; paint(); } },
+          has: id => picked.includes(id),
+        };
+        paint();
+      })();
 
       // URL links — each click appends a name + URL row; rows can be removed.
       const linkRows = document.querySelector('.in-links-rows');
@@ -8060,6 +8096,24 @@ body.rv-spotmode{user-select:none;}
       // Stable ids for the collapse state.
       let seq = 0;
       (function tag(list) { list.forEach(n => { n.id = 'n' + (seq++); if (n.children) tag(n.children); }); })(INITIATIVES);
+
+      // Related initiatives (roadmap ID 22) — two-way links between top-level
+      // initiatives: id → Set of ids, kept symmetric, so B lists A once A links B.
+      const IN_LINKS = new Map();
+      const linkSet = id => { if (!IN_LINKS.has(id)) IN_LINKS.set(id, new Set()); return IN_LINKS.get(id); };
+      window.inLinks = {
+        of: id => [...(IN_LINKS.get(id) || [])],
+        set: (id, ids) => {
+          const next = new Set((ids || []).filter(x => x !== id));
+          linkSet(id).forEach(x => { if (!next.has(x)) linkSet(x).delete(id); });
+          next.forEach(x => linkSet(x).add(id));
+          IN_LINKS.set(id, next);
+        },
+      };
+      // Seeded pairs so view mode shows links out of the box.
+      const topId = name => INITIATIVES.find(n => n.name === name)?.id;
+      [['Partner Enablement Program', 'Enterprise Sales Expansion'], ['Customer Health Scoring', 'Self-serve Onboarding'], ['Customer Health Scoring', 'Enterprise Sales Expansion']]
+        .forEach(([a, b]) => { const ia = topId(a), ib = topId(b); if (ia && ib) window.inLinks.set(ia, [...window.inLinks.of(ia), ib]); });
 
       document.querySelector('.page-head-title .count-badge').textContent = INITIATIVES.length;
 
@@ -8887,6 +8941,7 @@ body.rv-spotmode{user-select:none;}
         <button type="button" data-state="create-errors">Required errors</button>
         <button type="button" data-state="create-duplicate">Duplicate notice</button>
         <button type="button" data-state="create-leave">Leave — unsaved changes</button>
+        <button type="button" data-state="create-related">Related initiatives picked</button>
         <button type="button" data-state="create-filled">Filled, ready to create</button>
       </div>
       <div class="in-switcher-group"><span>Draft & edit</span>
@@ -8897,6 +8952,7 @@ body.rv-spotmode{user-select:none;}
         <button type="button" data-state="view-full">View — all fields</button>
         <button type="button" data-state="view-minimal">View — required only</button>
         <button type="button" data-state="view-activity">View — activity log</button>
+        <button type="button" data-state="view-related">View — related initiatives</button>
       </div>
     </div>
   </div>
@@ -9007,6 +9063,12 @@ body.rv-spotmode{user-select:none;}
         'create-blank': async () => { await openCreate(); },
         'create-errors': async () => { await openCreate(); $('[data-create-initiative]').click(); },
         'create-duplicate': async () => { await openCreate(); type('in-name', 'Partner portal'); },
+        'create-related': async () => {
+          await openCreate(); type('in-name', 'Partner portal');
+          $('.in-conn-wrap[data-conn="related"] .in-conn').click(); await W(100);
+          [...document.querySelectorAll('.in-conn-wrap[data-conn="related"] .dropdown-item')].filter(i => /Customer Health|Self-serve/.test(i.textContent)).forEach(i => i.click());
+          document.body.click(); $('#in-cs-connections').scrollIntoView();
+        },
         'create-leave': async () => { await openCreate(); type('in-name', 'Vendor scorecards'); $('#in-drawer-new .in-cs-close').click(); },
         'create-filled': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); },
         'draft-reopen': async () => {
@@ -9016,6 +9078,7 @@ body.rv-spotmode{user-select:none;}
         'edit-mode': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); $('[data-view-edit]').click(); await W(300); },
         'view-full': async () => { await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow(); },
         'view-minimal': async () => { await openCreate(); fillRequired('Vendor scorecards'); await create(); await openFirstRow(); },
+        'view-related': async () => { window.inOpenViewNode(INITIATIVES.find(n => n.name === 'Customer Health Scoring')); await W(200); $('#in-vs-connections')?.scrollIntoView(); },
         'view-activity': async () => {
           await openCreate(); fillAll('Launch MVP Operationalize'); await create(); await openFirstRow();
           $('[data-view-edit]').click(); await W(300); type('in-name', 'Launch MVP Operationalize v2'); await create();
@@ -9035,7 +9098,7 @@ body.rv-spotmode{user-select:none;}
  * `?review=0` turns it off again).
  *
  * What it gives reviewers, from a bar at the bottom of the page:
- *   Interact   – use the prototype normally
+ *   View       – use the prototype normally
  *   Edit text  – click any text and retype it (persisted, reapplied after re-renders)
  *   Comment    – click any element and leave a note on it; pins + side panel
  *   Spotlight  – drag a rectangle; everything outside it is dimmed
@@ -9060,15 +9123,14 @@ body.rv-side-open .rv-toggle{display:none;}
 body.rv-edit .rv-toggle,body.rv-comment .rv-toggle,body.rv-spotmode .rv-toggle{cursor:pointer !important;}
 
 /* Bar */
-.rv-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2000;display:flex;align-items:center;gap:4px;
+.rv-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2000;display:flex;align-items:center;gap:0;
   background:#1d2433;border-radius:22px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:13px;}
-.rv-bar button{height:32px;border:none;border-radius:16px;background:none;color:#cfd4de;padding:0 14px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;cursor:pointer;}
+.rv-bar button{height:32px;border:none;border-radius:16px;background:none;color:#cfd4de;padding:0 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;cursor:pointer;}
 .rv-bar button:hover{background:rgba(255,255,255,.08);color:#fff;}
 .rv-bar button.on{background:#fff;color:#1d2433;font-weight:600;}
 .rv-bar .k{font-size:10px;opacity:.55;border:1px solid currentColor;border-radius:3px;padding:0 4px;line-height:14px;}
 .rv-bar .n{background:var(--rv-orange);color:#fff;border-radius:9px;font-size:10px;font-weight:700;padding:0 6px;line-height:16px;}
 .rv-bar .st{color:var(--rv-muted);font-size:11px;padding:0 10px 0 6px;white-space:nowrap;}
-.rv-bar .sep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 2px;}
 
 /* Hover highlight */
 .rv-hover{position:fixed;z-index:1900;pointer-events:none;border:2px solid var(--rv-blue);border-radius:3px;background:rgba(32,78,207,.06);transition:all .05s;}
@@ -9094,7 +9156,11 @@ body.rv-spotmode{user-select:none;}
 
 /* Side panel */
 .rv-side{position:fixed;top:0;right:0;bottom:0;width:360px;z-index:2100;background:#fff;border-left:1px solid var(--rv-line);box-shadow:-8px 0 30px rgba(0,0,0,.12);
-  display:flex;flex-direction:column;font-size:13px;line-height:19px;animation:rvin .18s ease-out;}
+  display:flex;flex-direction:column;font-size:13px;line-height:19px;}
+/* Entrance only — the panel is rebuilt on every render (tab switch, new comment),
+   and animating those made the drawer jump about. JS adds this class on the first
+   render after opening and not after. */
+.rv-side.rv-side-enter{animation:rvin .18s ease-out;}
 @keyframes rvin{from{transform:translateX(24px);}}
 .rv-side .h{display:flex;align-items:center;gap:8px;padding:16px 16px 12px;border-bottom:1px solid var(--rv-line-soft);}
 .rv-side .h b{font-size:15px;flex:1;}
@@ -9138,6 +9204,133 @@ body.rv-spotmode{user-select:none;}
 .rv-side .foot button:not(.btn){border:none;background:none;padding:0;font:inherit;font-size:12px;color:var(--rv-blue);cursor:pointer;}
 .rv-c .meta2 b{color:var(--rv-ink-2);font-weight:600;}
 </style>
+<style>
+/* plugins.css — the plugin launcher (author/reviewer tooling). Pairs with plugins.js.
+ *
+ * One floating button, bottom right, that owns every author plugin on the page:
+ * the review bar, the states switcher and the component map. Before this, each
+ * plugin had its own trigger in its own corner (or none at all), which is what
+ * made them feel like clutter rather than tools.
+ *
+ * Self-contained on purpose: colours are literal, not tokens, so the launcher
+ * looks the same on a prototype that does not load the design system — the same
+ * rule review.css follows. Nothing here is a user-facing UI primitive.
+ */
+
+.pg-fab, .pg-panel, .pg-panel * { box-sizing: border-box; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+/* ── The button ───────────────────────────────────────────────────── */
+.pg-fab {
+  position: fixed; right: 20px; bottom: 20px; z-index: 2300;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid #d8d9dc; background: #fff; color: #1d2433;
+  display: grid; place-items: center; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.pg-fab:hover { transform: scale(1.06); }
+.pg-fab.on    { background: #1d2433; border-color: #1d2433; color: #fff; }
+
+/* How many plugins are running right now — only when at least one is */
+.pg-fab .pg-count {
+  position: absolute; top: -2px; right: -2px;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: #ff8a3d; color: #fff;
+  border: 2px solid #fff; border-radius: 9px;
+  font: 700 10px/14px ui-sans-serif, system-ui, sans-serif;
+  display: grid; place-items: center;
+}
+
+/* The bar and the switcher get out of the way of the launcher */
+body.pg-open .pg-fab { background: #1d2433; border-color: #1d2433; color: #fff; }
+
+/* ── The panel ────────────────────────────────────────────────────── */
+.pg-panel {
+  position: fixed; right: 20px; bottom: 74px; z-index: 2300;
+  width: 290px; background: #fff; color: #1d2433;
+  border: 1px solid #d8d9dc; border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.22);
+  overflow: hidden;
+  font-size: 13px; line-height: 19px;
+  animation: pgin .16s ease-out;
+}
+@keyframes pgin { from { opacity: 0; transform: translateY(6px); } }
+
+.pg-panel .pg-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: #1d2433; color: #fff;
+  font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+}
+.pg-panel .pg-head button {
+  border: 0; background: transparent; color: inherit; cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 2px 4px;
+}
+
+.pg-panel .pg-list { padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+
+/* One plugin */
+.pg-item {
+  display: grid; grid-template-columns: 1fr auto; align-items: center;
+  gap: 10px; padding: 9px 10px; border-radius: 8px;
+  background: transparent; border: 0; width: 100%; text-align: left;
+  color: inherit; font: inherit; cursor: pointer;
+}
+.pg-item:hover:not(:disabled) { background: #f4f5f6; }
+.pg-item:disabled { cursor: default; opacity: .5; }
+.pg-item .pg-name { font-weight: 600; }
+.pg-item .pg-why  { display: block; margin-top: 1px; font-size: 11px; line-height: 15px; color: #6b7280; font-weight: 400; }
+
+/* The switch — a plain one so it never depends on components.css */
+.pg-switch {
+  width: 34px; height: 20px; border-radius: 10px;
+  background: #d8d9dc; position: relative; flex-shrink: 0;
+  transition: background .15s ease;
+}
+.pg-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: transform .15s ease;
+}
+.pg-item.is-on .pg-switch { background: #204ecf; }
+.pg-item.is-on .pg-switch::after { transform: translateX(14px); }
+
+.pg-panel .pg-foot {
+  padding: 8px 12px 10px; border-top: 1px solid #ebecef;
+  font-size: 11px; line-height: 16px; color: #6b7280;
+}
+
+/* review.js mounts its own circle button; the launcher owns that corner now.
+   Kept as a rule rather than deleted in review.js so an older inlined bar that
+   has not been refreshed yet still gets tidied up. */
+.pg-has-launcher .rv-toggle { display: none !important; }
+
+/* The review bar's own corner cases.
+
+   The bar runs along the bottom, so the button sits above it — keyed to the bar
+   being on screen, never to which mode it is in. The modes do not move the bar,
+   so anything mode-dependent here just makes the button jump about as you switch
+   between them. It has to clear the bar in every mode, too: the bar is centred
+   and grows with its buttons, and on a narrow viewport it runs the full width
+   and would sit under the button even in View. */
+body:has(#rvBar) .pg-fab { bottom: 76px; }
+body:has(#rvBar) .pg-panel { bottom: 130px; }
+
+/* The drawer covers this corner completely. review.css hides its own toggle
+   then, and the launcher does the same rather than float over the comments. */
+body.rv-side-open .pg-fab, body.rv-side-open .pg-panel { display: none; }
+
+/* Same courtesy for the states switcher, which sits bottom-left and is tall:
+   with the bar on, its last few states ended up behind it. The rule lives here
+   rather than in each prototype because the switcher is hand-copied with a
+   different prefix every time, and this file already reaches all of them. */
+body:has(#rvBar) [id$="-switcher"] { bottom: 76px; }
+
+@media (max-width: 520px) {
+  .pg-panel { right: 12px; left: 12px; width: auto; }
+  .pg-fab { right: 12px; bottom: 12px; }
+}
+</style>
 <!-- === /review.css === -->
 <!-- === review.js === -->
 <script>
@@ -9149,7 +9342,7 @@ body.rv-spotmode{user-select:none;}
  * localStorage, `?review=0` or the same button turns it off again.
  *
  * Modes (bottom bar, keyboard letters in brackets):
- *   Interact [I]   use the prototype normally
+ *   View [V]       use the prototype normally
  *   Edit text [E]  click any text and retype it — edits persist and are reapplied after re-renders
  *   Comment  [C]   click any element, leave a note; numbered pins + a side panel (open / resolved)
  *   Spotlight [S]  drag a rectangle; everything outside it is dimmed
@@ -9182,7 +9375,11 @@ body.rv-spotmode{user-select:none;}
   try { if (q === '1' || q === '') localStorage.setItem(KEY + ':on', '1'); if (q === '0') localStorage.removeItem(KEY + ':on'); } catch {}
   let on = false; try { on = localStorage.getItem(KEY + ':on') === '1'; } catch {}
 
-  /* Floating toggle — present on every page, turns the bar on/off (reloads so the page starts clean) */
+  window.__icarusReview = true;          // the launcher looks for this when listing plugins
+
+  /* Floating toggle — the fallback trigger. plugins.js owns this corner when it
+     is present (it hides this button via .pg-has-launcher), so the bar keeps its
+     own switch for pages that carry the bar alone. */
   const ICON = '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h9A2.5 2.5 0 0 1 17 5.5v6a2.5 2.5 0 0 1-2.5 2.5H9l-3.6 3v-3H5.5A2.5 2.5 0 0 1 3 11.5z"/><path d="M7 7.5h6M7 10.5h3.5"/></svg>';
   const mountToggle = () => {
     document.body.insertAdjacentHTML('beforeend', `<button type="button" id="rvToggle" class="rv-toggle${on ? ' on' : ''}" title="${on ? 'Turn the review bar off' : 'Review this page: comment, edit text, spotlight'}" aria-label="Review bar">${ICON}</button>`);
@@ -9195,10 +9392,13 @@ body.rv-spotmode{user-select:none;}
   if (!on) return;
 
   const HOST = () => window.REVIEW || {};
-  const REVIEW_UI = '.rv-bar,.rv-side,.rv-pins,.rv-hover,.rv-spot,.rv-toggle';
+  // Author tooling the bar must never treat as page content — its own
+  // furniture plus the plugin launcher, which shares the screen with it.
+  const REVIEW_UI = '.rv-bar,.rv-side,.rv-pins,.rv-hover,.rv-spot,.rv-toggle,.pg-fab,.pg-panel';
   let FB = {edits:{}, comments:[]};
   let mode = 'interact';                 // interact | edit | comment | spot
   let sideOpen = false, draft = null, selId = null, filter = 'open', saveState = '', online = false;
+  let sideShown = false;                 // panel already on screen — re-render without replaying the entrance
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -9483,22 +9683,26 @@ body.rv-spotmode{user-select:none;}
   document.addEventListener('click', e => { const p = e.target.closest('[data-pin]'); if (p) { selId = p.dataset.pin; sideOpen = true; draft = null; renderSide(); placePins(); [...document.querySelectorAll('[data-cid]')].find(n => n.dataset.cid === selId)?.scrollIntoView({block:'nearest'}); } });
 
   /* ── Bar ──────────────────────────────────────────────────────────── */
+  // Entering comment mode leaves the drawer alone — it is opened by "Show
+  // comments", by picking an element to comment on, or by clicking a pin.
   function setMode(m) {
     mode = m; document.body.classList.toggle('rv-edit', m === 'edit'); document.body.classList.toggle('rv-comment', m === 'comment'); document.body.classList.toggle('rv-spotmode', m === 'spot');
-    showHover(null); if (m === 'comment') sideOpen = true; renderBar(); renderSide();
+    showHover(null); renderBar(); renderSide();
   }
+  // The status at the right end only appears when it has something to say:
+  // "Shared" is the steady state, so it is left out; Local only, Saving… and
+  // Save failed — retrying still show.
   function renderBar() {
     const open = FB.comments.filter(c => !c.resolved).length, edits = Object.keys(FB.edits).length;
     $('#rvBar').innerHTML = `
-      <button class="${mode === 'interact' ? 'on' : ''}" data-rv-mode="interact">Interact <span class="k">I</span></button>
+      <button class="${mode === 'interact' ? 'on' : ''}" data-rv-mode="interact">View <span class="k">V</span></button>
       <button class="${mode === 'edit' ? 'on' : ''}" data-rv-mode="edit">Edit text <span class="k">E</span></button>
       <button class="${mode === 'comment' ? 'on' : ''}" data-rv-mode="comment">Comment <span class="k">C</span>${open ? `<span class="n">${open}</span>` : ''}</button>
       <button class="${mode === 'spot' ? 'on' : ''}" data-rv-mode="spot">Spotlight <span class="k">S</span></button>
       ${spot ? `<button data-rv="clear-spot" title="Remove the spotlight">✕ Clear spotlight</button>` : ''}
-      <span class="sep"></span>
       <button data-rv="side">${sideOpen ? 'Hide' : 'Show'} comments</button>
       ${edits ? `<button data-rv="reset" title="Undo all text edits">↺ ${edits} edit${edits > 1 ? 's' : ''}</button>` : ''}
-      <span class="st">${saveState}</span>`;
+      ${saveState && saveState !== 'Shared' ? `<span class="st">${saveState}</span>` : ''}`;
   }
   document.addEventListener('click', e => {
     const m = e.target.closest('[data-rv-mode]'); if (m) return setMode(m.dataset.rvMode);
@@ -9535,11 +9739,16 @@ body.rv-spotmode{user-select:none;}
   /* ── Side panel ───────────────────────────────────────────────────── */
   function renderSide() {
     document.body.classList.toggle('rv-side-open', sideOpen);
-    if (!sideOpen) { $('#rvSide').innerHTML = ''; return; }
+    if (!sideOpen) { $('#rvSide').innerHTML = ''; sideShown = false; return; }
+    // Every render rebuilds the panel, so switching tabs would otherwise replay
+    // the slide-in and throw the list back to the top. Animate only the first
+    // render after opening, and put the scroll position back afterwards.
+    const entering = !sideShown;
+    const keepScroll = entering ? 0 : ($('#rvSide .body')?.scrollTop || 0);
     const list = FB.comments.filter(c => filter === 'all' || (filter === 'open' ? !c.resolved : c.resolved)).slice().reverse();
     const counts = {open:FB.comments.filter(c => !c.resolved).length, resolved:FB.comments.filter(c => c.resolved).length, all:FB.comments.length};
     const when = c => new Date(c.created).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
-    $('#rvSide').innerHTML = `<div class="rv-side">
+    $('#rvSide').innerHTML = `<div class="rv-side${entering ? ' rv-side-enter' : ''}">
       <div class="h"><b>Comments</b><button class="x" data-rv="close" title="Close">×</button></div>
       <div class="tabs2">${['open','resolved','all'].map(f => `<button class="${filter === f ? 'on' : ''}" data-rv="filter" data-v="${f}">${f[0].toUpperCase() + f.slice(1)} ${counts[f]}</button>`).join('')}</div>
       <div class="body">
@@ -9559,6 +9768,8 @@ body.rv-spotmode{user-select:none;}
       <div class="foot">${online ? `Shared with everyone who opens this prototype. Commenting as <b>${esc(who() || 'anonymous')}</b> · <button data-rv="who">change</button>` : `Not connected to a shared store — kept in this browser only.`}
         <div><button class="btn" data-rv="copy">Copy comments as prompt</button></div></div>
     </div>`;
+    sideShown = true;
+    if (keepScroll) { const b = $('#rvSide .body'); if (b) b.scrollTop = keepScroll; }
     const ta = $('#rvDraft');
     ta?.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) postDraft(); if (e.key === 'Escape') { draft = null; renderSide(); placePins(); } });
   }
@@ -9569,13 +9780,135 @@ body.rv-spotmode{user-select:none;}
     const k = e.key.toLowerCase();
     if (k === 'e') setMode(mode === 'edit' ? 'interact' : 'edit');
     if (k === 'c') setMode(mode === 'comment' ? 'interact' : 'comment');
-    if (k === 'i') setMode('interact');
+    if (k === 'v' || k === 'i') setMode('interact');   // I kept working for muscle memory
     if (k === 's') setMode(mode === 'spot' ? 'interact' : 'spot');
     if (e.key === 'Escape' && spot) { e.stopImmediatePropagation(); clearSpot(); return; }   // spotlight first, then the mode
     if (e.key === 'Escape' && mode !== 'interact') { e.stopImmediatePropagation(); draft = null; setMode('interact'); placePins(); }
   }, true);
 
   renderBar(); load();
+})();
+</script>
+<script>
+/* plugins.js — the plugin launcher. Pairs with plugins.css.
+ *
+ * One floating button that turns the author plugins on and off:
+ *
+ *   Review bar      ?review=1   comment, retype copy, spotlight          (review.js)
+ *   States switcher ?states=1   jump between a prototype's designed states
+ *   Component map   ?map=1      cross-reference components to Picasso
+ *
+ * Each plugin still owns its own behaviour and its own URL parameter; this only
+ * gathers the switches into one place, so a prototype shows one unobtrusive
+ * button instead of a button bottom-right, a panel bottom-left and nothing at
+ * all for the third.
+ *
+ * Toggling always reloads. Every one of these plugins decides what to do at
+ * boot — stamp the page, replay a state, render a bar — so flipping them live
+ * would mean three teardown paths that only ever run in author tooling. A
+ * reload is one path, and the page always starts in a known state.
+ *
+ * A plugin appears in the panel only if it is actually on the page; the rest
+ * are listed greyed out, so the launcher tells the truth about what this page
+ * carries rather than offering a switch that does nothing.
+ */
+(() => {
+  if (window.__icarusLauncher) return;            // never mount twice
+  window.__icarusLauncher = true;
+  document.documentElement.classList.add('pg-has-launcher');   // review.js hides its own button
+
+  const P = () => new URLSearchParams(location.search);
+  const isOn = key => P().get(key) === '1';
+
+  /* ── What this page actually carries ──────────────────────────────
+     Detection is deliberately structural rather than a flag each plugin
+     has to set, so a prototype that was built before the launcher existed
+     still lights up correctly. */
+  const DETECT = {
+    // review.js announces itself; fall back to the bar/toggle it leaves behind
+    review: () => !!(window.__icarusReview || document.querySelector('.rv-toggle, #rvBar')),
+    // switchers are hand-copied with a per-prototype prefix (in-, ws-, pr-, …),
+    // so the stable hook is the id suffix rather than a class. The [data-state]
+    // check keeps an unrelated "…-switcher" (a theme toggle, say) from
+    // masquerading as one.
+    states: () => !!document.querySelector('[id$="-switcher"] [data-state]'),
+    // the kit's goggles button, or a page that ships the registry
+    map:    () => !!document.querySelector('.map-toggle') || !!window.__icarusComponentMap,
+  };
+
+  const PLUGINS = [
+    { key: 'review', name: 'Review bar',      on: 'Comment, retype copy, spotlight a region.',
+      off: 'Not on this page — inline.py adds it.' },
+    { key: 'states', name: 'States switcher', on: "Jump between this prototype's designed states.",
+      off: 'This prototype has no states defined.' },
+    { key: 'map',    name: 'Component map',   on: 'Cross-reference components to React / Storybook.',
+      off: 'Only on the component kit for now.' },
+  ];
+
+  const ICON = '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 3h-3A1.5 1.5 0 0 0 3 4.5v3A1.5 1.5 0 0 0 4.5 9h3A1.5 1.5 0 0 0 9 7.5v-3A1.5 1.5 0 0 0 7.5 3Z"/><path d="M15.5 3h-3A1.5 1.5 0 0 0 11 4.5v3A1.5 1.5 0 0 0 12.5 9h3A1.5 1.5 0 0 0 17 7.5v-3A1.5 1.5 0 0 0 15.5 3Z"/><path d="M7.5 11h-3A1.5 1.5 0 0 0 3 12.5v3A1.5 1.5 0 0 0 4.5 17h3A1.5 1.5 0 0 0 9 15.5v-3A1.5 1.5 0 0 0 7.5 11Z"/><path d="M14 11.5v5M11.5 14h5"/></svg>';
+
+  let open = false;
+
+  /* Flipping a plugin: the parameter is set explicitly either way rather than
+     deleted, because the plugins disagree about what a missing parameter means
+     — the review bar remembers its last state in localStorage, so it needs a
+     literal review=0 to be told to stop. */
+  function toggle(key) {
+    const p = P();
+    p.set(key, isOn(key) ? '0' : '1');
+    location.search = p.toString();
+  }
+
+  function render() {
+    document.getElementById('pgPanel')?.remove();
+    document.body.classList.toggle('pg-open', open);
+
+    const live = PLUGINS.filter(x => DETECT[x.key]() && isOn(x.key)).length;
+    const fab = document.getElementById('pgFab');
+    fab.classList.toggle('on', live > 0);
+    fab.setAttribute('aria-expanded', String(open));
+    fab.innerHTML = ICON + (live ? `<span class="pg-count">${live}</span>` : '');
+
+    if (!open) return;
+
+    const rows = PLUGINS.map(x => {
+      const here = DETECT[x.key]();
+      const on = here && isOn(x.key);
+      return `<button class="pg-item${on ? ' is-on' : ''}" type="button" data-pg="${x.key}"${here ? '' : ' disabled'}>
+          <span><span class="pg-name">${x.name}</span><span class="pg-why">${here ? x.on : x.off}</span></span>
+          <span class="pg-switch"></span>
+        </button>`;
+    }).join('');
+
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="pg-panel" id="pgPanel" role="dialog" aria-label="Plugins">
+        <div class="pg-head">Plugins<button type="button" data-pg-close aria-label="Close">×</button></div>
+        <div class="pg-list">${rows}</div>
+        <div class="pg-foot">Switching one reloads the page, so it starts clean.</div>
+      </div>`);
+    document.querySelector('.pg-item:not(:disabled)')?.focus();
+  }
+
+  function mount() {
+    document.body.insertAdjacentHTML('beforeend',
+      `<button type="button" id="pgFab" class="pg-fab" aria-label="Plugins" aria-expanded="false" aria-controls="pgPanel" title="Plugins — review bar, states, component map">${ICON}</button>`);
+    render();
+  }
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('#pgFab'))        { open = !open; return render(); }
+    if (e.target.closest('[data-pg-close]')) { open = false; return render(); }
+    const row = e.target.closest('[data-pg]');
+    if (row && !row.disabled) return toggle(row.dataset.pg);
+    if (open && !e.target.closest('#pgPanel')) { open = false; render(); }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && open) { open = false; render(); document.getElementById('pgFab')?.focus(); }
+  });
+
+  if (document.body) mount();
+  else document.addEventListener('DOMContentLoaded', mount);
 })();
 </script>
 <!-- === /review.js === -->
