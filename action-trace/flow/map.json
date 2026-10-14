@@ -1,0 +1,453 @@
+{
+ "when": 1791981932872,
+ "p": "/action-trace/",
+ "start": "page=meetings",
+ "depth": 3,
+ "max": 24,
+ "states": [
+  {
+   "id": 0,
+   "fp": {
+    "sig": "{\"screen\":\"meetings · free navigation\",\"layers\":[],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+    "screen": "meetings · free navigation",
+    "layers": [],
+    "nav": [
+     "RoB Meetings"
+    ],
+    "main": "RoB Meetings"
+   },
+   "sig": "{\"screen\":\"meetings · free navigation\",\"layers\":[],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+   "name": "meetings · free navigation",
+   "sub": "meetings · free navigation",
+   "path": [],
+   "depth": 0
+  },
+  {
+   "id": 1,
+   "fp": {
+    "sig": "{\"screen\":\"processes · free navigation\",\"layers\":[],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+    "screen": "processes · free navigation",
+    "layers": [],
+    "nav": [
+     "Processes"
+    ],
+    "main": "Processes"
+   },
+   "sig": "{\"screen\":\"processes · free navigation\",\"layers\":[],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+   "name": "processes · free navigation",
+   "sub": "processes · free navigation",
+   "path": [
+    {
+     "sel": "button[data-page=\"processes\"]",
+     "text": "Processes",
+     "byText": false
+    }
+   ],
+   "depth": 1
+  },
+  {
+   "id": 2,
+   "fp": {
+    "sig": "{\"screen\":\"initiatives · free navigation\",\"layers\":[],\"nav\":[\"Initiatives\"],\"main\":\"Initiatives\"}",
+    "screen": "initiatives · free navigation",
+    "layers": [],
+    "nav": [
+     "Initiatives"
+    ],
+    "main": "Initiatives"
+   },
+   "sig": "{\"screen\":\"initiatives · free navigation\",\"layers\":[],\"nav\":[\"Initiatives\"],\"main\":\"Initiatives\"}",
+   "name": "initiatives · free navigation",
+   "sub": "initiatives · free navigation",
+   "path": [
+    {
+     "sel": "button[data-page=\"initiatives\"]",
+     "text": "Initiatives",
+     "byText": false
+    }
+   ],
+   "depth": 1
+  },
+  {
+   "id": 3,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+    "screen": "Screen 1 · New ROB · Action Trace processes adding",
+    "layers": [
+     "create:[ ROB ] PO Invoice · Matching & Coding Review",
+     "fs-modal:[ ROB ] PO Invoice · Matching & Coding Review"
+    ],
+    "nav": [
+     "RoB Meetings"
+    ],
+    "main": "RoB Meetings"
+   },
+   "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+   "name": "[ ROB ] PO Invoice · Matching & Coding Review",
+   "sub": "Screen 1 · New ROB · Action Trace processes adding · create + fs-modal",
+   "path": [
+    {
+     "sel": "button[data-act=\"new-meeting\"]",
+     "text": "New RoB Meeting",
+     "byText": false
+    }
+   ],
+   "depth": 1
+  },
+  {
+   "id": 4,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 2 · ROB · Action Trace added\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+    "screen": "Screen 2 · ROB · Action Trace added",
+    "layers": [
+     "meeting:[ ROB ] PO Invoice · Matching & Coding Review",
+     "fs-modal:[ ROB ] PO Invoice · Matching & Coding Review"
+    ],
+    "nav": [
+     "RoB Meetings"
+    ],
+    "main": "RoB Meetings"
+   },
+   "sig": "{\"screen\":\"Screen 2 · ROB · Action Trace added\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+   "name": "[ ROB ] PO Invoice · Matching & Coding Review",
+   "sub": "Screen 2 · ROB · Action Trace added · meeting + fs-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    }
+   ],
+   "depth": 1
+  },
+  {
+   "id": 5,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 4 · Recordings modal · Recording not selected\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\",\"rec:PO Invoice · Matching & Coding Review\",\"rec-modal:PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+    "screen": "Screen 4 · Recordings modal · Recording not selected",
+    "layers": [
+     "meeting:[ ROB ] PO Invoice · Matching & Coding Review",
+     "fs-modal:[ ROB ] PO Invoice · Matching & Coding Review",
+     "rec:PO Invoice · Matching & Coding Review",
+     "rec-modal:PO Invoice · Matching & Coding Review"
+    ],
+    "nav": [
+     "RoB Meetings"
+    ],
+    "main": "RoB Meetings"
+   },
+   "sig": "{\"screen\":\"Screen 4 · Recordings modal · Recording not selected\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\",\"rec:PO Invoice · Matching & Coding Review\",\"rec-modal:PO Invoice · Matching & Coding Review\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+   "name": "PO Invoice · Matching & Coding Review",
+   "sub": "Screen 4 · Recordings modal · Recording not selected · meeting + fs-modal + rec + rec-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "button[data-act=\"open-rec\"]",
+     "text": "Review",
+     "byText": false
+    }
+   ],
+   "depth": 2
+  },
+  {
+   "id": 6,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 2 · ROB · Action Trace added\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\",\"assign:Managers & workers\",\"asg-modal:Managers and workers\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+    "screen": "Screen 2 · ROB · Action Trace added",
+    "layers": [
+     "meeting:[ ROB ] PO Invoice · Matching & Coding Review",
+     "fs-modal:[ ROB ] PO Invoice · Matching & Coding Review",
+     "assign:Managers & workers",
+     "asg-modal:Managers and workers"
+    ],
+    "nav": [
+     "RoB Meetings"
+    ],
+    "main": "RoB Meetings"
+   },
+   "sig": "{\"screen\":\"Screen 2 · ROB · Action Trace added\",\"layers\":[\"meeting:[ ROB ] PO Invoice · Matching & Coding Review\",\"fs-modal:[ ROB ] PO Invoice · Matching & Coding Review\",\"assign:Managers & workers\",\"asg-modal:Managers and workers\"],\"nav\":[\"RoB Meetings\"],\"main\":\"RoB Meetings\"}",
+   "name": "Managers and workers",
+   "sub": "Screen 2 · ROB · Action Trace added · meeting + fs-modal + assign + asg-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "button[data-act=\"asg-edit-meeting\"]",
+     "text": "Edit workers and managers",
+     "byText": false
+    }
+   ],
+   "depth": 2
+  },
+  {
+   "id": 7,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 3 · Process · Action Trace connector view mode\",\"layers\":[\"init:Supplier Invoice Management\",\"drawer:Supplier Invoice Management\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+    "screen": "Screen 3 · Process · Action Trace connector view mode",
+    "layers": [
+     "init:Supplier Invoice Management",
+     "drawer:Supplier Invoice Management"
+    ],
+    "nav": [
+     "Processes"
+    ],
+    "main": "Processes"
+   },
+   "sig": "{\"screen\":\"Screen 3 · Process · Action Trace connector view mode\",\"layers\":[\"init:Supplier Invoice Management\",\"drawer:Supplier Invoice Management\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+   "name": "Supplier Invoice Management",
+   "sub": "Screen 3 · Process · Action Trace connector view mode · init + drawer",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "span[data-act=\"open-initiative\"]",
+     "text": "Supplier Invoice Management",
+     "byText": false
+    }
+   ],
+   "depth": 2
+  },
+  {
+   "id": 8,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 3 · Process · Action Trace connector view mode\",\"layers\":[\"init:Supplier Invoice Management\",\"drawer:Supplier Invoice Management\",\"assign:Managers & workers\",\"asg-modal:Managers and workers\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+    "screen": "Screen 3 · Process · Action Trace connector view mode",
+    "layers": [
+     "init:Supplier Invoice Management",
+     "drawer:Supplier Invoice Management",
+     "assign:Managers & workers",
+     "asg-modal:Managers and workers"
+    ],
+    "nav": [
+     "Processes"
+    ],
+    "main": "Processes"
+   },
+   "sig": "{\"screen\":\"Screen 3 · Process · Action Trace connector view mode\",\"layers\":[\"init:Supplier Invoice Management\",\"drawer:Supplier Invoice Management\",\"assign:Managers & workers\",\"asg-modal:Managers and workers\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+   "name": "Managers and workers",
+   "sub": "Screen 3 · Process · Action Trace connector view mode · init + drawer + assign + asg-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "span[data-act=\"open-initiative\"]",
+     "text": "Supplier Invoice Management",
+     "byText": false
+    },
+    {
+     "sel": "button[data-act=\"proc-people\"][data-proc=\"po\"]",
+     "text": "",
+     "byText": false
+    }
+   ],
+   "depth": 3
+  },
+  {
+   "id": 9,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] PO Invoice Processing · Review\",\"fs-modal:[ ROB ] PO Invoice Processing · Review\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+    "screen": "Screen 1 · New ROB · Action Trace processes adding",
+    "layers": [
+     "create:[ ROB ] PO Invoice Processing · Review",
+     "fs-modal:[ ROB ] PO Invoice Processing · Review"
+    ],
+    "nav": [
+     "Processes"
+    ],
+    "main": "Processes"
+   },
+   "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] PO Invoice Processing · Review\",\"fs-modal:[ ROB ] PO Invoice Processing · Review\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+   "name": "[ ROB ] PO Invoice Processing · Review",
+   "sub": "Screen 1 · New ROB · Action Trace processes adding · create + fs-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "span[data-act=\"open-initiative\"]",
+     "text": "Supplier Invoice Management",
+     "byText": false
+    },
+    {
+     "sel": "button[data-act=\"proc-rob\"][data-proc=\"po\"]",
+     "text": "",
+     "byText": false
+    }
+   ],
+   "depth": 3
+  },
+  {
+   "id": 10,
+   "fp": {
+    "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] Non-PO Invoice Processing · Review\",\"fs-modal:[ ROB ] Non-PO Invoice Processing · Review\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+    "screen": "Screen 1 · New ROB · Action Trace processes adding",
+    "layers": [
+     "create:[ ROB ] Non-PO Invoice Processing · Review",
+     "fs-modal:[ ROB ] Non-PO Invoice Processing · Review"
+    ],
+    "nav": [
+     "Processes"
+    ],
+    "main": "Processes"
+   },
+   "sig": "{\"screen\":\"Screen 1 · New ROB · Action Trace processes adding\",\"layers\":[\"create:[ ROB ] Non-PO Invoice Processing · Review\",\"fs-modal:[ ROB ] Non-PO Invoice Processing · Review\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+   "name": "[ ROB ] Non-PO Invoice Processing · Review",
+   "sub": "Screen 1 · New ROB · Action Trace processes adding · create + fs-modal",
+   "path": [
+    {
+     "sel": "tr[data-act=\"open-meeting\"]",
+     "text": "[ ROB ] PO Invoice · Matching & Coding Review",
+     "byText": false
+    },
+    {
+     "sel": "span[data-act=\"open-initiative\"]",
+     "text": "Supplier Invoice Management",
+     "byText": false
+    },
+    {
+     "sel": "button[data-act=\"proc-rob\"][data-proc=\"nonpo\"]",
+     "text": "",
+     "byText": false
+    }
+   ],
+   "depth": 3
+  }
+ ],
+ "edges": [
+  {
+   "from": 0,
+   "to": 1,
+   "label": "Processes",
+   "back": false
+  },
+  {
+   "from": 0,
+   "to": 2,
+   "label": "Initiatives",
+   "back": false
+  },
+  {
+   "from": 0,
+   "to": 3,
+   "label": "New RoB Meeting",
+   "back": false
+  },
+  {
+   "from": 0,
+   "to": 4,
+   "label": "[ ROB ] PO Invoice · Matching & Coding Review",
+   "back": false
+  },
+  {
+   "from": 1,
+   "to": 2,
+   "label": "Initiatives",
+   "back": true
+  },
+  {
+   "from": 1,
+   "to": 0,
+   "label": "RoB Meetings",
+   "back": true
+  },
+  {
+   "from": 2,
+   "to": 1,
+   "label": "Processes",
+   "back": true
+  },
+  {
+   "from": 2,
+   "to": 0,
+   "label": "RoB Meetings",
+   "back": true
+  },
+  {
+   "from": 3,
+   "to": 0,
+   "label": "Close create",
+   "back": true
+  },
+  {
+   "from": 4,
+   "to": 0,
+   "label": "Close meeting",
+   "back": true
+  },
+  {
+   "from": 4,
+   "to": 5,
+   "label": "Review",
+   "back": false
+  },
+  {
+   "from": 4,
+   "to": 6,
+   "label": "Edit workers and managers",
+   "back": false
+  },
+  {
+   "from": 4,
+   "to": 7,
+   "label": "Supplier Invoice Management",
+   "back": false
+  },
+  {
+   "from": 5,
+   "to": 4,
+   "label": "Close rec",
+   "back": true
+  },
+  {
+   "from": 6,
+   "to": 4,
+   "label": "Close",
+   "back": true
+  },
+  {
+   "from": 7,
+   "to": 1,
+   "label": "Close initiative",
+   "back": true
+  },
+  {
+   "from": 7,
+   "to": 8,
+   "label": "Proc people",
+   "back": false
+  },
+  {
+   "from": 7,
+   "to": 9,
+   "label": "Proc rob",
+   "back": false
+  },
+  {
+   "from": 7,
+   "to": 4,
+   "label": "[ ROB ] PO Invoice · Matching & Coding Review",
+   "back": true
+  },
+  {
+   "from": 7,
+   "to": 10,
+   "label": "Proc rob",
+   "back": false
+  }
+ ]
+}
