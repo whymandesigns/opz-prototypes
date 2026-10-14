@@ -79,6 +79,8 @@
   .btn.primary{background:var(--green);border-color:var(--green);color:#fff;}
   .btn.primary:hover{background:#029a70;}
   .btn.danger-link{border:none;background:none;color:var(--red);font-weight:400;font-size:13px;padding:0;}
+  .btn.danger{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn.danger:hover{background:#b51f45;}
 
   h2.sec{font-size:16px;line-height:24px;font-weight:600;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
   .count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;border:1px solid var(--gray-400);font-size:10px;font-weight:600;color:var(--graphite-800);}
@@ -382,10 +384,13 @@
   .proc-row .proc-acts{display:inline-flex;gap:2px;margin-left:auto;}
   .proc-row .icon-btn{width:28px;height:28px;position:relative;color:var(--graphite-700);}
   .proc-row .icon-btn:hover{color:var(--graphite-900);background:var(--gray-100);}
+  .proc-row .icon-btn.danger:hover{color:var(--red);background:#fbedf1;}
   /* Tooltip: data-tip, shown above the control */
   [data-tip]{position:relative;}
   [data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);background:#262d3d;color:#fff;font-size:12px;line-height:16px;padding:4px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;z-index:50;}
   [data-tip]:hover::before{content:"";position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);border:5px solid transparent;border-top-color:#262d3d;pointer-events:none;z-index:50;}
+  [data-tip].tip-end:hover::after{left:auto;right:0;transform:none;}
+  [data-tip].tip-end:hover::before{left:auto;right:9px;transform:none;}
   .proc-link:hover{text-decoration:underline;}
   .rob-tag{display:inline-flex;align-items:center;gap:2px;}
 
@@ -510,7 +515,8 @@
   .cf-b b{color:var(--graphite-900);}
   .cf-f{display:flex;justify-content:flex-end;gap:12px;padding:16px 32px;border-top:1px solid var(--gray-200);}
   .cf-modal .btn{font-size:13px;line-height:16px;padding:8px 16px;min-width:60px;justify-content:center;}
-  .cf-modal .btn:not(.primary){border-color:#d8d9dc;color:#000;}
+  .cf-modal .btn:not(.primary):not(.danger){border-color:#d8d9dc;color:#000;}
+  .cf-modal .btn.danger{color:#fff;}
   .cf-modal .btn.primary{background:#00cc83;border-color:#00cc83;}
   .field.ph select{color:var(--gray-600);}
   .field.err{border-color:var(--red);}
@@ -778,6 +784,8 @@ const S = {
   meetingOpen:true,
   initDrawer:false,
   procAssign:{},            // managers & workers per process, edited from the Process drawer
+  procRemoved:{},           // processes removed from the initiative's Action Trace (po / nonpo), from the drawer's trash button
+  procConfirm:null,         // process whose removal is awaiting confirmation
   raci:null,                // {locked, showInformed, compact}
   rec:null,                 // recordings modal state
   flowStep:2,
@@ -1175,13 +1183,17 @@ function renderInitiative() {
       <h2 class="sec" style="font-size:14px;margin:16px 0 8px">Connections</h2>
       <div class="iconn"><div class="k"><span class="conn-ic">${slackLogo(16)}</span>Slack channels</div><div class="v">${first ? `<span class="dot" style="width:6px;height:6px"></span> <a href="#" onclick="return false">#-rob-invoices-rampup</a> <span class="tag">Default</span>` : none}</div></div>
       <div class="iconn"><div class="k"><span class="conn-ic">${ic.cal(16)}</span>RoB meetings</div><div class="v">${first ? `<a href="#" onclick="return false">[RoB][Process] Invoices &amp; Payroll Ramp-up</a><div class="when">Jul 22 • 4:00pm<span class="tag">Every week on Tuesday until Jul 29...</span></div>` : none}</div></div>
-      <div class="iconn"><div class="k">${AT_BIG(20)}Action Trace</div><div class="v">${first ? `
-        <div class="proc-row"><span class="proc-link" data-hover-deck="po">PO Invoice Processing</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="po" data-tip="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="po" data-tip="Add RoB meeting">${ic.calPlus(16)}</button></span></div><div class="muted" style="color:var(--graphite-900)">Updated on Sep 22</div>
+      <div class="iconn"><div class="k">${AT_BIG(20)}Action Trace</div><div class="v">${first ? (() => {
+        // One block per connected process: name, the three actions (people · add RoB · remove), its RoB meetings.
+        const procRow = (proc, name) => `<div class="proc-row"><span class="proc-link" data-hover-deck="${proc}">${name}</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="${proc}" data-tip="Manage people" aria-label="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="${proc}" data-tip="Add RoB meeting" aria-label="Add RoB meeting">${ic.calPlus(16)}</button><button class="icon-btn danger tip-end" data-act="proc-remove" data-proc="${proc}" data-tip="Remove from Action Trace" aria-label="Remove ${name} from Action Trace">${ic.trash(16)}</button></span></div>`;
+        const blocks = [];
+        if (!S.procRemoved.po) blocks.push(`${procRow('po', 'PO Invoice Processing')}<div class="muted" style="color:var(--graphite-900)">Updated on Sep 22</div>
         ${m.created ? robLine(esc(m.title), `${fmtDate(m.date,{month:'short',day:'numeric'})} • ${fmtTime(m.start).replace(' PM','pm').replace(' AM','am')}`, 'Every week on Friday', true) : ''}
-        ${robLine('PO Invoice · Approval &amp; Payment', 'Oct 1 • 4:00pm', 'Every week on Tuesday')}
-        <div style="height:16px"></div>
-        <div class="proc-row"><span class="proc-link" data-hover-deck="nonpo">Non-PO Invoice Processing</span><span class="proc-acts"><button class="icon-btn" data-act="proc-people" data-proc="nonpo" data-tip="Manage people">${ic.people(16)}</button><button class="icon-btn" data-act="proc-rob" data-proc="nonpo" data-tip="Add RoB meeting">${ic.calPlus(16)}</button></span></div><div style="color:var(--graphite-900)">Updated on Sep 21</div>
-        ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}` : none}
+        ${robLine('PO Invoice · Approval &amp; Payment', 'Oct 1 • 4:00pm', 'Every week on Tuesday')}`);
+        if (!S.procRemoved.nonpo) blocks.push(`${procRow('nonpo', 'Non-PO Invoice Processing')}<div style="color:var(--graphite-900)">Updated on Sep 21</div>
+        ${robLine('Non-PO Invoice · End-to-End', 'Oct 29 • 2:30pm', 'Every week on Thursday')}`);
+        return blocks.length ? blocks.join('<div style="height:16px"></div>') : none;
+      })() : none}
       </div></div>
       ${addLink('Add processes')}
       <div class="kvrow" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)"><span>Beneficiary function</span><span class="v"><a href="#" onclick="return false">Finance</a></span></div>
@@ -1312,6 +1324,19 @@ function renderAssignModal() {
 
 // Pop-up before saving when workers are still unassigned: OK sends them to
 // the RoB owner and saves; Cancel returns to the step so they can be assigned.
+// RoB meetings connected to a process in the drawer (what the Action Trace block lists).
+const procRobCount = proc => proc === 'po' ? 1 + (S.meeting.created ? 1 : 0) : 1;
+function renderProcConfirm() {
+  const proc = S.procConfirm, name = PROCESSES[proc].name, robs = procRobCount(proc);
+  if (robs) return `<div class="scrim" data-act="proc-remove-cancel"></div><div class="cf-modal" role="alertdialog" aria-label="Process has RoBs connected">
+    <div class="cf-h">${esc(name)} can't be disconnected yet</div>
+    <div class="cf-b">AT process has RoBs connected. Please, cancel them first, in order to disconnect AT process.</div>
+    <div class="cf-f"><button class="btn primary" data-act="proc-remove-cancel">OK</button></div></div>`;
+  return `<div class="scrim" data-act="proc-remove-cancel"></div><div class="cf-modal" role="alertdialog" aria-label="Remove process from Action Trace">
+    <div class="cf-h">Remove ${esc(name)} from Action Trace?</div>
+    <div class="cf-b">The process will no longer be traced for this initiative. Workers and managers assigned to it keep their other work. You can add the process again later.</div>
+    <div class="cf-f"><button class="btn" data-act="proc-remove-cancel">Cancel</button><button class="btn danger" data-act="proc-remove-ok">Remove</button></div></div>`;
+}
 function renderAsgConfirm() {
   const un = S.asg.confirm; const one = un.length === 1;
   return `<div class="scrim" data-asg="confirm-cancel"></div><div class="cf-modal" role="alertdialog" aria-label="Unassigned workers">
@@ -1331,6 +1356,7 @@ function render() {
   if (S.rec) L.push(['rec', renderRec()]);
   if (S.asg && S.asg.ctx !== 'create') L.push(['assign', renderAssignModal()]);
   if (S.asg && S.asg.confirm) L.push(['confirm', renderAsgConfirm()]);
+  if (S.procConfirm) L.push(['proc-confirm', renderProcConfirm()]);
   // Preserve scroll positions of scrollable bodies across re-renders
   const keep = ['#createBody', '#meetBody', '#recBody', '.asg-modal-b', '.asg-table-wrap', '.asg-pop-list'].map(s => [s, $(s)?.scrollTop]);
   const focusId = document.activeElement?.id; const caret = document.activeElement?.selectionStart;
@@ -1617,6 +1643,9 @@ document.addEventListener('click', e => {
     case 'raci-compact': S.raci.compact = true; render(); break;
     case 'raci-comfy': S.raci.compact = false; render(); break;
     case 'proc-people': openAssign('proc', d.proc); break;
+    case 'proc-remove': S.procConfirm = d.proc; render(); break;
+    case 'proc-remove-cancel': S.procConfirm = null; render(); break;
+    case 'proc-remove-ok': if (!procRobCount(S.procConfirm)) S.procRemoved[S.procConfirm] = true; S.procConfirm = null; hideInitDeck(); render(); break;
     case 'proc-rob': S.create = Object.assign(newCreateState(), {proc:d.proc, title:`${PROCESSES[d.proc].name} · Review`, procLocked:true, fromDrawer:true, atOpen:true, section:'c-connections'}); S.initDrawer = false; hideInitDeck(); S.flowStep = 1; render(); setTimeout(() => $('#c-connections')?.scrollIntoView({block:'start'})); break;
     case 'open-initiative': S.meetingOpen = false; S.page = 'processes'; S.initDrawer = true; S.flowStep = 3; render(); break;
     case 'close-initiative': S.initDrawer = false; hideInitDeck(); S.flowStep = null; render(); break;
