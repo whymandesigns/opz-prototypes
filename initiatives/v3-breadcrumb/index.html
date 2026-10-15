@@ -4205,10 +4205,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     #in-drawer-view .in-view-rows { gap: var(--ic-space-3); }
     #in-drawer-view .in-view-row { grid-template-columns: 200px minmax(0, 1fr); gap: var(--ic-space-2); min-height: 32px; }
     #in-drawer-view .in-view-row:has(.in-view-person) { min-height: 48px; }
+    #in-drawer-view .in-view-row:has(.in-view-people) { align-items: start; padding-top: var(--ic-space-2); }
+    .in-view-people { display: flex; flex-direction: column; gap: var(--ic-space-3); }
     #in-drawer-view .in-view-row dt,
     #in-drawer-view .in-view-row dd { font: var(--ic-weight-regular) var(--ic-text-sm)/20px var(--ic-font-sans); }
     #in-drawer-view .in-view-block { gap: var(--ic-space-2); }
     #in-drawer-view .in-view-block h3 { font: var(--ic-weight-regular) var(--ic-text-sm)/20px var(--ic-font-sans); color: var(--color-text-muted); }
+    /* RACI in People reads as a sub-heading (designmd h4), not a field label. */
+    #in-drawer-view .in-view-block h3.in-view-subhead { font: var(--type-h4); color: var(--color-text); margin-top: var(--ic-space-2); }
     #in-drawer-view .in-view-section { gap: var(--ic-space-4); padding: var(--ic-space-4) 0; border-top: 1px solid var(--color-border); }
     #in-drawer-view .in-view-section:last-child { border-bottom: 1px solid var(--color-border); }
     #in-drawer-view .in-view-section h3 { font: var(--type-body-semibold); color: var(--color-text); }
@@ -7375,14 +7379,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               ? d.related.map(r => `<a class="in-view-link" href="#" data-view-related="${vEsc(r.id)}">${vEsc(r.name)}</a>`).join(', ')
               : '<span class="in-view-empty">Not linked</span>')}
             ${row('Core strategy', `<span class="tag tag-indicator ${d.coreOn ? 'tag-positive' : 'in-health-na'}">${d.coreOn ? 'On' : 'Off'}</span>`)}
-            ${d.coreOn ? row('Company strategic objective', d.coreObj ? vEsc(d.coreObj) : EMPTY) : ''}
+            ${d.coreOn ? row('Company strategic objective', d.coreObj ? `<a class="in-view-link" href="#" data-view-dead>${vEsc(d.coreObj)}</a>` : EMPTY) : ''}
           </dl>`),
           sec('people', 'People', `<dl class="in-view-rows">
             ${row('Accountable owner', d.ownerHtml || person(null))}
             ${row('Project manager', d.pmHtml || person(null))}
+            ${row('Working team', d.teamHtml || EMPTY)}
           </dl>
-          <div class="in-view-block"><h3>Working team</h3>${d.teamHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>
-          <div class="in-view-block"><h3>RACI</h3>${d.raciHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>`, ' data-change="new" data-change-note="People section"'),
+          <div class="in-view-block"><h3 class="in-view-subhead">RACI</h3>${d.raciHtml || `<p class="in-view-text">${EMPTY}</p>`}</div>`, ' data-change="new" data-change-note="People section"'),
           sec('timeline', 'Timeline', `<dl class="in-view-rows">
             ${row('Estimated duration', d.duration ? vEsc(d.duration) : EMPTY)}
             ${row('Start date', d.start ? vEsc(d.start) : EMPTY)}
@@ -7429,9 +7433,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           sponsorHtml: sel1('in-sponsor') ? person(sel1('in-sponsor')) : '',
           beneficiary: sel1('in-beneficiary') ? label(sel1('in-beneficiary')) : '',
           ownerHtml: person(sel1('in-owner')), pmHtml: person(sel1('in-pm')),
-          teamHtml: team.length
-            ? `<div class="in-view-team-cards">${team.map(t => `<div class="in-team-card" data-initials="${vEsc(t.dataset.initials || '')}"><span class="avatar">${t.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${vEsc(label(t))}</span><span class="in-team-card-role">${vEsc(t.querySelector('.dropdown-item-description')?.textContent.trim() || '')}</span></span></div>`).join('')}</div>`
-            : '',
+          // Working team as a stacked list in the value column, same person
+          // style as Accountable owner / Project manager.
+          teamHtml: team.length ? `<div class="in-view-people">${team.map(t => person(t)).join('')}</div>` : '',
           raciHtml: window.inRaciViewHtml ? window.inRaciViewHtml() : '',
           duration: sel1('in-duration') ? label(sel1('in-duration')) : '',
           start: startInput.value.trim(), end: endInput.value.trim(),
