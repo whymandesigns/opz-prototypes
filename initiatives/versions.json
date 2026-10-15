@@ -1,0 +1,26 @@
+{
+  "family": "Initiatives (TopTrack set-up / edit)",
+  "versions": [
+    {
+      "folder": "v1-drawer",
+      "label": "v1 · Drawer",
+      "date": "2026-10-01",
+      "note": "Initiatives table with the New initiative side drawer and drawer view mode.",
+      "basedOn": null
+    },
+    {
+      "folder": "v2-full-screen",
+      "label": "v2 · Full screen",
+      "date": "2026-10-13",
+      "note": "Full-screen create and view pages with a sticky TOC; ✕-close header (breadcrumb via ?header=breadcrumb).",
+      "basedOn": "v1-drawer"
+    },
+    {
+      "folder": "v3-breadcrumb",
+      "label": "v3 · Breadcrumb + People",
+      "date": "2026-10-15",
+      "note": "Breadcrumb header by default; regrouped General / People sections, related initiatives as an input, no description field.",
+      "basedOn": "v2-full-screen"
+    }
+  ]
+}
