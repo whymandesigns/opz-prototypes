@@ -29,6 +29,15 @@ The four problems it traces back to:
 
 ## How this fits with `features/initiatives`
 
+> **Folder layout (2026-10-15).** All Initiatives prototype versions live under
+> `features/initiatives/`: `v1-drawer/` (the original drawer, formerly
+> `features/initiatives/`), `v2-full-screen/` (formerly
+> `features/initiatives-full-screen/`) and `v3-breadcrumb/` (formerly
+> `features/initiatives-breadcrumb/`). `initiatives/index.html` lists them;
+> `initiatives/versions.json` feeds the in-prototype **Version** switcher
+> (top of the `?states=1` panel, Alt+← / Alt+→). The two old folders keep
+> redirect stubs. Paths below that say `features/initiatives` mean v1.
+
 Decided 2026-10-01: **two linked prototypes, not one merged file.**
 
 | Prototype | Owns |
@@ -107,7 +116,7 @@ Decided 2026-10-01: **two linked prototypes, not one merged file.**
   Core strategy (not in ID 18's list, but stay — optional). Keep Description
   *and* add Problem / Opportunity alongside it. End date is always required.
 
-- Sidenavs are cross-linked: toptrack *Initiatives* → `../initiatives/`;
+- Sidenavs are cross-linked: toptrack *Initiatives* → `../initiatives/v3-breadcrumb/` (latest);
   initiatives *Dashboard* → `../toptrack/`. Each side only blocks its own
   decorative `href="#"` items.
 - **Not yet:** dashboard-row → initiative-drawer deep links, and a shared mock
