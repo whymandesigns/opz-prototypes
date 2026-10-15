@@ -106,3 +106,15 @@ await reset();
 await pool.end();
 console.log(failed ? `\n${failed} failing` : '\nall passing');
 process.exit(failed ? 1 : 0);
+
+// flow-canvas arrows ride on the edits table under the flow:link: prefix
+await applyOps(query, P, [{ t:'link', l:{ id:'l1', from:{ sig:'a', fx:0.1, fy:0.2 }, to:{ sig:'b', fx:0.5, fy:0.5 }, label:'Opens the modal', author:'Ann' } }, { t:'edit', k:'body/0#0', v:{ orig:'a', text:'b' } }]);
+doc = await read(query, P);
+ok('arrow stored and split out of edits', doc.links.length === 1 && doc.links[0].id === 'l1' && doc.links[0].label === 'Opens the modal' && !Object.keys(doc.edits).some(k => k.startsWith('flow:link:')));
+await applyOps(query, P, [{ t:'edits:clear' }, { t:'link', l:{ id:'l1', label:'Renamed' } }]);
+doc = await read(query, P);
+ok('edits:clear keeps arrows; partial update merges', doc.links.length === 1 && doc.links[0].label === 'Renamed' && doc.links[0].to?.sig === 'b' && Object.keys(doc.edits).length === 0);
+await applyOps(query, P, [{ t:'link-del', id:'l1' }]);
+doc = await read(query, P);
+ok('arrow deleted', doc.links.length === 0);
+

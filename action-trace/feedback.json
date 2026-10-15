@@ -1,1 +1,23 @@
-{"edits": {}, "comments": []}
+{
+  "edits": {},
+  "comments": [],
+  "links": [
+    {
+      "id": "lnmv98l2ixe6gm",
+      "from": {
+        "sig": "{\"screen\":\"processes · free navigation\",\"layers\":[],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+        "fx": 0.43032914279603746,
+        "fy": 0.3120574302116086
+      },
+      "to": {
+        "sig": "{\"screen\":\"Screen 3 · Process · Action Trace connector view mode\",\"layers\":[\"init:Supplier Invoice Management\",\"drawer:Supplier Invoice Management\"],\"nav\":[\"Processes\"],\"main\":\"Processes\"}",
+        "fx": 0.6330683296709885,
+        "fy": 0.40395605700809634
+      },
+      "label": "Process opens sidebar",
+      "author": "Roman",
+      "created": "2026-10-15T07:47:58.089Z"
+    }
+  ],
+  "updated": "2026-10-15T07:48:05.775Z"
+}
