@@ -4033,16 +4033,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        padding + 1px border puts the photo 8px in). minmax(200px) fits three
        per row at the full form width. */
     .in-team-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--ic-space-2); }
-    .in-team-card { display: flex; align-items: flex-start; gap: var(--ic-space-2); min-width: 0; padding: 7px; border: 1px solid var(--color-border); border-radius: 0; background: var(--color-surface); }
+    .in-team-card { display: flex; align-items: flex-start; gap: var(--ic-space-2); min-width: 0; padding: 7px; border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm); background: var(--color-surface); }
     .in-team-card .avatar { --avatar-size: 32px; --avatar-text: var(--ic-text-sm); border-radius: 0; flex: none; }
     .in-team-card .avatar img { border-radius: 0; }
     .in-team-card-text { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; height: 32px; }
-    .in-team-card-name { font-family: var(--ic-font-sans); font-size: 14px; line-height: 18px; font-weight: var(--ic-weight-regular); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Same as the RACI person name: 13px semibold, 18px line. */
+    .in-team-card-name { font: var(--type-body-sm-semibold); line-height: 18px; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .in-team-card-role { font-family: var(--ic-font-sans); font-size: 12px; line-height: 14px; color: #84888E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .in-team-card-remove { flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: var(--ic-radius-sm); background: transparent; color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; align-self: center; }
-    .in-team-card-remove .icon { width: 12px; height: 12px; }
-    .in-team-card-remove:hover { background: var(--color-surface-muted); color: var(--color-text); }
-    .in-team-card-remove:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    /* Remove = designmd round icon button (.btn-icon-only.btn-ghost.btn-xs); just keep it from shrinking. */
+    .in-team-card-remove { flex: none; align-self: center; }
     [data-theme="dark"] .in-team-card-name { color: var(--color-text); }
     [data-theme="dark"] .in-team-card-role { color: var(--color-text-muted); }
     /* Empty: the select trigger only. With picks: cards + "+ Add team member"
@@ -5192,7 +5191,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              Objectives come from the admin-managed list (roadmap row 4). -->
         <div data-change="moved" data-change-note="Core strategy, from its own section + helper text" class="in-form-rows in-core">
           <label class="in-form-row">
-            <span class="field-label in-label-stack">Core strategy<span class="in-label-hint">Link it to company-level goals</span></span>
+            <span class="field-label in-label-stack">Core strategy<span class="in-label-hint">Supports a company-level objective</span></span>
             <span class="switch"><input type="checkbox" class="switch-input" id="in-core" aria-controls="in-core-objective" /><span class="switch-track"></span></span>
           </label>
           <div data-change="changed" data-change-note="Searchable OKR objectives" class="in-form-row" id="in-core-objective" hidden>
@@ -5231,7 +5230,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                Start date. Fills End date = Start date + duration; editing End
                date by hand flips it to Custom. -->
           <!-- Optional extras (was the More details section): business lines, tags. -->
-          <div class="in-adds"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label in-label-tip">Business lines <span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder"></span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label in-label-tip">Tags <span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add tag…" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button><span class="in-tip" data-tooltip="Business lines this initiative serves." tabindex="0" aria-label="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button><span class="in-tip" data-tooltip="Free-form labels for filtering." tabindex="0" aria-label="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span></div>
+          <div class="in-adds" data-change="changed" data-change-note="Tooltips on the links; placeholders, no ⓘ"><div class="in-form-row in-reveal-row" id="in-row-business" hidden><span class="field-label">Business lines</span><div class="input-select" data-multi><button class="input-select-trigger" aria-expanded="false" aria-label="Business lines" type="button"><span class="input-select-value input-select-placeholder">Select the business lines this initiative serves</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Talent Solutions</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Tech Services</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Enterprise</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>SMB</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Marketplace</button><button class="dropdown-item" type="button"><svg class="dropdown-item-check"><use href="#i-check"/></svg>Consulting</button></div></div></div><div class="in-form-row in-reveal-row in-row-top" id="in-row-tags" hidden><span class="field-label">Tags</span><div class="field in-tags-field"><div class="input-tags"><input class="input-tags-input" type="text" placeholder="Add labels for filtering, e.g. Q4 or pricing" aria-label="Add tag" aria-describedby="in-tags-hint" /></div><span class="field-hint" id="in-tags-hint">Label names should contain at least two non-whitespace characters</span></div></div><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-business" data-tooltip="Business lines this initiative serves."><svg class="icon icon-16"><use href="#i-plus"/></svg>Add business lines</button></span><span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-tags" data-tooltip="Free-form labels for filtering."><svg class="icon icon-16"><use href="#i-plus"/></svg>Add tags</button></span></div>
           </div>
         </section>
         <!-- People (layout v2) — owner, PM, working team, then the RACI matrix. -->
@@ -5858,7 +5857,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                Restored 2026-10-02 after being parked. -->
           <!-- Optional impact dates — "+ Add …" links like Business lines / Tags;
                a row opens on click, or by itself when it holds a quarter. -->
-          <div class="in-adds">
+          <div class="in-adds" data-change="changed" data-change-note="Tooltips on the links, no ⓘ">
           <div class="in-form-row in-reveal-row" id="in-row-impact-initial" hidden>
             <span class="field-label in-label-tip">Initial impact date <span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
             <div class="input-select" id="in-impact-initial">
@@ -5873,8 +5872,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
               <div class="dropdown-menu" hidden></div>
             </div>
           </div>
-          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-initial"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add initial impact date</button><span class="in-tip" data-tooltip="The quarter you expect to see the first measurable impact." tabindex="0" aria-label="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
-          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-full"><svg class="icon icon-16"><use href="#i-plus"/></svg>Add full impact date</button><span class="in-tip" data-tooltip="The quarter you expect the initiative to reach its full impact." tabindex="0" aria-label="The quarter you expect the initiative to reach its full impact."><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-initial" data-tooltip="The quarter you expect to see the first measurable impact."><svg class="icon icon-16"><use href="#i-plus"/></svg>Add initial impact date</button></span>
+          <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-reveal="in-row-impact-full" data-tooltip="The quarter you expect the initiative to reach its full impact."><svg class="icon icon-16"><use href="#i-plus"/></svg>Add full impact date</button></span>
           </div>
           </div>
         </section>
@@ -5894,8 +5893,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <!-- TopTrack roadmap ID 19 — Problem / Opportunity, required, below
              Description (Description stays — ID 18 decision). Expects 2–3 lines. -->
         <label class="field in-problem">
-          <span class="field-label in-label-tip">Problem / Opportunity <span class="in-tip" data-tooltip="Describe the problem this project will solve or the opportunity it will address. Focus on the current gap, need, or potential impact—not the proposed solution." tabindex="0" aria-label="About problem / opportunity"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
-          <textarea class="input" id="in-problem" rows="3" maxlength="500" placeholder="What gap, need or opportunity does this initiative address?" aria-required="true" aria-describedby="in-problem-error in-problem-count"></textarea>
+          <span class="field-label" data-change="changed" data-change-note="Guidance in the placeholder, no ⓘ">Problem / Opportunity</span>
+          <textarea class="input" id="in-problem" rows="3" maxlength="500" placeholder="Describe the problem this initiative will solve or the opportunity it will address. Focus on the current gap, need or potential impact, not the proposed solution." aria-required="true" aria-describedby="in-problem-error in-problem-count"></textarea>
           <span class="field-hint-row">
             <span class="field-hint is-error" id="in-problem-error" hidden>Describe the problem or opportunity to create this initiative.</span>
             <span class="field-hint field-hint-end editor-counter" id="in-problem-count" aria-live="polite"><span class="editor-counter-text">0 / 500</span></span>
@@ -6411,7 +6410,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             // Multi-select: toggle, list picks in the trigger, keep the menu open.
             item.classList.toggle('is-selected');
             const picked = [...menu.querySelectorAll('.dropdown-item.is-selected')].map(i => i.textContent.trim());
-            value.textContent = picked.join(', ');
+            value.textContent = picked.length ? picked.join(', ') : (sel.dataset.ph || ''); // back to the placeholder when emptied
             value.classList.toggle('input-select-placeholder', !picked.length);
             return;
           }
@@ -6773,7 +6772,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         teamCards.querySelectorAll('.in-team-card').forEach(c => c.remove());
         teamCards.querySelector('.in-team-add').insertAdjacentHTML('beforebegin', picked.map(i => {
           const name = i.querySelector('.dropdown-item-label').textContent;
-          return `<div class="in-team-card" data-initials="${i.dataset.initials}"><span class="avatar">${i.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
+          return `<div class="in-team-card" data-initials="${i.dataset.initials}"><span class="avatar">${i.querySelector('.avatar').innerHTML}</span><span class="in-team-card-text"><span class="in-team-card-name">${name}</span><span class="in-team-card-role">${i.querySelector('.dropdown-item-description')?.textContent || ''}</span></span><button class="btn btn-icon-only btn-ghost btn-xs in-team-card-remove" type="button" data-team-remove="${items.indexOf(i)}" aria-label="Remove ${name}"><svg class="icon"><use href="#i-x"/></svg></button></div>`;
         }).join(''));
       };
       // ✕ on a card unpicks that person — same path as unticking them in the menu.
@@ -7636,6 +7635,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const row = document.getElementById(btn.dataset.reveal);
         row.hidden = false;
         btn.closest('.in-add').hidden = true;
+        document.querySelector('.in-float-tip')?.classList.remove('is-visible'); // its link just hid — drop the tooltip too
         row.querySelector('.input-select-trigger')?.click();
         row.querySelector('.input-select-trigger, .input, .input-tags-input')?.focus();
       }));
