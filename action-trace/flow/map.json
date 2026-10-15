@@ -1,5 +1,5 @@
 {
- "when": 1791981932872,
+ "when": 1792048908464,
  "p": "/action-trace/",
  "start": "page=meetings",
  "depth": 3,
@@ -20,7 +20,8 @@
    "name": "meetings · free navigation",
    "sub": "meetings · free navigation",
    "path": [],
-   "depth": 0
+   "depth": 0,
+   "shot": "shots/0.png"
   },
   {
    "id": 1,
@@ -43,7 +44,8 @@
      "byText": false
     }
    ],
-   "depth": 1
+   "depth": 1,
+   "shot": "shots/1.png"
   },
   {
    "id": 2,
@@ -66,7 +68,8 @@
      "byText": false
     }
    ],
-   "depth": 1
+   "depth": 1,
+   "shot": "shots/2.png"
   },
   {
    "id": 3,
@@ -92,7 +95,8 @@
      "byText": false
     }
    ],
-   "depth": 1
+   "depth": 1,
+   "shot": "shots/3.png"
   },
   {
    "id": 4,
@@ -118,7 +122,8 @@
      "byText": false
     }
    ],
-   "depth": 1
+   "depth": 1,
+   "shot": "shots/4.png"
   },
   {
    "id": 5,
@@ -151,7 +156,8 @@
      "byText": false
     }
    ],
-   "depth": 2
+   "depth": 2,
+   "shot": "shots/5.png"
   },
   {
    "id": 6,
@@ -184,7 +190,8 @@
      "byText": false
     }
    ],
-   "depth": 2
+   "depth": 2,
+   "shot": "shots/6.png"
   },
   {
    "id": 7,
@@ -215,7 +222,8 @@
      "byText": false
     }
    ],
-   "depth": 2
+   "depth": 2,
+   "shot": "shots/7.png"
   },
   {
    "id": 8,
@@ -253,7 +261,8 @@
      "byText": false
     }
    ],
-   "depth": 3
+   "depth": 3,
+   "shot": "shots/8.png"
   },
   {
    "id": 9,
@@ -289,7 +298,8 @@
      "byText": false
     }
    ],
-   "depth": 3
+   "depth": 3,
+   "shot": "shots/9.png"
   },
   {
    "id": 10,
@@ -325,7 +335,8 @@
      "byText": false
     }
    ],
-   "depth": 3
+   "depth": 3,
+   "shot": "shots/10.png"
   }
  ],
  "edges": [
