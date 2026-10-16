@@ -5897,8 +5897,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <!-- TopTrack roadmap ID 19 — Problem / Opportunity, required, below
              Description (Description stays — ID 18 decision). Expects 2–3 lines. -->
         <label class="field in-problem">
-          <span class="field-label" data-change="changed" data-change-note="Guidance in the placeholder, no ⓘ">Problem / Opportunity</span>
-          <textarea class="input" id="in-problem" rows="3" maxlength="500" placeholder="Describe the problem this initiative will solve or the opportunity it will address. Focus on the current gap, need or potential impact, not the proposed solution." aria-required="true" aria-describedby="in-problem-error in-problem-count"></textarea>
+          <span class="field-label in-label-tip">Problem / Opportunity <span class="in-tip" data-tooltip="Describe the problem this initiative will solve or the opportunity it will address. Focus on the current gap, need or potential impact, not the proposed solution." data-tooltip-style="regular" tabindex="0" aria-label="About problem / opportunity"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <textarea class="input" id="in-problem" rows="3" maxlength="500" placeholder="What gap, need or opportunity does this initiative address?" aria-required="true" aria-describedby="in-problem-error in-problem-count"></textarea>
           <span class="field-hint-row">
             <span class="field-hint is-error" id="in-problem-error" hidden>Describe the problem or opportunity to create this initiative.</span>
             <span class="field-hint field-hint-end editor-counter" id="in-problem-count" aria-live="polite"><span class="editor-counter-text">0 / 500</span></span>
@@ -5909,7 +5909,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
              Rows built by the multi-entry list script: number · text · drag
              handle · remove. Starts with 3 rows showing sample placeholders. -->
         <div data-change="changed" data-change-note="Starts with 1 row" class="field in-multi" id="in-objectives" data-noun="objective" data-samples='["Establish a scalable partner management model", "Increase activation of strategic partners", "Improve visibility into partner performance"]'>
-          <span class="field-label in-label-tip">Objective(s) <span class="in-tip" data-tooltip="What is this initiative or project intended to achieve? Describe the desired outcome, not the activities or deliverables." tabindex="0" aria-label="About objectives"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <span class="field-label in-label-tip">Objective(s) <span class="in-tip" data-tooltip="What is this initiative or project intended to achieve? Describe the desired outcome, not the activities or deliverables." data-tooltip-style="regular" tabindex="0" aria-label="About objectives"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
           <ol class="in-multi-list" aria-label="Objectives"></ol>
           <span class="field-hint is-error" id="in-objectives-error" hidden>Add at least one objective to create this initiative.</span>
           <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-multi-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add objective</button></span>
@@ -5918,7 +5918,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <!-- TopTrack roadmap ID 21 — Success metrics, required (≥ 1 filled).
              Same multi-entry list as Objective(s), numbered for consistency. -->
         <div data-change="changed" data-change-note="Starts with 1 row" class="field in-multi" id="in-metrics" data-noun="success metric" data-samples='["75% of strategic partners activated within 90 days", "Partner management model adopted as the standard way of working", "Leadership has a consistent view of partner performance"]'>
-          <span class="field-label in-label-tip">Success metrics <span class="in-tip" data-tooltip="How will we know this initiative or project was successful? Define the measurable outcomes or indicators of success. Metrics can be quantitative or qualitative." tabindex="0" aria-label="About success metrics"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
+          <span class="field-label in-label-tip">Success metrics <span class="in-tip" data-tooltip="How will we know this initiative or project was successful? Define the measurable outcomes or indicators of success. Metrics can be quantitative or qualitative." data-tooltip-style="regular" tabindex="0" aria-label="About success metrics"><svg class="icon icon-16"><use href="#i-info"/></svg></span></span>
           <ol class="in-multi-list" aria-label="Success metrics"></ol>
           <span class="field-hint is-error" id="in-metrics-error" hidden>Add at least one success metric to create this initiative.</span>
           <span class="in-add"><button class="btn btn-ghost in-link" type="button" data-multi-add><svg class="icon icon-16"><use href="#i-plus"/></svg>Add success metric</button></span>
