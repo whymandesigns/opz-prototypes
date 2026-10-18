@@ -4363,6 +4363,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* Related initiatives as an input (layout v2): trigger + menu as wide as
        the field, picks listed under it. The card-only rules don't apply. */
     /* Float over the form (outside .dropdown / .input-select designmd leaves the menu in flow). */
+    /* Options read as a tree: projects / sub-projects step in under their initiative. */
+    .in-related-opt[data-depth="1"] { padding-left: calc(var(--ic-space-3) + 16px); }
+    .in-related-opt[data-depth="2"] { padding-left: calc(var(--ic-space-3) + 32px); }
     .in-related-select .in-conn-menu { position: absolute; z-index: var(--ic-z-dropdown); left: 0; right: 0; top: 32px; margin-top: var(--ic-space-1); } /* under the 32px trigger, over the picks */
     .in-related-select.has-picks .in-conn-body { display: block; }
     /* The trigger value borrows .in-conn-body for the JS — undo the card caption look. */
@@ -5173,15 +5176,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                field like Beneficiary function: manual links to other
                top-level initiatives, two-way (B shows A once A links B).
                Picks list under the input (blue name, meta, red trash). -->
-          <div data-change="moved" data-change-note="From a Connections card to an input" class="in-form-row in-row-top">
-            <span class="field-label">Related initiatives</span>
+          <div data-change="moved" data-change-note="Input; links initiatives, projects and sub-projects" class="in-form-row in-row-top">
+            <span class="field-label">Related initiatives &amp; projects</span>
             <div class="field">
               <div class="in-conn-wrap in-related-select" data-conn="related">
-                <button class="input-select-trigger in-related-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Related initiatives"><span class="input-select-value input-select-placeholder in-conn-body" data-default="Link initiatives this relates to or depends on">Link initiatives this relates to or depends on</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
+                <button class="input-select-trigger in-related-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Related initiatives and projects"><span class="input-select-value input-select-placeholder in-conn-body" data-default="Link initiatives or projects this relates to">Link initiatives or projects this relates to</span><svg class="btn-icon"><use href="#i-arrows-select"/></svg></button>
                 <div class="dropdown-menu in-conn-menu" hidden>
                   <div class="input-icon input-icon-left">
                     <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                    <input class="input" type="search" placeholder="Search initiatives" aria-label="Search initiatives" autocomplete="off" />
+                    <input class="input" type="search" placeholder="Search initiatives and projects" aria-label="Search initiatives and projects" autocomplete="off" />
                   </div>
                   <div class="in-conn-options" role="listbox" aria-multiselectable="true"></div>
                   <p class="dropdown-menu-label in-conn-empty" hidden>No matches</p>
@@ -7375,7 +7378,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             ${row('Beneficiary function', d.beneficiary
               ? `<span class="in-view-person"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(d.beneficiary)}</a><span class="in-view-person-role">Function</span></span></span>`
               : EMPTY)}
-            ${row('Related initiatives', (d.related || []).length
+            ${row('Related initiatives & projects', (d.related || []).length
               ? d.related.map(r => `<a class="in-view-link" href="#" data-view-related="${vEsc(r.id)}">${vEsc(r.name)}</a>`).join(', ')
               : '<span class="in-view-empty">Not linked</span>')}
             ${row('Core strategy', `<span class="tag tag-indicator ${d.coreOn ? 'tag-positive' : 'in-health-na'}">${d.coreOn ? 'On' : 'Off'}</span>`)}
@@ -7463,7 +7466,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         ? `<span class="in-view-person" data-initials="${vEsc(o.initials || '')}"><span class="avatar avatar-md">${vEsc(o.initials || '')}</span><span class="in-view-person-text"><a class="in-view-person-name" href="#" data-view-dead>${vEsc(o.name)}</a>${o.role ? `<span class="in-view-person-role">${vEsc(o.role)}</span>` : ''}</span></span>`
         : person(null);
       // Two-way links (ID 22) as { id, name } for the view's Connections row.
-      const relatedOf = id => (window.inLinks?.of(id) || []).map(rid => (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(n => n.id === rid)).filter(Boolean).map(n => ({ id: n.id, name: n.name }));
+      const relatedOf = id => (window.inLinks?.of(id) || []).map(rid => window.inFindNode?.(rid)?.n).filter(Boolean).map(n => ({ id: n.id, name: n.name }));
       window.inOpenViewNode = n => {
         if (!n) return;
         viewEl.querySelector('#in-view-title').textContent = n.name;
@@ -7507,7 +7510,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const rel = e.target.closest('[data-view-related]');
         if (rel) {
           e.preventDefault();
-          const n = (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []).find(x => x.id === rel.dataset.viewRelated);
+          const n = window.inFindNode?.(rel.dataset.viewRelated)?.n;
           if (n?.editable && drafts[n.id]) window.inOpenView(n.id); else window.inOpenViewNode(n);
           return;
         }
@@ -7852,10 +7855,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const chosen = wrap.querySelector('[data-related-list]');
         const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const HEALTH = { on: 'On track', risk: 'At risk', off: 'Off track', na: 'Not active' };
-        const all = () => (typeof INITIATIVES !== 'undefined' ? INITIATIVES : []);
-        const pool = () => all().filter(n => !n.draft && n.id !== draftId);
-        const byId = id => all().find(n => n.id === id);
-        const meta = n => [n.status, HEALTH[n.health] || 'Not active', n.owner?.name].filter(Boolean).join(' · ');
+        // Every level of the tree can be linked: initiatives, projects and
+        // sub-projects. flat() walks INITIATIVES in tree order with depth +
+        // parent, so options read Initiative → its Projects → Sub-projects.
+        const LEVEL = ['Initiative', 'Project', 'Sub-project'];
+        const flat = () => {
+          const out = [];
+          (function walk(list, depth, parent) {
+            (list || []).forEach(n => { out.push({ n, depth, parent }); walk(n.children, depth + 1, n); });
+          })(typeof INITIATIVES !== 'undefined' ? INITIATIVES : [], 0, null);
+          return out;
+        };
+        window.inFindNode = id => flat().find(x => x.n.id === id) || null; // shared with view mode
+        const pool = () => flat().filter(x => !x.n.draft && x.n.id !== draftId);
+        const byId = id => window.inFindNode(id)?.n;
+        const where = x => `${LEVEL[Math.min(x.depth, 2)]}${x.parent ? ` in ${x.parent.name}` : ''}`;
+        const meta = n => { const x = window.inFindNode(n.id); return [x ? where(x) : '', n.status, n.owner?.name].filter(Boolean).join(' · '); };
         let picked = [];
         const paint = () => {
           picked = picked.filter(id => byId(id));
@@ -7869,7 +7884,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           window.inDupSync?.();
         };
         const renderOptions = () => {
-          list.innerHTML = pool().map(n => `<button class="dropdown-item" type="button" role="option" aria-selected="false" data-id="${n.id}"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${esc(n.name)}</span><span class="dropdown-item-description">${esc(meta(n))}</span></div></button>`).join('');
+          list.innerHTML = pool().map(x => `<button class="dropdown-item in-related-opt" type="button" role="option" aria-selected="false" data-id="${x.n.id}" data-depth="${Math.min(x.depth, 2)}"><svg class="dropdown-item-check"><use href="#i-check"/></svg><div class="dropdown-item-text"><span class="dropdown-item-label">${esc(x.n.name)}</span><span class="dropdown-item-description">${esc([where(x), x.n.status].filter(Boolean).join(' · '))}</span></div></button>`).join('');
           paint();
         };
         const filter = () => {
