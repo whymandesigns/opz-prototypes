@@ -1,0 +1,26 @@
+{
+  "family": "Integrations (Admin Settings)",
+  "versions": [
+    {
+      "folder": "v1-connectors",
+      "label": "v1 · Connectors",
+      "date": "2026-06-04",
+      "note": "Integrations list, connect flow and status: connectors, Tableau connect, field mapping.",
+      "basedOn": null
+    },
+    {
+      "folder": "v2-tableau-streams",
+      "label": "v2 · Tableau streams",
+      "date": "2026-08-04",
+      "note": "OKR connectors: Tableau connected-app set-up, streams and CSV import.",
+      "basedOn": "v1-connectors"
+    },
+    {
+      "folder": "v3-admin-settings",
+      "label": "v3 · Admin Settings + HireGlobal",
+      "date": "2026-09-09",
+      "note": "Integrations inside Admin Settings, with the HireGlobal connect-and-sync flow.",
+      "basedOn": "v2-tableau-streams"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "_values": "delivered | complete | in-review | in-progress | on-hold | archived",
+  "action-trace": "in-progress",
+  "admin-toc": "in-review",
+  "api-token-management": "delivered",
+  "csv-export": "on-hold",
+  "empty-states": "complete",
+  "initiatives": "in-progress",
+  "integrations": "in-progress",
+  "loaders": "complete",
+  "meeting-grid": "in-progress",
+  "performance-reviews": "on-hold",
+  "planning-voyage": "in-progress",
+  "rob": "in-progress",
+  "spotlight": "in-progress",
+  "toptrack": "in-progress",
+  "workspaces": "in-progress"
+}

@@ -2628,6 +2628,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .arrow { float: right; color: var(--color-text-subtle); }
     .folder { display: none; }
     .updated { font: var(--type-body-sm); color: var(--color-text-subtle); display: block; margin-top: var(--ic-space-2); }
+    /* Status + last updated share the card's bottom row */
+    .card-foot { display: flex; align-items: center; gap: var(--ic-space-2); margin-top: var(--ic-space-3); }
+    .card-foot .updated { margin-top: 0; margin-left: auto; }
+    /* designmd has no purple badge yet; same recipe ({hue}-100 fill, -150 stroke) from its palette */
+    .badge-purple { background: var(--ic-palette-purple-100); color: var(--ic-palette-purple-500); border-color: var(--ic-palette-purple-150); }
     .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
     .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
     .empty { display: none; }
@@ -2648,6 +2653,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     </div>
 
     <!-- Add a card per feature. Keep alphabetical by folder name.
+         Each card's status badge comes from status.json (keyed by folder):
+         delivered | complete | in-review | in-progress | on-hold | archived
          Refresh thumbnails with headless Chrome:
          chrome --headless --window-size=1280,800 --screenshot=_thumbs/<name>.png http://localhost:4173/features/<name>/ -->
     <section class="links" id="feature-list">
@@ -2715,27 +2722,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </a>
       <a class="card" href="./integrations/">
-        <img class="thumb" src="./_thumbs/integrations.png" alt="Integrations screenshot" loading="lazy" />
+        <img class="thumb" src="./_thumbs/integrations-v3.png" alt="Integrations screenshot" loading="lazy" />
         <div class="card-meta">
           <h3 class="card-title">Integrations <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Integrations list, connect flow, status.</p>
+          <p class="card-body">Integrations list, connect flows and Admin Settings — all versions (v1 connectors, v2 Tableau streams, v3 Admin Settings + HireGlobal) with a version switcher.</p>
           <span class="folder">integrations/</span>
-        </div>
-      </a>
-      <a class="card" href="./integrations-v2/">
-        <img class="thumb" src="./_thumbs/integrations-v2.png" alt="Integrations v2 screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">Integrations v2 <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Second iteration of the integrations flow.</p>
-          <span class="folder">integrations-v2/</span>
-        </div>
-      </a>
-      <a class="card" href="./integrations-v3/">
-        <img class="thumb" src="./_thumbs/integrations-v3.png" alt="Integrations v3 screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">Integrations v3 <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Admin Settings integrations, and the HireGlobal connect-and-sync flow.</p>
-          <span class="folder">integrations-v3/</span>
         </div>
       </a>
       <a class="card" href="./loaders/">
@@ -2824,9 +2815,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           'api-token-management/': '2026-07-06',
           'csv-export/': '2026-08-06',
           'empty-states/': '2026-09-23',
-          'integrations/': '2026-07-06',
-          'integrations-v2/': '2026-07-06',
-          'integrations-v3/': '2026-09-09',
+          'integrations/': '2026-10-20',
           'loaders/': '2026-07-06',
           'performance-reviews/': '2026-08-19',
           'spotlight/': '2026-09-23',
@@ -2849,13 +2838,45 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         var list = document.getElementById('feature-list');
         var cards = Array.prototype.slice.call(list.querySelectorAll('.card:not([hidden])'));
 
+        // Status badges come from status.json, keyed by folder — designers edit
+        // that one file (on GitHub or locally) to move a card along. Every card
+        // gets its bottom row now; the badge joins it once the file is read.
+        var STATUS = {
+          'delivered':   { label: 'Delivered',   cls: 'badge-purple' },
+          'complete':    { label: 'Complete',    cls: 'badge-success' },
+          'in-review':   { label: 'In review',   cls: 'badge-warning' },
+          'in-progress': { label: 'In progress', cls: 'badge-info' },
+          'on-hold':     { label: 'On hold',     cls: 'badge-danger' },
+          'archived':    { label: 'Archived',    cls: '' }
+        };
+        cards.forEach(function (c) {
+          var foot = document.createElement('div');
+          foot.className = 'card-foot';
+          c.querySelector('.card-meta').appendChild(foot);
+        });
+        fetch('./status.json', { cache: 'no-cache' })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (map) {
+            cards.forEach(function (c) {
+              var folderEl = c.querySelector('.folder');
+              var key = folderEl ? folderEl.textContent.trim().replace(/\/+$/, '') : '';
+              var st = STATUS[map[key]];
+              if (!st) return;
+              var b = document.createElement('span');
+              b.className = 'badge' + (st.cls ? ' ' + st.cls : '');
+              b.textContent = st.label;
+              c.querySelector('.card-foot').prepend(b);
+            });
+          })
+          .catch(function () { /* no badges if the file can't be read */ });
+
         function render(c, iso) {
           c.dataset.updated = iso || '';
           if (!iso) return;
           if (!c._updSpan) {
             c._updSpan = document.createElement('span');
             c._updSpan.className = 'updated';
-            c.querySelector('.card-meta').appendChild(c._updSpan);
+            c.querySelector('.card-foot').appendChild(c._updSpan);
           }
           c._updSpan.textContent = 'Updated ' + relTime(iso);
         }
