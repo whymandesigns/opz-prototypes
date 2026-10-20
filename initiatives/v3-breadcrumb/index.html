@@ -4095,6 +4095,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-raci-person-role { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 18px; }
     .in-raci-person.is-tbd .in-raci-person-name { font-weight: var(--ic-weight-regular); color: var(--color-text-muted); }
     .in-raci-tbd-av { background: var(--color-surface-sunken); color: var(--color-text-subtle); }
+    /* Drag and drop between roles (edit mode). */
+    .in-raci-person[draggable="true"] { cursor: grab; }
+    .in-raci-person.is-dragging { opacity: 0.4; }
+    .in-raci-matrix.is-dnd .in-raci-remove { display: none; }
+    .in-raci-table td.is-drop-ok { outline: 2px dashed var(--color-border-strong); outline-offset: -4px; border-radius: var(--ic-radius-sm); }
+    .in-raci-table td.is-drop-hover { outline-color: var(--color-accent); background: var(--color-accent-subtle); }
     .in-raci-remove { position: absolute; top: 50%; right: var(--ic-space-1); transform: translateY(-50%); width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--ic-radius-full); background: var(--color-surface); box-shadow: var(--ic-shadow-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; }
     .in-raci-person:hover { background: var(--color-surface-muted); }
     .in-raci-person:hover .in-raci-remove, .in-raci-remove:focus-visible { opacity: 1; }
@@ -6837,7 +6843,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const teamSel = root.querySelector('.in-raci-team');
         const picks = [...root.querySelectorAll('.in-raci-pick')];
         const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-        let entries = []; // { unit, role: 'R'|'C'|'I', person: { name, title, initials, img, tbd } }
+        let entries = []; // { unit, role: 'R'|'C'|'I', person: { name, title, initials, img, tbd }, fromTeam? }
 
         // Team options
         // Org-unit icon by type (designmd iconography): Team · Function · Subfunction / Sub-team.
@@ -6889,7 +6895,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         const avatar = p => p.tbd
           ? '<span class="avatar avatar-md in-raci-tbd-av"><svg class="icon"><use href="#i-user"/></svg></span>'
           : `<span class="avatar avatar-md">${p.img ? `<img src="${esc(p.img)}" alt="" />` : esc(p.initials)}</span>`;
-        const personHtml = (e, i, editable) => `<div class="in-raci-person${e.person.tbd ? ' is-tbd' : ''}" data-initials="${esc(e.person.initials)}">${avatar(e.person)}<span class="in-raci-person-text"><span class="in-raci-person-name" title="${esc(e.person.name)}">${esc(e.person.name)}</span>${e.person.title ? `<span class="in-raci-person-role" title="${esc(e.person.title)}">${esc(e.person.title)}</span>` : ''}</span>${editable && (i >= 0 || e.role === 'A') ? `<button class="in-raci-remove" type="button" data-raci-remove="${e.role === 'A' ? 'A' : i}" aria-label="Remove ${esc(e.person.name)}"><svg class="icon"><use href="#i-x"/></svg></button>` : ''}</div>`;
+        const personHtml = (e, i, editable) => `<div class="in-raci-person${e.person.tbd ? ' is-tbd' : ''}" data-initials="${esc(e.person.initials)}"${editable && (i >= 0 || e.role === 'A') ? ` draggable="true" data-raci-drag="${e.role === 'A' ? 'A' : i}" title="Drag to another role"` : ''}>${avatar(e.person)}<span class="in-raci-person-text"><span class="in-raci-person-name" title="${esc(e.person.name)}">${esc(e.person.name)}</span>${e.person.title ? `<span class="in-raci-person-role" title="${esc(e.person.title)}${e.fromTeam ? ' · From working team' : ''}">${esc(e.person.title)}</span>` : ''}</span>${editable && (i >= 0 || e.role === 'A') ? `<button class="in-raci-remove" type="button" data-raci-remove="${e.role === 'A' ? 'A' : i}" aria-label="Remove ${esc(e.person.name)}"><svg class="icon"><use href="#i-x"/></svg></button>` : ''}</div>`;
         // View mode (unassigned = true): a role column nobody fills shows one
         // "Unassigned" placeholder spanning all rows.
         const UNASSIGNED = { role: '', person: { name: 'Unassigned', title: '', initials: '', img: '', tbd: true } };
@@ -6906,7 +6912,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             const meta = UNITS.find(x => x.name === u) || { name: u, sub: '' };
             const cells = (unassigned ? visibleRoles : ROLES).map(r => {
               if (emptyRoles.includes(r)) return rowIdx ? '' : `<td rowspan="${order.length}" class="in-raci-unassigned">${personHtml(UNASSIGNED, -1, false)}</td>`;
-              return `<td>${list.filter(e => e.unit === u && e.role === r)
+              return `<td${editable ? ` data-raci-role-cell="${r}" data-raci-unit="${esc(u)}"` : ''}>${list.filter(e => e.unit === u && e.role === r)
                 .map(e => personHtml(e, e.role === 'A' ? -1 : entries.indexOf(e), editable)).join('')}</td>`;
             }).join('');
             return `<tr><th scope="row"><div class="in-raci-unit-cell"><span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#${unitIcon(meta.sub)}"/></svg></span><span class="in-raci-person-text"><span class="in-raci-unit" title="${esc(meta.name)}">${esc(meta.name)}</span><span class="in-raci-unit-sub" title="${esc(meta.sub)}">${esc(meta.sub)}</span></span></div></th>${cells}</tr>`;
@@ -6983,10 +6989,79 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           const btn = e.target.closest('[data-raci-remove]');
           if (!btn) return;
           if (btn.dataset.raciRemove === 'A') aOverride = false; // stays empty until someone is picked
-          else entries.splice(+btn.dataset.raciRemove, 1);
+          else {
+            const gone = entries.splice(+btn.dataset.raciRemove, 1)[0];
+            if (gone?.fromTeam) dismissedFromTeam.add(gone.person.name); // don't suggest them again
+          }
           render();
           root.querySelector('[data-raci-remove]')?.focus();
         });
+        // Drag a person to another role in their own team's row (a person's row
+        // is their team, so only that row's role cells accept the drop; the
+        // Org unit column never does). Accountable holds one: dropping onto a
+        // filled Accountable swaps the two. R / C / I keep their 20 cap.
+        let drag = null; // { from: 'A' | index, role, unit }
+        const ROLE_NAME = { A: 'Accountable', R: 'Responsible', C: 'Consulted', I: 'Informed' };
+        const clearDnd = () => {
+          drag = null;
+          tbody.querySelectorAll('.is-dragging, .is-drop-ok, .is-drop-hover').forEach(el => el.classList.remove('is-dragging', 'is-drop-ok', 'is-drop-hover'));
+          root.classList.remove('is-dnd');
+        };
+        tbody.addEventListener('dragstart', e => {
+          const card = e.target.closest('[data-raci-drag]');
+          if (!card) return;
+          const from = card.dataset.raciDrag;
+          const src = from === 'A' ? owner() : entries[+from];
+          if (!src) return;
+          drag = { from, role: src.role, unit: src.unit };
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', src.person.name);
+          requestAnimationFrame(() => card.classList.add('is-dragging'));
+          root.classList.add('is-dnd');
+          tbody.querySelectorAll('[data-raci-role-cell]').forEach(td => {
+            td.classList.toggle('is-drop-ok', td.dataset.raciUnit === drag.unit && td.dataset.raciRoleCell !== drag.role);
+          });
+        });
+        tbody.addEventListener('dragover', e => {
+          const td = e.target.closest('td.is-drop-ok');
+          if (!drag || !td) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          tbody.querySelectorAll('.is-drop-hover').forEach(x => x !== td && x.classList.remove('is-drop-hover'));
+          td.classList.add('is-drop-hover');
+        });
+        tbody.addEventListener('dragleave', e => {
+          const td = e.target.closest('td.is-drop-hover');
+          if (td && !td.contains(e.relatedTarget)) td.classList.remove('is-drop-hover');
+        });
+        tbody.addEventListener('drop', e => {
+          const td = e.target.closest('td.is-drop-ok');
+          if (!drag || !td) return;
+          e.preventDefault();
+          const to = td.dataset.raciRoleCell;
+          const { from } = drag;
+          const moving = from === 'A' ? owner() : entries[+from];
+          const fail = msg => { window.toast?.({ variant: 'warning', message: msg }); clearDnd(); };
+          if (to !== 'A' && entries.filter(x => x.role === to).length >= LIMIT[to]) return fail(`Up to ${LIMIT[to]} people in ${ROLE_NAME[to]}.`);
+          if (to === 'A') {
+            const prevA = owner();
+            entries.splice(+from, 1);
+            // The old Accountable takes the dragged person's old role (a swap).
+            if (prevA) entries.push({ unit: prevA.unit, role: moving.role, person: { ...prevA.person } });
+            aOverride = { unit: moving.unit, role: 'A', person: { ...moving.person } };
+          } else if (from === 'A') {
+            aOverride = false; // Accountable left empty until someone is set again
+            entries.push({ unit: moving.unit, role: to, person: { ...moving.person } });
+          } else {
+            const dup = entries.some((x, k) => k !== +from && x.role === to && x.unit === moving.unit && x.person.name === moving.person.name);
+            if (dup) entries.splice(+from, 1); else entries[+from] = { ...moving, role: to };
+          }
+          clearDnd();
+          render();
+          window.toast?.({ variant: 'success', message: `${moving.person.name} moved to ${ROLE_NAME[to]}.` });
+        });
+        tbody.addEventListener('dragend', clearDnd);
+
         // Accountable follows the Accountable owner field.
         new MutationObserver(render).observe(document.querySelector('#in-owner'), { subtree: true, attributes: true, attributeFilter: ['class'] });
 
@@ -7004,6 +7079,33 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         informedSw?.addEventListener('click', () => { setInformed(!isInformed()); render(); });
 
         // Hooks for drafts (snapshot / restore) and view mode.
+        // DISABLED: the working team and RACI are independent again — picking
+        // someone for the working team no longer adds them to RACI. The sync is
+        // kept below (observer commented out) in case we bring it back.
+        // Working team → RACI suggestions. Everyone picked for the working team
+        // joins RACI under Consulted in their team's row (unless they're already
+        // in RACI in any role), ready to be dragged into the right role. Taking
+        // someone off the team removes them again if they're still the untouched
+        // Consulted suggestion; once moved to another role they stay.
+        const dismissedFromTeam = new Set();
+        const syncTeam = () => {
+          const picked = [...team.querySelectorAll('[data-dropdown-list] .dropdown-item.is-selected')].map(personOf);
+          const names = new Set(picked.map(p => p.name));
+          const before = entries.length;
+          entries = entries.filter(x => !(x.fromTeam && x.role === 'C' && !names.has(x.person.name)));
+          [...dismissedFromTeam].forEach(n => { if (!names.has(n)) dismissedFromTeam.delete(n); });
+          let added = 0, full = false;
+          picked.forEach(p => {
+            if (dismissedFromTeam.has(p.name) || all().some(x => x.person.name === p.name)) return;
+            if (entries.filter(x => x.role === 'C').length >= LIMIT.C || all().length >= TOTAL) { full = true; return; }
+            entries.push({ unit: unitFor(p.title), role: 'C', person: p, fromTeam: true });
+            added++;
+          });
+          if (added || entries.length !== before) render();
+          if (full) window.toast?.({ variant: 'warning', message: 'RACI is full — not every working team member could be added to Consulted.' });
+        };
+        // new MutationObserver(syncTeam).observe(team.querySelector('[data-dropdown-list]'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
         window.inRaci = {
           get: () => entries.map(e => ({ ...e, person: { ...e.person } })),
           set: list => { entries = (list || []).map(e => ({ ...e, person: { ...e.person } })); render(); },
