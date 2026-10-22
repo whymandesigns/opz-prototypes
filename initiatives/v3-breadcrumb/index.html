@@ -4044,12 +4044,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .in-team-card-remove { flex: none; align-self: center; }
     [data-theme="dark"] .in-team-card-name { color: var(--color-text); }
     [data-theme="dark"] .in-team-card-role { color: var(--color-text-muted); }
-    /* Empty: the select trigger only. With picks: cards + "+ Add team member"
-       tile, and the trigger steps aside (the menu then opens under the cards). */
+    /* No select box: empty shows just "+ Add team member"; with picks, the
+       cards + the same link. The trigger stays in the DOM (it
+       anchors the menu) but is never shown, so the menu opens under the link. */
     .in-team-cards { margin-top: 0; }
-    .in-team:not(:has(.in-team-card)) .in-team-cards { display: none; }
-    .in-team:has(.in-team-card) > .input-select-trigger { display: none; }
+    .in-team > .input-select-trigger { display: none; }
     .in-team-add { display: flex; align-items: center; min-width: 0; height: 48px; }
+    .in-team:not(:has(.in-team-card)) .in-team-add { height: 32px; }
     .in-team-add .btn.in-link { height: 32px; justify-content: flex-start; }
     /* Label lines up with the trigger (32px) or the card row (48px). */
     .in-form-row:has(> .field > #in-team) > .field-label { min-height: 32px; }
@@ -6603,6 +6604,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const ownerField = requiredSelect('in-owner', 'Select who is accountable for the outcome');
       const pmField = requiredSelect('in-pm', 'Select who runs day-to-day delivery');
       const teamField = requiredSelect('in-team', 'Add the people doing the work');
+      // The select is never shown here — focus the link when the field is missing.
+      teamField.trigger = document.querySelector('#in-team-cards [data-team-add]');
       const durationField = requiredSelect('in-duration', 'Add estimated duration');
       // ID 18 — everything required to publish, in form order.
       const requiredSelects = [sponsorField, beneficiaryField, ownerField, pmField, teamField, durationField];
@@ -6794,10 +6797,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         if (!btn) return;
         team.querySelectorAll('.dropdown-item')[+btn.dataset.teamRemove]?.click();
         // Cards repaint on the next tick (observer) — focus after that.
-        setTimeout(() => (teamCards.querySelector('[data-team-remove]') || team.querySelector('.input-select-trigger')).focus());
+        setTimeout(() => (teamCards.querySelector('[data-team-remove]') || teamCards.querySelector('[data-team-add]')).focus());
       });
-      // Once someone is picked the select gives way to the cards plus
-      // "+ Add team member", which opens the same searchable menu below them.
+      // "+ Add team member" (alone when empty, after the cards once people are
+      // picked) opens the searchable menu below it.
       teamCards.querySelector('[data-team-add]').addEventListener('click', e => {
         e.stopPropagation();
         team.querySelector('.input-select-trigger').click();
