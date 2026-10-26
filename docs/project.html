@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -24,7 +23,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -70,13 +69,13 @@
                   <div class="docs-mock-field">
                     <div class="docs-mock-label">Parent Project <span class="docs-optional">Optional</span></div>
                     <div class="docs-mock-input is-filled" style="display:flex;align-items:center;gap:var(--ic-space-2)">
-                      <i class="ph ph-folders" style="color:var(--color-accent)"></i> EMEA Go-to-Market
+                      <svg class="icon" style="color:var(--color-accent)"><use href="#i-folder"/></svg> EMEA Go-to-Market
                     </div>
                   </div>
                   <div class="docs-mock-field">
                     <div class="docs-mock-label">Team <span class="docs-required">Required</span></div>
                     <div class="docs-mock-input is-filled" style="display:flex;align-items:center;gap:var(--ic-space-2)">
-                      <i class="ph ph-users" style="color:var(--color-text-muted)"></i> Product — International
+                      <svg class="icon" style="color:var(--color-text-muted)"><use href="#i-users"/></svg> Product — International
                     </div>
                   </div>
                 </div>
@@ -88,7 +87,7 @@
                     <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">DP</span>Dev Patel</span>
                     <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">AK</span>Aria Kim</span>
                     <span class="chip"><span class="avatar avatar-xs" style="margin-right:4px">JM</span>James Moore</span>
-                    <span style="font:var(--type-caption);color:var(--color-text-muted);display:flex;align-items:center;gap:4px"><i class="ph ph-plus"></i>Add</span>
+                    <span style="font:var(--type-caption);color:var(--color-text-muted);display:flex;align-items:center;gap:4px"><svg class="icon"><use href="#i-plus"/></svg>Add</span>
                   </div>
                 </div>
 
@@ -97,21 +96,21 @@
                   <div style="display:flex;gap:var(--ic-space-3)">
                     <div style="flex:1;padding:var(--ic-space-3);border:2px solid var(--color-brand);border-radius:var(--ic-radius-sm);background:var(--color-brand-subtle)">
                       <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
-                        <i class="ph ph-buildings" style="color:var(--color-brand)"></i>
+                        <svg class="icon" style="color:var(--color-brand)"><use href="#i-buildings"/></svg>
                         <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Company-wide</span>
                       </div>
                       <span style="font:var(--type-caption);color:var(--color-text-muted)">Visible to everyone</span>
                     </div>
                     <div style="flex:1;padding:var(--ic-space-3);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);background:var(--color-surface)">
                       <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
-                        <i class="ph ph-users" style="color:var(--color-text-muted)"></i>
+                        <svg class="icon" style="color:var(--color-text-muted)"><use href="#i-users"/></svg>
                         <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Team only</span>
                       </div>
                       <span style="font:var(--type-caption);color:var(--color-text-muted)">Team members only</span>
                     </div>
                     <div style="flex:1;padding:var(--ic-space-3);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm);background:var(--color-surface)">
                       <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:4px">
-                        <i class="ph ph-lock" style="color:var(--color-text-muted)"></i>
+                        <svg class="icon" style="color:var(--color-text-muted)"><use href="#i-lock"/></svg>
                         <span style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Private</span>
                       </div>
                       <span style="font:var(--type-caption);color:var(--color-text-muted)">Contributors only</span>
@@ -168,7 +167,7 @@
                 <div style="display:flex;flex-direction:column;align-items:center;gap:0">
                   <!-- Program -->
                   <div style="padding:var(--ic-space-3) var(--ic-space-5);background:var(--color-accent-subtle);border:1px solid color-mix(in srgb,var(--color-accent) 30%,transparent);border-radius:var(--ic-radius-md);font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-accent)">
-                    <i class="ph ph-folders"></i> EMEA Go-to-Market Program
+                    <svg class="icon"><use href="#i-folder"/></svg> EMEA Go-to-Market Program
                   </div>
                   <!-- Connector -->
                   <div style="width:1px;height:24px;background:var(--color-border)"></div>
@@ -231,7 +230,7 @@
           </table>
 
           <div class="docs-callout is-tip">
-            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-lightbulb"/></svg>
             <div class="docs-callout-body">
               <strong>Start public, go private intentionally</strong>
               The default is Company-wide for a reason. Most initiatives benefit from broad visibility — stakeholders can find context without having to ask, and unexpected connections get surfaced. Only restrict visibility when there's a clear reason to.
@@ -258,12 +257,12 @@
 
         <div class="docs-page-nav">
           <a href="documents.html" class="docs-page-nav-prev">
-            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-label"><svg class="icon"><use href="#i-arrow-long-left"/></svg> Previous</span>
             <span class="docs-page-nav-title">Documents</span>
           </a>
           <a href="index.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Back to start</span>
-            <span class="docs-page-nav-title">Introduction <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">Introduction <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -281,5 +280,6 @@
     </aside>
   </div>
 
+  <script src="./sprite.js"></script>
 </body>
 </html>

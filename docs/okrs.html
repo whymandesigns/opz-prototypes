@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -24,7 +23,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -70,7 +69,7 @@
               <div style="border:1px solid var(--color-border);border-radius:var(--ic-radius-md);overflow:hidden;margin-bottom:var(--ic-space-4)">
                 <div style="padding:var(--ic-space-4);background:var(--color-surface);border-bottom:1px solid var(--color-border)">
                   <div style="display:flex;align-items:center;gap:var(--ic-space-2);margin-bottom:var(--ic-space-2)">
-                    <i class="ph ph-target" style="color:var(--color-accent);font-size:16px"></i>
+                    <svg class="icon" style="color:var(--color-accent);font-size:16px"><use href="#i-target"/></svg>
                     <span style="font:var(--ic-weight-semibold) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Expand into EMEA markets</span>
                     <span class="badge badge-info" style="margin-left:auto">Q3 2025</span>
                   </div>
@@ -106,7 +105,7 @@
                 </div>
               </div>
               <button class="btn btn-secondary" style="align-self:flex-start">
-                <i class="ph ph-plus" style="font-size:14px"></i> Link an OKR
+                <svg class="icon" style="font-size:14px"><use href="#i-plus"/></svg> Link an OKR
               </button>
             </div>
           </div>
@@ -146,7 +145,7 @@
           </table>
 
           <div class="docs-callout is-info">
-            <i class="ph ph-info docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-info"/></svg>
             <div class="docs-callout-body">
               <strong>OKRs are managed separately</strong>
               OKRs are created and managed in the OKRs section of Operationalize — not inside the initiative form. When creating an initiative, you link to OKRs that already exist. This design keeps OKRs as the source of truth and allows multiple initiatives to contribute to the same objective.
@@ -208,7 +207,7 @@
           </table>
 
           <div class="docs-callout is-tip">
-            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-lightbulb"/></svg>
             <div class="docs-callout-body">
               <strong>Update KRs weekly, not just at quarter-end</strong>
               Progress visibility is only useful if it's current. Teams that update Key Results weekly catch problems early. Teams that update at quarter-end use OKRs as a reporting exercise rather than a management tool.
@@ -242,12 +241,12 @@
 
         <div class="docs-page-nav">
           <a href="rob-meetings.html" class="docs-page-nav-prev">
-            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-label"><svg class="icon"><use href="#i-arrow-long-left"/></svg> Previous</span>
             <span class="docs-page-nav-title">ROB Meetings</span>
           </a>
           <a href="slack-channels.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Next</span>
-            <span class="docs-page-nav-title">Slack Channels <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">Slack Channels <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -265,5 +264,6 @@
     </aside>
   </div>
 
+  <script src="./sprite.js"></script>
 </body>
 </html>

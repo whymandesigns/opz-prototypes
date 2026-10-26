@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -25,7 +24,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -73,7 +72,7 @@
             <div class="docs-screenshot-body">
               <div style="display:flex;gap:var(--ic-space-4);align-items:center;margin-bottom:var(--ic-space-5)">
                 <div style="width:40px;height:40px;border-radius:var(--ic-radius-md);background:var(--color-brand-subtle);display:flex;align-items:center;justify-content:center">
-                  <i class="ph ph-rocket" style="font-size:20px;color:var(--color-brand)"></i>
+                  <svg class="icon" style="font-size:20px;color:var(--color-brand)"><use href="#i-rocket"/></svg>
                 </div>
                 <div>
                   <div style="font:var(--type-h4);color:var(--color-text)">Q3 Product Expansion</div>
@@ -85,10 +84,10 @@
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--ic-space-3)">
-                <div class="docs-mini-card"><i class="ph ph-calendar" style="color:var(--color-brand)"></i><span>3 Meetings</span></div>
-                <div class="docs-mini-card"><i class="ph ph-target" style="color:var(--color-accent)"></i><span>4 OKRs</span></div>
-                <div class="docs-mini-card"><i class="ph ph-chat-circle-dots" style="color:var(--color-warning)"></i><span>2 Channels</span></div>
-                <div class="docs-mini-card"><i class="ph ph-files" style="color:var(--color-text-muted)"></i><span>7 Docs</span></div>
+                <div class="docs-mini-card"><svg class="icon" style="color:var(--color-brand)"><use href="#i-calendar"/></svg><span>3 Meetings</span></div>
+                <div class="docs-mini-card"><svg class="icon" style="color:var(--color-accent)"><use href="#i-target"/></svg><span>4 OKRs</span></div>
+                <div class="docs-mini-card"><svg class="icon" style="color:var(--color-warning)"><use href="#i-chat"/></svg><span>2 Channels</span></div>
+                <div class="docs-mini-card"><svg class="icon" style="color:var(--color-text-muted)"><use href="#i-file"/></svg><span>7 Docs</span></div>
               </div>
             </div>
           </div>
@@ -111,60 +110,60 @@
 
           <div class="docs-field-list">
             <a href="basic-info.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-info"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-info"/></svg></div>
               <div>
                 <div class="docs-field-card-title">Basic Info</div>
                 <div class="docs-field-card-desc">Name, description, owner, dates, and status.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="rob-meetings.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-calendar"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-calendar"/></svg></div>
               <div>
                 <div class="docs-field-card-title">ROB Meetings</div>
                 <div class="docs-field-card-desc">Link recurring Rhythm of Business meetings to this initiative.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="okrs.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-target"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-target"/></svg></div>
               <div>
                 <div class="docs-field-card-title">OKRs</div>
                 <div class="docs-field-card-desc">Connect Objectives and Key Results to track measurable outcomes.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="slack-channels.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-chat-circle-dots"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-chat"/></svg></div>
               <div>
                 <div class="docs-field-card-title">Slack Channels</div>
                 <div class="docs-field-card-desc">Attach Slack channels where the team communicates about this work.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="jira.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-circles-three"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-group-3"/></svg></div>
               <div>
                 <div class="docs-field-card-title">Jira</div>
                 <div class="docs-field-card-desc">Link Jira epics or projects to surface delivery progress.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="documents.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-files"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-file"/></svg></div>
               <div>
                 <div class="docs-field-card-title">Documents</div>
                 <div class="docs-field-card-desc">Attach PRDs, briefs, specs, and other reference material.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
             <a href="project.html" class="docs-field-card">
-              <div class="docs-field-card-icon"><i class="ph ph-folders"></i></div>
+              <div class="docs-field-card-icon"><svg class="icon"><use href="#i-folder"/></svg></div>
               <div>
                 <div class="docs-field-card-title">Project</div>
                 <div class="docs-field-card-desc">Associate this initiative with a parent project or program.</div>
               </div>
-              <i class="ph ph-arrow-right" style="margin-left:auto;color:var(--color-text-subtle)"></i>
+              <svg class="icon" style="margin-left:auto;color:var(--color-text-subtle)"><use href="#i-arrow-right"/></svg>
             </a>
           </div>
         </div>
@@ -178,7 +177,7 @@
           <div></div>
           <a href="basic-info.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Next</span>
-            <span class="docs-page-nav-title">Basic Info <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">Basic Info <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -1234,5 +1233,6 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 })();
 </script>
 <!-- === /review.js === -->
+  <script src="./sprite.js"></script>
 </body>
 </html>

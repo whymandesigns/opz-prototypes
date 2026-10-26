@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -24,7 +23,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -113,7 +112,7 @@
                 </div>
 
                 <button class="btn btn-secondary" style="align-self:flex-start">
-                  <i class="ph ph-plus" style="font-size:14px"></i> Link Jira item
+                  <svg class="icon" style="font-size:14px"><use href="#i-plus"/></svg> Link Jira item
                 </button>
               </div>
             </div>
@@ -153,7 +152,7 @@
           <h2 class="h2" id="connecting-jira">Connecting Jira</h2>
 
           <div class="docs-callout is-info">
-            <i class="ph ph-info docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-info"/></svg>
             <div class="docs-callout-body">
               <strong>Jira Cloud only</strong>
               Operationalize currently integrates with Jira Cloud (atlassian.net). Jira Data Center / Server support is on the roadmap. If your team uses Jira Server, you can still paste issue URLs as document links in the <a href="documents.html" class="docs-link">Documents</a> section.
@@ -195,7 +194,7 @@
           </ul>
 
           <div class="docs-callout is-warning" style="margin-top:var(--ic-space-5)">
-            <i class="ph ph-warning docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-warning"/></svg>
             <div class="docs-callout-body">
               <strong>Delivery progress ≠ initiative status</strong>
               Jira progress tells you how much work is done. It doesn't automatically update the initiative's status (On Track / At Risk). The owner still sets status manually based on their judgment. A sprint at 90% completion can still be At Risk if the remaining 10% is a critical path blocker.
@@ -205,12 +204,12 @@
 
         <div class="docs-page-nav">
           <a href="slack-channels.html" class="docs-page-nav-prev">
-            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-label"><svg class="icon"><use href="#i-arrow-long-left"/></svg> Previous</span>
             <span class="docs-page-nav-title">Slack Channels</span>
           </a>
           <a href="documents.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Next</span>
-            <span class="docs-page-nav-title">Documents <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">Documents <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -227,5 +226,6 @@
     </aside>
   </div>
 
+  <script src="./sprite.js"></script>
 </body>
 </html>
