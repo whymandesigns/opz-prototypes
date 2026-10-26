@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -24,7 +23,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -69,7 +68,7 @@
               <div style="display:flex;flex-direction:column;gap:var(--ic-space-3)">
                 <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
                   <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:var(--color-accent-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="ph ph-calendar-check" style="color:var(--color-accent);font-size:18px"></i>
+                    <svg class="icon" style="color:var(--color-accent);font-size:18px"><use href="#i-calendar"/></svg>
                   </div>
                   <div style="flex:1;min-width:0">
                     <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Product Weekly</div>
@@ -79,7 +78,7 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:var(--ic-space-3);padding:var(--ic-space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--ic-radius-sm)">
                   <div style="width:36px;height:36px;border-radius:var(--ic-radius-sm);background:var(--color-brand-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="ph ph-calendar-check" style="color:var(--color-brand);font-size:18px"></i>
+                    <svg class="icon" style="color:var(--color-brand);font-size:18px"><use href="#i-calendar"/></svg>
                   </div>
                   <div style="flex:1;min-width:0">
                     <div style="font:var(--ic-weight-medium) var(--ic-text-sm)/1 var(--ic-font-sans);color:var(--color-text)">Exec Review — Q3</div>
@@ -88,7 +87,7 @@
                   <span class="badge badge-success">Active</span>
                 </div>
                 <button class="btn btn-secondary" style="align-self:flex-start">
-                  <i class="ph ph-plus" style="font-size:14px"></i> Link a meeting
+                  <svg class="icon" style="font-size:14px"><use href="#i-plus"/></svg> Link a meeting
                 </button>
               </div>
             </div>
@@ -106,7 +105,7 @@
           </p>
 
           <div class="docs-callout is-info">
-            <i class="ph ph-info docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-info"/></svg>
             <div class="docs-callout-body">
               <strong>ROB meetings live at the org level</strong>
               Meetings are created and managed by admins in the ROB Meetings section of Operationalize. When creating an initiative, you link to existing meetings rather than creating new ones. If a meeting you need doesn't exist yet, ask your admin to create it first.
@@ -186,7 +185,7 @@
           <h2 class="h2" id="best-practices">Best practices</h2>
 
           <div class="docs-callout is-tip">
-            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-lightbulb"/></svg>
             <div class="docs-callout-body">
               <strong>Link to the right level</strong>
               A tactical initiative (a sprint goal, a bug fix release) belongs in a team-level weekly. A strategic initiative (a new product line, a market expansion) belongs in an exec review. Linking to both adds noise to the exec forum.
@@ -194,7 +193,7 @@
           </div>
 
           <div class="docs-callout is-warning" style="margin-top:var(--ic-space-3)">
-            <i class="ph ph-warning docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-warning"/></svg>
             <div class="docs-callout-body">
               <strong>Update status before the meeting</strong>
               The agenda is generated 1 hour before meeting start. If you haven't updated your initiative status since the last meeting, the agenda will show stale data. Build a habit of updating status the morning of your ROB meeting.
@@ -204,12 +203,12 @@
 
         <div class="docs-page-nav">
           <a href="basic-info.html" class="docs-page-nav-prev">
-            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-label"><svg class="icon"><use href="#i-arrow-long-left"/></svg> Previous</span>
             <span class="docs-page-nav-title">Basic Info</span>
           </a>
           <a href="okrs.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Next</span>
-            <span class="docs-page-nav-title">OKRs <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">OKRs <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -227,5 +226,6 @@
     </aside>
   </div>
 
+  <script src="./sprite.js"></script>
 </body>
 </html>

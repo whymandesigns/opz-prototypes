@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="docs.css" />
 </head>
 <body>
@@ -24,7 +23,7 @@
     </nav>
     <div class="docs-topbar-actions">
       <button class="btn btn-ghost btn-icon-only" aria-label="Toggle theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? '' : 'dark'">
-        <i class="ph ph-sun-horizon" style="font-size:16px"></i>
+        <svg class="icon" style="font-size:16px"><use href="#i-sun"/></svg>
       </button>
     </div>
   </header>
@@ -91,11 +90,11 @@
                 <div class="docs-mock-row">
                   <div class="docs-mock-field">
                     <div class="docs-mock-label">Start Date</div>
-                    <div class="docs-mock-input is-filled"><i class="ph ph-calendar" style="margin-right:6px;color:var(--color-text-muted)"></i>Jun 1, 2025</div>
+                    <div class="docs-mock-input is-filled"><svg class="icon" style="margin-right:6px;color:var(--color-text-muted)"><use href="#i-calendar"/></svg>Jun 1, 2025</div>
                   </div>
                   <div class="docs-mock-field">
                     <div class="docs-mock-label">End Date</div>
-                    <div class="docs-mock-input is-filled"><i class="ph ph-calendar" style="margin-right:6px;color:var(--color-text-muted)"></i>Sep 30, 2025</div>
+                    <div class="docs-mock-input is-filled"><svg class="icon" style="margin-right:6px;color:var(--color-text-muted)"><use href="#i-calendar"/></svg>Sep 30, 2025</div>
                   </div>
                 </div>
               </div>
@@ -164,7 +163,7 @@
           <p class="body">Additional team members working on the initiative should be added as <strong>Contributors</strong> in the Project section. Contributors can edit the initiative but don't receive ownership-level notifications.</p>
 
           <div class="docs-callout is-tip">
-            <i class="ph ph-lightbulb docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-lightbulb"/></svg>
             <div class="docs-callout-body">
               <strong>Best practice</strong>
               The Owner should be the person who will present this initiative in your ROB meeting — not necessarily the person doing the most work. Align owner with accountability, not workload.
@@ -211,7 +210,7 @@
           </ul>
 
           <div class="docs-callout is-warning">
-            <i class="ph ph-warning docs-callout-icon"></i>
+            <svg class="icon docs-callout-icon"><use href="#i-warning"/></svg>
             <div class="docs-callout-body">
               <strong>Avoid codenames</strong>
               Codenames (Project Falcon, Operation Sunrise) look cool but confuse stakeholders who weren't in the room when the name was chosen. Use descriptive names from day one.
@@ -221,12 +220,12 @@
 
         <div class="docs-page-nav">
           <a href="index.html" class="docs-page-nav-prev">
-            <span class="docs-page-nav-label"><i class="ph ph-arrow-left"></i> Previous</span>
+            <span class="docs-page-nav-label"><svg class="icon"><use href="#i-arrow-long-left"/></svg> Previous</span>
             <span class="docs-page-nav-title">Introduction</span>
           </a>
           <a href="rob-meetings.html" class="docs-page-nav-next">
             <span class="docs-page-nav-label">Next</span>
-            <span class="docs-page-nav-title">ROB Meetings <i class="ph ph-arrow-right"></i></span>
+            <span class="docs-page-nav-title">ROB Meetings <svg class="icon"><use href="#i-arrow-right"/></svg></span>
           </a>
         </div>
 
@@ -244,5 +243,6 @@
     </aside>
   </div>
 
+  <script src="./sprite.js"></script>
 </body>
 </html>
