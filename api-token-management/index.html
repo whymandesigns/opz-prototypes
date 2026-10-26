@@ -504,12 +504,12 @@ body {
  * on that side to make room.
  *
  *   <div class="input-icon input-icon-left">
- *     <svg class="icon i-calendar input-icon-glyph"><use href="#i-calendar"/></svg>
+ *     <svg class="icon input-icon-glyph"><use href="#i-calendar"/></svg>
  *     <input class="input" type="text" />
  *   </div>
  *   <div class="input-icon input-icon-right">
  *     <input class="input" type="search" />
- *     <svg class="icon i-search input-icon-glyph"><use href="#i-search"/></svg>
+ *     <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
  *   </div>
  */
 .input-icon { position: relative; }
@@ -707,10 +707,10 @@ textarea.input {
  *
  *   <div class="toolbar">
  *     <div class="input-icon input-icon-left toolbar-search">
- *       <svg class="icon i-search input-icon-glyph"><use href="#i-search"/></svg>
+ *       <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
  *       <input class="input" placeholder="Search…">
  *     </div>
- *     <button class="btn btn-secondary"><svg class="icon i-funnel"><use href="#i-funnel"/></svg>Filters</button>
+ *     <button class="btn btn-secondary"><svg class="icon"><use href="#i-funnel"/></svg>Filters</button>
  *     <div class="toolbar-end"> … .input-select.is-auto … .segmented … </div>
  *   </div>
  */
@@ -1467,13 +1467,13 @@ textarea.input {
  * Horizontal block with: icon · message · optional CTAs · optional close button.
  *
  *   <div class="alert alert-danger" role="alert">
- *     <svg class="icon i-critical alert-icon"><use href="#i-critical"/></svg>
+ *     <svg class="icon alert-icon"><use href="#i-critical"/></svg>
  *     <p class="alert-message">Something went wrong.</p>
  *     <div class="alert-actions">              optional — drop if no CTAs
  *       <button class="btn btn-xs btn-primary">Retry</button>
  *       <button class="btn btn-xs btn-secondary">Dismiss</button>
  *     </div>
- *     <button class="alert-close" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+ *     <button class="alert-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
  *   </div>
  *
  * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
@@ -1520,8 +1520,8 @@ textarea.input {
  *
  *   <span class="badge badge-success">Active</span>                          read-only
  *   <button class="badge badge-warning" type="button">Pending</button>       editable
- *   <span class="badge badge-info"><svg class="icon i-info badge-icon"><use href="#i-info"/></svg>New</span>          icon left
- *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><svg class="icon i-close"><use href="#i-close"/></svg></button></span>   deletable
+ *   <span class="badge badge-info"><svg class="icon badge-icon"><use href="#i-info"/></svg>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><svg class="icon"><use href="#i-close"/></svg></button></span>   deletable
  */
 .badge {
   display: inline-flex; align-items: center;
@@ -1679,7 +1679,7 @@ button.badge:focus-visible {
  *
  *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
  *   Initials:  <span class="avatar avatar-md">JD</span>
- *   Team/co:   <span class="avatar avatar-md avatar-team"><svg class="icon i-buildings"><use href="#i-buildings"/></svg></span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span>
  *
  * Sizes (default = avatar-md / 32px):
  *   .avatar-xs   16px
@@ -1963,7 +1963,7 @@ a.avatar:focus-visible {
  *   </div>
  *
  * Variants compose via optional siblings around the range input:
- *   icons        <svg class="icon i-minus slider-icon"><use href="#i-minus"/></svg> … <svg class="icon i-plus slider-icon"><use href="#i-plus"/></svg>
+ *   icons        <svg class="icon slider-icon"><use href="#i-minus"/></svg> … <svg class="icon slider-icon"><use href="#i-plus"/></svg>
  *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
  *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
  *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
@@ -2657,7 +2657,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <ol class="stepper">
  *     <li class="stepper-step is-current"><span class="stepper-num">1</span><span class="stepper-label">Details</span></li>
- *     <li class="stepper-sep"><svg class="icon i-caret-right"><use href="#i-caret-right"/></svg></li>
+ *     <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
  *     <li class="stepper-step"><span class="stepper-num">2</span><span class="stepper-label">Review</span></li>
  *   </ol>
  */
@@ -2997,10 +2997,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <div class="toast-region" aria-live="polite"></div>     ← one per page
  *   <div class="toast toast-success">
- *     <svg class="icon i-check-circle toast-icon"><use href="#i-check-circle"/></svg>
+ *     <svg class="icon toast-icon"><use href="#i-check-circle"/></svg>
  *     <p class="toast-message">Saved.</p>
  *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
- *     <button class="toast-close" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+ *     <button class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
  *   </div>
  */
 .toast-region {
@@ -4131,7 +4131,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </a>
       <div class="topbar-actions">
         <div class="topbar-search">
-          <svg class="icon i-search search-icon"><use href="#i-search"/></svg>
+          <svg class="icon search-icon"><use href="#i-search"/></svg>
           <input class="topbar-search-input" type="search" placeholder="Search Operationalize…" />
         </div>
         <button class="avatar avatar-md" aria-label="Account" type="button">MV</button>
@@ -4200,18 +4200,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
           <div class="tab-actions" style="justify-content: flex-start">
             <div class="topbar-search" style="flex: 1; max-width: 400px">
-              <svg class="icon i-search search-icon" style="color: var(--color-text-subtle)"><use href="#i-search"/></svg>
+              <svg class="icon search-icon" style="color: var(--color-text-subtle)"><use href="#i-search"/></svg>
               <input class="input" type="search" placeholder="Search integrations…" style="padding-left: 36px; width: 100%" />
             </div>
             <div class="input-select" id="integration-filter" style="max-width: 200px">
               <button class="input-select-trigger" aria-expanded="false" type="button">
                 <span class="input-select-value">Show all</span>
-                <svg class="icon i-caret-down"><use href="#i-caret-down"/></svg>
+                <svg class="icon"><use href="#i-caret-down"/></svg>
               </button>
               <div class="dropdown-menu" hidden>
-                <button class="dropdown-item is-selected" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>Show all</button>
-                <button class="dropdown-item" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>Connected</button>
-                <button class="dropdown-item" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>Available</button>
+                <button class="dropdown-item is-selected" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>Show all</button>
+                <button class="dropdown-item" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>Connected</button>
+                <button class="dropdown-item" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>Available</button>
               </div>
             </div>
           </div>
@@ -4298,7 +4298,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
         <!-- Optional safety reminder. Kept dismissable so it doesn't dominate the page on revisits. -->
         <div class="alert alert-info" role="status" style="margin-bottom: var(--ic-space-5)">
-          <svg class="icon i-info alert-icon"><use href="#i-info"/></svg>
+          <svg class="icon alert-icon"><use href="#i-info"/></svg>
           <div class="alert-message">
             <strong>Treat tokens like passwords.</strong> Operationalize will only show a token's full value once, at creation time. Rotate tokens at least every 90 days.
           </div>
@@ -4346,7 +4346,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
                 <td style="text-align: right">
                   <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon i-dots-three-vertical"><use href="#i-dots-three-vertical"/></svg></button>
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon"><use href="#i-dots-three-vertical"/></svg></button>
                     <div class="dropdown-menu dropdown-menu-end" hidden>
                       <button class="dropdown-item" type="button" data-token-action="edit">Details</button>
                       <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke">Revoke</button>
@@ -4379,7 +4379,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
                 <td style="text-align: right">
                   <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon i-dots-three-vertical"><use href="#i-dots-three-vertical"/></svg></button>
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon"><use href="#i-dots-three-vertical"/></svg></button>
                     <div class="dropdown-menu dropdown-menu-end" hidden>
                       <button class="dropdown-item" type="button" data-token-action="edit">Details</button>
                       <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke">Revoke</button>
@@ -4413,7 +4413,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
                 <td style="text-align: right">
                   <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon i-dots-three-vertical"><use href="#i-dots-three-vertical"/></svg></button>
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon"><use href="#i-dots-three-vertical"/></svg></button>
                     <div class="dropdown-menu dropdown-menu-end" hidden>
                       <button class="dropdown-item" type="button" data-token-action="edit">Details</button>
                       <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke">Revoke</button>
@@ -4446,7 +4446,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
                 <td style="text-align: right">
                   <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon i-dots-three-vertical"><use href="#i-dots-three-vertical"/></svg></button>
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon"><use href="#i-dots-three-vertical"/></svg></button>
                     <div class="dropdown-menu dropdown-menu-end" hidden>
                       <button class="dropdown-item" type="button" data-token-action="edit">Details</button>
                       <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke">Revoke</button>
@@ -4479,7 +4479,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
                 </td>
                 <td style="text-align: right">
                   <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon i-dots-three-vertical"><use href="#i-dots-three-vertical"/></svg></button>
+                    <button class="btn btn-ghost btn-icon-only dropdown-trigger" aria-expanded="false" aria-label="Token actions" type="button"><svg class="icon"><use href="#i-dots-three-vertical"/></svg></button>
                     <div class="dropdown-menu dropdown-menu-end" hidden>
                       <button class="dropdown-item dropdown-item-danger" type="button" data-modal-open="modal-revoke">Delete</button>
                     </div>
@@ -4505,7 +4505,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <h2 id="view-token-title" class="h3" style="margin: 0">Token</h2>
           <span class="tag tag-indicator" id="view-token-status">Active</span>
         </div>
-        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
       </header>
       <div class="drawer-body">
         <div class="stack" style="gap: var(--ic-space-6)">
@@ -4572,7 +4572,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="create-token-title">
       <header class="drawer-header">
         <h2 id="create-token-title" class="h3" style="margin: 0">Create API token</h2>
-        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
       </header>
       <div class="drawer-body">
         <div class="stack" style="gap: var(--ic-space-5)">
@@ -4593,13 +4593,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <div class="input-select">
               <button class="input-select-trigger" aria-expanded="false" type="button">
                 <span class="input-select-value">90 days</span>
-                <svg class="icon i-caret-down"><use href="#i-caret-down"/></svg>
+                <svg class="icon"><use href="#i-caret-down"/></svg>
               </button>
               <div class="dropdown-menu" hidden>
-                <button class="dropdown-item" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>30 days</button>
-                <button class="dropdown-item is-selected" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>90 days</button>
-                <button class="dropdown-item" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>1 year</button>
-                <button class="dropdown-item" type="button"><svg class="icon i-check dropdown-item-check"><use href="#i-check"/></svg>Never</button>
+                <button class="dropdown-item" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>30 days</button>
+                <button class="dropdown-item is-selected" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>90 days</button>
+                <button class="dropdown-item" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>1 year</button>
+                <button class="dropdown-item" type="button"><svg class="icon dropdown-item-check"><use href="#i-check"/></svg>Never</button>
               </div>
             </div>
             <span class="field-hint">Best practice is to rotate tokens at least every 90 days.</span>
@@ -4680,12 +4680,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="token-reveal" id="token-reveal">
           <code class="token-reveal-value">op_live_T3kqx9_82A4lN7vP6mFwY1bDcX0hRsLZ_3a2fH8gKuQp</code>
           <button class="token-reveal-copy" type="button" id="copy-token-btn">
-            <svg class="icon i-copy"><use href="#i-copy"/></svg><span>Copy</span>
+            <svg class="icon"><use href="#i-copy"/></svg><span>Copy</span>
           </button>
         </div>
 
         <div class="warning-callout" style="margin-top: var(--ic-space-4)">
-          <svg class="icon i-warning"><use href="#i-warning"/></svg>
+          <svg class="icon"><use href="#i-warning"/></svg>
           <p>Store this token in a secrets manager. If you lose it, revoke the token and create a new one — we can't recover it for you.</p>
         </div>
       </div>
@@ -4700,7 +4700,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="revoke-title">
       <header class="modal-header">
         <h2 id="revoke-title" class="h3" style="margin: 0">Revoke this token?</h2>
-        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
       </header>
       <div class="modal-body">
         <p class="body" style="margin: 0 0 var(--ic-space-3)">Any service using <strong>Production webhook</strong> will immediately stop working. This can't be undone.</p>
@@ -4730,7 +4730,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.className = `toast toast-${variant} is-entering`;
       el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
       const actionHTML = behavior === 'action' && action ? `<button type="button" class="btn btn-xs btn-secondary toast-action">${action.label}</button>` : '';
-      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon i-close"><use href="#i-close"/></svg></button>` : '';
+      const closeHTML  = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>` : '';
       el.innerHTML = `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg><p class="toast-message"></p>${actionHTML}${closeHTML}`;
       el.querySelector('.toast-message').textContent = message;
       region.appendChild(el);
