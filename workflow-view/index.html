@@ -579,6 +579,12 @@
       from { transform: translateY(8px); opacity: 0; }
       to   { transform: translateY(0);   opacity: 1; }
     }
+  
+    /* Generic icon. The Phosphor <i> glyphs these replaced were font
+       characters, sized by font-size — 1em reproduces that exactly, and
+       matches designmd's own .icon. Without it an <svg> falls back to the
+       SVG default of 300x150. */
+    .icon { width: 1em; height: 1em; flex-shrink: 0; display: inline-block; vertical-align: -0.125em; fill: none; }
   </style>
 
   <style>
@@ -1413,7 +1419,7 @@ textarea.input {
  *       <button class="btn btn-xs btn-primary">Retry</button>
  *       <button class="btn btn-xs btn-secondary">Dismiss</button>
  *     </div>
- *     <button class="alert-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *     <button class="alert-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
  *   </div>
  *
  * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
@@ -2373,7 +2379,7 @@ a.avatar:focus-visible {
  *     <i class="ph ph-check-circle toast-icon"></i>
  *     <p class="toast-message">Saved.</p>
  *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
- *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *     <button class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
  *   </div>
  */
 .toast-region {
@@ -7398,7 +7404,7 @@ a.avatar:focus-visible {
           <h1>My Function Quarterly Planning Q3/26</h1>
           <div class="wf-title-actions">
             <button class="btn btn-secondary" id="btn-back" type="button">
-              <i class="ph ph-arrow-left"></i>&nbsp; Back
+              <svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp; Back
             </button>
             <button class="btn-generate" id="btn-generate" type="button">Generate schedule</button>
           </div>
@@ -7438,7 +7444,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--north-star"
                          data-step="0" tabindex="0"
                          aria-label="North Star context card">
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Business goals and targets for the next quarter are aligned. This sets the "North Star" for the Function.</p>
                   </div>
@@ -7448,7 +7454,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--cross-functional"
                          data-step="5" tabindex="0" aria-label="Step 5">
                   <div class="step-badge">5</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Partner Functions receive goals and OKRs from the Function Directors to confirm the proposed plan.</p>
                     <div class="card-assignee">
@@ -7456,11 +7462,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item" data-tooltip="Sync status"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item" data-tooltip="Meetings"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item" data-tooltip="Inputs"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item" data-tooltip="Outputs"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item" data-tooltip="Participants"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item" data-tooltip="Sync status"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item" data-tooltip="Meetings"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item" data-tooltip="Inputs"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item" data-tooltip="Outputs"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item" data-tooltip="Participants"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7469,7 +7475,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--cross-functional-done"
                          data-step="7" tabindex="0" aria-label="Step 7">
                   <div class="step-badge step-badge--green">7</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">The final plan and resource allocations are locked. The plan is shared back with the Function Head and the broader team for execution.</p>
                     <div class="card-assignee">
@@ -7477,11 +7483,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item" data-tooltip="Sync status"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item" data-tooltip="Meetings"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item" data-tooltip="Inputs"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item" data-tooltip="Outputs"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item" data-tooltip="Participants"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item" data-tooltip="Sync status"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item" data-tooltip="Meetings"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item" data-tooltip="Inputs"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item" data-tooltip="Outputs"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item" data-tooltip="Participants"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7500,7 +7506,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--function-director"
                          data-step="1" tabindex="0" aria-label="Step 1">
                   <div class="step-badge">1</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">The Function leadership team meets with partner Functions to discuss business goals and possible constraints</p>
                     <div class="card-assignee">
@@ -7508,11 +7514,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7521,7 +7527,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--function-director"
                          data-step="4" tabindex="0" aria-label="Step 4">
                   <div class="step-badge">4</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Function leaders review the sub-functional OKRs and goals with sub-functions to ensure they're aligned with the overarching strategy.</p>
                     <div class="card-assignee">
@@ -7529,11 +7535,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7542,7 +7548,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--function-director"
                          data-step="6" tabindex="0" aria-label="Step 6">
                   <div class="step-badge">6</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Function leadership sync with Sub-functional leads to share the plan, brainstorm and work out initiatives and projects to drive the Sub-functional OKRs</p>
                     <div class="card-assignee">
@@ -7550,11 +7556,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7573,7 +7579,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--subfunctions"
                          data-step="2" tabindex="0" aria-label="Step 2">
                   <div class="step-badge">2</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Subfunction leads develop OKRs to meet numeric targets based off the business goals received by the Function leadership.</p>
                     <div class="card-assignee">
@@ -7581,11 +7587,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7594,7 +7600,7 @@ a.avatar:focus-visible {
                 <article class="step-card step-card--subfunctions"
                          data-step="3" tabindex="0" aria-label="Step 3">
                   <div class="step-badge">3</div>
-                  <div class="drag-handle"><i class="ph ph-dots-six-vertical"></i></div>
+                  <div class="drag-handle"><svg class="icon"><use href="#i-drag"/></svg></div>
                   <div class="card-content">
                     <p class="card-description">Sub-function teams develop localized targets and "how-to" plans that make biggest impact on the primary functional OKRs.</p>
                     <div class="card-assignee">
@@ -7602,11 +7608,11 @@ a.avatar:focus-visible {
                       <span class="card-assignee-name">Adan Jones</span>
                     </div>
                     <div class="card-details">
-                      <span class="card-detail-item"><i class="ph ph-arrows-left-right"></i></span>
-                      <span class="card-detail-item"><i class="ph ph-calendar-blank"></i>&nbsp;9</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-left"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-arrow-fat-right"></i>&nbsp;6</span>
-                      <span class="card-detail-item"><i class="ph ph-user"></i>&nbsp;8</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-transfer"/></svg></span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-calendar-blank"/></svg>&nbsp;9</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-left"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-arrow-long-right"/></svg>&nbsp;6</span>
+                      <span class="card-detail-item"><svg class="icon"><use href="#i-user"/></svg>&nbsp;8</span>
                     </div>
                   </div>
                 </article>
@@ -7625,7 +7631,7 @@ a.avatar:focus-visible {
       <div id="panel-meeting-grid" class="tab-panel" role="tabpanel"
            aria-labelledby="tab-meeting-grid" hidden>
         <div class="placeholder-view">
-          <i class="ph ph-calendar-blank"></i>
+          <svg class="icon"><use href="#i-calendar-blank"/></svg>
           <p>Meeting Grid view — coming soon</p>
         </div>
       </div>
@@ -7634,7 +7640,7 @@ a.avatar:focus-visible {
       <div id="panel-calendar" class="tab-panel" role="tabpanel"
            aria-labelledby="tab-calendar" hidden>
         <div class="placeholder-view">
-          <i class="ph ph-calendar"></i>
+          <svg class="icon"><use href="#i-calendar"/></svg>
           <p>Calendar view — coming soon</p>
         </div>
       </div>
@@ -7662,7 +7668,7 @@ a.avatar:focus-visible {
           </div>
         </div>
         <button class="dp-close" id="drawer-close" type="button" aria-label="Close">
-          <i class="ph ph-x"></i>
+          <svg class="icon"><use href="#i-x"/></svg>
         </button>
       </div>
 
@@ -7784,7 +7790,7 @@ a.avatar:focus-visible {
       <div class="modal-header">
         <h2 class="h3" style="margin:0">Generate Schedule</h2>
         <button class="modal-close" type="button" data-modal-close aria-label="Close">
-          <i class="ph ph-x"></i>
+          <svg class="icon"><use href="#i-x"/></svg>
         </button>
       </div>
       <div class="modal-body">
@@ -7856,6 +7862,18 @@ a.avatar:focus-visible {
       <symbol id="i-x" viewBox="0 0 16 16">
         <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
       </symbol>
+    
+      <!-- from designmd/icons.svg -->
+      <symbol id="i-arrow-long-left" viewBox="0 0 24 24"><path d="M8.5 6.79291L9.20711 7.50001L4.70711 12H21V13H4.70711L9.20711 17.5L8.5 18.2071L2.79289 12.5L8.5 6.79291Z" fill="currentColor"/></symbol>
+      <symbol id="i-arrow-long-right" viewBox="0 0 24 24"><path d="M14.7929 7.50001L19.2929 12H3V13H19.2929L14.7929 17.5L15.5 18.2071L21.2071 12.5L15.5 6.79291L14.7929 7.50001Z" fill="currentColor"/></symbol>
+      <symbol id="i-calendar-blank" viewBox="0 0 24 24"><use href="#i-calendar"/></symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24"><use href="#i-check"/></symbol>
+      <symbol id="i-drag" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 4C6.55228 4 7 3.55228 7 3C7 2.44772 6.55228 2 6 2C5.44772 2 5 2.44772 5 3C5 3.55228 5.44772 4 6 4ZM6 10C6.55228 10 7 9.55228 7 9C7 8.44772 6.55228 8 6 8C5.44772 8 5 8.44772 5 9C5 9.55228 5.44772 10 6 10ZM7 15C7 15.5523 6.55228 16 6 16C5.44772 16 5 15.5523 5 15C5 14.4477 5.44772 14 6 14C6.55228 14 7 14.4477 7 15ZM6 22C6.55228 22 7 21.5523 7 21C7 20.4477 6.55228 20 6 20C5.44772 20 5 20.4477 5 21C5 21.5523 5.44772 22 6 22ZM13 3C13 3.55228 12.5523 4 12 4C11.4477 4 11 3.55228 11 3C11 2.44772 11.4477 2 12 2C12.5523 2 13 2.44772 13 3ZM12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10ZM13 15C13 15.5523 12.5523 16 12 16C11.4477 16 11 15.5523 11 15C11 14.4477 11.4477 14 12 14C12.5523 14 13 14.4477 13 15ZM12 22C12.5523 22 13 21.5523 13 21C13 20.4477 12.5523 20 12 20C11.4477 20 11 20.4477 11 21C11 21.5523 11.4477 22 12 22ZM19 3C19 3.55228 18.5523 4 18 4C17.4477 4 17 3.55228 17 3C17 2.44772 17.4477 2 18 2C18.5523 2 19 2.44772 19 3ZM18 10C18.5523 10 19 9.55228 19 9C19 8.44772 18.5523 8 18 8C17.4477 8 17 8.44772 17 9C17 9.55228 17.4477 10 18 10ZM19 15C19 15.5523 18.5523 16 18 16C17.4477 16 17 15.5523 17 15C17 14.4477 17.4477 14 18 14C18.5523 14 19 14.4477 19 15ZM18 22C18.5523 22 19 21.5523 19 21C19 20.4477 18.5523 20 18 20C17.4477 20 17 20.4477 17 21C17 21.5523 17.4477 22 18 22Z" fill="currentColor"/></symbol>
+      <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M16.5 4.79291L15.7929 5.50001L19.293 9.00001H2V10H21.7071L16.5 4.79291Z" fill="currentColor"/> <path d="M22 15V14H2.29289L7.5 19.2071L8.20711 18.5L4.707 15H22Z" fill="currentColor"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.765 14.4327C17.2559 13.3606 19 10.884 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 10.884 6.74405 13.3606 9.23499 14.4327C5.61721 15.5994 3 18.9941 3 23H4C4 18.5817 7.58172 15 12 15C16.4183 15 20 18.5817 20 23H21C21 18.9941 18.3828 15.5994 14.765 14.4327ZM12 14C8.68629 14 6 11.3137 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14Z" fill="currentColor"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M11 0H12V2.01446C16.4617 2.27327 20 5.97343 20 10.5V18C20 18.5523 20.4477 19 21 19V20H2V19C2.55228 19 3 18.5523 3 18V10.5C3 5.97343 6.53831 2.27327 11 2.01446V0ZM4 10.5C4 6.35786 7.35786 3 11.5 3C15.6421 3 19 6.35786 19 10.5V18C19 18.3643 19.0974 18.7058 19.2676 19H3.73244C3.90261 18.7058 4 18.3643 4 18V10.5ZM11.5 24C10.1193 24 9 22.8807 9 21.5V21H10V21.5C10 22.3284 10.6716 23 11.5 23C12.3284 23 13 22.3284 13 21.5V21H14V21.5C14 22.8807 12.8807 24 11.5 24Z" fill="currentColor"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 18.2998L21.5 4.2998L22.2071 5.00691L8.20711 19.0069L7.5 19.714L6.79289 19.0069L1.79289 14.0069L2.5 13.2998L7.5 18.2998Z" fill="currentColor"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><rect x="4" y="10.75" width="16" height="2.5" rx="1.25" fill="currentColor"/></symbol>
     </defs>
   </svg>
 
@@ -7910,7 +7928,7 @@ a.avatar:focus-visible {
     function toast(msg, ms = 3000) {
       const el = Object.assign(document.createElement('div'), {
         className: 'toast',
-        innerHTML: `<i class="ph ph-check-circle"></i> ${msg}`,
+        innerHTML: `<svg class="icon"><use href="#i-check-circle"/></svg> ${msg}`,
       });
       document.getElementById('toasts').appendChild(el);
       setTimeout(() => el.remove(), ms);
