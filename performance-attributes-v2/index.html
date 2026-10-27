@@ -3827,6 +3827,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* GAP: .sidenav paints a fixed gray-100, so it stays light in the dark theme. */
     [data-theme="dark"] .sidenav { background: var(--color-surface); }
     [data-theme="dark"] .sidenav-item:hover, [data-theme="dark"] .sidenav-item.is-active { background: var(--color-surface-muted); }
+    /* GAP: .toast-success keeps its green-100 fill in the dark theme, so its text disappears. */
+    [data-theme="dark"] .toast-success { background: var(--color-surface); }
 
     /* Top bar: business-line switcher and the account dot (GAP: no business-line switcher, no notification dot) */
     .pa-brand { display: flex; align-items: center; gap: var(--spacing-4); }
