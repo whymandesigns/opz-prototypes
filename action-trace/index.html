@@ -815,7 +815,9 @@ const ANN_COUNTS = [3, 1, 0, 2, 0, 4, 1, 0];
   feedback:'',
 })));
 const nowLabel = () => { const d = new Date(); return `${d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
-const annTip = a => `<div>${esc(a.text)}</div><div class="tm">${esc(a.by ? P[a.by].n : 'You')} · ${esc(a.at || 'just now')}</div>`;
+// Tooltip: the note, then who left it and the stretch of the recording it covers (the 10 s before its marker).
+const annSpan = (a, rec) => { const end = a.t * rec.dur; return `${hms(Math.max(0, end - 10))} – ${hms(end)}`; };
+const annTip = (a, rec) => `<div>${esc(a.text)}</div><div class="tm">${esc(a.by ? P[a.by].n : 'You')} · ${annSpan(a, rec)}</div>`;
 
 const INITIATIVES = [
   ['Supplier Invoice Management','Execution','John Appleseed','Principal AI Expert'],
@@ -1571,7 +1573,7 @@ function goFlow(n) {
   if (n === 1.5) { openAssign('create'); $('#c-connections')?.scrollIntoView({block:'start'}); }
   if (n === 5) play();
   if (n === 6) { S.rec.hoverSeg = 2; render(); const sg = segs(rec)[2]; showTip(`Step ${sg.idx}: ${cap(sg.n)}`, (sg.a + sg.b) / 2); S.rec.hoverSeg = null; }
-  if (n === 7) { S.rec.hoverMarker = 2; render(); showTip(annTip(rec.anns[2]), rec.anns[2].t, 'anntip'); S.rec.hoverMarker = null; }
+  if (n === 7) { S.rec.hoverMarker = 2; render(); showTip(annTip(rec.anns[2], rec), rec.anns[2].t, 'anntip'); S.rec.hoverMarker = null; }
   if (n === 9) { const b = $('#recBody'); if (b) b.scrollTop = 140; }
 }
 
@@ -1790,7 +1792,7 @@ document.addEventListener('mousemove', e => {
   if (S.rec && curRec() && tl) {
     const rec = curRec(); const mk = e.target.closest('[data-marker]');
     document.querySelectorAll('.timeline .seg').forEach(s => s.classList.remove('hov'));
-    if (mk) { const a = rec.anns[Number(mk.dataset.marker)]; showTip(annTip(a), a.t, 'anntip'); return; }
+    if (mk) { const a = rec.anns[Number(mk.dataset.marker)]; showTip(annTip(a, rec), a.t, 'anntip'); return; }
     const rect = tl.getBoundingClientRect(); const p = (e.clientX - rect.left) / rect.width;
     if (e.clientY - rect.top < 18) { hideTip(); return; }
     const sg = segs(rec); const i = sg.findIndex(s => p >= s.a && p < s.b);
