@@ -235,6 +235,9 @@
   .deck-mini .pager{padding-top:1.2em;}
   .deck-mini .wm{right:1.6em;bottom:1.4em;}
   .tip{position:absolute;z-index:40;background:#262d3d;color:#fff;font-size:13px;line-height:18px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;transform:translateX(-50%);}
+  /* Annotation tooltip: the note, then who left it and when */
+  .tip.anntip{white-space:normal;width:max-content;max-width:280px;padding:5px 10px 6px;}
+  .tip.anntip .tm{font-size:11px;line-height:14px;color:#b8c0d0;margin-top:2px;}
   .tip.sm{font-size:9px;line-height:12px;padding:2px 6px;}
 
   /* ───────── Recordings modal ───────── */
@@ -259,11 +262,20 @@
   .rec-right{flex:1;min-width:0;}
   .player{position:relative;width:800px;height:520px;border-radius:6px;overflow:hidden;background:var(--navy-800);}
   .player .empty{position:absolute;inset:0 0 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;font-size:14px;}
+  /* No recording picked: a light gray panel the full height of the modal, dark gray prompt and icon */
+  .rec-left.idle{display:flex;flex-direction:column;}
+  .player.idle{flex:1;height:auto;min-height:520px;background:var(--gray-100);}
+  .player.idle .empty{color:var(--graphite-700);}
   .player .empty img{width:48px;height:48px;opacity:.3;margin-top:24px;filter:grayscale(1) brightness(2);}
   .player .frame{position:absolute;left:0;top:0;width:800px;height:481px;background:#000;overflow:hidden;}
   .player .frame img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:30% 40%;}
   .player .frame .dim{position:absolute;inset:0;background:rgba(38,45,61,.5);transition:opacity .3s;}
   .player.playing .frame .dim{opacity:.15;}
+  /* Loading the recording: neutral dark frame with a spinner, instead of the dimmed first frame */
+  .player .frame .loading{position:absolute;inset:0;background:#15181f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;font-size:13px;}
+  .spinner{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.22);border-top-color:#fff;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .meta .ic{display:inline-flex;align-items:center;gap:4px;}
   .timeline{position:absolute;left:16px;right:32px;top:440px;height:40px;cursor:pointer;}
   .timeline .track{position:absolute;left:0;right:0;top:26px;height:4px;border-radius:100px;background:#9ea6b2;}
   .timeline .seg{position:absolute;top:24px;height:8px;}
@@ -312,10 +324,19 @@
   .rlist td{padding:6px 8px;vertical-align:top;color:var(--graphite-700);cursor:pointer;}
   .rlist td b{display:block;color:var(--graphite-900);font-weight:600;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .rlist td .ell{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
-  .rlist tr:hover td{background:var(--gray-100);}
-  .rlist tr.sel td{background:var(--blue-100);}
+  .rlist tbody:hover td{background:var(--gray-100);}
+  .rlist tbody.sel td{background:var(--blue-100);}
+  .rlist tbody td{padding-bottom:2px;}
+  .rlist tbody tr.sub td{padding-top:0;padding-bottom:8px;}
   .rlist .rv{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:4px;vertical-align:middle;}
   .rlist-wrap{position:sticky;top:0;}
+  /* Per-recording counters on their own line: annotations (blue when there are any) and views */
+  .rlist td.cnts{white-space:nowrap;}
+  .rlist .cnt{display:inline-flex;align-items:center;gap:3px;color:var(--graphite-700);}
+  .rlist .cnt + .cnt{margin-left:12px;}
+  .rlist td:nth-child(2){white-space:nowrap;}
+  .rlist .cnt.on{color:var(--blue);font-weight:600;}
+  .rlist .cnt.off{color:var(--gray-500);}
   .none-msg{padding:24px 8px;color:var(--gray-600);font-size:13px;}
 
   .ann{position:absolute;z-index:35;width:320px;background:#fff;border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.25);padding:16px;}
@@ -779,14 +800,22 @@ const WORKERS = {
 };
 const DUR = {james:[15,17,21,19,22,32,14,18,17,12,18,22,41,32,22,19,17,14,27], emily:[24,16,29,18,21,33,15,20,26]};
 const RECORDINGS = [];
+// Annotations carry who left them and when; recordings get 0–4 of these samples so the list shows the spread.
+const ANN_SAMPLES = [
+  {t:.16, text:'Worker paused to look up the PO number', by:'john', at:'May 12, 2026 · 10:14'},
+  {t:.25, text:'Worker re-entered the vendor ID twice', by:'emily', at:'May 12, 2026 · 11:02'},
+  {t:.335, text:'Worker skipped step 2', by:'john', at:'May 13, 2026 · 09:40'},
+  {t:.62, text:'Approval sent back for a missing cost center', by:'james', at:'May 13, 2026 · 15:27'},
+];
+const ANN_COUNTS = [3, 1, 0, 2, 0, 4, 1, 0];
 ['james','emily'].forEach(m => WORKERS[m].forEach((w, i) => RECORDINGS.push({
   id:`${m}-${i}`, worker:w, mgr:m, date:'May 11, 2026', dur:DUR[m][i],
-  anns:[
-    {t:.16, text:'Worker paused to look up the PO number'},
-    {t:.25, text:'Worker re-entered the vendor ID twice'},
-    {t:.335, text:'Worker skipped step 2'},
-  ], feedback:'',
+  anns:ANN_SAMPLES.slice(0, ANN_COUNTS[i % ANN_COUNTS.length]).map(a => ({...a})),
+  views:2 + ((i * 7 + m.length) % 23),
+  feedback:'',
 })));
+const nowLabel = () => { const d = new Date(); return `${d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const annTip = a => `<div>${esc(a.text)}</div><div class="tm">${esc(a.by ? P[a.by].n : 'You')} · ${esc(a.at || 'just now')}</div>`;
 
 const INITIATIVES = [
   ['Supplier Invoice Management','Execution','John Appleseed','Principal AI Expert'],
@@ -1329,12 +1358,13 @@ function renderRec() {
         <div><label>To</label><label class="field" style="height:40px">${ic.cal(18)}<input type="date" value="${r.to}" data-rf="to" /></label></div>
       </div></div>
     <div class="rec-body" id="recBody">
-      <div class="rec-left">
-        ${rec ? playerHTML(rec) : `<div class="player"><div class="empty">${ic.recDoc(32)}<span>Select Recording to Play</span><svg viewBox="2.9 3 6.2 6" width="52" height="50" fill="#fff" style="opacity:.22;margin-top:24px"><path d="M4.38182 8.94546H2.94546L5.21818 3.05455H6.46699L5.12193 6.85455H6.92727L6.42471 5.56364H7.71562L9.05455 8.94546H7.61818L7.25455 7.94546H4.73578L4.38182 8.94546Z"/></svg></div></div><div style="height:308px;background:var(--gray-100);margin-top:0"></div>`}
+      <div class="rec-left ${rec ? '' : 'idle'}">
+        ${rec ? playerHTML(rec) : `<div class="player idle"><div class="empty">${ic.recDoc(32)}<span>Select Recording to Play</span><svg viewBox="2.9 3 6.2 6" width="52" height="50" fill="currentColor" style="opacity:.22;margin-top:24px"><path d="M4.38182 8.94546H2.94546L5.21818 3.05455H6.46699L5.12193 6.85455H6.92727L6.42471 5.56364H7.71562L9.05455 8.94546H7.61818L7.25455 7.94546H4.73578L4.38182 8.94546Z"/></svg></div></div>`}
       </div>
       <div class="rec-right"><div class="rlist-wrap">
         <table class="rlist"><thead><tr><th>Worker /<br>Manager</th><th>Recorder at /<br>Duration</th><th>Steps Covered</th></tr></thead>
-        <tbody>${list.map(x => `<tr class="${x.id === r.sel ? 'sel' : ''}" data-rec="${x.id}"><td><b>${esc(x.worker)}${x.feedback ? '<span class="rv" title="Feedback added"></span>' : ''}</b>${mgrNameOf(recMgr(x))}</td><td>${x.date}<br>(0m ${x.dur}s)</td><td><span class="ell">${steps.filter(s => r.steps.includes(s.id)).map(s => cap(s.n)).join(', ')}</span></td></tr>`).join('')}</tbody></table>
+        ${list.map(x => `<tbody class="${x.id === r.sel ? 'sel' : ''}" data-rec="${x.id}"><tr><td><b>${esc(x.worker)}${x.feedback ? '<span class="rv" title="Feedback added"></span>' : ''}</b>${mgrNameOf(recMgr(x))}</td><td>${x.date}<br>(0m ${x.dur}s)</td><td><span class="ell">${steps.filter(s => r.steps.includes(s.id)).map(s => cap(s.n)).join(', ')}</span></td></tr>
+          <tr class="sub"><td colspan="3" class="cnts"><span class="cnt ${x.anns.length ? 'on' : 'off'}" title="${x.anns.length} annotation${x.anns.length === 1 ? '' : 's'}">${ic.comment(12)}${x.anns.length ? `${x.anns.length} annotation${x.anns.length === 1 ? '' : 's'}` : 'No annotations'}</span><span class="cnt" title="${x.views} views">${ic.eye(12)}${x.views} view${x.views === 1 ? '' : 's'}</span></td></tr></tbody>`).join('')}</table>
         ${list.length ? '' : '<div class="none-msg">No recordings match these filters.</div>'}
       </div></div>
     </div></div>`;
@@ -1344,7 +1374,7 @@ function playerHTML(rec) {
   const cur = sg.find(s => p >= s.a && p < s.b) || sg[sg.length - 1];
   const ticks = [.053, .118, .238, .339, .437, .568, .71, .83, .93];
   return `<div class="player ${r.playing ? 'playing' : ''}" id="player">
-      <div class="frame"><img src="assets/recording-frame.png" alt="Recording of ${esc(rec.worker)}" id="frameImg" /><div class="dim"></div></div>
+      <div class="frame"><img src="assets/recording-frame.png" alt="Recording of ${esc(rec.worker)}" id="frameImg" />${r.loading ? `<div class="loading"><div class="spinner"></div><span>Loading recording…</span></div>` : '<div class="dim"></div>'}</div>
       <div class="timeline" id="timeline">
         <div class="track"></div>
         <div class="played" id="played" style="width:${p * 100}%"></div>
@@ -1355,13 +1385,13 @@ function playerHTML(rec) {
         <div class="head" id="phead" style="left:${p * 100}%"></div>
         <div id="tlTip"></div>
       </div>
-      <div class="ctrl"><button class="pp" data-act="pp" aria-label="${r.playing ? 'Pause' : 'Play'}">${r.playing ? ic.pause(14) : ic.playFill(14)}</button>
+      <div class="ctrl"><button class="pp" data-act="pp" aria-label="${r.playing ? 'Pause' : 'Play'}" ${r.loading ? 'disabled' : ''}>${r.playing ? ic.pause(14) : ic.playFill(14)}</button>
         <span class="time" id="ptime">${hms(r.t)} / ${hms(rec.dur)}</span><span class="grow"></span>
         <button class="add-ann" data-act="add-ann" ${r.ann ? 'disabled' : ''}>${ic.plus(14)}Add Annotation</button>
         <button class="sp" data-act="speed">${r.speed}×</button><button class="fsb" data-act="fs">${ic.fullscreen(20)}</button></div>
       ${r.ann ? annHTML(rec) : ''}
     </div>
-    <div class="meta">Worker: <b>${esc(rec.worker)}</b><span class="vs"></span>Manager: <b>${mgrNameOf(recMgr(rec))}</b><span class="vs"></span>Recorded at: <b>${rec.date}</b></div>
+    <div class="meta">Worker: <b>${esc(rec.worker)}</b><span class="vs"></span>Manager: <b>${mgrNameOf(recMgr(rec))}</b><span class="vs"></span>Recorded at: <b>${rec.date}</b><span class="vs"></span><span class="ic" title="Views">${ic.eye(14)}<b>${rec.views}</b> views</span><span class="vs"></span><span class="ic" title="Annotations">${ic.comment(14)}<b>${rec.anns.length}</b> annotation${rec.anns.length === 1 ? '' : 's'}</span></div>
     <div class="stepbar ${sg.length > 3 ? 'many' : ''}" id="stepbar">${sg.map((s, i) => `${i ? '<span class="ln"></span>' : ''}<div class="stepcard ${s === cur ? 'cur' : ''}" data-stepcard="${i}"><span class="badge">Current Step</span><span class="n"><b>${cap(s.n)}</b> Step</span><span class="s">${s.sys}</span></div>`).join('')}</div>
     <div class="fb-label">Summary Feedback</div>
     <div class="rte">${rteToolbar()}<div class="ed" id="fbEd" contenteditable="true" data-placeholder="Specify your summary feedback" style="min-height:124px">${rec.feedback}</div></div>`;
@@ -1495,7 +1525,7 @@ function hideInitDeck() { $('#pops [data-pop=init]')?.remove(); }
 
 function showTip(html, xPct, cls = '') {
   const t = $('#tlTip'); if (!t) return;
-  t.innerHTML = `<div class="tip ${cls}" style="left:${xPct * 100}%;top:-30px">${html}</div>`;
+  t.innerHTML = `<div class="tip ${cls}" style="left:${xPct * 100}%;top:${cls === 'anntip' ? -52 : -30}px">${html}</div>`;
 }
 function hideTip() { const t = $('#tlTip'); if (t) t.innerHTML = ''; }
 
@@ -1541,7 +1571,7 @@ function goFlow(n) {
   if (n === 1.5) { openAssign('create'); $('#c-connections')?.scrollIntoView({block:'start'}); }
   if (n === 5) play();
   if (n === 6) { S.rec.hoverSeg = 2; render(); const sg = segs(rec)[2]; showTip(`Step ${sg.idx}: ${cap(sg.n)}`, (sg.a + sg.b) / 2); S.rec.hoverSeg = null; }
-  if (n === 7) { S.rec.hoverMarker = 2; render(); showTip(rec.anns[2].text, rec.anns[2].t); S.rec.hoverMarker = null; }
+  if (n === 7) { S.rec.hoverMarker = 2; render(); showTip(annTip(rec.anns[2]), rec.anns[2].t, 'anntip'); S.rec.hoverMarker = null; }
   if (n === 9) { const b = $('#recBody'); if (b) b.scrollTop = 140; }
 }
 
@@ -1670,7 +1700,12 @@ document.addEventListener('click', e => {
     if (d.fpick === 'worker') { const all = RECORDINGS.filter(x => r.mgrs.includes(recMgr(x))).map(x => x.id); let cur = r.workers || all; cur = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]; r.workers = cur.length === all.length ? null : cur; }
     if (d.fpick === 'steps') { r.steps = r.steps.includes(v) ? (r.steps.length > 1 ? r.steps.filter(x => x !== v) : r.steps) : [...r.steps, v]; }
     r.openFilter = d.fpick; render(); return; }
-  if (d.rec) { const r = S.rec; if (r.sel !== d.rec) { r.sel = d.rec; r.t = 0; r.ann = null; } S.flowStep = 5; play(); return; }
+  if (d.rec) { const r = S.rec; S.flowStep = 5;
+    if (r.sel === d.rec) { play(); return; }
+    const x = RECORDINGS.find(z => z.id === d.rec); if (!x.viewed) { x.viewed = true; x.views++; }   // one view per session
+    r.sel = d.rec; r.t = 0; r.ann = null; r.playing = false; r.loading = true; render();
+    setTimeout(() => { if (S.rec && S.rec.sel === d.rec && S.rec.loading) { S.rec.loading = false; play(); } }, 1100);
+    return; }
   if (d.marker != null) { const rec = curRec(); const a = rec.anns[Number(d.marker)]; S.rec.playing = false; const at = a.t * rec.dur;
     S.rec.ann = {idx:Number(d.marker), start:Math.max(0, at - 10), end:at, text:a.text}; render(); return; }
   if (d.stepcard != null) { const rec = curRec(); const s = segs(rec)[Number(d.stepcard)]; S.rec.t = s.a * rec.dur + .01; tickUI(); return; }
@@ -1720,7 +1755,7 @@ document.addEventListener('click', e => {
     case 'ann-save': {
       const r = S.rec; const rec = curRec(); const a = r.ann; const text = $('#annText').value.trim() || 'Annotation';
       const t = Math.min(1, Math.max(0, a.end / rec.dur));
-      if (a.idx == null) rec.anns.push({t, text}); else Object.assign(rec.anns[a.idx], {t, text});
+      if (a.idx == null) rec.anns.push({t, text, by:OWNER, at:nowLabel()}); else Object.assign(rec.anns[a.idx], {t, text});
       rec.anns.sort((x, y) => x.t - y.t); r.ann = null; render(); break;
     }
   }
@@ -1755,7 +1790,7 @@ document.addEventListener('mousemove', e => {
   if (S.rec && curRec() && tl) {
     const rec = curRec(); const mk = e.target.closest('[data-marker]');
     document.querySelectorAll('.timeline .seg').forEach(s => s.classList.remove('hov'));
-    if (mk) { const a = rec.anns[Number(mk.dataset.marker)]; showTip(esc(a.text), a.t); return; }
+    if (mk) { const a = rec.anns[Number(mk.dataset.marker)]; showTip(annTip(a), a.t, 'anntip'); return; }
     const rect = tl.getBoundingClientRect(); const p = (e.clientX - rect.left) / rect.width;
     if (e.clientY - rect.top < 18) { hideTip(); return; }
     const sg = segs(rec); const i = sg.findIndex(s => p >= s.a && p < s.b);
