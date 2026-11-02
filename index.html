@@ -2625,6 +2625,31 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       background: var(--color-surface-muted);
     }
     .card-meta { padding: var(--ic-space-4); }
+    /* Group cards (a folder of prototypes): the members' own thumbnails tucked
+       into a folder, so the card reads as a collection, not one screen. */
+    .thumb-folder { position: relative; overflow: hidden; }
+    .thumb-folder-back, .thumb-folder-tab, .thumb-folder-front { position: absolute; background: var(--color-surface); border: 1px solid var(--color-border-strong); }
+    .thumb-folder-back { inset: 14% 10% 8% 10%; border-radius: var(--ic-radius-md, 8px); }
+    .thumb-folder-tab { top: calc(14% - 12px); left: 10%; width: 26%; height: 14px; border-bottom: 0; border-radius: var(--ic-radius-md, 8px) var(--ic-radius-md, 8px) 0 0; }
+    .thumb-folder img {
+      position: absolute; top: 19%; left: 24%; width: 52%; aspect-ratio: 1280 / 800; object-fit: cover; object-position: top;
+      border: 1px solid var(--color-border); border-radius: var(--ic-radius-sm, 4px); box-shadow: var(--ic-shadow-md, 0 4px 12px rgba(0,0,0,.12));
+      background: var(--color-surface-muted);
+      transition: transform var(--ic-duration-base, .2s) var(--ic-ease, ease);
+    }
+    .thumb-folder img:nth-of-type(1) { transform: translate(-30%, 6%) rotate(-7deg); }
+    .thumb-folder img:nth-of-type(2) { transform: translate(0, -4%); }
+    .thumb-folder img:nth-of-type(3) { transform: translate(30%, 6%) rotate(7deg); }
+    a.card:hover .thumb-folder img:nth-of-type(1) { transform: translate(-36%, 0) rotate(-9deg); }
+    a.card:hover .thumb-folder img:nth-of-type(2) { transform: translate(0, -12%); }
+    a.card:hover .thumb-folder img:nth-of-type(3) { transform: translate(36%, 0) rotate(9deg); }
+    @media (prefers-reduced-motion: reduce) { .thumb-folder img { transition: none; } }
+    .thumb-folder-front {
+      left: 10%; right: 10%; bottom: 8%; height: 28%; border-radius: var(--ic-radius-md, 8px);
+      display: flex; align-items: flex-end; padding: var(--ic-space-3);
+      box-shadow: 0 -2px 8px rgba(25, 30, 40, .06);
+    }
+    .thumb-folder-count { font: var(--type-body-sm); font-weight: var(--ic-weight-semibold, 600); color: var(--color-text-muted); }
     .arrow { float: right; color: var(--color-text-subtle); }
     .folder { display: none; }
     .updated { font: var(--type-body-sm); color: var(--color-text-subtle); display: block; margin-top: var(--ic-space-2); }
@@ -2658,12 +2683,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
          Refresh thumbnails with headless Chrome:
          chrome --headless --window-size=1280,800 --screenshot=_thumbs/<name>.png http://localhost:4173/features/<name>/ -->
     <section class="links" id="feature-list">
-      <a class="card" href="./planning-voyage/">
-        <img class="thumb" src="./_thumbs/planning-voyage.png" alt="Planning Voyage screenshot" loading="lazy" />
+      <a class="card" href="./experiments/">
+        <div class="thumb thumb-folder" aria-hidden="true">
+          <span class="thumb-folder-tab"></span><span class="thumb-folder-back"></span>
+          <img src="./_thumbs/spotlight.png" alt="" loading="lazy" />
+          <img src="./_thumbs/planning-voyage.png" alt="" loading="lazy" />
+          <img src="./_thumbs/loaders.png" alt="" loading="lazy" />
+          <span class="thumb-folder-front"><span class="thumb-folder-count">3 prototypes</span></span>
+        </div>
         <div class="card-meta">
-          <h3 class="card-title">Planning Voyage <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">The Workflow setup flow (planning cycles) rebuilt as a sea expedition: steps are islands on a chart, the crew are the owners, the intensity knob is the wind, the meeting grid is the ship's log. <code>?states=1</code> for the state switcher.</p>
-          <span class="folder">planning-voyage/</span>
+          <h3 class="card-title">Experiments <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Explorations outside the roadmap: Spotlight, Loaders and Planning Voyage.</p>
+          <span class="folder">experiments/</span>
         </div>
       </a>
       <!-- The respond-via-menu flow is the prototype's default now, so no hash
@@ -2696,15 +2727,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="folder">admin-toc/</span>
         </div>
       </a>
-      <a class="card" href="./api-token-management/">
-        <img class="thumb" src="./_thumbs/api-token-management.png" alt="API token management screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">API token management <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Create, scope and revoke API tokens.</p>
-          <span class="folder">api-token-management/</span>
-        </div>
-      </a>
-
       <a class="card" href="./csv-export/">
         <img class="thumb" src="./_thumbs/csv-export.png" alt="CSV / XLSX import screenshot" loading="lazy" />
         <div class="card-meta">
@@ -2722,19 +2744,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </a>
       <a class="card" href="./integrations/">
-        <img class="thumb" src="./_thumbs/integrations-v3.png" alt="Integrations screenshot" loading="lazy" />
+        <div class="thumb thumb-folder" aria-hidden="true">
+          <span class="thumb-folder-tab"></span><span class="thumb-folder-back"></span>
+          <img src="./_thumbs/integrations-v3.png" alt="" loading="lazy" />
+          <img src="./_thumbs/api-token-management.png" alt="" loading="lazy" />
+          <img src="./_thumbs/integrations-v2.png" alt="" loading="lazy" />
+          <span class="thumb-folder-front"><span class="thumb-folder-count">4 prototypes</span></span>
+        </div>
         <div class="card-meta">
           <h3 class="card-title">Integrations <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Integrations list, connect flows and Admin Settings — all versions (v1 connectors, v2 Tableau streams, v3 Admin Settings + HireGlobal) with a version switcher.</p>
+          <p class="card-body">Integrations list, connect flows and Admin Settings: Connectors, Tableau streams, Admin Settings + HireGlobal, and API token management.</p>
           <span class="folder">integrations/</span>
-        </div>
-      </a>
-      <a class="card" href="./loaders/">
-        <img class="thumb" src="./_thumbs/loaders.png" alt="Loaders screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">Loaders <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Loading states and skeletons.</p>
-          <span class="folder">loaders/</span>
         </div>
       </a>
       <a class="card" href="./performance-reviews/">
@@ -2745,26 +2765,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="folder">performance-reviews/</span>
         </div>
       </a>
-      <a class="card" href="./spotlight/">
-        <img class="thumb" src="./_thumbs/spotlight.png" alt="Spotlight screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">Spotlight <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">Help docs and feature launches in a card that opens into a modal, with thumbnail, text, list and collapsed variants.</p>
-          <span class="folder">spotlight/</span>
-        </div>
-      </a>
       <a class="card" href="./workspaces/">
-        <img class="thumb" src="./_thumbs/workspaces.png" alt="Workspaces screenshot" loading="lazy" />
+        <img class="thumb" src="./_thumbs/workspaces.png" alt="Multi-tenants workspaces screenshot" loading="lazy" />
         <div class="card-meta">
-          <h3 class="card-title">Workspaces <span class="arrow">&rarr;</span></h3>
+          <h3 class="card-title">Multi-tenants workspaces <span class="arrow">&rarr;</span></h3>
           <p class="card-body">Kick-off screen picks a workspace, then the app opens on it — the topbar logo switches products and the brand follows, over the Initiatives list.</p>
           <span class="folder">workspaces/</span>
         </div>
       </a>
       <a class="card" href="./toptrack/">
-        <img class="thumb" src="./_thumbs/toptrack.png" alt="Toptrack screenshot" loading="lazy" />
+        <img class="thumb" src="./_thumbs/toptrack.png" alt="Initiatives: Toptrack screenshot" loading="lazy" />
         <div class="card-meta">
-          <h3 class="card-title">Toptrack <span class="arrow">&rarr;</span></h3>
+          <h3 class="card-title">Initiatives: Toptrack <span class="arrow">&rarr;</span></h3>
           <p class="card-body">Core Strategy vs. other initiatives dashboard — health, status and a filterable initiative tree.</p>
           <span class="folder">toptrack/</span>
         </div>
@@ -2778,9 +2790,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </a>
       <a class="card" href="./action-trace/">
-        <img class="thumb" src="./_thumbs/action-trace.png" alt="Action Trace screenshot" loading="lazy" />
+        <img class="thumb" src="./_thumbs/action-trace.png" alt="ROB: Action Trace screenshot" loading="lazy" />
         <div class="card-meta">
-          <h3 class="card-title">Action Trace <span class="arrow">&rarr;</span></h3>
+          <h3 class="card-title">ROB: Action Trace <span class="arrow">&rarr;</span></h3>
           <p class="card-body">Connect ActionTrace processes to an RoB meeting, then review worker recordings step by step with timeline annotations, summary feedback and the RACI sidebar.</p>
           <span class="folder">action-trace/</span>
         </div>
@@ -2794,19 +2806,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </a>
       <a class="card" href="./performance-attributes/">
-        <img class="thumb" src="./_thumbs/performance-attributes.png" alt="Performance Attributes screenshot" loading="lazy" />
+        <img class="thumb" src="./_thumbs/performance-attributes-v2.png" alt="Performance attributes screenshot" loading="lazy" />
         <div class="card-meta">
-          <h3 class="card-title">Performance Attributes <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">The eight performance attributes on the OKRs page, rebuilt on Icarus to compare with the code-component version &mdash; attribute list and detail, icons on objectives and key results, add / change / remove, filter, and all 18 states on one canvas (canvas.html).</p>
+          <h3 class="card-title">Performance attributes <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">OKR performance attributes (TOP-7764) &mdash; all versions (v1 Icarus rebuild, v2 master prompt) with a version switcher. Each version is a cut-off for engineering.</p>
           <span class="folder">performance-attributes/</span>
-        </div>
-      </a>
-      <a class="card" href="./performance-attributes-v2/">
-        <img class="thumb" src="./_thumbs/performance-attributes-v2.png" alt="Performance Attributes v2 screenshot" loading="lazy" />
-        <div class="card-meta">
-          <h3 class="card-title">Performance Attributes v2 <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">The same 18 states rebuilt from the Icarus master prompt &mdash; OKRs active in the sidenav, sprite icons at 16px, responsive down to phone width and a dark theme toggle in the top bar.</p>
-          <span class="folder">performance-attributes-v2/</span>
         </div>
       </a>
     </section>
@@ -2828,20 +2832,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           'rob/': '2026-07-10',
           'admin/': '2026-09-17',
           'admin-toc/': '2026-09-17',
-          'api-token-management/': '2026-07-06',
           'csv-export/': '2026-08-06',
           'empty-states/': '2026-09-23',
           'integrations/': '2026-10-20',
-          'loaders/': '2026-07-06',
           'performance-reviews/': '2026-08-19',
-          'spotlight/': '2026-09-23',
+          'experiments/': '2026-11-02',
           'toptrack/': '2026-09-25',
           'initiatives/': '2026-10-15',
           'workspaces/': '2026-10-01',
           'action-trace/': '2026-10-02',
           'meeting-grid/': '2026-10-20',
-          'performance-attributes/': '2026-10-27',
-          'performance-attributes-v2/': '2026-10-27'
+          'performance-attributes/': '2026-11-02'
         };
         function relTime(v) {
           if (!v) return '';

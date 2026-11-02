@@ -27,17 +27,7 @@
   .hidden{display:none !important;}
 
   /* ───────── App shell ───────── */
-  .topbar{height:56px;background:var(--graphite-800);display:flex;align-items:center;padding:0 32px;}
-  .brand{display:flex;align-items:center;gap:2px;color:#fff;font-size:21px;font-weight:600;letter-spacing:.1px;}
-  .brand img{width:20px;height:20px;filter:brightness(0) invert(1);opacity:.85;}
   .shell{display:flex;height:calc(100% - 56px);}
-  .leftbar{width:236px;flex-shrink:0;background:var(--gray-100);border-right:1px solid var(--gray-200);
-    padding:16px;display:flex;flex-direction:column;}
-  .leftbar .grow{flex:1;}
-  .nav-item{display:flex;align-items:center;gap:12px;height:38px;padding:8px 16px;border-radius:4px;color:var(--graphite-700);
-    font-size:14px;background:none;border:none;width:100%;text-align:left;}
-  .nav-item:hover{background:#e9eaee;}
-  .nav-item.active{background:var(--gray-200);color:var(--graphite-900);}
   .main{flex:1;min-width:0;overflow:auto;padding:24px 32px;}
 
   /* Initiatives list */
@@ -617,9 +607,9 @@
      Which deployment is this? Filled from /api/version: on Vercel that is the
      commit the deployment was built from, locally the checkout's HEAD. Solid
      dark pill so it reads on the topbar and on the full-screen layers alike;
-     sits left of the 48px close-button zone those layers use. Compact (SHA
+     sits left of the top bar's search + avatar (24 + 32 + 16 + 360 + 16 = 448px). Compact (SHA
      only) until hovered, then it shows branch + environment. */
-  .verbadge{position:fixed;top:14px;right:64px;z-index:1200;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;
+  .verbadge{position:fixed;top:14px;right:464px;z-index:1200;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;
     background:rgba(24,30,42,.92);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.85);font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
     text-decoration:none;letter-spacing:.01em;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:background .15s,color .15s;}
   .verbadge[hidden]{display:none;}
@@ -633,16 +623,399 @@
   .verbadge .dirty{color:#f5b74a;}
   .verbadge.is-copied{background:rgba(46,125,79,.95);color:#fff;}
 </style>
+<style>
+/* ───────── Top bar — designmd .topbar + .avatar ─────────
+   Copied verbatim from designmd/components.css, for the same reason as the
+   side nav below. Re-copy if the kit changes. */
+  /* designmd tokens the top bar reads, resolved to their values. Scoped to the
+     bar so the page's own variables are untouched. Only the wide bar is copied:
+     the page has min-width 1280, so the kit's collapsed (≤1024px) bar never applies. */
+  .topbar{
+    --color-graphite-800:#262D3D; --color-white:#FFFFFF;
+    --color-surface-muted:#F3F4F6; --color-text-muted:#5F636A; --color-border-focus:#204ECF;
+    --header-height:3.5rem; --spacing-2:0.5rem; --spacing-3:0.75rem; --spacing-4:1rem; --spacing-6:1.5rem;
+    --radius-sm:4px; --radius-full:9999px; --font-weight-semibold:600;
+    --text-sm:0.8125rem; --text-lg:1rem; --font-sans:var(--font);
+    --type-body:400 0.875rem/1.375rem var(--font);
+    --duration-fast:120ms; --ease:cubic-bezier(0.2, 0, 0, 1);
+  }
+/* ---------- Top bar ----------
+ * Dark application chrome. 56px tall, graphite-800 background.
+ * Brand on left, search in middle, avatar on right.
+ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-6);
+  height: var(--header-height);
+  padding: 0 var(--spacing-6);
+  background: var(--color-graphite-800);
+  color: var(--color-white);
+  /* Query container so the bar can collapse to a mobile layout based on its own
+   * width (works full-width in real use and inside the sized playground frame). */
+  container-type: inline-size;
+}
+/* Hamburger + page title + primary action — the collapsed mobile layout.
+ * The hamburger is the icon-button component (.btn.btn-icon-only.btn-ghost);
+ * this marker only controls when it shows (hidden on the wide bar, revealed by
+ * the container query below). */
+.topbar-menu { display: none; flex-shrink: 0; }
+.topbar-title {
+  display: none;
+  flex: 1; min-width: 0;
+  font: var(--font-weight-semibold) var(--text-lg)/1 var(--font-sans);
+  color: inherit;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.topbar-cta { display: none; flex-shrink: 0; }
+.topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  text-decoration: none;
+  color: inherit;
+  font: var(--font-weight-semibold) var(--text-lg)/1 var(--font-sans);
+  flex-shrink: 0;
+}
+.topbar-logo {
+  width: 20px; height: 20px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.topbar-brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex-shrink: 0;
+}
+
+.topbar-search {
+  position: relative;
+  width: 360px;
+}
+.topbar-search .search-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+.topbar-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--spacing-4) 0 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  font: var(--type-body);
+  transition: background var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease);
+}
+.topbar-search-input::placeholder { color: rgba(255, 255, 255, 0.55); }
+.topbar-search-input:hover { background: rgba(255, 255, 255, 0.12); }
+.topbar-search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
+/* The account button is the avatar component (.avatar.avatar-md) — it already
+ * covers the button reset, hover dim and focus ring. */
+.avatar {
+  --avatar-size: 32px;
+  --avatar-text: var(--text-sm);
+  --avatar-icon: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 0;
+  /* Chamfered bottom-left corner (Figma Avatar Core) — a 45° cut sized at 25%
+   * of the square, so it scales with every avatar size. */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 25% 100%, 0 75%);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font: var(--font-weight-semibold) var(--avatar-text)/1 var(--font-sans);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+}
+.avatar-md  { --avatar-size: 32px;  --avatar-text: var(--text-sm);  --avatar-icon: 16px; }
+button.avatar,
+a.avatar {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+button.avatar:hover,
+a.avatar:hover { filter: brightness(0.95); }
+button.avatar:focus-visible,
+a.avatar:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+</style>
+<style>
+/* ───────── Side nav — designmd .sidenav ─────────
+   Copied verbatim from designmd/components.css. This page is self-contained
+   and its own classes (.btn, .tag, .topbar, .drawer, .tabs…) collide with the
+   kit's, so the full stylesheet can't be linked. Re-copy if the kit changes. */
+  /* designmd tokens the sidenav reads, resolved to their values. Scoped to the
+     sidenav so the page's own variables and classes are untouched. */
+  .sidenav{
+    --color-gray-100:#F3F4F6; --color-gray-200:#EBECED; --color-border:var(--color-gray-200);
+    --color-surface:#FFFFFF; --color-surface-muted:var(--color-gray-100);
+    --color-text:#191E28; --color-text-muted:#5F636A;
+    --duration-base:200ms; --duration-fast:120ms; --ease:cubic-bezier(0.2, 0, 0, 1);
+    --font-weight-regular:400; --radius-full:9999px; --radius-sm:4px;
+    --shadow-1:0 0 8px 0 rgba(0,0,0, 0.08);
+    --spacing-2:0.5rem; --spacing-3:0.75rem; --spacing-4:1rem;
+    --type-body:400 0.875rem/1.375rem var(--font);
+    --type-body-sm:400 0.8125rem/1.25rem var(--font);
+    --z-sticky:200;
+  }
+/* ---------- Side navigation ----------
+ * Two states: expanded (236px) and compact (62px), toggled with `.is-compact`.
+ *
+ *   <aside class="sidenav">
+ *     <button class="sidenav-toggle" aria-label="Toggle">…chevron…</button>
+ *     <ul class="sidenav-list">
+ *       <li><a class="sidenav-item is-active" href="#">…icon… <span class="sidenav-item-label">Label</span></a></li>
+ *     </ul>
+ *     <div class="sidenav-spacer"></div>
+ *     <div class="sidenav-footer">…more items…</div>
+ *   </aside>
+ */
+.sidenav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 236px;
+  height: 100%;
+  padding: var(--spacing-3);
+  background: var(--color-gray-100);
+  border-right: 1px solid var(--color-border);
+  transition: width var(--duration-base) var(--ease);
+  flex-shrink: 0;
+}
+.sidenav.is-compact { width: 62px; }
+
+/* Panel header and search — the off-canvas layout's own chrome.
+ *
+ * Above 1024px the top bar carries the logo and the search field, so these
+ * would be a second copy of both; they are hidden and the ≤1024px block below
+ * reveals them. Keep them in the markup from the start, like .topbar-menu —
+ * they cost nothing until the panel exists. */
+.sidenav-head,
+.sidenav-search { display: none; }
+.sidenav-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.sidenav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: 36px;
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font: var(--type-body);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  width: 100%;
+  transition: background var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+.sidenav-item:hover {
+  background: var(--color-gray-200);
+}
+.sidenav-item.is-active {
+  background: var(--color-gray-200);
+  color: var(--color-text);
+  font-weight: var(--font-weight-regular);
+}
+.sidenav-item-icon {
+  /* Pinned rather than 1em: the icon should read a little larger than its
+   * 14px label. 16 is a size the pack is drawn at; 18 was not. */
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  /* fill:none so stroke-based icons (e.g. Initiatives) render as outlines
+   * instead of a solid black silhouette; filled icons carry their own
+   * fill="currentColor" on their paths and are unaffected. (NB-51) */
+  fill: none;
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast) var(--ease);
+}
+.sidenav-item.is-active .sidenav-item-icon { color: var(--color-text); }
+.sidenav-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transition: opacity var(--duration-fast) var(--ease);
+}
+.sidenav-item-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+/* Nested group — a parent item that expands to reveal child items. */
+.sidenav-group { display: contents; }
+.sidenav-group-trigger[aria-expanded="true"] .sidenav-item-chevron { transform: rotate(180deg); }
+.sidenav-sublist {
+  list-style: none;
+  margin: 0;
+  /* Indent so subitem labels line up with the parent label (icon + gap). */
+  padding: 0 0 0 calc(var(--spacing-2) + 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.sidenav-group-trigger[aria-expanded="false"] + .sidenav-sublist { display: none; }
+.sidenav-subitem {
+  height: 32px;
+  font: var(--type-body-sm);
+}
+
+/* Compact state — icon-only square buttons, labels hidden */
+.sidenav.is-compact .sidenav-item {
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+  margin: 0 auto;
+}
+.sidenav.is-compact .sidenav-item-label,
+.sidenav.is-compact .sidenav-item-chevron { display: none; }
+.sidenav.is-compact .sidenav-sublist { display: none; }
+
+.sidenav-spacer { flex: 1; }
+.sidenav-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--spacing-3);
+}
+
+/* Toggle button — floats over the right edge of the sidebar */
+.sidenav-toggle {
+  position: absolute;
+  top: var(--spacing-4);
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  z-index: var(--z-sticky);
+  box-shadow: var(--shadow-1);
+  transition: color var(--duration-fast) var(--ease),
+              background var(--duration-fast) var(--ease);
+}
+.sidenav-toggle:hover { color: var(--color-text); background: var(--color-surface-muted); }
+.sidenav-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--duration-base) var(--ease);
+}
+.sidenav.is-compact .sidenav-toggle svg { transform: rotate(180deg); }
+</style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><!-- designmd/icons.svg, the symbols the top bar and side nav use -->
+<symbol id="i-search" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8536 15.1465C17.1889 13.6451 18 11.6673 18 9.5C18 4.80558 14.1944 1 9.5 1C4.80558 1 1 4.80558 1 9.5C1 14.1944 4.80558 18 9.5 18C11.6673 18 13.6451 17.1889 15.1465 15.8536L21.5 22.2071L22.2071 21.5L15.8536 15.1465ZM9.5 17C5.35786 17 2 13.6421 2 9.5C2 5.35786 5.35786 2 9.5 2C13.6421 2 17 5.35786 17 9.5C17 13.6421 13.6421 17 9.5 17Z" fill="currentColor"/></symbol>
+<symbol id="i-cpu-2" viewBox="0 0 24 24"><g> <path d="M24 12C24 18.626 18.626 23.9998 12 24C7.82165 23.9999 4.14772 21.8595 2 18.627V21H1V17H5V18H2.7832C4.74625 21.0071 8.13954 22.9999 12 23C18.0737 22.9998 23 18.0737 23 12H24ZM14 19H13V17H11V19H10V17H7V14H5V13H7V11H5V10H7V7H10V5H11V7H13V5H14V7H17V10H19V11H17V13H19V14H17V17H14V19ZM8 16H16V8H8V16ZM12 0C16.1778 0 19.852 2.13933 22 5.37109V3H23V7H19V6H21.2168C19.2537 2.99279 15.8606 1 12 1C5.92614 1 1 5.92614 1 12H0C0 5.37386 5.37386 0 12 0Z" fill="currentColor"/> </g></symbol>
+<symbol id="i-initiatives" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M6.3666 12.783L11.8821 6.35912L11.8659 6.3429C14.218 3.6176 17.4949 1.89807 21.0313 1.50874C21.2285 1.4859 21.4284 1.50796 21.6159 1.57325C21.8034 1.63855 21.9738 1.7454 22.1142 1.88581C22.2546 2.02622 22.3615 2.19655 22.4267 2.38408C22.492 2.57161 22.5141 2.77147 22.4913 2.96872C22.0995 6.52606 20.3717 9.80196 17.6571 12.1341L11.2332 17.6496M11.3305 6.40778C6.3666 4.67203 1.5 7.91643 1.5 7.91643L6.3666 12.783L11.2332 17.6496M11.2332 17.6496L16.0998 22.5162C16.0998 22.5162 19.3442 17.6496 17.722 12.783M7.9888 19.2718C7.9888 19.2718 6.3666 20.894 3.1222 20.894C3.1222 17.6496 4.7444 16.0274 4.7444 16.0274" stroke="currentColor" stroke-miterlimit="10"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2H5V4H0V9V10V22H24V10V9V4H19V2H18V4H6V2ZM5 5V7H6V5H18V7H19V5H23V9H1V5H5ZM1 10V21H23V10H1Z" fill="currentColor"/></symbol>
+<symbol id="i-okr" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15ZM12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14Z" fill="currentColor"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M19 12C19 15.866 15.866 19 12 19C8.13401 19 5 15.866 5 12C5 8.13401 8.13401 5 12 5C15.866 5 19 8.13401 19 12ZM6 12C6 15.3137 8.68629 18 12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12Z" fill="currentColor"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12Z" fill="currentColor"/></symbol>
+<symbol id="i-participants" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.5719 13.4224C12.5987 12.4593 14 10.3933 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 10.3933 3.40127 12.4593 5.42812 13.4224C2.27153 14.4934 0 17.4814 0 21H1C1 17.134 4.13401 14 8 14C11.866 14 15 17.134 15 21H16C16 17.4814 13.7285 14.4934 10.5719 13.4224ZM8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3C10.7614 3 13 5.23858 13 8C13 10.7614 10.7614 13 8 13Z" fill="currentColor"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M16.9528 16.4371C16.6981 16.5515 16.4536 16.6872 16.2217 16.8424L16.778 17.6734C16.9956 17.5277 17.227 17.4037 17.469 17.3033C17.9498 17.1039 18.4672 17 19 17C21.2091 17 23 18.7909 23 21H24C24 18.9681 22.7879 17.2192 21.0474 16.437C22.2168 15.7389 23 14.4609 23 13C23 10.7909 21.2091 9 19 9C16.7909 9 15 10.7909 15 13C15 14.461 15.7833 15.739 16.9528 16.4371ZM19 16C17.3431 16 16 14.6569 16 13C16 11.3431 17.3431 10 19 10C20.6569 10 22 11.3431 22 13C22 14.6569 20.6569 16 19 16Z" fill="currentColor"/></symbol>
+<symbol id="i-org-unit" viewBox="0 0 24 24"><path d="M18.25 14.625C19.5617 14.625 20.625 15.6883 20.625 17C20.625 17.6931 20.3261 18.3148 19.8525 18.749C20.205 18.9227 20.5304 19.1535 20.8135 19.4365C21.4933 20.1163 21.875 21.0386 21.875 22H20.875C20.875 21.3038 20.5987 20.6358 20.1064 20.1436C19.6142 19.6513 18.9462 19.375 18.25 19.375C17.5538 19.375 16.8858 19.6513 16.3936 20.1436C15.9013 20.6358 15.625 21.3038 15.625 22H14.625C14.625 21.3038 14.3487 20.6358 13.8564 20.1436C13.3642 19.6513 12.6962 19.375 12 19.375C11.3038 19.375 10.6358 19.6513 10.1436 20.1436C9.65127 20.6358 9.375 21.3038 9.375 22H8.375C8.375 21.3038 8.09873 20.6358 7.60645 20.1436C7.11416 19.6513 6.44619 19.375 5.75 19.375C5.05381 19.375 4.38584 19.6513 3.89355 20.1436C3.40127 20.6358 3.125 21.3038 3.125 22H2.125C2.125 21.0386 2.5067 20.1163 3.18652 19.4365C3.46938 19.1537 3.79433 18.9226 4.14648 18.749C3.67319 18.3149 3.375 17.6929 3.375 17C3.375 15.6883 4.43832 14.625 5.75 14.625C7.06168 14.625 8.125 15.6883 8.125 17C8.125 17.6931 7.82615 18.3148 7.35254 18.749C7.705 18.9227 8.03041 19.1535 8.31348 19.4365C8.53247 19.6555 8.72067 19.8996 8.875 20.1621C9.02933 19.8996 9.21753 19.6555 9.43652 19.4365C9.71938 19.1537 10.0443 18.9226 10.3965 18.749C9.92319 18.3149 9.625 17.6929 9.625 17C9.625 15.6883 10.6883 14.625 12 14.625C13.3117 14.625 14.375 15.6883 14.375 17C14.375 17.6931 14.0761 18.3148 13.6025 18.749C13.955 18.9227 14.2804 19.1535 14.5635 19.4365C14.7825 19.6555 14.9707 19.8996 15.125 20.1621C15.2793 19.8996 15.4675 19.6555 15.6865 19.4365C15.9694 19.1537 16.2943 18.9226 16.6465 18.749C16.1732 18.3149 15.875 17.6929 15.875 17C15.875 15.6883 16.9383 14.625 18.25 14.625ZM5.75 15.625C4.99061 15.625 4.375 16.2406 4.375 17C4.375 17.7594 4.99061 18.375 5.75 18.375C6.50939 18.375 7.125 17.7594 7.125 17C7.125 16.2406 6.50939 15.625 5.75 15.625ZM12 15.625C11.2406 15.625 10.625 16.2406 10.625 17C10.625 17.7594 11.2406 18.375 12 18.375C12.7594 18.375 13.375 17.7594 13.375 17C13.375 16.2406 12.7594 15.625 12 15.625ZM18.25 15.625C17.4906 15.625 16.875 16.2406 16.875 17C16.875 17.7594 17.4906 18.375 18.25 18.375C19.0094 18.375 19.625 17.7594 19.625 17C19.625 16.2406 19.0094 15.625 18.25 15.625ZM12.5 10.875H19.375V13.25H18.375V11.875H12.5V13.25H11.5V11.875H5.625V13.25H4.625V10.875H11.5V9.5H12.5V10.875ZM12 2.125C13.3117 2.125 14.375 3.18832 14.375 4.5C14.375 5.19315 14.0761 5.81485 13.6025 6.24902C13.955 6.42268 14.2804 6.65345 14.5635 6.93652C15.2433 7.61634 15.625 8.53859 15.625 9.5H14.625C14.625 8.80381 14.3487 8.13584 13.8564 7.64355C13.3642 7.15127 12.6962 6.875 12 6.875C11.3038 6.875 10.6358 7.15127 10.1436 7.64355C9.65127 8.13584 9.375 8.80381 9.375 9.5H8.375C8.375 8.53859 8.7567 7.61634 9.43652 6.93652C9.71938 6.65366 10.0443 6.42264 10.3965 6.24902C9.92319 5.81487 9.625 5.19289 9.625 4.5C9.625 3.18832 10.6883 2.125 12 2.125ZM12 3.125C11.2406 3.125 10.625 3.74061 10.625 4.5C10.625 5.25939 11.2406 5.875 12 5.875C12.7594 5.875 13.375 5.25939 13.375 4.5C13.375 3.74061 12.7594 3.125 12 3.125Z" fill="currentColor"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M14 3.22266C15.0045 3.4506 15.9452 3.84699 16.791 4.37988L18.3643 2.80762L21.1924 5.63574L19.6201 7.20898C20.153 8.05477 20.5494 8.99546 20.7773 10H23V14H20.7773C20.5494 15.0045 20.153 15.9452 19.6201 16.791L21.1924 18.3643L18.3643 21.1924L16.791 19.6201C15.9452 20.153 15.0045 20.5494 14 20.7773V23H10V20.7773C8.99546 20.5494 8.05477 20.153 7.20898 19.6201L5.63574 21.1924L2.80762 18.3643L4.37988 16.791C3.84699 15.9452 3.4506 15.0045 3.22266 14H1V10H3.22266C3.4506 8.99546 3.84699 8.05477 4.37988 7.20898L2.80762 5.63574L5.63574 2.80762L7.20898 4.37988C8.05477 3.84699 8.99546 3.4506 10 3.22266V1H14V3.22266ZM11 4.02148L10.2217 4.19824C9.34003 4.3983 8.50231 4.74697 7.74121 5.22656L7.06641 5.65137L5.63574 4.22168L4.22168 5.63574L5.65137 7.06641L5.22656 7.74121C4.74697 8.50231 4.3983 9.34003 4.19824 10.2217L4.02148 11H2V13H4.02148L4.19824 13.7783C4.3983 14.66 4.74697 15.4977 5.22656 16.2588L5.65137 16.9336L4.22168 18.3643L5.63574 19.7783L7.06641 18.3486L7.74121 18.7734C8.50231 19.253 9.34003 19.6017 10.2217 19.8018L11 19.9785V22H13V19.9785L13.7783 19.8018C14.66 19.6017 15.4977 19.253 16.2588 18.7734L16.9336 18.3486L18.3643 19.7783L19.7783 18.3643L18.3486 16.9336L18.7734 16.2588C19.253 15.4977 19.6017 14.66 19.8018 13.7783L19.9785 13H22V11H19.9785L19.8018 10.2217C19.6017 9.34003 19.253 8.50231 18.7734 7.74121L18.3486 7.06641L19.7783 5.63574L18.3643 4.22168L16.9336 5.65137L16.2588 5.22656C15.4977 4.74697 14.66 4.3983 13.7783 4.19824L13 4.02148V2H11V4.02148ZM12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7ZM12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8Z" fill="currentColor"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8 22.4H9.33333L10.6667 24H13.3333L14.6667 22.4H16V17.0645C18.9634 15.5918 21 12.5337 21 9C21 4.02944 16.9706 0 12 0C7.02944 0 3 4.02944 3 9C3 12.5337 5.03656 15.5918 8 17.0645V22.4ZM15 16.4448L15.555 16.169C18.1916 14.8587 20 12.1396 20 9C20 4.58172 16.4183 1 12 1C7.58172 1 4 4.58172 4 9C4 12.1396 5.80844 14.8587 8.44503 16.169L9 16.4448V17.5H9.84912L7.84912 10H16.1507L14.1507 17.5H15V16.4448ZM13.1158 17.5L14.8491 11H9.15073L10.8841 17.5H13.1158ZM15 21.4V18.5H9V21.4H9.80171L11.135 23H12.865L14.1983 21.4H15Z" fill="currentColor"/> </g></symbol>
+<symbol id="i-lightbulb" viewBox="0 0 24 24"><use href="#i-bulb"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="M15.79 11.9971L6.78998 2.99708L7.49708 2.28998L17.2042 11.9971L7.49708 21.7042L6.78998 20.9971L15.79 11.9971Z" fill="currentColor"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><use href="#i-chevron" transform="rotate(90 12 12)"/></symbol>
+<symbol id="i-chevron-left" viewBox="0 0 24 24"><use href="#i-chevron" transform="rotate(180 12 12)"/></symbol>
+</svg>
 
-<div class="topbar"><div class="brand"><img src="assets/operationalize-o.svg" alt="" />perationalize</div></div>
+<header class="topbar">
+  <span class="topbar-brand"><img class="topbar-brand-logo" src="assets/logo.svg" alt="Operationalize" /></span>
+  <div class="topbar-actions">
+    <div class="topbar-search">
+      <svg class="search-icon"><use href="#i-search"/></svg>
+      <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
+    </div>
+    <div class="topbar-account"><a class="avatar avatar-md" href="#" aria-label="Open profile">MV</a></div>
+  </div>
+</header>
 <a class="verbadge is-unknown" id="verbadge" title="Loading version…" hidden><span class="dot"></span><span class="id">version</span></a>
 <div class="shell">
-  <aside class="leftbar">
-    <div class="grow" id="leftnav"></div>
-    <button class="nav-item" data-ic="gear">Admin Settings</button>
-    <button class="nav-item" data-ic="bulb">Learning Hub</button>
+  <aside class="sidenav">
+    <button class="sidenav-toggle" aria-label="Toggle navigation" type="button">
+      <svg><use href="#i-chevron-left"/></svg>
+    </button>
+    <ul class="sidenav-list" id="leftnav"></ul>
+    <div class="sidenav-spacer"></div>
+    <div class="sidenav-footer">
+      <div class="sidenav-group">
+        <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="false">
+          <svg class="sidenav-item-icon"><use href="#i-settings"/></svg>
+          <span class="sidenav-item-label">Admin Settings</span>
+          <svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg>
+        </button>
+        <ul class="sidenav-sublist">
+          <li><button class="sidenav-item sidenav-subitem" type="button"><span class="sidenav-item-label">Permissions</span></button></li>
+          <li><button class="sidenav-item sidenav-subitem" type="button"><span class="sidenav-item-label">Settings</span></button></li>
+          <li><button class="sidenav-item sidenav-subitem" type="button"><span class="sidenav-item-label">Integrations</span></button></li>
+        </ul>
+      </div>
+      <button class="sidenav-item" type="button"><svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg><span class="sidenav-item-label">Learning Hub</span></button>
+    </div>
   </aside>
   <main class="main" id="main"></main>
 </div>
@@ -1062,10 +1435,16 @@ function asgColumns() {
 
 /* ───────────────────────── Left nav + pages ───────────────────────── */
 function renderNav() {
-  const items = [['process','Processes','processes'],['rocket','Initiatives','initiatives'],['cal','RoB Meetings','meetings'],['target','OKRs'],['people','People'],['team','Team']];
-  $('#leftnav').innerHTML = items.map(([i, l, p]) => `<button class="nav-item ${p && S.page === p ? 'active' : ''}" ${p ? `data-page="${p}"` : ''}>${ic[i](18)}${l}</button>`).join('');
-  document.querySelectorAll('.leftbar > .nav-item[data-ic]').forEach(b => { if (!b.dataset.done) { b.insertAdjacentHTML('afterbegin', ic[b.dataset.ic](18)); b.dataset.done = 1; } });
+  const items = [['cpu-2','Processes','processes'],['initiatives','Initiatives','initiatives'],['calendar','RoB Meetings','meetings'],['okr','OKRs'],['participants','People'],['org-unit','Team']];
+  $('#leftnav').innerHTML = items.map(([i, l, p]) => `<li><button class="sidenav-item ${p && S.page === p ? 'is-active' : ''}" type="button" ${p ? `data-page="${p}"` : ''}><svg class="sidenav-item-icon"><use href="#i-${i}"/></svg><span class="sidenav-item-label">${l}</span></button></li>`).join('');
 }
+// designmd side nav: the rail toggle and the Admin Settings expander (the kit ships no handler)
+document.addEventListener('click', e => {
+  const rail = e.target.closest('.sidenav-toggle');
+  if (rail) rail.closest('.sidenav').classList.toggle('is-compact');
+  const group = e.target.closest('.sidenav-group-trigger');
+  if (group) group.setAttribute('aria-expanded', String(group.getAttribute('aria-expanded') !== 'true'));
+});
 function renderMain() {
   if (S.page === 'initiatives') {
     $('#main').innerHTML = `<h1 class="page-title">Initiatives</h1>
@@ -1875,7 +2254,7 @@ window.addEventListener('resize', () => { if (S.rec?.diagOpen) renderDiagPop(); 
 window.REVIEW = {
   screen: () => ({ id: S.flowStep, name: S.flowStep ? `Screen ${flowLabel(S.flowStep)} · ${(FLOW.find(([n]) => n === S.flowStep) || [])[1] || ''}` : `${S.page} · free navigation` }),
   goto: id => { if (id) goFlow(id); },
-  roots: '[data-layer], [data-pop], #main, .leftbar, .topbar',
+  roots: '[data-layer], [data-pop], #main, .sidenav, .topbar',
   key: el => el.id === 'main' ? 'main:' + S.page : null,   // #main's content depends on the page shown
 };
 </script>

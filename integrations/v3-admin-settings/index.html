@@ -4238,7 +4238,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <li><a class="sidenav-item" href="#" data-page="processes"><svg class="sidenav-item-icon"><use href="#i-cpu-2"/></svg><span class="sidenav-item-label">Processes</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="initiatives"><svg class="sidenav-item-icon"><use href="#i-initiatives"/></svg><span class="sidenav-item-label">Initiatives</span></a></li>
         <!-- Out to the RoB prototype, the same thread as Settings below. -->
-        <li><a class="sidenav-item" href="../../rob/" data-ig-sibling="rob"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
+        <li><a class="sidenav-item" href="../../rob/" data-ig-sibling="../rob"><svg class="sidenav-item-icon"><use href="#i-calendar"/></svg><span class="sidenav-item-label">RoB Meetings</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="okrs"><svg class="sidenav-item-icon"><use href="#i-okr"/></svg><span class="sidenav-item-label">OKRs</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="people"><svg class="sidenav-item-icon"><use href="#i-participants"/></svg><span class="sidenav-item-label">People</span></a></li>
         <li><a class="sidenav-item" href="#" data-page="team"><svg class="sidenav-item-icon"><use href="#i-org-unit"/></svg><span class="sidenav-item-label">Team</span></a></li>
@@ -4253,7 +4253,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <!-- A real link out to the Admin Settings prototype, the other half
                  of this shell — data-page is dropped so the nav's own router
                  doesn't swallow the click. -->
-            <li><a class="sidenav-item sidenav-subitem" href="../../admin-toc/" data-ig-sibling="admin-toc"><span class="sidenav-item-label">Settings</span></a></li>
+            <li><a class="sidenav-item sidenav-subitem" href="../../admin-toc/" data-ig-sibling="../admin-toc"><span class="sidenav-item-label">Settings</span></a></li>
             <li><a class="sidenav-item sidenav-subitem is-active" href="#" data-page="integrations"><span class="sidenav-item-label">Integrations</span></a></li>
           </ul>
         </div>
@@ -4279,7 +4279,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <div class="page-head-actions">
             <!-- Token creation lives in the API tokens prototype; the CTA opens
                  its drawer via the #create-token hash. -->
-            <a class="btn btn-primary" href="/features/api-token-management/#create-token" data-ig-sibling="api-token-management" data-ig-hash="create-token">Create token</a>
+            <a class="btn btn-primary" href="../api-token-management/#create-token" data-ig-sibling="api-token-management" data-ig-hash="create-token">Create token</a>
           </div>
         </div>
 
@@ -4287,7 +4287,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <button class="tab is-active" type="button" role="tab" aria-selected="true">Integrations</button>
           <!-- Not a panel: the API token flow is its own prototype, so the tab
                goes there, landing on that page's own API tokens tab. -->
-          <a class="tab" role="tab" aria-selected="false" href="../../api-token-management/#tokens" data-ig-sibling="api-token-management" data-ig-hash="tokens">API tokens</a>
+          <a class="tab" role="tab" aria-selected="false" href="../api-token-management/#tokens" data-ig-sibling="api-token-management" data-ig-hash="tokens">API tokens</a>
         </div>
 
         <!-- Content region. Sections and cards are generated from the Figma
