@@ -1,0 +1,19 @@
+{
+  "family": "Performance attributes (TOP-7764)",
+  "versions": [
+    {
+      "folder": "v1-icarus-rebuild",
+      "label": "v1 · Icarus rebuild",
+      "date": "2026-10-27",
+      "note": "The eight performance attributes on the OKRs page, rebuilt on Icarus to compare with the code-component version; all 18 states, plus canvas.html with every state on one canvas.",
+      "basedOn": null
+    },
+    {
+      "folder": "v2-master-prompt",
+      "label": "v2 · Master prompt",
+      "date": "2026-10-27",
+      "note": "The same 18 states rebuilt from the Icarus master prompt: OKRs active in the sidenav, sprite icons at 16px, responsive down to phone width, dark theme toggle.",
+      "basedOn": "v1-icarus-rebuild"
+    }
+  ]
+}

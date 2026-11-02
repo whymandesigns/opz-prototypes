@@ -11,7 +11,7 @@ tokens in the prototype's own style block and listed under "Library gaps" below.
 | `index.html` | The clickable prototype. `?state=<key>` opens a state. `?states=1` adds the state switcher. |
 | `canvas.html` | All 18 states as live screens, laid out like the original canvas. Screen 02 stays clickable. `?states=1&state=<key>` zooms to a screen. |
 
-Rebuild after a library change with `python3 ../icarus/inline.py performance-attributes/index.html`
+Rebuild after a library change with `python3 ../icarus/inline.py performance-attributes/v1-icarus-rebuild/index.html`
 (and the same for `canvas.html`).
 
 ## What the feature adds to the OKRs page
