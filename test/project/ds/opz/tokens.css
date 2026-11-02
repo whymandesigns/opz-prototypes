@@ -1,0 +1,250 @@
+/* Operationalize — generated from tokens.json */
+:root, [data-theme="light"] {
+  --white: #ffffff; /* Surfaces: drawers, modals, cards, inputs, table rows on the page ground. Text on blue-500, red-500, graphite-800 fills. */
+  --black: #000000; /* Primary text: page titles, row names, values, labels of secondary buttons. Reads on white, gray-50 and gray-100. */
+  --gray-50: #fcfcfc; /* Page ground (content column background), page head and table header row. Picasso grey.lightest. */
+  --gray-100: #f3f4f6; /* Sidebar background, striped table rows, icon tiles, selected vertical tab, connected-integration card fill. Picasso grey.lighter. */
+  --gray-200: #ebeced; /* Hairlines: table row and header borders, page-head rule, card borders, sidebar right edge; active sidebar item and light-grey TagRectangular fill. Picasso grey.lighter2. */
+  --gray-300: #e5e7ea; /* Sidebar item hover, connection-card border, tooltip-free separators. Picasso grey.light. */
+  --gray-400: #d8d9dc; /* Control borders (inputs, selects, secondary buttons), pill Tag border, disabled primary button fill. Picasso grey.light2. */
+  --gray-500: #c4c6ca; /* Avatar placeholder fill, disabled text and borders, unselected tab divider, inactive Slack glyph. Picasso grey.main. */
+  --gray-600: #84888e; /* Placeholders, hints (11px), input hover border, switch off track. On white it measures about 3.6:1, which is below 4.5:1 for small text; this is the product's own value and is kept exact. Picasso grey.main2. */
+  --graphite-700: #455065; /* Secondary text (labels, descriptions, table header text), icons, sidebar item text, search field fill in the top bar, active segmented button. About 8.6:1 on white. Picasso grey.dark. */
+  --graphite-800: #262d3d; /* Top bar background, compact (dark) tooltip, light-grey TagRectangular text, dark-grey tag fill. Picasso grey.darker. */
+  --graphite-900: #191e28; /* Active sidebar item text and icon. */
+  --blue-100: #edf1fd; /* Info box fill, row hover and selected fill, menu option hover, clickable overview block hover. */
+  --blue-150: #d5defa; /* Info box border (Container variant blue). */
+  --blue-400: #25a9ef; /* Info icon colour (Alert blue), light-blue tag and indicator. */
+  --blue-500: #204ecf; /* Brand blue: primary button, links, tab indicator, focus ring base, switch on, checked controls, Initiative kind tag in drawers, Execution status tag. */
+  --blue-600: #183a9e; /* Picasso blue.dark; pressed brand surfaces (rare). */
+  --blue-700: #0f256e; /* Picasso blue.darker; blue-darker tag and indicator. */
+  --green-100: #eafbf5; /* Success notification and Alert fill. */
+  --green-150: #d7f3e9; /* Success container border. */
+  --green-500: #00cc83; /* Positive button fill (Create …, Update, Connect), success check in inputs. White 13px label on it measures about 2.2:1; product value kept exact. */
+  --green-600: #03b080; /* Green tag and indicator (On track health), Typography green. White 11px text on it measures about 2.9:1; product value kept exact. */
+  --green-700: #05947c; /* Picasso green.darker. */
+  --red-100: #fbedf1; /* Error notification and Alert fill. */
+  --red-150: #f5d8e0; /* Error container border. */
+  --red-500: #d42551; /* Errors, negative button, Off track indicator, notification dot, required asterisk, delete icons. */
+  --yellow-100: #fff5e3; /* Warning Alert and banner fill (e.g. roadmap reminder). */
+  --yellow-150: #f8e7c8; /* Warning container border. */
+  --yellow-500: #e59c01; /* Warnings: At risk indicator, Note accent bar, 'No meeting connected' icon. White text on it measures about 2.1:1; never put white text on it. */
+  --purple-500: #6727cf; /* Visited link colour. */
+  --blue-500-hover: #4269d6; /* Primary button hover (Picasso button source). */
+  --blue-500-active: #1a41ab; /* Primary button pressed. */
+  --green-500-hover: #27d496; /* Positive button hover. */
+  --green-500-active: #00a96c; /* Positive button pressed. */
+  --red-500-hover: #db466b; /* Negative button hover. */
+  --red-500-active: #b01f43; /* Negative button pressed. */
+  --control-checked-hover: #446ad7; /* Checked checkbox and radio hover: blue-500 mixed 16% with white. */
+  --focus-ring: rgba(32,78,207,0.48); /* 3px focus ring on buttons and inputs (box-shadow 0 0 0 3px). On white it is the only focus cue; links have none. */
+  --focus-ring-error: rgba(212,37,81,0.48); /* Focus ring of an input in error state. */
+  --backdrop: #4550658b; /* Modal and drawer backdrop. */
+  --skeleton-fg: rgba(132,136,142,0.16); /* Skeleton loader bars. */
+  --skeleton-bg: rgba(132,136,142,0.04); /* Skeleton loader background. */
+  --autofill: rgba(255,245,227,0.6); /* Input highlight='autofill' background. */
+  --highlight-flash: rgba(37,169,239,0.5); /* Row highlight animation midpoint (tailwind.config.js 'highlight' keyframes, 3s). */
+  --legacy-grey: rgb(136,144,155); /* Legacy app colour (src/styles/colors.ts 'grey'). Do not use in new designs. */
+  --legacy-grey-scorpion: rgb(94,94,94); /* Legacy app colour (greyScorpion). Do not use in new designs. */
+  --legacy-grey-darker: rgb(236,238,237); /* Legacy app colour (greyDarker). Do not use in new designs. */
+  --legacy-grey-darker-2: rgb(219,219,223); /* Legacy app colour (greyDarker2). Do not use in new designs. */
+  --legacy-grey-lighter: rgba(235,236,237,0.32); /* Legacy app colour (greyLighter). Do not use in new designs. */
+  --page-bg: var(--gray-50); /* Alias: content column and page head background. */
+  --sidebar-bg: var(--gray-100); /* Alias: sidebar background. */
+  --topbar-bg: var(--graphite-800); /* Alias: top bar background. */
+  --surface: var(--white); /* Alias: drawers, modals, cards, inputs. */
+  --text-primary: var(--black); /* Alias: titles, names, values. On page-bg, surface and sidebar-bg. */
+  --text-secondary: var(--graphite-700); /* Alias: labels, descriptions, table header text. On page-bg, surface and sidebar-bg. */
+  --text-muted: var(--gray-600); /* Alias: placeholders and 11px hints (below 4.5:1, product value). */
+  --border-subtle: var(--gray-200); /* Alias: hairlines and card borders. */
+  --border-control: var(--gray-400); /* Alias: input, select and secondary-button borders. */
+  --link: var(--blue-500); /* Alias: link and action-link text. */
+  --link-visited: var(--purple-500); /* Alias: visited anchor links. */
+  --shadow-1: 0 0 8px 0 rgba(0,0,0,0.08); /* Paper, switch thumb, selected vertical tab. */
+  --shadow-2: 0 4px 8px 0 rgba(0,0,0,0.08); /* Modal, user menu, dropdown popper, integration card, collapse trigger. */
+  --shadow-3: 0 0 0 1px rgba(0,0,0,0.04), 0 0 8px 0 rgba(0,0,0,0.16); /* Toast (growl) notifications. */
+  --shadow-4: 0 0 4px 0 rgba(0,0,0,0.24), 0 0 32px 0 rgba(0,0,0,0.12); /* Tooltip. */
+  --shadow-5: 0 0 0 1px rgba(0,0,0,0.04), 0 8px 12px -3px rgba(0,0,0,0.08), 0 4px 8px -2px rgba(0,0,0,0.04); /* Select menu, popper (src/styles/universal.ts popper). */
+  --shadow-16: 0px 8px 10px -5px rgba(0,0,0,0.2), 0px 16px 24px 2px rgba(0,0,0,0.14), 0px 6px 30px 5px rgba(0,0,0,0.12); /* Drawer paper (MUI elevation 16). */
+}
+:root {
+  --space-1: 4px; /* Icon-to-text in tags, tight stacks. */
+  --space-2: 8px; /* Input inner padding, gap between icon and label, tag groups. */
+  --space-3: 12px; /* Table cell vertical padding, icon-to-label gap in the sidebar, card inner gaps. */
+  --space-4: 16px; /* Sidebar padding, card padding, gap between toolbar controls and between buttons. */
+  --space-6: 24px; /* Content top padding, gap between page sections, integration card padding. */
+  --space-8: 32px; /* Content side padding, drawer padding, gap between tabs. */
+  --space-10: 40px; /* Large empty-state padding. */
+  --space-12: 48px; /* Bottom padding of long pages. */
+  --radius-sm: 4px; /* Buttons, inputs, sidebar items, TagRectangular, menus, tooltips. */
+  --radius-md: 8px; /* Cards, info boxes, modals, settings panels, icon tiles. */
+  --radius-switch: 12px; /* Switch track. */
+  --radius-pill: 100px; /* Pill Tag (6.25rem). */
+  --radius-full: 9999px; /* Circular buttons, badges, indicators. */
+  --header-height: 56px; /* Top bar height. */
+  --sidebar-width: 236px; /* Expanded desktop sidebar. */
+  --sidebar-width-compact: 62px; /* Collapsed desktop sidebar. */
+  --page-head-height: 54px; /* Page head row (PageHead.Main 3.375em). */
+  --content-padding-x: 32px; /* Content and page-head side padding on desktop (16px below 1024px on mobile-ready pages). */
+  --content-padding-top: 24px; /* Gap between the page head rule and the first content row. */
+  --drawer-width: 560px; /* Regular drawer (narrow 440, medium 640, wide 960, ultra-wide 1180). */
+  --input-width: 300px; /* Default input width (18.75rem); drawer form controls are 288px. */
+  --input-height: 32px; /* Medium input, select and button height. */
+  --search-width: 460px; /* Universal search field in the top bar. */
+  --z-drawer: 1200; /* Drawer. */
+  --z-modal: 1300; /* Modal, popper, tooltip. */
+  --z-snackbar: 1400; /* Toast container. */
+  --font-sans: proxima-nova, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-inconsolata: Inconsolata, monospace;
+  --text-body-xxsmall: 400 11px/16px var(--font-sans); /* Typography size xxsmall (token 2xs): form hints and errors, character counters, drawer secondary lines. */
+  --text-body-xsmall: 400 12px/18px var(--font-sans); /* Typography xsmall: team under a name, 'Last edit was made…', settings descriptions. */
+  --text-body-small: 400 13px/20px var(--font-sans); /* Typography small: drawer field labels, table body text, card descriptions, subtitles. */
+  --text-body-medium: 400 14px/22px var(--font-sans); /* Typography medium: form labels, sidebar items, description text, inputs (14px/16px inside the field). */
+  --text-body-large: 400 16px/24px var(--font-sans); /* Typography large (black): profile About text. */
+  --text-heading-small: 600 14px/22px var(--font-sans); /* Row names, section headings in drawers (Connections, Agenda), card titles, user names in badges. */
+  --text-heading-medium: 600 16px/24px var(--font-sans); /* Drawer title, settings section title, integration card title. */
+  --text-heading-large: 600 20px/30px var(--font-sans); /* Page title in the page head, profile name, modal title. */
+  --text-heading-xlarge: 600 28px/42px var(--font-sans); /* Rare large display (Picasso xlarge). */
+  --text-button-small: 600 12px/15px var(--font-sans); /* Small button label (24px button), e.g. Edit profile. */
+  --text-button-medium: 600 13px/16px var(--font-sans); /* Default button label (32px button). */
+  --text-button-large: 600 15px/18px var(--font-sans); /* Large button label (48px button). */
+  --text-tab-label: 600 13px/17.6px var(--font-sans); /* Horizontal tab label. */
+  --text-table-head: 600 12px/18px var(--font-sans); /* Table header cells (graphite-700). */
+  --text-tag: 600 11px/16px var(--font-sans); /* TagRectangular (status, kind, health) and badge-like labels. */
+  --text-tag-pill: 600 12px/18px var(--font-sans); /* Pill Tag label (labels such as #Core Strategy). */
+  --text-counter: 600 10px/12px var(--font-sans); /* Badge counter. */
+}
+.body-xxsmall {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-xsmall {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-small {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-medium {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-large {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.heading-small {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.heading-medium {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.heading-large {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.heading-xlarge {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  line-height: 42px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.button-small {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.button-medium {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.button-large {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.tab-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 17.6px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.table-head {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.tag {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.tag-pill {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.counter {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+@font-face {
+  font-family: "proxima-nova";
+  src: url("fonts/proxima-nova-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "proxima-nova";
+  src: url("fonts/proxima-nova-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}

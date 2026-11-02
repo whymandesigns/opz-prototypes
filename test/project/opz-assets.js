@@ -1,0 +1,26 @@
+/* Upload urls for the pictures this canvas uses (see the Opz README, "On a Claude Design canvas"). */
+window.OpzAssets = {
+"img/avatars/avery-collins.jpg": "/_blob/af52be70cc02a0ac00fa1073cb22a4a0",
+"img/avatars/daniel-mercer.jpg": "/_blob/078b4214c506c53193fd7b1021e59d69",
+"img/avatars/hannah-okafor.jpg": "/_blob/a8cbf04d723260d28715f204fae3fc6b",
+"img/avatars/jordan-blake.jpg": "/_blob/1a53c8813e82c401d524021edfa60033",
+"img/avatars/julian-park.jpg": "/_blob/ef4696879a71542174bf65e3bea2705b",
+"img/avatars/marisol-vega.jpg": "/_blob/1c167474142efe71bb71155dc06a3f58",
+"img/avatars/maya-thompson.jpg": "/_blob/09501ea35f3a3fe356fe508a29280345",
+"img/avatars/nadia-rahman.jpg": "/_blob/b4b5c494886254f7c762cf5f277b6cca",
+"img/avatars/p104.jpg": "/_blob/82c0b71f1f3feb0af9929f41ea90527d",
+"img/avatars/p110.jpg": "/_blob/8fe1bb9b2f9f2467ba2be01ab154c9b6",
+"img/avatars/p133.jpg": "/_blob/b0b2150e86baffb74ee98720eb19ebc4",
+"img/avatars/p140.jpg": "/_blob/7a54203dadc19646772868702fbe196a",
+"img/avatars/p152.jpg": "/_blob/439980daaa2f31b3f693415acfba87fa",
+"img/avatars/p160.jpg": "/_blob/77b5bfe388e442393b5fd4a1956ebde0",
+"img/avatars/p194.jpg": "/_blob/90dda8cf2bd4e2dd659cd632068ee1e8",
+"img/avatars/p34.jpg": "/_blob/a6fbe744497aab36cffb53bb2d473793",
+"img/avatars/p83.jpg": "/_blob/1c78054bc618b003506b6fe07259f8b7",
+"img/avatars/rafael-costa.jpg": "/_blob/5ff03c6e013cafea62eab76485037ee5",
+"img/avatars/zara-khan.jpg": "/_blob/1a7fd703780d72aa33a71c9b7b122739",
+"img/avatars/noor-a.jpg": "/_blob/74b82c96cea9ad035ef84fa0edd24831",
+"img/avatars/felix-m.jpg": "/_blob/38bcd297f94142d0619fe94de18ecaed",
+"img/avatars/aisha-bello.jpg": "/_blob/5d415b786ba1677a8a6f35814d2ffc9c",
+"img/avatars/sofia-romano.jpg": "/_blob/93f04d084e1059aa3cf2d4c7fef047a0"
+};

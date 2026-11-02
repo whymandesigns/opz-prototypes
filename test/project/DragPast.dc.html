@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dragging over a past time</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/opz/tokens.css">
+<link rel="stylesheet" href="opz-mc-bundle.css">
+<script src="opz-mc-bundle.js"></script>
+<script src="opz-assets.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+@font-face{font-family:proxima-nova;font-weight:400;font-display:swap;src:url("/_blob/55b4d68ca180bf6c439ad6dd5bf406df") format("woff2")}
+@font-face{font-family:proxima-nova;font-weight:600;font-display:swap;src:url("/_blob/3f7d87f75b94c40ff6893aadd1baa80b") format("woff2")}
+</style>
+</helmet>
+<x-import component-from-global-scope="Opz.AppShell" tenant="topteam" active="meetings" width="fill" height="fill" business-lines="{{yes}}" notification="{{yes}}" abilities="{{abilities}}" flags="{{flags}}" user="{{user}}">
+<x-import component-from-global-scope="Opz.RobPage" state="mcPast" admin="{{no}}"></x-import>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1440, "height": 900}}'>
+window.OpzMcMarks = true;
+const S = window.Opz.samples;
+const C = {
+  yes: true, no: false,
+  abilities: ['dashboard', 'positions', 'permissions', 'settings', 'welcomeEmail', 'salary'],
+  flags: { topSpots: false, newcomers: true },
+  user: { name: 'Avery Collins', position: 'Chief People Officer', avatar: S.avatar('avery-collins') }
+};
+class Component extends DCLogic {
+  renderVals() { return { ...C }; }
+}
+</script>
+</body>
+</html>

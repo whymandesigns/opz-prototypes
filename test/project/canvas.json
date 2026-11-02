@@ -1,0 +1,365 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-27T08:36:28Z"
+ },
+ "title": "RoB master-calendar follow-ups",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "01 · Week view · cards you can move say “Drag to change the time”; every card is as tall as the meeting"
+  },
+  "DragMove.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "02 · Dragging · snaps to 15 minutes, shows the new start and end; the original slot stays outlined"
+  },
+  "DragPast.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "03 · Over a time that has passed · past slots are shaded; dropping here puts the card back"
+  },
+  "DragDrop.dc.html": {
+   "x": 4560,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "04 · Drop · the card lands in the slot: a short press and one ring (about a quarter of a second), then the confirmation opens; shown here on a loop"
+  },
+  "DragConfirm.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "04b · Confirm · choose which meetings the move applies to, and see how many participants are busy then"
+  },
+  "DragMoved.dc.html": {
+   "x": 7600,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "05 · Moved · the dialog closes at once; the card shows “Saved, syncing…” until Google Calendar confirms (RoB Async) and can’t be dragged meanwhile"
+  },
+  "DragFailed.dc.html": {
+   "x": 9120,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "06 · Sync failed · the card is marked; the meeting view offers Try again (RoB Async states)"
+  },
+  "RespondView.dc.html": {
+   "x": 0,
+   "y": 1300,
+   "w": 1440,
+   "h": 900,
+   "title": "07 · Participant’s meeting view · Decline and Propose new time"
+  },
+  "DeclineDialog.dc.html": {
+   "x": 1520,
+   "y": 1300,
+   "w": 1440,
+   "h": 900,
+   "title": "08 · Decline this meeting? · optional comment for the owner"
+  },
+  "Declined.dc.html": {
+   "x": 3040,
+   "y": 1300,
+   "w": 1440,
+   "h": 900,
+   "title": "09 · Declined · Accept undoes it until the meeting starts; proposing a time stays possible; the roster shows Declined"
+  },
+  "ProposeDialog.dc.html": {
+   "x": 4560,
+   "y": 1300,
+   "w": 1440,
+   "h": 900,
+   "title": "10 · Propose new time · date, start, end and an optional comment"
+  },
+  "Proposed.dc.html": {
+   "x": 6080,
+   "y": 1300,
+   "w": 1440,
+   "h": 900,
+   "title": "11 · Proposed · the participant sees their open proposal and can change or cancel it; Decline stays possible"
+  },
+  "OwnerView.dc.html": {
+   "x": 0,
+   "y": 2600,
+   "w": 1440,
+   "h": 900,
+   "title": "12 · Owner’s meeting view · open proposal with how many participants are busy then, Reject / Move meeting; a decline with its comment"
+  },
+  "SlackDms.dc.html": {
+   "x": 1520,
+   "y": 2600,
+   "w": 1440,
+   "h": 900,
+   "title": "13 · Slack DMs · the owner moves the meeting or rejects the proposal right in Slack; the outcome to the participant"
+  },
+  "ZoomPicker.dc.html": {
+   "x": 0,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "14 · Create meeting · Zoom: Auto-created or Custom link"
+  },
+  "ZoomCustom.dc.html": {
+   "x": 1520,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "15 · Custom link · checked in the company’s Zoom account: a recurring meeting hosted by the owner; Auto-Recording stays"
+  },
+  "ZoomError.dc.html": {
+   "x": 3040,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "16 · Not a meeting link · personal room links and other links are rejected as you type"
+  },
+  "ZoomCheckError.dc.html": {
+   "x": 4560,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "17 · Fails the Zoom check · another host, another account, one-time or instant, expired"
+  },
+  "ZoomScope.dc.html": {
+   "x": 6080,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "18 · Edit · a Zoom link change applies to this and following, or all meetings"
+  },
+  "ZoomMeetingView.dc.html": {
+   "x": 7600,
+   "y": 3900,
+   "w": 1440,
+   "h": 900,
+   "title": "19 · Meeting view · REC plus a Custom link tag; your company’s Zoom settings still apply"
+  },
+  "Prototype.dc.html": {
+   "x": 0,
+   "y": 6500,
+   "w": 1440,
+   "h": 900,
+   "title": "20 · Clickable prototype · drag your meetings, open People Leadership Weekly (you’re a participant), Recruiting Pipeline (you own it), edit any of yours, or open last Thursday’s Talent Onboarding Automation, a 5-minute call, and move it to a later day",
+   "is_interactive": true
+  },
+  "RespondViewM.dc.html": {
+   "x": 7600,
+   "y": 1300,
+   "w": 390,
+   "h": 844,
+   "title": "07m · Phone · the meeting view opens full screen, the date box moves above Details; Decline and Propose new time fill the footer"
+  },
+  "DeclineDialogM.dc.html": {
+   "x": 8070,
+   "y": 1300,
+   "w": 390,
+   "h": 844,
+   "title": "08m · Phone · Decline slides up from the bottom as a drawer (as the app’s action drawers); tap outside or Cancel to close"
+  },
+  "DeclinedM.dc.html": {
+   "x": 8540,
+   "y": 1300,
+   "w": 390,
+   "h": 844,
+   "title": "09m · Phone · Declined · “You declined this meeting” sits above Accept and Propose new time; the roster shows Declined"
+  },
+  "ProposeDialogM.dc.html": {
+   "x": 9010,
+   "y": 1300,
+   "w": 390,
+   "h": 844,
+   "title": "10m · Phone · Propose new time slides up as a drawer; the date gets its own row, start and end share the next"
+  },
+  "ProposedM.dc.html": {
+   "x": 9480,
+   "y": 1300,
+   "w": 390,
+   "h": 844,
+   "title": "11m · Phone · Proposed · Cancel proposal moves under the text; Change proposal sits in the footer"
+  },
+  "OwnerViewM.dc.html": {
+   "x": 3040,
+   "y": 2600,
+   "w": 390,
+   "h": 844,
+   "title": "12m · Phone · Owner · the open proposal comes first, Reject and Move meeting under its text"
+  },
+  "OwnerDeclineM.dc.html": {
+   "x": 3510,
+   "y": 2600,
+   "w": 390,
+   "h": 844,
+   "title": "12m-b · Phone · Owner · tapping a participant’s status shows their decline comment"
+  },
+  "PhoneParticipant.dc.html": {
+   "x": 1520,
+   "y": 6500,
+   "w": 390,
+   "h": 844,
+   "is_interactive": true,
+   "title": "21 · Phone prototype · you’re a participant in People Leadership Weekly: decline, accept, propose a time, change or cancel it"
+  },
+  "PhoneOwner.dc.html": {
+   "x": 1990,
+   "y": 6500,
+   "w": 390,
+   "h": 844,
+   "is_interactive": true,
+   "title": "22 · Phone prototype · you own Recruiting Pipeline: move the meeting to Hannah’s proposed time or reject it"
+  },
+  "PastMoved.dc.html": {
+   "x": 1520,
+   "y": 5200,
+   "w": 1440,
+   "h": 900,
+   "title": "24 · Moved · an upcoming meeting again; the 5-minute recording stays on it, marked “recorded on Oct 8” on the same line"
+  },
+  "PastHistory.dc.html": {
+   "x": 3040,
+   "y": 5200,
+   "w": 1440,
+   "h": 900,
+   "title": "25 · History · one row for the meeting, titled “Oct 13, 2026 (moved from Oct 8)”; the recording from the original time comes last"
+  },
+  "PastSlack.dc.html": {
+   "x": 4560,
+   "y": 5200,
+   "w": 1440,
+   "h": 900,
+   "title": "26 · Slack · the card from Thursday says where the meeting went; a new card arrives before the new time"
+  },
+  "PastEditScope.dc.html": {
+   "x": 0,
+   "y": 5200,
+   "w": 1440,
+   "h": 900,
+   "title": "23 · Save · a new date or time applies to this meeting only or to all meetings, as for the next meeting; the note says the meeting has ended (or “is in progress” while it runs) and anything recorded at the original time stays with it"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "DragMove.dc.html",
+  "DragPast.dc.html",
+  "DragDrop.dc.html",
+  "DragConfirm.dc.html",
+  "DragMoved.dc.html",
+  "DragFailed.dc.html",
+  "RespondView.dc.html",
+  "DeclineDialog.dc.html",
+  "Declined.dc.html",
+  "ProposeDialog.dc.html",
+  "Proposed.dc.html",
+  "RespondViewM.dc.html",
+  "DeclineDialogM.dc.html",
+  "DeclinedM.dc.html",
+  "ProposeDialogM.dc.html",
+  "ProposedM.dc.html",
+  "OwnerView.dc.html",
+  "SlackDms.dc.html",
+  "OwnerViewM.dc.html",
+  "OwnerDeclineM.dc.html",
+  "ZoomPicker.dc.html",
+  "ZoomCustom.dc.html",
+  "ZoomError.dc.html",
+  "ZoomCheckError.dc.html",
+  "ZoomScope.dc.html",
+  "ZoomMeetingView.dc.html",
+  "PastEditScope.dc.html",
+  "PastMoved.dc.html",
+  "PastHistory.dc.html",
+  "PastSlack.dc.html",
+  "Prototype.dc.html",
+  "PhoneParticipant.dc.html",
+  "PhoneOwner.dc.html"
+ ],
+ "notes": {
+  "row1": {
+   "x": 0,
+   "y": -300,
+   "text": "TOP-7501 · Drag a meeting to a new time in the Week view",
+   "kind": "title1",
+   "maxW": 10560
+  },
+  "row2": {
+   "x": 0,
+   "y": 1000,
+   "text": "TOP-7503 · Decline a meeting or propose a new time (participant)",
+   "kind": "title1",
+   "maxW": 7520
+  },
+  "row3": {
+   "x": 0,
+   "y": 2300,
+   "text": "TOP-7503 · The owner’s side",
+   "kind": "title1",
+   "maxW": 2960
+  },
+  "row4": {
+   "x": 0,
+   "y": 3600,
+   "text": "TOP-7505 · Use your own Zoom link instead of the auto-created one",
+   "kind": "title1",
+   "maxW": 9040
+  },
+  "row5": {
+   "x": 0,
+   "y": 6200,
+   "text": "Try it",
+   "kind": "title1",
+   "maxW": 1440
+  },
+  "row2m": {
+   "x": 7600,
+   "y": 1000,
+   "text": "On a phone",
+   "kind": "title1",
+   "maxW": 2270
+  },
+  "row3m": {
+   "x": 3040,
+   "y": 2300,
+   "text": "On a phone",
+   "kind": "title1",
+   "maxW": 860
+  },
+  "row5m": {
+   "x": 1520,
+   "y": 6200,
+   "text": "On a phone",
+   "kind": "title1",
+   "maxW": 860
+  },
+  "row6": {
+   "x": 0,
+   "y": 4900,
+   "text": "TOP-7502 · Edit the latest meeting after it started, as any upcoming one",
+   "kind": "title1",
+   "maxW": 6000
+  }
+ },
+ "designSystems": [
+  {
+   "title": "Operationalize",
+   "namespace": "opz",
+   "artifact": "https://claude.ai/artifact/WC71egyHPyoLzevA9twnoB",
+   "version": "1793005099-6207",
+   "copiedAt": "2026-10-27T08:36:28Z"
+  }
+ ]
+}
