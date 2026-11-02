@@ -2700,6 +2700,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <!-- The respond-via-menu flow is the prototype's default now, so no hash
            is needed here. The older direct-to-modal flow is still reachable at
            ./rob/#respond=modal. -->
+      <!-- A Design canvas, also shared as one editable Claude artifact
+           (test/artifact.json). Locally it opens read-only. -->
+      <a class="card" href="./test/">
+        <img class="thumb" src="./_thumbs/test.png" alt="RoB: Master calendar follow-ups screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">RoB: Master calendar follow-ups <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Design canvas of 34 boards: the week view with movable meetings, propose / respond / decline, drag-to-move and custom Zoom links. Also shared as an editable Claude artifact.</p>
+          <span class="folder">test/</span>
+        </div>
+      </a>
       <a class="card" href="./rob/">
         <img class="thumb" src="./_thumbs/rob.png" alt="RoB screenshot" loading="lazy" />
         <div class="card-meta">
@@ -2829,6 +2839,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         var REPO = 'whymandesigns/opz-prototypes';
         var CACHE_TTL = 3600000; // 1 hour
         var FALLBACK = {
+          'test/': '2026-11-02',
           'rob/': '2026-07-10',
           'admin/': '2026-09-17',
           'admin-toc/': '2026-09-17',
