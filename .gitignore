@@ -11,3 +11,4 @@ node_modules/
 # tools/feedback-sync.mjs pull, which is when they should be committed)
 .neon
 .env.local
+*/.artifact-url
