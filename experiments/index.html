@@ -4444,7 +4444,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <header style="margin-top: var(--spacing-8)">
       <a class="backlink" href="../">&larr; Feature directory</a>
       <h1 class="h1" style="margin-top: var(--spacing-3)">Experiments</h1>
-      <p class="body-sm">Explorations outside the product roadmap. Each lives in <code style="font: var(--type-mono); color: var(--color-text-muted)">features/experiments/&lt;name&gt;/</code>.</p>
+      <p class="body-sm">Explorations outside the product roadmap. Each lives in <code style="font: var(--type-mono); color: var(--color-text-muted)">features/experiments/&lt;name&gt;/</code>. The two Admin Settings rebuilds are custom-themed UI, deliberately not built from designmd — leave them as they are.</p>
     </header>
 
     <div class="toolbar">
@@ -4454,6 +4454,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <!-- One card per experiment in experiments/<name>/. The hidden .folder is the
          path from the repo root: it keys status.json and the "Updated" date. -->
     <section class="links" id="feature-list">
+      <a class="card" href="./admin-toc-tailwind-v4/">
+        <img class="thumb" src="../_thumbs/admin-toc-tailwind-v4.png" alt="Admin Settings (Tailwind v4) screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Admin Settings, Tailwind v4 <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">The Admin Settings page redesigned from scratch with stock Tailwind CSS v4: default palette, type and spacing, no custom tokens or fonts.</p>
+          <span class="folder">experiments/admin-toc-tailwind-v4/</span>
+        </div>
+      </a>
+      <a class="card" href="./admin-toc-shadcn/">
+        <img class="thumb" src="../_thumbs/admin-toc-shadcn.png" alt="Admin Settings (shadcn/ui) screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Admin Settings, shadcn/ui <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">The Admin Settings page rebuilt with shadcn/ui components (Radix primitives, lucide icons, the neutral theme) running in the browser with no build step.</p>
+          <span class="folder">experiments/admin-toc-shadcn/</span>
+        </div>
+      </a>
       <a class="card" href="./spotlight/">
         <img class="thumb" src="../_thumbs/spotlight.png" alt="Spotlight screenshot" loading="lazy" />
         <div class="card-meta">
@@ -4493,6 +4509,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         var REPO = 'whymandesigns/opz-prototypes';
         var CACHE_TTL = 3600000; // 1 hour
         var FALLBACK = {
+          'experiments/admin-toc-shadcn/': '2026-11-03',
+          'experiments/admin-toc-tailwind-v4/': '2026-11-03',
           'experiments/loaders/': '2026-07-06',
           'experiments/planning-voyage/': '2026-10-16',
           'experiments/spotlight/': '2026-09-23'
