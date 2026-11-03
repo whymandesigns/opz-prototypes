@@ -2,6 +2,7 @@
   "_values": "delivered | complete | in-review | in-progress | on-hold | archived",
   "action-trace": "in-progress",
   "admin-toc": "in-review",
+  "admin-toc-shadcn": "in-review",
   "admin-toc-tailwind-v4": "in-review",
   "csv-export": "on-hold",
   "empty-states": "complete",

@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings — Operationalize (shadcn/ui)</title>
+
+  <!-- shadcn/ui, with no build step: Tailwind v4 in the browser, React + Radix primitives + lucide
+       from esm.sh, and the shadcn component source written inline below (Button, Card, Switch,
+       Select, DropdownMenu, Alert, Badge, Input, Separator, Sonner). Theme = shadcn "neutral". -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+
+  <style type="text/tailwindcss">
+    @custom-variant dark (&:is(.dark *));
+
+    :root {
+      --radius: 0.625rem;
+      --background: oklch(1 0 0);
+      --foreground: oklch(0.145 0 0);
+      --card: oklch(1 0 0);
+      --card-foreground: oklch(0.145 0 0);
+      --popover: oklch(1 0 0);
+      --popover-foreground: oklch(0.145 0 0);
+      --primary: oklch(0.205 0 0);
+      --primary-foreground: oklch(0.985 0 0);
+      --secondary: oklch(0.97 0 0);
+      --secondary-foreground: oklch(0.205 0 0);
+      --muted: oklch(0.97 0 0);
+      --muted-foreground: oklch(0.556 0 0);
+      --accent: oklch(0.97 0 0);
+      --accent-foreground: oklch(0.205 0 0);
+      --destructive: oklch(0.577 0.245 27.325);
+      --border: oklch(0.922 0 0);
+      --input: oklch(0.922 0 0);
+      --ring: oklch(0.708 0 0);
+      --sidebar: oklch(0.985 0 0);
+      --sidebar-foreground: oklch(0.145 0 0);
+      --sidebar-accent: oklch(0.97 0 0);
+      --sidebar-accent-foreground: oklch(0.205 0 0);
+      --sidebar-border: oklch(0.922 0 0);
+    }
+
+    @theme inline {
+      --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --color-sidebar: var(--sidebar);
+      --color-sidebar-foreground: var(--sidebar-foreground);
+      --color-sidebar-accent: var(--sidebar-accent);
+      --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+      --color-sidebar-border: var(--sidebar-border);
+      --radius-sm: calc(var(--radius) - 4px);
+      --radius-md: calc(var(--radius) - 2px);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) + 4px);
+    }
+
+    @layer base {
+      * { @apply border-border outline-ring/50; }
+      body { @apply bg-background text-foreground font-sans antialiased; }
+    }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@19.1.0",
+      "react/jsx-runtime": "https://esm.sh/react@19.1.0/jsx-runtime",
+      "react-dom": "https://esm.sh/react-dom@19.1.0?deps=react@19.1.0",
+      "react-dom/client": "https://esm.sh/react-dom@19.1.0/client?deps=react@19.1.0",
+      "clsx": "https://esm.sh/clsx@2.1.1",
+      "tailwind-merge": "https://esm.sh/tailwind-merge@3.3.0",
+      "class-variance-authority": "https://esm.sh/class-variance-authority@0.7.1",
+      "@radix-ui/react-switch": "https://esm.sh/@radix-ui/react-switch@1.2.5?deps=react@19.1.0,react-dom@19.1.0",
+      "@radix-ui/react-select": "https://esm.sh/@radix-ui/react-select@2.2.5?deps=react@19.1.0,react-dom@19.1.0",
+      "@radix-ui/react-dropdown-menu": "https://esm.sh/@radix-ui/react-dropdown-menu@2.1.15?deps=react@19.1.0,react-dom@19.1.0",
+      "sonner": "https://esm.sh/sonner@2.0.3?deps=react@19.1.0,react-dom@19.1.0",
+      "lucide-react": "https://esm.sh/lucide-react@0.511.0?deps=react@19.1.0&exports=Search,ChevronDown,ChevronUp,Check,Plus,Minus,X,Eye,EyeOff,GripVertical,TriangleAlert,Info,Menu,LayoutGrid,Zap,Calendar,Target,Users,Building2,Settings,Lightbulb,ListChecks,Briefcase,Lock,MessageSquare,ArrowRight"
+    }
+  }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.27.1/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module" data-presets="react">
+    import React, { useState, useEffect, useRef, useMemo } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { clsx } from 'clsx';
+    import { twMerge } from 'tailwind-merge';
+    import { cva } from 'class-variance-authority';
+    import * as SwitchPrimitive from '@radix-ui/react-switch';
+    import * as SelectPrimitive from '@radix-ui/react-select';
+    import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+    import { Toaster as Sonner, toast } from 'sonner';
+    import {
+      Search, ChevronDown, ChevronUp, Check, Plus, Minus, X, Eye, EyeOff, GripVertical, TriangleAlert, Info,
+      Menu, LayoutGrid, Zap, Calendar, Target, Users, Building2, Settings, Lightbulb, ListChecks, Briefcase,
+      Lock, MessageSquare, ArrowRight,
+    } from 'lucide-react';
+
+    const cn = (...a) => twMerge(clsx(a));
+
+    /* ───────────────────────── shadcn/ui components ───────────────────────── */
+
+    const buttonVariants = cva(
+      "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
+      {
+        variants: {
+          variant: {
+            default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
+            outline: 'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground',
+            secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
+            ghost: 'hover:bg-accent hover:text-accent-foreground',
+            link: 'text-primary underline-offset-4 hover:underline',
+          },
+          size: {
+            default: 'h-9 px-4 py-2',
+            sm: 'h-8 gap-1.5 rounded-md px-3',
+            icon: 'size-9',
+            'icon-sm': 'size-8',
+          },
+        },
+        defaultVariants: { variant: 'default', size: 'default' },
+      }
+    );
+    const Button = ({ className, variant, size, ...props }) => (
+      <button className={cn(buttonVariants({ variant, size }), className)} {...props} />
+    );
+
+    const Card = ({ className, ...p }) => <div className={cn('flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm', className)} {...p} />;
+    const CardHeader = ({ className, ...p }) => <div className={cn('grid auto-rows-min gap-1.5 px-6', className)} {...p} />;
+    const CardTitle = ({ className, ...p }) => <h2 className={cn('leading-none font-semibold', className)} {...p} />;
+    const CardDescription = ({ className, ...p }) => <p className={cn('text-sm text-muted-foreground', className)} {...p} />;
+    const CardContent = ({ className, ...p }) => <div className={cn('px-6', className)} {...p} />;
+    const CardFooter = ({ className, ...p }) => <div className={cn('flex items-center px-6', className)} {...p} />;
+
+    const Badge = ({ className, ...p }) => <span className={cn('inline-flex w-fit shrink-0 items-center justify-center rounded-md border border-transparent bg-secondary px-2 py-0.5 text-xs font-medium whitespace-nowrap text-secondary-foreground', className)} {...p} />;
+    const Separator = ({ className, ...p }) => <div role="separator" className={cn('h-px w-full shrink-0 bg-border', className)} {...p} />;
+    const Input = ({ className, ...p }) => <input className={cn('flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm', className)} {...p} />;
+
+    const Switch = ({ className, ...p }) => (
+      <SwitchPrimitive.Root className={cn('peer inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input', className)} {...p}>
+        <SwitchPrimitive.Thumb className="pointer-events-none block size-4 rounded-full bg-background ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0" />
+      </SwitchPrimitive.Root>
+    );
+
+    const Select = SelectPrimitive.Root;
+    const SelectValue = SelectPrimitive.Value;
+    const SelectTrigger = ({ className, children, ...p }) => (
+      <SelectPrimitive.Trigger className={cn("flex h-9 w-fit items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", className)} {...p}>
+        {children}
+        <SelectPrimitive.Icon asChild><ChevronDown className="size-4 opacity-50" /></SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+    );
+    const SelectContent = ({ className, children, align = 'end', ...p }) => (
+      <SelectPrimitive.Portal>
+        <SelectPrimitive.Content position="popper" align={align} sideOffset={4} className={cn('relative z-50 max-h-72 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[side=bottom]:translate-y-1', className)} {...p}>
+          <SelectPrimitive.Viewport className="p-1 w-full min-w-[var(--radix-select-trigger-width)]">{children}</SelectPrimitive.Viewport>
+        </SelectPrimitive.Content>
+      </SelectPrimitive.Portal>
+    );
+    const SelectItem = ({ className, children, ...p }) => (
+      <SelectPrimitive.Item className={cn("relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className)} {...p}>
+        <span className="absolute right-2 flex size-3.5 items-center justify-center">
+          <SelectPrimitive.ItemIndicator><Check className="size-4" /></SelectPrimitive.ItemIndicator>
+        </span>
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      </SelectPrimitive.Item>
+    );
+
+    const DropdownMenu = DropdownMenuPrimitive.Root;
+    const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+    const DropdownMenuContent = ({ className, sideOffset = 6, ...p }) => (
+      <DropdownMenuPrimitive.Portal>
+        <DropdownMenuPrimitive.Content sideOffset={sideOffset} className={cn('z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md', className)} {...p} />
+      </DropdownMenuPrimitive.Portal>
+    );
+    const DropdownMenuItem = ({ className, ...p }) => <DropdownMenuPrimitive.Item className={cn('relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground', className)} {...p} />;
+    const DropdownMenuSeparator = ({ className, ...p }) => <DropdownMenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...p} />;
+    const DropdownMenuLabel = ({ className, ...p }) => <DropdownMenuPrimitive.Label className={cn('px-2 py-1.5 text-sm font-medium', className)} {...p} />;
+
+    const Toaster = () => (
+      <Sonner position="bottom-right" toastOptions={{ classNames: { toast: '!bg-popover !text-popover-foreground !border-border !shadow-lg !rounded-lg !font-sans' } }} />
+    );
+
+    /* ───────────────────────── page pieces ───────────────────────── */
+
+    const stub = (name) => () => toast(`“${name}” isn’t part of this prototype.`);
+
+    const SettingRow = ({ title, description, children, className, stacked }) => (
+      <div className={cn('flex flex-wrap items-center justify-between gap-x-6 gap-y-4', stacked && 'items-start', className)}>
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-sm leading-none font-medium">{title}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        {children}
+      </div>
+    );
+
+    /* Overlay that swallows clicks on a governed row and explains why. */
+    const Governed = ({ on, message, children, className }) => (
+      <div className={cn('relative', className)}>
+        <div className={cn('transition-opacity', !on && 'opacity-50')}>{children}</div>
+        {!on && <div className="absolute inset-0 z-10 cursor-not-allowed" onClick={() => toast(message)} />}
+      </div>
+    );
+
+    const Choice = ({ value, onValueChange, options, label }) => (
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger className="min-w-44" aria-label={label}><SelectValue /></SelectTrigger>
+        <SelectContent>{options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+      </Select>
+    );
+
+    const RULES = [
+      { html: <>A manager is assigned as <strong>Responsible</strong></> },
+      { html: <>The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong></> },
+      { html: <>Require RACI members to match the respective Slack channel</> },
+      { html: <><strong>Limit exceeded!</strong> Only 8 Consulted members are allowed.</>, danger: true },
+    ];
+
+    function RuleDeck({ enabled }) {
+      const [i, setI] = useState(0);
+      const danger = !!RULES[i].danger;
+      const tone = danger ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50';
+      return (
+        <div className={cn('basis-full transition-opacity', !enabled && 'opacity-40')}>
+          <div className={cn('relative pb-3', enabled ? 'cursor-pointer' : 'cursor-not-allowed')} onClick={() => enabled && setI((i + 1) % RULES.length)}>
+            <span aria-hidden className={cn('absolute inset-x-8 top-0 bottom-3 translate-y-3 rounded-lg border', tone)} />
+            <span aria-hidden className={cn('absolute inset-x-4 top-0 bottom-3 translate-y-1.5 rounded-lg border', tone)} />
+            <div role="note" aria-live="polite" className={cn('relative flex items-center gap-3 rounded-lg border px-4 py-3 text-sm', tone, danger ? 'text-red-900' : 'text-amber-900')}>
+              <TriangleAlert className={cn('size-4 shrink-0', danger ? 'text-red-600' : 'text-amber-600')} />
+              <p className="[&_strong]:font-semibold">{RULES[i].html}</p>
+            </div>
+          </div>
+          <div className="mt-1 flex items-center justify-center gap-1">
+            {RULES.map((_, n) => (
+              <button key={n} type="button" aria-label={`Rule ${n + 1} of ${RULES.length}`} aria-current={n === i} disabled={!enabled}
+                onClick={() => setI(n)} className="group py-2 disabled:cursor-not-allowed">
+                <span className={cn('block h-1.5 rounded-full transition-all', n === i ? 'w-5 bg-primary' : 'w-1.5 bg-border group-hover:bg-muted-foreground/40')} />
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    const LIMITS = [
+      { key: 'total', name: 'Total people', hint: 'Defines the limit on the total number of people in a RACI matrix', v: 20 },
+      { key: 'r', name: 'Responsible', hint: 'Defines the max number of people responsible for the task', v: 8 },
+      { key: 'a', name: 'Accountable', hint: 'The person ultimately answerable for the task', v: 1, locked: true },
+      { key: 'c', name: 'Consulted', hint: 'Defines the max number of people whose opinions are sought', v: 2 },
+      { key: 'i', name: 'Informed', hint: 'Defines the max number of people updated on progress', v: 9 },
+    ];
+
+    function Limits({ enabled }) {
+      const [vals, setVals] = useState(() => Object.fromEntries(LIMITS.map(l => [l.key, l.v])));
+      const [draft, setDraft] = useState(null);
+      const editing = draft !== null;
+      const bump = (k, d) => setDraft(s => ({ ...s, [k]: Math.max(1, (+s[k] || 1) + d) }));
+      return (
+        <div className={cn('basis-full transition-opacity', !enabled && 'pointer-events-none opacity-40')}>
+          <div className="mb-1 flex items-center justify-between gap-4">
+            <h4 className="text-sm font-semibold">Member limits</h4>
+            <Button variant="outline" size="sm" disabled={editing} onClick={() => setDraft({ ...vals })}>Edit limits</Button>
+          </div>
+          <div className="divide-y">
+            {LIMITS.map(l => (
+              <div key={l.key} className="flex items-center gap-4 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-2 text-sm font-medium">{l.name}{l.locked && <Badge>Fixed</Badge>}</p>
+                  <p className="text-xs text-muted-foreground">{l.hint}</p>
+                </div>
+                {editing ? (
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <Button variant="outline" size="icon-sm" disabled={l.locked} aria-label={`Decrease ${l.name}`} onClick={() => bump(l.key, -1)}><Minus /></Button>
+                    <Input type="number" min="1" disabled={l.locked} aria-label={`${l.name} limit`} value={draft[l.key]}
+                      onChange={e => setDraft(s => ({ ...s, [l.key]: e.target.value }))}
+                      className="h-8 w-16 text-center tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                    <Button variant="outline" size="icon-sm" disabled={l.locked} aria-label={`Increase ${l.name}`} onClick={() => bump(l.key, 1)}><Plus /></Button>
+                  </div>
+                ) : (
+                  <span className="min-w-8 text-right text-sm font-semibold tabular-nums">{vals[l.key]}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          {editing && (
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setDraft(null)}>Cancel</Button>
+              <Button size="sm" onClick={() => {
+                setVals(Object.fromEntries(Object.entries(draft).map(([k, v]) => [k, Math.max(1, +v || 1)])));
+                setDraft(null); toast.success('Member limits updated.');
+              }}>Update limits</Button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const FORMATS = ['First letter', 'Abbreviation', 'Full value'];
+    const INITIAL_VARS = () => [
+      { id: 'function', label: 'Function', full: 'marketing', abbr: 'mktg', fmt: 'First letter', on: false },
+      { id: 'team', label: 'Team', full: 'seo', abbr: 'seo', fmt: 'Abbreviation', on: true },
+      { id: 'entity', label: 'Entity', full: 'initiative', abbr: 'init', fmt: 'Abbreviation', on: true },
+      { id: 'name', label: 'Name', full: 'outreach', abbr: 'out', fmt: 'Full value', on: true },
+    ];
+    const part = (v) => v.custom ? (v.value || '').trim()
+      : v.fmt === 'First letter' ? v.full.charAt(0) : v.fmt === 'Abbreviation' ? v.abbr : v.full;
+
+    function SlackSection() {
+      const [enabled, setEnabled] = useState(true);
+      const [vars, setVars] = useState(INITIAL_VARS);
+      const [saved, setSaved] = useState(() => JSON.stringify(INITIAL_VARS()));
+      const seq = useRef(0);
+      const dragId = useRef(null);
+      const [draggable, setDraggable] = useState(null);
+      const dirty = JSON.stringify(vars) !== saved;
+      const name = vars.filter(v => v.on).map(part).filter(Boolean).join('-') || 'channel-name';
+      const msg = 'Channel naming standards are off. Turn them on to change these settings.';
+      const patch = (id, p) => setVars(vs => vs.map(v => v.id === id ? { ...v, ...p } : v));
+
+      const onDrop = (e) => {
+        e.preventDefault();
+        const rows = [...e.currentTarget.querySelectorAll('[data-var]')];
+        let to = rows.findIndex(r => e.clientY < r.getBoundingClientRect().top + r.offsetHeight / 2);
+        setVars(vs => {
+          const from = vs.findIndex(v => v.id === dragId.current);
+          if (from < 0) return vs;
+          if (to < 0) to = vs.length;
+          const next = [...vs]; const [m] = next.splice(from, 1);
+          next.splice(to > from ? to - 1 : to, 0, m);
+          return next;
+        });
+      };
+
+      return (
+        <Card id="slack" data-section className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>Slack compliance</CardTitle>
+            <CardDescription>Channel naming standards, the variables each name is built from, and a live preview.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <SettingRow stacked title="Slack channel naming standards" description="Enforce a consistent naming convention for Slack channels created and linked within Operationalize. This does not affect channels managed outside of Operationalize.">
+              <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Slack channel naming standards" />
+            </SettingRow>
+            <Separator />
+
+            <Governed on={enabled} message={msg}>
+              <p className="text-sm leading-none font-medium">Structure variables</p>
+              <p className="mt-1 text-sm text-muted-foreground">Customize how channel name variables are formatted. Drag to reorder.</p>
+              <div className="mt-4 flex flex-col gap-2"
+                onDragOver={e => e.preventDefault()} onDrop={onDrop}>
+                {vars.map(v => (
+                  <div key={v.id} data-var draggable={draggable === v.id}
+                    onDragStart={e => { dragId.current = v.id; e.dataTransfer.effectAllowed = 'move'; }}
+                    onDragEnd={() => setDraggable(null)}
+                    className="flex items-center gap-2 bg-background">
+                    <span onMouseDown={() => setDraggable(v.id)} onMouseUp={() => setDraggable(null)}
+                      className="grid size-6 shrink-0 cursor-grab place-items-center text-muted-foreground active:cursor-grabbing"><GripVertical className="size-4" /></span>
+                    {v.custom ? (
+                      <>
+                        <Input value={v.label} onChange={e => patch(v.id, { label: e.target.value })} placeholder="Variable name" aria-label="Variable name" className={cn('w-36 shrink-0', !v.on && 'opacity-50')} />
+                        <Input value={v.value || ''} onChange={e => patch(v.id, { value: e.target.value })} placeholder="Text, appears exactly as typed" aria-label="Variable value" className={cn('flex-1', !v.on && 'opacity-50')} />
+                      </>
+                    ) : (
+                      <>
+                        <span className={cn('w-24 shrink-0 truncate text-sm font-medium', !v.on && 'text-muted-foreground')}>{v.label}</span>
+                        <div className={cn('min-w-0 flex-1', !v.on && 'opacity-50')}>
+                          <Select value={v.fmt} onValueChange={fmt => patch(v.id, { fmt })} disabled={!v.on}>
+                            <SelectTrigger className="w-full" aria-label={`${v.label} format`}><SelectValue /></SelectTrigger>
+                            <SelectContent align="start">{FORMATS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+                    <Button variant="ghost" size="icon-sm" aria-pressed={v.on} aria-label={`${v.on ? 'Hide' : 'Include'} ${v.label || 'variable'} in channel names`}
+                      className={v.on ? '' : 'text-muted-foreground'} onClick={() => patch(v.id, { on: !v.on })}>
+                      {v.on ? <Eye /> : <EyeOff />}
+                    </Button>
+                    {v.custom && <Button variant="ghost" size="icon-sm" aria-label="Remove variable" onClick={() => setVars(vs => vs.filter(x => x.id !== v.id))}><X /></Button>}
+                  </div>
+                ))}
+                {vars.some(v => v.custom) && <p className="pl-8 text-xs text-muted-foreground">Custom text appears exactly as typed in the channel name.</p>}
+                <Button variant="ghost" size="sm" className="self-start" onClick={() => setVars(vs => [...vs, { id: 'c' + (++seq.current), custom: true, label: '', value: '', on: true }])}><Plus />Add variable</Button>
+              </div>
+            </Governed>
+            <Separator />
+
+            <Governed on={enabled} message={msg}>
+              <p className="text-sm leading-none font-medium">Live preview</p>
+              <p className="mt-1 text-sm text-muted-foreground">How a channel created from these rules is named.</p>
+              <div className="mt-4 overflow-hidden rounded-lg border shadow-sm">
+                <div className="flex h-8 items-center gap-1.5 border-b bg-muted px-3">
+                  <span className="size-2.5 rounded-full bg-red-400" /><span className="size-2.5 rounded-full bg-amber-400" /><span className="size-2.5 rounded-full bg-green-400" />
+                </div>
+                <div className="flex h-56 bg-background text-sm">
+                  <div className="hidden w-48 shrink-0 flex-col gap-0.5 bg-purple-950 p-3 text-purple-200 sm:flex">
+                    <p className="mb-3 font-semibold text-white">Operationalize</p>
+                    <p className="mb-1 text-xs font-semibold tracking-wide text-purple-300/70 uppercase">Channels</p>
+                    <p className="rounded-md px-2 py-1 text-purple-300"># general</p>
+                    <p className="truncate rounded-md bg-purple-600 px-2 py-1 font-medium text-white"># {name}</p>
+                    <p className="rounded-md px-2 py-1 text-purple-300"># announcements</p>
+                    <p className="rounded-md px-2 py-1 text-purple-300"># random</p>
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-center border-b px-4 py-2.5"><p className="truncate text-base font-bold"># {name}</p></div>
+                    <div className="flex-1 space-y-4 p-4">
+                      {[['bg-indigo-100', 'w-24', 'w-3/4'], ['bg-emerald-100', 'w-20', 'w-1/2']].map(([c, a, b], n) => (
+                        <div key={n} className="flex gap-3"><span className={cn('size-8 shrink-0 rounded-md', c)} /><div className="flex-1 space-y-2 pt-1"><span className={cn('block h-2.5 rounded bg-muted', a)} /><span className={cn('block h-2.5 rounded bg-muted/60', b)} /></div></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Governed>
+
+            <Governed on={enabled} message={msg}>
+              <div className="flex items-center justify-between gap-6 rounded-lg border bg-muted/40 p-4">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-sm leading-none font-medium">Slack channel compliance</p>
+                  <p className="text-sm text-muted-foreground">Monitor and manage all public Slack channels for naming standard adherence.</p>
+                </div>
+                <Button variant="link" size="sm" onClick={stub('Channel compliance')}>548 channels<ArrowRight /></Button>
+              </div>
+            </Governed>
+          </CardContent>
+          <CardFooter className="justify-end gap-2 border-t pt-6">
+            <Button variant="outline" disabled={!enabled || !dirty} onClick={() => setVars(JSON.parse(saved))}>Cancel</Button>
+            <Button disabled={!enabled || !dirty} onClick={() => { setSaved(JSON.stringify(vars)); toast.success('Channel naming standards saved.'); }}>Save changes</Button>
+          </CardFooter>
+        </Card>
+      );
+    }
+
+    function OkrSection() {
+      const [on, setOn] = useState(true);
+      const [approver, setApprover] = useState('Direct manager');
+      const [escalation, setEscalation] = useState('None');
+      const opts = ['None', 'Direct manager', 'Org unit lead', 'Super admin'];
+      const msg = 'OKRs are disabled. Turn OKRs on to change these settings.';
+      return (
+        <Card id="okrs" data-section className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>OKRs</CardTitle>
+            <CardDescription>Whether OKRs are available, the default approver, and approval escalation.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <SettingRow title="Enable OKRs" description="Visible to everyone and shown in the navigation bar.">
+              <Switch checked={on} onCheckedChange={setOn} aria-label="Enable OKRs" />
+            </SettingRow>
+            <Separator />
+            <Governed on={on} message={msg}><SettingRow title="Default approver type" description="None means new OKRs need no approval."><Choice label="Default approver type" value={approver} onValueChange={setApprover} options={opts} /></SettingRow></Governed>
+            <Separator />
+            <Governed on={on} message={msg}><SettingRow title="Escalation rules" description="If not approved for 3 days, escalate to."><Choice label="Escalation rules" value={escalation} onValueChange={setEscalation} options={opts} /></SettingRow></Governed>
+            <Separator />
+            <Governed on={on} message={msg}><SettingRow title="OKR levels" description="Choose which org unit types set OKRs and at what cadence."><Button variant="link" size="sm" onClick={stub('OKR levels')}>Manage levels<ArrowRight /></Button></SettingRow></Governed>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    function RaciSection() {
+      const [tips, setTips] = useState(true);
+      const [manage, setManage] = useState(true);
+      return (
+        <Card id="raci" data-section className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>RACI</CardTitle>
+            <CardDescription>How RACI roles are configured, best-practice guidance, and member limits per role.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <SettingRow stacked title="Best practice recommendations" description="Turn on guided alerts to steer people towards a well-formed RACI as they assign roles.">
+              <Switch checked={tips} onCheckedChange={setTips} aria-label="Best practice recommendations" />
+              <RuleDeck enabled={tips} />
+            </SettingRow>
+            <Separator />
+            <SettingRow stacked title="Manage RACI roles" description="Control how many people can hold each RACI role.">
+              <Switch checked={manage} onCheckedChange={setManage} aria-label="Manage RACI roles" />
+              <Limits enabled={manage} />
+            </SettingRow>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    function PeopleSection() {
+      const [invites, setInvites] = useState(true);
+      const [vis, setVis] = useState('Everyone');
+      return (
+        <Card id="people" data-section className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>People</CardTitle>
+            <CardDescription>Member invites and what a profile shows publicly.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <SettingRow title="Email invites" description="Allow members beyond Super Admin to send invites.">
+              <Switch checked={invites} onCheckedChange={setInvites} aria-label="Email invites" />
+            </SettingRow>
+            <Separator />
+            <SettingRow title="Public profile visibility" description="Show public profile information across the organization.">
+              <Choice label="Public profile visibility" value={vis} onValueChange={setVis} options={['Everyone', 'Across organization', 'None']} />
+            </SettingRow>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    const SimpleCard = ({ id, title, description, rowTitle, rowDescription, action }) => (
+      <Card id={id} data-section className="scroll-mt-24">
+        <CardHeader><CardTitle>{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader>
+        <CardContent><SettingRow title={rowTitle} description={rowDescription}>{action}</SettingRow></CardContent>
+      </Card>
+    );
+
+    const NAV = [
+      { icon: LayoutGrid, label: 'Processes' }, { icon: Zap, label: 'Initiatives' }, { icon: Calendar, label: 'RoB Meetings' },
+      { icon: Target, label: 'OKRs' }, { icon: Users, label: 'People' }, { icon: Building2, label: 'Team' },
+    ];
+    const TOC = [
+      { id: 'raci', label: 'RACI', icon: ListChecks }, { id: 'okrs', label: 'OKRs', icon: Target },
+      { id: 'people', label: 'People', icon: Users }, { id: 'positions', label: 'Positions', icon: Briefcase },
+      { id: 'permissions', label: 'Permissions', icon: Lock }, { id: 'slack', label: 'Slack compliance', icon: MessageSquare },
+    ];
+
+    function Sidebar({ open, onClose }) {
+      const [adminOpen, setAdminOpen] = useState(true);
+      const item = 'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground';
+      return (
+        <>
+          {open && <div className="fixed inset-0 z-40 bg-black/40 md:hidden" onClick={onClose} />}
+          <aside className={cn('fixed inset-y-0 left-0 z-50 flex w-64 flex-col gap-2 border-r bg-sidebar p-2 transition-transform duration-200 md:sticky md:top-14 md:z-10 md:h-[calc(100dvh-3.5rem)] md:shrink-0 md:translate-x-0', open ? 'translate-x-0' : '-translate-x-full')}>
+            <nav className="flex flex-col gap-0.5 pt-1">
+              {NAV.map(n => <a key={n.label} href="#" className={item}><n.icon />{n.label}</a>)}
+            </nav>
+            <div className="mt-auto flex flex-col gap-0.5">
+              <Separator className="mb-1" />
+              <button type="button" onClick={() => setAdminOpen(o => !o)} aria-expanded={adminOpen} className={cn(item, 'w-full')}>
+                <Settings /><span className="flex-1 text-left">Admin</span>
+                <ChevronDown className={cn('transition-transform', adminOpen && 'rotate-180')} />
+              </button>
+              {adminOpen && (
+                <div className="mx-3.5 flex flex-col gap-0.5 border-l py-0.5 pl-2.5">
+                  <a href="#" className="rounded-md px-2 py-1.5 text-sm text-muted-foreground line-through hover:bg-sidebar-accent">Permissions</a>
+                  <a href="#" className="rounded-md px-2 py-1.5 text-sm text-muted-foreground line-through hover:bg-sidebar-accent">Positions</a>
+                  <a href="#" aria-current="page" className="rounded-md bg-sidebar-accent px-2 py-1.5 text-sm font-medium text-sidebar-accent-foreground">Settings</a>
+                  <a href="#" className="rounded-md px-2 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent">Integrations</a>
+                </div>
+              )}
+              <a href="#" className={item}><Lightbulb />Learning Hub</a>
+            </div>
+          </aside>
+        </>
+      );
+    }
+
+    function TopBar({ onMenu }) {
+      return (
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur sm:px-6">
+          <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open navigation" onClick={onMenu}><Menu /></Button>
+          <a href="#" className="flex items-center gap-2 font-semibold tracking-tight">
+            <span className="grid size-7 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">O</span>
+            <span className="hidden sm:inline">Operationalize</span>
+          </a>
+          <div className="relative ml-auto w-full max-w-sm">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input type="search" placeholder="Search…" className="pl-9" />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" aria-label="Account" className="grid size-8 place-items-center rounded-full bg-muted text-xs font-medium outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50">MV</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>My account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {['My profile', 'Feedback', 'Career map', 'Recognitions'].map(l => <DropdownMenuItem key={l}>{l}</DropdownMenuItem>)}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Sign out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+      );
+    }
+
+    function App() {
+      const [nav, setNav] = useState(false);
+      const [active, setActive] = useState('raci');
+      useEffect(() => {
+        const spy = () => {
+          const secs = [...document.querySelectorAll('[data-section]')];
+          let cur = secs[0]?.id;
+          if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = secs.at(-1)?.id;
+          else secs.forEach(s => { if (s.getBoundingClientRect().top <= 130) cur = s.id; });
+          setActive(cur);
+        };
+        addEventListener('scroll', spy, { passive: true }); addEventListener('resize', spy); spy();
+        return () => { removeEventListener('scroll', spy); removeEventListener('resize', spy); };
+      }, []);
+
+      return (
+        <div className="min-h-screen">
+          <TopBar onMenu={() => setNav(true)} />
+          <div className="flex">
+            <Sidebar open={nav} onClose={() => setNav(false)} />
+            <main className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
+              <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1fr)_13rem]">
+                <div className="min-w-0">
+                  <div className="mb-8">
+                    <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+                    <p className="mt-1 text-sm text-muted-foreground">Manage how your workspace handles RACI, OKRs, people and Slack.</p>
+                  </div>
+                  <div className="space-y-8">
+                    <RaciSection />
+                    <OkrSection />
+                    <PeopleSection />
+                    <SimpleCard id="positions" title="Positions" description="The job positions people are hired into and assigned to."
+                      rowTitle="Positions" rowDescription="A job position is required when creating new people."
+                      action={<Button variant="outline" size="sm" onClick={stub('Add position')}><Plus />Add position</Button>} />
+                    <SimpleCard id="permissions" title="Permissions" description="What each role can see and do across the workspace."
+                      rowTitle="User roles and permissions" rowDescription="Define what each user role can access and do."
+                      action={<Button variant="link" size="sm" onClick={stub('User roles')}>55 user roles<ArrowRight /></Button>} />
+                    <SlackSection />
+                  </div>
+                </div>
+                <nav aria-label="On this page" className="sticky top-24 hidden self-start lg:block">
+                  <p className="mb-3 text-xs font-medium text-muted-foreground">On this page</p>
+                  <ul className="space-y-0.5 border-l text-sm">
+                    {TOC.map(t => (
+                      <li key={t.id}>
+                        <a href={`#${t.id}`} aria-current={active === t.id}
+                          className="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-muted-foreground transition-colors hover:text-foreground aria-[current=true]:border-primary aria-[current=true]:font-medium aria-[current=true]:text-foreground [&_svg]:size-4">
+                          <t.icon />{t.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
+            </main>
+          </div>
+          <Toaster />
+        </div>
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
