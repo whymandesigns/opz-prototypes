@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings — Operationalize</title>
+  <!-- Stock Tailwind CSS v4: default palette, type scale, spacing and font stack. No custom theme. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
+    <button data-nav-open type="button" aria-label="Open navigation" class="-ml-1 rounded-md p-2 text-slate-500 hover:bg-slate-100 md:hidden"><i data-ic="menu" class="size-5"></i></button>
+    <a href="#" class="flex items-center gap-2 font-semibold tracking-tight text-slate-900">
+      <span class="grid size-7 place-items-center rounded-lg bg-indigo-600 text-sm font-bold text-white">O</span>
+      <span class="hidden sm:inline">Operationalize</span>
+    </a>
+    <div class="relative ml-auto w-full max-w-sm">
+      <i data-ic="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"></i>
+      <input type="search" placeholder="Search…" class="block w-full rounded-lg border-0 bg-slate-100 py-1.5 pr-12 pl-9 text-sm text-slate-900 ring-1 ring-transparent transition placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+      <kbd class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded border border-slate-200 bg-white px-1.5 text-xs text-slate-400 sm:block">⌘K</kbd>
+    </div>
+    <div class="relative" data-dd>
+      <button type="button" data-trigger aria-expanded="false" aria-label="Account" class="grid size-8 place-items-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700 ring-2 ring-white transition hover:bg-indigo-200">MV</button>
+      <div data-menu hidden class="absolute right-0 z-40 mt-2 w-48 rounded-xl bg-white p-1 shadow-lg ring-1 ring-slate-950/5">
+        <button type="button" class="flex w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100">My profile</button>
+        <button type="button" class="flex w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100">Feedback</button>
+        <button type="button" class="flex w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100">Career map</button>
+        <button type="button" class="flex w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100">Recognitions</button>
+        <div class="my-1 h-px bg-slate-100"></div>
+        <button type="button" class="flex w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <div data-scrim hidden class="fixed inset-0 z-40 bg-slate-900/40 md:hidden"></div>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside data-nav class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white p-3 transition-transform duration-200 md:sticky md:top-14 md:z-10 md:h-[calc(100dvh-3.5rem)] md:shrink-0 md:translate-x-0">
+      <nav class="flex flex-col gap-0.5 text-sm font-medium">
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="squares" class="size-5 text-slate-400"></i>Processes</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="bolt" class="size-5 text-slate-400"></i>Initiatives</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="calendar" class="size-5 text-slate-400"></i>RoB Meetings</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="target" class="size-5 text-slate-400"></i>OKRs</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="users" class="size-5 text-slate-400"></i>People</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="building" class="size-5 text-slate-400"></i>Team</a>
+      </nav>
+
+      <div class="mt-auto flex flex-col gap-0.5 border-t border-slate-200 pt-3 text-sm font-medium">
+        <button data-nav-group type="button" aria-expanded="true" class="group/trigger flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+          <i data-ic="cog" class="size-5 text-slate-400"></i><span class="flex-1">Admin</span>
+          <i data-ic="chevron-down" class="size-4 text-slate-400 transition-transform group-aria-expanded/trigger:rotate-180"></i>
+        </button>
+        <div data-nav-sub class="ml-5 flex flex-col gap-0.5 border-l border-slate-200 pl-3">
+          <a href="#" class="rounded-lg px-3 py-1.5 text-slate-400 line-through hover:bg-slate-100">Permissions</a>
+          <a href="#" class="rounded-lg px-3 py-1.5 text-slate-400 line-through hover:bg-slate-100">Positions</a>
+          <a href="#" aria-current="page" class="rounded-lg bg-indigo-50 px-3 py-1.5 text-indigo-700">Settings</a>
+          <a href="#" class="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900">Integrations</a>
+        </div>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><i data-ic="bulb" class="size-5 text-slate-400"></i>Learning Hub</a>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
+      <div class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1fr)_13rem]">
+        <div class="min-w-0">
+          <header class="mb-10">
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Settings</h1>
+            <p class="mt-1 text-sm text-slate-500">Manage how your workspace handles RACI, OKRs, people and Slack.</p>
+          </header>
+
+          <div class="space-y-12">
+
+            <!-- RACI -->
+            <section id="raci" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">RACI</h2>
+              <p class="mt-1 text-sm text-slate-500">How RACI roles are configured, best-practice guidance, and member limits per role.</p>
+              <div class="mt-4 divide-y divide-slate-100 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+
+                <div class="group/setting flex flex-wrap items-start justify-between gap-x-6 gap-y-4 pb-6">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Best practice recommendations</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Turn on guided alerts to steer people towards a well-formed RACI as they assign roles.</p>
+                  </div>
+                  <div data-sw data-label="Best practice recommendations" data-checked></div>
+
+                  <div data-rules class="group/deck relative basis-full cursor-pointer pb-3 transition-opacity group-has-[.sw:not(:checked)]/setting:cursor-not-allowed group-has-[.sw:not(:checked)]/setting:opacity-40">
+                    <span aria-hidden="true" class="absolute inset-x-8 top-0 bottom-3 translate-y-3 rounded-lg bg-amber-50 ring-1 ring-amber-200 group-data-[danger]/deck:bg-rose-50 group-data-[danger]/deck:ring-rose-200"></span>
+                    <span aria-hidden="true" class="absolute inset-x-4 top-0 bottom-3 translate-y-1.5 rounded-lg bg-amber-50 ring-1 ring-amber-200 group-data-[danger]/deck:bg-rose-50 group-data-[danger]/deck:ring-rose-200"></span>
+                    <div role="note" aria-live="polite" class="relative flex items-center gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200 group-data-[danger]/deck:bg-rose-50 group-data-[danger]/deck:text-rose-900 group-data-[danger]/deck:ring-rose-200">
+                      <i data-ic="warn" class="size-5 shrink-0 text-amber-500 group-data-[danger]/deck:text-rose-500"></i>
+                      <p data-rule-text class="[&_strong]:font-semibold"></p>
+                    </div>
+                  </div>
+                  <div data-rule-dots class="flex basis-full items-center justify-center gap-1 transition-opacity group-has-[.sw:not(:checked)]/setting:opacity-40"></div>
+                </div>
+
+                <div class="group/setting flex flex-wrap items-start justify-between gap-x-6 gap-y-4 pt-6">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Manage RACI roles</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Control how many people can hold each RACI role.</p>
+                  </div>
+                  <div data-sw data-label="Manage RACI roles" data-checked></div>
+
+                  <div class="basis-full transition-opacity group-has-[.sw:not(:checked)]/setting:pointer-events-none group-has-[.sw:not(:checked)]/setting:opacity-40">
+                    <div class="mb-1 flex items-center justify-between gap-4">
+                      <h4 class="text-sm font-semibold text-slate-900">Member limits</h4>
+                      <button data-limits-edit type="button" class="rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-xs ring-1 ring-slate-300 ring-inset hover:bg-slate-50 disabled:opacity-50">Edit limits</button>
+                    </div>
+                    <div data-limit-list class="divide-y divide-slate-100"></div>
+                    <div data-limits-foot hidden class="mt-4 flex justify-end">
+                      <button data-limits-save type="button" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update limits</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- OKRs -->
+            <section id="okrs" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">OKRs</h2>
+              <p class="mt-1 text-sm text-slate-500">Whether OKRs are available, the default approver, and approval escalation.</p>
+              <div data-governed="OKRs are disabled. Turn OKRs on to change these settings." class="mt-4 divide-y divide-slate-100 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+                <div class="flex items-center justify-between gap-6 pb-5">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Enable OKRs</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Visible to everyone and shown in the navigation bar.</p>
+                  </div>
+                  <div data-sw data-master data-label="Enable OKRs" data-checked></div>
+                </div>
+                <div data-gov class="flex items-center justify-between gap-6 py-5 transition-opacity">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Default approver type</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">None means new OKRs need no approval.</p>
+                  </div>
+                  <div data-select data-options="None|Direct manager|Org unit lead|Super admin" data-value="Direct manager"></div>
+                </div>
+                <div data-gov class="flex items-center justify-between gap-6 py-5 transition-opacity">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Escalation rules</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">If not approved for 3 days, escalate to.</p>
+                  </div>
+                  <div data-select data-options="None|Direct manager|Org unit lead|Super admin" data-value="None"></div>
+                </div>
+                <div data-gov class="flex items-center justify-between gap-6 pt-5 transition-opacity">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">OKR levels</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Choose which org unit types set OKRs and at what cadence.</p>
+                  </div>
+                  <button type="button" data-stub="OKR levels" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500">Manage levels<i data-ic="arrow-right" class="size-4"></i></button>
+                </div>
+              </div>
+            </section>
+
+            <!-- People -->
+            <section id="people" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">People</h2>
+              <p class="mt-1 text-sm text-slate-500">Member invites and what a profile shows publicly.</p>
+              <div class="mt-4 divide-y divide-slate-100 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+                <div class="flex items-center justify-between gap-6 pb-5">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Email invites</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Allow members beyond Super Admin to send invites.</p>
+                  </div>
+                  <div data-sw data-label="Email invites" data-checked></div>
+                </div>
+                <div class="flex items-center justify-between gap-6 pt-5">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Public profile visibility</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Show public profile information across the organization.</p>
+                  </div>
+                  <div data-select data-options="Everyone|Across organization|None" data-value="Everyone"></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Positions -->
+            <section id="positions" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">Positions</h2>
+              <p class="mt-1 text-sm text-slate-500">The job positions people are hired into and assigned to.</p>
+              <div class="mt-4 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+                <div class="flex items-center justify-between gap-6">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Positions</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">A job position is required when creating new people.</p>
+                  </div>
+                  <button type="button" data-stub="Add position" class="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-xs ring-1 ring-slate-300 ring-inset hover:bg-slate-50"><i data-ic="plus" class="size-4"></i>Add position</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- Permissions -->
+            <section id="permissions" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">Permissions</h2>
+              <p class="mt-1 text-sm text-slate-500">What each role can see and do across the workspace.</p>
+              <div class="mt-4 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+                <div class="flex items-center justify-between gap-6">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">User roles and permissions</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Define what each user role can access and do.</p>
+                  </div>
+                  <button type="button" data-stub="User roles" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500">55 user roles<i data-ic="arrow-right" class="size-4"></i></button>
+                </div>
+              </div>
+            </section>
+
+            <!-- Slack -->
+            <section id="slack" data-section class="scroll-mt-24">
+              <h2 class="text-base font-semibold text-slate-900">Slack compliance</h2>
+              <p class="mt-1 text-sm text-slate-500">Channel naming standards, the variables each name is built from, and a live preview.</p>
+              <div data-governed="Channel naming standards are off. Turn them on to change these settings." class="mt-4 divide-y divide-slate-100 rounded-xl bg-white p-6 shadow-xs ring-1 ring-slate-950/5">
+
+                <div class="flex items-start justify-between gap-6 pb-6">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-medium text-slate-900">Slack channel naming standards</h3>
+                    <p class="mt-0.5 text-sm text-slate-500">Enforce a consistent naming convention for Slack channels created and linked within Operationalize. This does not affect channels managed outside of Operationalize.</p>
+                  </div>
+                  <div data-sw data-master data-label="Slack channel naming standards" data-checked></div>
+                </div>
+
+                <div data-gov class="py-6 transition-opacity">
+                  <h3 class="text-sm font-medium text-slate-900">Structure variables</h3>
+                  <p class="mt-0.5 text-sm text-slate-500">Customize how channel name variables are formatted. Drag to reorder.</p>
+                  <div data-vars class="mt-4 flex flex-col gap-2"></div>
+                </div>
+
+                <div data-gov class="py-6 transition-opacity">
+                  <h3 class="text-sm font-medium text-slate-900">Live preview</h3>
+                  <p class="mt-0.5 text-sm text-slate-500">How a channel created from these rules is named.</p>
+
+                  <div aria-hidden="false" class="mt-4 overflow-hidden rounded-xl shadow-sm ring-1 ring-slate-200">
+                    <div class="flex h-8 items-center gap-1.5 bg-slate-100 px-3">
+                      <span class="size-2.5 rounded-full bg-rose-400"></span><span class="size-2.5 rounded-full bg-amber-400"></span><span class="size-2.5 rounded-full bg-emerald-400"></span>
+                    </div>
+                    <div class="flex h-56 bg-white text-sm">
+                      <div class="hidden w-48 shrink-0 flex-col gap-0.5 bg-purple-950 p-3 text-purple-200 sm:flex">
+                        <p class="mb-3 font-semibold text-white">Operationalize</p>
+                        <p class="mb-1 text-xs font-semibold tracking-wide text-purple-300/70 uppercase">Channels</p>
+                        <p class="rounded-md px-2 py-1 text-purple-300"># general</p>
+                        <p class="truncate rounded-md bg-purple-600 px-2 py-1 font-medium text-white"># <span data-preview>seo-init-outreach</span></p>
+                        <p class="rounded-md px-2 py-1 text-purple-300"># announcements</p>
+                        <p class="rounded-md px-2 py-1 text-purple-300"># random</p>
+                      </div>
+                      <div class="flex min-w-0 flex-1 flex-col">
+                        <div class="flex items-center border-b border-slate-200 px-4 py-2.5">
+                          <p class="truncate text-base font-bold text-slate-900"># <span data-preview>seo-init-outreach</span></p>
+                        </div>
+                        <div class="flex-1 space-y-4 p-4">
+                          <div class="flex gap-3"><span class="size-8 shrink-0 rounded-md bg-indigo-100"></span><div class="flex-1 space-y-2 pt-1"><span class="block h-2.5 w-24 rounded bg-slate-200"></span><span class="block h-2.5 w-3/4 rounded bg-slate-100"></span></div></div>
+                          <div class="flex gap-3"><span class="size-8 shrink-0 rounded-md bg-emerald-100"></span><div class="flex-1 space-y-2 pt-1"><span class="block h-2.5 w-20 rounded bg-slate-200"></span><span class="block h-2.5 w-1/2 rounded bg-slate-100"></span></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div data-gov class="py-6 transition-opacity">
+                  <div class="flex items-center justify-between gap-6 rounded-lg bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-sm font-medium text-slate-900">Slack channel compliance</h3>
+                      <p class="mt-0.5 text-sm text-slate-500">Monitor and manage all public Slack channels for naming standard adherence.</p>
+                    </div>
+                    <button type="button" data-stub="Channel compliance" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500">548 channels<i data-ic="arrow-right" class="size-4"></i></button>
+                  </div>
+                </div>
+
+                <div data-gov class="flex justify-end gap-3 pt-6 transition-opacity">
+                  <button type="button" data-vars-cancel disabled class="rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-xs ring-1 ring-slate-300 ring-inset hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white">Cancel</button>
+                  <button type="button" data-vars-save disabled class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-indigo-600">Save changes</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- On this page -->
+        <nav data-toc aria-label="On this page" class="sticky top-24 hidden self-start lg:block">
+          <p class="mb-3 text-xs font-semibold tracking-wide text-slate-500 uppercase">On this page</p>
+          <ul class="space-y-1 border-l border-slate-200 text-sm">
+            <li><a href="#raci" data-toc-target="raci" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="list" class="size-4"></i>RACI</a></li>
+            <li><a href="#okrs" data-toc-target="okrs" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="target" class="size-4"></i>OKRs</a></li>
+            <li><a href="#people" data-toc-target="people" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="users" class="size-4"></i>People</a></li>
+            <li><a href="#positions" data-toc-target="positions" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="briefcase" class="size-4"></i>Positions</a></li>
+            <li><a href="#permissions" data-toc-target="permissions" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="lock" class="size-4"></i>Permissions</a></li>
+            <li><a href="#slack" data-toc-target="slack" class="-ml-px flex items-center gap-2 border-l-2 border-transparent py-1.5 pl-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 aria-[current=true]:border-indigo-600 aria-[current=true]:font-medium aria-[current=true]:text-indigo-600"><i data-ic="chat" class="size-4"></i>Slack compliance</a></li>
+          </ul>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <div data-toasts class="pointer-events-none fixed right-4 bottom-4 z-[60] flex flex-col gap-2"></div>
+
+  <script>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+    /* ── Icons (outline, 24px grid) ────────────────────────────────────── */
+    const ICONS = {
+      search: 'm21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z',
+      'chevron-down': 'm19.5 8.25-7.5 7.5-7.5-7.5',
+      check: 'm4.5 12.75 6 6 9-13.5',
+      plus: 'M12 4.5v15m7.5-7.5h-15',
+      x: 'M6 18 18 6M6 6l12 12',
+      'arrow-right': 'M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3',
+      menu: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5',
+      warn: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z',
+      info: 'm11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z',
+      eye: 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+      'eye-off': 'M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88',
+      grip: 'M9 5.5h.01M9 12h.01M9 18.5h.01M15 5.5h.01M15 12h.01M15 18.5h.01',
+      squares: 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z',
+      bolt: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z',
+      calendar: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5',
+      target: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-4 0a5 5 0 1 1-10 0 5 5 0 0 1 10 0Zm-4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z',
+      users: 'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z',
+      building: 'M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21',
+      cog: 'M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+      bulb: 'M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18',
+      list: 'M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm0 5.25h.007v.008H3.75V12Zm0 5.25h.007v.008H3.75v-.008Z',
+      briefcase: 'M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0',
+      lock: 'M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z',
+      chat: 'M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z',
+    };
+    const svg = (name, cls = 'size-5') =>
+      `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[name]}"/></svg>`;
+    const hydrateIcons = (root = document) => $$('[data-ic]', root).forEach(el => el.replaceWith(Object.assign(
+      document.createRange().createContextualFragment(svg(el.dataset.ic, el.className)).firstElementChild)));
+
+    /* ── Reusable pieces ───────────────────────────────────────────────── */
+    const BTN_SECONDARY = 'rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-xs ring-1 ring-inset ring-slate-300 hover:bg-slate-50';
+    const FIELD = 'block rounded-md border-0 bg-white px-3 py-1.5 text-sm text-slate-900 shadow-xs ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-600 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400';
+    const MENU_ITEM = 'group/item flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100';
+
+    const switchHTML = (label, checked, master) => `
+      <label class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer">
+        <input type="checkbox" ${checked ? 'checked' : ''} ${master ? 'data-master' : ''} aria-label="${label}" class="sw peer sr-only" />
+        <span class="absolute inset-0 rounded-full bg-slate-300 transition-colors duration-200 peer-checked:bg-indigo-600 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-600 peer-focus-visible:ring-offset-2"></span>
+        <span class="absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></span>
+      </label>`;
+
+    const selectHTML = (options, value, align = 'right') => `
+      <button type="button" data-trigger aria-expanded="false" class="inline-flex min-w-40 items-center justify-between gap-3 ${BTN_SECONDARY}">
+        <span data-value class="truncate">${value}</span>${svg('chevron-down', 'size-4 text-slate-400')}
+      </button>
+      <div data-menu hidden class="absolute ${align === 'right' ? 'right-0' : 'left-0'} z-20 mt-1 w-max min-w-full max-w-72 rounded-xl bg-white p-1 shadow-lg ring-1 ring-slate-950/5">
+        ${options.map(o => `<button type="button" data-item ${o === value ? 'data-selected' : ''} class="${MENU_ITEM}">${svg('check', 'size-4 shrink-0 text-indigo-600 invisible group-data-[selected]/item:visible')}${o}</button>`).join('')}
+      </div>`;
+
+    $$('[data-sw]').forEach(el => { el.outerHTML = switchHTML(el.dataset.label, el.hasAttribute('data-checked'), el.hasAttribute('data-master')); });
+    $$('[data-select]').forEach(el => {
+      el.setAttribute('data-dd', ''); el.classList.add('relative', 'shrink-0');
+      el.innerHTML = selectHTML(el.dataset.options.split('|'), el.dataset.value);
+    });
+    hydrateIcons();
+
+    /* ── Toast ─────────────────────────────────────────────────────────── */
+    const toast = (msg) => {
+      const el = document.createElement('div');
+      el.className = 'pointer-events-auto flex max-w-sm translate-y-2 items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white opacity-0 shadow-lg transition duration-200';
+      el.innerHTML = `${svg('info', 'size-5 shrink-0 text-indigo-300')}<p></p>`;
+      el.querySelector('p').textContent = msg;
+      $('[data-toasts]').appendChild(el);
+      requestAnimationFrame(() => el.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => { el.classList.add('translate-y-2', 'opacity-0'); setTimeout(() => el.remove(), 220); }, 3200);
+    };
+
+    /* ── Dropdowns ─────────────────────────────────────────────────────── */
+    const closeAll = (except) => $$('[data-dd]').forEach(dd => {
+      if (dd === except) return;
+      $('[data-menu]', dd).hidden = true;
+      $('[data-trigger]', dd).setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', (e) => {
+      const dd = e.target.closest('[data-dd]');
+      if (dd && e.target.closest('[data-trigger]')) {
+        if (dd.closest('[data-var]')?.dataset.off === 'true') return;
+        const menu = $('[data-menu]', dd), open = menu.hidden;
+        closeAll(dd);
+        menu.hidden = !open;
+        $('[data-trigger]', dd).setAttribute('aria-expanded', String(open));
+        return;
+      }
+      const item = e.target.closest('[data-item]');
+      if (item) {
+        const owner = item.closest('[data-dd]');
+        $$('[data-item]', owner).forEach(i => i.toggleAttribute('data-selected', i === item));
+        const v = $('[data-value]', owner); if (v) v.textContent = item.textContent.trim();
+        owner.dispatchEvent(new CustomEvent('pick', { bubbles: true, detail: item.textContent.trim() }));
+      }
+      closeAll(dd && !item ? dd : null);
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-stub]');
+      if (b) toast(`“${b.dataset.stub}” isn’t part of this prototype.`);
+    });
+
+    /* ── Sidebar ───────────────────────────────────────────────────────── */
+    const nav = $('[data-nav]'), scrim = $('[data-scrim]');
+    const drawer = (open) => { nav.classList.toggle('translate-x-0', open); nav.classList.toggle('-translate-x-full', !open); scrim.hidden = !open; };
+    $('[data-nav-open]').addEventListener('click', () => drawer(true));
+    scrim.addEventListener('click', () => drawer(false));
+    $('[data-nav-group]').addEventListener('click', (e) => {
+      const t = e.currentTarget, open = t.getAttribute('aria-expanded') !== 'true';
+      t.setAttribute('aria-expanded', String(open));
+      $('[data-nav-sub]').hidden = !open;
+    });
+
+    /* ── On-this-page scroll-spy ───────────────────────────────────────── */
+    const links = $$('[data-toc-target]'), sections = $$('[data-section]');
+    const spy = () => {
+      let cur = sections[0].id;
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = sections.at(-1).id;
+      else sections.forEach(s => { if (s.getBoundingClientRect().top <= 130) cur = s.id; });
+      links.forEach(l => l.setAttribute('aria-current', String(l.dataset.tocTarget === cur)));
+    };
+    addEventListener('scroll', spy, { passive: true });
+    addEventListener('resize', spy);
+    spy();
+
+    /* ── Best-practice deck ────────────────────────────────────────────── */
+    (() => {
+      const RULES = [
+        { html: 'A manager is assigned as <strong>Responsible</strong>' },
+        { html: 'The same person cannot be both <strong>Responsible</strong> and <strong>Accountable</strong>' },
+        { html: 'Require RACI members to match the respective Slack channel' },
+        { html: '<strong>Limit exceeded!</strong> Only 8 Consulted members are allowed.', danger: true },
+      ];
+      const deck = $('[data-rules]'), text = $('[data-rule-text]'), dots = $('[data-rule-dots]');
+      const sw = deck.closest('.group\\/setting').querySelector('.sw');
+      let i = 0;
+      dots.innerHTML = RULES.map((_, n) => `<button type="button" data-i="${n}" aria-label="Rule ${n + 1} of ${RULES.length}" class="group/dot py-2"><span class="block h-1.5 w-1.5 rounded-full bg-slate-300 transition-all group-hover/dot:bg-slate-400 group-aria-[current=true]/dot:w-5 group-aria-[current=true]/dot:bg-indigo-600"></span></button>`).join('');
+      const render = () => {
+        text.innerHTML = RULES[i].html;
+        deck.toggleAttribute('data-danger', !!RULES[i].danger);
+        $$('[data-i]', dots).forEach((b, n) => b.setAttribute('aria-current', String(n === i)));
+      };
+      deck.addEventListener('click', () => { if (sw.checked) { i = (i + 1) % RULES.length; render(); } });
+      dots.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b && sw.checked) { i = +b.dataset.i; render(); } });
+      render();
+    })();
+
+    /* ── Member limits ─────────────────────────────────────────────────── */
+    (() => {
+      const LIMITS = [
+        { name: 'Total people', hint: 'Defines the limit on the total number of people in a RACI matrix', v: 20 },
+        { name: 'Responsible', hint: 'Defines the max number of people responsible for the task', v: 8 },
+        { name: 'Accountable', hint: 'The person ultimately answerable for the task', v: 1, locked: true },
+        { name: 'Consulted', hint: 'Defines the max number of people whose opinions are sought', v: 2 },
+        { name: 'Informed', hint: 'Defines the max number of people updated on progress', v: 9 },
+      ];
+      const list = $('[data-limit-list]'), foot = $('[data-limits-foot]'), editBtn = $('[data-limits-edit]');
+      const step = 'grid size-8 place-items-center rounded-md text-slate-500 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent';
+      list.innerHTML = LIMITS.map((l, n) => `
+        <div data-row="${n}" class="flex items-center gap-4 py-3">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-slate-900">${l.name}${l.locked ? `<span class="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">Fixed</span>` : ''}</p>
+            <p class="text-xs text-slate-500">${l.hint}</p>
+          </div>
+          <span data-val class="min-w-8 text-right text-sm font-semibold text-slate-700 tabular-nums">${l.v}</span>
+          <div data-field hidden class="flex shrink-0 items-center gap-1.5">
+            <button type="button" data-step="-1" ${l.locked ? 'disabled' : ''} aria-label="Decrease ${l.name}" class="${step}">${svg('plus', 'size-4 hidden')}<span class="text-base leading-none">−</span></button>
+            <input type="number" min="1" value="${l.v}" ${l.locked ? 'disabled' : ''} aria-label="${l.name} limit" class="${FIELD} w-16 text-center tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+            <button type="button" data-step="1" ${l.locked ? 'disabled' : ''} aria-label="Increase ${l.name}" class="${step}">${svg('plus', 'size-4')}</button>
+          </div>
+        </div>`).join('');
+      const edit = (on) => {
+        $$('[data-val]', list).forEach(v => v.hidden = on);
+        $$('[data-field]', list).forEach(f => f.hidden = !on);
+        foot.hidden = !on; editBtn.disabled = on;
+      };
+      editBtn.addEventListener('click', () => edit(true));
+      list.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-step]'); if (!b) return;
+        const inp = $('input', b.closest('[data-field]'));
+        inp.value = Math.max(1, (+inp.value || 1) + +b.dataset.step);
+      });
+      $('[data-limits-save]').addEventListener('click', () => {
+        $$('[data-row]', list).forEach(r => { $('[data-val]', r).textContent = Math.max(1, +$('input', r).value || 1); });
+        edit(false); toast('Member limits updated.');
+      });
+    })();
+
+    /* ── Governed cards ────────────────────────────────────────────────── */
+    $$('[data-governed]').forEach(card => {
+      const master = $('[data-master]', card), rows = $$('[data-gov]', card);
+      master.addEventListener('change', () => rows.forEach(r => {
+        r.classList.toggle('opacity-50', !master.checked);
+        r.classList.toggle('cursor-not-allowed', !master.checked);
+        $$('button, input', r).forEach(c => c.tabIndex = master.checked ? 0 : -1);
+      }));
+      card.addEventListener('click', (e) => {
+        if (master.checked || !e.target.closest('[data-gov]')) return;
+        e.preventDefault(); e.stopPropagation(); toast(card.dataset.governed);
+      }, true);
+    });
+
+    /* ── Slack channel naming ──────────────────────────────────────────── */
+    (() => {
+      const FORMATS = ['First letter', 'Abbreviation', 'Full value'];
+      let vars = [
+        { id: 'function', label: 'Function', full: 'marketing', abbr: 'mktg', fmt: 'First letter', on: false },
+        { id: 'team', label: 'Team', full: 'seo', abbr: 'seo', fmt: 'Abbreviation', on: true },
+        { id: 'entity', label: 'Entity', full: 'initiative', abbr: 'init', fmt: 'Abbreviation', on: true },
+        { id: 'name', label: 'Name', full: 'outreach', abbr: 'out', fmt: 'Full value', on: true },
+      ];
+      let saved = JSON.stringify(vars), seq = 0;
+      const list = $('[data-vars]'), previews = $$('[data-preview]');
+      const saveBtn = $('[data-vars-save]'), cancelBtn = $('[data-vars-cancel]');
+
+      const part = (v) => v.custom ? (v.value || '').trim()
+        : v.fmt === 'First letter' ? v.full.charAt(0) : v.fmt === 'Abbreviation' ? v.abbr : v.full;
+      const eye = (v) => `<button type="button" data-eye aria-pressed="${v.on}" aria-label="${v.on ? 'Hide' : 'Include'} ${v.label || 'variable'} in channel names" class="grid size-8 shrink-0 place-items-center rounded-md ${v.on ? 'text-slate-600' : 'text-slate-400'} hover:bg-slate-100 hover:text-slate-900">${svg(v.on ? 'eye' : 'eye-off', 'size-5')}</button>`;
+      const grip = `<span data-grip class="grid size-6 shrink-0 cursor-grab place-items-center text-slate-300 hover:text-slate-500 active:cursor-grabbing">${svg('grip', 'size-5')}</span>`;
+
+      const row = (v) => v.custom
+        ? `<div data-var data-id="${v.id}" data-off="${!v.on}" class="flex items-center gap-2 rounded-lg bg-white">
+             ${grip}
+             <input data-cname value="${v.label}" placeholder="Variable name" aria-label="Variable name" class="${FIELD} w-36 shrink-0 ${v.on ? '' : 'opacity-50'}" />
+             <input data-cvalue value="${v.value || ''}" placeholder="Text, appears exactly as typed" aria-label="Variable value" class="${FIELD} min-w-0 flex-1 ${v.on ? '' : 'opacity-50'}" />
+             ${eye(v)}
+             <button type="button" data-remove aria-label="Remove variable" class="grid size-8 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-900">${svg('x', 'size-5')}</button>
+           </div>`
+        : `<div data-var data-id="${v.id}" data-off="${!v.on}" class="flex items-center gap-2 rounded-lg bg-white">
+             ${grip}
+             <span class="w-24 shrink-0 truncate text-sm font-medium ${v.on ? 'text-slate-900' : 'text-slate-400'}">${v.label}</span>
+             <div data-dd class="relative min-w-0 flex-1 ${v.on ? '' : 'opacity-50'}">
+               <button type="button" data-trigger aria-expanded="false" class="flex w-full items-center justify-between gap-3 ${BTN_SECONDARY} ${v.on ? '' : '!cursor-not-allowed'}"><span data-value class="truncate">${v.fmt}</span>${svg('chevron-down', 'size-4 text-slate-400')}</button>
+               <div data-menu hidden class="absolute left-0 z-20 mt-1 w-max min-w-full rounded-xl bg-white p-1 shadow-lg ring-1 ring-slate-950/5">
+                 ${FORMATS.map(f => `<button type="button" data-item ${f === v.fmt ? 'data-selected' : ''} class="${MENU_ITEM}">${svg('check', 'size-4 shrink-0 text-indigo-600 invisible group-data-[selected]/item:visible')}${f}</button>`).join('')}
+               </div>
+             </div>
+             ${eye(v)}
+           </div>`;
+
+      const render = () => {
+        list.innerHTML = vars.map(row).join('') +
+          `<p ${vars.some(v => v.custom) ? '' : 'hidden'} class="pl-8 text-xs text-slate-500">Custom text appears exactly as typed in the channel name.</p>
+           <button type="button" data-add class="mt-1 inline-flex items-center gap-1.5 self-start rounded-md px-1 py-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500">${svg('plus', 'size-4')}Add variable</button>`;
+        update();
+      };
+      const update = () => {
+        const name = vars.filter(v => v.on).map(part).filter(Boolean).join('-') || 'channel-name';
+        previews.forEach(p => p.textContent = name);
+        saveBtn.disabled = cancelBtn.disabled = JSON.stringify(vars) === saved;
+      };
+      const byId = (el) => vars.find(v => v.id === el.closest('[data-var]').dataset.id);
+
+      list.addEventListener('click', (e) => {
+        if (e.target.closest('[data-eye]')) { const v = byId(e.target); v.on = !v.on; render(); }
+        else if (e.target.closest('[data-remove]')) { vars = vars.filter(v => v !== byId(e.target)); render(); }
+        else if (e.target.closest('[data-add]')) { vars.push({ id: 'c' + (++seq), custom: true, label: '', value: '', on: true }); render(); }
+      });
+      list.addEventListener('pick', (e) => { byId(e.target).fmt = e.detail; update(); });
+      list.addEventListener('input', (e) => {
+        const v = byId(e.target);
+        if (e.target.matches('[data-cname]')) v.label = e.target.value;
+        if (e.target.matches('[data-cvalue]')) v.value = e.target.value;
+        update();
+      });
+
+      let dragId = null;
+      list.addEventListener('mousedown', (e) => { const r = e.target.closest('[data-var]'); if (r) r.draggable = !!e.target.closest('[data-grip]'); });
+      list.addEventListener('dragstart', (e) => { const r = e.target.closest('[data-var]'); dragId = r.dataset.id; r.classList.add('opacity-40'); e.dataTransfer.effectAllowed = 'move'; });
+      list.addEventListener('dragend', (e) => { const r = e.target.closest?.('[data-var]'); if (r) { r.classList.remove('opacity-40'); r.draggable = false; } });
+      list.addEventListener('dragover', (e) => e.preventDefault());
+      list.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const rows = $$('[data-var]', list), from = vars.findIndex(v => v.id === dragId);
+        let to = rows.findIndex(r => e.clientY < r.getBoundingClientRect().top + r.offsetHeight / 2);
+        if (to < 0) to = vars.length;
+        const [m] = vars.splice(from, 1);
+        vars.splice(to > from ? to - 1 : to, 0, m);
+        render();
+      });
+
+      saveBtn.addEventListener('click', () => { saved = JSON.stringify(vars); update(); toast('Channel naming standards saved.'); });
+      cancelBtn.addEventListener('click', () => { vars = JSON.parse(saved); render(); });
+      render();
+    })();
+  })();
+  </script>
+</body>
+</html>
