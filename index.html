@@ -4553,6 +4553,16 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="folder">test/</span>
         </div>
       </a>
+      <!-- A Design canvas, also shared as one editable Claude artifact
+           (slack-profile-card/artifact.json). Locally it opens read-only. -->
+      <a class="card" href="./slack-profile-card/">
+        <img class="thumb" src="./_thumbs/slack-profile-card.png" alt="Slack profile card screenshot" loading="lazy" />
+        <div class="card-meta">
+          <h3 class="card-title">Slack profile card <span class="arrow">&rarr;</span></h3>
+          <p class="card-body">Design canvas of the profile link preview in Slack: the original card plus photo-right, photo-left and split-row versions and two new layout ideas. Also shared as an editable Claude artifact.</p>
+          <span class="folder">slack-profile-card/</span>
+        </div>
+      </a>
       <a class="card" href="./rob/">
         <img class="thumb" src="./_thumbs/rob.png" alt="RoB screenshot" loading="lazy" />
         <div class="card-meta">
@@ -4683,6 +4693,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         var CACHE_TTL = 3600000; // 1 hour
         var FALLBACK = {
           'test/': '2026-11-02',
+          'slack-profile-card/': '2026-11-04',
           'rob/': '2026-07-10',
           'admin/': '2026-09-17',
           'admin-toc/': '2026-09-17',

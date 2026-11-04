@@ -1,0 +1,111 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Hover.dc.html": {
+      "h": 314,
+      "title": "Hover",
+      "w": 600,
+      "x": 680,
+      "y": 0
+    },
+    "LayoutFacts.dc.html": {
+      "h": 314,
+      "title": "Idea B, fact columns",
+      "w": 600,
+      "x": 2600,
+      "y": 1122
+    },
+    "LayoutPanel.dc.html": {
+      "h": 314,
+      "title": "Idea A, full-bleed photo",
+      "w": 600,
+      "x": 1950,
+      "y": 1122
+    },
+    "Main.dc.html": {
+      "h": 314,
+      "title": "Normal",
+      "w": 600,
+      "x": 0,
+      "y": 0
+    },
+    "ManagerIcon.dc.html": {
+      "h": 314,
+      "title": "Manager icon",
+      "w": 560,
+      "x": 0,
+      "y": 416
+    },
+    "Mobile.dc.html": {
+      "h": 340,
+      "title": "Mobile",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "PhotoLeft.dc.html": {
+      "h": 314,
+      "title": "Normal, photo left",
+      "w": 600,
+      "x": 650,
+      "y": 1122
+    },
+    "PhotoLeftSplit.dc.html": {
+      "h": 314,
+      "title": "Normal, photo left, split row",
+      "w": 600,
+      "x": 1300,
+      "y": 1122
+    },
+    "PhotoRight.dc.html": {
+      "h": 314,
+      "title": "Normal, photo right",
+      "w": 600,
+      "x": 0,
+      "y": 1122
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-03T08:46:00Z",
+    "v": 1
+  },
+  "designSystems": [
+    {
+      "artifact": "https://claude.ai/artifact/WC71egyHPyoLzevA9twnoB",
+      "copiedAt": "2026-11-03T08:46:00Z",
+      "namespace": "opz",
+      "title": "Operationalize",
+      "version": "1793620548-db85"
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "title"
+  ],
+  "notes": {
+    "title": {
+      "kind": "title1",
+      "maxW": 1280,
+      "text": "Profile link preview in Slack",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Hover.dc.html",
+    "Mobile.dc.html",
+    "ManagerIcon.dc.html",
+    "PhotoRight.dc.html",
+    "PhotoLeft.dc.html",
+    "PhotoLeftSplit.dc.html",
+    "LayoutPanel.dc.html",
+    "LayoutFacts.dc.html"
+  ],
+  "pages": [],
+  "title": "Slack Profile Card"
+}
