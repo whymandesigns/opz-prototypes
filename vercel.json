@@ -1,0 +1,8 @@
+{
+  "headers": [
+    { "source": "/_blob/f9e20eef9ce671843f4a8f97b41ac057", "headers": [{ "key": "Content-Type", "value": "image/jpeg" }] },
+    { "source": "/_blob/7d24c9cdfb9236d07822df8e741bf872", "headers": [{ "key": "Content-Type", "value": "image/jpeg" }] },
+    { "source": "/_blob/881ab08be326006871e03a7fd753d88d", "headers": [{ "key": "Content-Type", "value": "image/jpeg" }] },
+    { "source": "/_blob/c5ac8b8ef7e305346b96c853322b9172", "headers": [{ "key": "Content-Type", "value": "image/svg+xml" }] }
+  ]
+}
