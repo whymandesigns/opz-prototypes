@@ -1,0 +1,14 @@
+{
+  "url": "https://claude.ai/artifact/KGej9EpiVX6ZBLJ7SqWPdt",
+  "capabilities": {
+    "downloads": {},
+    "artifact": {},
+    "comments": { "composer_only": true, "customAnchors": true },
+    "room": {},
+    "db": { "rules": [{ "path": "", "write": "admin" }] },
+    "assets": {},
+    "user": { "scopes": ["profile"] },
+    "sample": {}
+  },
+  "contract": "0.2.47"
+}
