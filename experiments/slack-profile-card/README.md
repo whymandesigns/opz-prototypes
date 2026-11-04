@@ -19,13 +19,17 @@ is the source of truth: use the artifact-sync skill to publish or save it.
 
 ## Images
 
-The boards reference images as `/_blob/<id>`, which only resolve inside the
-artifact, so locally they show as broken images. The same files are in
-`assets/`:
+The boards reference images as `/_blob/<id>`, the same addresses the Claude
+artifact uses. On the deployed site those resolve to the repo-root `_blob/`
+folder (file names are the ids, no extension; `vercel.json` sets their content
+types), so the images show in the artifact and on the site without editing the
+boards. Serve the repo root (not this folder) when running locally.
 
-| `/_blob/` id | File | What it is |
-| --- | --- | --- |
-| `f9e20eef...` | `f9e20eef9ce671843f4a8f97b41ac057.jpg` | Lucas Ferreira photo |
-| `7d24c9cd...` | `7d24c9cdfb9236d07822df8e741bf872.jpg` | Elena Petrova avatar |
-| `881ab08b...` | `881ab08be326006871e03a7fd753d88d.jpg` | Dana Whitfield avatar |
-| `c5ac8b8e...` | `c5ac8b8ef7e305346b96c853322b9172.svg` | Operationalize banner |
+| `/_blob/` id | What it is |
+| --- | --- |
+| `f9e20eef...` | Lucas Ferreira photo |
+| `7d24c9cd...` | Elena Petrova avatar |
+| `881ab08b...` | Dana Whitfield avatar |
+| `c5ac8b8e...` | Operationalize banner (SVG) |
+
+`assets/` keeps the same files with their extensions.
