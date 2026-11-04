@@ -14,19 +14,23 @@ inside `features/`, reach the system as `../designmd/`.
 
 ## Before writing markup
 
-Read `designmd/dist/kit.json`. It is the generated inventory — 368 classes grouped by
+Read `designmd/dist/kit.json`. It is the generated inventory — every class grouped by
 component, the attribute-driven components, and the classes you must not use. Find the
 class there; do not guess one, and do not copy markup out of `designmd/example.html`
 (see Traps).
 
-For a new screen, start from the skeleton rather than assembling one:
+Read `designmd/UXCopy.md` before writing any user-facing string, and
+`features/CONTEXT.md` for what the product calls things.
+
+For a new screen, scaffold from the template rather than assembling one:
 
 ```bash
-cp -r designmd/starter features/my-feature
+python3 designmd/tools/new-prototype.py <kebab-name> --title "<Title>" --nav "<Section>"
 ```
 
-It already has the top bar, page head, table, modal and search wired correctly, and it
-lints clean.
+`designmd/template/index.html` is a real prototype that lints and inlines, so the shell
+a new feature starts from is the shell the system currently ships. It carries the top
+bar, side nav, page head and the delegated handlers the kit does not.
 
 ## The rules
 
@@ -62,7 +66,7 @@ These fail silently, and each has cost someone a debugging session:
   `.btn-cta-icon` is one and is already shipped in a prototype. Browse the file to see
   what a component looks like; take the class name from `kit.json`.
 - **Icons are blank until `inline.py` runs.** The stylesheets do not carry the sprite.
-  The starter fetches it at dev time; a hand-built page will not.
+  The template fetches it at dev time; a hand-built page will not.
 - **Don't copy the `example.html` script block whole.** 2,286 lines, and its tail renders
   the showcase's palette swatches against elements no prototype has — it throws, and
   every handler after it never attaches. Take only the handlers you need.
