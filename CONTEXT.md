@@ -12,8 +12,9 @@ made against, and it should change only when the product does.
 file follows it: one section per nav item. A nav item with no prototype yet still
 gets a section, because knowing nothing has been designed is itself worth knowing.
 
-The operating-framework section below is from Toptal's own Operating Framework
-documentation (supplied 2026-11-03) and is authoritative. Feature sections draw
+The operating-framework section below, and the RoB rules, are from Toptal's own
+Operating Framework training material (supplied 2026-11-03 and 2026-11-04) and
+are authoritative. Feature sections draw
 on it plus whatever that feature's `PLAN.md` records.
 
 > **Marked `TO FILL`** means nobody has written it down yet. Everything else is
@@ -38,6 +39,10 @@ wrong place.
 | OKRs | may or may not support one | supports an OKR, with specific Key Results as targets |
 | Measured by | KPIs showing day-to-day performance | its Key Results |
 | Time | ongoing | start and end dates |
+| Delivered as | Activities and Sub-activities | Projects and Sub-projects |
+| RoB held at | the **lowest** level — each sub-activity, or the activity if it has none | the **Initiative** — its projects and sub-projects link to that one RoB |
+| RoB cadence | weekly or bi-weekly; monthly by exception | weekly or bi-weekly |
+| RoB drives | business KPIs | the Initiative's OKRs |
 
 Three things make the framework work, and all three show up in the product:
 
@@ -51,6 +56,15 @@ Divisions, Processes, Initiatives and RoB meetings alike:
 
 That "singular owner" is a design constraint, not a nicety — anywhere the UI
 shows ownership, Accountable is one person.
+
+RACI is also how **working teams** are formed. A team either drives an Initiative
+by delivering its Projects and Sub-projects, or runs a Process by delivering its
+Activities and Sub-activities — and its RoB meeting is where that team works.
+
+The **Accountable Owner** is the A for an Initiative or a Process: the sole owner,
+responsible for setting up the Initiative or Process *and its RoB* so the working
+team is ready to succeed, and for leading that RoB. The Initiative cannot progress
+unless its Accountable Owner runs an effective RoB — the source is that blunt.
 
 **RoB meetings.** Structured recurring meetings on a set cadence, tied to
 important areas of the business. They exist to drive continuous progress on
@@ -89,9 +103,16 @@ and the question is how well it is running rather than how far along it is.
 **Relationship to OKRs** — a Process *may or may not* support one. Do not build
 screens that assume it does.
 
-**Who uses it** — TO FILL *(ownership is RACI; the Accountable role is a single
-owner — but who opens these screens, and how often, is not yet written down)*
-**When** — TO FILL
+**Its RoB** — set up at the **lowest level** of the tree. An activity with
+sub-activities gives each sub-activity its own dedicated, recurring RoB; an
+activity without them gets one itself. Every review, discussion, decision and
+assignment about a sub-activity belongs in that sub-activity's RoB. See RoB
+Meetings for the full rules.
+
+**Who uses it** — the working team, which is the Process's RACI, set up and led
+by its Accountable Owner. *(Which of them opens which screen, and how often, is
+not yet written down.)*
+**When** — continuously; the team meets weekly or bi-weekly in its RoB.
 
 **Prototypes** — the largest group, seven of them:
 `operationalize-web-app` (the main app shell), `workflow-view`, `meeting-grid`
@@ -110,8 +131,15 @@ and drives it, **supports an OKR** with specific Key Results as its targets, and
 has **start and end dates**. In the product: initiative definition, set-up and
 tracking, plus the live dashboard for the Core Strategy forum.
 
-**Who uses it** — Core Strategy leaders and initiative owners.
-*(Source: `toptrack/PLAN.md`.)*
+**Who uses it** — Core Strategy leaders and initiative owners
+*(source: `toptrack/PLAN.md`)*, and the working team — the RACI of the Initiative
+and its Projects — led by the Accountable Owner.
+
+**Its RoB** — one, at the Initiative level. Every Project and Sub-project links to
+it, and all discussion about them happens there and in the Initiative's allied
+Slack channel — not in RoBs of their own. A Project-level RoB is a rare exception
+for exceptionally large, complex projects, and needs explicit approval from the
+leader of the Accountable Function. See RoB Meetings.
 
 **When** — the dashboard is read in the Core Strategy forum; set-up and edit
 happen outside it, when an initiative is defined or changes.
@@ -149,9 +177,55 @@ activities and sub-activities, or on Initiatives, projects and sub-projects — 
 a meeting is always *about* something in one of those two trees, and a design
 that treats a meeting as free-standing has lost the point of it.
 
-**When** — on its cadence, which is a property of the meeting.
-**Who uses it** — TO FILL *(RACI assigns the roles; who chairs and who attends
-is not yet written down)*
+**Who uses it** — the working team. Everyone in the RACI of the Initiative and
+its underlying Projects is invited to an Initiative RoB; a Process RoB is the
+working session for that Process's RACI. The **Accountable Owner leads it**.
+
+**When** — weekly or bi-weekly. A Process RoB may run monthly only by exception,
+with explicit approval from the Accountable Function's leader. The source
+states that exception for Process RoBs only.
+
+**How a RoB runs** — the same for both kinds:
+
+1. A **quick** round of status updates — the prelude, not the point.
+2. Then a **working session**: robust discussion that ends in **decisions and
+   actions**. For an Initiative those serve its OKRs; for a Process they drive
+   its business KPIs.
+3. Discussion stays on the **agenda**, and true to the meeting's purpose — which
+   is defined by its **name and description on TopTeam**.
+4. Each kind follows its own **format and template**, designed to make that kind
+   of RoB effective. *(The templates themselves are not yet written down here.)*
+
+**The two kinds**
+
+| | Initiative RoB | Process RoB |
+|---|---|---|
+| Held at | the Initiative; a Project only by approved exception | the lowest level — sub-activity, else activity |
+| Covers | the Initiative and every Project and Sub-project linked to it | exactly **one** Process item |
+| Invitees | the RACI of the Initiative and its Projects | the item's working team — its RACI |
+| Also has | an allied Slack channel | — |
+| Cadence | weekly or bi-weekly | weekly or bi-weekly; monthly by approved exception |
+| Outcomes serve | OKRs | business KPIs |
+
+**What follows for a screen.** Not extra rules — these are what the rules above
+mean once they meet a UI:
+
+- **A RoB always has exactly one parent**: one Initiative, or one lowest-level
+  Process item. Never none, and for a Process never several. A "create meeting"
+  flow that starts from a blank form, or lets a Process RoB attach to two items,
+  is designing against the framework.
+- **Projects don't get their own RoB by default.** Showing one under its
+  Initiative's meeting is right; offering "create RoB" on every Project is not.
+  The Project-level exception exists, so it can be represented — as the
+  exception it is, needing approval, not as a peer option.
+- **Invitees come from the RACI.** The attendee list is derived from the parent
+  item, not hand-picked from the directory.
+- **Cadence is weekly or bi-weekly.** Monthly appears only for a Process RoB and
+  only as an approved exception. There is no daily, and no free-form recurrence.
+- **The output of a meeting is decisions and actions.** Status is the short
+  prelude; a design that centres the status update has the emphasis backwards.
+- **Name and description carry the purpose**, and the agenda keeps the
+  discussion on it — they are load-bearing fields, not optional metadata.
 
 **Prototypes** — `rob` (meeting action items, respond-via-menu), `action-trace`
 (connects ActionTrace processes to an RoB meeting, then reviews worker recordings
