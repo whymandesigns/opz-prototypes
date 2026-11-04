@@ -8,6 +8,7 @@
   "experiments/admin-toc-tailwind-v4": "in-review",
   "experiments/loaders": "complete",
   "experiments/planning-voyage": "in-progress",
+  "experiments/slack-profile-card": "in-progress",
   "experiments/spotlight": "in-progress",
   "initiatives": "in-progress",
   "integrations": "in-progress",
@@ -21,7 +22,6 @@
   "performance-reviews": "on-hold",
   "rob": "in-progress",
   "test": "in-progress",
-  "slack-profile-card": "in-progress",
   "toptrack": "in-progress",
   "workspaces": "in-progress"
 }
