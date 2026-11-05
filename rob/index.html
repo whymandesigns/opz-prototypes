@@ -5230,6 +5230,20 @@ body { overflow: hidden; }
     .cm-time-fields { flex: 1; display: flex; gap: var(--ic-space-2); align-items: end; }
     .cm-time-to { padding-bottom: 6px; color: var(--color-text-muted); font: var(--type-body-sm); }
 
+/* The converted fields sit in .cm-row's columns, so they fill them the way
+   the .cm-input-suffix wrappers they replaced did. The leading glyph sits
+   inside the value, which is what ellipses. */
+    .cm-select { width: 100%; min-width: 0; }
+    .cm-select .input-select-trigger { width: 100%; }
+    .cm-select .dropdown-menu { max-height: 260px; overflow-y: auto; }
+    .cm-select-value { display: inline-flex; align-items: center; gap: var(--ic-space-2); min-width: 0; }
+    .cm-select-value > .icon { font-size: 16px; flex-shrink: 0; color: var(--color-text-muted); }
+    .cm-select-value > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+    .cm-owner-select { width: 100%; }
+    .cm-owner-select .input-select-trigger { width: 100%; }
+    .cm-owner-select .dropdown-menu { max-height: 260px; overflow-y: auto; }
+
     .cm-section-title {
       font: var(--ic-weight-semibold) var(--ic-text-md)/1.5 var(--ic-font-sans);
       color: var(--color-text);
@@ -5328,6 +5342,10 @@ body { overflow: hidden; }
       border-radius: var(--ic-radius-md);
       padding: var(--ic-space-4);
     }
+    /* The tile sets the colour; .icon carries its own (--color-icon, graphite
+       700) and would otherwise outrank it, leaving these a shade light. */
+    .cm-conn-icon .icon,
+    .md-conn-icon .icon { color: inherit; }
     .cm-conn-icon {
       width: 32px; height: 32px;
       flex-shrink: 0;
@@ -5419,15 +5437,23 @@ body { overflow: hidden; }
 
               <!-- Row 2: Time Zone | Recurrence -->
               <div class="cm-row">
-                <div class="cm-input-suffix">
-                  <svg class="icon cm-lead"><use href="#i-globe"/></svg>
-                  <input class="input" type="text" value="(GMT-04:00) New York" readonly aria-label="Time zone" />
-                  <svg class="icon"><use href="#i-chevron-minor"/></svg>
+                <div class="input-select cm-select" data-cm-select="tz">
+                  <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Time zone">
+                    <span class="input-select-value cm-select-value" data-cm-select-value>
+                      <svg class="icon"><use href="#i-globe"/></svg><span data-cm-select-text>(GMT-04:00) New York</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <div class="dropdown-menu" hidden data-cm-select-options></div>
                 </div>
-                <div class="cm-input-suffix">
-                  <svg class="icon cm-lead"><use href="#i-update"/></svg>
-                  <input class="input" type="text" value="Every week on a Wednesday" readonly aria-label="Recurrence" />
-                  <svg class="icon"><use href="#i-chevron-minor"/></svg>
+                <div class="input-select cm-select" data-cm-select="recurrence">
+                  <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Recurrence">
+                    <span class="input-select-value cm-select-value" data-cm-select-value>
+                      <svg class="icon"><use href="#i-update"/></svg><span data-cm-select-text>Every week on a Wednesday</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <div class="dropdown-menu" hidden data-cm-select-options></div>
                 </div>
               </div>
 
@@ -5461,26 +5487,38 @@ body { overflow: hidden; }
                   </label>
                 </div>
                 <div class="cm-cell-stack">
-                  <div class="cm-input-suffix">
-                    <svg class="icon cm-lead"><use href="#i-jobs"/></svg>
-                    <input class="input" type="text" value="Busy" readonly aria-label="Availability" />
-                    <svg class="icon"><use href="#i-chevron-minor"/></svg>
-                  </div>
+                  <div class="input-select cm-select" data-cm-select="busy">
+                  <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Availability">
+                    <span class="input-select-value cm-select-value" data-cm-select-value>
+                      <svg class="icon"><use href="#i-jobs"/></svg><span data-cm-select-text>Busy</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <div class="dropdown-menu" hidden data-cm-select-options></div>
+                </div>
                   <p class="cm-cell-hint">Controls whether this blocks the slot on participants calendars.</p>
                 </div>
               </div>
 
               <!-- Row 4: Org unit | Business Line -->
               <div class="cm-row">
-                <div class="cm-input-suffix">
-                  <svg class="icon cm-lead"><use href="#i-org-chart"/></svg>
-                  <input class="input" type="text" placeholder="Select org unit" readonly aria-label="Org unit" />
-                  <svg class="icon"><use href="#i-chevron-minor"/></svg>
+                <div class="input-select cm-select" data-cm-select="orgunit">
+                  <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Org unit">
+                    <span class="input-select-value cm-select-value input-select-placeholder" data-cm-select-value>
+                      <svg class="icon"><use href="#i-org-chart"/></svg><span data-cm-select-text>Select org unit</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <div class="dropdown-menu" hidden data-cm-select-options></div>
                 </div>
-                <div class="cm-input-suffix">
-                  <svg class="icon cm-lead"><use href="#i-company"/></svg>
-                  <input class="input" type="text" placeholder="Select Business Lines" readonly aria-label="Business Line (optional)" />
-                  <svg class="icon"><use href="#i-chevron-minor"/></svg>
+                <div class="input-select cm-select" data-cm-select="lines">
+                  <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Business Line (optional)">
+                    <span class="input-select-value cm-select-value input-select-placeholder" data-cm-select-value>
+                      <svg class="icon"><use href="#i-company"/></svg><span data-cm-select-text>Select Business Lines</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <div class="dropdown-menu" hidden data-cm-select-options></div>
                 </div>
               </div>
             </section>
@@ -5525,7 +5563,7 @@ body { overflow: hidden; }
                     <span class="input-select-value input-select-placeholder md-kr-select-value" data-md-kr-label>
                       <svg class="icon"><use href="#i-okr"/></svg><span data-md-kr-label-text>Search or select a suggested OKR, or create a custom metric</span>
                     </span>
-                    <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
                   <div class="dropdown-menu md-kr-menu" hidden data-md-kr-menu>
                     <button class="dropdown-item md-kr-custom" type="button" data-md-kr-custom>
@@ -5599,7 +5637,7 @@ body { overflow: hidden; }
               <h3 class="cm-section-title">Connections</h3>
 
               <div class="cm-conn">
-                <span class="cm-conn-icon" style="color: #4a154b"><svg class="icon"><use href="#i-cloud-connect"/></svg></span>
+                <span class="cm-conn-icon"><svg class="icon"><use href="#i-slack"/></svg></span>
                 <div class="cm-conn-body">
                   <p class="cm-conn-title">Slack</p>
                   <p class="cm-conn-desc">Create or add Slack channels to sync conversations with this meeting</p>
@@ -5624,7 +5662,7 @@ body { overflow: hidden; }
               </div>
 
               <div class="cm-conn">
-                <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu"/></svg></span>
+                <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu-2"/></svg></span>
                 <div class="cm-conn-body">
                   <p class="cm-conn-title">Processes</p>
                   <p class="cm-conn-desc">Connect processes that this meeting drives</p>
@@ -5639,15 +5677,24 @@ body { overflow: hidden; }
           <div>
             <section class="cm-section">
               <h3 class="cm-section-title">Owner</h3>
-              <div class="cm-input-suffix">
-                <svg class="icon"><use href="#i-chevron-minor"/></svg>
-                <input class="input" type="text" value="Adan Jones" readonly />
+              <!-- A new meeting is owned by whoever is creating it, so this
+                   defaults to the signed-in person. Filled from the topbar
+                   account menu at load so the two cannot disagree. -->
+              <!-- designmd's .input-select, not a readonly .input with a chevron
+                   glued on: picking an owner is a real choice, so it uses the
+                   component that opens. -->
+              <div class="input-select cm-owner-select" data-cm-owner-select>
+                <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Owner">
+                  <span class="input-select-value" data-cm-owner-name>Matthew Vella</span>
+                  <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                </button>
+                <div class="dropdown-menu" hidden data-cm-owner-options></div>
               </div>
               <div class="cm-owner-row">
-                <span class="avatar avatar-lg">AJ</span>
+                <span class="avatar avatar-lg" data-cm-owner-initials>MV</span>
                 <div style="flex: 1; min-width: 0">
-                  <p class="cm-owner-name">Adan Jones</p>
-                  <p class="cm-owner-role">Senior Director of Program Management</p>
+                  <p class="cm-owner-name" data-cm-owner-name>Matthew Vella</p>
+                  <p class="cm-owner-role" data-cm-owner-role>Senior Product Designer</p>
                 </div>
                 <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove owner"><svg class="icon"><use href="#i-trash"/></svg></button>
               </div>
@@ -5662,7 +5709,7 @@ body { overflow: hidden; }
                 <div class="input-select">
                   <button class="input-select-trigger" type="button" data-cm-participants-trigger aria-haspopup="listbox" aria-expanded="false">
                     <span class="input-select-value input-select-placeholder">Add participants…</span>
-                    <svg class="icon" style="width: 12px; height: 12px"><use href="#i-chevron-minor"/></svg>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
 
                   <div class="dropdown-menu" hidden data-cm-participants-menu>
@@ -5727,7 +5774,7 @@ body { overflow: hidden; }
               <!-- Participant permissions — Google Calendar-style toggle. Owner opts
                    participants into direct editing of the meeting. -->
               <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
-              <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
+              <h3 class="cm-section-title">Permissions</h3>
               <label class="checkbox">
                 <input type="checkbox" class="checkbox-input" data-cm-editable-rob />
                 <span class="checkbox-box">
@@ -7884,7 +7931,7 @@ Platform reliability — error budget
                     <span class="input-select-value input-select-placeholder md-kr-select-value" data-md-kr-label>
                       <svg class="icon"><use href="#i-okr"/></svg><span data-md-kr-label-text>Search or select a suggested OKR, or create a custom metric</span>
                     </span>
-                    <svg class="btn-icon"><use href="#i-chevron-down"/></svg>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
                   <div class="dropdown-menu md-kr-menu" hidden data-md-kr-menu>
                     <!-- Custom metric leads: it is the way out of the OKR list,
@@ -8226,7 +8273,7 @@ Platform reliability — error budget
 
               <div class="md-conn">
                 <div class="md-conn-head">
-                  <span class="md-conn-icon" style="color: #4a154b"><svg class="icon"><use href="#i-cloud-connect"/></svg></span>
+                  <span class="md-conn-icon"><svg class="icon"><use href="#i-slack"/></svg></span>
                   <p class="md-conn-title">Slack</p>
                 </div>
                 <div class="md-conn-row">
@@ -8257,7 +8304,7 @@ Platform reliability — error budget
 
               <div class="md-conn">
                 <div class="md-conn-head">
-                  <span class="md-conn-icon"><svg class="icon"><use href="#i-cpu"/></svg></span>
+                  <span class="md-conn-icon"><svg class="icon"><use href="#i-cpu-2"/></svg></span>
                   <p class="md-conn-title">Processes</p>
                 </div>
                 <div class="md-conn-row">
@@ -8466,7 +8513,7 @@ Platform reliability — error budget
               </div>
 
               <hr style="border: 0; border-top: 1px solid var(--ic-palette-gray-200); margin: var(--ic-space-4) 0 var(--ic-space-3)" />
-              <h4 style="font: var(--ic-weight-semibold) var(--ic-text-base)/1.3 var(--ic-font-sans); color: var(--color-text); margin: 0 0 var(--ic-space-2)">Permissions</h4>
+              <h3 class="md-section-title">Permissions</h3>
               <label class="checkbox">
                 <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
@@ -9303,7 +9350,7 @@ Platform reliability — error budget
 
               <div class="cm-conn" style="flex-direction: column; align-items: stretch">
                 <div style="display: flex; align-items: center; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-                  <span class="cm-conn-icon" style="color: #4a154b"><svg class="icon"><use href="#i-cloud-connect"/></svg></span>
+                  <span class="cm-conn-icon"><svg class="icon"><use href="#i-slack"/></svg></span>
                   <p class="cm-conn-title" style="flex: 1">Slack</p>
                 </div>
                 <div class="md-conn-row">
@@ -9343,7 +9390,7 @@ Platform reliability — error budget
 
               <div class="cm-conn" style="flex-direction: column; align-items: stretch">
                 <div style="display: flex; align-items: center; gap: var(--ic-space-3); margin-bottom: var(--ic-space-3)">
-                  <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu"/></svg></span>
+                  <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu-2"/></svg></span>
                   <p class="cm-conn-title" style="flex: 1">Processes</p>
                 </div>
                 <div class="md-conn-row">
@@ -13347,6 +13394,73 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
       // Every item is a stub, so the menu closes and the page says so.
       menu.addEventListener('click', (e) => { if (e.target.closest('.dropdown-item')) close(); });
+
+      // A new meeting is owned by whoever creates it. Reading the name off this
+      // menu keeps the Create modal in step with whoever is signed in.
+      const me = {
+        initials: trigger.textContent.trim(),
+        name: menu.querySelector('.dropdown-item-label')?.textContent.trim(),
+        role: menu.querySelector('.dropdown-item-description')?.textContent.trim(),
+      };
+      const setOwner = (person) => {
+        document.querySelectorAll('[data-cm-owner-name]').forEach(el => { el.textContent = person.name; });
+        const ini = document.querySelector('[data-cm-owner-initials]');
+        if (ini) ini.textContent = person.initials;
+        const rl = document.querySelector('[data-cm-owner-role]');
+        if (rl) rl.textContent = person.role || '';
+      };
+      if (me.name) setOwner(me);
+
+      // Who the owner can be. Read off the participants already in the meeting
+      // detail rather than a second list that could drift from it; the signed-in
+      // person leads, since a new meeting defaults to them.
+      const sel = document.querySelector('[data-cm-owner-select]');
+      if (sel) {
+        const menu = sel.querySelector('[data-cm-owner-options]');
+        const trigger = sel.querySelector('.input-select-trigger');
+        const value = sel.querySelector('[data-cm-owner-name]');
+        const seen = new Set([me.name]);
+        const people = [me, ...[...document.querySelectorAll('#meeting-detail .md-person')]
+          .map(row => ({
+            // The participants list marks the signed-in person "Name (you)";
+            // that suffix is a label, not part of the name, and leaving it on
+            // would list them twice.
+            name: row.querySelector('.md-person-name')?.textContent.trim().replace(/\s*\(you\)$/i, ''),
+            role: row.querySelector('.md-person-role')?.textContent.trim(),
+            initials: row.querySelector('.avatar')?.textContent.trim(),
+          }))
+          // A bot owns nothing, and the signed-in person is already first.
+          .filter(x => x.name && !/bot/i.test(x.name) && !seen.has(x.name) && seen.add(x.name))];
+
+        people.forEach((person, i) => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'dropdown-item' + (i === 0 ? ' is-selected' : '');
+          item.innerHTML = `<span class="dropdown-item-avatar avatar avatar-md">${person.initials || ''}</span>`
+            + `<span class="dropdown-item-text"><span class="dropdown-item-label"></span>`
+            + `<span class="dropdown-item-description"></span></span>`;
+          item.querySelector('.dropdown-item-label').textContent = person.name;
+          item.querySelector('.dropdown-item-description').textContent = person.role || '';
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.querySelectorAll('.dropdown-item').forEach(x => x.classList.toggle('is-selected', x === item));
+            setOwner(person);
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+          });
+          menu.appendChild(item);
+        });
+
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', (e) => {
+          if (!sel.contains(e.target)) { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+        });
+      }
       document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !menu.hidden) { close(); trigger.focus(); }
@@ -13997,6 +14111,66 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
 
       show();
+    })();
+  </script>
+  <script>
+    // The Create meeting fields that were readonly inputs with a chevron glued
+    // beside them are designmd selects now, so they need something to open.
+    (function () {
+      const OPTIONS = {
+        tz: ['(GMT-04:00) New York', '(GMT+00:00) London', '(GMT+01:00) Lisbon',
+             '(GMT+02:00) Berlin', '(GMT+05:30) Bengaluru', '(GMT+08:00) Singapore'],
+        // CONTEXT.md: a RoB runs weekly or bi-weekly. Monthly is a Process-only
+        // exception needing approval, so it says so rather than sitting as a peer.
+        recurrence: ['Every week on a Wednesday', 'Every two weeks on a Wednesday',
+                     'Every month on the third Wednesday (needs approval)', 'Does not repeat'],
+        busy: ['Busy', 'Free'],
+        orgunit: ['New Business', 'Marketing', 'Services', 'Engineering',
+                  'Product Management', 'Talent Operations', 'Toptal'],
+        lines: ['Core', 'HireGlobal', 'ExpertCrowd', 'TechResume', 'Creator'],
+      };
+
+      document.querySelectorAll('[data-cm-select]').forEach(sel => {
+        const key = sel.dataset.cmSelect;
+        const trigger = sel.querySelector('.input-select-trigger');
+        const menu = sel.querySelector('[data-cm-select-options]');
+        const wrap = sel.querySelector('[data-cm-select-value]');
+        const text = sel.querySelector('[data-cm-select-text]');
+        const current = text.textContent.trim();
+
+        (OPTIONS[key] || []).forEach(opt => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'dropdown-item' + (opt === current ? ' is-selected' : '');
+          item.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>';
+          item.append(opt);
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === item));
+            text.textContent = opt;
+            // Once something is chosen it is a value, not a prompt.
+            wrap.classList.remove('input-select-placeholder');
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+          });
+          menu.appendChild(item);
+        });
+
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          // One of these open at a time, as a set of selects should behave.
+          document.querySelectorAll('[data-cm-select-options]').forEach(m => { if (m !== menu) m.hidden = true; });
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', (e) => {
+          if (!sel.contains(e.target)) { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+        });
+      });
     })();
   </script>
 </body>
