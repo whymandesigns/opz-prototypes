@@ -3584,6 +3584,97 @@ body { overflow: hidden; }
    search row. */
 .page-head:has(+ .tabs) { border-bottom: 0; margin-bottom: var(--ic-space-4); }
 .rob-tabs + .rob-toolbar { margin-top: var(--ic-space-4); }
+/* Paused series. The page-head here has no tabs under it, so it keeps its own
+   divider; the :has rule above only strips it when tabs follow. */
+.rob-paused-table { margin-top: var(--ic-space-5); }
+.rob-paused-title { font: var(--type-body-semibold); color: var(--color-text); }
+.rob-paused-when { white-space: nowrap; }
+/* Exporting holds the menu item busy while the file is built. */
+.dropdown-item.is-busy { color: var(--color-text-muted); pointer-events: none; }
+/* The longest item is "Paused meeting series"; 180px wraps it. */
+[data-rob-more] .dropdown-menu { min-width: 228px; }
+/* .btn-ghost already gives a borderless button with a background-only hover,
+   which is the whole treatment here. This only holds that fill while the menu
+   is open, so the button reads as pressed. */
+[data-rob-more] .dropdown-trigger[aria-expanded="true"] { background: var(--color-surface-muted); }
+/* The account menu carries a name and role in its header; the shared 180px
+   min-width wraps them to three lines. */
+[data-rob-account] .dropdown-menu { min-width: 260px; }
+/* Mirrors the designmd fix to .dropdown-header (name and role truncate rather
+   than wrapping). Repeated here because this file carries designmd:legacy, so
+   the kit change cannot reach it; drop these two rules when it is migrated. */
+.dropdown-header .dropdown-item-label,
+.dropdown-header .dropdown-item-description { overflow: hidden; text-overflow: ellipsis; }
+.dropdown-header .dropdown-item-description { white-space: nowrap; }
+.dropdown-header .dropdown-item-text { max-width: 220px; }
+
+/* Info popover beside the page heading. Lives here rather than in
+   components.css because this file carries the designmd:legacy marker, so no
+   kit change reaches it. The kit has no popover component yet either. */
+.rob-info { position: relative; display: inline-flex; }
+.rob-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ic-radius-full);
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  transition: background var(--ic-duration-fast) var(--ic-ease),
+              color var(--ic-duration-fast) var(--ic-ease);
+}
+.rob-info-btn:hover,
+.rob-info-btn[aria-expanded="true"] {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+.rob-info-pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  /* Opens rightward from the icon, not centred on it: centred, a 420px panel
+     hangs off the content area into the side-nav gutter. The icon's centre
+     lands CARET_X from the popover's left edge, which is where the caret sits. */
+  left: 50%;
+  transform: translateX(-32px);
+  z-index: var(--ic-z-dropdown);
+  width: 420px;
+  max-width: calc(100vw - var(--ic-space-7) * 2);
+  padding: var(--ic-space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-xl);
+  font: var(--type-body);
+  color: var(--color-text);
+  text-align: left;
+  /* The heading is semibold and centred; the popover is neither. */
+  font-weight: var(--ic-weight-regular);
+}
+.rob-info-pop[hidden] { display: none; }
+.rob-info-pop p { margin: 0; }
+.rob-info-pop p + p { margin-top: var(--ic-space-4); }
+.rob-info-pop strong { font-weight: var(--ic-weight-semibold); }
+/* Caret, pointing back at the icon. */
+.rob-info-pop::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 25px;          /* 32px icon centre, less the 7px caret half-width */
+  border: 7px solid transparent;
+  border-bottom-color: var(--color-border);
+}
+.rob-info-pop::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: 25px;
+  border: 7px solid transparent;
+  border-bottom-color: var(--color-surface);
+}
 .cal-month {
   font: var(--type-h2);
   color: var(--color-text);
@@ -3621,8 +3712,9 @@ body { overflow: hidden; }
   justify-content: center;
   background: var(--color-surface);
   padding: 0 var(--ic-space-2);
-  /* Library Body Small — 13px regular. */
-  font: var(--type-body-sm);
+  /* Library Body Small Semibold — 13px, same size, heavier so the day names
+     read as column headers rather than content. */
+  font: var(--type-body-sm-semibold);
   /* Figma "Gray Main 2" (#84888E) — no light-mode semantic alias lands here. */
   color: var(--ic-palette-gray-600);
   text-transform: uppercase;
@@ -3666,42 +3758,58 @@ body { overflow: hidden; }
   font-weight: var(--ic-weight-semibold);
 }
 
-/* Event chip */
+/* Event chip — a coloured rule on the left, no fill. The colour is the
+   occurrence's STATE, not a per-series category: blue by default, yellow for a
+   warning, red for an error, gray once cancelled. Semantic tokens throughout,
+   since each one means something. */
 .cal-event {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1px;
   width: 100%;
-  padding: 4px var(--ic-space-2);
-  background: var(--color-accent-subtle, color-mix(in srgb, var(--color-accent) 12%, transparent));
+  padding: 2px var(--ic-space-2);
+  background: transparent;
   border: 0;
-  border-left: 3px solid var(--color-accent);
-  border-radius: var(--ic-radius-sm);
-  color: var(--color-text);
-  font: var(--type-caption);
-  cursor: pointer;
+  border-left: 3px solid var(--cal-accent, var(--color-accent));
+  border-radius: 0;
   text-align: left;
+  cursor: pointer;
   min-width: 0;
   transition: background var(--ic-duration-fast) var(--ic-ease);
 }
-.cal-event:hover { background: color-mix(in srgb, var(--color-accent) 20%, transparent); }
+.cal-event:hover { background: var(--color-surface-muted); }
 .cal-event-dot { display: none; }
 /* Name — 12/18 regular, truncated to one line (Figma "Body Extra Small"). */
 .cal-event-title {
   align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font: var(--ic-weight-regular) var(--ic-text-xs)/var(--ic-lh-body-xs) var(--ic-font-sans);
   color: var(--color-text);
+  overflow: hidden;
+  min-width: 0;
+}
+/* The label is what ellipses; the warning icon beside it must not shrink. */
+.cal-event-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
 }
+/* The state icon takes the rule's colour, so the two always agree. */
+.cal-event-flag { flex-shrink: 0; font-size: 12px; color: var(--cal-accent); }
+
+/* The three non-default states. */
+.cal-event.is-warning   { --cal-accent: var(--color-warning); }
+.cal-event.is-error     { --cal-accent: var(--color-danger); }
+.cal-event.is-cancelled { --cal-accent: var(--color-text-subtle); }
 /* Time start + org unit — 11/16 muted, one row (Figma "Time and function"). */
 .cal-event-meta {
   display: flex;
   align-items: center;
-  gap: var(--ic-space-3);
+  gap: var(--ic-space-2);
   align-self: stretch;
   min-width: 0;
   font: var(--ic-weight-regular) var(--ic-text-xxs)/var(--ic-lh-body-xxs) var(--ic-font-sans);
@@ -3722,12 +3830,217 @@ body { overflow: hidden; }
    still clickable into its detail. Faded with colour rather than opacity:
    opacity would also fade the hover tooltip, which is an ::after on this very
    element and cannot opt back out of a parent's opacity group. */
-.cal-event.is-past {
-  background: color-mix(in srgb, var(--color-accent-subtle) 54%, transparent);
-  border-left-color: color-mix(in srgb, var(--color-accent) 54%, transparent);
+.cal-event.is-past { border-left-color: color-mix(in srgb, var(--cal-accent, var(--color-accent)) 40%, transparent); }
+.cal-event.is-past .cal-event-title { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.cal-event.is-past .cal-event-meta  { color: color-mix(in srgb, var(--color-text-muted) 55%, transparent); }
+/* A cancelled occurrence stays in place, struck through: the series still met
+   on that cadence, and a gap would read as "never scheduled". */
+.cal-event.is-cancelled .cal-event-name,
+.cal-event.is-cancelled .cal-event-meta { text-decoration: line-through; }
+.cal-event.is-cancelled .cal-event-title { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.cal-event.is-cancelled .cal-event-meta  { color: color-mix(in srgb, var(--color-text-muted) 55%, transparent); }
+
+/* ---- Filter popover ----
+   Anchored to its button with no backdrop, so the calendar it narrows stays
+   visible. Lives here rather than in components.css: this file carries the
+   designmd:legacy marker, so no kit change reaches it, and the kit has no
+   popover component yet. */
+.rob-filter { position: relative; display: inline-flex; }
+.rob-filter-pop {
+  position: absolute;
+  top: calc(100% + var(--ic-space-2));
+  /* Anchored to the button's right edge, not its left: Filter sits well into
+     the toolbar, and a 520px panel opening rightward runs off the page. */
+  right: 0;
+  z-index: var(--ic-z-dropdown);
+  width: 520px;
+  max-width: calc(100vw - var(--ic-space-7) * 2);
+  padding: var(--ic-space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--ic-radius-md);
+  box-shadow: var(--ic-shadow-xl);
 }
-.cal-event.is-past:hover { background: color-mix(in srgb, var(--color-accent) 11%, transparent); }
-.cal-event.is-past .cal-event-title { color: color-mix(in srgb, var(--color-text) 54%, transparent); }
+.rob-filter-pop[hidden] { display: none; }
+.rob-filter-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--ic-space-4);
+  margin-bottom: var(--ic-space-4);
+}
+.rob-filter-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+.rob-filter-clear {
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  font: var(--type-body-semibold);
+  color: var(--color-accent);
+}
+.rob-filter-clear:hover { text-decoration: underline; text-underline-offset: 3px; }
+.rob-filter-body { display: flex; flex-direction: column; gap: var(--ic-space-3); }
+/* Label column, then the control. Labels wrap rather than widening the panel. */
+.rob-filter-row {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ic-space-4);
+}
+.rob-filter-label { font: var(--type-body); color: var(--color-text); }
+.rob-filter-field { width: 100%; min-width: 0; }
+.rob-filter-field .input-select-trigger { width: 100%; }
+.rob-filter-field .dropdown-menu { max-height: 240px; overflow-y: auto; }
+/* The three switches set scope rather than narrowing a field, so they sit
+   below a rule of their own. */
+.rob-filter-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ic-space-3);
+  margin-top: var(--ic-space-5);
+  padding-top: var(--ic-space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---- Week view ----
+   An hour grid with events placed by start time. The hour height is one
+   variable, so the axis, the lines and every block stay in step. */
+.cal-week { --cal-hour: 64px; --cal-axis: 72px; display: flex; flex-direction: column; }
+.cal-week[hidden], .cal-sched[hidden] { display: none; }
+.cal-week-head {
+  display: grid;
+  grid-template-columns: var(--cal-axis) minmax(0, 1fr);
+  border: 1px solid var(--color-border);
+  border-bottom: 0;
+  border-radius: var(--ic-radius-md) var(--ic-radius-md) 0 0;
+  background: var(--color-surface);
+}
+.cal-week-tz {
+  display: flex; align-items: center; justify-content: center;
+  font: var(--type-body-xs);
+  color: var(--color-text-muted);
+}
+.cal-week-headdays { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cal-week-day {
+  display: flex; align-items: center; justify-content: center; gap: var(--ic-space-2);
+  padding: var(--ic-space-3) var(--ic-space-2);
+  font: var(--type-body-sm-semibold);
+  color: var(--ic-palette-gray-600);
+  text-transform: uppercase;
+  border-left: 1px solid var(--color-border);
+}
+.cal-week-day.is-today { color: var(--color-accent); }
+.cal-week-daynum { font: var(--type-body-sm-semibold); }
+/* Today's date gets the same blue disc the month grid gives it. */
+.cal-week-day.is-today .cal-week-daynum {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: var(--ic-radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+.cal-week-body {
+  display: grid;
+  grid-template-columns: var(--cal-axis) minmax(0, 1fr);
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--ic-radius-md) var(--ic-radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.cal-week-axis { position: relative; }
+/* The label sits above its own line, so it is nudged up half a line-height. */
+.cal-week-hour {
+  position: absolute;
+  right: var(--ic-space-3);
+  transform: translateY(-50%);
+  font: var(--type-body-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.cal-week-cols { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cal-week-col { position: relative; border-left: 1px solid var(--color-border); }
+.cal-week-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--color-border); }
+/* Now — the one amber thing on the page, so it reads as a position in time
+   rather than as another event state. */
+.cal-week-now { position: absolute; height: 0; border-top: 2px solid var(--color-warning); z-index: 3; }
+/* In the schedule the line is a row of its own, between the day's heading and
+   its first meeting, rather than something floated over the heading. */
+.cal-sched-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); margin: var(--ic-space-1) 0 var(--ic-space-2); }
+.cal-week-now::before, .cal-sched-now::before {
+  content: ""; position: absolute; left: -4px; top: -5px;
+  width: 8px; height: 8px; border-radius: var(--ic-radius-full);
+  background: var(--color-warning);
+}
+/* A block, not a chip: tinted fill plus the state's rule down the left. */
+.cal-week-ev {
+  position: absolute;
+  left: 0; right: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  overflow: hidden;
+  padding: 3px var(--ic-space-2);
+  border: 0;
+  border-left: 3px solid var(--cal-accent, var(--color-accent));
+  border-radius: var(--ic-radius-sm);
+  background: color-mix(in srgb, var(--cal-accent, var(--color-accent)) 10%, var(--color-surface));
+  text-align: left;
+  cursor: pointer;
+  z-index: 2;
+}
+.cal-week-ev:hover { background: color-mix(in srgb, var(--cal-accent, var(--color-accent)) 18%, var(--color-surface)); }
+.cal-week-ev .cal-event-title { font: var(--type-body-sm); }
+.cal-week-ev.is-past   { opacity: 0.55; }
+.cal-week-ev.is-warning   { --cal-accent: var(--color-warning); }
+.cal-week-ev.is-error     { --cal-accent: var(--color-danger); }
+.cal-week-ev.is-cancelled { --cal-accent: var(--color-text-subtle); }
+.cal-week-ev.is-cancelled .cal-event-name,
+.cal-week-ev.is-cancelled .cal-event-meta { text-decoration: line-through; }
+
+/* ---- Schedule view ---- */
+.cal-sched { position: relative; display: flex; flex-direction: column; gap: var(--ic-space-6); }
+.cal-sched-day { display: flex; flex-direction: column; gap: var(--ic-space-1); position: relative; }
+.cal-sched-date { font: var(--type-h3); color: var(--color-text); margin: 0 0 var(--ic-space-2); }
+/* The weekday is secondary to the date it qualifies. */
+.cal-sched-weekday { font: var(--type-body-lg); color: var(--color-text-muted); }
+.cal-sched-row {
+  display: grid;
+  grid-template-columns: 4px 200px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ic-space-5);
+  padding: var(--ic-space-2) 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--ic-radius-sm);
+}
+.cal-sched-row:hover { background: var(--color-surface-muted); }
+.cal-sched-bar { width: 4px; height: 20px; border-radius: 2px; background: var(--cal-accent, var(--color-accent)); }
+.cal-sched-time { font: var(--type-body); color: var(--color-text); white-space: nowrap; }
+.cal-sched-title { font: var(--type-body); color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-sched-row.is-past .cal-sched-time,
+.cal-sched-row.is-past .cal-sched-title { color: var(--color-text-muted); }
+.cal-sched-row.is-warning   { --cal-accent: var(--color-warning); }
+.cal-sched-row.is-error     { --cal-accent: var(--color-danger); }
+.cal-sched-row.is-cancelled { --cal-accent: var(--color-text-subtle); }
+.cal-sched-row.is-cancelled .cal-sched-title { text-decoration: line-through; }
+/* Schedule stops at the end of this week rather than scrolling forever, so it
+   says so instead of just running out. */
+.cal-sched-end {
+  padding-top: var(--ic-space-4);
+  border-top: 1px solid var(--color-border);
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+}
+.cal-sched-empty { font: var(--type-body-sm); color: var(--color-text-muted); padding: var(--ic-space-2) 0; }
+
+/* Overflow: a day shows CAL_MAX events, then says how many more. Clicking
+   expands that one day rather than opening a separate popover. */
+.cal-more {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0 var(--ic-space-2);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: var(--ic-weight-semibold) var(--ic-text-xxs)/var(--ic-lh-body-xxs) var(--ic-font-sans);
+  color: var(--color-text-muted);
+}
+.cal-more:hover { color: var(--color-text); text-decoration: underline; }
 .cal-event.is-past .cal-event-meta  { color: color-mix(in srgb, var(--color-text-muted) 54%, transparent); }
 
 /* ---------- Walkthrough spotlight on the Jan 21 event ---------- */
@@ -4380,7 +4693,31 @@ body { overflow: hidden; }
           <svg class="search-icon"><use href="#i-search"/></svg>
           <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." data-rob-todo="Global search" />
         </div>
-        <a class="avatar avatar-md" href="profile-items.html" aria-label="Open profile">MV</a>
+        <!-- The kit's account slot: .dropdown.topbar-account with the avatar as
+             the trigger, per designmd's own topbar. It was a bare link to a
+             profile page before, which is neither the component nor the flow. -->
+        <div class="dropdown topbar-account" data-rob-account>
+          <button class="avatar avatar-md dropdown-trigger" type="button"
+                  aria-haspopup="menu" aria-expanded="false" aria-label="Account">MV</button>
+          <div class="dropdown-menu dropdown-menu-end" hidden role="menu">
+            <div class="dropdown-header">
+              <span class="avatar avatar-md">MV</span>
+              <div class="dropdown-item-text">
+                <span class="dropdown-item-label">Matthew Vella</span>
+                <span class="dropdown-item-description">Senior Product Designer</span>
+              </div>
+            </div>
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Your profile">My profile</button>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Feedback">Feedback<span class="count-badge dropdown-item-count">10</span></button>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="The career map">Career map</button>
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Recognitions">Recognitions</button>
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Time off">Time off</button>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Signing out">Sign out</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -4421,15 +4758,53 @@ body { overflow: hidden; }
       <!-- MAIN -->
       <main class="app-shell-main" style="padding: var(--ic-space-7)">
 
+        <!-- The calendar and the paused list are two screens of this page; the
+             More menu swaps between them. Named data-rob-screen, not
+             data-rob-view — that one is already the calendar's
+             Month / Week / Schedule switcher. -->
+        <div data-rob-screen="calendar">
+
         <!-- PAGE HEAD -->
         <div class="page-head">
           <div class="page-head-main">
             <div class="page-head-title">
               <h1 class="page-head-heading">RoB Meetings</h1>
+              <!-- Click-to-open rather than the kit's [data-tooltip]: that one
+                   renders through ::after from an attribute, so it cannot carry
+                   paragraphs or bold, and caps at 240px. -->
+              <span class="rob-info" data-rob-info>
+                <button class="rob-info-btn" type="button" aria-expanded="false"
+                        aria-controls="rob-info-pop" aria-label="About RoB Meetings">
+                  <svg class="icon"><use href="#i-info"/></svg>
+                </button>
+                <div class="rob-info-pop" id="rob-info-pop" role="dialog"
+                     aria-label="About RoB Meetings" hidden>
+                  <p><strong>Rhythm of Business Meetings</strong> are a structured, recurring cadence of team meetings, focused on reviewing progress, removing roadblocks, and maintaining high performance.</p>
+                  <p>Every Initiative and Process must have a recurring RoB Meeting to drive alignment, execution, and strategic decision-making.</p>
+                  <p><strong>Meeting owners</strong> are responsible for updates, including adding guests, scheduling, and deleting meetings.</p>
+                </div>
+              </span>
             </div>
           </div>
           <div class="page-head-actions">
             <button class="btn btn-primary" data-modal-open="create-meeting">Create meeting</button>
+            <div class="dropdown" data-rob-more>
+              <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button"
+                      aria-haspopup="menu" aria-expanded="false" aria-label="More actions">
+                <!-- i-more, not i-dots-three-vertical: that slug is i-more
+                     rotated 90deg, so despite the name it draws the dots
+                     horizontally. i-more is the upright kebab. -->
+                <svg class="icon"><use href="#i-more"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" hidden role="menu">
+                <button class="dropdown-item" type="button" role="menuitem" data-rob-export>
+                  <svg class="dropdown-item-icon"><use href="#i-download"/></svg>Export as CSV
+                </button>
+                <button class="dropdown-item" type="button" role="menuitem" data-rob-paused>
+                  <svg class="dropdown-item-icon"><use href="#i-pause"/></svg>Paused meeting series
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4448,7 +4823,81 @@ body { overflow: hidden; }
             <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
             <input class="input" type="search" placeholder="Search meetings" data-rob-search data-rob-todo="Searching meetings" />
           </div>
-          <button class="btn btn-secondary" type="button" data-rob-filter data-rob-todo="Filtering meetings"><svg class="btn-icon"><use href="#i-funnel"/></svg>Filter</button>
+          <!-- Filter — a popover anchored to its button, not a modal: the
+               calendar behind it is what is being narrowed. -->
+          <div class="rob-filter" data-rob-filter-wrap>
+            <button class="btn btn-secondary" type="button" data-rob-filter
+                    aria-haspopup="dialog" aria-expanded="false"><svg class="btn-icon"><use href="#i-funnel"/></svg><span data-rob-filter-label>Filter</span></button>
+            <div class="rob-filter-pop" hidden role="dialog" aria-label="Filters" data-rob-filter-pop>
+              <div class="rob-filter-head">
+                <p class="rob-filter-title">Filters</p>
+                <button class="rob-filter-clear" type="button" data-rob-filter-clear>Clear all</button>
+              </div>
+
+              <div class="rob-filter-body">
+                <div class="rob-filter-row">
+                  <label class="rob-filter-label" for="rf-name">Meeting name</label>
+                  <input class="input rob-filter-field" id="rf-name" type="search" data-rob-f="name" />
+                </div>
+                <div class="rob-filter-row">
+                  <span class="rob-filter-label">Team</span>
+                  <div class="input-select rob-filter-field" data-rob-f="team" data-rob-f-default="All">
+                    <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Team">
+                      <span class="input-select-value" data-rob-f-value>All</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden data-rob-f-options></div>
+                  </div>
+                </div>
+                <div class="rob-filter-row">
+                  <span class="rob-filter-label">Meeting owners</span>
+                  <div class="input-select rob-filter-field" data-rob-f="owner" data-rob-f-default="All">
+                    <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Meeting owners">
+                      <span class="input-select-value" data-rob-f-value>All</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden data-rob-f-options></div>
+                  </div>
+                </div>
+                <div class="rob-filter-row">
+                  <span class="rob-filter-label">Attendee</span>
+                  <div class="input-select rob-filter-field" data-rob-f="attendee" data-rob-f-default="All">
+                    <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Attendee">
+                      <span class="input-select-value" data-rob-f-value>All</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden data-rob-f-options></div>
+                  </div>
+                </div>
+                <div class="rob-filter-row">
+                  <span class="rob-filter-label">Divisions</span>
+                  <div class="input-select rob-filter-field" data-rob-f="division" data-rob-f-default="All">
+                    <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Divisions">
+                      <span class="input-select-value" data-rob-f-value>All</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden data-rob-f-options></div>
+                  </div>
+                </div>
+                <div class="rob-filter-row">
+                  <span class="rob-filter-label">Slack channels</span>
+                  <div class="input-select rob-filter-field" data-rob-f="slack" data-rob-f-default="All">
+                    <button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Slack channels">
+                      <span class="input-select-value" data-rob-f-value>All</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <div class="dropdown-menu" hidden data-rob-f-options></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rob-filter-toggles">
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="subteams" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Show sub teams</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="no11" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Hide 1:1 Meetings</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="robonly" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Label RoBs only</span></label>
+              </div>
+            </div>
+          </div>
           <div class="toolbar-end">
             <div class="segmented" role="tablist" aria-label="Calendar view">
               <button class="segmented-item" type="button" role="tab" aria-selected="false" data-rob-view="schedule" title="Schedule view is not in this prototype yet">Schedule</button>
@@ -4468,6 +4917,22 @@ body { overflow: hidden; }
               <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Next month" data-rob-todo="Moving between months"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
             </div>
           </div>
+
+          <!-- Week — Monday to Friday, events placed by start time and sized by
+               duration. Hidden until the view switcher picks it. -->
+          <div class="cal-week" hidden>
+            <div class="cal-week-head">
+              <div class="cal-week-tz">GMT+1</div>
+              <div class="cal-week-headdays" data-cal-week-head></div>
+            </div>
+            <div class="cal-week-body">
+              <div class="cal-week-axis" data-cal-week-axis></div>
+              <div class="cal-week-cols" data-cal-week-cols></div>
+            </div>
+          </div>
+
+          <!-- Schedule — the same week as a list, one group per day. -->
+          <div class="cal-sched" hidden data-cal-sched></div>
 
           <div class="cal-grid">
             <!-- Weekday header -->
@@ -4503,13 +4968,6 @@ body { overflow: hidden; }
             <div class="cal-day"><span class="cal-day-num">13</span></div>
             <div class="cal-day">
               <span class="cal-day-num">14</span>
-              <button class="cal-event is-past" type="button" data-modal-open="meeting-detail" data-occurrence="2026-01-14">
-                <span class="cal-event-title">Engineering Weekly</span>
-                <span class="cal-event-meta">
-                  <span class="cal-event-time">14:30</span>
-                  <span class="cal-event-unit">Engineering</span>
-                </span>
-              </button>
             </div>
             <div class="cal-day"><span class="cal-day-num">15</span></div>
             <div class="cal-day"><span class="cal-day-num">16</span></div>
@@ -4521,13 +4979,6 @@ body { overflow: hidden; }
             <div class="cal-day"><span class="cal-day-num">20</span></div>
             <div class="cal-day is-today">
               <span class="cal-day-num">21</span>
-              <button class="cal-event has-spotlight" type="button" data-modal-open="meeting-detail" data-occurrence="2026-01-21">
-                <span class="cal-event-title">Engineering Weekly</span>
-                <span class="cal-event-meta">
-                  <span class="cal-event-time">14:30</span>
-                  <span class="cal-event-unit">Engineering</span>
-                </span>
-              </button>
               <!-- Walkthrough hint -->
               <div class="cal-hint" id="cal-hint">
                 <svg class="cal-hint-arrow" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -4553,18 +5004,44 @@ body { overflow: hidden; }
             <div class="cal-day"><span class="cal-day-num">27</span></div>
             <div class="cal-day">
               <span class="cal-day-num">28</span>
-              <button class="cal-event" type="button" data-modal-open="meeting-detail" data-occurrence="2026-01-28">
-                <span class="cal-event-title">Engineering Weekly</span>
-                <span class="cal-event-meta">
-                  <span class="cal-event-time">14:30</span>
-                  <span class="cal-event-unit">Engineering</span>
-                </span>
-              </button>
             </div>
             <div class="cal-day"><span class="cal-day-num">29</span></div>
             <div class="cal-day"><span class="cal-day-num">30</span></div>
             <div class="cal-day"><span class="cal-day-num">31</span></div>
           </div>
+        </div>
+
+        </div><!-- /calendar view -->
+
+        <!-- Paused series. Titles are deliberately not links: there is no
+             series detail screen to open yet, and a link that goes nowhere
+             reads as broken rather than unbuilt. -->
+        <div data-rob-screen="paused" hidden>
+          <div class="page-head">
+            <div class="page-head-main">
+              <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a class="breadcrumb" href="#" data-rob-back>RoB Meetings</a>
+                <span class="breadcrumb is-current" aria-current="page">Paused meeting series</span>
+              </nav>
+              <div class="page-head-title">
+                <h1 class="page-head-heading">Paused meeting series</h1>
+              </div>
+              <p class="page-head-subtitle" data-rob-paused-count></p>
+            </div>
+          </div>
+
+          <table class="table rob-paused-table">
+            <thead>
+              <tr>
+                <th>Meeting</th>
+                <th>Drives</th>
+                <th>Cadence</th>
+                <th>Accountable Owner</th>
+                <th>Paused</th>
+              </tr>
+            </thead>
+            <tbody data-rob-paused-rows></tbody>
+          </table>
         </div>
 
       </main>
@@ -9195,8 +9672,8 @@ Platform reliability — error budget
   <script>
     // Normalize URL: if served via a clean URL ending with the folder name
     // (no trailing slash), append one so sibling relative URLs like
-    // <a href="profile-items.html"> resolve to /<dir>/profile-items.html
-    // instead of /profile-items.html. Local-only fix — Cloudflare Pages
+    // <a href="roles.html"> resolve to /<dir>/roles.html
+    // instead of /roles.html. Local-only fix — Cloudflare Pages
     // already serves trailing slashes for directory targets.
     if (/\/rob$/.test(location.pathname)) {
       history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
@@ -9211,21 +9688,8 @@ Platform reliability — error budget
       link.href = `${base}/${link.dataset.robSibling}/`;
     });
 
-    // Calendar view switcher. Month is what this prototype draws; the other two
-    // say so rather than moving the selection onto a view that never renders.
-    document.querySelectorAll('[data-rob-view]').forEach(seg => {
-      seg.addEventListener('click', () => {
-        if (seg.dataset.robView !== 'month') {
-          window.robNotBuilt?.(`The ${seg.textContent.trim()} view`);
-          return;
-        }
-        document.querySelectorAll('[data-rob-view]').forEach(s => {
-          const on = s === seg;
-          s.classList.toggle('is-active', on);
-          s.setAttribute('aria-selected', String(on));
-        });
-      });
-    });
+    // The calendar view switcher is wired with the views themselves, further
+    // down — all three are built now, so nothing here declines to render.
 
     // Sidenav: toggle compact mode
     document.querySelector('.sidenav-toggle')?.addEventListener('click', () => {
@@ -9243,8 +9707,11 @@ Platform reliability — error budget
     const openModal  = (id) => document.getElementById(id)?.removeAttribute('hidden');
     const closeModal = (el) => el?.closest('.modal-overlay')?.setAttribute('hidden', '');
 
-    document.querySelectorAll('[data-modal-open]').forEach(btn => {
-      btn.addEventListener('click', () => openModal(btn.dataset.modalOpen));
+    // Delegated, not bound per element at load: the calendar builds its events
+    // from data, so triggers that did not exist at load still have to work.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-modal-open]');
+      if (btn) openModal(btn.dataset.modalOpen);
     });
     document.querySelectorAll('[data-modal-close]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn));
@@ -9291,7 +9758,8 @@ Platform reliability — error budget
       };
 
       grid.addEventListener('click', (e) => {
-        if (e.target.closest('.cal-event')) return;
+        // .cal-more expands the day; it is not an invitation to create.
+        if (e.target.closest('.cal-event, .cal-more')) return;
         const day = e.target.closest('.cal-day');
         if (day) openFor(day);
       });
@@ -9299,7 +9767,7 @@ Platform reliability — error budget
       grid.addEventListener('keydown', (e) => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         const day = e.target.closest('.cal-day');
-        if (!day || e.target.closest('.cal-event')) return;
+        if (!day || e.target.closest('.cal-event, .cal-more')) return;
         e.preventDefault();
         openFor(day);
       });
@@ -11405,7 +11873,10 @@ Platform reliability — error budget
         if (!title) return;
         const meta = [...ev.querySelectorAll('.cal-event-meta > *')]
           .map(n => n.textContent.trim()).filter(Boolean).join(' \u00b7 ');
-        ev.setAttribute('data-tooltip', meta ? `${title}\n${meta}` : title);
+        // A non-default occurrence explains itself; the chip parks that reason
+        // on the element so rebuilding the tooltip here cannot drop it.
+        const note = ev.dataset.stateNote ? `\n\n${ev.dataset.stateNote}` : '';
+        ev.setAttribute('data-tooltip', (meta ? `${title}\n${meta}` : title) + note);
         ev.setAttribute('data-tooltip-style', 'regular');
       };
       const syncAll = () => document.querySelectorAll('.cal-event').forEach(sync);
@@ -12859,5 +13330,674 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 })();
 </script>
 <!-- === /review.js === -->
+  <script>
+    // Account menu on the topbar avatar.
+    (function () {
+      const wrap = document.querySelector('[data-rob-account]');
+      if (!wrap) return;
+      const trigger = wrap.querySelector('.dropdown-trigger');
+      const menu = wrap.querySelector('.dropdown-menu');
+      const close = () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
+      // No stopPropagation: the click has to reach the other popovers'
+      // outside-click handlers, which is what closes them when this one opens.
+      trigger.addEventListener('click', () => {
+        const open = menu.hidden;
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+      });
+      // Every item is a stub, so the menu closes and the page says so.
+      menu.addEventListener('click', (e) => { if (e.target.closest('.dropdown-item')) close(); });
+      document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menu.hidden) { close(); trigger.focus(); }
+      });
+    })();
+
+    // Info popover beside the page heading.
+    (function () {
+      const wrap = document.querySelector('[data-rob-info]');
+      if (!wrap) return;
+      const btn = wrap.querySelector('.rob-info-btn');
+      const pop = wrap.querySelector('.rob-info-pop');
+      const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+      btn.addEventListener('click', () => {
+        const open = pop.hidden;
+        pop.hidden = !open;
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !pop.hidden) { close(); btn.focus(); }
+      });
+    })();
+
+    // More menu: Export as CSV, and the paused-series view.
+    (function () {
+      const more    = document.querySelector('[data-rob-more]');
+      if (!more) return;
+      const trigger = more.querySelector('.dropdown-trigger');
+      const menu    = more.querySelector('.dropdown-menu');
+      const calView = document.querySelector('[data-rob-screen="calendar"]');
+      const pauView = document.querySelector('[data-rob-screen="paused"]');
+
+      // Every series this workspace runs, active and paused. The paused view
+      // renders the paused ones; the export carries all of them, so the CSV
+      // and the screen can never disagree.
+      const SERIES = [
+        { name: 'Engineering Weekly',            kind: 'Process RoB',    parent: 'Platform reliability \u2014 error budget', cadence: 'Weekly',    owner: 'Adan Jones',   status: 'Active' },
+        { name: 'Incident Review',               kind: 'Process RoB',    parent: 'Platform reliability \u2014 on-call',      cadence: 'Weekly',    owner: 'Daniel Reyes', status: 'Active' },
+        { name: 'Ops Leadership Review',         kind: 'Initiative RoB', parent: 'Operational Excellence Program',       cadence: 'Bi-weekly', owner: 'Aisha Khan',   status: 'Active' },
+        { name: 'Pipeline Review',               kind: 'Initiative RoB', parent: 'Enterprise Sales Expansion',          cadence: 'Weekly',    owner: 'Owen Clarke',  status: 'Active' },
+        { name: 'Vendor Consolidation Review',   kind: 'Initiative RoB', parent: 'Operational Excellence Program',      cadence: 'Bi-weekly', owner: 'Tom Baker',    status: 'Paused', paused: '2026-10-24' },
+        { name: 'Brand Refresh Sync',            kind: 'Initiative RoB', parent: 'Marketing Consulting',                cadence: 'Weekly',    owner: 'Maria Santos', status: 'Paused', paused: '2026-10-09' },
+        { name: 'Career Ladders Working Session',kind: 'Initiative RoB', parent: 'Talent Development Framework',        cadence: 'Bi-weekly', owner: 'Sofia Jensen', status: 'Paused', paused: '2026-09-18' },
+        { name: 'Escalations Triage',            kind: 'Process RoB',    parent: 'Support \u2014 Escalations Pod',           cadence: 'Weekly',    owner: 'Aisha Khan',   status: 'Paused', paused: '2026-08-27' },
+        { name: 'Budget Checkpoint',             kind: 'Initiative RoB', parent: 'FY25 Budget Planning',                cadence: 'Weekly',    owner: 'Tom Baker',    status: 'Paused', paused: '2026-07-15' },
+      ];
+
+      // UXCopy: medium date in tables, relative under a week.
+      const fmtDate = (iso) => {
+        const d = new Date(iso + 'T00:00');
+        const days = Math.round((Date.now() - d) / 86400000);
+        if (days <= 0) return 'today';
+        if (days === 1) return 'yesterday';
+        if (days < 7) return `${days} days ago`;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      // ---- Paused view ----
+      const paused = SERIES.filter(x => x.status === 'Paused');
+      const rows = document.querySelector('[data-rob-paused-rows]');
+      const count = document.querySelector('[data-rob-paused-count]');
+      paused.forEach(x => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td><span class="rob-paused-title"></span></td>'
+          + '<td><div class="cell-meta"><span class="cell-meta-title"></span>'
+          + '<span class="cell-meta-sub"></span></div></td>'
+          + '<td></td><td></td><td class="rob-paused-when"></td>';
+        const td = tr.querySelectorAll('td');
+        td[0].querySelector('.rob-paused-title').textContent = x.name;
+        td[1].querySelector('.cell-meta-title').textContent = x.parent;
+        td[1].querySelector('.cell-meta-sub').textContent = x.kind;
+        td[2].textContent = x.cadence;
+        td[3].textContent = x.owner;
+        td[4].textContent = fmtDate(x.paused);
+        rows.appendChild(tr);
+      });
+      // UXCopy: counts read as a phrase, not a parenthetical.
+      count.textContent = `${paused.length} series paused. Occurrences stop until a series is resumed.`;
+
+      const show = (view) => {
+        calView.hidden = view !== 'calendar';
+        pauView.hidden = view !== 'paused';
+        document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
+      };
+
+      // ---- Menu ----
+      const closeMenu = () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
+      trigger.addEventListener('click', () => {
+        const open = menu.hidden;
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', (e) => { if (!more.contains(e.target)) closeMenu(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+      document.querySelector('[data-rob-paused]').addEventListener('click', () => {
+        closeMenu();
+        show('paused');
+      });
+      document.querySelector('[data-rob-back]').addEventListener('click', (e) => {
+        e.preventDefault();
+        show('calendar');
+      });
+
+      // ---- Export as CSV ----
+      const csvCell = (v) => {
+        const t = String(v ?? '');
+        return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+      };
+      const buildCsv = () => {
+        const head = ['Meeting', 'Type', 'Drives', 'Cadence', 'Accountable Owner', 'Status', 'Paused on'];
+        const body = SERIES.map(x => [x.name, x.kind, x.parent, x.cadence, x.owner, x.status, x.paused || '']);
+        // CRLF and a BOM so Excel opens it as UTF-8 rather than mojibake.
+        return '\uFEFF' + [head, ...body].map(r => r.map(csvCell).join(',')).join('\r\n');
+      };
+
+      const exportBtn = document.querySelector('[data-rob-export]');
+      exportBtn.addEventListener('click', async () => {
+        const label = exportBtn.textContent.trim();
+        exportBtn.classList.add('is-busy');
+        exportBtn.lastChild.textContent = 'Preparing export\u2026';
+
+        // A real export would be assembled server-side; the pause stands in for
+        // that so the flow reads honestly rather than resolving instantly.
+        await new Promise(r => setTimeout(r, 700));
+
+        const csv = buildCsv();
+        const name = `rob-meeting-series-${new Date().toISOString().slice(0, 10)}.csv`;
+        let saved = false;
+        try {
+          // showSaveFilePicker is what opens the system's own save dialog. It
+          // needs the click's transient activation, which the 700ms wait above
+          // stays inside, and it is Chromium-only \u2014 hence the fallback.
+          if (window.showSaveFilePicker) {
+            const handle = await window.showSaveFilePicker({
+              suggestedName: name,
+              types: [{ description: 'CSV', accept: { 'text/csv': ['.csv'] } }],
+            });
+            const w = await handle.createWritable();
+            await w.write(new Blob([csv], { type: 'text/csv' }));
+            await w.close();
+            saved = true;
+          }
+        } catch (err) {
+          // AbortError is the person closing the dialog, which is not a failure.
+          if (err?.name === 'AbortError') {
+            exportBtn.classList.remove('is-busy');
+            exportBtn.lastChild.textContent = label;
+            closeMenu();
+            return;
+          }
+        }
+
+        if (!saved) {
+          // No picker (or it refused): fall back to a plain download, which asks
+          // where to save only if the browser is set to.
+          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+          const a = Object.assign(document.createElement('a'), { href: url, download: name });
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        exportBtn.classList.remove('is-busy');
+        exportBtn.lastChild.textContent = label;
+        closeMenu();
+        window.toast?.({ variant: 'success', message: `${SERIES.length} meeting series exported` });
+      });
+    })();
+  </script>
+  <script>
+    // Calendar occurrences. The month grid is company-wide by default ("All
+    // events"); "My events" narrows it to the series this person sits in.
+    // Series, not occurrences, are the unit: a RoB recurs on a cadence, so the
+    // grid is generated from the cadence rather than hand-placed.
+    (function () {
+      const grid = document.querySelector('.cal-grid');
+      const monthEl = document.querySelector('.cal-month');
+      if (!grid || !monthEl) return;
+
+      const MAX = 3;   // events a day shows before it offers the rest
+
+      // An occurrence's state, and what the state means. Blue is the default and
+      // carries no icon; the other three say why they are not blue.
+      const STATE = {
+        warning:   { cls: 'is-warning',   icon: 'i-warning',  note: 'No recording — auto-recording is turned off for this meeting.' },
+        error:     { cls: 'is-error',     icon: 'i-critical', note: 'Zoom data isn’t available for this meeting. This may be because the event had no Zoom link, or no attendees joined.' },
+        cancelled: { cls: 'is-cancelled', icon: '',           note: 'This occurrence was cancelled.' },
+      };
+
+      // dow: 0=Sun … 6=Sat. every: 1 weekly, 2 bi-weekly. mine: on my calendar.
+      // CONTEXT.md: Processes, never BAU — the product's older word.
+      const SERIES = [
+        { title: '[RoB] [Initiative] Operationalize Launch', time: '10:00am', unit: 'New Business',        dow: 1, every: 1, mine: true, mins: 60, owner: 'Adan Jones' },
+        { title: '[RoB] [Initiative] Business Propellant',   time: '2:30pm',  unit: 'New Business',        dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
+        { title: 'Business Propellant Call',                 time: '4:00pm',  unit: 'Toptal',              dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
+        { title: '[RoB] [Process] HireGlobal Outbound Motion', time: '2:00pm', unit: 'New Business, Services', dow: 2, every: 1, mins: 30, owner: 'Maria Santos' },
+        { title: 'Operationalize Integrations',              time: '2:30pm',  unit: 'New Business',        dow: 2, every: 1, mins: 30, owner: 'Nina Gupta' },
+        { title: '[RoB] [Team] Executive Team',              time: '5:00pm',  unit: 'Toptal',              dow: 2, every: 2, mins: 60, owner: 'Adan Jones' },
+        { title: 'HireGlobal — Paid Marketing weekly',  time: '5:30pm',  unit: 'New Business',        dow: 2, every: 2, mins: 30, owner: 'Maria Santos' },
+        { title: '[RoB] Operationalize QAs Sync',            time: '12:30pm', unit: 'New Business',        dow: 3, every: 1, mins: 30, owner: 'Nina Gupta' },
+        { title: '[RoB] ExpertCrowd <> ActionTrace Integration', time: '2:30pm', unit: 'New Business',     dow: 3, every: 1, mins: 25, owner: 'Daniel Reyes' },
+        { title: '[RoB] Engineering Weekly',                 time: '2:30pm',  unit: 'Engineering',         dow: 3, every: 1, mine: true, mins: 60, owner: 'Daniel Reyes' },
+        { title: '[RoB] [Process] New Business Strategy',    time: '4:00pm',  unit: 'New Business',        dow: 3, every: 2, mins: 90, owner: 'Owen Clarke' },
+        { title: 'HireGlobal — Client Advisor Weekly',  time: '3:30pm',  unit: 'New Business',        dow: 3, every: 2, mins: 30, owner: 'Aisha Khan' },
+        { title: '[RoB] [Initiative] TechResume — improve profile quality', time: '4:30pm', unit: 'New Business', dow: 4, every: 1, mins: 60, owner: 'Sofia Jensen' },
+        { title: '[RoB] [Initiative] Expert Crowd',          time: '5:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Owen Clarke' },
+        { title: '[RoB] HUD <> EC Integration & Benchmarks', time: '6:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Daniel Reyes' },
+        { title: '[RoB] [Team] Product All Hands',           time: '4:00pm',  unit: 'Product Management',  dow: 4, every: 2, mine: true, mins: 60, owner: 'Matthew Vella' },
+        { title: '[RoB] [Process] HireGlobal Weekly GTM Review', time: '2:30pm', unit: 'Marketing, New Business', dow: 5, every: 1, mins: 50, owner: 'Maria Santos' },
+        { title: '[RoB] [Process] SEO for HireGlobal',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Liam Wong' },
+        { title: '[RoB] [Initiative] Creator Website',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Sofia Jensen' },
+      ];
+
+      // State belongs to one occurrence, not to the series: a meeting that lost
+      // its recording last Tuesday is fine this Tuesday. Keyed date|title so a
+      // single date can be marked without splitting the series.
+      const OCCURRENCE_STATE = {
+        '2026-01-06|[RoB] [Process] HireGlobal Outbound Motion': 'cancelled',
+        '2026-01-20|[RoB] [Process] HireGlobal Outbound Motion': 'cancelled',
+        '2026-01-14|[RoB] Operationalize QAs Sync': 'warning',
+        '2026-01-08|[RoB] [Initiative] Expert Crowd': 'warning',
+        '2026-01-26|[RoB] [Initiative] Business Propellant': 'warning',
+        '2026-01-14|[RoB] Engineering Weekly': 'error',
+        '2026-01-09|[RoB] [Process] SEO for HireGlobal': 'error',
+        '2026-01-19|[RoB] [Initiative] Operationalize Launch': 'error',
+      };
+
+      const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      // Give every cell its date once, so rendering and filtering key off it.
+      const cells = [...grid.querySelectorAll('.cal-day')];
+      const [monthName, year] = monthEl.textContent.trim().split(/\s+/);
+      const base = new Date(`${monthName} 1, ${year}`);
+      const firstOfMonth = cells.findIndex(c => !c.classList.contains('is-other'));
+      cells.forEach((cell, i) => {
+        const numEl = cell.querySelector('.cal-day-num');
+        const num = Number(numEl.textContent.trim());
+        let month = base.getMonth();
+        if (cell.classList.contains('is-other')) month += i < firstOfMonth ? -1 : 1;
+        const d = new Date(base.getFullYear(), month, num);
+        cell.dataset.date = iso(d);
+        cell.dataset.dow = d.getDay();
+        numEl.textContent = String(num).padStart(2, '0');   // two digits, as the reference
+      });
+
+      // "Today" is the cell the grid already marks, so the faded past matches
+      // the month on screen rather than the real clock.
+      const todayIso = grid.querySelector('.cal-day.is-today')?.dataset.date || iso(new Date());
+      const weekOf = (i) => Math.floor(i / 7);   // bi-weekly rides the week index
+
+      const eventsFor = (cell, i, mineOnly) => SERIES
+        .filter(s => s.dow === Number(cell.dataset.dow))
+        .filter(s => s.every === 1 || weekOf(i) % 2 === 1)
+        .filter(s => !mineOnly || s.mine)
+        .filter(s => window.robFilterPass ? window.robFilterPass(s) : true);
+
+      function chip(s, date) {
+        const b = document.createElement('button');
+        b.className = 'cal-event';
+        b.type = 'button';
+        b.setAttribute('data-modal-open', 'meeting-detail');
+        b.setAttribute('data-occurrence', date);
+        if (date < todayIso) b.classList.add('is-past');
+
+        const state = STATE[OCCURRENCE_STATE[`${date}|${s.title}`]];
+        if (state) {
+          b.classList.add(state.cls);
+          // The reason rides with the colour: a yellow rule on its own does not
+          // say what is wrong, and the month cell has no room to spell it out.
+          b.dataset.stateNote = state.note;
+        }
+        // The reason rides with the colour: a yellow rule on its own does not
+        // say what is wrong, and the month cell has no room to spell it out.
+        b.setAttribute('data-tooltip',
+          `${s.title}\n${s.time} · ${s.unit}` + (state ? `\n\n${state.note}` : ''));
+        b.setAttribute('data-tooltip-style', 'regular');
+
+        const flag = state?.icon
+          ? `<svg class="icon cal-event-flag"><use href="#${state.icon}"/></svg>` : '';
+        b.innerHTML = `<span class="cal-event-title">${flag}<span class="cal-event-name">${esc(s.title)}</span></span>`
+          + `<span class="cal-event-meta"><span class="cal-event-time">${esc(s.time)}</span>`
+          + `<span class="cal-event-unit">${esc(s.unit)}</span></span>`;
+        return b;
+      }
+
+      const render = (mineOnly) => {
+        cells.forEach((cell, i) => {
+          cell.querySelectorAll('.cal-event, .cal-more').forEach(el => el.remove());
+          const list = eventsFor(cell, i, mineOnly);
+          list.slice(0, MAX).forEach(s => cell.appendChild(chip(s, cell.dataset.date)));
+          if (list.length > MAX) {
+            const more = document.createElement('button');
+            more.className = 'cal-more';
+            more.type = 'button';
+            more.textContent = `${list.length - MAX} more`;
+            more.addEventListener('click', () => {
+              more.remove();
+              list.slice(MAX).forEach(s => cell.appendChild(chip(s, cell.dataset.date)));
+              window.syncCalEventTooltips?.();
+            });
+            cell.appendChild(more);
+          }
+        });
+        window.syncCalEventTooltips?.();
+      };
+
+      // ---- Week and Schedule ----
+      // Both read the same SERIES and the same OCCURRENCE_STATE as the month,
+      // so a cancelled Tuesday is cancelled in all three.
+      const weekEl  = document.querySelector('.cal-week');
+      const schedEl = document.querySelector('[data-cal-sched]');
+      const HOUR_0 = 10, HOUR_N = 20;           // the band the day is drawn over
+      const HOUR_PX = 64;
+      const PX_PER_MIN = HOUR_PX / 60;
+      // "Now" rides on the pinned today, not the wall clock: the month grid
+      // marks a fixed day, and a line drawn from the real time would contradict it.
+      const NOW_MINS = 14 * 60 + 5;
+
+      const toMins = (t) => {
+        const m = /^(\d+):(\d+)(am|pm)$/.exec(t.trim());
+        if (!m) return 0;
+        let h = Number(m[1]) % 12;
+        if (m[3] === 'pm') h += 12;
+        return h * 60 + Number(m[2]);
+      };
+      const fmtMins = (n) => {
+        const h24 = Math.floor(n / 60), mm = String(n % 60).padStart(2, '0');
+        const h = h24 % 12 === 0 ? 12 : h24 % 12;
+        return `${h}:${mm}${h24 < 12 ? 'am' : 'pm'}`;
+      };
+
+      // Monday–Friday of the week holding today — the five columns the
+      // reference shows, and the span the schedule stops at.
+      const weekDays = (() => {
+        const t = new Date(todayIso + 'T00:00');
+        const monday = new Date(t);
+        monday.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+        return Array.from({ length: 5 }, (_, i) => {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          return d;
+        });
+      })();
+
+      // Which series meet on a given date, with their state resolved.
+      const occurrencesOn = (d, mineOnly) => {
+        const date = iso(d);
+        // Bi-weekly rides the same parity the month grid uses, so the two agree.
+        const idx = cells.findIndex(c => c.dataset.date === date);
+        const wk = idx >= 0 ? weekOf(idx) : 0;
+        return SERIES
+          .filter(x => x.dow === d.getDay())
+          .filter(x => x.every === 1 || wk % 2 === 1)
+          .filter(x => !mineOnly || x.mine)
+          .filter(x => window.robFilterPass ? window.robFilterPass(x) : true)
+          .map(x => {
+            const start = toMins(x.time);
+            return { ...x, date, start, end: start + (x.mins || 30),
+                     state: STATE[OCCURRENCE_STATE[`${date}|${x.title}`]] };
+          })
+          .sort((a, b) => a.start - b.start);
+      };
+
+      const label = (ev) => `<span class="cal-event-title"><span class="cal-event-name">${esc(ev.title)}</span></span>`
+        + `<span class="cal-event-meta"><span class="cal-event-time">${esc(ev.time)}</span>`
+        + `<span class="cal-event-unit">${esc(ev.unit)}</span></span>`;
+
+      const wire = (el, ev) => {
+        el.type = 'button';
+        el.setAttribute('data-modal-open', 'meeting-detail');
+        el.setAttribute('data-occurrence', ev.date);
+        if (ev.state) {
+          el.classList.add(ev.state.cls);
+          el.dataset.stateNote = ev.state.note;
+        }
+        if (ev.date < todayIso) el.classList.add('is-past');
+      };
+
+      function renderWeek(mineOnly) {
+        const head = weekEl.querySelector('[data-cal-week-head]');
+        const axis = weekEl.querySelector('[data-cal-week-axis]');
+        const cols = weekEl.querySelector('[data-cal-week-cols]');
+        head.replaceChildren(); axis.replaceChildren(); cols.replaceChildren();
+
+        // The hour label is centred on its own line, so the first one needs
+        // room above it or it is cut off by the top edge.
+        const PAD = 10;
+        const height = (HOUR_N - HOUR_0) * HOUR_PX + PAD;
+        axis.style.height = `${height}px`;
+        cols.style.height = `${height}px`;
+
+        for (let h = HOUR_0; h <= HOUR_N; h++) {
+          const top = (h - HOUR_0) * HOUR_PX + PAD;
+          const lab = document.createElement('span');
+          lab.className = 'cal-week-hour';
+          lab.style.top = `${top}px`;
+          lab.textContent = fmtMins(h * 60);
+          axis.appendChild(lab);
+        }
+
+        weekDays.forEach(d => {
+          const date = iso(d);
+          const dh = document.createElement('div');
+          dh.className = 'cal-week-day' + (date === todayIso ? ' is-today' : '');
+          dh.innerHTML = `${d.toLocaleDateString('en-US', { weekday: 'long' })} `
+            + `<span class="cal-week-daynum">${d.getDate()}</span>`;
+          head.appendChild(dh);
+
+          const col = document.createElement('div');
+          col.className = 'cal-week-col';
+          for (let h = HOUR_0 + 1; h < HOUR_N; h++) {
+            const line = document.createElement('div');
+            line.className = 'cal-week-line';
+            line.style.top = `${(h - HOUR_0) * HOUR_PX + PAD}px`;
+            col.appendChild(line);
+          }
+
+          // Overlapping blocks step right rather than stacking on each other.
+          const list = occurrencesOn(d, mineOnly);
+          list.forEach((ev, i) => {
+            const lane = list.slice(0, i).filter(p => p.end > ev.start).length;
+            const b = document.createElement('button');
+            b.className = 'cal-week-ev';
+            b.style.top = `${(ev.start - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
+            b.style.height = `${Math.max(28, (ev.end - ev.start) * PX_PER_MIN - 2)}px`;
+            b.style.marginLeft = `${lane * 14}px`;
+            b.style.zIndex = String(2 + lane);
+            b.innerHTML = label(ev);
+            wire(b, ev);
+            col.appendChild(b);
+          });
+          cols.appendChild(col);
+        });
+
+        // The now line starts at today's column and runs to the end of the week.
+        const todayIdx = weekDays.findIndex(d => iso(d) === todayIso);
+        if (todayIdx >= 0) {
+          const now = document.createElement('div');
+          now.className = 'cal-week-now';
+          now.style.top = `${(NOW_MINS - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
+          now.style.left = `${(todayIdx / 5) * 100}%`;
+          now.style.right = '0';
+          cols.appendChild(now);
+        }
+      }
+
+      function renderSchedule(mineOnly) {
+        schedEl.replaceChildren();
+        weekDays.forEach(d => {
+          const date = iso(d);
+          const list = occurrencesOn(d, mineOnly);
+          const day = document.createElement('section');
+          day.className = 'cal-sched-day';
+
+          const h = document.createElement('h3');
+          h.className = 'cal-sched-date';
+          h.innerHTML = `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'long' })} ${d.getFullYear()}, `
+            + `<span class="cal-sched-weekday">${d.toLocaleDateString('en-US', { weekday: 'long' })}</span>`;
+          day.appendChild(h);
+
+          // Straight after the heading, so it separates the day from its first
+          // meeting instead of sitting on top of the date.
+          if (date === todayIso) {
+            day.appendChild(Object.assign(document.createElement('div'), { className: 'cal-sched-now' }));
+          }
+
+          if (!list.length) {
+            const none = document.createElement('p');
+            none.className = 'cal-sched-empty';
+            none.textContent = 'No meetings.';
+            day.appendChild(none);
+          }
+          list.forEach(ev => {
+            const row = document.createElement('button');
+            row.className = 'cal-sched-row';
+            row.innerHTML = `<span class="cal-sched-bar"></span>`
+              + `<span class="cal-sched-time">${fmtMins(ev.start)} - ${fmtMins(ev.end)}</span>`
+              + `<span class="cal-sched-title">${esc(ev.title)}</span>`;
+            wire(row, ev);
+            day.appendChild(row);
+          });
+          schedEl.appendChild(day);
+        });
+
+        const end = document.createElement('p');
+        end.className = 'cal-sched-end';
+        end.textContent = 'That is everything scheduled this week.';
+        schedEl.appendChild(end);
+      }
+
+      // ---- Filter popover ----
+      // Only the filters this prototype's data can answer actually narrow the
+      // calendar; the rest are built but inert. FILTERED says which is which.
+      const fWrap = document.querySelector('[data-rob-filter-wrap]');
+      const fBtn  = fWrap.querySelector('[data-rob-filter]');
+      const fPop  = fWrap.querySelector('[data-rob-filter-pop]');
+      const fLabel = fWrap.querySelector('[data-rob-filter-label]');
+      const F = {};   // active filter values
+
+      const uniq = (a) => [...new Set(a.filter(Boolean))].sort();
+      const OPTIONS = {
+        // "Team" is the org unit a series belongs to; a series can name two.
+        team: uniq(SERIES.flatMap(x => x.unit.split(',').map(u => u.trim()))),
+        owner: uniq(SERIES.map(x => x.owner)),
+        // No attendee, division or Slack-channel data on this page yet. The
+        // controls are built; these three do not narrow anything.
+        attendee: uniq(SERIES.map(x => x.owner)),
+        division: ['Go to Market', 'Product and Engineering', 'Operations'],
+        slack: ['#new-business', '#hireglobal', '#operationalize', '#product'],
+      };
+      const INERT = new Set(['attendee', 'division', 'slack', 'subteams', 'no11']);
+
+      fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
+        const key = sel.dataset.robF;
+        const menu = sel.querySelector('[data-rob-f-options]');
+        const value = sel.querySelector('[data-rob-f-value]');
+        const trigger = sel.querySelector('.input-select-trigger');
+        ['All', ...(OPTIONS[key] || [])].forEach(opt => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'dropdown-item' + (opt === 'All' ? ' is-selected' : '');
+          b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>';
+          b.append(opt);
+          b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === b));
+            value.textContent = opt;
+            if (opt === 'All') delete F[key]; else F[key] = opt;
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+            apply();
+          });
+          menu.appendChild(b);
+        });
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          fWrap.querySelectorAll('[data-rob-f-options]').forEach(m => { if (m !== menu) m.hidden = true; });
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', String(open));
+        });
+      });
+
+      fWrap.addEventListener('input', (e) => {
+        const el = e.target.closest('[data-rob-f]');
+        if (!el || el.classList.contains('input-select')) return;
+        const key = el.dataset.robF;
+        if (el.type === 'checkbox') F[key] = el.checked;
+        else if (el.value.trim()) F[key] = el.value.trim();
+        else delete F[key];
+        apply();
+      });
+
+      // What counts as "set": the two checkboxes that start on only count once
+      // they are turned off, or the tally would start at 2 on a clean page.
+      const activeCount = () => Object.entries(F).filter(([k, v]) => {
+        if (k === 'subteams' || k === 'no11') return v === false;
+        if (k === 'robonly') return v === true;
+        return Boolean(v);
+      }).length;
+
+      // The live predicate, used by all three views.
+      window.robFilterPass = (x) => {
+        if (F.name && !x.title.toLowerCase().includes(String(F.name).toLowerCase())) return false;
+        if (F.team && !x.unit.split(',').map(u => u.trim()).includes(F.team)) return false;
+        if (F.owner && x.owner !== F.owner) return false;
+        if (F.robonly && !/^\[RoB\]/i.test(x.title)) return false;
+        return true;
+      };
+
+      const apply = () => {
+        const n = activeCount();
+        fLabel.textContent = n ? `Filters (${n})` : 'Filter';
+        show();
+      };
+
+      fBtn.addEventListener('click', () => {
+        const open = fPop.hidden;
+        fPop.hidden = !open;
+        fBtn.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', (e) => {
+        if (!fWrap.contains(e.target)) {
+          fPop.hidden = true;
+          fBtn.setAttribute('aria-expanded', 'false');
+          fWrap.querySelectorAll('[data-rob-f-options]').forEach(m => { m.hidden = true; });
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !fPop.hidden) { fPop.hidden = true; fBtn.setAttribute('aria-expanded', 'false'); fBtn.focus(); }
+      });
+
+      fWrap.querySelector('[data-rob-filter-clear]').addEventListener('click', () => {
+        Object.keys(F).forEach(k => delete F[k]);
+        fWrap.querySelectorAll('input[type="search"]').forEach(i => { i.value = ''; });
+        fWrap.querySelectorAll('input[type="checkbox"]').forEach(c => {
+          c.checked = c.dataset.robF !== 'robonly';   // back to their defaults
+        });
+        fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
+          sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
+          sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+        });
+        apply();
+      });
+
+      // ---- View switcher ----
+      let view = 'month', mine = false;
+      const show = () => {
+        grid.hidden = view !== 'month';
+        weekEl.hidden = view !== 'week';
+        schedEl.hidden = view !== 'schedule';
+        if (view === 'month') render(mine);
+        if (view === 'week') renderWeek(mine);
+        if (view === 'schedule') renderSchedule(mine);
+        window.syncCalEventTooltips?.();
+      };
+
+      document.querySelectorAll('[data-rob-view]').forEach(seg => {
+        seg.removeAttribute('title');
+        seg.addEventListener('click', () => {
+          document.querySelectorAll('[data-rob-view]').forEach(x => {
+            const on = x === seg;
+            x.classList.toggle('is-active', on);
+            x.setAttribute('aria-selected', String(on));
+          });
+          view = seg.dataset.robView;
+          show();
+        });
+      });
+
+      // Tabs: the same grid, narrowed. My events was a stub before.
+      const tabs = [...document.querySelectorAll('.rob-tabs .tab')];
+      tabs.forEach(tab => {
+        tab.removeAttribute('data-rob-todo');
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+          });
+          mine = tab.textContent.trim() === 'My events';
+          show();
+        });
+      });
+
+      show();
+    })();
+  </script>
 </body>
 </html>
