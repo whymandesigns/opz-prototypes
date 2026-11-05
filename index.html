@@ -4532,9 +4532,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="folder">experiments/</span>
         </div>
       </a>
-      <!-- The respond-via-menu flow is the prototype's default now, so no hash
-           is needed here. The older direct-to-modal flow is still reachable at
-           ./rob/#respond=modal. -->
+      <!-- The card opens the role chooser, not the prototype: a RoB reads
+           differently for the person who runs it and the people invited to it,
+           and only the Accountable Owner's view is built. The Owner build is
+           still ./rob/ directly, and the older direct-to-modal respond flow is
+           still reachable at ./rob/#respond=modal. -->
       <!-- A Design canvas, also shared as one editable Claude artifact
            (test/artifact.json). Locally it opens read-only. -->
       <a class="card" href="./onboarding/">
@@ -4553,11 +4555,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="folder">test/</span>
         </div>
       </a>
-      <a class="card" href="./rob/">
+      <a class="card" href="./rob/roles.html">
         <img class="thumb" src="./_thumbs/rob.png" alt="RoB screenshot" loading="lazy" />
         <div class="card-meta">
           <h3 class="card-title">RoB <span class="arrow">&rarr;</span></h3>
-          <p class="card-body">RoB meeting action items, opening the respond-via-menu variant.</p>
+          <p class="card-body">RoB meeting action items, opening the respond-via-menu variant. Pick a role first: the Accountable Owner view is built, the Participant view is next.</p>
           <span class="folder">rob/</span>
         </div>
       </a>
