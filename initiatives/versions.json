@@ -1,10 +1,13 @@
 {
+  "$schema": "../../designmd/versions.schema.json",
   "family": "Initiatives (TopTrack set-up / edit)",
   "versions": [
     {
       "folder": "v1-drawer",
       "label": "v1 · Drawer",
       "date": "2026-10-01",
+      "kind": "concept",
+      "stage": "shipped",
       "note": "Initiatives table with the New initiative side drawer and drawer view mode.",
       "basedOn": null
     },
@@ -12,6 +15,8 @@
       "folder": "v2-full-screen",
       "label": "v2 · Full screen",
       "date": "2026-10-13",
+      "kind": "concept",
+      "stage": "review",
       "note": "Full-screen create and view pages with a sticky TOC; ✕-close header (breadcrumb via ?header=breadcrumb).",
       "basedOn": "v1-drawer"
     },
@@ -19,8 +24,26 @@
       "folder": "v3-breadcrumb",
       "label": "v3 · Breadcrumb + People",
       "date": "2026-10-15",
+      "kind": "concept",
+      "stage": "review",
       "note": "Breadcrumb header by default; regrouped General / People sections, related initiatives as an input, no description field.",
-      "basedOn": "v2-full-screen"
+      "basedOn": "v2-full-screen",
+      "changes": [
+        { "id": "v3-01", "type": "new", "summary": "Breadcrumb replaces the ✕ and tags", "status": "pending" },
+        { "id": "v3-02", "type": "moved", "summary": "Stage tag → Status field", "status": "pending" },
+        { "id": "v3-03", "type": "changed", "summary": "Guiding placeholder", "status": "pending" },
+        { "id": "v3-04", "type": "changed", "summary": "Guiding placeholder, no ⓘ", "status": "pending" },
+        { "id": "v3-05", "type": "moved", "summary": "Input; links initiatives, projects and sub-projects", "status": "pending" },
+        { "id": "v3-06", "type": "moved", "summary": "Core strategy, from its own section + helper text", "status": "pending" },
+        { "id": "v3-07", "type": "changed", "summary": "Searchable OKR objectives", "status": "pending" },
+        { "id": "v3-08", "type": "changed", "summary": "Tooltips on the links; placeholders, no ⓘ", "status": "pending" },
+        { "id": "v3-09", "type": "new", "summary": "People section", "status": "pending" },
+        { "id": "v3-10", "type": "moved", "summary": "RACI, from its own section", "status": "pending" },
+        { "id": "v3-11", "type": "changed", "summary": "Tooltips on the links, no ⓘ", "status": "pending" },
+        { "id": "v3-12", "type": "changed", "summary": "Description field removed", "status": "pending" },
+        { "id": "v3-13", "type": "changed", "summary": "Starts with 1 row", "status": "pending" },
+        { "id": "v3-14", "type": "changed", "summary": "People added; Strategy and RACI removed", "status": "pending" }
+      ]
     }
   ]
 }
