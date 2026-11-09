@@ -4151,6 +4151,25 @@ body { overflow: hidden; }
  * it is, and .topbar-back is the way out. Back takes the hamburger's slot
  * rather than sitting beside it — two controls on the left read as a choice,
  * and only one of them leaves. */
+/* ---- Series lifecycle menu ----
+ * Sits between the occurrence nav and Close, so the destructive actions are at
+ * the far end of the header rather than beside the title. */
+.md-life { flex-shrink: 0; }
+.md-life-menu { min-width: 232px; }
+.md-life-menu .dropdown-item[hidden] { display: none; }
+/* Red on the item itself, not only in the dialog: the menu is where the choice
+ * is made, so it is where the warning belongs. */
+.md-life-danger { color: var(--color-danger); }
+.md-life-danger .dropdown-item-icon { color: var(--color-danger); }
+.md-life-danger:hover { background: var(--color-danger-subtle); }
+.md-life-meta { font: var(--type-body-sm-semibold); color: var(--color-text); margin: 0 0 var(--spacing-3); }
+.md-life-copy { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0 0 var(--spacing-2); }
+.md-life-copy:last-child { margin-bottom: 0; }
+.md-transfer-dd { display: block; }
+.md-transfer-dd .input-select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-2); width: 100%; text-align: left; cursor: pointer; }
+.md-transfer-placeholder { color: var(--color-text-subtle); }
+.md-transfer-menu { min-width: 100%; }
+
 .topbar-back { display: none; flex-shrink: 0; }
 @media (max-width: 1024px) {
   .topbar.is-subscreen .topbar-menu { display: none; }
@@ -4234,7 +4253,14 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 /* Paused series. The page-head here has no tabs under it, so it keeps its own
    divider; the :has rule above only strips it when tabs follow. */
 .rob-paused-table { margin-top: var(--spacing-6); }
-.rob-paused-title { font: var(--type-body-semibold); color: var(--color-text); }
+/* A button now, because it opens the meeting view — the only place Resume is.
+   Reset to look like the text it replaced, with the link affordance on hover. */
+.rob-paused-title {
+  font: var(--type-body-semibold);
+  color: var(--color-text);
+  border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+}
+.rob-paused-title:hover { color: var(--color-text-link); text-decoration: underline; }
 .rob-paused-when { white-space: nowrap; }
 /* Exporting holds the menu item busy while the file is built. */
 .dropdown-item.is-busy { color: var(--color-text-muted); pointer-events: none; }
@@ -5392,7 +5418,13 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
             <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Recognitions">Recognitions</button>
             <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Time off">Time off</button>
             <hr class="dropdown-divider" />
-            <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Signing out">Sign out</button>
+            <!-- Signing out lands on the role chooser, which is this prototype's
+                 sign-in screen: the next thing you do there is say who you are.
+                 An anchor, not a button with a handler, so it behaves like the
+                 link it is. data-rob-todo is gone — that attribute makes the
+                 global handler preventDefault and announce "not built", which
+                 would now be a lie. -->
+            <a class="dropdown-item" role="menuitem" href="roles.html">Sign out</a>
           </div>
         </div>
       </div>
@@ -9207,6 +9239,36 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           </span>
           <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Next occurrence"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
         </div>
+        <!-- Series lifecycle. One menu, because these actions share a shape:
+             each is a confirmation away from changing what the calendar shows.
+             Labels and order are the product's own, Delete last and red. -->
+        <div class="dropdown md-life" data-md-life-wrap data-rob-needs="edit-series">
+          <button class="btn btn-icon-only btn-ghost btn-xs dropdown-trigger" type="button"
+                  aria-haspopup="menu" aria-expanded="false" aria-label="More actions">
+            <svg class="icon"><use href="#i-more"/></svg>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end md-life-menu" hidden role="menu">
+            <button class="dropdown-item" type="button" role="menuitem" data-md-life="transfer">
+              <svg class="dropdown-item-icon"><use href="#i-transfer"/></svg>Transfer ownership
+            </button>
+            <button class="dropdown-item" type="button" role="menuitem" data-md-life="pause">
+              <svg class="dropdown-item-icon"><use href="#i-pause"/></svg>Pause meeting series
+            </button>
+            <button class="dropdown-item" type="button" role="menuitem" data-md-life="resume">
+              <svg class="dropdown-item-icon"><use href="#i-update"/></svg>Resume meeting series
+            </button>
+            <button class="dropdown-item" type="button" role="menuitem" data-md-life="cancel">
+              <svg class="dropdown-item-icon"><use href="#i-close-circle"/></svg>Cancel this meeting only
+            </button>
+            <button class="dropdown-item" type="button" role="menuitem" data-md-life="restore">
+              <svg class="dropdown-item-icon"><use href="#i-arrow-counter-clockwise"/></svg>Restore meeting
+            </button>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item md-life-danger" type="button" role="menuitem" data-md-life="delete">
+              <svg class="dropdown-item-icon"><use href="#i-trash"/></svg>Delete meeting series
+            </button>
+          </div>
+        </div>
         <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
       </header>
 
@@ -10125,6 +10187,57 @@ Platform reliability — error budget
   </script>
 
   <!-- ============ REJECT MEETING MODAL ============ -->
+  <!-- ============ SERIES LIFECYCLE ============
+       One confirmation dialog for five actions. They differ only in title,
+       the line of meeting detail, the body copy and the confirm button, so the
+       controller fills those in rather than the page carrying five near-copies
+       that would drift apart the first time the wording changed. -->
+  <div class="modal-overlay" id="md-life-confirm" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="md-life-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="md-life-title"></h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <p class="md-life-meta" data-md-life-meta hidden></p>
+        <p class="md-life-copy" data-md-life-copy></p>
+        <p class="md-life-copy" data-md-life-copy2 hidden></p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-primary" type="button" data-md-life-go></button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Transfer ownership has a field, so it is its own dialog. -->
+  <div class="modal-overlay" id="md-life-transfer" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="md-transfer-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="md-transfer-title">Transfer ownership</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="md-transfer-pick">New owner</label>
+          <div class="dropdown md-transfer-dd">
+            <button class="input input-select-trigger" type="button" id="md-transfer-pick"
+                    aria-haspopup="listbox" aria-expanded="false" data-md-transfer-trigger>
+              <span data-md-transfer-value class="md-transfer-placeholder">Select an owner</span>
+              <svg class="icon"><use href="#i-arrows-select"/></svg>
+            </button>
+            <div class="dropdown-menu md-transfer-menu" hidden role="listbox" data-md-transfer-menu></div>
+          </div>
+          <p class="field-hint is-error" data-md-transfer-error hidden>Select owner to transfer ownership</p>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-primary" type="button" data-md-transfer-go>Transfer</button>
+      </footer>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="reject-meeting" hidden>
     <!-- The same bottom snackbar the detail view uses, for the same job:
          explaining a control that won't react. -->
@@ -15047,17 +15160,35 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       };
 
       // ---- Paused view ----
-      const paused = SERIES.filter(x => x.status === 'Paused');
       const rows = document.querySelector('[data-rob-paused-rows]');
       const count = document.querySelector('[data-rob-paused-count]');
+
+      // Rebuilt rather than built once: pausing a series from the meeting view
+      // has to show up here, which was the hole in this screen — it listed
+      // paused series and offered no way to pause one or bring one back.
+      const renderPaused = () => {
+      rows.innerHTML = '';
+      const paused = SERIES.filter(x => x.status === 'Paused');
       paused.forEach(x => {
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td><span class="rob-paused-title"></span></td>'
+        // The title opens the meeting view, which is the only place Resume
+        // lives. Without it, pausing a series removes it from the calendar and
+        // strands it here — the loop this screen was missing in the first
+        // place, just moved one step along. data-modal-open / data-occurrence
+        // are the calendar chips' own attributes, so the existing handlers
+        // switch the occurrence and open the modal with nothing added.
+        tr.innerHTML = '<td><button class="rob-paused-title" type="button"'
+          + ' data-modal-open="meeting-detail" data-tooltip-style="regular"></button></td>'
           + '<td><div class="cell-meta"><span class="cell-meta-title"></span>'
           + '<span class="cell-meta-sub"></span></div></td>'
           + '<td></td><td></td><td class="rob-paused-when"></td>';
         const td = tr.querySelectorAll('td');
-        td[0].querySelector('.rob-paused-title').textContent = x.name;
+        const titleBtn = td[0].querySelector('.rob-paused-title');
+        titleBtn.textContent = x.name;
+        titleBtn.dataset.occurrence = x.paused || '2026-01-21';
+        // The capture listener that renames the header reads the first line of
+        // data-tooltip, the same as a calendar chip.
+        titleBtn.dataset.tooltip = x.name;
         td[1].querySelector('.cell-meta-title').textContent = x.parent;
         td[1].querySelector('.cell-meta-sub').textContent = x.kind;
         td[2].textContent = x.cadence;
@@ -15067,6 +15198,24 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
       // UXCopy: counts read as a phrase, not a parenthetical.
       count.textContent = `${paused.length} series paused. Occurrences stop until a series is resumed.`;
+      };
+      renderPaused();
+
+      // The meeting view's lifecycle menu drives this from its own block.
+      window.robPausedList = {
+        add(entry) {
+          const found = SERIES.find(x => x.name === entry.name);
+          if (found) { found.status = 'Paused'; found.paused = entry.paused; }
+          else SERIES.push({ status: 'Paused', ...entry });
+          renderPaused();
+        },
+        remove(name) {
+          const found = SERIES.find(x => x.name === name);
+          if (found) { found.status = 'Active'; found.paused = null; }
+          renderPaused();
+        },
+        isPaused: (name) => SERIES.some(x => x.name === name && x.status === 'Paused'),
+      };
 
       // Below 1024px the bar is the page head, so a screen change has to reach
       // it: the paused screen's own head — breadcrumb and all — is standing down.
@@ -15244,6 +15393,13 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         '2026-01-19|[RoB] [Initiative] Operationalize Launch': 'error',
       };
 
+      // Series-level lifecycle, alongside the per-occurrence state above.
+      // Paused and deleted both stop occurrences appearing, and they are not
+      // the same thing: a paused series keeps its past and can come back, a
+      // deleted one is gone from the viewed occurrence onward and cannot.
+      const PAUSED = new Set();
+      const DELETED_FROM = {};   // title -> iso; occurrences on or after it are gone
+
       const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -15268,10 +15424,14 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const todayIso = grid.querySelector('.cal-day.is-today')?.dataset.date || iso(new Date());
       const weekOf = (i) => Math.floor(i / 7);   // bi-weekly rides the week index
 
+      const liveOn = (s, date) => !PAUSED.has(s.title)
+        && !(DELETED_FROM[s.title] && date >= DELETED_FROM[s.title]);
+
       const eventsFor = (cell, i, mineOnly) => SERIES
         .filter(s => s.dow === Number(cell.dataset.dow))
         .filter(s => s.every === 1 || weekOf(i) % 2 === 1)
         .filter(s => !mineOnly || s.mine)
+        .filter(s => liveOn(s, cell.dataset.date))
         .filter(s => window.robFilterPass ? window.robFilterPass(s) : true);
 
       function chip(s, date) {
@@ -15372,6 +15532,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           .filter(x => x.dow === d.getDay())
           .filter(x => x.every === 1 || wk % 2 === 1)
           .filter(x => !mineOnly || x.mine)
+          .filter(x => liveOn(x, date))
           .filter(x => window.robFilterPass ? window.robFilterPass(x) : true)
           .map(x => {
             const start = toMins(x.time);
@@ -15679,6 +15840,24 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         window.syncCalEventTooltips?.();
       };
 
+      // Bridge for the meeting view's lifecycle menu. That menu lives in its
+      // own block — it belongs to the modal, not to the calendar — so it gets
+      // a named surface rather than reaching into this closure. Every setter
+      // re-renders whichever view is open, so the result is on screen in the
+      // one the reviewer is actually looking at.
+      window.robLifecycle = {
+        key:         (title, date) => `${date}|${title}`,
+        isPaused:    (title) => PAUSED.has(title),
+        isCancelled: (title, date) => OCCURRENCE_STATE[`${date}|${title}`] === 'cancelled',
+        isDeleted:   (title, date) => !!DELETED_FROM[title] && date >= DELETED_FROM[title],
+        seriesFor:   (title) => SERIES.find(s => s.title === title) || null,
+        cancel:  (title, date) => { OCCURRENCE_STATE[`${date}|${title}`] = 'cancelled'; show(); },
+        restore: (title, date) => { delete OCCURRENCE_STATE[`${date}|${title}`]; show(); },
+        pause:   (title) => { PAUSED.add(title); show(); },
+        resume:  (title) => { PAUSED.delete(title); show(); },
+        deleteFrom: (title, date) => { DELETED_FROM[title] = date; show(); },
+      };
+
       document.querySelectorAll('[data-rob-view]').forEach(seg => {
         seg.removeAttribute('title');
         seg.addEventListener('click', () => {
@@ -15766,6 +15945,225 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    // Series lifecycle — the meeting view's "..." menu and its confirmations.
+    //
+    // Titles, body copy, button labels and toasts are the product's own; they
+    // are written out rather than paraphrased, because this flow is the one
+    // place a prototype can get a destructive confirmation wrong and have it
+    // read as fine. Where the shipped help text and the shipped menu label
+    // disagree about what the restore item is called, this follows the menu.
+    (function () {
+      const md    = document.getElementById('meeting-detail');
+      const wrap  = document.querySelector('[data-md-life-wrap]');
+      const dlg   = document.getElementById('md-life-confirm');
+      const xfer  = document.getElementById('md-life-transfer');
+      if (!md || !wrap || !dlg || !xfer) return;
+
+      const trigger = wrap.querySelector('.dropdown-trigger');
+      const menu    = wrap.querySelector('.dropdown-menu');
+      const items   = Object.fromEntries(
+        [...wrap.querySelectorAll('[data-md-life]')].map(b => [b.dataset.mdLife, b]));
+      const divider = wrap.querySelector('.dropdown-divider');
+      const titleEl = md.querySelector('#md-title');
+      const whenEl  = md.querySelector('[data-when-date]');
+      const aiSec   = document.querySelector('[data-ai-section]');
+
+      // Which occurrence is open. The action-items section already tracks it,
+      // so there is one answer rather than two that can disagree.
+      const date  = () => aiSec?.dataset.currentOccurrence || '';
+      const name  = () => (titleEl?.textContent || 'this meeting').trim();
+      const when  = () => (whenEl?.textContent || '').trim();
+      const api   = () => window.robLifecycle;
+
+      // The header's title was fixed text, so every meeting opened as
+      // "Engineering Weekly" — harmless while nothing read it, wrong the moment
+      // a confirmation says "Delete <name> meeting series". Capture phase, to
+      // land before the modal opens.
+      document.addEventListener('click', (e) => {
+        const trig = e.target.closest('[data-modal-open="meeting-detail"][data-occurrence]');
+        if (!trig || !titleEl) return;
+        const label = (trig.dataset.tooltip || '').split('\n')[0].trim()
+          || trig.querySelector('.cal-event-name, .cal-sched-title')?.textContent.trim();
+        if (label) titleEl.textContent = label;
+      }, true);
+
+      // ---- Menu ----
+      const closeMenu = () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
+
+      // ROB-LIFE-014 / -028: cancel and delete are offered only on an occurrence
+      // that is neither cancelled nor started; restore only on a cancelled one
+      // whose start has not passed. Pause and Resume swap on the series state.
+      const sync = () => {
+        const d = date(), n = name(), a = api();
+        const started   = d && d < '2026-01-21';   // "today" is pinned in this prototype
+        const cancelled = !!a?.isCancelled(n, d);
+        const paused    = !!a?.isPaused(n);
+        items.cancel.hidden  = cancelled || started;
+        items.delete.hidden  = cancelled || started;
+        items.restore.hidden = !cancelled || started;
+        items.pause.hidden   = paused;
+        items.resume.hidden  = !paused;
+        if (divider) divider.hidden = items.delete.hidden;
+      };
+
+      trigger.addEventListener('click', () => {
+        const open = menu.hidden;
+        if (open) sync();
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) closeMenu(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+      // ---- Confirmations ----
+      const dTitle = dlg.querySelector('#md-life-title');
+      const dMeta  = dlg.querySelector('[data-md-life-meta]');
+      const dCopy  = dlg.querySelector('[data-md-life-copy]');
+      const dCopy2 = dlg.querySelector('[data-md-life-copy2]');
+      const dGo    = dlg.querySelector('[data-md-life-go]');
+
+      // closeView: pausing, resuming and deleting change the series, so the
+      // occurrence on screen is no longer a thing you can look at. Cancelling
+      // and restoring change one occurrence, and the view stays on it.
+      const PLAN = {
+        cancel: () => ({
+          title: `Cancel ${name()}`,
+          meta:  `Date: ${when()}`,
+          copy:  'If you wish to restore this meeting, you can do so by locating it in the calendar, opening it, and selecting "Restore meeting" from the dropdown menu.',
+          go: 'Cancel meeting', danger: true, toast: 'Event canceled', closeView: false,
+          run: () => api().cancel(name(), date()),
+        }),
+        restore: () => ({
+          title: 'Restore meeting',
+          copy:  `You are restoring ${name()} meeting.`,
+          go: 'Restore', toast: 'Event restored', closeView: false,
+          run: () => api().restore(name(), date()),
+        }),
+        pause: () => ({
+          title: `Pause ${name()} meeting series`,
+          copy:  'This will temporarily pause the RoB meeting series.',
+          copy2: 'You can unpause the RoB meeting series at any time and resume it with the same setup.',
+          go: 'Pause meeting series', toast: 'Meeting series paused', closeView: true,
+          run: () => {
+            api().pause(name());
+            const s = api().seriesFor(name());
+            window.robPausedList?.add({
+              name: name(),
+              kind: /\[Process\]/.test(name()) ? 'Process RoB' : 'Initiative RoB',
+              parent: s?.unit || '', cadence: s?.every === 2 ? 'Bi-weekly' : 'Weekly',
+              owner: 'Bill Bryck', paused: date(),
+            });
+          },
+        }),
+        resume: () => ({
+          title: 'Unpause meeting series',
+          copy:  `You're going to unpause ${name()} meeting series`,
+          meta:  `Starting from: ${when()}`,
+          go: 'Unpause Meeting Series', toast: 'Meeting series unpaused', closeView: true,
+          run: () => { api().resume(name()); window.robPausedList?.remove(name()); },
+        }),
+        delete: () => ({
+          title: `Delete ${name()} meeting series`,
+          meta:  `Starting from: ${when()}`,
+          copy:  'You are about to delete this meeting and all following meetings in the RoB series. These meetings cannot be restored. All previous meetings will remain unchanged.',
+          go: 'Delete meeting series', danger: true, toast: 'Meeting series deleted', closeView: true,
+          run: () => api().deleteFrom(name(), date()),
+        }),
+      };
+
+      let plan = null;
+      const openConfirm = (kind) => {
+        plan = PLAN[kind]();
+        dTitle.textContent = plan.title;
+        dMeta.textContent = plan.meta || '';
+        dMeta.hidden = !plan.meta;
+        dCopy.textContent = plan.copy || '';
+        dCopy2.textContent = plan.copy2 || '';
+        dCopy2.hidden = !plan.copy2;
+        dGo.textContent = plan.go;
+        dGo.classList.toggle('btn-danger', !!plan.danger);
+        dGo.classList.toggle('btn-primary', !plan.danger);
+        dlg.hidden = false;
+      };
+
+      dGo.addEventListener('click', () => {
+        plan.run();
+        dlg.hidden = true;
+        if (plan.closeView) md.hidden = true;
+        window.toast?.({ variant: 'success', message: plan.toast });
+      });
+
+      // ---- Transfer ownership ----
+      // Anyone on this meeting can take it: the roster is the candidate list.
+      const xTrigger = xfer.querySelector('[data-md-transfer-trigger]');
+      const xValue   = xfer.querySelector('[data-md-transfer-value]');
+      const xMenu    = xfer.querySelector('[data-md-transfer-menu]');
+      const xError   = xfer.querySelector('[data-md-transfer-error]');
+      const xGo      = xfer.querySelector('[data-md-transfer-go]');
+      let picked = null;
+
+      const openTransfer = () => {
+        picked = null;
+        xValue.textContent = 'Select an owner';
+        xValue.classList.add('md-transfer-placeholder');
+        xError.hidden = true;
+        xMenu.innerHTML = '';
+        // Candidates are the meeting's people. A row whose second line is an
+        // e-mail rather than a job title is a bot or a Google guest that maps
+        // to no user account — it can sit on the invite and cannot hold the
+        // series, so it is not offered. Keyed on that marker, not on the name,
+        // because the next bot will be called something else.
+        const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        [...md.querySelectorAll('.md-person')]
+          .filter(row => !EMAIL.test((row.querySelector('.md-person-role')?.textContent || '').trim()))
+          .map(row => (row.querySelector('.md-person-name')?.textContent || '').replace(/\(you\)/, '').trim())
+          .filter((v, i, arr) => v && arr.indexOf(v) === i)
+          .forEach(person => {
+            const b = document.createElement('button');
+            b.className = 'dropdown-item';
+            b.type = 'button';
+            b.setAttribute('role', 'option');
+            b.textContent = person;
+            b.addEventListener('click', () => {
+              picked = person;
+              xValue.textContent = person;
+              xValue.classList.remove('md-transfer-placeholder');
+              xError.hidden = true;
+              xMenu.hidden = true;
+              xTrigger.setAttribute('aria-expanded', 'false');
+            });
+            xMenu.appendChild(b);
+          });
+        xfer.hidden = false;
+      };
+
+      xTrigger.addEventListener('click', () => {
+        const open = xMenu.hidden;
+        xMenu.hidden = !open;
+        xTrigger.setAttribute('aria-expanded', String(open));
+      });
+
+      xGo.addEventListener('click', () => {
+        // The button stays enabled with nothing chosen, and says so inline.
+        if (!picked) { xError.hidden = false; return; }
+        const ownerName = md.querySelector('#md-owner-name, .md-person-name');
+        if (ownerName) ownerName.textContent = picked;
+        xfer.hidden = true;
+        window.toast?.({ variant: 'success',
+          message: 'The ownership transfer has been initiated. The changes will take effect within a few minutes.' });
+      });
+
+      // ---- Wiring ----
+      Object.entries(items).forEach(([kind, btn]) => {
+        btn.addEventListener('click', () => {
+          closeMenu();
+          if (kind === 'transfer') openTransfer(); else openConfirm(kind);
         });
       });
     })();
