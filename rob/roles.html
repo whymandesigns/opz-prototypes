@@ -4115,6 +4115,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
        as a misalignment. */
     .rights .table th,
     .rights .table td { white-space: normal; vertical-align: top; }
+
+    /* A rule under every action row. The kit leaves tbody borderless — right
+       for a short list, hard to track across 29 rows whose answers sit in two
+       narrow columns a long way right of their subject. A group heading carries
+       none, so a boundary is one line and a gap rather than two lines a few
+       pixels apart, and the last row carries none so the table ends on content. */
+    .rights .table tbody td { border-bottom: 1px solid var(--color-border); }
+    .rights .table tbody .rights-group th { border-bottom: 0; }
+    .rights .table tbody tr:last-child td { border-bottom: 0; }
+
+    /* The column heads read as one block, so the two role names are a header
+       rather than two more rows of text. The empty first cell is filled too,
+       or the band starts two-thirds of the way across. */
+    .rights .table thead th { background: var(--color-surface-muted); }
     .rights-group th {
       padding-top: var(--spacing-6);
       font: var(--font-weight-semibold) var(--text-2xs)/1 var(--font-sans);
@@ -4122,7 +4136,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       letter-spacing: .06em;
       color: var(--color-text-subtle);
     }
-    .rights-who { display: block; font: var(--type-body-xs); color: var(--color-text-subtle); font-weight: var(--font-weight-regular); margin-top: 2px; }
     .rights-mark { display: inline-flex; align-items: center; gap: var(--spacing-2); }
     .rights-mark .icon { width: 16px; height: 16px; flex-shrink: 0; }
     .rights-yes .icon { color: var(--color-success); }
@@ -4229,8 +4242,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <thead>
             <tr>
               <th scope="col">&nbsp;</th>
-              <th scope="col">Admin role<span class="rights-who">Bill Bryck &middot; owner + manages all</span></th>
-              <th scope="col">Participant role<span class="rights-who">Matthew Vella &middot; attends</span></th>
+              <th scope="col">Admin role</th>
+              <th scope="col">Participant role</th>
             </tr>
           </thead>
           <tbody>
