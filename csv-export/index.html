@@ -46,10 +46,12 @@
   /* --color-gray-800: #3D4149;  unreferenced extension */
   /* --color-gray-900: #24272D;  unreferenced extension */
   /* Zinc — dark-theme neutrals */
-  /* Zinc — NOT Picasso. Picasso has no zinc at all. These nine exist for one
-   * reason: they are the entire foundation of the dark theme in semantic.css.
-   * Hidden from the palette gallery in example.html so nobody reaches for them
-   * when building, and they should never appear in a prototype directly.
+  /* Zinc — NOT Picasso. Picasso has no zinc at all. The four below are
+   * commented out; the five that remain exist for one reason: they are the
+   * entire foundation of the dark theme in semantic.css. They are kept out of
+   * the palette gallery in example.html and out of dist/tokens.json, so
+   * nothing downstream offers them as a colour to design with, and they
+   * should never appear in a prototype directly.
    * They cannot simply be deleted — the [data-theme="dark"] block resolves to
    * nothing without them and the theme toggle breaks. Picasso ships real dark
    * values for every token; rebuilding dark mode on those is what retires this
@@ -545,7 +547,7 @@ body {
 /* fill:none so stroke-based icons render as outlines; filled icons carry their
  * own fill="currentColor" on the paths. Colour rides on currentColor. */
 .icon { width: 1em; height: 1em; flex-shrink: 0; display: inline-block; vertical-align: -0.125em; fill: none; color: var(--color-icon); }
-/* The pack ships two sizes only — 16 and 24 (see design.md §9). */
+/* The pack ships two sizes only — 16 and 24 (see DESIGN.md §9). */
 .icon-16 { width: 16px; height: 16px; }
 .icon-24 { width: 24px; height: 24px; }
 /* Interactive / colour-carrying contexts keep the icon on the context colour
@@ -664,12 +666,12 @@ body {
  * on that side to make room.
  *
  *   <div class="input-icon input-icon-left">
- *     <i class="ph ph-calendar-blank input-icon-glyph"></i>
+ *     <svg class="icon input-icon-glyph"><use href="#i-calendar-blank"/></svg>
  *     <input class="input" type="text" />
  *   </div>
  *   <div class="input-icon input-icon-right">
  *     <input class="input" type="search" />
- *     <i class="ph ph-magnifying-glass input-icon-glyph"></i>
+ *     <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
  *   </div>
  */
 .input-icon { position: relative; }
@@ -779,7 +781,7 @@ textarea.input {
  * On Enter the typed text becomes a chip; Backspace on empty removes the last chip.
  *
  *   <div class="input-tags">
- *     <span class="dropdown-chip">React<button class="dropdown-chip-remove">…</button></span>
+ *     <span class="chip">React<button class="chip-remove">…</button></span>
  *     <input class="input-tags-input" placeholder="Add tag…" />
  *   </div>
  */
@@ -830,9 +832,20 @@ textarea.input {
   height: 32px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  overflow: hidden;
   flex-shrink: 0;
+  /* Scrolls rather than clips. `overflow: hidden` rounds the end segments
+   * against the border, but it also means a control wider than its container
+   * loses its last segments with no way to reach them — on a phone the
+   * feature directory's "On hold" filter was simply gone. overflow-x: auto
+   * still clips to the radius and keeps them reachable, by touch, trackpad
+   * or Tab. The scrollbar is suppressed because a half-cut segment is the
+   * affordance, and a 32px control has no room for a bar under it. */
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
+.segmented::-webkit-scrollbar { display: none; }
 .segmented-item {
   display: inline-flex;
   align-items: center;
@@ -840,6 +853,11 @@ textarea.input {
   gap: var(--spacing-2);
   height: 100%;
   padding: 0 var(--spacing-4);
+  /* Hold the label on one line and keep the intrinsic width: the control
+   * scrolls when it runs out of room (see .segmented), and an item that
+   * shrinks instead wraps its label and breaks the 32px row. */
+  flex: 0 0 auto;
+  white-space: nowrap;
   border: 0;
   border-right: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -867,17 +885,21 @@ textarea.input {
  *
  *   <div class="toolbar">
  *     <div class="input-icon input-icon-left toolbar-search">
- *       <i class="ph ph-magnifying-glass input-icon-glyph"></i>
+ *       <svg class="icon input-icon-glyph"><use href="#i-magnifying-glass"/></svg>
  *       <input class="input" placeholder="Search…">
  *     </div>
- *     <button class="btn btn-secondary"><i class="ph ph-funnel"></i>Filters</button>
+ *     <button class="btn btn-secondary"><svg class="icon"><use href="#i-funnel"/></svg>Filters</button>
  *     <div class="toolbar-end"> … .input-select.is-auto … .segmented … </div>
  *   </div>
  */
 .toolbar { display: flex; align-items: center; gap: var(--spacing-2); flex-wrap: wrap; }
 .toolbar-search { flex: 1 1 240px; min-width: 160px; }
 .toolbar-search > .input { width: 100%; }
-.toolbar-end { margin-left: auto; display: inline-flex; align-items: center; gap: var(--spacing-2); flex-wrap: wrap; }
+/* min-width: 0 so a scrollable child can actually be capped. A flex item
+ * defaults to min-width: auto and refuses to go below its content, so a
+ * .segmented inside with max-width: 100% measures 100% of an already
+ * overflowing parent and the row runs off the screen. */
+.toolbar-end { margin-left: auto; display: inline-flex; align-items: center; gap: var(--spacing-2); flex-wrap: wrap; min-width: 0; }
 .toolbar-spacer { flex: 1 1 auto; }
 /* Quick-filter select sized to its content instead of filling the row */
 .input-select.is-auto { width: auto; }
@@ -1048,7 +1070,16 @@ textarea.input {
 .input.is-error                { border-color: var(--color-danger); }
 .input.is-error:focus          { border-color: var(--color-danger); box-shadow: 0 0 0 3px var(--color-danger-subtle); }
 
-/* ---------- Card ---------- */
+/* ---------- Card ----------
+ * `hidden` has to be stated. A card is often an <a> or a <div> that the page
+ * gives its own `display`, and any such rule beats the browser's
+ * `[hidden] { display: none }` — so the attribute silently stops working and
+ * a card meant to be out of the list is in it. .card[hidden] outranks both
+ * `.card` and `a.card` on specificity, so no !important is needed. (The kit
+ * carried this once and lost it; the feature directory's hidden admin card
+ * came back when it was re-baked.) */
+.card[hidden] { display: none; }
+
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -1229,7 +1260,7 @@ textarea.input {
  *   (default) · .is-empty · :hover · .is-selected · .is-editing ·
  *   .is-saving · .is-saved · .is-error · .is-readonly · .is-skeleton
  * Behaviour (select / edit / commit / cancel / arrow-nav / save sim) is
- * driven by the [data-sheet] JS module; see design.md §Sheet.
+ * driven by the [data-sheet] JS module; see DESIGN.md §Sheet.
  */
 .table-sheet {
   border-collapse: separate;
@@ -1483,7 +1514,7 @@ textarea.input {
   font: var(--type-body-sm); color: var(--color-text); cursor: pointer;
 }
 .sheet-opt:hover, .sheet-opt.is-active { background: var(--color-surface-muted); }
-.sheet-opt svg.ph-check { margin-left: auto; color: var(--color-accent); font-size: 1em; }
+.sheet-opt svg.sheet-opt-check { margin-left: auto; color: var(--color-accent); font-size: 1em; }
 .sheet-opt.is-empty-note { color: var(--color-text-subtle); cursor: default; }
 .sheet-opt.is-empty-note:hover { background: transparent; }
 
@@ -1542,13 +1573,14 @@ textarea.input {
   gap: var(--spacing-3); padding: var(--spacing-12);
   color: var(--color-text-muted); text-align: center;
 }
+.sheet-empty-state[hidden] { display: none; }
 .sheet-empty-state svg { font-size: 32px; color: var(--color-text-subtle); }
 
 /* ---------- Accordion ----------
  * Collapsible sections. One item = .accordion (a .accordion-summary trigger +
  * a .accordion-details collapsible region). Stack items in an .accordion-group;
  * the group's border modifier controls the horizontal rules:
- *   .borders-all (default) · .borders-middle (only between) · .borders-none.
+ *   all borders (default — no class) · .borders-middle (only between) · .borders-none.
  *   <div class="accordion-group">
  *     <div class="accordion is-open">
  *       <button class="accordion-summary" type="button" aria-expanded="true">
@@ -1617,13 +1649,13 @@ textarea.input {
  * Horizontal block with: icon · message · optional CTAs · optional close button.
  *
  *   <div class="alert alert-danger" role="alert">
- *     <i class="ph ph-warning-octagon alert-icon"></i>
+ *     <svg class="icon alert-icon"><use href="#i-warning-octagon"/></svg>
  *     <p class="alert-message">Something went wrong.</p>
  *     <div class="alert-actions">              optional — drop if no CTAs
  *       <button class="btn btn-xs btn-primary">Retry</button>
  *       <button class="btn btn-xs btn-secondary">Dismiss</button>
  *     </div>
- *     <button class="alert-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *     <button class="alert-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
  *   </div>
  *
  * Variants: .alert-danger · .alert-warning · .alert-success · .alert-info
@@ -1647,6 +1679,7 @@ textarea.input {
 /* Tighter than body-sm's 20px leading: the loose line box let the glyphs ride
  * high above the centred icon. 1.35 hugs the text so it optically centres with
  * the 16px icon and the CTAs, and still wraps cleanly on multi-line alerts. */
+.alert[hidden] { display: none; }
 .alert-message { flex: 1; min-width: 0; margin: 0; line-height: 1.35; padding-top: 2px; }
 .alert-actions { display: inline-flex; gap: var(--spacing-2); flex-shrink: 0; }
 /* Dismiss button — styled by the icon-only ghost button component in the
@@ -1670,8 +1703,8 @@ textarea.input {
  *
  *   <span class="badge badge-success">Active</span>                          read-only
  *   <button class="badge badge-warning" type="button">Pending</button>       editable
- *   <span class="badge badge-info"><i class="ph ph-info badge-icon"></i>New</span>          icon left
- *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><i class="ph ph-x"></i></button></span>   deletable
+ *   <span class="badge badge-info"><svg class="icon badge-icon"><use href="#i-info"/></svg>New</span>          icon left
+ *   <span class="badge">Draft<button class="badge-remove" aria-label="Remove"><svg class="icon"><use href="#i-x"/></svg></button></span>   deletable
  */
 .badge {
   display: inline-flex; align-items: center;
@@ -1829,7 +1862,7 @@ button.badge:focus-visible {
  *
  *   Photo:     <span class="avatar avatar-md"><img src="…" alt="Jane"></span>
  *   Initials:  <span class="avatar avatar-md">JD</span>
- *   Team/co:   <span class="avatar avatar-md avatar-team"><i class="ph ph-buildings"></i></span>
+ *   Team/co:   <span class="avatar avatar-md avatar-team"><svg class="icon"><use href="#i-buildings"/></svg></span>
  *
  * Sizes (default = avatar-md / 32px):
  *   .avatar-xs   16px
@@ -2113,7 +2146,7 @@ a.avatar:focus-visible {
  *   </div>
  *
  * Variants compose via optional siblings around the range input:
- *   icons        <i class="ph ph-minus slider-icon"></i> … <i class="ph ph-plus slider-icon"></i>
+ *   icons        <svg class="icon slider-icon"><use href="#i-minus"/></svg> … <svg class="icon slider-icon"><use href="#i-plus"/></svg>
  *   labels       <span class="slider-label">Zoom Out</span> (pairs with icons)
  *   min/max      <span class="slider-value">0</span> … <span class="slider-value">100</span>
  *   current      <output class="slider-value" data-slider-output></output>  ← JS-synced
@@ -2125,6 +2158,7 @@ a.avatar:focus-visible {
   gap: var(--spacing-3);
   width: 100%;
 }
+.slider[hidden] { display: none; }
 .slider-input {
   -webkit-appearance: none;
   appearance: none;
@@ -2325,14 +2359,17 @@ a.avatar:focus-visible {
 }
 
 /* ---------- Drawer ----------
- * Right-anchored side panel. Reuses .modal-header / .modal-body / .modal-footer for layout.
- * Sizes: narrow / regular / medium / wide / ultra / full.
+ * Right-anchored side panel. Sizes: narrow / regular / medium / wide / ultra.
+ *
+ * Use the .drawer-* parts, not the .modal-* ones. example.html mixes modal
+ * parts into drawers in places; that is the showcase being inconsistent, not
+ * the pattern to copy, and this comment used to teach it.
  *
  *   <div class="drawer-overlay" id="my-drawer" hidden>
  *     <aside class="drawer drawer-regular">
- *       <header class="modal-header">…title + close…</header>
- *       <div class="modal-body">…</div>
- *       <footer class="modal-footer">…</footer>
+ *       <header class="drawer-header">…title + close…</header>
+ *       <div class="drawer-body">…</div>
+ *       <footer class="drawer-footer">…</footer>
  *     </aside>
  *   </div>
  */
@@ -2392,6 +2429,20 @@ a.avatar:focus-visible {
   flex-shrink: 0;
 }
 .sidenav.is-compact { width: 62px; }
+
+/* Panel header and search — the off-canvas layout's own chrome.
+ *
+ * Above 1024px the top bar carries the logo and the search field, so these
+ * would be a second copy of both; they are hidden and the ≤1024px block below
+ * reveals them. Keep them in the markup from the start, like .topbar-menu —
+ * they cost nothing until the panel exists. */
+.sidenav-head,
+.sidenav-search { display: none; }
+.sidenav-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
 
 .sidenav-list {
   display: flex;
@@ -2528,8 +2579,99 @@ a.avatar:focus-visible {
 }
 .sidenav.is-compact .sidenav-toggle svg { transform: rotate(180deg); }
 
-/* App shell — pairs sidenav + main content */
+/* ---------- Side nav — tablet and below ----------
+ * At Picasso's lg edge (1024px) a 236px rail costs too much of the width, so
+ * it stops being a column and becomes a panel that slides over the content.
+ *
+ * It is hidden, not deleted: `display: none` on its own would strand the user
+ * with no way to navigate, because .topbar-menu is wired to nothing by
+ * default. So this block does three things together, and they only work as a
+ * set — reveal the hamburger, take the rail out of the flow, and dim what is
+ * behind it while it is open:
+ *
+ *   <button class="btn btn-icon-only btn-ghost topbar-menu" …>   in .topbar
+ *   <aside class="sidenav">…</aside>                             first child of .app-shell
+ *   JS: the hamburger toggles `.is-open` on that .sidenav
+ *
+ * The template ships all three. A prototype built from it inherits the
+ * behaviour and needs no CSS of its own.
+ *
+ * Compact mode is overridden back to full width on purpose: a 62px icon rail
+ * is a way to save horizontal space, and a panel floating over the content is
+ * not short of any. The collapse chevron goes with it.
+ */
+@media (max-width: 1024px) {
+  /* Fixed, not absolute: the panel spans the whole window, top bar included,
+   * and the bar sits behind it. Anchoring it inside .app-shell would start it
+   * below the bar and leave the product's own chrome lit while a modal
+   * surface is open over everything else. --z-drawer clears the bar, which is
+   * in normal flow with no z-index of its own. */
+  .app-shell > .sidenav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    z-index: var(--z-drawer);
+    width: 236px;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-2);
+    transition: transform var(--duration-base) var(--ease);
+  }
+  .app-shell > .sidenav.is-open { transform: translateX(0); }
+  .app-shell > .sidenav.is-compact { width: 236px; }
+  .app-shell > .sidenav .sidenav-toggle { display: none; }
+
+  /* The panel is the whole product chrome while it is open, so it carries the
+   * brand, a way out, and search — the three things the collapsed top bar
+   * gave up. .sidenav-close is a behaviour hook: the icon-only ghost button
+   * styles it, and the script finds it by this class. */
+  .app-shell > .sidenav .sidenav-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-2) var(--spacing-4);
+  }
+  .app-shell > .sidenav .sidenav-search {
+    display: block;
+    margin-bottom: var(--spacing-4);
+  }
+
+  /* The scrim, fixed to match — dimming everything the panel is not. A
+   * pseudo-element rather than a markup node, so an existing prototype gains
+   * it without its HTML changing; clicks on it land on .app-shell, which is
+   * what the template's handler listens for. */
+  .app-shell:has(> .sidenav.is-open)::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: var(--color-overlay);
+  }
+
+  .topbar .topbar-menu { display: inline-flex; }
+}
+
+/* ---------- App shell ----------
+ * Pairs a .sidenav with .app-shell-main.
+ *
+ * TWO SHAPES, AND YOU NEVER WRITE CSS FOR EITHER:
+ *
+ *   .app-shell                 a 560px box — the SHOWCASE's framing, so
+ *                              example.html can show a screen inside a card.
+ *   .app-shell is-fullscreen   fills the window under the .topbar. This is
+ *                              what a real prototype wants, every time.
+ *
+ * A prototype that is the app writes `<div class="app-shell is-fullscreen">`
+ * and stops. Do not add `height`, `min-height`, `flex`, `overflow` or a
+ * `html, body { height: 100% }` reset in the page — .app-shell-main already
+ * scrolls on its own, and a local override is what breaks the layout rather
+ * than fixing it. Older prototypes carry four hand-written lines here because
+ * this variant did not exist yet; they are not the pattern to copy.
+ */
 .app-shell {
+  position: relative;   /* the off-canvas rail below ≤1024px anchors to this */
   display: flex;
   height: 560px;
   background: var(--color-bg);
@@ -2542,6 +2684,47 @@ a.avatar:focus-visible {
   background: var(--color-surface);
   padding: var(--spacing-6);
   overflow: auto;
+}
+/* Full-viewport variant — the shell takes whatever the top bar leaves.
+ *
+ * Two mechanisms, deliberately. The calc is the floor: it works everywhere but
+ * assumes the only thing above the shell is a .topbar of exactly
+ * --header-height. The :has() block below replaces it with a real flex fill,
+ * so the shell stays correct when the bar changes height or something else
+ * (a global banner, a breadcrumb strip) is added above it. A browser without
+ * :has() drops that rule entirely and keeps the calc, which is the old
+ * behaviour — so there is no version of this that collapses to nothing.
+ *
+ * dvh is the second declaration because 100vh on mobile Safari means the
+ * viewport WITHOUT browser chrome, which overflows the page by the height of
+ * the address bar. Browsers that do not know dvh ignore the line and keep vh.
+ */
+.app-shell.is-fullscreen {
+  height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+body:has(> .app-shell.is-fullscreen) {
+  /* A fixed height, not min-height: the shell is a flex child that grows into
+   * what is left, and a body that can grow has nothing left to give — the
+   * shell would size to its content and the whole page would scroll instead
+   * of .app-shell-main. overflow: hidden makes that explicit; it propagates to
+   * the viewport and does not clip the fixed-position modals or drawers. */
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Anything above the shell keeps its own height; the shell eats the rest. */
+body:has(> .app-shell.is-fullscreen) > * { flex: 0 0 auto; }
+body:has(> .app-shell.is-fullscreen) > .app-shell.is-fullscreen {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
 }
 
 /* ---------- Breadcrumbs ----------
@@ -2663,7 +2846,32 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-shrink: 0;
 }
 
-/* Template frame — full app preview: topbar + sidenav + main, vertically stacked */
+/* Below the lg edge the collapsed top bar carries the page title itself, so a
+ * page head here would print the same heading twice, one line apart. It stands
+ * down, and its actions move up with the title as `.topbar-cta` — which the
+ * collapsed bar reveals at exactly this breakpoint.
+ *
+ * ONE .topbar-cta PER PAGE-HEAD CTA, in the same order, carrying the same
+ * variant: a `.btn-secondary` down here is a `.btn-secondary` up there. Ship
+ * only the primary and the page's other actions vanish on a phone, with
+ * nothing on screen to say they existed. `.btn-icon-only` rounds them to
+ * 32px; `.topbar-title` is flex:1, so they group against the right edge.
+ *
+ * This is what makes .topbar-cta safe to carry on a page that also has a page
+ * head. It used to be the opposite: nothing hid .page-head-actions, so a page
+ * with both put two primary CTAs on screen the moment the bar collapsed. */
+@media (max-width: 1024px) {
+  .page-head { display: none; }
+}
+
+/* ---------- Template frame ----------
+ * Full app preview — topbar + sidenav + main, stacked vertically inside a
+ * fixed-height bordered frame. For showing a whole screen in miniature.
+ *
+ *   <div class="template-frame">
+ *     <div class="app-shell"> … </div>
+ *   </div>
+ */
 .template-frame {
   display: flex;
   flex-direction: column;
@@ -2680,7 +2888,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex: 1;
 }
 
-/* Stat tile — used inside templates */
+/* ---------- Stat card ----------
+ * A single metric on a surface: small muted label above a large value.
+ * Lay several out in a grid; the card carries its own border and padding.
+ *
+ *   <div class="stat-card">
+ *     <p class="stat-card-label">Active initiatives</p>
+ *     <p class="stat-card-value">24</p>
+ *   </div>
+ */
 .stat-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -2698,7 +2914,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   margin: var(--spacing-1) 0 0;
 }
 
-/* List row — denser card variant for index pages */
+/* ---------- List row ----------
+ * Denser card variant for index and feed pages. The row IS the surface —
+ * it carries its own border, radius and padding, so it is a sibling of
+ * other rows, never nested inside a .card. Title and meta stack on the
+ * left; anything trailing (status, actions) sits at the right edge.
+ *
+ *   <a class="list-row" href="#">
+ *     <div>
+ *       <p class="list-row-title">Q3 revenue objective</p>
+ *       <p class="list-row-meta">Updated 2 days ago</p>
+ *     </div>
+ *     <span class="tag tag-positive">On track</span>
+ *   </a>
+ */
 .list-row {
   display: flex;
   align-items: center;
@@ -2809,7 +3038,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <ol class="stepper">
  *     <li class="stepper-step is-current"><span class="stepper-num">1</span><span class="stepper-label">Details</span></li>
- *     <li class="stepper-sep"><i class="ph ph-caret-right"></i></li>
+ *     <li class="stepper-sep"><svg class="icon"><use href="#i-caret-right"/></svg></li>
  *     <li class="stepper-step"><span class="stepper-num">2</span><span class="stepper-label">Review</span></li>
  *   </ol>
  */
@@ -3151,10 +3380,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  *
  *   <div class="toast-region" aria-live="polite"></div>     ← one per page
  *   <div class="toast toast-success">
- *     <i class="ph ph-check-circle toast-icon"></i>
+ *     <svg class="icon toast-icon"><use href="#i-check-circle"/></svg>
  *     <p class="toast-message">Saved.</p>
  *     <button class="btn btn-xs btn-secondary toast-action">Undo</button>
- *     <button class="toast-close" aria-label="Close"><i class="ph ph-x"></i></button>
+ *     <button class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
  *   </div>
  */
 .toast-region {
@@ -3313,18 +3542,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   .topbar-search { width: 200px; }
 }
 
-/* Collapsed bar (≤768px, Picasso md edge): hamburger + page title on the left,
- * a primary action on the right; the brand logo, search and account menu drop. */
-/* The bar's own appearance when collapsed.
+/* Collapsed bar (≤1024px, Picasso lg edge): light surface, hamburger + page
+ * title on the left, a primary action on the right; the brand logo, search and
+ * account menu drop.
  *
- * This cannot live in the @container block below: .topbar carries
- * container-type itself, and a container query styles a container's
- * descendants, never the container. Inside a prototype the topbar spans the
- * viewport, so a media query says the same thing; in the kit's playground the
- * surrounding .playground-stage is the container, and the rule below covers it
- * there. Both paths land on the same result. */
-@media (max-width: 768px) {
+ * It collapses at the SAME edge as the side nav (see "Side nav — tablet and
+ * below"), and that is not a coincidence — below 1024px the rail is off-canvas
+ * and the hamburger in this bar is the only way to reach it. Move one edge and
+ * you must move the other, or there is a band of widths with a hidden nav and
+ * no control that opens it.
+ *
+ * Two queries, saying the same thing, because neither covers both cases:
+ *
+ *   @media     — a real prototype, where .topbar spans the viewport. This is
+ *                the one that matters for a feature screen.
+ *   @container — the kit's playground, where .topbar is narrow inside a wide
+ *                window, so the viewport says nothing useful about it. Its
+ *                edge stays at 768px: that is a measurement of the BAR, and a
+ *                bar 768px wide is cramped whatever the window is doing.
+ *
+ * The bar's own background cannot live in the @container block: .topbar
+ * carries container-type itself, and a container query styles a container's
+ * descendants, never the container. So the media query sets it in the
+ * prototype case and the @container block repeats it for the playground. */
+@media (max-width: 1024px) {
   .topbar { background: var(--color-surface); color: var(--color-text); gap: var(--spacing-3); }
+  .topbar .topbar-menu  { display: inline-flex; }
+  .topbar .topbar-title { display: block; font: var(--type-h2); }
+  .topbar .topbar-cta   { display: inline-flex; }
+  .topbar .topbar-brand,
+  .topbar .topbar-search,
+  .topbar .topbar-account { display: none; }
 }
 
 @container (max-width: 768px) {
@@ -3439,11 +3687,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding: var(--spacing-2) var(--spacing-3) var(--spacing-3);
 }
 .dropdown-header .dropdown-item-label { font-weight: var(--font-weight-semibold); white-space: nowrap; }
+/* A name and a role are identity, not content: they belong on one line each, so
+ * a long role ellipses rather than growing the menu or stacking three lines.
+ * Scoped to the header — an item's own description still wraps, which is what
+ * explanatory rows need. .dropdown-item-text already carries min-width: 0, so
+ * the flex child can shrink far enough for the ellipsis to show. */
+.dropdown-header .dropdown-item-label,
+.dropdown-header .dropdown-item-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-header .dropdown-item-description { white-space: nowrap; }
+/* nowrap alone only stops the wrap: the menu has a min-width and no max, so a
+ * long role widens the whole panel instead of ellipsing. Capping the header's
+ * text block is what makes the ellipsis appear, and it bounds only the identity
+ * row — items still size to their own content. */
+.dropdown-header .dropdown-item-text { max-width: 220px; }
 
 /* Trailing count/badge inside a dropdown item — pushed to the right edge */
 .dropdown-item-count { margin-left: auto; flex-shrink: 0; }
 
-/* Selected state — leading check + semibold label */
+/* Selected state — leading check + semibold label.
+ * Put .dropdown-item-check on EVERY item, not just the selected one: it is
+ * opacity:0 until .is-selected, and it is what reserves the leading slot. On
+ * the selected item alone it indents that one label and shows no check. */
 .dropdown-item-check {
   width: 16px;
   height: 16px;
@@ -3480,7 +3747,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  font: var(--font-weight-regular) var(--text-xxs)/1 var(--font-sans);
+  font: var(--font-weight-semibold) var(--text-xxs)/1 var(--font-sans);
   color: var(--color-text);
 }
 /* Tight right padding when a remove button is present */
@@ -3683,16 +3950,23 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
  * Tiny flex/grid primitives used across prototypes. `.page` lives in
  * semantic.css (it's the content max-width wrapper). The three below are
  * the everyday building blocks for stacking content vertically (`.stack`),
- * placing items in a wrapping row (`.row`), or a two-column grid that
- * collapses on narrow viewports (`.grid-2`).
+ * placing items in a wrapping row (`.row`), or an even grid that collapses on
+ * narrow viewports (`.grid-2`, `.grid-4`). `.grid-4` steps down to two columns
+ * before it goes to one, because four metric tiles stacked in a single column
+ * push everything below them off the first screen.
  */
 .stack  { display: flex; flex-direction: column; gap: var(--spacing-4); }
 .row    { display: flex; gap: var(--spacing-3); align-items: center; flex-wrap: wrap; }
 .row-end { justify-content: flex-end; }   /* actions pushed to the trailing edge */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-4); }
 
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 720px) {
   .grid-2 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr; }
 }
 
 /* ---------- Drawer parts ----------
@@ -3757,16 +4031,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .is-map-mode [data-picasso-color],
 .is-map-mode [data-picasso-font],
 .is-map-mode [data-picasso-radius],
-.is-map-mode [data-picasso-icon] { outline: 1px dotted var(--map-color); outline-offset: 2px; }
+.is-map-mode [data-picasso-icon],
+.is-map-mode [data-picasso-scale] { outline: 1px dotted var(--map-color); outline-offset: 2px; }
 .is-map-mode [data-component]:hover,
 .is-map-mode [data-picasso-color]:hover,
 .is-map-mode [data-picasso-font]:hover,
 .is-map-mode [data-picasso-radius]:hover,
-.is-map-mode [data-picasso-icon]:hover { outline-width: 2px; }
+.is-map-mode [data-picasso-icon]:hover,
+.is-map-mode [data-picasso-scale]:hover { outline-width: 2px; }
 .is-map-mode [data-picasso-color],
 .is-map-mode [data-picasso-font],
 .is-map-mode [data-picasso-radius],
-.is-map-mode [data-picasso-icon] { cursor: help; }
+.is-map-mode [data-picasso-icon],
+.is-map-mode [data-picasso-scale] { cursor: help; }
 /* Nav toggle turns pink while the inspector is on. */
 .map-toggle.is-active,
 .map-toggle.is-active:hover { color: var(--map-color); }
@@ -7510,8 +7787,8 @@ body:has(#rvBar) [id$="-switcher"] { bottom: 76px; }
   width: 232px;
   background: var(--color-surface, #fff);
   border: 1px solid var(--color-border-strong, #D8D9DC);
-  border-radius: var(--radius-md, 12px);
-  box-shadow: var(--shadow-4, 0 8px 30px rgba(0,0,0,.18));
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-5, 0 8px 30px rgba(0,0,0,.18));
   overflow: hidden;
   font: var(--type-body-sm, 400 13px/20px var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif));
   color: var(--color-text, #191E28);
