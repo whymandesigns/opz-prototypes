@@ -3755,7 +3755,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  font: var(--font-weight-regular) var(--text-xxs)/1 var(--font-sans);
+  font: var(--font-weight-semibold) var(--text-xxs)/1 var(--font-sans);
   color: var(--color-text);
 }
 /* Tight right padding when a remove button is present */
@@ -4431,6 +4431,9 @@ body { overflow: hidden; }
 }
 .rob-filter-clear:hover { text-decoration: underline; text-underline-offset: 3px; }
 .rob-filter-body { display: flex; flex-direction: column; gap: var(--spacing-3); }
+/* Applied-filter tags sit directly under the toolbar (ROB-VIEW-030). */
+.rob-filter-tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin: var(--spacing-4) 0; }
+.rob-filter-tags[hidden] { display: none; }
 /* Label column, then the control. Labels wrap rather than widening the panel. */
 .rob-filter-row {
   display: grid;
@@ -5456,8 +5459,8 @@ body { overflow: hidden; }
               </div>
 
               <div class="rob-filter-toggles">
-                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="subteams" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Show sub teams</span></label>
-                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="no11" checked /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Hide 1:1 Meetings</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="subteams" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Show sub teams</span></label>
+                <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="no11" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Hide 1:1 Meetings</span></label>
                 <label class="checkbox"><input type="checkbox" class="checkbox-input" data-rob-f="robonly" /><span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span><span class="checkbox-label">Label RoBs only</span></label>
               </div>
             </div>
@@ -5470,6 +5473,8 @@ body { overflow: hidden; }
             </div>
           </div>
         </div>
+
+        <div class="rob-filter-tags" data-rob-filter-tags hidden></div>
 
         <!-- MONTH CALENDAR -->
         <div class="cal">
@@ -5787,6 +5792,96 @@ body { overflow: hidden; }
       cursor: pointer;
     }
     .cm-agenda-add:hover { text-decoration: underline; }
+    .cm-agenda-empty[hidden] { display: none; }
+    .cm-agenda-add[hidden] { display: none; }
+
+    /* Agenda item rows — one stacked block, borders shared between
+     * neighbours so the list reads as a single table rather than cards. */
+    .cm-ai-list { display: flex; flex-direction: column; }
+    .cm-ai-list[hidden] { display: none; }
+    .cm-ai-row {
+      position: relative;
+      display: flex; flex-direction: column; gap: var(--spacing-2);
+      padding: var(--spacing-2) var(--spacing-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-gray-200);
+    }
+    .cm-ai-row + .cm-ai-row { margin-top: -1px; }
+    .cm-ai-row:first-child { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
+    .cm-ai-row:last-child  { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+    .cm-ai-row-top { display: flex; align-items: flex-start; gap: var(--spacing-2); }
+    .cm-ai-row-desc {
+      flex: 1; min-width: 0; margin: 0;
+      font: var(--type-body-sm); color: var(--color-text);
+      overflow-wrap: anywhere;
+    }
+    /* The delete control is revealed on hover, as it is in the app — a row of
+     * always-on trash icons reads as the point of the list. Keyboard users get
+     * it back through :focus-within. */
+    .cm-ai-row-del { opacity: 0; transition: opacity var(--duration-fast) var(--ease); }
+    .cm-ai-row:hover .cm-ai-row-del,
+    .cm-ai-row:focus-within .cm-ai-row-del { opacity: 1; }
+    /* Aligns the meta row under the description, clearing the number badge. */
+    .cm-ai-row-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--spacing-2); padding-left: var(--spacing-6);
+    }
+    .cm-ai-row-meta-start, .cm-ai-row-meta-end { display: flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    .cm-ai-row-owner {
+      font: var(--type-body-sm); color: var(--color-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* Add form — dashed outline marks it as not-yet-saved. */
+    .cm-ai-form {
+      display: flex; flex-direction: column; gap: var(--spacing-2);
+      padding: var(--spacing-2) var(--spacing-4);
+      background: var(--color-surface);
+      border: 1px dashed var(--color-gray-200);
+      border-radius: var(--radius-md);
+    }
+    .cm-ai-form[hidden] { display: none; }
+    .cm-ai-form > div { min-width: 0; }
+    .cm-ai-form .input { width: 100%; }
+    .cm-ai-form-foot {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: var(--spacing-2); flex-wrap: wrap;
+    }
+    .cm-ai-form-fields { display: flex; align-items: flex-start; gap: var(--spacing-2); min-width: 0; }
+    .cm-ai-form-actions { display: flex; gap: var(--spacing-2); flex-shrink: 0; }
+    .cm-ai-field { position: relative; }
+    .cm-ai-field[hidden] { display: none; }
+    /* The app pins this to 122px because its own column is narrow; here
+     * there is room, so it sizes to a full name before truncating. */
+    .cm-ai-field-owner { width: 160px; }
+    .cm-ai-cadence-tag { height: 24px; }
+    .cm-ai-pick {
+      display: flex; align-items: center; gap: var(--spacing-2);
+      width: 100%; height: 24px; padding: 0 var(--spacing-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+      font: var(--type-body-sm); color: var(--color-text);
+      cursor: pointer;
+    }
+    .cm-ai-pick:hover { border-color: var(--color-border-strong); }
+    .cm-ai-pick:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    .cm-ai-field.is-error .cm-ai-pick { border-color: var(--color-danger); }
+    .cm-ai-pick-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .cm-ai-pick-text.is-placeholder { color: var(--color-text-muted); }
+    .cm-ai-pick > .btn-icon { flex-shrink: 0; color: var(--color-text-muted); }
+    .cm-ai-menu { min-width: 180px; max-height: 240px; overflow-y: auto; }
+    /* The owner and Project menus carry an avatar plus a name and a role,
+     * which all wrap at the 180px .dropdown-menu-start inherits. Widen them
+     * past their 160px trigger and let the text ellipsis instead. */
+    [data-cm-ai-owner-menu], [data-cm-ai-project-menu] { min-width: 260px; max-width: 320px; }
+    .cm-ai-menu .dropdown-item-text { min-width: 0; }
+    .cm-ai-menu .dropdown-item-label,
+    .cm-ai-menu .dropdown-item-description {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cm-ai-menu[hidden] { display: none; }
+    .cm-ai-err { margin: var(--spacing-2) 0 0; font: var(--type-body-xxs); color: var(--color-danger); }
+    .cm-ai-err[hidden] { display: none; }
 
     .cm-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); }
     .cm-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); align-items: end; }
@@ -5921,9 +6016,52 @@ body { overflow: hidden; }
       font-size: 18px;
     }
     .cm-conn-body { flex: 1; min-width: 0; }
-    .cm-conn-title { font: var(--font-weight-semibold) var(--text-md)/1.4 var(--font-sans); color: var(--color-text); margin: 0; }
-    .cm-conn-desc  { font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
+    .cm-conn-title { display: block; font: var(--font-weight-semibold) var(--text-md)/1.4 var(--font-sans); color: var(--color-text); margin: 0; }
+    .cm-conn-desc  { display: block; font: var(--type-body-sm); color: var(--color-text-muted); margin: 2px 0 0; }
     .cm-conn-extra { margin-top: var(--spacing-2); }
+
+    /* Connection cards open a searchable multi-select; what's linked is listed
+       inside the card. Same pattern as initiatives/v3-breadcrumb, on current tokens. */
+    .cm-conn-wrap { position: relative; }
+    .cm-conn { padding: 0; display: block; transition: background var(--duration-fast) var(--ease); }
+    .cm-conn:hover,
+    .cm-conn:has(> .cm-conn-btn[aria-expanded="true"]) { background: var(--color-surface-muted); }
+    .cm-conn-btn {
+      display: flex; gap: var(--spacing-3); align-items: flex-start;
+      width: 100%; padding: var(--spacing-4);
+      background: transparent; border: 0; border-radius: var(--radius-md);
+      font: inherit; text-align: left; cursor: pointer;
+    }
+    .cm-conn-btn:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: -2px; }
+    /* "Not applicable" greys the Slack picker out — a channel or nothing, never both. */
+    .cm-conn-wrap.is-off .cm-conn-btn { opacity: .5; pointer-events: none; }
+    .cm-conn-wrap.has-picks .cm-conn-desc { display: none; }
+    .cm-conn-menu { left: 0; right: 0; margin-top: var(--spacing-1); }
+    .cm-conn-menu[hidden], .cm-conn-options .dropdown-item[hidden] { display: none; }
+    .cm-conn-menu .input-icon, .cm-conn-menu .input-icon .input { width: 100%; }
+    .cm-conn-options {
+      display: flex; flex-direction: column; gap: 2px;
+      max-height: 224px; overflow-y: auto; margin-top: var(--spacing-1);
+    }
+    .cm-conn-options .dropdown-item-description { font: var(--type-caption); color: var(--color-text-muted); }
+    .cm-conn-list {
+      list-style: none; margin: 0; padding: 0 var(--spacing-4) var(--spacing-4);
+      display: flex; flex-direction: column; gap: var(--spacing-3);
+    }
+    .cm-conn-list[hidden] { display: none; }
+    .cm-conn-item { display: flex; align-items: center; gap: var(--spacing-3); }
+    .cm-conn-item-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .cm-conn-item-name {
+      font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      align-self: flex-start; max-width: 100%;
+    }
+    .cm-conn-item-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .cm-conn-item-meta { font: var(--type-body-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-conn-item-end { display: inline-flex; align-items: center; gap: var(--spacing-2); flex: none; }
+    .cm-conn-item-remove.btn-icon-only { flex: none; color: var(--color-red-500); }
+    .cm-conn-item-remove.btn-icon-only:hover { color: var(--color-red-500); background: var(--color-danger-subtle); }
+    .cm-conn-foot { padding: 0 var(--spacing-4) var(--spacing-4); }
 
     .cm-owner-row {
       display: flex; gap: var(--spacing-3); align-items: center;
@@ -5969,7 +6107,7 @@ body { overflow: hidden; }
       </header>
 
       <!-- BODY -->
-      <div class="modal-body" style="padding-top: 0; background: var(--color-gray-100)">
+      <div class="modal-body" style="padding-top: 0; background: var(--color-gray-50)">
         <div class="cm-grid">
           <!-- LEFT COLUMN -->
           <div>
@@ -6176,21 +6314,84 @@ body { overflow: hidden; }
             </section>
 
             <!-- Agenda items (create flow only) -->
-            <section class="cm-section" id="cm-agenda">
+            <section class="cm-section" id="cm-agenda" data-cm-agenda>
               <div class="cm-agenda-head">
                 <div class="cm-agenda-title-row">
                   <h3 class="cm-section-title">Agenda items</h3>
-                  <span class="badge">0</span>
+                  <span class="badge" data-cm-ai-count>0</span>
                 </div>
-                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item">
+                <button class="btn btn-icon-only btn-ghost btn-xs" type="button"
+                        data-cm-ai-open aria-label="Add agenda item">
                   <svg class="icon"><use href="#i-plus"/></svg>
                 </button>
               </div>
-              <div class="cm-agenda-empty">
+
+              <div class="cm-agenda-empty" data-cm-ai-empty>
                 <svg class="icon"><use href="#i-list-unordered"/></svg>
-                No Agenda items yet
+                No Agenda Items yet
               </div>
-              <button class="cm-agenda-add" type="button">
+
+              <!-- Saved items — creation order, numbered 1..n. Items cannot be
+                   reordered (ROB-AGENDA-023), so there is no drag handle. -->
+              <div class="cm-ai-list" data-cm-ai-list hidden></div>
+
+              <!-- Add form. Fields and validation follow ROB-AGENDA-037:
+                   description (required, 200 max), cadence, Project (One-off
+                   only, ROB-AGENDA-009), owner (required, from the roster,
+                   ROB-AGENDA-038). Flags are set after creation, never here
+                   (ROB-AGENDA-008). -->
+              <div class="cm-ai-form" hidden data-cm-ai-form>
+                <div>
+                  <input class="input" type="text" maxlength="200" autocomplete="off"
+                         placeholder="Describe this agenda item"
+                         aria-label="Agenda item description" data-cm-ai-desc />
+                  <p class="cm-ai-err" hidden data-cm-ai-desc-err></p>
+                </div>
+
+                <div class="cm-ai-form-foot">
+                  <div class="cm-ai-form-fields">
+                    <div class="cm-ai-field" data-cm-ai-cadence>
+                      <button class="tag tag-light cm-ai-cadence-tag" type="button"
+                              aria-haspopup="listbox" aria-expanded="false"
+                              data-cm-ai-cadence-trigger>
+                        <span data-cm-ai-cadence-label>Weekly</span>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
+                           role="listbox" data-cm-ai-cadence-menu></div>
+                    </div>
+
+                    <div class="cm-ai-field" hidden data-cm-ai-project>
+                      <button class="cm-ai-pick" type="button"
+                              aria-haspopup="listbox" aria-expanded="false"
+                              data-cm-ai-project-trigger>
+                        <span class="cm-ai-pick-text is-placeholder" data-cm-ai-project-label>Project</span>
+                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
+                           role="listbox" data-cm-ai-project-menu></div>
+                    </div>
+
+                    <div class="cm-ai-field cm-ai-field-owner" data-cm-ai-owner>
+                      <button class="cm-ai-pick" type="button"
+                              aria-haspopup="listbox" aria-expanded="false"
+                              data-cm-ai-owner-trigger>
+                        <span class="cm-ai-pick-text is-placeholder" data-cm-ai-owner-label>Owner</span>
+                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
+                           role="listbox" data-cm-ai-owner-menu></div>
+                      <p class="cm-ai-err" hidden data-cm-ai-owner-err></p>
+                    </div>
+                  </div>
+
+                  <div class="cm-ai-form-actions">
+                    <button class="btn btn-secondary btn-xs" type="button" data-cm-ai-cancel>Cancel</button>
+                    <button class="btn btn-primary btn-xs" type="button" data-cm-ai-save>Save</button>
+                  </div>
+                </div>
+              </div>
+
+              <button class="cm-agenda-add" type="button" data-cm-ai-open>
                 <svg class="icon"><use href="#i-plus"/></svg>
                 Add agenda item
               </button>
@@ -6200,14 +6401,19 @@ body { overflow: hidden; }
             <section class="cm-section" id="cm-connections">
               <h3 class="cm-section-title">Connections</h3>
 
-              <div class="cm-conn">
-                <span class="cm-conn-icon"><svg class="icon"><use href="#i-slack"/></svg></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Slack</p>
-                  <p class="cm-conn-desc">Create or add Slack channels to sync conversations with this meeting</p>
-                  <div class="cm-conn-extra">
+              <div class="cm-conn-wrap" data-cm-conn="slack">
+                <div class="cm-conn">
+                  <button class="cm-conn-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cm-conn-icon"><svg class="icon"><use href="#i-slack"/></svg></span>
+                    <span class="cm-conn-body">
+                      <span class="cm-conn-title">Slack</span>
+                      <span class="cm-conn-desc" data-default="Create or add Slack channels to sync conversations with this meeting">Create or add Slack channels to sync conversations with this meeting</span>
+                    </span>
+                  </button>
+                  <ul class="cm-conn-list" data-cm-conn-list aria-label="Linked Slack channels" hidden></ul>
+                  <div class="cm-conn-foot">
                     <label class="checkbox">
-                      <input type="checkbox" class="checkbox-input" />
+                      <input type="checkbox" class="checkbox-input" data-cm-conn-na />
                       <span class="checkbox-box">
                         <svg class="checkbox-mark"><use href="#i-check"/></svg>
                       </span>
@@ -6215,21 +6421,55 @@ body { overflow: hidden; }
                     </label>
                   </div>
                 </div>
-              </div>
-
-              <div class="cm-conn">
-                <span class="cm-conn-icon"><svg class="icon"><use href="#i-initiatives"/></svg></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Initiatives</p>
-                  <p class="cm-conn-desc">Connect to the Initiative this work advances</p>
+                <div class="dropdown-menu dropdown-menu-start cm-conn-menu" hidden>
+                  <div class="input-icon input-icon-left">
+                    <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                    <input class="input" type="search" placeholder="Search Slack channels" aria-label="Search Slack channels" autocomplete="off" />
+                  </div>
+                  <div class="cm-conn-options" role="listbox" aria-multiselectable="true"></div>
+                  <p class="dropdown-menu-label cm-conn-empty" hidden>No matches</p>
                 </div>
               </div>
 
-              <div class="cm-conn">
-                <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu-2"/></svg></span>
-                <div class="cm-conn-body">
-                  <p class="cm-conn-title">Processes</p>
-                  <p class="cm-conn-desc">Connect processes that this meeting drives</p>
+              <div class="cm-conn-wrap" data-cm-conn="initiatives">
+                <div class="cm-conn">
+                  <button class="cm-conn-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cm-conn-icon"><svg class="icon"><use href="#i-initiatives"/></svg></span>
+                    <span class="cm-conn-body">
+                      <span class="cm-conn-title">Initiatives</span>
+                      <span class="cm-conn-desc" data-default="Connect to the Initiative this work advances">Connect to the Initiative this work advances</span>
+                    </span>
+                  </button>
+                  <ul class="cm-conn-list" data-cm-conn-list aria-label="Linked initiatives" hidden></ul>
+                </div>
+                <div class="dropdown-menu dropdown-menu-start cm-conn-menu" hidden>
+                  <div class="input-icon input-icon-left">
+                    <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                    <input class="input" type="search" placeholder="Search initiatives" aria-label="Search initiatives" autocomplete="off" />
+                  </div>
+                  <div class="cm-conn-options" role="listbox" aria-multiselectable="true"></div>
+                  <p class="dropdown-menu-label cm-conn-empty" hidden>No matches</p>
+                </div>
+              </div>
+
+              <div class="cm-conn-wrap" data-cm-conn="processes">
+                <div class="cm-conn">
+                  <button class="cm-conn-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cm-conn-icon"><svg class="icon"><use href="#i-cpu-2"/></svg></span>
+                    <span class="cm-conn-body">
+                      <span class="cm-conn-title">Processes</span>
+                      <span class="cm-conn-desc" data-default="Connect processes that this meeting drives">Connect processes that this meeting drives</span>
+                    </span>
+                  </button>
+                  <ul class="cm-conn-list" data-cm-conn-list aria-label="Linked processes" hidden></ul>
+                </div>
+                <div class="dropdown-menu dropdown-menu-start cm-conn-menu" hidden>
+                  <div class="input-icon input-icon-left">
+                    <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                    <input class="input" type="search" placeholder="Search processes" aria-label="Search processes" autocomplete="off" />
+                  </div>
+                  <div class="cm-conn-options" role="listbox" aria-multiselectable="true"></div>
+                  <p class="dropdown-menu-label cm-conn-empty" hidden>No matches</p>
                 </div>
               </div>
             </section>
@@ -6368,6 +6608,614 @@ body { overflow: hidden; }
       </footer>
     </div>
   </div>
+
+  <!-- ============ FIND TIME (PARTICIPANTS AVAILABILITY) MODAL ============ -->
+  <!--
+    "Find time for <meeting>" — ROB-CREATE-028. A 24-hour grid for one day in
+    the meeting's time zone, a row per person, Google free/busy blocks labelled
+    "Busy" (ROB-CREATE-029 — titles are never returned), day and week
+    navigation, a date picker and start/end pickers. Clicking an hour cell
+    selects that hour; Save copies date + start + end into the create form;
+    Cancel discards.
+
+    The prototype has no Google: busy blocks are generated deterministically
+    from the person and the day, inside each person's *own* working hours, so
+    the grid is stable across re-opens and a Bengaluru row is busy where a New
+    York row is not. Everything else — layout, copy, measurements, the hour
+    maths — is the app's.
+  -->
+  <style>
+    .ft-overlay .modal { max-width: 1200px; }
+    .ft-pickers {
+      display: flex; gap: var(--spacing-6); align-items: flex-start;
+      flex-wrap: wrap; margin-bottom: var(--spacing-4);
+    }
+    .ft-picker-label { font: var(--type-body-sm); color: var(--color-text-muted); margin: 0 0 var(--spacing-1); }
+    .ft-picker-row { display: flex; align-items: center; gap: var(--spacing-2); }
+    .ft-nav { flex-shrink: 0; }
+    .ft-nav .icon { transform: none; }
+    .ft-flip { transform: scaleX(-1); }
+    .ft-date { width: 150px; text-align: center; }
+    .ft-time-field { width: 128px; }
+    .ft-time-err { font: var(--type-body-sm); color: var(--color-danger); margin: 0; }
+    .ft-time-err[hidden] { display: none; }
+
+    /* The grid. Measurements are the app's: 270px name column, 75px an hour. */
+    .ft-grid-wrap { display: flex; align-items: flex-start; gap: var(--spacing-2); }
+    .ft-scroller {
+      flex: 1; min-width: 0;
+      overflow: auto; position: relative; max-height: 35rem;
+      scrollbar-width: none;
+      border: 1px solid var(--color-gray-200); border-radius: var(--radius-md);
+    }
+    .ft-scroller::-webkit-scrollbar { display: none; }
+    .ft-table-wrap { position: relative; width: max-content; }
+    .ft-table { border-collapse: collapse; width: max-content; }
+    .ft-table th, .ft-table td { padding: 0; }
+    .ft-th {
+      width: 75px; min-width: 75px; text-align: left;
+      border: 1px solid var(--color-gray-200); border-top: none;
+      position: sticky; top: 0; background: var(--color-surface); z-index: 1;
+      font: var(--type-body-sm); color: var(--color-text-muted);
+      height: 36px; box-sizing: border-box;
+    }
+    .ft-th > span { padding-left: var(--spacing-1); }
+    .ft-th-name {
+      width: 270px; min-width: 270px; left: 0; z-index: 2;
+      border-left: none; padding: 0 var(--spacing-3); box-sizing: border-box;
+    }
+    .ft-th-name-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-2); }
+    .ft-th-tz { display: flex; align-items: center; gap: var(--spacing-1); color: var(--color-text); }
+    .ft-row { position: relative; }
+    .ft-name-cell {
+      width: 270px; min-width: 270px;
+      border: 1px solid var(--color-gray-200); border-top: none; border-left: none;
+      position: sticky; left: 0; background: var(--color-surface); z-index: 1;
+      padding: 6px var(--spacing-3); box-sizing: border-box;
+    }
+    .ft-person { display: flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    .ft-person-body { min-width: 0; }
+    .ft-person-name {
+      margin: 0; font: var(--type-body-sm); color: var(--color-text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .ft-person-time { margin: 0; font: var(--type-caption); color: var(--color-text-muted); }
+    /* Hour cells are the click target — one hour each (ROB-CREATE-028). */
+    .ft-cell {
+      border-right: 1px solid var(--color-gray-200);
+      border-bottom: 1px solid var(--color-gray-200);
+      height: 48px; cursor: pointer;
+    }
+    .ft-cell:hover { background: var(--color-gray-50); }
+    /* A section heading runs into the row beneath it, as it does in the app. */
+    .ft-section td { border-bottom: none; }
+    .ft-section-cell {
+      border-right: 1px solid var(--color-gray-200);
+      position: sticky; left: 0; background: var(--color-surface); z-index: 1;
+      padding: var(--spacing-2) var(--spacing-3) var(--spacing-1);
+      font: var(--font-weight-semibold) var(--text-sm)/1.2 var(--font-sans);
+      color: var(--color-text);
+    }
+    .ft-section .ft-cell { height: 28px; cursor: default; border-bottom: none; }
+    .ft-section .ft-cell:hover { background: transparent; }
+    /* A busy block floats over its row — no title is ever shown, only "Busy". */
+    .ft-busy {
+      position: absolute; bottom: 4px; height: 40px;
+      box-sizing: border-box; padding: var(--spacing-1) var(--spacing-2);
+      background: var(--color-blue-100);
+      border-left: 2px solid var(--color-blue-500);
+      border-radius: var(--radius-sm);
+      font: var(--type-body-sm); color: var(--color-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      pointer-events: none;
+    }
+    /* The chosen slot, drawn across every row. */
+    .ft-selection {
+      position: absolute; top: 0; height: 100%;
+      background: var(--color-gray-500); opacity: .4;
+      border-radius: var(--radius-sm); pointer-events: none;
+    }
+    .ft-selection[hidden] { display: none; }
+    .ft-empty { font: var(--type-body-sm); color: var(--color-text-muted); }
+  </style>
+
+  <!-- Stacks on top of the create/edit form that opened it. --z-modal is 1300,
+       so a literal 1000 would sit underneath. -->
+  <div class="modal-overlay ft-overlay" id="find-time" hidden style="z-index: calc(var(--z-modal) + 1)">
+    <div class="modal modal-xl" role="dialog" aria-modal="true" aria-labelledby="ft-title">
+      <header class="modal-header" style="border-bottom: 1px solid var(--color-gray-200)">
+        <h2 id="ft-title" class="modal-title">Find time</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close type="button" aria-label="Close">
+          <svg class="icon"><use href="#i-close"/></svg>
+        </button>
+      </header>
+
+      <div class="modal-body" style="padding: var(--spacing-6)">
+        <div class="ft-pickers">
+          <div>
+            <p class="ft-picker-label">Date</p>
+            <div class="ft-picker-row">
+              <button class="btn btn-secondary btn-icon-only btn-xs ft-nav" type="button"
+                      data-ft-nav="-7" data-tooltip="Previous Week" aria-label="Previous week">
+                <svg class="icon ft-flip"><use href="#i-chevron-double"/></svg>
+              </button>
+              <button class="btn btn-secondary btn-icon-only btn-xs ft-nav" type="button"
+                      data-ft-nav="-1" data-tooltip="Previous Day" aria-label="Previous day">
+                <svg class="icon"><use href="#i-chevron-left"/></svg>
+              </button>
+              <div class="cm-input-icon ft-date">
+                <svg class="icon"><use href="#i-calendar"/></svg>
+                <input class="input" type="text" readonly data-ft-date aria-label="Date" />
+              </div>
+              <button class="btn btn-secondary btn-icon-only btn-xs ft-nav" type="button"
+                      data-ft-nav="1" data-tooltip="Next Day" aria-label="Next day">
+                <svg class="icon"><use href="#i-chevron-right"/></svg>
+              </button>
+              <button class="btn btn-secondary btn-icon-only btn-xs ft-nav" type="button"
+                      data-ft-nav="7" data-tooltip="Next Week" aria-label="Next week">
+                <svg class="icon"><use href="#i-chevron-double"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p class="ft-picker-label">Time</p>
+            <div class="ft-picker-row">
+              <div class="cm-input-suffix ft-time-field">
+                <svg class="icon"><use href="#i-time"/></svg>
+                <input class="input" type="text" data-ft-start aria-label="Start time" />
+              </div>
+              <div class="cm-input-suffix ft-time-field">
+                <svg class="icon"><use href="#i-time"/></svg>
+                <input class="input" type="text" data-ft-end aria-label="End time" />
+              </div>
+              <p class="ft-time-err" hidden data-ft-time-err>End time should be after start time</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ft-grid-wrap">
+          <div class="ft-scroller" data-ft-scroller>
+            <div class="ft-table-wrap">
+              <table class="ft-table" data-ft-table>
+                <thead data-ft-head></thead>
+                <tbody data-ft-body></tbody>
+              </table>
+              <div class="ft-selection" hidden data-ft-selection></div>
+            </div>
+          </div>
+          <button class="btn btn-icon-only btn-ghost btn-xs" type="button"
+                  style="margin-top: var(--spacing-2)" data-ft-scroll="1" aria-label="Scroll right">
+            <svg class="icon"><use href="#i-chevron-right"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <footer class="modal-footer" style="border-top: 1px solid var(--color-gray-200)">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-primary" type="button" data-ft-save>Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Find Time — ROB-CREATE-028 / -029.
+    (function () {
+      const ft = document.getElementById('find-time');
+      if (!ft) return;
+
+      const HOURS = 24;
+      const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g,
+        c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      const head = ft.querySelector('[data-ft-head]');
+      const body = ft.querySelector('[data-ft-body]');
+      const scroller = ft.querySelector('[data-ft-scroller]');
+      const selEl = ft.querySelector('[data-ft-selection]');
+      const dateIn = ft.querySelector('[data-ft-date]');
+      const startIn = ft.querySelector('[data-ft-start]');
+      const endIn = ft.querySelector('[data-ft-end]');
+      const timeErr = ft.querySelector('[data-ft-time-err]');
+      const title = ft.querySelector('#ft-title');
+
+      // Where Save writes back to, and where the roster is read from.
+      let target = null;
+
+      // ---- state ----------------------------------------------------------
+      let day = new Date();          // the day the grid is drawn for
+      let start = '14:00';
+      let end = '15:00';
+      let tzOffset = -4;             // the meeting's time zone, hours from UTC
+      let tzLabel = '(GMT-04:00)';
+      let people = [];
+
+      // ---- people ---------------------------------------------------------
+      // The prototype has no directory, so each known person carries a time
+      // zone here. The caption under a name is the selected start time in that
+      // zone, which is the whole point of the column header "Name, local time".
+      const ZONES = {
+        'Matthew Vella':     [2,    'Valletta'],
+        'Keith Berlin':      [-4,   'New York'],
+        'Rick Lacroix':      [-7,   'Vancouver'],
+        'Tile Tampakas':     [2,    'Athens'],
+        'Collete Parker':    [-4,   'New York'],
+        'Kate Ottavio Kent': [-5,   'Chicago'],
+        'Jane Eveland':      [1,    'London'],
+        'Emily Smith':       [5.5,  'Bengaluru'],
+        'Adan Jones':        [11,   'Sydney'],
+      };
+      const zoneOf = name => (ZONES[name] || [0, 'UTC'])[0];
+
+      // ---- deterministic busy slots ---------------------------------------
+      // Same person + same day always gives the same calendar, so re-opening
+      // the modal does not reshuffle it. Blocks sit inside that person's own
+      // 8am-6pm, which is why rows in distant zones are busy in different
+      // columns.
+      const hash = str => {
+        let h = 2166136261 >>> 0;
+        for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+        return h >>> 0;
+      };
+      const rngFrom = seed => {
+        let x = (seed || 1) >>> 0;
+        return () => { x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; };
+      };
+      const iso = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+
+      const busyFor = (name, d) => {
+        const r = rngFrom(hash(name + '|' + iso(d)));
+        const weekend = d.getDay() === 0 || d.getDay() === 6;
+        const n = weekend ? (r() < 0.5 ? 0 : 1) : 2 + Math.floor(r() * 3);
+        const out = [];
+        let cursor = 8 + Math.floor(r() * 2);                 // local hour
+        for (let i = 0; i < n && cursor < 18; i++) {
+          const dur = r() < 0.5 ? 1 : 1.5;
+          out.push([cursor, Math.min(cursor + dur, 18)]);
+          cursor += dur + 1 + Math.floor(r() * 2);
+        }
+        return out;
+      };
+
+      // A person's local hour, placed on the meeting-time-zone grid.
+      const toGrid = (localHour, personOffset) => localHour - personOffset + tzOffset;
+
+      // ---- time helpers ----------------------------------------------------
+      const hhmm = h => {
+        const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+        return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+      };
+      const toHours = t => {
+        const m = /^(\d{1,2}):(\d{2})$/.exec((t || '').trim());
+        return m ? Number(m[1]) + Number(m[2]) / 60 : null;
+      };
+      // The app's 12-hour caption, lowercased: "2:30 pm".
+      const ampm = h => {
+        let hh = Math.floor(((h % 24) + 24) % 24), mm = Math.round((h - Math.floor(h)) * 60);
+        const suffix = hh < 12 ? 'am' : 'pm';
+        return (hh % 12 || 12) + ':' + String(mm).padStart(2, '0') + ' ' + suffix;
+      };
+      const fmtLong = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const fmtShort = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+      // ---- render ----------------------------------------------------------
+      const hourCells = () => {
+        let out = '';
+        for (let h = 0; h < HOURS; h++) out += '<td class="ft-cell" data-ft-hour="' + h + '"></td>';
+        return out;
+      };
+
+      function renderHead() {
+        let th = '<th class="ft-th ft-th-name"><div class="ft-th-name-inner">' +
+          '<span>Name, local time</span>' +
+          '<span class="ft-th-tz">Time ' + esc(tzLabel) +
+          '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-ft-scroll="-1" aria-label="Scroll left">' +
+          '<svg class="icon"><use href="#i-chevron-left"/></svg></button></span></div></th>';
+        for (let h = 0; h < HOURS; h++) {
+          th += '<th class="ft-th"><span>' + (h % 12 || 12) + ' ' + (h < 12 ? 'am' : 'pm') + '</span></th>';
+        }
+        head.innerHTML = '<tr>' + th + '</tr>';
+      }
+
+      const personRow = p => {
+        const local = toHours(start);
+        const caption = local == null ? '' : ampm(local - tzOffset + p.offset);
+        return '<tr class="ft-row" data-ft-person="' + esc(p.name) + '">' +
+          '<td class="ft-name-cell"><div class="ft-person">' +
+            '<span class="avatar avatar-md">' + esc(p.initials) + '</span>' +
+            '<div class="ft-person-body">' +
+              '<p class="ft-person-name">' + esc(p.name) + '</p>' +
+              '<p class="ft-person-time">' + esc(caption) + '</p>' +
+            '</div></div></td>' + hourCells() + '</tr>';
+      };
+
+      const sectionRow = label =>
+        '<tr class="ft-section"><td class="ft-section-cell">' + esc(label) + '</td>' + hourCells() + '</tr>';
+
+      function renderBody() {
+        const owner = people[0];
+        const rest = people.slice(1);
+        let html = '';
+        if (owner) html += sectionRow('Owner') + personRow(owner);
+        // The Participants heading only appears once someone is on the meeting.
+        if (rest.length) {
+          html += sectionRow('Participants');
+          rest.forEach(p => { html += personRow(p); });
+        }
+        body.innerHTML = html;
+        paintBusy();
+        paintSelection();
+      }
+
+      // Measured, not computed from constants: the grid's real column pitch is
+      // whatever the browser laid out, and the blocks have to agree with it.
+      const metrics = () => {
+        const row = body.querySelector('.ft-row') || body.querySelector('.ft-section');
+        if (!row) return null;
+        const cells = row.querySelectorAll('.ft-cell');
+        if (cells.length < 2) return null;
+        return { left0: cells[0].offsetLeft, pitch: cells[1].offsetLeft - cells[0].offsetLeft };
+      };
+
+      function paintBusy() {
+        const m = metrics();
+        if (!m) return;
+        body.querySelectorAll('.ft-row').forEach(row => {
+          row.querySelectorAll('.ft-busy').forEach(b => b.remove());
+          const p = people.find(x => x.name === row.dataset.ftPerson);
+          if (!p) return;
+          busyFor(p.name, day).forEach(([ls, le]) => {
+            // Clamp to the visible day — a block that starts before midnight
+            // or runs past it is shown cut, never wrapped.
+            const gs = Math.max(0, toGrid(ls, p.offset));
+            const ge = Math.min(HOURS, toGrid(le, p.offset));
+            if (ge <= gs) return;
+            const el = document.createElement('div');
+            el.className = 'ft-busy';
+            el.textContent = 'Busy';
+            el.style.left = (m.left0 + gs * m.pitch) + 'px';
+            el.style.width = ((ge - gs) * m.pitch) + 'px';
+            row.appendChild(el);
+          });
+        });
+      }
+
+      function paintSelection() {
+        const m = metrics();
+        const sh = toHours(start), eh = toHours(end);
+        if (!m || sh == null || eh == null || eh <= sh) { selEl.hidden = true; return; }
+        selEl.hidden = false;
+        selEl.style.left = (m.left0 + sh * m.pitch) + 'px';
+        selEl.style.width = ((Math.min(eh, HOURS) - sh) * m.pitch) + 'px';
+      }
+
+      function paintCaptions() {
+        const local = toHours(start);
+        body.querySelectorAll('.ft-row').forEach(row => {
+          const p = people.find(x => x.name === row.dataset.ftPerson);
+          const el = row.querySelector('.ft-person-time');
+          if (p && el) el.textContent = local == null ? '' : ampm(local - tzOffset + p.offset);
+        });
+      }
+
+      function paintPickers() {
+        dateIn.value = fmtShort(day);
+        startIn.value = start;
+        endIn.value = end;
+        const sh = toHours(start), eh = toHours(end);
+        // The app flags start > end here and lets the form catch the rest.
+        const bad = sh != null && eh != null && sh > eh;
+        timeErr.hidden = !bad;
+        endIn.classList.toggle('is-error', bad);
+      }
+
+      // ---- opening ---------------------------------------------------------
+      // Everything the modal needs comes from the form that opened it: the
+      // date, the time zone, the owner and the participants.
+      // The create form labels its fields with aria-label and uses a designmd
+      // select for the time zone; the edit form uses <label class="field"> and
+      // a readonly input. Resolve by either, so one modal serves both.
+      const byAria = (scope, label) => scope.querySelector('input[aria-label="' + label + '"]');
+      const byFieldLabel = (scope, label) => {
+        const el = [...scope.querySelectorAll('.field-label')]
+          .find(sp => sp.textContent.trim().toLowerCase() === label.toLowerCase());
+        const field = el && el.closest('.field');
+        return field ? field.querySelector('input') : null;
+      };
+      // Section bodies are found by their heading, which is the only thing the
+      // two forms spell the same way.
+      const sectionByTitle = (overlay, prefix) =>
+        [...overlay.querySelectorAll('.cm-section')].find(sec => {
+          const h = sec.querySelector('.cm-section-title');
+          return h && h.textContent.trim().toLowerCase().startsWith(prefix);
+        }) || null;
+
+      function readTarget(btn) {
+        const overlay = btn.closest('.modal-overlay') || document;
+        const scope = btn.closest('.cm-row, .cm-time-row, .cm-section') || overlay;
+        const pick = (fn, label) => fn(scope, label) || fn(overlay, label);
+
+        // Start and end are the two inputs of the time pair, whichever form.
+        const timeFields = scope.querySelector('.cm-time-fields') ||
+                           overlay.querySelector('.cm-time-fields');
+        const timeInputs = timeFields ? timeFields.querySelectorAll('input') : [];
+
+        const tzSelect = overlay.querySelector('[data-cm-select="tz"] [data-cm-select-text]');
+        const tzInput = byFieldLabel(overlay, 'Time Zone');
+
+        return {
+          overlay: overlay,
+          date: pick(byAria, 'Date') || pick(byFieldLabel, 'Date'),
+          start: pick(byAria, 'Start time') || timeInputs[0] || null,
+          end: pick(byAria, 'End time') || timeInputs[1] || null,
+          tz: tzSelect || tzInput,
+          name: overlay.querySelector('#cm-title-label, #me-title'),
+          ownerSection: sectionByTitle(overlay, 'owner'),
+          participantsSection: sectionByTitle(overlay, 'participants'),
+        };
+      }
+
+      // A time zone reads off a select's text or an input's value.
+      const valueOf = el => !el ? '' : ('value' in el && el.value != null ? el.value : el.textContent) || '';
+
+      const initialsOf = name => name.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+
+      // A row is a person when it has a name; the grid shows users only, so
+      // bots and guest addresses are dropped the way Talents and guests are
+      // (ROB-CREATE-028).
+      const rowsOf = root => root ? [...root.querySelectorAll('.md-person, .me-person')] : [];
+      const toPerson = row => {
+        const nameEl = row.querySelector('.md-person-name, .me-person-name');
+        const roleEl = row.querySelector('.md-person-role, .me-person-role');
+        const name = nameEl ? nameEl.textContent.trim() : '';
+        const role = roleEl ? roleEl.textContent.trim() : '';
+        if (!name || /@/.test(role)) return null;
+        const av = row.querySelector('.avatar');
+        const initials = av && !av.querySelector('svg') ? av.textContent.trim() : initialsOf(name);
+        return { name: name, initials: initials || initialsOf(name), offset: zoneOf(name) };
+      };
+
+      function readPeople(t) {
+        const out = [];
+        const ownerEl = t.overlay.querySelector('[data-cm-owner-name]');
+        const ownerRow = rowsOf(t.ownerSection)[0];
+        if (ownerEl) {
+          const name = ownerEl.textContent.trim();
+          const ini = t.overlay.querySelector('[data-cm-owner-initials]');
+          out.push({
+            name: name,
+            initials: (ini && ini.textContent.trim()) || initialsOf(name),
+            offset: zoneOf(name),
+          });
+        } else if (ownerRow) {
+          const p = toPerson(ownerRow);
+          if (p) out.push(p);
+        }
+
+        const pSection = t.participantsSection ||
+          t.overlay.querySelector('[data-cm-participants-list]');
+        rowsOf(pSection).forEach(row => {
+          const p = toPerson(row);
+          // The owner is already the first row; never list them twice.
+          if (p && !out.some(x => x.name === p.name)) out.push(p);
+        });
+        return out;
+      }
+
+      function open(btn) {
+        target = readTarget(btn);
+
+        const tzText = valueOf(target.tz) || '(GMT-04:00) New York';
+        const m = /\(GMT([+-])(\d{2}):(\d{2})\)/.exec(tzText);
+        tzOffset = m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) + Number(m[3]) / 60) : 0;
+        tzLabel = m ? m[0] : '(GMT+00:00)';
+
+        const parsed = target.date ? new Date(target.date.value) : null;
+        day = parsed && !isNaN(parsed) ? parsed : new Date();
+        start = (target.start && target.start.value.trim()) || '14:00';
+        end = (target.end && target.end.value.trim()) || '15:00';
+
+        people = readPeople(target);
+
+        const meetingName = target.name ? (target.name.value || target.name.textContent || '').trim() : '';
+        title.textContent = meetingName ? 'Find time for ' + meetingName : 'Find time';
+
+        renderHead();
+        paintPickers();
+        renderBody();
+        ft.removeAttribute('hidden');
+        // Open on the chosen hour rather than at midnight.
+        requestAnimationFrame(() => {
+          const sh = toHours(start), mm = metrics();
+          if (mm && sh != null) scroller.scrollLeft = Math.max(0, sh * mm.pitch - mm.pitch);
+          paintBusy();
+          paintSelection();
+        });
+      }
+
+      // ---- wiring ----------------------------------------------------------
+      // Every "Find Time" in the page opens this, whichever form it sits in.
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.textContent.trim() !== 'Find Time' || btn.disabled) return;
+        e.preventDefault();
+        open(btn);
+      });
+
+      // Disabled until there is a date and a time zone to draw the grid for.
+      const syncFindTimeButtons = () => {
+        document.querySelectorAll('button').forEach(btn => {
+          if (btn.textContent.trim() !== 'Find Time') return;
+          const t = readTarget(btn);
+          const off = !(t.date && t.date.value.trim()) || !valueOf(t.tz).trim();
+          btn.disabled = off;
+          if (off) btn.setAttribute('data-tooltip', 'Select Date and Time Zone to proceed');
+          else btn.removeAttribute('data-tooltip');
+        });
+      };
+      document.addEventListener('input', syncFindTimeButtons);
+      document.addEventListener('click', () => requestAnimationFrame(syncFindTimeButtons));
+      syncFindTimeButtons();
+
+      // Day and week navigation.
+      ft.addEventListener('click', e => {
+        const nav = e.target.closest('[data-ft-nav]');
+        if (nav) {
+          day = new Date(day.getFullYear(), day.getMonth(), day.getDate() + Number(nav.dataset.ftNav));
+          paintPickers();
+          renderBody();
+          return;
+        }
+        const scroll = e.target.closest('[data-ft-scroll]');
+        if (scroll) {
+          const mm = metrics();
+          scroller.scrollBy({ left: Number(scroll.dataset.ftScroll) * (mm ? mm.pitch * 3 : 225), behavior: 'smooth' });
+          return;
+        }
+        // Clicking an hour cell selects that hour (23 runs to 23:59).
+        const cell = e.target.closest('[data-ft-hour]');
+        if (cell) {
+          const h = Number(cell.dataset.ftHour);
+          start = hhmm(h);
+          end = h < 23 ? hhmm(h + 1) : '23:59';
+          paintPickers();
+          paintCaptions();
+          paintSelection();
+        }
+      });
+
+      [startIn, endIn].forEach(input => input.addEventListener('input', () => {
+        start = startIn.value;
+        end = endIn.value;
+        paintPickers();
+        paintCaptions();
+        paintSelection();
+      }));
+
+      // Save copies the slot into the form it came from and closes. The app
+      // does not validate here either — the form's own validators do.
+      ft.querySelector('[data-ft-save]').addEventListener('click', () => {
+        if (target) {
+          if (target.date) target.date.value = fmtLong(day);
+          if (target.start) target.start.value = start;
+          if (target.end) target.end.value = end;
+          [target.date, target.start, target.end].forEach(el => {
+            if (el) el.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+        }
+        ft.setAttribute('hidden', '');
+      });
+
+      // The page's global Escape closes every open overlay at once. While Find
+      // Time is up it belongs to Find Time alone, so the form behind it stays.
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape' || ft.hasAttribute('hidden')) return;
+        e.stopImmediatePropagation();
+        ft.setAttribute('hidden', '');
+      }, true);
+
+      window.addEventListener('resize', () => { paintBusy(); paintSelection(); });
+    })();
+  </script>
 
   <!-- ============ USER-CREATED MEETING VIEW MODAL ============ -->
   <div class="modal-overlay" id="user-meeting-view" hidden>
@@ -6614,6 +7462,452 @@ body { overflow: hidden; }
         }
         links.forEach(l => l.classList.toggle('is-active', l.dataset.cmTocTarget === active?.id));
       });
+
+      // Connections — each card opens a searchable multi-select and lists what
+      // it linked inside the card. Options use the meeting detail's own
+      // vocabulary: initiative levels (Initiative / Project / Sub-project) and
+      // process levels (Focus Area / Activity / Sub-Activity).
+      const CM_CONN = {
+        slack: { options: [
+          ['#eng-weekly-standup', '312 members'], ['#platform-reliability', '48 members'],
+          ['#data-pipeline-migration', '26 members'], ['#eng-leadership', '14 members'],
+          ['#incident-response', '87 members'], ['#ops-announcements', '310 members'] ] },
+        initiatives: { options: [
+          ['Platform Reliability & Observability', 'Initiative'], ['Data Pipeline Migration', 'Initiative'],
+          ['Developer Experience', 'Initiative'], ['Observability Tooling', 'Project'],
+          ['Alerting Overhaul', 'Project'], ['Runbook Automation', 'Sub-project'] ] },
+        processes: { options: [
+          ['Platform Engineering', 'Focus Area'], ['Weekly Engineering Sync', 'Activity'],
+          ['Capacity Planning', 'Activity'], ['Incident Response Review', 'Sub-Activity'],
+          ['Postmortem Review', 'Sub-Activity'], ['On-call Handover', 'Sub-Activity'] ] },
+      };
+      const connWraps = [...modal.querySelectorAll('.cm-conn-wrap')];
+      const closeConn = wrap => {
+        wrap.querySelector('.cm-conn-menu').hidden = true;
+        wrap.querySelector('.cm-conn-btn').setAttribute('aria-expanded', 'false');
+      };
+      connWraps.forEach(wrap => {
+        const cfg = CM_CONN[wrap.dataset.cmConn];
+        if (!cfg) return;
+        const card   = wrap.querySelector('.cm-conn-btn');
+        const menu   = wrap.querySelector('.cm-conn-menu');
+        const search = menu.querySelector('input');
+        const list   = menu.querySelector('.cm-conn-options');
+        const empty  = menu.querySelector('.cm-conn-empty');
+        const desc   = wrap.querySelector('.cm-conn-desc');
+        const chosen = wrap.querySelector('[data-cm-conn-list]');
+        const isSlack = wrap.dataset.cmConn === 'slack';
+
+        list.innerHTML = cfg.options.map(([label, meta]) =>
+          '<button class="dropdown-item" type="button" role="option" aria-selected="false">' +
+          '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' +
+          '<div class="dropdown-item-text"><span class="dropdown-item-label">' + label + '</span>' +
+          '<span class="dropdown-item-description">' + meta + '</span></div></button>').join('');
+        const items = [...list.children];
+
+        card.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          connWraps.forEach(w => { if (w !== wrap) closeConn(w); });
+          menu.hidden = !open;
+          card.setAttribute('aria-expanded', String(open));
+          if (open) { search.value = ''; search.dispatchEvent(new Event('input')); search.focus(); }
+        });
+        menu.addEventListener('click', e => e.stopPropagation());
+        search.addEventListener('input', () => {
+          const q = search.value.trim().toLowerCase();
+          let shown = 0;
+          items.forEach(i => { const hit = i.textContent.toLowerCase().includes(q); i.hidden = !hit; shown += hit; });
+          empty.hidden = shown > 0;
+        });
+        items.forEach(item => item.addEventListener('click', () => {
+          const on = !item.classList.contains('is-selected');
+          item.classList.toggle('is-selected', on);
+          item.setAttribute('aria-selected', String(on));
+          paint();
+        }));
+
+        // The first Slack channel picked is the meeting's default channel.
+        const paint = () => {
+          const picked = items.filter(i => i.classList.contains('is-selected'));
+          chosen.innerHTML = picked.map((i, n) => {
+            const label = i.querySelector('.dropdown-item-label').textContent;
+            const meta  = i.querySelector('.dropdown-item-description')?.textContent || '';
+            const tag   = isSlack
+              ? (n === 0 ? '<span class="tag tag-light">Default</span>' : '')
+              : (meta ? '<span class="tag tag-light">' + meta + '</span>' : '');
+            const sub   = isSlack && meta ? '<span class="cm-conn-item-meta">' + meta + '</span>' : '';
+            return '<li class="cm-conn-item"><span class="cm-conn-item-text">' +
+              '<a class="cm-conn-item-name" href="#" data-cm-conn-open>' + label + '</a>' + sub +
+              '</span><span class="cm-conn-item-end">' + tag +
+              '<button class="btn btn-icon-only btn-ghost cm-conn-item-remove" type="button" data-cm-conn-remove="' +
+              items.indexOf(i) + '" aria-label="Remove ' + label + '"><svg class="icon"><use href="#i-trash"/></svg></button>' +
+              '</span></li>';
+          }).join('');
+          chosen.hidden = !picked.length;
+          wrap.classList.toggle('has-picks', picked.length > 0);
+        };
+        chosen.addEventListener('click', e => {
+          if (e.target.closest('[data-cm-conn-open]')) { e.preventDefault(); return; }
+          const btn = e.target.closest('[data-cm-conn-remove]');
+          if (!btn) return;
+          items[+btn.dataset.cmConnRemove].click(); // same path as unticking it in the menu
+          (chosen.querySelector('[data-cm-conn-remove]') || card).focus();
+        });
+        wrap.addEventListener('keydown', e => {
+          if (e.key === 'Escape' && !menu.hidden) { e.stopPropagation(); closeConn(wrap); card.focus(); }
+        });
+
+        // Slack "Not applicable" — a channel or nothing, never both.
+        const na = wrap.querySelector('[data-cm-conn-na]');
+        if (na) na.addEventListener('change', () => {
+          wrap.classList.toggle('is-off', na.checked);
+          if (!na.checked) return;
+          closeConn(wrap);
+          items.filter(i => i.classList.contains('is-selected')).forEach(i => i.click());
+        });
+      });
+      modal.addEventListener('click', () => connWraps.forEach(closeConn));
+    })();
+  </script>
+
+  <script>
+    // Create meeting — Agenda items.
+    //
+    // The real app has no agenda section in the create form yet: items are
+    // added from the meeting view, and doing it while creating is the open
+    // spike TOP-7338. So this is a proposal — but it is built on the shipped
+    // agenda-item model rather than invented, because that model is what any
+    // implementation will have to satisfy:
+    //
+    //   ROB-AGENDA-001  description + owner + cadence required; one optional
+    //                   Project link; flags default off
+    //   ROB-AGENDA-002  seven cadences, with these exact labels
+    //   ROB-AGENDA-003  an item cadence may not be shorter than the meeting's
+    //   ROB-AGENDA-004  so the menu offers only the allowed ones
+    //   ROB-AGENDA-005  the default is the shortest cadence that is allowed
+    //   ROB-AGENDA-008  flags are set after creation, never in the add form
+    //   ROB-AGENDA-009  Project is One-off only, and lists projects of the
+    //                   meeting's connected initiatives — so it reads the
+    //                   Connections section above
+    //   ROB-AGENDA-023  creation order, no reordering
+    //   ROB-AGENDA-037  field set, 200-char cap, error copy, Enter, Escape
+    //   ROB-AGENDA-038  owners come from the roster: series owner + participants
+    (function () {
+      const modal = document.getElementById('create-meeting');
+      if (!modal) return;
+      const sec = modal.querySelector('[data-cm-agenda]');
+      if (!sec) return;
+
+      const MAX = 200;                                  // AGENDA_TOPIC_TEXT_MAX_LENGTH
+      // label, period in weeks (null = not a recurring cadence)
+      const CAD = {
+        EVERY_MEETING: ['Each meeting',  null],
+        ONE_TIME:      ['One-off',       null],
+        WEEKLY:        ['Weekly',           1],
+        BI_WEEKLY:     ['Bi-weekly',        2],
+        MONTHLY:       ['Monthly',          4],
+        QUARTERLY:     ['Quarterly',       13],
+        HALF_ANNUALLY: ['Half-annually',   26],
+      };
+      const RECURRING = ['WEEKLY', 'BI_WEEKLY', 'MONTHLY', 'QUARTERLY', 'HALF_ANNUALLY'];
+
+      const $  = (sel, root) => (root || sec).querySelector(sel);
+      const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g,
+        c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      const list    = $('[data-cm-ai-list]');
+      const empty   = $('[data-cm-ai-empty]');
+      const count   = $('[data-cm-ai-count]');
+      const form    = $('[data-cm-ai-form]');
+      const addLink = $('.cm-agenda-add');
+      const descIn  = $('[data-cm-ai-desc]');
+      const descErr = $('[data-cm-ai-desc-err]');
+      const ownErr  = $('[data-cm-ai-owner-err]');
+
+      const items = [];
+      let seq = 0;
+      let draft = { cadence: null, project: null, owner: null };
+
+      // ---- the meeting's own cadence, read live from the recurrence select.
+      // "Does not repeat" is irregular: anything is allowed and the default is
+      // Weekly (ROB-AGENDA-005).
+      const meetingPeriodWeeks = () => {
+        const t = (modal.querySelector('[data-cm-select="recurrence"] [data-cm-select-text]')
+                  || {}).textContent || '';
+        if (/^Every week/i.test(t))      return 1;
+        if (/^Every two weeks/i.test(t)) return 2;
+        if (/^Every month/i.test(t))     return 4;
+        return null;                                    // irregular
+      };
+
+      const allowedCadences = () => {
+        const p = meetingPeriodWeeks();
+        const ok = RECURRING.filter(k => p == null || CAD[k][1] >= p);
+        // "Each meeting" is always offered; "One-off" only in the add form,
+        // which is the only place this control exists.
+        return ['EVERY_MEETING', 'ONE_TIME'].concat(ok);
+      };
+
+      const defaultCadence = () => {
+        const p = meetingPeriodWeeks();
+        if (p == null) return 'WEEKLY';
+        return RECURRING.find(k => CAD[k][1] >= p) || 'EVERY_MEETING';
+      };
+
+      // ---- option sources -------------------------------------------------
+      // Owners: the series owner plus whoever is in the participants list.
+      const roster = () => {
+        const out = [];
+        const oName = modal.querySelector('[data-cm-owner-name]');
+        const oIni  = modal.querySelector('[data-cm-owner-initials]');
+        if (oName) out.push({
+          name: oName.textContent.trim(),
+          initials: oIni ? oIni.textContent.trim() : '',
+          role: (modal.querySelector('[data-cm-owner-role]') || {}).textContent || '',
+        });
+        modal.querySelectorAll('[data-cm-participants-list] .md-person').forEach(p => {
+          out.push({
+            name: (p.querySelector('.md-person-name') || {}).textContent || '',
+            initials: (p.querySelector('.avatar') || {}).textContent || '',
+            role: (p.querySelector('.md-person-role') || {}).textContent || '',
+          });
+        });
+        return out;
+      };
+
+      // Projects: the PROJECT-level items connected to the meeting. Nothing
+      // connected yet means nothing to pick — that is the rule, not a bug.
+      const projects = () => [...modal.querySelectorAll(
+        '[data-cm-conn="initiatives"] [data-cm-conn-list] .cm-conn-item')]
+        .filter(li => /^Project$/i.test(((li.querySelector('.tag') || {}).textContent || '').trim()))
+        .map(li => ((li.querySelector('.cm-conn-item-name') || {}).textContent || '').trim());
+
+      // ---- menus ----------------------------------------------------------
+      const fields = [...sec.querySelectorAll('.cm-ai-field')];
+      const closeMenus = except => fields.forEach(f => {
+        if (f === except) return;
+        const m = f.querySelector('.cm-ai-menu');
+        const t = f.querySelector('button');
+        if (m) m.hidden = true;
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+
+      // Wires one trigger + menu pair. `build` returns [{label, value, html}].
+      const wireMenu = (field, build, onPick) => {
+        const trigger = field.querySelector('button');
+        const menu    = field.querySelector('.cm-ai-menu');
+        trigger.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          closeMenus(field);
+          if (!open) { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); return; }
+          const opts = build();
+          menu.innerHTML = opts.length
+            ? opts.map(o =>
+                '<button class="dropdown-item' + (o.selected ? ' is-selected' : '') +
+                '" type="button" role="option" aria-selected="' + !!o.selected +
+                '" data-value="' + esc(o.value) + '">' +
+                '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + o.html + '</button>').join('')
+            : '<p class="dropdown-empty">' + esc(build.emptyText || 'Nothing to pick') + '</p>';
+          menu.hidden = false;
+          trigger.setAttribute('aria-expanded', 'true');
+        });
+        menu.addEventListener('click', e => {
+          e.stopPropagation();
+          const it = e.target.closest('[data-value]');
+          if (!it) return;
+          onPick(it.dataset.value);
+          menu.hidden = true;
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        });
+      };
+
+      // Cadence
+      const cadField = $('[data-cm-ai-cadence]');
+      const cadLabel = $('[data-cm-ai-cadence-label]');
+      wireMenu(cadField,
+        () => allowedCadences().map(k => ({
+          value: k, selected: k === draft.cadence,
+          html: '<span class="dropdown-item-label">' + esc(CAD[k][0]) + '</span>',
+        })),
+        v => { draft.cadence = v; paintDraft(); });
+
+      // Project — One-off only; switching away clears the pick.
+      const projField = $('[data-cm-ai-project]');
+      const projLabel = $('[data-cm-ai-project-label]');
+      const buildProjects = () => projects().map(n => ({
+        value: n, selected: n === draft.project,
+        html: '<span class="dropdown-item-label">' + esc(n) + '</span>',
+      }));
+      buildProjects.emptyText = 'No projects connected to this meeting';
+      wireMenu(projField, buildProjects, v => {
+        draft.project = (v === draft.project) ? null : v;
+        paintDraft();
+      });
+
+      // Owner
+      const ownField = $('[data-cm-ai-owner]');
+      const ownLabel = $('[data-cm-ai-owner-label]');
+      const buildOwners = () => roster().map(p => ({
+        value: p.name, selected: p.name === (draft.owner && draft.owner.name),
+        html: '<span class="dropdown-item-avatar avatar avatar-md">' + esc(p.initials) + '</span>' +
+              '<div class="dropdown-item-text"><span class="dropdown-item-label">' + esc(p.name) + '</span>' +
+              '<span class="dropdown-item-description">' + esc(p.role) + '</span></div>',
+      }));
+      buildOwners.emptyText = 'No one on the meeting yet';
+      wireMenu(ownField, buildOwners, v => {
+        draft.owner = roster().find(p => p.name === v) || null;
+        ownField.classList.remove('is-error');
+        ownErr.hidden = true;
+        paintDraft();
+      });
+
+      document.addEventListener('click', e => { if (!sec.contains(e.target)) closeMenus(null); });
+
+      // ---- draft painting -------------------------------------------------
+      function paintDraft() {
+        cadLabel.textContent = CAD[draft.cadence][0];
+
+        const oneOff = draft.cadence === 'ONE_TIME';
+        projField.hidden = !oneOff;
+        if (!oneOff) draft.project = null;              // ROB-AGENDA-009
+        projLabel.textContent = draft.project || 'Project';
+        projLabel.classList.toggle('is-placeholder', !draft.project);
+
+        ownLabel.textContent = draft.owner ? draft.owner.name : 'Owner';
+        ownLabel.classList.toggle('is-placeholder', !draft.owner);
+      }
+
+      // ---- the saved list -------------------------------------------------
+      function paint() {
+        list.innerHTML = items.map((it, n) =>
+          '<div class="cm-ai-row" data-cm-ai-row="' + it.id + '">' +
+            '<div class="cm-ai-row-top">' +
+              '<span class="count-badge count-badge-lg count-badge-secondary">' + (n + 1) + '</span>' +
+              '<p class="cm-ai-row-desc">' + esc(it.description) + '</p>' +
+              '<button class="btn btn-icon-only btn-ghost btn-xs cm-ai-row-del" type="button" ' +
+                      'data-cm-ai-del="' + it.id + '" data-tooltip="Delete the agenda item" ' +
+                      'aria-label="Delete the agenda item">' +
+                '<svg class="icon"><use href="#i-trash"/></svg></button>' +
+            '</div>' +
+            '<div class="cm-ai-row-meta">' +
+              '<span class="cm-ai-row-meta-start">' +
+                '<span class="tag tag-light">' + esc(CAD[it.cadence][0]) + '</span>' +
+                (it.project
+                  ? '<span class="tag tag-light" data-tooltip="This agenda item relates to ‘' +
+                    esc(it.project) + '’ project">' + esc(it.project) + '</span>'
+                  : '') +
+              '</span>' +
+              '<span class="cm-ai-row-meta-end">' +
+                '<span class="avatar avatar-sm">' + esc(it.owner.initials) + '</span>' +
+                '<span class="cm-ai-row-owner">' + esc(it.owner.name) + '</span>' +
+              '</span>' +
+            '</div>' +
+          '</div>').join('');
+        list.hidden   = items.length === 0;
+        empty.hidden  = items.length > 0 || !form.hidden;
+        count.textContent = String(items.length);
+      }
+
+      list.addEventListener('click', e => {
+        const del = e.target.closest('[data-cm-ai-del]');
+        if (!del) return;
+        const i = items.findIndex(it => String(it.id) === del.dataset.cmAiDel);
+        if (i > -1) items.splice(i, 1);
+        paint();
+      });
+
+      // ---- open / cancel / save -------------------------------------------
+      function openForm() {
+        draft = {
+          cadence: defaultCadence(),
+          project: null,
+          // Defaults to the current user when they are on the roster
+          // (ROB-AGENDA-038) — here that is the meeting's owner.
+          owner: roster()[0] || null,
+        };
+        descIn.value = '';
+        descErr.hidden = true;
+        ownErr.hidden = true;
+        ownField.classList.remove('is-error');
+        descIn.classList.remove('is-error');
+        paintDraft();
+        form.hidden = false;
+        addLink.hidden = true;
+        empty.hidden = true;
+        descIn.focus();
+      }
+
+      function closeForm() {
+        form.hidden = true;
+        addLink.hidden = false;
+        closeMenus(null);
+        paint();
+      }
+
+      function save() {
+        const description = descIn.value.trim();
+        let bad = false;
+
+        if (!description) {
+          descErr.textContent = 'Description is required';
+          bad = true;
+        } else if (description.length > MAX) {
+          descErr.textContent = 'Too long. Should be shorter than ' + MAX + ' characters';
+          bad = true;
+        }
+        descErr.hidden = !bad;
+        descIn.classList.toggle('is-error', bad);
+
+        if (!draft.owner) {
+          ownErr.textContent = 'Owner is required';
+          ownErr.hidden = false;
+          ownField.classList.add('is-error');
+          bad = true;
+        }
+        if (bad) return;                                // the form stays open
+
+        items.push({
+          id: ++seq,
+          description: description,
+          cadence: draft.cadence,
+          project: draft.project,
+          owner: draft.owner,
+        });
+        closeForm();
+      }
+
+      sec.querySelectorAll('[data-cm-ai-open]').forEach(b => b.addEventListener('click', openForm));
+      $('[data-cm-ai-cancel]').addEventListener('click', closeForm);
+      $('[data-cm-ai-save]').addEventListener('click', save);
+
+      descIn.addEventListener('input', () => {
+        if (descErr.hidden) return;
+        descErr.hidden = true;
+        descIn.classList.remove('is-error');
+      });
+      descIn.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        save();
+      });
+
+      // Escape closes the form, not the modal behind it (TOP-7358). An open
+      // menu takes the first Escape.
+      sec.addEventListener('keydown', e => {
+        if (e.key !== 'Escape' || form.hidden) return;
+        const openMenu = fields.some(f => {
+          const m = f.querySelector('.cm-ai-menu');
+          return m && !m.hidden;
+        });
+        e.stopPropagation();
+        if (openMenu) { closeMenus(null); return; }
+        closeForm();
+      });
+
+      paint();
     })();
   </script>
 
@@ -14606,13 +15900,8 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         apply();
       });
 
-      // What counts as "set": the two checkboxes that start on only count once
-      // they are turned off, or the tally would start at 2 on a clean page.
-      const activeCount = () => Object.entries(F).filter(([k, v]) => {
-        if (k === 'subteams' || k === 'no11') return v === false;
-        if (k === 'robonly') return v === true;
-        return Boolean(v);
-      }).length;
+      // Every control now starts off, so "set" is simply a truthy value.
+      const activeCount = () => Object.values(F).filter(Boolean).length;
 
       // The live predicate, used by all three views.
       window.robFilterPass = (x) => {
@@ -14626,6 +15915,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const apply = () => {
         const n = activeCount();
         fLabel.textContent = n ? `Filters (${n})` : 'Filter';
+        paintTags();
         show();
       };
 
@@ -14649,12 +15939,62 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         Object.keys(F).forEach(k => delete F[k]);
         fWrap.querySelectorAll('input[type="search"]').forEach(i => { i.value = ''; });
         fWrap.querySelectorAll('input[type="checkbox"]').forEach(c => {
-          c.checked = c.dataset.robF !== 'robonly';   // back to their defaults
+          c.checked = false;   // every filter starts off
         });
         fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
           sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
           sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
         });
+        apply();
+      });
+
+
+      // ---- Applied-filter tags (ROB-VIEW-030) ----
+      // One removable tag per active filter, in the order the real app renders
+      // them (RoBFilterTags.tsx): owners, attendee, team, divisions, name,
+      // hide 1:1, label RoBs, Slack channels, show sub teams. The × clears only
+      // that filter. Booleans show the label alone; the rest show "Name: value".
+      const fTags = document.querySelector('[data-rob-filter-tags]');
+      const TAG_SPEC = [
+        { key: 'owner',    name: 'Meeting owners' },
+        { key: 'attendee', name: 'Attendee' },
+        { key: 'team',     name: 'Teams' },
+        { key: 'division', name: 'Divisions' },
+        { key: 'name',     name: 'Meeting name' },
+        { key: 'no11',     name: 'Hide 1:1 Meetings', bool: true },
+        { key: 'robonly',  name: 'Label RoBs only',   bool: true },
+        { key: 'slack',    name: 'Slack channels' },
+        { key: 'subteams', name: 'Show sub teams', value: 'Yes' },
+      ];
+
+      // Put one control back to its default without touching the others.
+      const resetField = (key) => {
+        const sel = fWrap.querySelector(`.input-select[data-rob-f="${key}"]`);
+        if (sel) {
+          sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
+          sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+        }
+        const field = fWrap.querySelector(`input[data-rob-f="${key}"]`);
+        if (field) { if (field.type === 'checkbox') field.checked = false; else field.value = ''; }
+        delete F[key];
+      };
+
+      const paintTags = () => {
+        const html = TAG_SPEC.filter(t => t.bool || t.value ? F[t.key] === true : Boolean(F[t.key]))
+          .map(t => {
+            const label = t.bool ? t.name : `${t.name}: ${t.value || F[t.key]}`;
+            return `<span class="chip" data-rob-tag="${t.key}">${label}` +
+              `<button class="chip-remove" type="button" aria-label="Remove filter ${label}">` +
+              `<svg><use href="#i-x"/></svg></button></span>`;
+          }).join('');
+        fTags.innerHTML = html;
+        fTags.hidden = !html;
+      };
+
+      fTags.addEventListener('click', (e) => {
+        const btn = e.target.closest('.chip-remove');
+        if (!btn) return;
+        resetField(btn.closest('[data-rob-tag]').dataset.robTag);
         apply();
       });
 
