@@ -4165,26 +4165,32 @@ body { overflow: hidden; }
   [data-rob-screen="paused"] .page-head-title { display: none; }
 }
 
-/* ---- Viewing as: owner / RoB admin / participant ----
- * Rights come from the oracle, not from a guess, and they are not one scale —
- * an owner is not an admin and an admin is not an owner:
+/* ---- Viewing as: admin owner / RoB admin / participant ----
+ * Rights come from the oracle, and they do not stack into one scale. These are
+ * three people, not three tiers:
  *
- *   data-rob-needs   | owner | admin | participant | rule
- *   administer-rob   |   -   |   x   |      -      | ROB-VIEW-003
- *   edit-series      |   x   |   x   |      -      | ROB-EDIT-001, ROB-ACCESS-005
- *   manage-items     |   x   |   x   |      -      | ROB-ACCESS-005, ROB-ACTION-010
- *   manage-deck      |   x   |   -   |      -      | ROB-ACCESS-002
+ *   data-rob-needs   | admin owner | rob admin | participant | rule
+ *   administer-rob   |      x      |     x     |      -      | ROB-VIEW-003
+ *   edit-series      |      x      |     x     |      -      | ROB-EDIT-001, ROB-ACCESS-005
+ *   manage-items     |      x      |     x     |      -      | ROB-ACCESS-005, ROB-ACTION-010
+ *   manage-deck      |      x      |     -     |      -      | ROB-ACCESS-002
  *
- * administer-rob is the surprise: "Manage all RoB meetings" is a global
- * permission, so owning a meeting does not put the directory's ⋮ on screen.
- * manage-deck is the other one: deck rights stayed with the owner when
- * everything else was handed to admins too (topteam#5934, 2026-08-04).
+ * The first column is one person wearing two hats: the stored owner of this
+ * series (ROB-ACCESS-002) who ALSO holds the global "Manage all RoB meetings"
+ * permission (ROB-ACCESS-003). That is the common case, and the person the role
+ * chooser calls the Admin role — whoever set the RoB up. Ownership on its own
+ * would not put the directory's ⋮ on screen: administer-rob is a global
+ * permission, not a property of the meeting (ROB-VIEW-003). The permission is
+ * what carries it, and this persona has it.
+ *
+ * The second column is what isolates manage-deck — an admin who does NOT own
+ * this series. Deck rights stayed with the owner when everything else was
+ * handed to admins too (topteam#5934, 2026-08-04).
  *
  * Hidden, not disabled. ROB-EDIT-001 is explicit that participants "do not see
  * them"; a disabled control would promise a right that does not exist. Disabled
  * is reserved for a right the viewer HAS that the integration is blocking.
  * Read is never gated: every employee reads every RoB (ROB-ACCESS-001). */
-html[data-rob-role="owner"]       [data-rob-needs="administer-rob"],
 html[data-rob-role="participant"] [data-rob-needs="administer-rob"],
 html[data-rob-role="participant"] [data-rob-needs="edit-series"],
 html[data-rob-role="participant"] [data-rob-needs="manage-items"],
@@ -4197,6 +4203,19 @@ html[data-rob-role="participant"] [data-rob-needs="manage-deck"] { display: none
 [data-rob-you] { display: none; }
 html[data-rob-role="owner"]       [data-rob-you="owner"],
 html[data-rob-role="participant"] [data-rob-you="participant"] { display: inline; }
+
+/* Answering the invite is something you do on your OWN row, and the roster's
+   "me" row is Matthew's — so it is only yours as the participant. For the other
+   two the control and its menu come off: as Bill you were otherwise answering
+   Matthew's invite for him, which is not a permission the owner is missing, it
+   is the wrong person's RSVP.
+   The own-row "Going" tick goes with it, for the reason its own comment already
+   gives — it is scoped to your row, while the other participants carry RACI
+   badges rather than attendance. A DECLINED or TENTATIVE marker stays for every
+   viewer: who is coming is readable by anyone who can open the RoB (Q-050). */
+html:not([data-rob-role="participant"]) #meeting-detail [data-md-respond],
+html:not([data-rob-role="participant"]) #meeting-detail [data-md-respond-menu] { display: none !important; }
+html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is-rejected):not(.is-tentative) .md-av-status::after { content: none; }
 
 /* Prototype role switcher (?roles=1). Bottom-LEFT, matching the estate's state
    switcher, so it stays clear of modals and of the review bar bottom-right. */
@@ -9381,11 +9400,11 @@ Platform reliability — error budget
               <!-- Key metric — three states: an empty add affordance, the select
                    (Figma 31083:44592), then the metric row itself. -->
               <div class="md-kr-flow" data-md-kr-flow>
-                <button class="btn btn-ghost btn-xs md-kr-add" type="button" data-md-kr-add>
+                <button class="btn btn-ghost btn-xs md-kr-add" type="button" data-md-kr-add data-rob-needs="edit-series">
                   <svg class="btn-icon"><use href="#i-plus"/></svg>Add key metric
                 </button>
 
-                <div class="input-select md-kr-select" hidden data-md-kr-select>
+                <div class="input-select md-kr-select" hidden data-md-kr-select data-rob-needs="edit-series">
                   <button class="input-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" data-md-kr-trigger>
                     <span class="input-select-value input-select-placeholder md-kr-select-value" data-md-kr-label>
                       <svg class="icon"><use href="#i-okr"/></svg><span data-md-kr-label-text>Search or select a suggested OKR, or create a custom metric</span>
@@ -9429,7 +9448,7 @@ Platform reliability — error budget
                       <span data-md-kr-pct>0%</span>
                     </div>
                   </div>
-                  <div class="md-kr-actions">
+                  <div class="md-kr-actions" data-rob-needs="edit-series">
                     <button class="btn btn-icon-only btn-ghost btn-xs md-kr-edit" type="button"
                             data-md-kr-edit aria-label="Change key metric">
                       <svg class="icon"><use href="#i-pencil"/></svg>
@@ -12324,9 +12343,18 @@ Platform reliability — error budget
               <span class="ai-assignee-name">${escapeHTML(person.name)}</span>
             </button>
             ${(!isClosed(item.status) && item.assignee !== 'system' && !onCall(item.assignee))
-              ? `<button class="ai-warn" type="button" data-action="not-participant" data-tooltip="${escapeHTML(person.name)} isn't a participant of this RoB" data-tooltip-style="regular" data-placement="bottom" aria-label="${escapeHTML(person.name)} isn't a participant of this RoB — invite or reassign">
-                  <svg class="icon"><use href="#i-warning"/></svg>
-                </button>`
+              // The warning is information, so it stays for every reader — it is
+              // what explains an assignee who is not on the call. The invite /
+              // reassign popover behind it is roster work, which only the owner
+              // and admins do, so for a participant it renders as a plain mark
+              // rather than a button that opens nothing.
+              ? (canManage()
+                ? `<button class="ai-warn" type="button" data-action="not-participant" data-tooltip="${escapeHTML(person.name)} isn't a participant of this RoB" data-tooltip-style="regular" data-placement="bottom" aria-label="${escapeHTML(person.name)} isn't a participant of this RoB — invite or reassign">
+                    <svg class="icon"><use href="#i-warning"/></svg>
+                  </button>`
+                : `<span class="ai-warn" data-tooltip="${escapeHTML(person.name)} isn't a participant of this RoB" data-tooltip-style="regular" data-placement="bottom" role="img" aria-label="${escapeHTML(person.name)} isn't a participant of this RoB">
+                    <svg class="icon"><use href="#i-warning"/></svg>
+                  </span>`)
               : ''}
             <span class="ai-spacer"></span>
             <button class="ai-icon-btn${hasComment ? ' has-content' : ''}" type="button" data-action="comment" title="${commentTitle}" ${editableComment ? '' : 'disabled'} aria-label="Comment">
@@ -15747,7 +15775,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
   <div class="rr-switcher" id="rr-switcher" hidden>
     <div class="rr-switcher-head"><span>Viewing as</span><button class="rr-switcher-toggle" type="button" aria-label="Collapse roles">–</button></div>
     <div class="rr-switcher-body">
-      <button type="button" data-rob-role-pick="owner">Owner<span class="rr-switcher-who">Bill Bryck · owns this series</span></button>
+      <button type="button" data-rob-role-pick="owner">Admin owner<span class="rr-switcher-who">Bill Bryck · owns this series, manages all</span></button>
       <button type="button" data-rob-role-pick="rob-admin">RoB admin<span class="rr-switcher-who">Collete Parker · manages all RoB meetings</span></button>
       <button type="button" data-rob-role-pick="participant">Participant<span class="rr-switcher-who">Matthew Vella · attends, assignee of one item</span></button>
     </div>
@@ -15762,6 +15790,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
     // items, whose rules are per-item rather than per-control.
     (function () {
       const ROLES = {
+        // Owner of this series AND a holder of "Manage all RoB meetings" — the
+        // key stays 'owner' so ?role=owner keeps working, but the persona is
+        // both, which is why the ⋮ is on screen for it.
         'owner':       'bill-bryck',
         // Deliberately a third person. An admin who also owned this series
         // would hold the deck rights too (ROB-ACCESS-002), and the one thing
@@ -15792,6 +15823,10 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         document.querySelectorAll('[data-rob-me-initials]').forEach(el => { el.textContent = initials; });
         document.querySelectorAll('[data-rob-me-name]').forEach(el => { el.textContent = name; });
         document.querySelectorAll('[data-rob-me-title]').forEach(el => { el.textContent = title; });
+        // Switching role mid-dialog is a switcher-only move, but it is exactly
+        // what happens during a role review: the reject confirmation would
+        // otherwise stay open on a view whose control is hidden.
+        document.getElementById('reject-meeting')?.setAttribute('hidden', '');
         // Action items re-render from their own permission check.
         window.robRoleChanged?.(role, ROLES[role]);
       };
