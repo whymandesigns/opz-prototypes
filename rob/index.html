@@ -4140,6 +4140,78 @@ body { overflow: hidden; }
    search row. */
 .page-head:has(+ .tabs) { border-bottom: 0; margin-bottom: var(--spacing-4); }
 .rob-tabs + .rob-toolbar { margin-top: var(--spacing-4); }
+
+/* ---- The collapsed bar as the page head ----
+ * Below 1024px the kit stands .page-head down, because the bar prints the page
+ * title itself. That holds for the calendar. It does not hold for the paused
+ * series screen, whose page head carries the breadcrumb — on a tablet the
+ * screen opened with no heading, no count and no way back, a bare table.
+ *
+ * So the bar takes both jobs on a sub-screen: .topbar-title says which screen
+ * it is, and .topbar-back is the way out. Back takes the hamburger's slot
+ * rather than sitting beside it — two controls on the left read as a choice,
+ * and only one of them leaves. */
+.topbar-back { display: none; flex-shrink: 0; }
+@media (max-width: 1024px) {
+  .topbar.is-subscreen .topbar-menu { display: none; }
+  .topbar.is-subscreen .topbar-back { display: inline-flex; }
+
+  /* The bar takes the breadcrumb's job and the heading's. The count sentence it
+     cannot take — a bar holds a title, not a line of prose — and that sentence
+     is the only thing on the screen that says what pausing costs. So one row of
+     this page head stands back up while the other two stay down. */
+  [data-rob-screen="paused"] .page-head { display: block; }
+  [data-rob-screen="paused"] .page-head .breadcrumbs,
+  [data-rob-screen="paused"] .page-head-title { display: none; }
+}
+
+/* ---- Viewing as: owner / RoB admin / participant ----
+ * Rights come from the oracle, not from a guess, and they are not one scale —
+ * an owner is not an admin and an admin is not an owner:
+ *
+ *   data-rob-needs   | owner | admin | participant | rule
+ *   administer-rob   |   -   |   x   |      -      | ROB-VIEW-003
+ *   edit-series      |   x   |   x   |      -      | ROB-EDIT-001, ROB-ACCESS-005
+ *   manage-items     |   x   |   x   |      -      | ROB-ACCESS-005, ROB-ACTION-010
+ *   manage-deck      |   x   |   -   |      -      | ROB-ACCESS-002
+ *
+ * administer-rob is the surprise: "Manage all RoB meetings" is a global
+ * permission, so owning a meeting does not put the directory's ⋮ on screen.
+ * manage-deck is the other one: deck rights stayed with the owner when
+ * everything else was handed to admins too (topteam#5934, 2026-08-04).
+ *
+ * Hidden, not disabled. ROB-EDIT-001 is explicit that participants "do not see
+ * them"; a disabled control would promise a right that does not exist. Disabled
+ * is reserved for a right the viewer HAS that the integration is blocking.
+ * Read is never gated: every employee reads every RoB (ROB-ACCESS-001). */
+html[data-rob-role="owner"]       [data-rob-needs="administer-rob"],
+html[data-rob-role="participant"] [data-rob-needs="administer-rob"],
+html[data-rob-role="participant"] [data-rob-needs="edit-series"],
+html[data-rob-role="participant"] [data-rob-needs="manage-items"],
+html[data-rob-role="rob-admin"]   [data-rob-needs="manage-deck"],
+html[data-rob-role="participant"] [data-rob-needs="manage-deck"] { display: none !important; }
+
+/* "(you)" sits on whoever is looking — on the Owner row as Bill, on the roster
+   row as Matthew, and on neither as the admin, who is on this meeting's roster
+   but is not its owner. */
+[data-rob-you] { display: none; }
+html[data-rob-role="owner"]       [data-rob-you="owner"],
+html[data-rob-role="participant"] [data-rob-you="participant"] { display: inline; }
+
+/* Prototype role switcher (?roles=1). Bottom-LEFT, matching the estate's state
+   switcher, so it stays clear of modals and of the review bar bottom-right. */
+.rr-switcher { position: fixed; left: 16px; bottom: 16px; z-index: 2000; width: 268px; background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-5); overflow: hidden; }
+.rr-switcher[hidden] { display: none; }
+.rr-switcher-head { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-2) var(--spacing-3); background: var(--color-text); color: var(--color-text-inverse); font: var(--font-weight-semibold) var(--text-2xs)/1.4 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; }
+.rr-switcher-toggle { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 2px 6px; font: inherit; }
+.rr-switcher-body { padding: var(--spacing-2); display: flex; flex-direction: column; gap: 4px; }
+.rr-switcher.is-collapsed .rr-switcher-body { display: none; }
+.rr-switcher-body button { text-align: left; padding: 6px 8px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); cursor: pointer; font: var(--type-body-sm); }
+.rr-switcher-body button:hover { background: var(--color-surface-muted); border-color: var(--color-border-strong); }
+.rr-switcher-body button.is-current { border-color: var(--color-accent); color: var(--color-accent); font-weight: var(--font-weight-semibold); }
+.rr-switcher-who { display: block; font: var(--type-body-xs); color: var(--color-text-muted); font-weight: var(--font-weight-regular); }
+.rr-switcher-body button.is-current .rr-switcher-who { color: var(--color-text-muted); }
+.rr-switcher-note { padding: 0 var(--spacing-2) var(--spacing-2); font: var(--type-body-xs); color: var(--color-text-subtle); }
 /* Paused series. The page-head here has no tabs under it, so it keeps its own
    divider; the :has rule above only strips it when tabs follow. */
 .rob-paused-table { margin-top: var(--spacing-6); }
@@ -4262,6 +4334,11 @@ body { overflow: hidden; }
   border-radius: var(--radius-md);
   overflow: visible;
 }
+/* The view switcher sets `hidden`, and `display: grid` above outranks the UA's
+   `[hidden] { display: none }` — so the month grid went on rendering under the
+   week and schedule views. The kit hits the same trap at `.card[hidden]`; the
+   week and schedule views already carry their own guard. */
+.cal-grid[hidden] { display: none; }
 .cal-weekday {
   display: flex;
   align-items: center;
@@ -4515,8 +4592,18 @@ body { overflow: hidden; }
 .cal-week-col { position: relative; border-left: 1px solid var(--color-border); }
 .cal-week-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--color-border); }
 /* Now — the one amber thing on the page, so it reads as a position in time
-   rather than as another event state. */
-.cal-week-now { position: absolute; height: 0; border-top: 2px solid var(--color-warning); z-index: 3; }
+   rather than as another event state. It is drawn from the time column, not
+   from today's column: the axis is where the hour is read off, so a line that
+   starts to the right of it leaves the reader to guess at its own height.
+   Geometry lives here rather than inline because --cal-axis does. */
+.cal-week-now {
+  position: absolute;
+  left: calc(-1 * var(--cal-axis));
+  right: 0;
+  height: 0;
+  border-top: 2px solid var(--color-warning);
+  z-index: 3;
+}
 /* In the schedule the line is a row of its own, between the day's heading and
    its first meeting, rather than something floated over the heading. */
 .cal-sched-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); margin: var(--spacing-1) 0 var(--spacing-2); }
@@ -4525,6 +4612,9 @@ body { overflow: hidden; }
   width: 8px; height: 8px; border-radius: var(--radius-full);
   background: var(--color-warning);
 }
+/* Flush to the start rather than centred on it. .cal-week-body clips, so a dot
+   hanging 4px past the axis would show only its right half. */
+.cal-week-now::before { left: 0; }
 /* A block, not a chip: tinted fill plus the state's rule down the left. */
 .cal-week-ev {
   position: absolute;
@@ -5246,6 +5336,11 @@ body { overflow: hidden; }
     <!-- TOPBAR -->
     <header class="topbar">
       <button class="btn btn-icon-only btn-ghost topbar-menu" type="button" aria-label="Menu"><svg class="icon"><use href="#i-overview"/></svg></button>
+      <!-- Shown only on a sub-screen in the collapsed bar: see .topbar-back. No
+           `hidden` attribute — .topbar-back sets `display`, which outranks the
+           UA's [hidden] rule, so the attribute would be a lie. -->
+      <button class="btn btn-icon-only btn-ghost topbar-back" type="button"
+              aria-label="Back to RoB Meetings"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
       <a class="topbar-brand" href="#" data-rob-todo="The Operationalize home page">
         <svg class="topbar-brand-logo" width="170" height="28" viewBox="0 0 170 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6925 5.00513C11.5704 4.99755 11.4673 5.09285 11.4624 5.21506L11.3199 8.82092C11.3151 8.94296 11.4101 9.04543 11.5319 9.05404C11.8046 9.07331 12.0729 9.10838 12.3359 9.15832C12.4556 9.18105 12.5735 9.1067 12.6003 8.98783L13.3946 5.47129C13.4215 5.35225 13.3469 5.2337 13.2274 5.20915C12.7273 5.10639 12.2148 5.03755 11.6925 5.00513Z" fill="white"/><path d="M10.3897 5.00033C10.5112 4.99369 10.6133 5.08877 10.6181 5.21036L10.7609 8.8204C10.7657 8.94254 10.6705 9.04505 10.5486 9.05354C10.2758 9.07254 10.0074 9.10734 9.74432 9.15703C9.6247 9.17962 9.50695 9.10527 9.48012 8.98649L8.68264 5.45569C8.65561 5.33604 8.7311 5.21703 8.8514 5.19323C9.35276 5.09405 9.86636 5.02892 10.3897 5.00033Z" fill="white"/><path d="M7.58847 5.52244C7.70397 5.48484 7.82696 5.55023 7.86302 5.66626L8.93861 9.12776C8.97494 9.24467 8.90922 9.36851 8.79343 9.40815C8.53582 9.49634 8.28507 9.5993 8.04218 9.71601C7.93249 9.76871 7.7996 9.72736 7.74298 9.61962L6.05349 6.4046C5.99643 6.296 6.03858 6.16148 6.14865 6.10737C6.61125 5.87995 7.09212 5.68404 7.58847 5.52244Z" fill="white"/><path d="M5.01218 6.7527C5.11403 6.68657 5.24968 6.71793 5.31449 6.82064L7.25525 9.89609C7.32062 9.99969 7.2891 10.1364 7.18735 10.2046C6.96161 10.3559 6.74526 10.5201 6.53936 10.6962C6.44705 10.7751 6.30831 10.7694 6.2259 10.6802L3.75345 8.00296C3.6701 7.91271 3.67617 7.77161 3.76878 7.6909C4.15993 7.35 4.57537 7.03629 5.01218 6.7527Z" fill="white"/><path d="M3.14377 8.5954C3.05475 8.51312 2.91591 8.51778 2.83455 8.60765C2.48506 8.99368 2.16255 9.4046 1.86999 9.83744C1.80108 9.93939 1.83165 10.0775 1.93568 10.1432L5.02874 12.0963C5.13123 12.161 5.2664 12.1309 5.33529 12.0311C5.49018 11.8068 5.65795 11.5921 5.83754 11.3881C5.91865 11.2959 5.91392 11.1553 5.82376 11.072L3.14377 8.5954Z" fill="white"/><path d="M1.49729 10.8734C1.39011 10.817 1.25734 10.8573 1.20192 10.965C0.963642 11.428 0.757205 11.9101 0.585497 12.4084C0.545434 12.5247 0.610701 12.6501 0.728093 12.6866L4.23398 13.7766C4.34974 13.8126 4.47253 13.7485 4.51329 13.6343C4.60557 13.3757 4.71279 13.1241 4.83391 12.8807C4.88869 12.7707 4.84782 12.6358 4.73902 12.5785L1.49729 10.8734Z" fill="white"/><path d="M0.494446 13.5089C0.376194 13.4822 0.258268 13.5557 0.232794 13.6743C0.123741 14.1818 0.0496438 14.7024 0.0131471 15.2333C0.0047196 15.3558 0.100176 15.4599 0.222917 15.4648L3.90175 15.6103C4.0229 15.6151 4.12492 15.5213 4.13464 15.4005C4.15686 15.1241 4.19529 14.8523 4.24898 14.5861C4.27328 14.4656 4.19889 14.346 4.07905 14.3189L0.494446 13.5089Z" fill="white"/><path d="M0.210291 16.321C0.0892093 16.3258 -0.00566608 16.4272 0.000263525 16.5483C0.0263981 17.0819 0.0904871 17.6055 0.189887 18.1165C0.213358 18.2372 0.332522 18.3131 0.452388 18.286L4.05308 17.4722C4.17122 17.4455 4.2455 17.3287 4.22385 17.2095C4.17514 16.9413 4.14188 16.6677 4.125 16.3897C4.11755 16.2669 4.0147 16.1705 3.89181 16.1753L0.210291 16.321Z" fill="white"/><path d="M0.662998 19.119C0.547156 19.155 0.481772 19.2778 0.519099 19.3932C0.682854 19.8997 0.882286 20.3902 1.11443 20.8617C1.16859 20.9717 1.303 21.0137 1.4115 20.9567L4.68415 19.2355C4.79158 19.179 4.83301 19.0466 4.78085 18.937C4.66271 18.6888 4.55891 18.4324 4.47051 18.1689C4.4314 18.0524 4.30715 17.9859 4.18977 18.0224L0.662998 19.119Z" fill="white"/><path d="M1.83513 21.7058C1.73232 21.7707 1.70106 21.9067 1.76746 22.0086C2.05728 22.4533 2.37835 22.8758 2.72754 23.2729C2.8084 23.3649 2.94892 23.3706 3.03885 23.2874L5.75571 20.7763C5.84491 20.6938 5.85059 20.5551 5.77166 20.4627C5.59177 20.2523 5.42427 20.0309 5.27029 19.7998C5.20225 19.6977 5.0653 19.6659 4.96156 19.7314L1.83513 21.7058Z" fill="white"/><path d="M3.64398 23.9008C3.56141 23.9902 3.56648 24.1298 3.65715 24.2109C4.05164 24.5642 4.47175 24.8894 4.91433 25.1835C5.01622 25.2512 5.15324 25.2203 5.21854 25.1168L7.19314 21.9886C7.25803 21.8858 7.22753 21.7502 7.12726 21.6814C6.89753 21.524 6.67777 21.353 6.46912 21.1697C6.37698 21.0887 6.23655 21.0935 6.15333 21.1837L3.64398 23.9008Z" fill="white"/><path d="M5.96361 25.5511C5.9069 25.659 5.94811 25.7927 6.05697 25.8475C6.5284 26.0847 7.01922 26.2891 7.5264 26.4576C7.64215 26.4961 7.76595 26.4307 7.80216 26.3142L8.89888 22.7853C8.93505 22.6689 8.87006 22.5455 8.75499 22.5053C8.4906 22.4131 8.23352 22.3052 7.98484 22.1829C7.87491 22.1288 7.74073 22.1699 7.68373 22.2783L5.96361 25.5511Z" fill="white"/><path d="M8.63566 26.5354C8.6087 26.6546 8.68365 26.7734 8.80348 26.7976C9.31726 26.9017 9.84401 26.9699 10.381 26.9997C10.5026 27.0064 10.6048 26.9113 10.6096 26.7896L10.7553 23.106C10.7601 22.9839 10.665 22.8814 10.5432 22.8728C10.262 22.853 9.98549 22.8164 9.7146 22.7641C9.5947 22.7409 9.47633 22.8152 9.4494 22.9344L8.63566 26.5354Z" fill="white"/><path d="M11.4709 26.7849C11.4758 26.9072 11.579 27.0025 11.7011 26.9948C12.237 26.9611 12.7624 26.8891 13.2747 26.7815C13.3938 26.7565 13.4678 26.6382 13.441 26.5195L12.631 22.9331C12.604 22.8138 12.4855 22.7394 12.3655 22.7628C12.0948 22.8154 11.8184 22.8523 11.5373 22.8723C11.4156 22.881 11.3206 22.9835 11.3255 23.1054L11.4709 26.7849Z" fill="white"/><path d="M14.2708 26.2896C14.3071 26.4067 14.4319 26.472 14.548 26.4326C15.052 26.2611 15.5396 26.0541 16.0077 25.8146C16.1157 25.7593 16.1563 25.6263 16.0998 25.5189L14.3952 22.2756C14.3382 22.167 14.2039 22.126 14.0939 22.1802C13.8456 22.3027 13.5888 22.4107 13.3248 22.5031C13.2098 22.5433 13.145 22.6666 13.1811 22.783L14.2708 26.2896Z" fill="white"/><path d="M16.8377 25.0791C16.9033 25.183 17.0412 25.2136 17.1431 25.145C17.5813 24.8498 17.9972 24.524 18.3877 24.1705C18.4776 24.0891 18.4822 23.9502 18.3999 23.8611L15.9238 21.1804C15.8405 21.0902 15.7 21.0855 15.6079 21.1665C15.3996 21.3497 15.1803 21.5206 14.951 21.6781C14.8509 21.7468 14.8205 21.8824 14.8853 21.9851L16.8377 25.0791Z" fill="white"/><path d="M18.9971 23.2462C19.0874 23.3296 19.2285 23.3235 19.3091 23.2308C19.6536 22.8351 19.9702 22.4145 20.256 21.9722C20.3218 21.8703 20.2904 21.7349 20.1879 21.6701L17.114 19.7283C17.0102 19.6627 16.8732 19.6945 16.8051 19.7967C16.6514 20.0277 16.4842 20.249 16.3046 20.4593C16.2258 20.5517 16.2315 20.6904 16.3207 20.7728L18.9971 23.2462Z" fill="white"/><path d="M20.6049 20.9229C20.7137 20.9801 20.8484 20.9377 20.9023 20.8272C21.1308 20.3591 21.327 19.8725 21.4882 19.3701C21.5252 19.2547 21.4598 19.1323 21.3441 19.0963L17.8842 18.0205C17.7668 17.984 17.6426 18.0505 17.6035 18.1671C17.5153 18.4302 17.4117 18.6863 17.2938 18.9343C17.2417 19.0439 17.2832 19.1762 17.3906 19.2327L20.6049 20.9229Z" fill="white"/><path d="M21.5508 18.2685C21.6709 18.2956 21.7901 18.2195 21.8134 18.0987C21.911 17.5923 21.974 17.0736 21.9997 16.5451C22.0056 16.424 21.9108 16.3226 21.7897 16.3178L18.1816 16.1751C18.0587 16.1702 17.9558 16.2667 17.9484 16.3895C17.9316 16.667 17.8984 16.9402 17.8498 17.208C17.8282 17.3272 17.9025 17.4439 18.0206 17.4706L21.5508 18.2685Z" fill="white"/><path d="M21.7771 15.468C21.8999 15.4631 21.9953 15.3591 21.9869 15.2365C21.9509 14.7107 21.878 14.1949 21.7708 13.6919C21.7455 13.5732 21.6275 13.4995 21.5091 13.5262L17.9946 14.3205C17.8748 14.3476 17.8004 14.4672 17.8247 14.5876C17.8783 14.8534 17.9166 15.1248 17.9388 15.4007C17.9485 15.5216 18.0505 15.6154 18.1717 15.6106L21.7771 15.468Z" fill="white"/><path d="M21.2795 12.7091C21.3967 12.6726 21.462 12.5475 21.4222 12.4314C21.2532 11.9373 21.05 11.459 20.8155 10.9994C20.7604 10.8913 20.6273 10.8506 20.5199 10.9071L17.3358 12.5814C17.227 12.6386 17.1861 12.7734 17.2408 12.8835C17.3617 13.1266 17.4687 13.3778 17.5607 13.6361C17.6015 13.7503 17.7243 13.8145 17.8401 13.7785L21.2795 12.7091Z" fill="white"/><path d="M20.088 10.1786C20.1918 10.1131 20.2225 9.97549 20.1542 9.87356C19.8655 9.44286 19.5473 9.03367 19.2024 8.64888C19.1212 8.55829 18.9818 8.55327 18.8925 8.63583L16.2526 11.0754C16.1625 11.1587 16.1577 11.2992 16.2387 11.3914C16.418 11.5954 16.5856 11.81 16.7402 12.0342C16.8091 12.134 16.9443 12.1642 17.0469 12.0995L20.088 10.1786Z" fill="white"/><path d="M18.291 8.04211C18.3741 7.9522 18.3684 7.81172 18.2766 7.73081C17.8894 7.38964 17.4781 7.07525 17.0456 6.79054C16.9437 6.72348 16.8072 6.75458 16.7421 6.85774L14.8228 9.89922C14.7575 10.0028 14.7889 10.1394 14.8905 10.2076C15.116 10.359 15.332 10.5232 15.5377 10.6993C15.63 10.7783 15.7688 10.7727 15.8512 10.6834L18.291 8.04211Z" fill="white"/><path d="M16.0105 6.43642C16.0673 6.32832 16.0259 6.19442 15.9167 6.13982C15.4571 5.91008 14.9792 5.71154 14.4858 5.54698C14.37 5.50835 14.2461 5.57372 14.2098 5.69034L13.1414 9.13004C13.1051 9.24687 13.1707 9.37062 13.2863 9.41034C13.5437 9.49873 13.7942 9.60187 14.0369 9.71874C14.1466 9.77158 14.2796 9.73027 14.3363 9.62245L16.0105 6.43642Z" fill="white"/><path d="M31.6491 10.712C34.6731 10.712 36.6651 13.52 36.6651 16.952C36.6651 20.36 34.6731 23.192 31.6251 23.192H30.9291C29.9931 23.192 28.7931 22.592 28.1211 21.704V27.896H25.0251V10.904H28.1211V12.224C28.6731 11.408 29.8251 10.712 30.9051 10.712H31.6491ZM30.3531 13.376C28.9851 13.376 27.9051 14.864 27.9051 16.952C27.9051 19.04 28.9851 20.528 30.3531 20.528H31.1211C32.4171 20.528 33.5451 19.064 33.5451 16.952C33.5451 14.84 32.4171 13.376 31.1211 13.376H30.3531ZM38.3755 16.928C38.3755 13.04 40.9915 10.712 43.6795 10.712H44.5435C47.4955 10.712 49.6075 13.304 49.6075 16.568C49.6075 17.096 49.5835 17.384 49.5595 17.624H41.4715C41.6635 19.568 42.6235 20.624 43.7515 20.624H44.6155C45.6475 20.624 46.3915 19.856 46.5595 18.92H49.5595C49.2955 21.44 47.1355 23.192 44.5675 23.192H43.7515C40.6315 23.192 38.3755 20.576 38.3755 16.928ZM41.6155 15.44H46.5355C46.4875 14.12 45.5995 13.112 44.5675 13.112H43.7515C42.8635 13.112 41.9515 13.952 41.6155 15.44ZM57.318 13.496C55.878 13.496 55.062 14.888 55.062 16.304V23H51.966V10.904H55.062V12.488C55.542 11.48 56.382 10.904 57.51 10.904H58.998V13.496H57.318ZM64.0292 23.192C61.5332 23.192 59.9492 21.776 59.9492 19.64C59.9492 17.336 61.8452 16.136 64.1732 15.8L67.3172 15.344V15.08C67.3172 13.976 66.5972 13.184 65.7092 13.184H64.8692C63.9092 13.184 63.2372 13.784 63.1412 14.816H60.0212C60.2132 12.32 62.3972 10.712 64.8692 10.712H65.7092C68.6852 10.712 70.4132 12.728 70.4132 15.2V19.52C70.4132 20.336 70.8452 20.408 71.7572 20.408V23H69.6932C68.4932 23 67.7492 22.52 67.6772 21.416C67.0772 22.52 65.7092 23.192 64.0292 23.192ZM63.0932 19.52C63.0932 20.336 63.7412 20.84 64.6292 20.84C66.2372 20.84 67.3172 19.712 67.3172 18.08V17.552L65.0132 17.96C63.8612 18.176 63.0932 18.464 63.0932 19.52ZM74.3162 7.976L77.4122 6.68V10.904H80.6762V13.496H77.4122V19.088C77.4122 20.096 77.9162 20.408 78.6122 20.408H80.6042V23H77.7002C75.5882 23 74.3162 21.896 74.3162 19.424V13.496H72.0602V10.904H74.3162V7.976ZM82.6626 23V10.904H85.7586V23H82.6626ZM82.5666 6.2H85.8786V8.984H82.5666V6.2ZM93.4437 23.192C90.3717 23.192 88.0677 20.552 88.0677 16.952C88.0677 13.328 90.3717 10.712 93.4197 10.712H94.3797C97.4517 10.712 99.7317 13.328 99.7317 16.952C99.7317 20.576 97.4517 23.192 94.4037 23.192H93.4437ZM94.2837 20.528C95.5797 20.528 96.6117 18.968 96.6117 16.952C96.6117 14.936 95.5797 13.376 94.2597 13.376H93.5397C92.2197 13.376 91.1877 14.888 91.1877 16.952C91.1877 19.016 92.2197 20.528 93.5397 20.528H94.2837ZM102.033 23V10.904H105.129V12.512C105.729 11.504 106.977 10.712 108.129 10.712H109.137C111.225 10.712 112.977 12.68 112.977 15.344V23H109.881V15.848C109.881 14.552 109.185 13.472 108.081 13.472H107.313C106.041 13.472 105.129 14.816 105.129 16.544V23H102.033ZM119.253 23.192C116.757 23.192 115.173 21.776 115.173 19.64C115.173 17.336 117.069 16.136 119.397 15.8L122.541 15.344V15.08C122.541 13.976 121.821 13.184 120.933 13.184H120.093C119.133 13.184 118.461 13.784 118.365 14.816H115.245C115.437 12.32 117.621 10.712 120.093 10.712H120.933C123.909 10.712 125.637 12.728 125.637 15.2V19.52C125.637 20.336 126.069 20.408 126.981 20.408V23H124.917C123.717 23 122.973 22.52 122.901 21.416C122.301 22.52 120.933 23.192 119.253 23.192ZM118.317 19.52C118.317 20.336 118.965 20.84 119.853 20.84C121.461 20.84 122.541 19.712 122.541 18.08V17.552L120.237 17.96C119.085 18.176 118.317 18.464 118.317 19.52ZM128.693 23V6.2H131.789V23H128.693ZM134.722 23V10.904H137.818V23H134.722ZM134.626 6.2H137.938V8.984H134.626V6.2ZM140.031 23V20.408L146.103 13.496H140.415V10.904H149.631V13.496L143.607 20.408H149.991V23H140.031ZM151.312 16.928C151.312 13.04 153.928 10.712 156.616 10.712H157.48C160.432 10.712 162.544 13.304 162.544 16.568C162.544 17.096 162.52 17.384 162.496 17.624H154.408C154.6 19.568 155.56 20.624 156.688 20.624H157.552C158.584 20.624 159.328 19.856 159.496 18.92H162.496C162.232 21.44 160.072 23.192 157.504 23.192H156.688C153.568 23.192 151.312 20.576 151.312 16.928ZM154.552 15.44H159.472C159.424 14.12 158.536 13.112 157.504 13.112H156.688C155.8 13.112 154.888 13.952 154.552 15.44Z" fill="white"/></svg>
       </a>
@@ -5261,13 +5356,13 @@ body { overflow: hidden; }
              profile page before, which is neither the component nor the flow. -->
         <div class="dropdown topbar-account" data-rob-account>
           <button class="avatar avatar-md dropdown-trigger" type="button"
-                  aria-haspopup="menu" aria-expanded="false" aria-label="Account">MV</button>
+                  aria-haspopup="menu" aria-expanded="false" aria-label="Account" data-rob-me-initials>MV</button>
           <div class="dropdown-menu dropdown-menu-end" hidden role="menu">
             <div class="dropdown-header">
-              <span class="avatar avatar-md">MV</span>
+              <span class="avatar avatar-md" data-rob-me-initials>MV</span>
               <div class="dropdown-item-text">
-                <span class="dropdown-item-label">Matthew Vella</span>
-                <span class="dropdown-item-description">Senior Product Designer</span>
+                <span class="dropdown-item-label" data-rob-me-name>Matthew Vella</span>
+                <span class="dropdown-item-description" data-rob-me-title>Senior Product Designer</span>
               </div>
             </div>
             <button class="dropdown-item" type="button" role="menuitem" data-rob-todo="Your profile">My profile</button>
@@ -5355,7 +5450,7 @@ body { overflow: hidden; }
           </div>
           <div class="page-head-actions">
             <button class="btn btn-primary" data-modal-open="create-meeting">Create meeting</button>
-            <div class="dropdown" data-rob-more>
+            <div class="dropdown" data-rob-more data-rob-needs="administer-rob">
               <button class="btn btn-icon-only btn-ghost dropdown-trigger" type="button"
                       aria-haspopup="menu" aria-expanded="false" aria-label="More actions">
                 <!-- i-more, not i-dots-three-vertical: that slug is i-more
@@ -5764,7 +5859,9 @@ body { overflow: hidden; }
     .cm-cell-stack { display: flex; flex-direction: column; gap: var(--spacing-2); }
 .cm-cell-hint { font: var(--type-body-xxs); color: var(--color-text-muted); margin: 0; }
 
-    /* Agenda items */
+    /* Agenda items. These stay after the create flow lost its agenda section:
+     * the meeting view's own #md-agenda uses the head, the empty state and the
+     * add link, and Key results reuses .cm-agenda-add for its own add row. */
     .cm-agenda-head { display: flex; align-items: center; justify-content: space-between; }
     .cm-agenda-title-row { display: flex; align-items: center; gap: var(--spacing-2); }
     .cm-agenda-count {
@@ -5795,94 +5892,6 @@ body { overflow: hidden; }
     .cm-agenda-empty[hidden] { display: none; }
     .cm-agenda-add[hidden] { display: none; }
 
-    /* Agenda item rows — one stacked block, borders shared between
-     * neighbours so the list reads as a single table rather than cards. */
-    .cm-ai-list { display: flex; flex-direction: column; }
-    .cm-ai-list[hidden] { display: none; }
-    .cm-ai-row {
-      position: relative;
-      display: flex; flex-direction: column; gap: var(--spacing-2);
-      padding: var(--spacing-2) var(--spacing-4);
-      background: var(--color-surface);
-      border: 1px solid var(--color-gray-200);
-    }
-    .cm-ai-row + .cm-ai-row { margin-top: -1px; }
-    .cm-ai-row:first-child { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
-    .cm-ai-row:last-child  { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
-    .cm-ai-row-top { display: flex; align-items: flex-start; gap: var(--spacing-2); }
-    .cm-ai-row-desc {
-      flex: 1; min-width: 0; margin: 0;
-      font: var(--type-body-sm); color: var(--color-text);
-      overflow-wrap: anywhere;
-    }
-    /* The delete control is revealed on hover, as it is in the app — a row of
-     * always-on trash icons reads as the point of the list. Keyboard users get
-     * it back through :focus-within. */
-    .cm-ai-row-del { opacity: 0; transition: opacity var(--duration-fast) var(--ease); }
-    .cm-ai-row:hover .cm-ai-row-del,
-    .cm-ai-row:focus-within .cm-ai-row-del { opacity: 1; }
-    /* Aligns the meta row under the description, clearing the number badge. */
-    .cm-ai-row-meta {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: var(--spacing-2); padding-left: var(--spacing-6);
-    }
-    .cm-ai-row-meta-start, .cm-ai-row-meta-end { display: flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
-    .cm-ai-row-owner {
-      font: var(--type-body-sm); color: var(--color-text-muted);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-
-    /* Add form — dashed outline marks it as not-yet-saved. */
-    .cm-ai-form {
-      display: flex; flex-direction: column; gap: var(--spacing-2);
-      padding: var(--spacing-2) var(--spacing-4);
-      background: var(--color-surface);
-      border: 1px dashed var(--color-gray-200);
-      border-radius: var(--radius-md);
-    }
-    .cm-ai-form[hidden] { display: none; }
-    .cm-ai-form > div { min-width: 0; }
-    .cm-ai-form .input { width: 100%; }
-    .cm-ai-form-foot {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: var(--spacing-2); flex-wrap: wrap;
-    }
-    .cm-ai-form-fields { display: flex; align-items: flex-start; gap: var(--spacing-2); min-width: 0; }
-    .cm-ai-form-actions { display: flex; gap: var(--spacing-2); flex-shrink: 0; }
-    .cm-ai-field { position: relative; }
-    .cm-ai-field[hidden] { display: none; }
-    /* The app pins this to 122px because its own column is narrow; here
-     * there is room, so it sizes to a full name before truncating. */
-    .cm-ai-field-owner { width: 160px; }
-    .cm-ai-cadence-tag { height: 24px; }
-    .cm-ai-pick {
-      display: flex; align-items: center; gap: var(--spacing-2);
-      width: 100%; height: 24px; padding: 0 var(--spacing-3);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border); border-radius: var(--radius-sm);
-      font: var(--type-body-sm); color: var(--color-text);
-      cursor: pointer;
-    }
-    .cm-ai-pick:hover { border-color: var(--color-border-strong); }
-    .cm-ai-pick:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
-    .cm-ai-field.is-error .cm-ai-pick { border-color: var(--color-danger); }
-    .cm-ai-pick-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
-    .cm-ai-pick-text.is-placeholder { color: var(--color-text-muted); }
-    .cm-ai-pick > .btn-icon { flex-shrink: 0; color: var(--color-text-muted); }
-    .cm-ai-menu { min-width: 180px; max-height: 240px; overflow-y: auto; }
-    /* The owner and Project menus carry an avatar plus a name and a role,
-     * which all wrap at the 180px .dropdown-menu-start inherits. Widen them
-     * past their 160px trigger and let the text ellipsis instead. */
-    [data-cm-ai-owner-menu], [data-cm-ai-project-menu] { min-width: 260px; max-width: 320px; }
-    .cm-ai-menu .dropdown-item-text { min-width: 0; }
-    .cm-ai-menu .dropdown-item-label,
-    .cm-ai-menu .dropdown-item-description {
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .cm-ai-menu[hidden] { display: none; }
-    .cm-ai-err { margin: var(--spacing-2) 0 0; font: var(--type-body-xxs); color: var(--color-danger); }
-    .cm-ai-err[hidden] { display: none; }
-
     .cm-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); }
     .cm-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); align-items: end; }
     .cm-time { display: flex; gap: var(--spacing-2); align-items: end; }
@@ -5909,9 +5918,8 @@ body { overflow: hidden; }
       margin: 0;
     }
     .cm-section + .cm-section { margin-top: var(--spacing-6); }
-    /* Divider above Agenda items and Connections — treat them as top-level
-     * sections separate from Details + Description block that precedes them. */
-    #cm-agenda,
+    /* Divider above Connections — treats it as a top-level section separate
+     * from the Details + Description block that precedes it. */
     #cm-connections {
       border-top: 1px solid var(--color-gray-200);
       padding-top: var(--spacing-6);
@@ -6313,89 +6321,6 @@ body { overflow: hidden; }
               </div>
             </section>
 
-            <!-- Agenda items (create flow only) -->
-            <section class="cm-section" id="cm-agenda" data-cm-agenda>
-              <div class="cm-agenda-head">
-                <div class="cm-agenda-title-row">
-                  <h3 class="cm-section-title">Agenda items</h3>
-                  <span class="badge" data-cm-ai-count>0</span>
-                </div>
-                <button class="btn btn-icon-only btn-ghost btn-xs" type="button"
-                        data-cm-ai-open aria-label="Add agenda item">
-                  <svg class="icon"><use href="#i-plus"/></svg>
-                </button>
-              </div>
-
-              <div class="cm-agenda-empty" data-cm-ai-empty>
-                <svg class="icon"><use href="#i-list-unordered"/></svg>
-                No Agenda Items yet
-              </div>
-
-              <!-- Saved items — creation order, numbered 1..n. Items cannot be
-                   reordered (ROB-AGENDA-023), so there is no drag handle. -->
-              <div class="cm-ai-list" data-cm-ai-list hidden></div>
-
-              <!-- Add form. Fields and validation follow ROB-AGENDA-037:
-                   description (required, 200 max), cadence, Project (One-off
-                   only, ROB-AGENDA-009), owner (required, from the roster,
-                   ROB-AGENDA-038). Flags are set after creation, never here
-                   (ROB-AGENDA-008). -->
-              <div class="cm-ai-form" hidden data-cm-ai-form>
-                <div>
-                  <input class="input" type="text" maxlength="200" autocomplete="off"
-                         placeholder="Describe this agenda item"
-                         aria-label="Agenda item description" data-cm-ai-desc />
-                  <p class="cm-ai-err" hidden data-cm-ai-desc-err></p>
-                </div>
-
-                <div class="cm-ai-form-foot">
-                  <div class="cm-ai-form-fields">
-                    <div class="cm-ai-field" data-cm-ai-cadence>
-                      <button class="tag tag-light cm-ai-cadence-tag" type="button"
-                              aria-haspopup="listbox" aria-expanded="false"
-                              data-cm-ai-cadence-trigger>
-                        <span data-cm-ai-cadence-label>Weekly</span>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
-                           role="listbox" data-cm-ai-cadence-menu></div>
-                    </div>
-
-                    <div class="cm-ai-field" hidden data-cm-ai-project>
-                      <button class="cm-ai-pick" type="button"
-                              aria-haspopup="listbox" aria-expanded="false"
-                              data-cm-ai-project-trigger>
-                        <span class="cm-ai-pick-text is-placeholder" data-cm-ai-project-label>Project</span>
-                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
-                           role="listbox" data-cm-ai-project-menu></div>
-                    </div>
-
-                    <div class="cm-ai-field cm-ai-field-owner" data-cm-ai-owner>
-                      <button class="cm-ai-pick" type="button"
-                              aria-haspopup="listbox" aria-expanded="false"
-                              data-cm-ai-owner-trigger>
-                        <span class="cm-ai-pick-text is-placeholder" data-cm-ai-owner-label>Owner</span>
-                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-start cm-ai-menu" hidden
-                           role="listbox" data-cm-ai-owner-menu></div>
-                      <p class="cm-ai-err" hidden data-cm-ai-owner-err></p>
-                    </div>
-                  </div>
-
-                  <div class="cm-ai-form-actions">
-                    <button class="btn btn-secondary btn-xs" type="button" data-cm-ai-cancel>Cancel</button>
-                    <button class="btn btn-primary btn-xs" type="button" data-cm-ai-save>Save</button>
-                  </div>
-                </div>
-              </div>
-
-              <button class="cm-agenda-add" type="button" data-cm-ai-open>
-                <svg class="icon"><use href="#i-plus"/></svg>
-                Add agenda item
-              </button>
-            </section>
 
             <!-- Connections -->
             <section class="cm-section" id="cm-connections">
@@ -6595,7 +6520,6 @@ body { overflow: hidden; }
           <!-- TOC RAIL -->
           <nav class="cm-toc" aria-label="Sections" data-cm-toc>
             <a class="cm-toc-item is-active" href="#cm-details"    data-cm-toc-target="cm-details"><svg class="icon"><use href="#i-legal-info"/></svg> Details</a>
-            <a class="cm-toc-item"           href="#cm-agenda"     data-cm-toc-target="cm-agenda"><svg class="icon"><use href="#i-list-unordered"/></svg> Agenda items</a>
             <a class="cm-toc-item"           href="#cm-connections" data-cm-toc-target="cm-connections"><svg class="icon"><use href="#i-connectors"/></svg> Connections</a>
           </nav>
         </div>
@@ -6842,7 +6766,7 @@ body { overflow: hidden; }
         'Kate Ottavio Kent': [-5,   'Chicago'],
         'Jane Eveland':      [1,    'London'],
         'Emily Smith':       [5.5,  'Bengaluru'],
-        'Adan Jones':        [11,   'Sydney'],
+        'Bill Bryck':        [11,   'Sydney'],
       };
       const zoneOf = name => (ZONES[name] || [0, 'UTC'])[0];
 
@@ -7572,343 +7496,20 @@ body { overflow: hidden; }
   </script>
 
   <script>
-    // Create meeting — Agenda items.
+    // Create meeting — Agenda items: removed from this flow.
     //
-    // The real app has no agenda section in the create form yet: items are
-    // added from the meeting view, and doing it while creating is the open
-    // spike TOP-7338. So this is a proposal — but it is built on the shipped
-    // agenda-item model rather than invented, because that model is what any
-    // implementation will have to satisfy:
+    // The create form never had an agenda section in the product; adding items
+    // while creating was the open spike TOP-7338, and this page carried a
+    // proposal for it. The call is the other way: create a shell, populate it
+    // from the meeting view, so the modal asks only for what a meeting cannot
+    // exist without.
     //
-    //   ROB-AGENDA-001  description + owner + cadence required; one optional
-    //                   Project link; flags default off
-    //   ROB-AGENDA-002  seven cadences, with these exact labels
-    //   ROB-AGENDA-003  an item cadence may not be shorter than the meeting's
-    //   ROB-AGENDA-004  so the menu offers only the allowed ones
-    //   ROB-AGENDA-005  the default is the shortest cadence that is allowed
-    //   ROB-AGENDA-008  flags are set after creation, never in the add form
-    //   ROB-AGENDA-009  Project is One-off only, and lists projects of the
-    //                   meeting's connected initiatives — so it reads the
-    //                   Connections section above
-    //   ROB-AGENDA-023  creation order, no reordering
-    //   ROB-AGENDA-037  field set, 200-char cap, error copy, Enter, Escape
-    //   ROB-AGENDA-038  owners come from the roster: series owner + participants
-    (function () {
-      const modal = document.getElementById('create-meeting');
-      if (!modal) return;
-      const sec = modal.querySelector('[data-cm-agenda]');
-      if (!sec) return;
-
-      const MAX = 200;                                  // AGENDA_TOPIC_TEXT_MAX_LENGTH
-      // label, period in weeks (null = not a recurring cadence)
-      const CAD = {
-        EVERY_MEETING: ['Each meeting',  null],
-        ONE_TIME:      ['One-off',       null],
-        WEEKLY:        ['Weekly',           1],
-        BI_WEEKLY:     ['Bi-weekly',        2],
-        MONTHLY:       ['Monthly',          4],
-        QUARTERLY:     ['Quarterly',       13],
-        HALF_ANNUALLY: ['Half-annually',   26],
-      };
-      const RECURRING = ['WEEKLY', 'BI_WEEKLY', 'MONTHLY', 'QUARTERLY', 'HALF_ANNUALLY'];
-
-      const $  = (sel, root) => (root || sec).querySelector(sel);
-      const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g,
-        c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-      const list    = $('[data-cm-ai-list]');
-      const empty   = $('[data-cm-ai-empty]');
-      const count   = $('[data-cm-ai-count]');
-      const form    = $('[data-cm-ai-form]');
-      const addLink = $('.cm-agenda-add');
-      const descIn  = $('[data-cm-ai-desc]');
-      const descErr = $('[data-cm-ai-desc-err]');
-      const ownErr  = $('[data-cm-ai-owner-err]');
-
-      const items = [];
-      let seq = 0;
-      let draft = { cadence: null, project: null, owner: null };
-
-      // ---- the meeting's own cadence, read live from the recurrence select.
-      // "Does not repeat" is irregular: anything is allowed and the default is
-      // Weekly (ROB-AGENDA-005).
-      const meetingPeriodWeeks = () => {
-        const t = (modal.querySelector('[data-cm-select="recurrence"] [data-cm-select-text]')
-                  || {}).textContent || '';
-        if (/^Every week/i.test(t))      return 1;
-        if (/^Every two weeks/i.test(t)) return 2;
-        if (/^Every month/i.test(t))     return 4;
-        return null;                                    // irregular
-      };
-
-      const allowedCadences = () => {
-        const p = meetingPeriodWeeks();
-        const ok = RECURRING.filter(k => p == null || CAD[k][1] >= p);
-        // "Each meeting" is always offered; "One-off" only in the add form,
-        // which is the only place this control exists.
-        return ['EVERY_MEETING', 'ONE_TIME'].concat(ok);
-      };
-
-      const defaultCadence = () => {
-        const p = meetingPeriodWeeks();
-        if (p == null) return 'WEEKLY';
-        return RECURRING.find(k => CAD[k][1] >= p) || 'EVERY_MEETING';
-      };
-
-      // ---- option sources -------------------------------------------------
-      // Owners: the series owner plus whoever is in the participants list.
-      const roster = () => {
-        const out = [];
-        const oName = modal.querySelector('[data-cm-owner-name]');
-        const oIni  = modal.querySelector('[data-cm-owner-initials]');
-        if (oName) out.push({
-          name: oName.textContent.trim(),
-          initials: oIni ? oIni.textContent.trim() : '',
-          role: (modal.querySelector('[data-cm-owner-role]') || {}).textContent || '',
-        });
-        modal.querySelectorAll('[data-cm-participants-list] .md-person').forEach(p => {
-          out.push({
-            name: (p.querySelector('.md-person-name') || {}).textContent || '',
-            initials: (p.querySelector('.avatar') || {}).textContent || '',
-            role: (p.querySelector('.md-person-role') || {}).textContent || '',
-          });
-        });
-        return out;
-      };
-
-      // Projects: the PROJECT-level items connected to the meeting. Nothing
-      // connected yet means nothing to pick — that is the rule, not a bug.
-      const projects = () => [...modal.querySelectorAll(
-        '[data-cm-conn="initiatives"] [data-cm-conn-list] .cm-conn-item')]
-        .filter(li => /^Project$/i.test(((li.querySelector('.tag') || {}).textContent || '').trim()))
-        .map(li => ((li.querySelector('.cm-conn-item-name') || {}).textContent || '').trim());
-
-      // ---- menus ----------------------------------------------------------
-      const fields = [...sec.querySelectorAll('.cm-ai-field')];
-      const closeMenus = except => fields.forEach(f => {
-        if (f === except) return;
-        const m = f.querySelector('.cm-ai-menu');
-        const t = f.querySelector('button');
-        if (m) m.hidden = true;
-        if (t) t.setAttribute('aria-expanded', 'false');
-      });
-
-      // Wires one trigger + menu pair. `build` returns [{label, value, html}].
-      const wireMenu = (field, build, onPick) => {
-        const trigger = field.querySelector('button');
-        const menu    = field.querySelector('.cm-ai-menu');
-        trigger.addEventListener('click', e => {
-          e.stopPropagation();
-          const open = menu.hidden;
-          closeMenus(field);
-          if (!open) { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); return; }
-          const opts = build();
-          menu.innerHTML = opts.length
-            ? opts.map(o =>
-                '<button class="dropdown-item' + (o.selected ? ' is-selected' : '') +
-                '" type="button" role="option" aria-selected="' + !!o.selected +
-                '" data-value="' + esc(o.value) + '">' +
-                '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + o.html + '</button>').join('')
-            : '<p class="dropdown-empty">' + esc(build.emptyText || 'Nothing to pick') + '</p>';
-          menu.hidden = false;
-          trigger.setAttribute('aria-expanded', 'true');
-        });
-        menu.addEventListener('click', e => {
-          e.stopPropagation();
-          const it = e.target.closest('[data-value]');
-          if (!it) return;
-          onPick(it.dataset.value);
-          menu.hidden = true;
-          trigger.setAttribute('aria-expanded', 'false');
-          trigger.focus();
-        });
-      };
-
-      // Cadence
-      const cadField = $('[data-cm-ai-cadence]');
-      const cadLabel = $('[data-cm-ai-cadence-label]');
-      wireMenu(cadField,
-        () => allowedCadences().map(k => ({
-          value: k, selected: k === draft.cadence,
-          html: '<span class="dropdown-item-label">' + esc(CAD[k][0]) + '</span>',
-        })),
-        v => { draft.cadence = v; paintDraft(); });
-
-      // Project — One-off only; switching away clears the pick.
-      const projField = $('[data-cm-ai-project]');
-      const projLabel = $('[data-cm-ai-project-label]');
-      const buildProjects = () => projects().map(n => ({
-        value: n, selected: n === draft.project,
-        html: '<span class="dropdown-item-label">' + esc(n) + '</span>',
-      }));
-      buildProjects.emptyText = 'No projects connected to this meeting';
-      wireMenu(projField, buildProjects, v => {
-        draft.project = (v === draft.project) ? null : v;
-        paintDraft();
-      });
-
-      // Owner
-      const ownField = $('[data-cm-ai-owner]');
-      const ownLabel = $('[data-cm-ai-owner-label]');
-      const buildOwners = () => roster().map(p => ({
-        value: p.name, selected: p.name === (draft.owner && draft.owner.name),
-        html: '<span class="dropdown-item-avatar avatar avatar-md">' + esc(p.initials) + '</span>' +
-              '<div class="dropdown-item-text"><span class="dropdown-item-label">' + esc(p.name) + '</span>' +
-              '<span class="dropdown-item-description">' + esc(p.role) + '</span></div>',
-      }));
-      buildOwners.emptyText = 'No one on the meeting yet';
-      wireMenu(ownField, buildOwners, v => {
-        draft.owner = roster().find(p => p.name === v) || null;
-        ownField.classList.remove('is-error');
-        ownErr.hidden = true;
-        paintDraft();
-      });
-
-      document.addEventListener('click', e => { if (!sec.contains(e.target)) closeMenus(null); });
-
-      // ---- draft painting -------------------------------------------------
-      function paintDraft() {
-        cadLabel.textContent = CAD[draft.cadence][0];
-
-        const oneOff = draft.cadence === 'ONE_TIME';
-        projField.hidden = !oneOff;
-        if (!oneOff) draft.project = null;              // ROB-AGENDA-009
-        projLabel.textContent = draft.project || 'Project';
-        projLabel.classList.toggle('is-placeholder', !draft.project);
-
-        ownLabel.textContent = draft.owner ? draft.owner.name : 'Owner';
-        ownLabel.classList.toggle('is-placeholder', !draft.owner);
-      }
-
-      // ---- the saved list -------------------------------------------------
-      function paint() {
-        list.innerHTML = items.map((it, n) =>
-          '<div class="cm-ai-row" data-cm-ai-row="' + it.id + '">' +
-            '<div class="cm-ai-row-top">' +
-              '<span class="count-badge count-badge-lg count-badge-secondary">' + (n + 1) + '</span>' +
-              '<p class="cm-ai-row-desc">' + esc(it.description) + '</p>' +
-              '<button class="btn btn-icon-only btn-ghost btn-xs cm-ai-row-del" type="button" ' +
-                      'data-cm-ai-del="' + it.id + '" data-tooltip="Delete the agenda item" ' +
-                      'aria-label="Delete the agenda item">' +
-                '<svg class="icon"><use href="#i-trash"/></svg></button>' +
-            '</div>' +
-            '<div class="cm-ai-row-meta">' +
-              '<span class="cm-ai-row-meta-start">' +
-                '<span class="tag tag-light">' + esc(CAD[it.cadence][0]) + '</span>' +
-                (it.project
-                  ? '<span class="tag tag-light" data-tooltip="This agenda item relates to ‘' +
-                    esc(it.project) + '’ project">' + esc(it.project) + '</span>'
-                  : '') +
-              '</span>' +
-              '<span class="cm-ai-row-meta-end">' +
-                '<span class="avatar avatar-sm">' + esc(it.owner.initials) + '</span>' +
-                '<span class="cm-ai-row-owner">' + esc(it.owner.name) + '</span>' +
-              '</span>' +
-            '</div>' +
-          '</div>').join('');
-        list.hidden   = items.length === 0;
-        empty.hidden  = items.length > 0 || !form.hidden;
-        count.textContent = String(items.length);
-      }
-
-      list.addEventListener('click', e => {
-        const del = e.target.closest('[data-cm-ai-del]');
-        if (!del) return;
-        const i = items.findIndex(it => String(it.id) === del.dataset.cmAiDel);
-        if (i > -1) items.splice(i, 1);
-        paint();
-      });
-
-      // ---- open / cancel / save -------------------------------------------
-      function openForm() {
-        draft = {
-          cadence: defaultCadence(),
-          project: null,
-          // Defaults to the current user when they are on the roster
-          // (ROB-AGENDA-038) — here that is the meeting's owner.
-          owner: roster()[0] || null,
-        };
-        descIn.value = '';
-        descErr.hidden = true;
-        ownErr.hidden = true;
-        ownField.classList.remove('is-error');
-        descIn.classList.remove('is-error');
-        paintDraft();
-        form.hidden = false;
-        addLink.hidden = true;
-        empty.hidden = true;
-        descIn.focus();
-      }
-
-      function closeForm() {
-        form.hidden = true;
-        addLink.hidden = false;
-        closeMenus(null);
-        paint();
-      }
-
-      function save() {
-        const description = descIn.value.trim();
-        let bad = false;
-
-        if (!description) {
-          descErr.textContent = 'Description is required';
-          bad = true;
-        } else if (description.length > MAX) {
-          descErr.textContent = 'Too long. Should be shorter than ' + MAX + ' characters';
-          bad = true;
-        }
-        descErr.hidden = !bad;
-        descIn.classList.toggle('is-error', bad);
-
-        if (!draft.owner) {
-          ownErr.textContent = 'Owner is required';
-          ownErr.hidden = false;
-          ownField.classList.add('is-error');
-          bad = true;
-        }
-        if (bad) return;                                // the form stays open
-
-        items.push({
-          id: ++seq,
-          description: description,
-          cadence: draft.cadence,
-          project: draft.project,
-          owner: draft.owner,
-        });
-        closeForm();
-      }
-
-      sec.querySelectorAll('[data-cm-ai-open]').forEach(b => b.addEventListener('click', openForm));
-      $('[data-cm-ai-cancel]').addEventListener('click', closeForm);
-      $('[data-cm-ai-save]').addEventListener('click', save);
-
-      descIn.addEventListener('input', () => {
-        if (descErr.hidden) return;
-        descErr.hidden = true;
-        descIn.classList.remove('is-error');
-      });
-      descIn.addEventListener('keydown', e => {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-        save();
-      });
-
-      // Escape closes the form, not the modal behind it (TOP-7358). An open
-      // menu takes the first Escape.
-      sec.addEventListener('keydown', e => {
-        if (e.key !== 'Escape' || form.hidden) return;
-        const openMenu = fields.some(f => {
-          const m = f.querySelector('.cm-ai-menu');
-          return m && !m.hidden;
-        });
-        e.stopPropagation();
-        if (openMenu) { closeMenus(null); return; }
-        closeForm();
-      });
-
-      paint();
-    })();
+    // The proposal was wired, not sketched — it satisfied ROB-AGENDA-001 to
+    // -038 (cadence floor from the meeting's own cadence, owners from the
+    // roster, Project limited to One-off and read from Connections, 200-char
+    // cap, flags only after creation). It is in b14f2c6 if the spike ever
+    // lands on the other answer. #md-agenda on the meeting view is where it
+    // would go.
   </script>
 
   <!-- ============ MEETING DETAIL MODAL ============ -->
@@ -9862,7 +9463,7 @@ Platform reliability — error budget
                         </li>
                         <li>
                           <code>{{accountable_owner}}</code>
-                          <span>Adan Jones</span>
+                          <span>Bill Bryck</span>
                         </li>
                         <li>
                           <code>{{date}}</code>
@@ -9915,7 +9516,7 @@ Platform reliability — error budget
                   </p>
                   <ul class="md-deck-info-vars" data-deck-info-details hidden>
                     <li><code>{{team_name}}</code><span>Daily meeting #1</span></li>
-                    <li><code>{{accountable_owner}}</code><span>Adan Jones</span></li>
+                    <li><code>{{accountable_owner}}</code><span>Bill Bryck</span></li>
                     <li><code>{{date}}</code><span>May 8 2026</span></li>
                   </ul>
                 </div>
@@ -9931,7 +9532,7 @@ Platform reliability — error budget
                 <div class="rc-grid">
 
                 <!-- State 1: Empty / not authorized -->
-                <article class="rc-card rc-card-clickable" data-resource-state="empty" data-modal-open="auth-required" role="button" tabindex="0" aria-label="Add an Initiative RoB meeting deck">
+                <article class="rc-card rc-card-clickable" data-resource-state="empty" data-modal-open="auth-required" role="button" tabindex="0" aria-label="Add an Initiative RoB meeting deck" data-rob-needs="manage-deck">
                   <div class="rc-hero rc-hero-cover">
                     <div class="rc-hero-text">
                       <h4 class="rc-hero-title">Add Initiative RoB Meeting Deck</h4>
@@ -10039,7 +9640,7 @@ Platform reliability — error budget
                     </div>
                     <div class="rc-foot-actions">
                       <button class="btn btn-secondary btn-xs" type="button">Open</button>
-                      <button class="btn btn-secondary btn-xs btn-icon-only" type="button" data-resource-disconnect aria-label="Disconnect">
+                      <button class="btn btn-secondary btn-xs btn-icon-only" type="button" data-resource-disconnect aria-label="Disconnect" data-rob-needs="manage-deck">
                         <svg class="icon btn-icon"><use href="#i-trash"/></svg>
                       </button>
                     </div>
@@ -10060,7 +9661,7 @@ Platform reliability — error budget
                   <h3 class="md-section-title" style="margin: 0">Agenda items</h3>
                   <span class="badge">0</span>
                 </div>
-                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item">
+                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item" data-rob-needs="manage-items">
                   <svg class="icon"><use href="#i-plus"/></svg>
                 </button>
               </div>
@@ -10068,7 +9669,7 @@ Platform reliability — error budget
                 <svg class="icon"><use href="#i-list-unordered"/></svg>
                 No Agenda items yet
               </div>
-              <button class="cm-agenda-add" type="button" style="margin-top: var(--spacing-2)">
+              <button class="cm-agenda-add" type="button" style="margin-top: var(--spacing-2)" data-rob-needs="manage-items">
                 <svg class="icon"><use href="#i-plus"/></svg>
                 Add agenda item
               </button>
@@ -10138,7 +9739,7 @@ Platform reliability — error budget
                   <a href="#">#eng-weekly-standup</a>
                   <span class="md-conn-row-end">
                     <span class="md-tag">Default</span>
-                    <button class="md-trash-btn" type="button" aria-label="Remove"><svg class="icon"><use href="#i-trash"/></svg></button>
+                    <button class="md-trash-btn" type="button" aria-label="Remove" data-rob-needs="edit-series"><svg class="icon"><use href="#i-trash"/></svg></button>
                   </span>
                 </div>
                 <div class="md-conn-row">
@@ -10255,9 +9856,9 @@ Platform reliability — error budget
             <section>
               <h3 class="md-section-title">Owner</h3>
               <div class="md-person">
-                <span class="avatar avatar-md">AJ</span>
+                <span class="avatar avatar-md">BB</span>
                 <div class="md-person-body">
-                  <p class="md-person-name">Adan Jones</p>
+                  <p class="md-person-name">Bill Bryck <span data-rob-you="owner" style="color: var(--color-text-muted); font-weight: var(--font-weight-regular)">(you)</span></p>
                   <p class="md-person-role">Senior Director of Program Management</p>
                 </div>
                 <span class="md-person-badge md-badge-a">A</span>
@@ -10345,7 +9946,7 @@ Platform reliability — error budget
               <div class="md-person is-me" data-md-me>
                 <span class="md-av-status"><span class="avatar avatar-md">MV</span></span>
                 <div class="md-person-body">
-                  <p class="md-person-name">Matthew Vella <span style="color: var(--color-text-muted); font-weight: var(--font-weight-regular)">(you)</span></p>
+                  <p class="md-person-name">Matthew Vella <span data-rob-you="participant" style="color: var(--color-text-muted); font-weight: var(--font-weight-regular)">(you)</span></p>
                   <p class="md-person-role">Senior Product Designer · Platform</p>
                 </div>
                 <!-- By default this icon opens a status menu (Going / Reject
@@ -10396,7 +9997,7 @@ Platform reliability — error budget
       </div>
 
       <footer class="modal-footer" style="border-top: 1px solid var(--color-gray-200)">
-        <button class="btn btn-secondary" type="button" data-md-edit-start hidden-when-editing>Edit</button>
+        <button class="btn btn-secondary" type="button" data-md-edit-start hidden-when-editing data-rob-needs="edit-series">Edit</button>
         <button class="btn btn-secondary" type="button" data-md-edit-cancel show-when-editing hidden>Cancel</button>
         <button class="btn btn-primary" type="button" data-md-edit-save show-when-editing hidden>Save changes</button>
       </footer>
@@ -11287,9 +10888,9 @@ Platform reliability — error budget
                 <input class="input" type="text" placeholder="Select Options" readonly />
               </div>
               <div class="me-person">
-                <span class="avatar avatar-md">AJ</span>
+                <span class="avatar avatar-md">BB</span>
                 <div class="me-person-body">
-                  <p class="me-person-name">Adan Jones</p>
+                  <p class="me-person-name">Bill Bryck</p>
                   <p class="me-person-role">Senior Director of Program Management</p>
                 </div>
                 <button class="me-trash" type="button" aria-label="Remove owner"><svg class="icon"><use href="#i-trash"/></svg></button>
@@ -12168,19 +11769,20 @@ Platform reliability — error budget
       const isClosed = (s) => CLOSED_STATUSES.has(s);
 
       const PEOPLE = {
-        'adan-jones':     { name: 'Adan Jones',     initials: 'AJ', color: '#475569', photo: 'https://i.pravatar.cc/64?u=adan-jones' },
+        'bill-bryck':     { name: 'Bill Bryck',     initials: 'BB', color: '#475569', photo: 'https://i.pravatar.cc/64?u=bill-bryck' },
         'keith-berlin':   { name: 'Keith Berlin',   initials: 'KB', color: '#1A73E8', photo: 'https://i.pravatar.cc/64?u=keith-berlin' },
         'rick-lacroix':   { name: 'Rick Lacroix',   initials: 'RL', color: '#0F9D58', photo: 'https://i.pravatar.cc/64?u=rick-lacroix' },
         'tile-tampakas':  { name: 'Tile Tampakas',  initials: 'TT', color: '#F4B400', photo: 'https://i.pravatar.cc/64?u=tile-tampakas' },
+        'matthew-vella':  { name: 'Matthew Vella',  initials: 'MV', color: '#DB2777', photo: 'https://i.pravatar.cc/64?u=matthew-vella' },
         'collete-parker': { name: 'Collete Parker', initials: 'CP', color: '#A855F7', photo: 'https://i.pravatar.cc/64?u=collete-parker' },
         'system':         { name: 'System',         initials: 'OP', color: '#94A3B8', photo: null },
       };
-      const OWNER_ID = 'adan-jones';
+      const OWNER_ID = 'bill-bryck';
 
       // Who's actually on this RoB call. An assignee not in this set gets a
       // "not a participant" warning on their item, with a quick invite/reassign.
       // (tile-tampakas is intentionally left off to demo the warning.)
-      const PARTICIPANTS = new Set(['adan-jones', 'keith-berlin', 'rick-lacroix', 'collete-parker']);
+      const PARTICIPANTS = new Set(['bill-bryck', 'matthew-vella', 'keith-berlin', 'rick-lacroix', 'collete-parker']);
       const onCall = (id) => PARTICIPANTS.has(id);
 
       const TODAY = new Date('2026-01-21');
@@ -12207,7 +11809,7 @@ Platform reliability — error budget
             status: 'done',
             comment: 'Rolled out Tuesday — no complaints so far.',
             history: [
-              { ts: '2026-01-07T15:30:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-07T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
               { ts: '2026-01-13T11:20:00', author: 'tile-tampakas', field: 'status', from: 'in-progress', to: 'done' },
               { ts: '2026-01-13T11:20:00', author: 'tile-tampakas', field: 'comment', from: '', to: 'Rolled out Tuesday — no complaints so far.' },
             ],
@@ -12220,7 +11822,7 @@ Platform reliability — error budget
             status: 'done',
             comment: 'Migration complete. Old instance scheduled for shutdown Jan 21.',
             history: [
-              { ts: '2026-01-07T15:31:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-07T15:31:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
               { ts: '2026-01-12T09:00:00', author: 'keith-berlin', field: 'status', from: 'open', to: 'in-progress' },
               { ts: '2026-01-13T17:45:00', author: 'keith-berlin', field: 'status', from: 'in-progress', to: 'done' },
               { ts: '2026-01-13T17:46:00', author: 'keith-berlin', field: 'comment', from: '', to: 'Migration complete. Old instance scheduled for shutdown Jan 21.' },
@@ -12229,14 +11831,14 @@ Platform reliability — error budget
           {
             id: newId(),
             desc: 'Approve infra spend uplift for Q1',
-            assignee: 'adan-jones',
+            assignee: 'bill-bryck',
             due: '2026-01-12',
             status: 'done',
             comment: 'Approved by finance — see ticket FIN-3214.',
             history: [
-              { ts: '2026-01-08T10:00:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-12T14:00:00', author: 'adan-jones', field: 'status', from: 'open', to: 'done' },
-              { ts: '2026-01-12T14:00:00', author: 'adan-jones', field: 'comment', from: '', to: 'Approved by finance — see ticket FIN-3214.' },
+              { ts: '2026-01-08T10:00:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-12T14:00:00', author: 'bill-bryck', field: 'status', from: 'open', to: 'done' },
+              { ts: '2026-01-12T14:00:00', author: 'bill-bryck', field: 'comment', from: '', to: 'Approved by finance — see ticket FIN-3214.' },
             ],
           },
           {
@@ -12247,7 +11849,7 @@ Platform reliability — error budget
             status: 'done',
             comment: 'Targets locked in: 99.9% availability, p95 < 400ms.',
             history: [
-              { ts: '2026-01-07T15:32:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-07T15:32:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
               { ts: '2026-01-13T16:00:00', author: 'collete-parker', field: 'status', from: 'in-progress', to: 'done' },
               { ts: '2026-01-13T16:01:00', author: 'collete-parker', field: 'comment', from: '', to: 'Targets locked in: 99.9% availability, p95 < 400ms.' },
             ],
@@ -12260,7 +11862,7 @@ Platform reliability — error budget
             status: 'in-progress',
             comment: 'Draft sent for legal review.',
             history: [
-              { ts: '2026-01-14T15:30:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-14T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
               { ts: '2026-01-14T16:15:00', author: 'rick-lacroix', field: 'status', from: 'open', to: 'in-progress' },
               { ts: '2026-01-14T16:16:00', author: 'rick-lacroix', field: 'comment', from: '', to: 'Draft sent for legal review.' },
             ],
@@ -12270,12 +11872,12 @@ Platform reliability — error budget
           {
             id: newId(),
             desc: 'Confirm cutover date for data-pipeline migration with the platform team',
-            assignee: 'keith-berlin',
+            assignee: 'matthew-vella',
             due: '2026-01-23',
             status: 'in-progress',
             comment: 'Drafted plan; waiting on infra sign-off.',
             history: [
-              { ts: '2026-01-19T10:14:00', author: 'adan-jones', field: 'status',  from: 'open',  to: 'in-progress' },
+              { ts: '2026-01-19T10:14:00', author: 'bill-bryck', field: 'status',  from: 'open',  to: 'in-progress' },
               { ts: '2026-01-20T16:02:00', author: 'keith-berlin', field: 'comment', from: '', to: 'Drafted plan; waiting on infra sign-off.' },
             ],
           },
@@ -12288,7 +11890,7 @@ Platform reliability — error budget
             comment: 'Blocked on legal review of customer-impact wording.',
             carriedFrom: '2026-01-14',
             history: [
-              { ts: '2026-01-14T15:30:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-14T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
               { ts: '2026-01-21T09:00:00', author: 'system', field: 'carried over', from: 'Jan 14', to: 'Jan 21' },
               { ts: '2026-01-20T09:45:00', author: 'rick-lacroix', field: 'status', from: 'in-progress', to: 'blocked' },
               { ts: '2026-01-20T09:46:00', author: 'rick-lacroix', field: 'comment', from: '', to: 'Blocked on legal review of customer-impact wording.' },
@@ -12302,20 +11904,20 @@ Platform reliability — error budget
             status: 'open',
             comment: '',
             history: [
-              { ts: '2026-01-21T11:00:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-21T11:00:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
             ],
           },
           {
             id: newId(),
             desc: 'Send Q4 reliability summary to leadership',
-            assignee: 'adan-jones',
+            assignee: 'bill-bryck',
             due: '2026-01-16',
             status: 'done',
             comment: 'Sent Friday — see #eng-leadership.',
             history: [
-              { ts: '2026-01-14T15:31:00', author: 'adan-jones', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-16T17:20:00', author: 'adan-jones', field: 'status',  from: 'in-progress', to: 'done' },
-              { ts: '2026-01-16T17:20:00', author: 'adan-jones', field: 'comment', from: '', to: 'Sent Friday — see #eng-leadership.' },
+              { ts: '2026-01-14T15:31:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: '2026-01-16T17:20:00', author: 'bill-bryck', field: 'status',  from: 'in-progress', to: 'done' },
+              { ts: '2026-01-16T17:20:00', author: 'bill-bryck', field: 'comment', from: '', to: 'Sent Friday — see #eng-leadership.' },
             ],
           },
         ],
@@ -12394,14 +11996,14 @@ Platform reliability — error budget
           ],
           items: [
             { id: 'keith-berlin',  ts: '2026-01-21T13:02:00' },
-            { id: 'adan-jones',    ts: '2026-01-21T11:45:00' },
+            { id: 'bill-bryck',    ts: '2026-01-21T11:45:00' },
             { id: 'rick-lacroix',  ts: '2026-01-20T20:15:00' },
             { id: 'tile-tampakas', ts: '2026-01-20T16:30:00' },
           ],
         },
         '2026-01-14': {
-          deck:  [ { id: 'adan-jones',   ts: '2026-01-14T09:00:00' }, { id: 'keith-berlin', ts: '2026-01-14T08:55:00' } ],
-          items: [ { id: 'rick-lacroix', ts: '2026-01-19T10:22:00' }, { id: 'adan-jones',   ts: '2026-01-16T17:20:00' }, { id: 'keith-berlin', ts: '2026-01-15T09:00:00' } ],
+          deck:  [ { id: 'bill-bryck',   ts: '2026-01-14T09:00:00' }, { id: 'keith-berlin', ts: '2026-01-14T08:55:00' } ],
+          items: [ { id: 'rick-lacroix', ts: '2026-01-19T10:22:00' }, { id: 'bill-bryck',   ts: '2026-01-16T17:20:00' }, { id: 'keith-berlin', ts: '2026-01-15T09:00:00' } ],
         },
         '2026-01-07': { deck: [], items: [] },
         '2025-12-31': { deck: [], items: [] },
@@ -12526,7 +12128,10 @@ Platform reliability — error budget
       }
 
       // Viewer role state
+      // Who is looking. The role lives on <html> (set by the role switcher at
+      // the foot of this file); OWNER_ID stays the series owner regardless.
       let currentUser = OWNER_ID;
+      const robRole = () => document.documentElement.dataset.robRole || 'owner';
       let showCompleted = true;
       let openPop = null;
       // Item id pending archive confirmation; cleared once the modal closes
@@ -12556,11 +12161,19 @@ Platform reliability — error budget
       const showCompletedBtn = section.querySelector('[data-ai-show-completed]');
 
       const canEdit = (item, field) => {
-        if (currentUser === OWNER_ID) return true;
+        if (canManage()) return true;
+        // ROB-ACTION-019: the assignee may change the STATUS and nothing else —
+        // description, due date, assignee and delete stay read-only for them.
+        // `comment` rides along because it is the prototype's own affordance:
+        // the product has no notes on action items at all (ROB-ACTION-008), so
+        // no rule governs it and the assignee is the sensible holder.
         if (currentUser === item.assignee && (field === 'status' || field === 'comment')) return true;
         return false;
       };
-      const canManage = () => currentUser === OWNER_ID;
+      // ROB-ACCESS-005 — attending grants no item rights; ROB-ACTION-010 — only
+      // the owner or a RoB admin creates one. Keyed on the role, not on
+      // currentUser === OWNER_ID, so a RoB admin is not mistaken for a stranger.
+      const canManage = () => robRole() !== 'participant';
 
       const closePop = () => {
         if (openPop) { openPop.remove(); openPop = null; }
@@ -12587,6 +12200,10 @@ Platform reliability — error budget
 
       const isOverdue = (item) =>
         !isClosed(item.status) && new Date(item.due) < TODAY;
+
+      // The switcher calls this; items re-ask canEdit/canManage per item, so a
+      // re-render is the whole update.
+      window.robRoleChanged = (role, userId) => { currentUser = userId; render(); };
 
       const render = () => {
         list.innerHTML = '';
@@ -13332,7 +12949,7 @@ Platform reliability — error budget
           </svg>
           <div>
             <p id="sv-title" class="sv-name" data-viewer-title>Engineering Weekly — Q1 Roadmap</p>
-            <p class="sv-meta">Last edited 2 hours ago · Adan Jones</p>
+            <p class="sv-meta">Last edited 2 hours ago · Bill Bryck</p>
           </div>
         </div>
         <div class="sv-head-actions">
@@ -15380,7 +14997,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // renders the paused ones; the export carries all of them, so the CSV
       // and the screen can never disagree.
       const SERIES = [
-        { name: 'Engineering Weekly',            kind: 'Process RoB',    parent: 'Platform reliability \u2014 error budget', cadence: 'Weekly',    owner: 'Adan Jones',   status: 'Active' },
+        { name: 'Engineering Weekly',            kind: 'Process RoB',    parent: 'Platform reliability \u2014 error budget', cadence: 'Weekly',    owner: 'Bill Bryck',   status: 'Active' },
         { name: 'Incident Review',               kind: 'Process RoB',    parent: 'Platform reliability \u2014 on-call',      cadence: 'Weekly',    owner: 'Daniel Reyes', status: 'Active' },
         { name: 'Ops Leadership Review',         kind: 'Initiative RoB', parent: 'Operational Excellence Program',       cadence: 'Bi-weekly', owner: 'Aisha Khan',   status: 'Active' },
         { name: 'Pipeline Review',               kind: 'Initiative RoB', parent: 'Enterprise Sales Expansion',          cadence: 'Weekly',    owner: 'Owen Clarke',  status: 'Active' },
@@ -15423,11 +15040,19 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // UXCopy: counts read as a phrase, not a parenthetical.
       count.textContent = `${paused.length} series paused. Occurrences stop until a series is resumed.`;
 
+      // Below 1024px the bar is the page head, so a screen change has to reach
+      // it: the paused screen's own head — breadcrumb and all — is standing down.
+      const topbar      = document.querySelector('.topbar');
+      const topbarTitle = document.querySelector('.topbar-title');
+      const backBtn     = document.querySelector('.topbar-back');
       const show = (view) => {
         calView.hidden = view !== 'calendar';
         pauView.hidden = view !== 'paused';
+        topbar.classList.toggle('is-subscreen', view === 'paused');
+        topbarTitle.textContent = view === 'paused' ? 'Paused meeting series' : 'RoB Meetings';
         document.querySelector('.app-shell-main')?.scrollTo({ top: 0, behavior: 'instant' });
       };
+      backBtn.addEventListener('click', () => show('calendar'));
 
       // ---- Menu ----
       const closeMenu = () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
@@ -15438,6 +15063,24 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
       document.addEventListener('click', (e) => { if (!more.contains(e.target)) closeMenu(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+      // The kit's contract is one .topbar-cta per page-head action, in the same
+      // order: the + button is the first, this menu is the second. It is MOVED
+      // rather than copied, because every item in it is wired by attribute and a
+      // clone would be a dead second copy of Export and Paused series — and of
+      // the trigger's aria-expanded. Closing first keeps an open menu from
+      // reappearing somewhere else.
+      const headActions = more.parentElement;
+      const plusCta = document.querySelector('.topbar .topbar-cta');
+      const collapsed = window.matchMedia('(max-width: 1024px)');
+      const placeMore = () => {
+        closeMenu();
+        if (collapsed.matches) plusCta.insertAdjacentElement('afterend', more);
+        else headActions.appendChild(more);
+        more.classList.toggle('topbar-cta', collapsed.matches);
+      };
+      collapsed.addEventListener('change', placeMore);
+      placeMore();
 
       document.querySelector('[data-rob-paused]').addEventListener('click', () => {
         closeMenu();
@@ -15538,12 +15181,12 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // dow: 0=Sun … 6=Sat. every: 1 weekly, 2 bi-weekly. mine: on my calendar.
       // CONTEXT.md: Processes, never BAU — the product's older word.
       const SERIES = [
-        { title: '[RoB] [Initiative] Operationalize Launch', time: '10:00am', unit: 'New Business',        dow: 1, every: 1, mine: true, mins: 60, owner: 'Adan Jones' },
+        { title: '[RoB] [Initiative] Operationalize Launch', time: '10:00am', unit: 'New Business',        dow: 1, every: 1, mine: true, mins: 60, owner: 'Bill Bryck' },
         { title: '[RoB] [Initiative] Business Propellant',   time: '2:30pm',  unit: 'New Business',        dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
         { title: 'Business Propellant Call',                 time: '4:00pm',  unit: 'Toptal',              dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
         { title: '[RoB] [Process] HireGlobal Outbound Motion', time: '2:00pm', unit: 'New Business, Services', dow: 2, every: 1, mins: 30, owner: 'Maria Santos' },
         { title: 'Operationalize Integrations',              time: '2:30pm',  unit: 'New Business',        dow: 2, every: 1, mins: 30, owner: 'Nina Gupta' },
-        { title: '[RoB] [Team] Executive Team',              time: '5:00pm',  unit: 'Toptal',              dow: 2, every: 2, mins: 60, owner: 'Adan Jones' },
+        { title: '[RoB] [Team] Executive Team',              time: '5:00pm',  unit: 'Toptal',              dow: 2, every: 2, mins: 60, owner: 'Bill Bryck' },
         { title: 'HireGlobal — Paid Marketing weekly',  time: '5:30pm',  unit: 'New Business',        dow: 2, every: 2, mins: 30, owner: 'Maria Santos' },
         { title: '[RoB] Operationalize QAs Sync',            time: '12:30pm', unit: 'New Business',        dow: 3, every: 1, mins: 30, owner: 'Nina Gupta' },
         { title: '[RoB] ExpertCrowd <> ActionTrace Integration', time: '2:30pm', unit: 'New Business',     dow: 3, every: 1, mins: 25, owner: 'Daniel Reyes' },
@@ -15781,14 +15424,12 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           cols.appendChild(col);
         });
 
-        // The now line starts at today's column and runs to the end of the week.
-        const todayIdx = weekDays.findIndex(d => iso(d) === todayIso);
-        if (todayIdx >= 0) {
+        // Drawn only when today is in view. Where it starts and stops is the
+        // stylesheet's business — it spans the body from the time column.
+        if (weekDays.some(d => iso(d) === todayIso)) {
           const now = document.createElement('div');
           now.className = 'cal-week-now';
           now.style.top = `${(NOW_MINS - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
-          now.style.left = `${(todayIdx / 5) * 100}%`;
-          now.style.right = '0';
           cols.appendChild(now);
         }
       }
@@ -16099,6 +15740,83 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           if (e.key === 'Escape') { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
         });
       });
+    })();
+  </script>
+
+  <!-- Prototype role switcher — ?roles=1. Keys match ROLES in the script. -->
+  <div class="rr-switcher" id="rr-switcher" hidden>
+    <div class="rr-switcher-head"><span>Viewing as</span><button class="rr-switcher-toggle" type="button" aria-label="Collapse roles">–</button></div>
+    <div class="rr-switcher-body">
+      <button type="button" data-rob-role-pick="owner">Owner<span class="rr-switcher-who">Bill Bryck · owns this series</span></button>
+      <button type="button" data-rob-role-pick="rob-admin">RoB admin<span class="rr-switcher-who">Collete Parker · manages all RoB meetings</span></button>
+      <button type="button" data-rob-role-pick="participant">Participant<span class="rr-switcher-who">Matthew Vella · attends, assignee of one item</span></button>
+    </div>
+    <p class="rr-switcher-note">Reads every RoB either way — ROB-ACCESS-001.</p>
+  </div>
+
+  <script>
+    // Viewing-as role. One source for the whole page: each surface asks the
+    // same question, because a surface that keeps its own flag drifts from the
+    // rest the first time a rule changes. CSS does the hiding (the rights table
+    // next to .rr-switcher); this only sets the attribute and tells the action
+    // items, whose rules are per-item rather than per-control.
+    (function () {
+      const ROLES = {
+        'owner':       'bill-bryck',
+        // Deliberately a third person. An admin who also owned this series
+        // would hold the deck rights too (ROB-ACCESS-002), and the one thing
+        // this entry exists to show is an admin WITHOUT them.
+        'rob-admin':   'collete-parker',
+        // The signed-in person, and the assignee of one open item, so the one
+        // write the role has (ROB-ACTION-019, status only) is on screen rather
+        // than described.
+        'participant': 'matthew-vella',
+      };
+      const params = new URLSearchParams(location.search);
+      const asked = params.get('role');
+      let role = ROLES[asked] ? asked : 'owner';
+
+      // Name, initials and title per person, so the account menu says who you
+      // are rather than always saying Matthew Vella.
+      const WHO = {
+        'bill-bryck':    ['Bill Bryck',    'BB', 'Senior Director of Program Management'],
+        'collete-parker':['Collete Parker','CP', 'Director of Engineering'],
+        'matthew-vella': ['Matthew Vella', 'MV', 'Senior Product Designer'],
+      };
+
+      const apply = (next) => {
+        role = next;
+        document.documentElement.dataset.robRole = role;
+        document.documentElement.dataset.robUser = ROLES[role];
+        const [name, initials, title] = WHO[ROLES[role]];
+        document.querySelectorAll('[data-rob-me-initials]').forEach(el => { el.textContent = initials; });
+        document.querySelectorAll('[data-rob-me-name]').forEach(el => { el.textContent = name; });
+        document.querySelectorAll('[data-rob-me-title]').forEach(el => { el.textContent = title; });
+        // Action items re-render from their own permission check.
+        window.robRoleChanged?.(role, ROLES[role]);
+      };
+      apply(role);
+
+      if (params.get('roles') !== '1') return;
+      const sw = document.getElementById('rr-switcher');
+      sw.hidden = false;
+      const picks = [...sw.querySelectorAll('[data-rob-role-pick]')];
+      const mark = () => picks.forEach(b => b.classList.toggle('is-current', b.dataset.robRolePick === role));
+      mark();
+      picks.forEach(b => b.addEventListener('click', () => {
+        apply(b.dataset.robRolePick);
+        mark();
+        history.replaceState(null, '', `?roles=1&role=${role}`);
+      }));
+
+      const toggle = sw.querySelector('.rr-switcher-toggle');
+      const setCollapsed = (on) => {
+        sw.classList.toggle('is-collapsed', on);
+        toggle.textContent = on ? '+' : '\u2013';
+        try { sessionStorage.setItem('rr-switcher-collapsed', on ? '1' : ''); } catch (_) {}
+      };
+      try { if (sessionStorage.getItem('rr-switcher-collapsed')) setCollapsed(true); } catch (_) {}
+      toggle.addEventListener('click', () => setCollapsed(!sw.classList.contains('is-collapsed')));
     })();
   </script>
 </body>

@@ -4143,27 +4143,28 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
             <span class="badge badge-success">Built</span>
           </div>
           <p class="body-sm" style="color: var(--color-text-muted)">
-            The meeting's singular owner. Sets the RoB up, builds the agenda and leads the session.
+            <strong>Bill Bryck.</strong> The meeting's singular owner. Sets the RoB up, builds the agenda and leads the session.
           </p>
         </div>
         <div class="role-foot"><span class="role-go">Open as admin &rarr;</span></div>
       </a>
 
-      <!-- Not a link: there is nothing to open yet. Saying so is better than a
-           card that looks live and goes nowhere. -->
-      <div class="card role is-pending">
+      <!-- Built. ?role=participant is the same prototype with the viewer role
+           switched; ?roles=1 adds the switcher panel, left off here because
+           this page IS the chooser. -->
+      <a class="card role" href="./?role=participant">
         <svg class="icon role-icon"><use href="#i-participants"/></svg>
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
             <h2 class="h4">Participant role</h2>
-            <span class="badge">Not built yet</span>
+            <span class="badge badge-success">Built</span>
           </div>
           <p class="body-sm" style="color: var(--color-text-muted)">
-            On the working team, invited from the RACI. Responds to the invite, works the agenda and owns action items &mdash; but does not configure the meeting.
+            <strong>Matthew Vella.</strong> On the working team, invited from the RACI. Reads everything, and changes almost nothing: the one write is the status of an action item assigned to them.
           </p>
         </div>
-        <div class="role-foot"><span class="body-sm" style="color: var(--color-text-subtle)">Coming next</span></div>
-      </div>
+        <div class="role-foot"><span class="role-go">Open as participant &rarr;</span></div>
+      </a>
 
     </div>
   </main>
