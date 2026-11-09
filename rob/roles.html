@@ -4092,6 +4092,48 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     /* Dimmed because there is nothing behind it yet — not because it is disabled. */
     .role.is-pending { background: var(--color-surface-sunken); }
     .role.is-pending .role-icon { color: var(--color-text-subtle); }
+
+    /* ---- Side-by-side rights ----
+     * Behaviour only. The source for these rows is the product's own behaviour
+     * spec, which also carries ticket, PR and defect references and an access
+     * risk list — none of which belongs on a page in a public repo. So the
+     * table says what each role can do and stops there; look the reasoning up
+     * in the spec itself. */
+    .rights { overflow-x: auto; }
+    /* Fixed layout, or the first column takes max-content: the explainer
+       sentences are long enough to push the two answer columns off the page
+       (1321px of table in a 945px page before this). Fixed makes them wrap. */
+    .rights .table { min-width: 620px; table-layout: fixed; }
+    .rights .table th:first-child,
+    .rights .table td:first-child { width: auto; }
+    .rights .table th:not(:first-child),
+    .rights .table td:not(:first-child) { width: 180px; }
+    /* The kit's table sets white-space: nowrap on every cell — right for short
+       data, wrong here: these cells carry sentences, and nowrap sent the column
+       heads' sub-lines straight across their neighbours. Top-aligned with it,
+       since a three-line cell middle-aligned against a one-word answer reads
+       as a misalignment. */
+    .rights .table th,
+    .rights .table td { white-space: normal; vertical-align: top; }
+    .rights-group th {
+      padding-top: var(--spacing-6);
+      font: var(--font-weight-semibold) var(--text-2xs)/1 var(--font-sans);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--color-text-subtle);
+    }
+    .rights-who { display: block; font: var(--type-body-xs); color: var(--color-text-subtle); font-weight: var(--font-weight-regular); margin-top: 2px; }
+    .rights-mark { display: inline-flex; align-items: center; gap: var(--spacing-2); }
+    .rights-mark .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .rights-yes .icon { color: var(--color-success); }
+    .rights-no  { color: var(--color-text-subtle); }
+    .rights-no .icon { color: var(--color-text-subtle); }
+    /* "Elsewhere" — the right exists but neither of these roles carries it, so
+       a cross would be a half-truth. A dash reads as "not from here". */
+    .rights-na { color: var(--color-text-muted); }
+    .rights-na .icon { color: var(--color-text-subtle); }
+    .rights-note { color: var(--color-text-muted); font: var(--type-body-xs); }
+    .rights-why { color: var(--color-text-muted); font: var(--type-body-xs); display: block; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -4140,7 +4182,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
             <h2 class="h4">Admin role</h2>
-            <span class="badge badge-success">Built</span>
           </div>
           <p class="body-sm" style="color: var(--color-text-muted)">
             <strong>Bill Bryck.</strong> The meeting's singular owner. Sets the RoB up, builds the agenda and leads the session.
@@ -4157,7 +4198,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
             <h2 class="h4">Participant role</h2>
-            <span class="badge badge-success">Built</span>
           </div>
           <p class="body-sm" style="color: var(--color-text-muted)">
             <strong>Matthew Vella.</strong> On the working team, invited from the RACI. Reads everything, and changes almost nothing: the one write is the status of an action item assigned to them.
@@ -4167,6 +4207,196 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </a>
 
     </div>
+
+    <section class="stack" style="gap: var(--spacing-3)">
+      <h2 class="h4">What each role can do</h2>
+
+      <!-- role="note", not the kit example's role="alert": an alert is an
+           assertive live region, which would interrupt a screen reader to
+           announce a provenance note that was on the page all along. -->
+      <div class="alert alert-info" role="note">
+        <svg class="icon alert-icon"><use href="#i-info"/></svg>
+        <p class="alert-message">
+          <strong>Source: the test oracle</strong> &mdash; Operationalize&rsquo;s own behaviour spec,
+          written from the platform code. These rows are what the product <em>enforces</em>, which is
+          not always what the Operating Framework material describes; where the two disagree, this is
+          the one that holds. The per-row evidence behind each answer stays in the spec.
+        </p>
+      </div>
+
+      <div class="rights">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">&nbsp;</th>
+              <th scope="col">Admin role<span class="rights-who">Bill Bryck &middot; owner + manages all</span></th>
+              <th scope="col">Participant role<span class="rights-who">Matthew Vella &middot; attends</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Reading</th></tr>
+            <tr>
+              <td>Open and read any RoB in the company<span class="rights-why">Details, occurrences, roster, history, agenda, action items, pre-reads and deck. Not a participant privilege &mdash; every employee can read every RoB, attending or not.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Attendance per occurrence, and the roster&rsquo;s participation icons</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>The aggregate attendance summary</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>The paused series list<span class="rights-why">Its page is open to anyone who has the URL. The admin permission only adds the link to it in the &hellip; menu.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes, and linked</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>By URL only</span></td>
+            </tr>
+            <tr>
+              <td>Search for people to invite, and resolve a Slack card<span class="rights-why">Open to every signed-in account, with no business-line narrowing.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">The meeting itself</th></tr>
+            <tr>
+              <td>Create a new series<span class="rights-why">Any employee can, and may name anyone as its owner.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Edit the series, or one occurrence</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Cancel an occurrence, or restore a cancelled one</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Pause or resume the series</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Delete the series</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Transfer ownership, or the Zoom room</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Retry or discard a failed calendar sync<span class="rights-why">Only where async calendar sync is switched on for the tenant and the person is on its rollout list, so it is absent most of the time.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>As owner, where enabled</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Export the directory as CSV<span class="rights-why">Carried by the global &ldquo;Manage all RoB meetings&rdquo; permission, not by owning a meeting.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Connections</th></tr>
+            <tr>
+              <td>Link an Initiative from the RoB side</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Attach the RoB from the Initiative&rsquo;s side<span class="rights-why">Neither role carries this: it belongs to whoever can update the Initiative &mdash; its accountable owner, its project manager, or a holder of &ldquo;Administer initiatives&rdquo;. No RoB permission is involved, which is how a meeting gets linked by someone who does not own it. Linking is also what pulls the Initiative&rsquo;s RACI in as participants.</span></td>
+              <td><span class="rights-mark rights-na"><svg class="icon"><use href="#i-minus"/></svg>From the Initiative</span></td>
+              <td><span class="rights-mark rights-na"><svg class="icon"><use href="#i-minus"/></svg>From the Initiative</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Agenda items</th></tr>
+            <tr>
+              <td>Add, edit, archive, move, mark discussed<span class="rights-why">One exception: anyone who can edit a linked Initiative may manage that Initiative&rsquo;s items on meetings it is linked to &mdash; a right that comes from the Initiative, not from the meeting.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Action items</th></tr>
+            <tr>
+              <td>Add, edit, archive</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Change the status</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Any item</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Their own item only</span></td>
+            </tr>
+            <tr>
+              <td>Mark as read</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>See a person&rsquo;s items on their profile</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Pre-reads</th></tr>
+            <tr>
+              <td>Read the links</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Add a link</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Remove a link</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Deck</th></tr>
+            <tr>
+              <td>View it</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Generate or remove it<span class="rights-why">The owner&rsquo;s alone. A RoB admin who does not own the series gets view only.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>As owner</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Recordings</th></tr>
+            <tr>
+              <td>Watch one without the passcode<span class="rights-why">The surprise in this table: the admin permission does not carry recording access, and ownership does not either. Attending does. An owner who is not an attendee needs what anyone else needs &mdash; an org-unit &ldquo;RoB recordings viewer&rdquo; grant, RACI membership of a linked Initiative, or an approved request.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>If attending, else by grant</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes, as an attendee</span></td>
+            </tr>
+            <tr>
+              <td>Request access, and answer a request<span class="rights-why">Requests come from readers who cannot already watch. Approve and decline arrive as buttons in the owner&rsquo;s Slack DM.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Answers requests</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Can request</span></td>
+            </tr>
+            <tr>
+              <td>List who watched one</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Their own attendance</th></tr>
+            <tr>
+              <td>Answer the invite &mdash; Going, Reject, Maybe<span class="rights-why">Everyone answers on their own row. It is identity, not permission: the owner cannot answer for a participant.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Own row</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Own row</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="body-sm" style="color: var(--color-text-subtle)">
+        Not in the prototype yet, so the table is ahead of the screens: pre-reads, the aggregate
+        attendance summary, and agenda items as anything more than an empty state.
+      </p>
+    </section>
   </main>
 <!-- === review.css === -->
 <style>
