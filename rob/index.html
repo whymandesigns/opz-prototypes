@@ -4737,7 +4737,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .cal-more:hover { color: var(--color-text); text-decoration: underline; }
 .cal-event.is-past .cal-event-meta  { color: color-mix(in srgb, var(--color-text-muted) 54%, transparent); }
 
-/* ---------- Walkthrough spotlight on the Jan 21 event ---------- */
+/* ---------- Walkthrough spotlight on the anchor occurrence ---------- */
 /* Walkthrough hint + spotlight pulse are turned off. Keep the markup so it
  * can be re-enabled by removing this override. */
 .cal-hint { display: none !important; }
@@ -5659,70 +5659,22 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
             <div class="cal-weekday">Friday</div>
             <div class="cal-weekday">Saturday</div>
 
-            <!-- Week 1: Dec 28-31 + Jan 1-3 -->
-            <div class="cal-day is-other"><span class="cal-day-num">28</span></div>
-            <div class="cal-day is-other"><span class="cal-day-num">29</span></div>
-            <div class="cal-day is-other"><span class="cal-day-num">30</span></div>
-            <div class="cal-day is-other"><span class="cal-day-num">31</span></div>
-            <div class="cal-day"><span class="cal-day-num">1</span></div>
-            <div class="cal-day"><span class="cal-day-num">2</span></div>
-            <div class="cal-day"><span class="cal-day-num">3</span></div>
-
-            <!-- Week 2: Jan 4-10 -->
-            <div class="cal-day"><span class="cal-day-num">4</span></div>
-            <div class="cal-day"><span class="cal-day-num">5</span></div>
-            <div class="cal-day"><span class="cal-day-num">6</span></div>
-            <div class="cal-day"><span class="cal-day-num">7</span></div>
-            <div class="cal-day"><span class="cal-day-num">8</span></div>
-            <div class="cal-day"><span class="cal-day-num">9</span></div>
-            <div class="cal-day"><span class="cal-day-num">10</span></div>
-
-            <!-- Week 3: Jan 11-17 -->
-            <div class="cal-day"><span class="cal-day-num">11</span></div>
-            <div class="cal-day"><span class="cal-day-num">12</span></div>
-            <div class="cal-day"><span class="cal-day-num">13</span></div>
-            <div class="cal-day">
-              <span class="cal-day-num">14</span>
-            </div>
-            <div class="cal-day"><span class="cal-day-num">15</span></div>
-            <div class="cal-day"><span class="cal-day-num">16</span></div>
-            <div class="cal-day"><span class="cal-day-num">17</span></div>
-
-            <!-- Week 4: Jan 18-24 -->
-            <div class="cal-day"><span class="cal-day-num">18</span></div>
-            <div class="cal-day"><span class="cal-day-num">19</span></div>
-            <div class="cal-day"><span class="cal-day-num">20</span></div>
-            <div class="cal-day is-today">
-              <span class="cal-day-num">21</span>
-              <!-- Walkthrough hint -->
-              <div class="cal-hint" id="cal-hint">
-                <svg class="cal-hint-arrow" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M70 8 C 55 8, 35 18, 18 42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M22 36 L 16 44 L 26 46" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <div class="cal-hint-body">
-                  <span class="cal-hint-eyebrow">Walkthrough</span>
-                  <span class="cal-hint-text">Click here to start the flow</span>
-                </div>
-                <button class="cal-hint-close" type="button" aria-label="Dismiss hint">
-                  <svg class="icon"><use href="#i-close"/></svg>
-                </button>
+            <!-- Day cells are built at load, for the month the pin lands in:
+                 see "The pin, applied to markup" below. The hint is authored
+                 here and moved into whichever cell is today. -->
+            <div class="cal-hint" id="cal-hint">
+              <svg class="cal-hint-arrow" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M70 8 C 55 8, 35 18, 18 42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M22 36 L 16 44 L 26 46" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div class="cal-hint-body">
+                <span class="cal-hint-eyebrow">Walkthrough</span>
+                <span class="cal-hint-text">Click here to start the flow</span>
               </div>
+              <button class="cal-hint-close" type="button" aria-label="Dismiss hint">
+                <svg class="icon"><use href="#i-close"/></svg>
+              </button>
             </div>
-            <div class="cal-day" data-date="2026-01-22"><span class="cal-day-num">22</span></div>
-            <div class="cal-day" data-date="2026-01-23"><span class="cal-day-num">23</span></div>
-            <div class="cal-day" data-date="2026-01-24"><span class="cal-day-num">24</span></div>
-
-            <!-- Week 5: Jan 25-31 -->
-            <div class="cal-day"><span class="cal-day-num">25</span></div>
-            <div class="cal-day"><span class="cal-day-num">26</span></div>
-            <div class="cal-day"><span class="cal-day-num">27</span></div>
-            <div class="cal-day">
-              <span class="cal-day-num">28</span>
-            </div>
-            <div class="cal-day"><span class="cal-day-num">29</span></div>
-            <div class="cal-day"><span class="cal-day-num">30</span></div>
-            <div class="cal-day"><span class="cal-day-num">31</span></div>
           </div>
         </div>
 
@@ -5942,6 +5894,170 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     .cm-agenda-add:hover { text-decoration: underline; }
     .cm-agenda-empty[hidden] { display: none; }
     .cm-agenda-add[hidden] { display: none; }
+
+    /* ---- Agenda items, meeting view (#md-agenda) ------------------------
+     * The section is two groups, not one list: "This meeting" numbered 1..n
+     * and "Other meetings" marked "-", with the add control between them
+     * (ROB-AGENDA-021). Rows are one stacked block with shared borders, as
+     * the app draws them — a list of cards reads as a set of records rather
+     * than an agenda. */
+    #md-agenda { position: relative; }
+    .md-ag-groups { display: flex; flex-direction: column; gap: var(--spacing-4); }
+    .md-ag-group[hidden], .md-ag-body[hidden] { display: none; }
+    .md-ag-group-head { display: flex; align-items: center; gap: var(--spacing-2); margin-bottom: var(--spacing-2); }
+    .md-ag-group-title {
+      margin: 0; font: var(--font-weight-semibold) var(--text-sm)/1.4 var(--font-sans);
+      color: var(--color-text-muted);
+    }
+    .md-ag-group-title[data-tooltip] { cursor: help; }
+    .md-ag-group-head { position: relative; }
+    .md-ag-group-title[data-tooltip] { position: static; }
+    .md-ag-group-title[data-tooltip]::after {
+      left: 0; right: auto; transform: none;
+      white-space: normal; max-width: 240px; width: max-content;
+    }
+    .md-ag-list { display: flex; flex-direction: column; }
+    .md-ag-row {
+      position: relative;
+      display: flex; flex-direction: column; gap: var(--spacing-2);
+      padding: var(--spacing-2) var(--spacing-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-gray-200);
+    }
+    .md-ag-row + .md-ag-row { margin-top: -1px; }
+    .md-ag-row:first-child { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
+    .md-ag-row:last-child  { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+    /* Discussed: grey row and a green check, for every reader (ROB-AGENDA-046). */
+    .md-ag-row.is-discussed { background: var(--color-surface-muted); }
+    .md-ag-row-top { display: flex; align-items: flex-start; gap: var(--spacing-2); }
+    .md-ag-num { flex-shrink: 0; }
+    .md-ag-row-desc {
+      flex: 1; min-width: 0; margin: 0;
+      font: var(--type-body-sm); color: var(--color-text);
+      overflow-wrap: anywhere;
+    }
+    /* Row controls are revealed on hover, as they are in the app — a column of
+     * always-on trash and arrow icons reads as the point of the list. Keyboard
+     * users get them back through :focus-within. The discussed check is the one
+     * exception: once it is on it is state, not an affordance, so it stays. */
+    .md-ag-acts { display: flex; align-items: center; gap: var(--spacing-1); flex-shrink: 0; }
+    .md-ag-acts > [data-md-ag-hover] { opacity: 0; transition: opacity var(--duration-fast) var(--ease); }
+    .md-ag-row:hover .md-ag-acts > [data-md-ag-hover],
+    .md-ag-row:focus-within .md-ag-acts > [data-md-ag-hover] { opacity: 1; }
+    .md-ag-check.is-on { color: var(--color-success); }
+    /* The kit's tooltip lays out inside its own box — [data-tooltip] is
+     * position: relative and the ::after is a nowrap absolute child — so a
+     * forty-character label on a 24px button widens that button, the row and
+     * the section, and the modal body (overflow-x: auto) grows a horizontal
+     * scrollbar at phone width. Both halves of the row carry long labels, so
+     * each is anchored to the edge it sits against rather than centred on the
+     * control: the action buttons to the row's right, the cadence and project
+     * tags to the meta row's left. The tags give up being centred over
+     * themselves for it, which is the cheaper loss. */
+    .md-ag-acts [data-tooltip]::after { left: auto; right: 0; transform: none; }
+    .md-ag-row-meta { position: relative; }
+    .md-ag-row-meta [data-tooltip] { position: static; }
+    .md-ag-row-meta [data-tooltip]::after {
+      left: 0; right: auto; transform: none;
+      /* A project name inside ‘ ’ plus the sentence around it runs past the
+       * row on a phone, so these wrap rather than staying one nowrap line. */
+      white-space: normal; max-width: 240px; width: max-content;
+    }
+    .md-ag-mark { display: inline-flex; color: var(--color-success); }
+    .md-ag-mark .icon { width: 16px; height: 16px; }
+    /* Meta row sits under the description, clearing the number badge. */
+    .md-ag-row-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--spacing-2); padding-left: var(--spacing-6);
+      /* A One-off row carries three tags and an owner. At phone width they do
+       * not fit on one line, and without wrapping the row pushes the modal
+       * body into a horizontal scroll. The owner keeps the right-hand end
+       * through margin-left, wrapped or not. */
+      flex-wrap: wrap;
+    }
+    .md-ag-meta-start, .md-ag-meta-end { display: flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    .md-ag-meta-start { flex-wrap: wrap; }
+    .md-ag-meta-end { flex-shrink: 0; margin-left: auto; }
+    .md-ag-owner {
+      font: var(--type-body-sm); color: var(--color-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .md-ag-owner-btn {
+      display: flex; align-items: center; gap: var(--spacing-2);
+      background: transparent; border: 0; padding: 0 var(--spacing-1); cursor: pointer;
+      border-radius: var(--radius-sm); min-width: 0;
+    }
+    .md-ag-owner-btn:hover { background: var(--color-surface-muted); }
+    button.tag { cursor: pointer; }
+    button.tag:hover { border-color: var(--color-border-strong); }
+    /* The flag label replaces the flag button once one is set, and carries its
+     * own clear control (ROB-AGENDA-008). */
+    .md-ag-flag { display: inline-flex; align-items: center; gap: var(--spacing-1); }
+    .md-ag-flag-x {
+      display: inline-flex; background: transparent; border: 0; padding: 0;
+      color: inherit; cursor: pointer; opacity: 0.7;
+    }
+    .md-ag-flag-x:hover { opacity: 1; }
+    .md-ag-flag-x .icon { width: 12px; height: 12px; }
+
+    /* Inline description edit (ROB-AGENDA-041). */
+    .md-ag-edit { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-2); }
+    .md-ag-edit .input { width: 100%; }
+    .md-ag-edit-actions { display: flex; gap: var(--spacing-2); }
+
+    /* Add form — a dashed outline marks it as not yet saved. */
+    .md-ag-form {
+      display: flex; flex-direction: column; gap: var(--spacing-2);
+      padding: var(--spacing-2) var(--spacing-4);
+      background: var(--color-surface);
+      border: 1px dashed var(--color-gray-200);
+      border-radius: var(--radius-md);
+    }
+    .md-ag-form[hidden] { display: none; }
+    .md-ag-form > div { min-width: 0; }
+    .md-ag-form .input { width: 100%; }
+    .md-ag-form-foot {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: var(--spacing-2); flex-wrap: wrap;
+    }
+    .md-ag-form-fields { display: flex; align-items: flex-start; gap: var(--spacing-2); min-width: 0; }
+    .md-ag-form-actions { display: flex; gap: var(--spacing-2); flex-shrink: 0; }
+    .md-ag-field { position: relative; }
+    .md-ag-field[hidden] { display: none; }
+    .md-ag-field-owner { width: 160px; }
+    .md-ag-pick {
+      display: flex; align-items: center; gap: var(--spacing-2);
+      width: 100%; height: 24px; padding: 0 var(--spacing-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+      font: var(--type-body-sm); color: var(--color-text);
+      cursor: pointer;
+    }
+    .md-ag-pick:hover { border-color: var(--color-border-strong); }
+    .md-ag-pick:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+    .md-ag-field.is-error .md-ag-pick { border-color: var(--color-danger); }
+    .md-ag-pick-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .md-ag-pick-text.is-placeholder { color: var(--color-text-muted); }
+    .md-ag-pick > .btn-icon { flex-shrink: 0; color: var(--color-text-muted); }
+    .md-ag-err { margin: var(--spacing-2) 0 0; font: var(--type-body-xxs); color: var(--color-danger); }
+    .md-ag-err[hidden] { display: none; }
+
+    /* One floating menu serves every picker in the section — cadence, owner,
+     * project and the flag list, on rows and in the add form alike. Per-row
+     * menus would be a dozen elements that can all be open at once. */
+    .md-ag-menu {
+      position: absolute; z-index: 40;
+      min-width: 200px; max-width: 320px; max-height: 240px; overflow-y: auto;
+    }
+    .md-ag-menu[hidden] { display: none; }
+    .md-ag-menu .dropdown-item-text { min-width: 0; }
+    .md-ag-menu .dropdown-item-label,
+    .md-ag-menu .dropdown-item-description { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* .btn sets display:inline-flex, which outranks the UA's
+     * `[hidden] { display: none }` — the same trap as .card[hidden] and
+     * .cal-grid[hidden] above. Every control in this section is hidden by the
+     * attribute, so it needs saying once. */
+    #md-agenda .btn[hidden], #md-agenda .tag[hidden] { display: none; }
 
     .cm-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); }
     .cm-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); align-items: end; }
@@ -6178,7 +6294,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
               <div class="cm-row">
                 <div class="cm-input-icon">
                   <svg class="icon"><use href="#i-calendar"/></svg>
-                  <input id="cm-date" class="input" type="text" value="Jan 22, 2026" aria-label="Date" />
+                  <input id="cm-date" class="input" type="text" value="Jan 22, 2026" data-rob-date="2026-01-22|med" aria-label="Date" />
                 </div>
                 <div class="cm-time">
                   <div class="cm-time-fields">
@@ -6773,6 +6889,111 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     </div>
   </div>
 
+  <!-- ============ THE PIN ============
+       Every date in this prototype hangs off one Wednesday — the occurrence the
+       meeting view opens on — written throughout as 2026-01-21. A pinned date
+       is right for about three weeks, and after that a demo looks abandoned: a
+       calendar sitting on last January says "nobody has touched this" louder
+       than any empty state can.
+
+       So the pin moves. The anchor is the Wednesday of the week the page is
+       opened in, and every fixture keeps the exact distance it had from
+       2026-01-21. Weekdays survive, because one Wednesday to another is a whole
+       number of weeks and the calendar's series are defined by weekday: a
+       Tuesday RoB stays on Tuesday, bi-weekly keeps its parity, and the three
+       agenda states — historical, live, future — keep their shape.
+
+       Read a date in the source as "this far from the anchor". The literal is
+       still there to read, which is the point; D() is what moves it.
+       ================================================================= -->
+  <script>
+    window.robClock = (function () {
+      const PIN = '2026-01-21';          // the Wednesday everything was written against
+      const DAY = 86400000;
+      const ms  = (iso) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+      const ymd = (t)   => new Date(t).toISOString().slice(0, 10);
+
+      // The Wednesday of the week on screen. Sunday-start, like the grid, so
+      // the anchor is never more than three days from the real today.
+      const now    = new Date();
+      const start  = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const anchor = start + (3 - new Date(start).getUTCDay()) * DAY;
+      const SHIFT  = Math.round((anchor - ms(PIN)) / DAY);
+
+      // Takes a date or a date-time; the time half is carried through intact.
+      const D = (s) => ymd(ms(s) + SHIFT * DAY) + (s.length > 10 ? s.slice(10) : '');
+
+      const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+      const DAYS   = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const parts  = (s) => {
+        const t = new Date(ms(s.slice(0, 10)));
+        return { y: t.getUTCFullYear(), m: t.getUTCMonth(), d: t.getUTCDate(), w: t.getUTCDay() };
+      };
+      const FMT = {
+        long:      p => `${DAYS[p.w]}, ${MONTHS[p.m]} ${p.d}, ${p.y}`,
+        longshort: p => `${DAYS[p.w]}, ${MONTHS[p.m].slice(0, 3)} ${p.d}, ${p.y}`,
+        med:       p => `${MONTHS[p.m].slice(0, 3)} ${p.d}, ${p.y}`,
+        short:     p => `${MONTHS[p.m].slice(0, 3)} ${p.d}`,
+        dmy:       p => `${MONTHS[p.m].slice(0, 3)} ${p.d} ${p.y}`,
+        month:     p => `${MONTHS[p.m]} ${p.y}`,
+      };
+
+      return {
+        PIN, SHIFT, D,
+        today:  D(PIN),
+        anchor: ymd(anchor),
+        fmt:    (s, style) => (FMT[style] || FMT.med)(parts(s)),
+      };
+    })();
+    // Short name, because it wraps roughly a hundred literals below.
+    window.D = window.robClock.D;
+  </script>
+
+  <script>
+    // The month grid, built for the month the pin lands in. It runs here,
+    // early, because two blocks below read the cells as they stand: the one
+    // that turns a day into a "create a meeting" target, and the one that
+    // fills the month with events. A month view is month-shaped, so the
+    // leading and trailing days, the number of rows and which cell is today
+    // all follow from the month rather than from any shift.
+    (function () {
+      const C = window.robClock;
+      const grid = document.querySelector('.cal-grid');
+      const monthEl = document.querySelector('.cal-month');
+      if (!grid || !monthEl) return;
+
+      const a = C.anchor;
+      const Y = +a.slice(0, 4), M = +a.slice(5, 7) - 1, DOM = +a.slice(8, 10);
+      monthEl.textContent = C.fmt(a, 'month');
+
+      const lead = new Date(Date.UTC(Y, M, 1)).getUTCDay();
+      const len  = new Date(Date.UTC(Y, M + 1, 0)).getUTCDate();
+      const rows = Math.ceil((lead + len) / 7);
+
+      // The hint is authored as a child of the grid and belongs in the today
+      // cell, wherever that lands.
+      const hint = document.getElementById('cal-hint');
+      grid.querySelectorAll('.cal-day').forEach(el => el.remove());
+
+      for (let i = 0; i < rows * 7; i++) {
+        const d = new Date(Date.UTC(Y, M, 1 - lead + i));
+        const other = d.getUTCMonth() !== M;
+        const cell = document.createElement('div');
+        cell.className = 'cal-day' + (other ? ' is-other' : '');
+        const num = document.createElement('span');
+        num.className = 'cal-day-num';
+        num.textContent = String(d.getUTCDate());
+        cell.appendChild(num);
+        if (!other && d.getUTCDate() === DOM) {
+          cell.classList.add('is-today');
+          if (hint) cell.appendChild(hint);
+        }
+        grid.appendChild(cell);
+      }
+    })();
+  </script>
+
   <script>
     // Find Time — ROB-CREATE-028 / -029.
     (function () {
@@ -7202,7 +7423,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
       <div class="modal-body" style="padding: var(--spacing-6)">
         <div style="display: flex; gap: var(--spacing-3); align-items: center; padding: var(--spacing-3) var(--spacing-4); background: var(--color-gray-100); border-radius: var(--radius-md); font: var(--type-body)">
           <svg class="icon" style="color: var(--color-text-muted)"><use href="#i-calendar"/></svg>
-          <span id="umv-when" data-when-date>Thursday, January 22, 2026 · 14:30 – 15:30</span>
+          <span id="umv-when" data-when-date data-rob-date="2026-01-22|long" data-rob-tail=" · 14:30 – 15:30">Thursday, January 22, 2026 · 14:30 – 15:30</span>
         </div>
         <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: var(--spacing-4) 0 0">
           Created just now. Deck, action items, and connections will appear here once the meeting runs.
@@ -7333,7 +7554,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
             title.focus();
             return;
           }
-          const date = (dateInput?.value || 'Jan 22, 2026').trim();
+          const date = (dateInput?.value || robClock.fmt(D('2026-01-22'), 'med')).trim();
           const start = (startInput?.value || '14:30').trim();
           const end = (endInput?.value || '15:30').trim();
           const iso = parseCalDate(date);          // e.g. "2026-01-22"
@@ -8165,6 +8386,9 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
       gap: var(--spacing-2);
       margin-bottom: 6px;
       flex-wrap: wrap;
+      /* Containing block for the not-a-participant tooltip below. The popovers
+       * are position: fixed on <body>, so nothing else re-anchors on this. */
+      position: relative;
     }
     .ai-meta-row .ai-spacer { flex: 1; }
 
@@ -8213,6 +8437,37 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     }
     .ai-warn:hover { background: var(--color-warning-subtle); }
     .ai-warn .icon { font-size: 15px; }
+    /* Same fault the agenda meta row had, and the same cure. The kit's tooltip
+     * is position: relative with an absolutely placed ::after, so a
+     * forty-five-character label centred on a 22px glyph widens that glyph's
+     * box by ~109px, and with it the meta row, the section and the modal body
+     * — which is overflow-x: auto, so at phone width it grows a real
+     * horizontal scrollbar. The regular style already wraps and caps itself at
+     * 240px; what overflows is the anchoring.
+     * Unlike the agenda's action buttons, this glyph does not sit against the
+     * row's right edge — it follows the assignee chip, so where it lands
+     * depends on the name's length and on which line the row wraps to. An
+     * anchor on the glyph itself is therefore wrong at one end or the other:
+     * pinned right it runs off the left of a wrapped line, pinned left it runs
+     * off the right of an unwrapped one. So the bubble is anchored to the row
+     * instead, where 240px always fits, whatever the glyph is doing.
+     * The caret goes with it: it would otherwise resolve against the row too
+     * and point at the row's midpoint rather than at the glyph, which is worse
+     * than no caret at all.
+     * Scoped to narrow widths, because row-anchoring costs something — on a
+     * 591px desktop row the bubble lands entirely to the left of the glyph it
+     * explains. It is only needed once the row cannot hold a bubble centred on
+     * the glyph: measured on this data the row first overflows below 480px and
+     * the modal body first scrolls below 440px, so 720px leaves roughly 240px
+     * of headroom for a longer assignee name before a centred bubble could
+     * reach the row's edge again. */
+    @media (max-width: 720px) {
+      .ai-meta-row .ai-warn[data-tooltip] { position: static; }
+      .ai-meta-row .ai-warn[data-tooltip]::after {
+        left: 0; right: auto; transform: none;
+      }
+      .ai-meta-row .ai-warn[data-tooltip]::before { content: none; }
+    }
     /* Invite/reassign popover rows reuse .ai-pop; give the invite row an icon gutter */
     .ai-pop-action { display: flex; align-items: center; gap: 8px; }
     .ai-pop-action .icon { font-size: 15px; color: var(--color-text-muted); flex-shrink: 0; }
@@ -9235,7 +9490,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Previous occurrence"><svg class="icon cal-nav-back"><use href="#i-arrow-right"/></svg></button>
           <span class="md-when-pill">
             <svg class="icon"><use href="#i-calendar"/></svg>
-            <span data-when-date>Wednesday, January 21, 2026 · 2:30 PM – 3:30 PM</span>
+            <span data-when-date data-rob-date="2026-01-21|long" data-rob-tail=" · 2:30 PM – 3:30 PM">Wednesday, January 21, 2026 · 2:30 PM – 3:30 PM</span>
           </span>
           <button class="btn btn-secondary cal-nav-btn" type="button" aria-label="Next occurrence"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
         </div>
@@ -9283,7 +9538,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
               <div class="md-detail-grid" data-md-view-only>
                 <div class="md-detail-row">
                   <svg class="icon"><use href="#i-calendar"/></svg>
-                  <span data-detail-date>Wednesday, January 21, 2026</span>
+                  <span data-detail-date data-rob-date="2026-01-21|long">Wednesday, January 21, 2026</span>
                 </div>
                 <div class="md-detail-row">
                   <svg class="icon"><use href="#i-time"/></svg>
@@ -9328,7 +9583,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                   <div class="cm-row">
                     <div class="cm-input-icon">
                       <svg class="icon"><use href="#i-calendar"/></svg>
-                      <input class="input" type="text" value="Jan 21, 2026" aria-label="Date" />
+                      <input class="input" type="text" value="Jan 21, 2026" data-rob-date="2026-01-21|med" aria-label="Date" />
                     </div>
                     <div class="cm-time">
                       <div class="cm-time-fields">
@@ -9548,7 +9803,7 @@ Platform reliability — error budget
                         </li>
                         <li>
                           <code>{{date}}</code>
-                          <span>May 8 2026</span>
+                          <span data-rob-date="2026-01-21|dmy">May 8 2026</span>
                         </li>
                       </ul>
                     </div>
@@ -9598,7 +9853,7 @@ Platform reliability — error budget
                   <ul class="md-deck-info-vars" data-deck-info-details hidden>
                     <li><code>{{team_name}}</code><span>Daily meeting #1</span></li>
                     <li><code>{{accountable_owner}}</code><span>Bill Bryck</span></li>
-                    <li><code>{{date}}</code><span>May 8 2026</span></li>
+                    <li><code>{{date}}</code><span data-rob-date="2026-01-21|dmy">May 8 2026</span></li>
                   </ul>
                 </div>
               </div>
@@ -9735,25 +9990,104 @@ Platform reliability — error budget
 
             <div class="md-divider"></div>
 
-            <!-- AGENDA ITEMS -->
-            <section id="md-agenda">
+            <!-- AGENDA ITEMS — the series' own agenda, filtered per occurrence.
+                 Built against ROB-AGENDA-001…066; the behaviour notes sit with
+                 the script that drives it, at the foot of this file. -->
+            <section id="md-agenda" data-md-agenda>
               <div class="cm-agenda-head" style="margin-bottom: var(--spacing-3)">
                 <div class="cm-agenda-title-row">
                   <h3 class="md-section-title" style="margin: 0">Agenda items</h3>
-                  <span class="badge">0</span>
+                  <span class="badge" data-md-ag-total title="Items on this agenda">0</span>
                 </div>
-                <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item" data-rob-needs="manage-items">
-                  <svg class="icon"><use href="#i-plus"/></svg>
-                </button>
+                <div class="cm-agenda-title-row">
+                  <!-- Expand / Collapse hides the whole list (ROB-AGENDA-024). -->
+                  <button class="btn btn-ghost btn-xs" type="button" data-md-ag-toggle aria-expanded="true" hidden>Collapse</button>
+                  <button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Add agenda item" data-md-ag-open data-rob-needs="manage-items">
+                    <svg class="icon"><use href="#i-plus"/></svg>
+                  </button>
+                </div>
               </div>
-              <div class="cm-agenda-empty">
-                <svg class="icon"><use href="#i-list-unordered"/></svg>
-                No Agenda items yet
+
+              <div class="md-ag-body" data-md-ag-body>
+                <!-- Read-only notice: a cancelled occurrence's agenda takes no
+                     changes (ROB-AGENDA-065). -->
+                <div class="alert alert-info" data-md-ag-frozen hidden style="margin-bottom: var(--spacing-3)">
+                  <svg class="icon alert-icon"><use href="#i-info"/></svg>
+                  <p class="alert-message" data-md-ag-frozen-msg></p>
+                </div>
+
+                <div class="cm-agenda-empty" data-md-ag-empty hidden>
+                  <svg class="icon"><use href="#i-list-unordered"/></svg>
+                  No Agenda Items yet
+                </div>
+
+                <div class="md-ag-groups">
+                  <div class="md-ag-group" data-md-ag-group="this" hidden>
+                    <div class="md-ag-group-head">
+                      <p class="md-ag-group-title">This meeting</p>
+                      <span class="badge" data-md-ag-count="this">0</span>
+                    </div>
+                    <div class="md-ag-list" data-md-ag-list="this"></div>
+                  </div>
+
+                  <!-- The add control sits between the two groups, where the
+                       app puts it (ROB-AGENDA-021). -->
+                  <div>
+                    <button class="cm-agenda-add" type="button" data-md-ag-open data-rob-needs="manage-items">
+                      <svg class="icon"><use href="#i-plus"/></svg>
+                      Add agenda item
+                    </button>
+
+                    <div class="md-ag-form" hidden data-md-ag-form>
+                      <div>
+                        <input class="input" type="text" maxlength="200" autocomplete="off"
+                               placeholder="Describe this agenda item"
+                               aria-label="Agenda item description" data-md-ag-desc />
+                        <p class="md-ag-err" hidden data-md-ag-desc-err></p>
+                      </div>
+                      <div class="md-ag-form-foot">
+                        <div class="md-ag-form-fields">
+                          <div class="md-ag-field" data-md-ag-field="cadence">
+                            <button class="tag tag-light" type="button" style="height: 24px"
+                                    aria-haspopup="listbox" aria-expanded="false" data-md-ag-trigger="cadence">
+                              <span data-md-ag-label="cadence">Weekly</span>
+                            </button>
+                          </div>
+                          <div class="md-ag-field" hidden data-md-ag-field="project">
+                            <button class="md-ag-pick" type="button"
+                                    aria-haspopup="listbox" aria-expanded="false" data-md-ag-trigger="project">
+                              <span class="md-ag-pick-text is-placeholder" data-md-ag-label="project">Project</span>
+                              <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                            </button>
+                          </div>
+                          <div class="md-ag-field md-ag-field-owner" data-md-ag-field="owner">
+                            <button class="md-ag-pick" type="button"
+                                    aria-haspopup="listbox" aria-expanded="false" data-md-ag-trigger="owner">
+                              <span class="md-ag-pick-text is-placeholder" data-md-ag-label="owner">Owner</span>
+                              <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                            </button>
+                            <p class="md-ag-err" hidden data-md-ag-owner-err></p>
+                          </div>
+                        </div>
+                        <div class="md-ag-form-actions">
+                          <button class="btn btn-secondary btn-xs" type="button" data-md-ag-cancel>Cancel</button>
+                          <button class="btn btn-primary btn-xs" type="button" data-md-ag-save>Save</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="md-ag-group" data-md-ag-group="other" hidden>
+                    <div class="md-ag-group-head">
+                      <p class="md-ag-group-title" data-tooltip="Other general agenda items covering all meetings in this series.">Other meetings</p>
+                      <span class="badge" data-md-ag-count="other">0</span>
+                    </div>
+                    <div class="md-ag-list" data-md-ag-list="other"></div>
+                  </div>
+                </div>
               </div>
-              <button class="cm-agenda-add" type="button" style="margin-top: var(--spacing-2)" data-rob-needs="manage-items">
-                <svg class="icon"><use href="#i-plus"/></svg>
-                Add agenda item
-              </button>
+
+              <div class="dropdown-menu md-ag-menu" hidden role="listbox" data-md-ag-menu></div>
             </section>
 
             <div class="md-divider"></div>
@@ -9882,7 +10216,7 @@ Platform reliability — error budget
                 <p class="md-history-lede">There were 46 events for [RoB] [Initiative] Operationalize Launch</p>
 
                 <article class="md-history-entry">
-                  <h4 class="md-history-date">Sep 07, 2024</h4>
+                  <h4 class="md-history-date" data-rob-date="2026-01-19|med">Sep 07, 2024</h4>
                   <ul class="md-history-facts">
                     <li class="md-history-fact">
                       <svg class="icon"><use href="#i-time"/></svg>
@@ -9904,7 +10238,7 @@ Platform reliability — error budget
                 </article>
 
                 <article class="md-history-entry">
-                  <h4 class="md-history-date">Aug 31, 2024</h4>
+                  <h4 class="md-history-date" data-rob-date="2026-01-12|med">Aug 31, 2024</h4>
                   <ul class="md-history-facts">
                     <li class="md-history-fact">
                       <svg class="icon"><use href="#i-time"/></svg>
@@ -10238,6 +10572,24 @@ Platform reliability — error budget
     </div>
   </div>
 
+  <!-- Deleting an agenda item leaves the series, not this meeting, so it is
+       the one agenda action that asks first (ROB-AGENDA-052). -->
+  <div class="modal-overlay" id="md-ag-delete" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="md-ag-delete-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="md-ag-delete-title">Delete this agenda item?</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" data-modal-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="modal-body">
+        <p class="md-life-copy">This item will be deleted from the entire meeting series and won't appear on any upcoming meeting.</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancel</button>
+        <button class="btn btn-danger" type="button" data-md-ag-delete-go>Delete</button>
+      </footer>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="reject-meeting" hidden>
     <!-- The same bottom snackbar the detail view uses, for the same job:
          explaining a control that won't react. -->
@@ -10275,7 +10627,7 @@ Platform reliability — error budget
             <label class="radio">
               <input type="radio" name="rm-scope" class="radio-input" value="occurrence" checked data-rm-scope />
               <span class="radio-circle"></span>
-              <span class="radio-label">This event only <span style="color: var(--color-text-muted)">— Wednesday, January 21, 2026</span></span>
+              <span class="radio-label">This event only <span style="color: var(--color-text-muted)" data-rob-date="2026-01-21|long" data-rob-lead="— ">— Wednesday, January 21, 2026</span></span>
             </label>
             <label class="radio">
               <input type="radio" name="rm-scope" class="radio-input" value="series" data-rm-scope />
@@ -10316,7 +10668,7 @@ Platform reliability — error budget
             <div class="cm-row">
               <div class="cm-input-icon">
                 <svg class="icon"><use href="#i-calendar"/></svg>
-                <input class="input" type="text" value="Thursday, Jan 29, 2026" aria-label="Proposed date" data-rm-date />
+                <input class="input" type="text" value="Thursday, Jan 29, 2026" data-rob-date="2026-01-29|longshort" aria-label="Proposed date" data-rm-date />
               </div>
               <div class="cm-time" style="align-items: center; gap: var(--spacing-2)">
                 <div class="cm-input-suffix" style="flex: 1">
@@ -10811,7 +11163,7 @@ Platform reliability — error budget
                   <span class="field-label">Date</span>
                   <div class="cm-input-icon">
                     <svg class="icon"><use href="#i-calendar"/></svg>
-                    <input class="input" type="text" value="Jan 21, 2026" />
+                    <input class="input" type="text" value="Jan 21, 2026" data-rob-date="2026-01-21|med" />
                   </div>
                 </label>
                 <label class="field">
@@ -11917,7 +12269,7 @@ Platform reliability — error budget
       const PARTICIPANTS = new Set(['bill-bryck', 'matthew-vella', 'keith-berlin', 'rick-lacroix', 'collete-parker']);
       const onCall = (id) => PARTICIPANTS.has(id);
 
-      const TODAY = new Date('2026-01-21');
+      const TODAY = new Date(D('2026-01-21'));   // the pin — see robClock
       // Description length: soft warning at SOFT, hard cap at MAX.
       const DESC_MAX = 200;
       const DESC_SOFT = 150;
@@ -11932,124 +12284,124 @@ Platform reliability — error budget
       // occurrence is opened for the first time, its items are derived from
       // the previous occurrence's non-closed items (auto-carry-over).
       const itemsByOccurrence = {
-        '2026-01-14': [
+        [D('2026-01-14')]: [
           {
             id: newId(),
             desc: 'Roll out the new on-call paging policy team-wide',
             assignee: 'tile-tampakas',
-            due: '2026-01-14',
+            due: D('2026-01-14'),
             status: 'done',
             comment: 'Rolled out Tuesday — no complaints so far.',
             history: [
-              { ts: '2026-01-07T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-13T11:20:00', author: 'tile-tampakas', field: 'status', from: 'in-progress', to: 'done' },
-              { ts: '2026-01-13T11:20:00', author: 'tile-tampakas', field: 'comment', from: '', to: 'Rolled out Tuesday — no complaints so far.' },
+              { ts: D('2026-01-07T15:30:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-13T11:20:00'), author: 'tile-tampakas', field: 'status', from: 'in-progress', to: 'done' },
+              { ts: D('2026-01-13T11:20:00'), author: 'tile-tampakas', field: 'comment', from: '', to: 'Rolled out Tuesday — no complaints so far.' },
             ],
           },
           {
             id: newId(),
             desc: 'Migrate observability dashboard to the new Grafana instance',
             assignee: 'keith-berlin',
-            due: '2026-01-13',
+            due: D('2026-01-13'),
             status: 'done',
             comment: 'Migration complete. Old instance scheduled for shutdown Jan 21.',
             history: [
-              { ts: '2026-01-07T15:31:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-12T09:00:00', author: 'keith-berlin', field: 'status', from: 'open', to: 'in-progress' },
-              { ts: '2026-01-13T17:45:00', author: 'keith-berlin', field: 'status', from: 'in-progress', to: 'done' },
-              { ts: '2026-01-13T17:46:00', author: 'keith-berlin', field: 'comment', from: '', to: 'Migration complete. Old instance scheduled for shutdown Jan 21.' },
+              { ts: D('2026-01-07T15:31:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-12T09:00:00'), author: 'keith-berlin', field: 'status', from: 'open', to: 'in-progress' },
+              { ts: D('2026-01-13T17:45:00'), author: 'keith-berlin', field: 'status', from: 'in-progress', to: 'done' },
+              { ts: D('2026-01-13T17:46:00'), author: 'keith-berlin', field: 'comment', from: '', to: 'Migration complete. Old instance scheduled for shutdown Jan 21.' },
             ],
           },
           {
             id: newId(),
             desc: 'Approve infra spend uplift for Q1',
             assignee: 'bill-bryck',
-            due: '2026-01-12',
+            due: D('2026-01-12'),
             status: 'done',
             comment: 'Approved by finance — see ticket FIN-3214.',
             history: [
-              { ts: '2026-01-08T10:00:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-12T14:00:00', author: 'bill-bryck', field: 'status', from: 'open', to: 'done' },
-              { ts: '2026-01-12T14:00:00', author: 'bill-bryck', field: 'comment', from: '', to: 'Approved by finance — see ticket FIN-3214.' },
+              { ts: D('2026-01-08T10:00:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-12T14:00:00'), author: 'bill-bryck', field: 'status', from: 'open', to: 'done' },
+              { ts: D('2026-01-12T14:00:00'), author: 'bill-bryck', field: 'comment', from: '', to: 'Approved by finance — see ticket FIN-3214.' },
             ],
           },
           {
             id: newId(),
             desc: 'Review Q1 SLO targets with the product team',
             assignee: 'collete-parker',
-            due: '2026-01-13',
+            due: D('2026-01-13'),
             status: 'done',
             comment: 'Targets locked in: 99.9% availability, p95 < 400ms.',
             history: [
-              { ts: '2026-01-07T15:32:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-13T16:00:00', author: 'collete-parker', field: 'status', from: 'in-progress', to: 'done' },
-              { ts: '2026-01-13T16:01:00', author: 'collete-parker', field: 'comment', from: '', to: 'Targets locked in: 99.9% availability, p95 < 400ms.' },
+              { ts: D('2026-01-07T15:32:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-13T16:00:00'), author: 'collete-parker', field: 'status', from: 'in-progress', to: 'done' },
+              { ts: D('2026-01-13T16:01:00'), author: 'collete-parker', field: 'comment', from: '', to: 'Targets locked in: 99.9% availability, p95 < 400ms.' },
             ],
           },
           {
             id: newId(),
             desc: 'Publish post-mortem for Tuesday\'s deploy incident',
             assignee: 'rick-lacroix',
-            due: '2026-01-19',
+            due: D('2026-01-19'),
             status: 'in-progress',
             comment: 'Draft sent for legal review.',
             history: [
-              { ts: '2026-01-14T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-14T16:15:00', author: 'rick-lacroix', field: 'status', from: 'open', to: 'in-progress' },
-              { ts: '2026-01-14T16:16:00', author: 'rick-lacroix', field: 'comment', from: '', to: 'Draft sent for legal review.' },
+              { ts: D('2026-01-14T15:30:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-14T16:15:00'), author: 'rick-lacroix', field: 'status', from: 'open', to: 'in-progress' },
+              { ts: D('2026-01-14T16:16:00'), author: 'rick-lacroix', field: 'comment', from: '', to: 'Draft sent for legal review.' },
             ],
           },
         ],
-        '2026-01-21': [
+        [D('2026-01-21')]: [
           {
             id: newId(),
             desc: 'Confirm cutover date for data-pipeline migration with the platform team',
             assignee: 'matthew-vella',
-            due: '2026-01-23',
+            due: D('2026-01-23'),
             status: 'in-progress',
             comment: 'Drafted plan; waiting on infra sign-off.',
             history: [
-              { ts: '2026-01-19T10:14:00', author: 'bill-bryck', field: 'status',  from: 'open',  to: 'in-progress' },
-              { ts: '2026-01-20T16:02:00', author: 'keith-berlin', field: 'comment', from: '', to: 'Drafted plan; waiting on infra sign-off.' },
+              { ts: D('2026-01-19T10:14:00'), author: 'bill-bryck', field: 'status',  from: 'open',  to: 'in-progress' },
+              { ts: D('2026-01-20T16:02:00'), author: 'keith-berlin', field: 'comment', from: '', to: 'Drafted plan; waiting on infra sign-off.' },
             ],
           },
           {
             id: newId(),
             desc: 'Publish post-mortem for Tuesday\'s deploy incident',
             assignee: 'rick-lacroix',
-            due: '2026-01-19',
+            due: D('2026-01-19'),
             status: 'blocked',
             comment: 'Blocked on legal review of customer-impact wording.',
-            carriedFrom: '2026-01-14',
+            carriedFrom: D('2026-01-14'),
             history: [
-              { ts: '2026-01-14T15:30:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-21T09:00:00', author: 'system', field: 'carried over', from: 'Jan 14', to: 'Jan 21' },
-              { ts: '2026-01-20T09:45:00', author: 'rick-lacroix', field: 'status', from: 'in-progress', to: 'blocked' },
-              { ts: '2026-01-20T09:46:00', author: 'rick-lacroix', field: 'comment', from: '', to: 'Blocked on legal review of customer-impact wording.' },
+              { ts: D('2026-01-14T15:30:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-21T09:00:00'), author: 'system', field: 'carried over', from: robClock.fmt(D('2026-01-14'), 'short'), to: robClock.fmt(D('2026-01-21'), 'short') },
+              { ts: D('2026-01-20T09:45:00'), author: 'rick-lacroix', field: 'status', from: 'in-progress', to: 'blocked' },
+              { ts: D('2026-01-20T09:46:00'), author: 'rick-lacroix', field: 'comment', from: '', to: 'Blocked on legal review of customer-impact wording.' },
             ],
           },
           {
             id: newId(),
             desc: 'Refresh on-call rotation roster for Q1',
             assignee: 'tile-tampakas',
-            due: '2026-01-30',
+            due: D('2026-01-30'),
             status: 'open',
             comment: '',
             history: [
-              { ts: '2026-01-21T11:00:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-21T11:00:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
             ],
           },
           {
             id: newId(),
             desc: 'Send Q4 reliability summary to leadership',
             assignee: 'bill-bryck',
-            due: '2026-01-16',
+            due: D('2026-01-16'),
             status: 'done',
             comment: 'Sent Friday — see #eng-leadership.',
             history: [
-              { ts: '2026-01-14T15:31:00', author: 'bill-bryck', field: 'create', from: '', to: 'created' },
-              { ts: '2026-01-16T17:20:00', author: 'bill-bryck', field: 'status',  from: 'in-progress', to: 'done' },
-              { ts: '2026-01-16T17:20:00', author: 'bill-bryck', field: 'comment', from: '', to: 'Sent Friday — see #eng-leadership.' },
+              { ts: D('2026-01-14T15:31:00'), author: 'bill-bryck', field: 'create', from: '', to: 'created' },
+              { ts: D('2026-01-16T17:20:00'), author: 'bill-bryck', field: 'status',  from: 'in-progress', to: 'done' },
+              { ts: D('2026-01-16T17:20:00'), author: 'bill-bryck', field: 'comment', from: '', to: 'Sent Friday — see #eng-leadership.' },
             ],
           },
         ],
@@ -12057,8 +12409,17 @@ Platform reliability — error budget
 
       // Adjacency for prev/next occurrence lookups (used for the "Carried over from"
       // history entry and the section dataset).
-      const PREV_OF = { '2026-01-21': '2026-01-14', '2026-01-28': '2026-01-21' };
-      const NEXT_OF = { '2026-01-14': '2026-01-21', '2026-01-21': '2026-01-28' };
+      const PREV_OF = { [D('2026-01-21')]: D('2026-01-14'), [D('2026-01-28')]: D('2026-01-21') };
+      const NEXT_OF = { [D('2026-01-14')]: D('2026-01-21'), [D('2026-01-21')]: D('2026-01-28') };
+      // The map covers the three occurrences that carry hand-written items.
+      // The series is weekly, so past them a neighbour is a week either side —
+      // which is what keeps carry-over working once the arrows walk off the
+      // seeded range, instead of opening an empty meeting.
+      const weekFrom = (date, n) => new Date(Date.UTC(
+        +date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10) + n * 7
+      )).toISOString().slice(0, 10);
+      const prevOf = (date) => PREV_OF[date] || weekFrom(date, -1);
+      const nextOf = (date) => NEXT_OF[date] || weekFrom(date, 1);
 
       // Comments live on each item as `item.comments = [{ ts, author, text }, ...]`.
       // Seed data uses the legacy `comment: 'string'` form — this helper migrates
@@ -12068,7 +12429,7 @@ Platform reliability — error budget
         const legacy = item.comment;
         item.comments = legacy
           ? [{
-              ts: item.due ? `${item.due}T12:00:00` : '2026-01-14T15:00:00',
+              ts: item.due ? `${item.due}T12:00:00` : D('2026-01-14T15:00:00'),
               author: item.assignee || OWNER_ID,
               text: legacy,
             }]
@@ -12081,7 +12442,7 @@ Platform reliability — error budget
       // non-closed items, tagging each with `carriedFrom` and a system history entry.
       const initOccurrence = (date) => {
         if (itemsByOccurrence[date]) return itemsByOccurrence[date];
-        const prev = PREV_OF[date];
+        const prev = prevOf(date);
         const source = prev ? itemsByOccurrence[prev] : null;
         if (!source) { itemsByOccurrence[date] = []; return itemsByOccurrence[date]; }
         const carryTs = `${date}T09:00:00`;
@@ -12107,39 +12468,37 @@ Platform reliability — error budget
         return itemsByOccurrence[date];
       };
 
-      let activeOccurrence = '2026-01-21';
+      let activeOccurrence = D('2026-01-21');
       let items = itemsByOccurrence[activeOccurrence];
 
       // When-pill labels per occurrence (recurring weekly Wednesday 2:30-3:30 PM)
-      const WHEN_LABELS = {
-        '2026-01-14': 'Wednesday, January 14, 2026 · 2:30 PM – 3:30 PM',
-        '2026-01-21': 'Wednesday, January 21, 2026 · 2:30 PM – 3:30 PM',
-        '2026-01-28': 'Wednesday, January 28, 2026 · 2:30 PM – 3:30 PM',
-      };
+      const WHEN_LABELS = Object.fromEntries(
+        ['2026-01-14', '2026-01-21', '2026-01-28'].map(d =>
+          [D(d), `${robClock.fmt(D(d), 'long')} · 2:30 PM – 3:30 PM`]));
 
       // Viewer records per occurrence — split by artifact (deck vs items).
       // Each entry: { id: person key from PEOPLE, ts: ISO string of last view }
       const viewersByOccurrence = {
-        '2026-01-21': {
+        [D('2026-01-21')]: {
           deck: [
-            { id: 'keith-berlin',  ts: '2026-01-21T09:12:00' },
-            { id: 'rick-lacroix',  ts: '2026-01-20T18:44:00' },
-            { id: 'collete-parker',ts: '2026-01-20T17:03:00' },
+            { id: 'keith-berlin',  ts: D('2026-01-21T09:12:00') },
+            { id: 'rick-lacroix',  ts: D('2026-01-20T18:44:00') },
+            { id: 'collete-parker',ts: D('2026-01-20T17:03:00') },
           ],
           items: [
-            { id: 'keith-berlin',  ts: '2026-01-21T13:02:00' },
-            { id: 'bill-bryck',    ts: '2026-01-21T11:45:00' },
-            { id: 'rick-lacroix',  ts: '2026-01-20T20:15:00' },
-            { id: 'tile-tampakas', ts: '2026-01-20T16:30:00' },
+            { id: 'keith-berlin',  ts: D('2026-01-21T13:02:00') },
+            { id: 'bill-bryck',    ts: D('2026-01-21T11:45:00') },
+            { id: 'rick-lacroix',  ts: D('2026-01-20T20:15:00') },
+            { id: 'tile-tampakas', ts: D('2026-01-20T16:30:00') },
           ],
         },
-        '2026-01-14': {
-          deck:  [ { id: 'bill-bryck',   ts: '2026-01-14T09:00:00' }, { id: 'keith-berlin', ts: '2026-01-14T08:55:00' } ],
-          items: [ { id: 'rick-lacroix', ts: '2026-01-19T10:22:00' }, { id: 'bill-bryck',   ts: '2026-01-16T17:20:00' }, { id: 'keith-berlin', ts: '2026-01-15T09:00:00' } ],
+        [D('2026-01-14')]: {
+          deck:  [ { id: 'bill-bryck',   ts: D('2026-01-14T09:00:00') }, { id: 'keith-berlin', ts: D('2026-01-14T08:55:00') } ],
+          items: [ { id: 'rick-lacroix', ts: D('2026-01-19T10:22:00') }, { id: 'bill-bryck',   ts: D('2026-01-16T17:20:00') }, { id: 'keith-berlin', ts: D('2026-01-15T09:00:00') } ],
         },
-        '2026-01-07': { deck: [], items: [] },
-        '2025-12-31': { deck: [], items: [] },
-        '2026-01-28': { deck: [], items: [] },
+        [D('2026-01-07')]: { deck: [], items: [] },
+        [D('2025-12-31')]: { deck: [], items: [] },
+        [D('2026-01-28')]: { deck: [], items: [] },
       };
 
       // Human-readable relative time — used inside the viewers tooltip
@@ -12222,8 +12581,8 @@ Platform reliability — error budget
         activeOccurrence = date;
         items = initOccurrence(date);
         section.dataset.currentOccurrence = date;
-        section.dataset.prevOccurrence = PREV_OF[date] || '';
-        section.dataset.nextOccurrence = NEXT_OF[date] || '';
+        section.dataset.prevOccurrence = prevOf(date);
+        section.dataset.nextOccurrence = nextOf(date);
         const pillDate = document.querySelector('#meeting-detail [data-when-date]');
         if (pillDate && WHEN_LABELS[date]) pillDate.textContent = WHEN_LABELS[date];
         showCompleted = true; // reset to default (show everything) when switching occurrences
@@ -12231,7 +12590,40 @@ Platform reliability — error budget
         render();
         renderViewers('deck');
         renderViewers('items');
+        // Deferred by a tick: the title is set by a later capture-phase
+        // listener than this one, and both of these read it.
+        setTimeout(() => { syncNav(); window.robAgendaOccurrenceChanged?.(); }, 0);
       };
+
+      // The ← / → arrows beside the when-pill, which had no handler at all:
+      // an occurrence could only be reached by clicking its chip. They walk
+      // the series' own occurrences — the chips the calendar is showing — so
+      // an arrow can only reach a meeting you could have clicked instead,
+      // and the one at each end of the month disables rather than stepping
+      // into an occurrence the prototype has no data for.
+      const seriesOccurrences = () => {
+        const name = (document.getElementById('md-title')?.textContent || '').trim();
+        const seen = new Set();
+        document.querySelectorAll('[data-modal-open="meeting-detail"][data-occurrence]').forEach(el => {
+          const label = (el.dataset.tooltip || '').split('\n')[0].trim()
+            || el.querySelector('.cal-event-name, .cal-sched-title')?.textContent.trim();
+          if (label && label === name) seen.add(el.dataset.occurrence);
+        });
+        return [...seen].sort();
+      };
+
+      const navBtns = [...document.querySelectorAll('#meeting-detail .md-when-nav button')];
+      const syncNav = () => {
+        const all = seriesOccurrences();
+        const i = all.indexOf(activeOccurrence);
+        navBtns[0]?.toggleAttribute('disabled', !(i > 0));
+        navBtns[1]?.toggleAttribute('disabled', !(i >= 0 && i < all.length - 1));
+      };
+      navBtns.forEach((btn, k) => btn.addEventListener('click', () => {
+        const all = seriesOccurrences();
+        const next = all[all.indexOf(activeOccurrence) + (k === 0 ? -1 : 1)];
+        if (next) setOccurrence(next);
+      }));
 
       // Hook into the meeting-detail open trigger to switch occurrence before show.
       // Capture phase so we run BEFORE the global modal-open handler.
@@ -12252,10 +12644,29 @@ Platform reliability — error budget
       };
       const requestedOccurrence = parseOccurrence();
       if (requestedOccurrence) {
-        const target = document.querySelector(`[data-modal-open="meeting-detail"][data-occurrence="${requestedOccurrence}"]`);
-        if (target) {
-          // Defer so the IIFE has finished wiring up its handlers
-          setTimeout(() => target.click(), 0);
+        // Waits for the document, not just for a tick. The calendar builds
+        // its chips further down the page, so the lookup this used to make
+        // here ran before any existed — which is why it never fired. A
+        // setTimeout is not enough either: parsing is several tasks, so a
+        // zero timer can still land mid-document.
+        // A date alone is ambiguous — several series meet on the same
+        // Wednesday — and every other chip would open this view over the
+        // wrong meeting's items. So it picks the series this view is built
+        // for, named by the title as authored, and only falls back to
+        // whatever else is on that day.
+        const openRequested = () => {
+          const want = (document.getElementById('md-title')?.textContent || '').trim();
+          const chips = [...document.querySelectorAll(
+            `[data-modal-open="meeting-detail"][data-occurrence="${requestedOccurrence}"]`)];
+          const named = want && chips.find(el => (
+            el.querySelector('.cal-event-name, .cal-sched-title')?.textContent || ''
+          ).includes(want));
+          (named || chips[0])?.click();
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', openRequested, { once: true });
+        } else {
+          openRequested();
         }
       }
 
@@ -13306,10 +13717,10 @@ Platform reliability — error budget
                   <text x="1240" y="420" text-anchor="middle">Wrap</text>
                 </g>
                 <g fill="#64748B" font-family="Inter, sans-serif" font-size="22">
-                  <text x="220"  y="580" text-anchor="middle">Jan 21</text>
-                  <text x="560"  y="580" text-anchor="middle">Feb 11</text>
-                  <text x="900"  y="580" text-anchor="middle">Mar 4</text>
-                  <text x="1240" y="580" text-anchor="middle">Mar 28</text>
+                  <text x="220"  y="580" text-anchor="middle" data-rob-date="2026-01-21|short">Jan 21</text>
+                  <text x="560"  y="580" text-anchor="middle" data-rob-date="2026-02-11|short">Feb 11</text>
+                  <text x="900"  y="580" text-anchor="middle" data-rob-date="2026-03-04|short">Mar 4</text>
+                  <text x="1240" y="580" text-anchor="middle" data-rob-date="2026-03-28|short">Mar 28</text>
                 </g>
               </svg>
             </div>
@@ -13337,7 +13748,7 @@ Platform reliability — error budget
                 <g fill="#64748B" font-family="Inter, sans-serif" font-size="20">
                   <text x="120"  y="380">Error-budget burn under 2%.</text>
                   <text x="120"  y="410">P95 latency &lt; 200ms.</text>
-                  <text x="600"  y="380">Cutover by Mar 4.</text>
+                  <text x="600"  y="380" data-rob-date="2026-03-04|short" data-rob-lead="Cutover by " data-rob-tail=".">Cutover by Mar 4.</text>
                   <text x="600"  y="410">Decommission legacy ETL.</text>
                   <text x="1080" y="380">Standardise toolchain.</text>
                   <text x="1080" y="410">New on-call rotation.</text>
@@ -15018,6 +15429,34 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 </script>
 <!-- === /review.js === -->
   <script>
+    // The pin, applied to markup — the static dates the page was authored
+    // with. The month grid is not here: it is rebuilt earlier, above, because
+    // blocks between here and there read its cells.
+    (function () {
+      const C = window.robClock;
+
+      // ---- Dates written into markup -----------------------------------
+      // Each element carries the literal it was authored as, so the source
+      // still reads as a fixture; the attribute is what moves it.
+      document.querySelectorAll('[data-rob-date]').forEach(el => {
+        const [date, style] = el.getAttribute('data-rob-date').split('|');
+        const text = (el.dataset.robLead || '') + C.fmt(C.D(date), style) + (el.dataset.robTail || '');
+        if (el.tagName === 'INPUT') el.value = text;
+        else el.textContent = text;
+      });
+
+      // ---- Occurrence pointers -----------------------------------------
+      // Only the ones authored into the markup: the calendar's own chips are
+      // built later, from dates that have already moved.
+      const ISO = /^20\d{2}-\d{2}-\d{2}$/;
+      document.querySelectorAll('[data-current-occurrence],[data-prev-occurrence],[data-next-occurrence]')
+        .forEach(el => ['currentOccurrence', 'prevOccurrence', 'nextOccurrence'].forEach(k => {
+          if (ISO.test(el.dataset[k] || '')) el.dataset[k] = C.D(el.dataset[k]);
+        }));
+    })();
+  </script>
+
+  <script>
     // Account menu on the topbar avatar.
     (function () {
       const wrap = document.querySelector('[data-rob-account]');
@@ -15142,11 +15581,11 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         { name: 'Incident Review',               kind: 'Process RoB',    parent: 'Platform reliability \u2014 on-call',      cadence: 'Weekly',    owner: 'Daniel Reyes', status: 'Active' },
         { name: 'Ops Leadership Review',         kind: 'Initiative RoB', parent: 'Operational Excellence Program',       cadence: 'Bi-weekly', owner: 'Aisha Khan',   status: 'Active' },
         { name: 'Pipeline Review',               kind: 'Initiative RoB', parent: 'Enterprise Sales Expansion',          cadence: 'Weekly',    owner: 'Owen Clarke',  status: 'Active' },
-        { name: 'Vendor Consolidation Review',   kind: 'Initiative RoB', parent: 'Operational Excellence Program',      cadence: 'Bi-weekly', owner: 'Tom Baker',    status: 'Paused', paused: '2026-10-24' },
-        { name: 'Brand Refresh Sync',            kind: 'Initiative RoB', parent: 'Marketing Consulting',                cadence: 'Weekly',    owner: 'Maria Santos', status: 'Paused', paused: '2026-10-09' },
-        { name: 'Career Ladders Working Session',kind: 'Initiative RoB', parent: 'Talent Development Framework',        cadence: 'Bi-weekly', owner: 'Sofia Jensen', status: 'Paused', paused: '2026-09-18' },
-        { name: 'Escalations Triage',            kind: 'Process RoB',    parent: 'Support \u2014 Escalations Pod',           cadence: 'Weekly',    owner: 'Aisha Khan',   status: 'Paused', paused: '2026-08-27' },
-        { name: 'Budget Checkpoint',             kind: 'Initiative RoB', parent: 'FY25 Budget Planning',                cadence: 'Weekly',    owner: 'Tom Baker',    status: 'Paused', paused: '2026-07-15' },
+        { name: 'Vendor Consolidation Review',   kind: 'Initiative RoB', parent: 'Operational Excellence Program',      cadence: 'Bi-weekly', owner: 'Tom Baker',    status: 'Paused', paused: D('2026-01-07') },
+        { name: 'Brand Refresh Sync',            kind: 'Initiative RoB', parent: 'Marketing Consulting',                cadence: 'Weekly',    owner: 'Maria Santos', status: 'Paused', paused: D('2025-12-17') },
+        { name: 'Career Ladders Working Session',kind: 'Initiative RoB', parent: 'Talent Development Framework',        cadence: 'Bi-weekly', owner: 'Sofia Jensen', status: 'Paused', paused: D('2025-11-26') },
+        { name: 'Escalations Triage',            kind: 'Process RoB',    parent: 'Support \u2014 Escalations Pod',           cadence: 'Weekly',    owner: 'Aisha Khan',   status: 'Paused', paused: D('2025-10-22') },
+        { name: 'Budget Checkpoint',             kind: 'Initiative RoB', parent: 'FY25 Budget Planning',                cadence: 'Weekly',    owner: 'Tom Baker',    status: 'Paused', paused: D('2025-09-03') },
       ];
 
       // UXCopy: medium date in tables, relative under a week.
@@ -15185,7 +15624,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         const td = tr.querySelectorAll('td');
         const titleBtn = td[0].querySelector('.rob-paused-title');
         titleBtn.textContent = x.name;
-        titleBtn.dataset.occurrence = x.paused || '2026-01-21';
+        titleBtn.dataset.occurrence = x.paused || D('2026-01-21');
         // The capture listener that renames the header reads the first line of
         // data-tooltip, the same as a calendar chip.
         titleBtn.dataset.tooltip = x.name;
@@ -15383,14 +15822,14 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // its recording last Tuesday is fine this Tuesday. Keyed date|title so a
       // single date can be marked without splitting the series.
       const OCCURRENCE_STATE = {
-        '2026-01-06|[RoB] [Process] HireGlobal Outbound Motion': 'cancelled',
-        '2026-01-20|[RoB] [Process] HireGlobal Outbound Motion': 'cancelled',
-        '2026-01-14|[RoB] Operationalize QAs Sync': 'warning',
-        '2026-01-08|[RoB] [Initiative] Expert Crowd': 'warning',
-        '2026-01-26|[RoB] [Initiative] Business Propellant': 'warning',
-        '2026-01-14|[RoB] Engineering Weekly': 'error',
-        '2026-01-09|[RoB] [Process] SEO for HireGlobal': 'error',
-        '2026-01-19|[RoB] [Initiative] Operationalize Launch': 'error',
+        [D(D('2026-01-06')) + '|[RoB] [Process] HireGlobal Outbound Motion']: 'cancelled',
+        [D(D('2026-01-20')) + '|[RoB] [Process] HireGlobal Outbound Motion']: 'cancelled',
+        [D(D('2026-01-14')) + '|[RoB] Operationalize QAs Sync']: 'warning',
+        [D(D('2026-01-08')) + '|[RoB] [Initiative] Expert Crowd']: 'warning',
+        [D(D('2026-01-26')) + '|[RoB] [Initiative] Business Propellant']: 'warning',
+        [D(D('2026-01-14')) + '|[RoB] Engineering Weekly']: 'error',
+        [D(D('2026-01-09')) + '|[RoB] [Process] SEO for HireGlobal']: 'error',
+        [D(D('2026-01-19')) + '|[RoB] [Initiative] Operationalize Launch']: 'error',
       };
 
       // Series-level lifecycle, alongside the per-occurrence state above.
@@ -15422,14 +15861,19 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // "Today" is the cell the grid already marks, so the faded past matches
       // the month on screen rather than the real clock.
       const todayIso = grid.querySelector('.cal-day.is-today')?.dataset.date || iso(new Date());
-      const weekOf = (i) => Math.floor(i / 7);   // bi-weekly rides the week index
+      const weekOf = (i) => Math.floor(i / 7);
+      // Bi-weekly is measured from the anchor's own row, not from the top of
+      // the grid: which row a month starts on is an accident of the calendar,
+      // and keying off it would flip every series' weeks month by month.
+      const anchorWeek = weekOf(Math.max(0, cells.findIndex(c => c.classList.contains('is-today'))));
+      const onBiweek = (i) => (((weekOf(i) - anchorWeek) % 2) + 2) % 2 === 0;
 
       const liveOn = (s, date) => !PAUSED.has(s.title)
         && !(DELETED_FROM[s.title] && date >= DELETED_FROM[s.title]);
 
       const eventsFor = (cell, i, mineOnly) => SERIES
         .filter(s => s.dow === Number(cell.dataset.dow))
-        .filter(s => s.every === 1 || weekOf(i) % 2 === 1)
+        .filter(s => s.every === 1 || onBiweek(i))
         .filter(s => !mineOnly || s.mine)
         .filter(s => liveOn(s, cell.dataset.date))
         .filter(s => window.robFilterPass ? window.robFilterPass(s) : true);
@@ -15527,10 +15971,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         const date = iso(d);
         // Bi-weekly rides the same parity the month grid uses, so the two agree.
         const idx = cells.findIndex(c => c.dataset.date === date);
-        const wk = idx >= 0 ? weekOf(idx) : 0;
         return SERIES
           .filter(x => x.dow === d.getDay())
-          .filter(x => x.every === 1 || wk % 2 === 1)
+          .filter(x => x.every === 1 || onBiweek(idx >= 0 ? idx : 0))
           .filter(x => !mineOnly || x.mine)
           .filter(x => liveOn(x, date))
           .filter(x => window.robFilterPass ? window.robFilterPass(x) : true)
@@ -16001,7 +16444,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // whose start has not passed. Pause and Resume swap on the series state.
       const sync = () => {
         const d = date(), n = name(), a = api();
-        const started   = d && d < '2026-01-21';   // "today" is pinned in this prototype
+        const started   = d && d < D('2026-01-21');   // "today" is pinned in this prototype
         const cancelled = !!a?.isCancelled(n, d);
         const paused    = !!a?.isPaused(n);
         items.cancel.hidden  = cancelled || started;
@@ -16169,6 +16612,685 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
     })();
   </script>
 
+  <script>
+    /* Agenda items — the meeting view's section (#md-agenda).
+     *
+     * The agenda belongs to the SERIES; what a given occurrence shows is a
+     * filter over it. That is the whole shape of this module, and the reason
+     * it is not a per-occurrence list like the action items beside it.
+     *
+     *   ROB-AGENDA-001  description, owner and cadence are required; project
+     *                   and one of three flags are optional
+     *   ROB-AGENDA-002  seven cadences, with these exact labels
+     *   ROB-AGENDA-004  only cadences at least as long as the meeting's are
+     *                   offered; "Each meeting" always is
+     *   ROB-AGENDA-006  a One-off item's cadence is fixed both ways
+     *   ROB-AGENDA-008  a One-off item carries at most one label, set after
+     *                   creation and cleared with "x" — never in the add form
+     *   ROB-AGENDA-009  Project is One-off only, and lists the projects of the
+     *                   meeting's connected Initiatives
+     *   ROB-AGENDA-014  Monthly and longer land on the anchor's Nth weekday of
+     *                   the month, not every four weeks
+     *   ROB-AGENDA-017  an "Other meetings" row's tooltip is the next date the
+     *                   item is due, counted from today
+     *   ROB-AGENDA-021  two groups, and the add control sits between them
+     *   ROB-AGENDA-022  which items land in which group on a live occurrence
+     *   ROB-AGENDA-023  creation order; no reordering
+     *   ROB-AGENDA-026  an occurrence is historical once the next one started
+     *   ROB-AGENDA-027  a historical "This meeting" is a frozen snapshot
+     *   ROB-AGENDA-028  historical "Other meetings" lists every recurring item
+     *   ROB-AGENDA-029  on a historical occurrence "This meeting" rows keep
+     *                   only "Mark as discussed"; move and remove are refused
+     *   ROB-AGENDA-032  historical "Other meetings" rows stay editable
+     *   ROB-AGENDA-036  One-off cannot be added to a historical occurrence
+     *   ROB-AGENDA-037  add-form fields, the 200-char cap and the error copy
+     *   ROB-AGENDA-038  owners come from the roster; defaults to you
+     *   ROB-AGENDA-040  who gets the controls — hidden, not disabled
+     *   ROB-AGENDA-046  discussed is per item AND occurrence
+     *   ROB-AGENDA-048  "Move" re-anchors the item to this occurrence
+     *   ROB-AGENDA-050  removing a One-off deletes it, with no confirmation
+     *   ROB-AGENDA-051  removing a recurring item re-anchors it to the next
+     *                   non-cancelled occurrence
+     *   ROB-AGENDA-052  "Delete" is offered only on "Other meetings" rows
+     *   ROB-AGENDA-054  no success toast — a refreshed list is the confirmation
+     *   ROB-AGENDA-065  a cancelled occurrence's agenda takes no changes
+     *   ROB-AGENDA-066  "Mark as discussed" only once the occurrence started
+     *
+     * Two of those are rules the product does not yet keep: -065 and -066 are
+     * both offered on any occurrence today. Built to the rule, which is what
+     * CONTEXT.md asks for.
+     */
+    (function () {
+      const sec = document.querySelector('[data-md-agenda]');
+      if (!sec) return;
+      const md      = document.getElementById('meeting-detail');
+      const aiSec   = document.querySelector('[data-ai-section]');
+      const titleEl = document.getElementById('md-title');
+      const dlg     = document.getElementById('md-ag-delete');
+
+      const TODAY = D('2026-01-21');   // the pin — moves with robClock, as everywhere else in this file
+      const MAX   = 200;            // AGENDA_TOPIC_TEXT_MAX_LENGTH
+
+      // `weeks` steps the occurrence list; `months` steps whole months on the
+      // anchor's Nth weekday. `occ` is the cadence's length measured in this
+      // series' own occurrences, which is what -004 compares against.
+      const CAD = {
+        EVERY_MEETING: { label: 'Each meeting' },
+        ONE_TIME:      { label: 'One-off' },
+        WEEKLY:        { label: 'Weekly',        weeks: 1,  occ: 1  },
+        BI_WEEKLY:     { label: 'Bi-weekly',     weeks: 2,  occ: 2  },
+        MONTHLY:       { label: 'Monthly',       months: 1, occ: 4  },
+        QUARTERLY:     { label: 'Quarterly',     months: 3, occ: 13 },
+        HALF_ANNUALLY: { label: 'Half-annually', months: 6, occ: 26 },
+      };
+      const RECURRING = ['WEEKLY', 'BI_WEEKLY', 'MONTHLY', 'QUARTERLY', 'HALF_ANNUALLY'];
+      const FLAGS = {
+        ROADBLOCK: 'Roadblock', CROSS_FUNCTIONAL: 'Cross-functional', ESCALATION: 'Escalation',
+      };
+      // Engineering Weekly runs weekly, so one occurrence is one week.
+      const MEETING_OCC = 1;
+
+      // The series, not just the three navigable occurrences: cadence matching
+      // and "next discussion" both ask about meetings this view cannot open.
+      const OCC = (() => {
+        const pad = n => String(n).padStart(2, '0');
+        const out = [], s = D('2025-12-31'), d = new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));   // three Wednesdays before the pin
+        for (let i = 0; i < 70; i++) {
+          out.push(d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()));
+          d.setDate(d.getDate() + 7);
+        }
+        return out;
+      })();
+      const idx = iso => OCC.indexOf(iso);
+      const dat = iso => new Date(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+      const nth = d => Math.floor((d.getDate() - 1) / 7) + 1;
+
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const SHORT  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const longDate  = iso => MONTHS[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(8, 10));
+      const shortDate = iso => (+iso.slice(8, 10)) + ' ' + SHORT[+iso.slice(5, 7) - 1];
+
+      const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g,
+        c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const icon = id => '<svg class="icon"><use href="#' + id + '"/></svg>';
+
+      // ---- the series' items ----------------------------------------------
+      // `anchor` is the occurrence the item's schedule starts from
+      // (ROB-AGENDA-010); moving and removing re-anchor it rather than
+      // touching the cadence.
+      const P = (name, initials) => ({ name: name, initials: initials });
+      let seq = 100;
+      const ITEMS = [
+        { id: 1, description: 'Status round: Initiative and Process KPIs',
+          cadence: 'EVERY_MEETING', owner: P('Bill Bryck', 'BB'), anchor: D('2026-01-07'),
+          project: null, flag: null, discussed: { [D('2026-01-14')]: true, [D('2026-01-21')]: true }, excluded: {} },
+        { id: 2, description: 'Error-budget burn on the checkout path, and what it cost us this week',
+          cadence: 'WEEKLY', owner: P('Keith Berlin', 'KB'), anchor: D('2026-01-07'),
+          project: null, flag: null, discussed: { [D('2026-01-14')]: true }, excluded: {} },
+        { id: 3, description: 'Pipeline migration — cutover readiness and the rollback plan',
+          cadence: 'BI_WEEKLY', owner: P('Rick Lacroix', 'RL'), anchor: D('2026-01-14'),
+          project: null, flag: null, discussed: { [D('2026-01-14')]: true }, excluded: {} },
+        { id: 4, description: 'On-call load and paging noise for the month',
+          cadence: 'MONTHLY', owner: P('Tile Tampakas', 'TT'), anchor: D('2026-01-21'),
+          project: null, flag: null, discussed: {}, excluded: {} },
+        { id: 5, description: 'Decision needed: who owns the schema registry after the split',
+          cadence: 'ONE_TIME', owner: P('Jane Eveland', 'JE'), anchor: D('2026-01-21'),
+          project: 'Schema Registry Split', flag: 'ESCALATION', discussed: {}, excluded: {} },
+        { id: 6, description: 'Revisit the reliability OKR targets for the quarter',
+          cadence: 'QUARTERLY', owner: P('Collete Parker', 'CP'), anchor: D('2026-01-14'),
+          project: null, flag: null, discussed: { [D('2026-01-14')]: true }, excluded: {} },
+        { id: 7, description: 'Blocked on the security review for the new observability vendor',
+          cadence: 'ONE_TIME', owner: P('Emily Smith', 'ES'), anchor: D('2026-01-14'),
+          project: 'Observability Vendor Migration', flag: 'ROADBLOCK', discussed: {}, excluded: {} },
+      ];
+
+      // ---- who is looking, and what they may do ----------------------------
+      const role      = () => document.documentElement.dataset.robRole || 'owner';
+      const canManage = () => role() !== 'participant';
+      const meName    = () => (document.querySelector('[data-rob-me-name]')?.textContent || '').trim();
+      const title     = () => (titleEl?.textContent || 'this meeting').trim();
+
+      let viewDate = aiSec?.dataset.currentOccurrence || D('2026-01-21');
+      const cancelled = () => !!window.robLifecycle?.isCancelled(title(), viewDate);
+      // ROB-AGENDA-065: a cancelled occurrence's agenda is read-only for
+      // everyone, whatever their rights.
+      const editable = () => canManage() && !cancelled();
+      const isHistorical = (d) => { const n = OCC[idx(d) + 1]; return !!n && n <= TODAY; };
+
+      // ---- cadence matching -------------------------------------------------
+      const matches = (it, d) => {
+        const a = idx(it.anchor), i = idx(d);
+        if (a < 0 || i < 0 || i < a) return false;
+        if (it.cadence === 'ONE_TIME')      return i === a;
+        if (it.cadence === 'EVERY_MEETING') return true;
+        const c = CAD[it.cadence];
+        if (c.weeks) return (i - a) % c.weeks === 0;
+        const A = dat(it.anchor), cur = dat(d);
+        const months = (cur.getFullYear() - A.getFullYear()) * 12 + (cur.getMonth() - A.getMonth());
+        return nth(cur) === nth(A) && months % c.months === 0;
+      };
+      const nextDue = (it) => OCC.find(d => d >= TODAY && matches(it, d)) || null;
+
+      // ---- the frozen snapshot of a historical occurrence --------------------
+      // Written the first time that agenda is read, and never again: later
+      // edits, re-anchors and deletions leave it alone (ROB-AGENDA-027). Each
+      // entry keeps a handle on the live item, because "Mark as discussed" is
+      // still allowed there (ROB-AGENDA-030) and writes through to it.
+      const FROZEN = {};
+      const frozenFor = (d) => {
+        if (!FROZEN[d]) {
+          FROZEN[d] = ITEMS.filter(it => !it.archived && !it.excluded[d] && matches(it, d))
+            .map(it => Object.assign({}, it, { live: it }));
+        }
+        return FROZEN[d];
+      };
+
+      // ROB-AGENDA-027 freezes an occurrence the first time its agenda is read
+      // AND before any item is changed, so a past meeting records what was on
+      // it rather than what the item became. Reading alone is not enough: move
+      // an item on today's meeting before ever opening last week's and the
+      // snapshot would be taken from the new anchor, quietly rewriting a
+      // meeting that already happened. Every mutating path calls this first,
+      // deletion included — ROB-AGENDA-033 says a delete must not change a past
+      // agenda either, which is the one part the product gets wrong today.
+      const freezePast = () => OCC.forEach(d => { if (isHistorical(d)) frozenFor(d); });
+
+      const groups = (d) => {
+        if (isHistorical(d)) {
+          return {
+            here: frozenFor(d),
+            // One-off items are left out of a historical "Other meetings".
+            there: ITEMS.filter(it => !it.archived && it.cadence !== 'ONE_TIME'),
+          };
+        }
+        const here = [], there = [];
+        ITEMS.filter(it => !it.archived).forEach(it => {
+          if (it.excluded[d])            { there.push(it); return; }
+          if (matches(it, d))            { here.push(it);  return; }
+          if (it.cadence !== 'ONE_TIME') { there.push(it); }
+          // A One-off belonging to another occurrence is not listed at all.
+        });
+        return { here: here, there: there };
+      };
+
+      // ---- option sources ----------------------------------------------------
+      // Owners: the series owner plus the occurrence's user participants. A row
+      // whose second line is an e-mail rather than a job title is a bot or an
+      // unmapped guest — it can sit on the invite and cannot own an item.
+      const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const roster = () => [...(md ? md.querySelectorAll('.md-person') : [])]
+        .filter(r => !EMAIL.test((r.querySelector('.md-person-role')?.textContent || '').trim()))
+        .map(r => ({
+          name: (r.querySelector('.md-person-name')?.textContent || '').replace(/\(you\)/, '').trim(),
+          initials: (r.querySelector('.avatar')?.textContent || '').trim(),
+          role: (r.querySelector('.md-person-role')?.textContent || '').trim(),
+        }))
+        .filter((p, i, arr) => p.name && arr.findIndex(q => q.name === p.name) === i);
+
+      // Projects: the Connections block holds this meeting's Initiative but no
+      // PROJECT-level rows, so the picker offers that Initiative's own child
+      // projects, which is the rest of what ROB-AGENDA-009 allows.
+      const PROJECTS = ['Checkout Error Budget', 'Observability Vendor Migration', 'Schema Registry Split'];
+
+      const allowedCadences = (forForm) => {
+        const ok = RECURRING.filter(k => CAD[k].occ >= MEETING_OCC);
+        const out = ['EVERY_MEETING'].concat(ok);
+        // One-off exists only in the add form, and not once the next meeting
+        // has started (ROB-AGENDA-036).
+        if (forForm && !isHistorical(viewDate)) out.splice(1, 0, 'ONE_TIME');
+        return out;
+      };
+      const defaultCadence = () => RECURRING.find(k => CAD[k].occ >= MEETING_OCC) || 'EVERY_MEETING';
+
+      // ---- one floating menu for every picker --------------------------------
+      const menu = sec.querySelector('[data-md-ag-menu]');
+      let ctx = null, openTrigger = null;
+      const closeMenu = () => {
+        menu.hidden = true;
+        ctx = null;
+        openTrigger?.setAttribute('aria-expanded', 'false');
+        openTrigger = null;
+      };
+
+      const OPTIONS = {
+        cadence: (it) => allowedCadences(!it).map(k => ({
+          value: k, selected: k === (it ? it.cadence : draft.cadence),
+          html: '<span class="dropdown-item-label">' + esc(CAD[k].label) + '</span>',
+        })),
+        owner: (it) => roster().map(p => ({
+          value: p.name, selected: p.name === (it ? it.owner.name : (draft.owner || {}).name),
+          html: '<span class="dropdown-item-avatar avatar avatar-md">' + esc(p.initials) + '</span>' +
+                '<div class="dropdown-item-text"><span class="dropdown-item-label">' + esc(p.name) + '</span>' +
+                '<span class="dropdown-item-description">' + esc(p.role) + '</span></div>',
+        })),
+        project: (it) => PROJECTS.map(n => ({
+          value: n, selected: n === (it ? it.project : draft.project),
+          html: '<span class="dropdown-item-label">' + esc(n) + '</span>',
+        })),
+        flag: (it) => Object.keys(FLAGS).map(k => ({
+          value: k, selected: !!it && it.flag === k,
+          html: '<span class="dropdown-item-label">' + esc(FLAGS[k]) + '</span>',
+        })),
+      };
+      OPTIONS.owner.empty   = 'No one on the meeting yet';
+      OPTIONS.project.empty = 'No projects on this meeting';
+
+      const PICK = {
+        cadence: (v, it) => {
+          if (!it) { draft.cadence = v; paintDraft(); return; }
+          freezePast();
+          it.cadence = v;                       // the anchor never moves (-042)
+          if (v !== 'ONE_TIME') { it.flag = null; it.project = null; }
+          render();
+        },
+        owner: (v, it) => {
+          const p = roster().find(x => x.name === v) || null;
+          if (!it) { draft.owner = p; ownField.classList.remove('is-error'); ownErr.hidden = true; paintDraft(); return; }
+          freezePast();
+          if (p) it.owner = p;
+          render();
+        },
+        project: (v, it) => {
+          if (!it) { draft.project = (v === draft.project ? null : v); paintDraft(); return; }
+          freezePast();
+          it.project = (v === it.project ? null : v);
+          render();
+        },
+        // One label at a time: choosing one clears the other two (-008).
+        flag: (v, it) => { if (it) { freezePast(); it.flag = v; render(); } },
+      };
+
+      const openMenu = (kind, anchor, itemId) => {
+        const it = itemId ? ITEMS.find(x => x.id === Number(itemId)) : null;
+        const opts = OPTIONS[kind](it);
+        menu.innerHTML = opts.length
+          ? opts.map(o =>
+              '<button class="dropdown-item' + (o.selected ? ' is-selected' : '') + '" type="button" role="option"' +
+              ' aria-selected="' + !!o.selected + '" data-value="' + esc(o.value) + '">' +
+              '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + o.html + '</button>').join('')
+          : '<p class="dropdown-empty">' + esc(OPTIONS[kind].empty || 'Nothing to pick') + '</p>';
+        const a = anchor.getBoundingClientRect(), s = sec.getBoundingClientRect();
+        menu.style.top  = (a.bottom - s.top + 4) + 'px';
+        menu.style.left = Math.max(0, a.left - s.left) + 'px';
+        menu.hidden = false;
+        anchor.setAttribute('aria-expanded', 'true');
+        openTrigger = anchor;
+        ctx = { kind: kind, item: it };
+      };
+
+      menu.addEventListener('click', (e) => {
+        const opt = e.target.closest('[data-value]');
+        if (!opt || !ctx) return;
+        e.stopPropagation();
+        const c = ctx;
+        closeMenu();
+        PICK[c.kind](opt.dataset.value, c.item);
+      });
+
+      // ---- rows ---------------------------------------------------------------
+      let editId = null;      // the row whose description is open for editing
+
+      const iconBtn = (attr, id, tip, extra) =>
+        '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-md-ag-hover ' + attr +
+        ' data-tooltip="' + esc(tip) + '" aria-label="' + esc(tip) + '">' + icon(id) + '</button>';
+
+      const rowHtml = (it, group, n, d) => {
+        const live       = it.live || it;
+        const historical = isHistorical(d);
+        // A historical "This meeting" row is a snapshot: nothing on it can be
+        // changed, and only the discussed mark is still live (-029).
+        const ro         = !editable() || (group === 'here' && historical);
+        const oneOff     = it.cadence === 'ONE_TIME';
+        const discussed  = !!live.discussed[d];
+        const canDiscuss = editable() && group === 'here' && d <= TODAY;
+        const editing    = !ro && editId === it.id;
+
+        const acts = [];
+        if (!ro && !editing) acts.push(iconBtn('data-md-ag-edit="' + it.id + '"', 'i-pencil', 'Edit'));
+        if (canDiscuss) {
+          acts.push('<button class="btn btn-icon-only btn-ghost btn-xs md-ag-check' + (discussed ? ' is-on' : '') + '"' +
+            (discussed ? '' : ' data-md-ag-hover') + ' type="button" data-md-ag-discuss="' + it.id + '"' +
+            ' aria-pressed="' + discussed + '" aria-label="Mark as discussed"' +
+            ' data-tooltip="' + (discussed ? 'Marked as discussed. Click to unmark.' : 'Mark as discussed') + '">' +
+            icon('i-check') + '</button>');
+        } else if (discussed && group === 'here') {
+          // Read-only viewers still see that it was discussed. Only on a "This
+          // meeting" row: the mark belongs to an item ON this occurrence, and
+          // an "Other meetings" row is by definition not on it.
+          acts.push('<span class="md-ag-mark" data-tooltip="Marked as discussed">' + icon('i-check') + '</span>');
+        }
+        if (!ro && group === 'here') {
+          acts.push(iconBtn('data-md-ag-remove="' + it.id + '"', 'i-arrow-down', "Remove from this meeting's agenda"));
+        }
+        if (!ro && group === 'there' && !historical) {
+          acts.push(iconBtn('data-md-ag-move="' + it.id + '"', 'i-arrow-up', "Move to this meeting's agenda"));
+        }
+        if (!ro && group === 'there') {
+          acts.push(iconBtn('data-md-ag-del="' + it.id + '"', 'i-trash', 'Delete the agenda item'));
+        }
+
+        const tip = group === 'here'
+          ? 'To be discussed on this meeting (' + longDate(d) + ')'
+          : (nextDue(it) ? 'Next discussion: ' + shortDate(nextDue(it)) + ' (as of today)' : '');
+        const tipAttr = tip ? ' data-tooltip="' + esc(tip) + '"' : '';
+        const cadence = (ro || oneOff)
+          ? '<span class="tag tag-light"' + tipAttr + '>' + esc(CAD[it.cadence].label) + '</span>'
+          : '<button class="tag tag-light" type="button" data-md-ag-trigger="cadence" data-md-ag-item="' + it.id +
+            '" aria-haspopup="listbox" aria-expanded="false"' + tipAttr + '>' + esc(CAD[it.cadence].label) + '</button>';
+
+        let flagBit = '';
+        if (it.flag) {
+          flagBit = '<span class="tag tag-warning md-ag-flag">' + esc(FLAGS[it.flag]) +
+            (ro ? '' : '<button class="md-ag-flag-x" type="button" data-md-ag-unflag="' + it.id +
+                       '" aria-label="Remove label">' + icon('i-close') + '</button>') + '</span>';
+        } else if (!ro && oneOff) {
+          flagBit = '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-md-ag-hover' +
+            ' data-md-ag-trigger="flag" data-md-ag-item="' + it.id + '" aria-haspopup="listbox" aria-expanded="false"' +
+            ' data-tooltip="Flag for special attention" aria-label="Flag for special attention">' + icon('i-flag') + '</button>';
+        }
+
+        let projBit = '';
+        const projTip = it.project ? ' data-tooltip="This agenda item relates to ‘' + esc(it.project) + '’ project"' : '';
+        if (ro || !oneOff) {
+          if (it.project) projBit = '<span class="tag tag-light"' + projTip + '>' + esc(it.project) + '</span>';
+        } else {
+          projBit = '<button class="tag tag-light" type="button" data-md-ag-trigger="project" data-md-ag-item="' + it.id +
+            '" aria-haspopup="listbox" aria-expanded="false"' + projTip + '>' +
+            esc(it.project || 'Project') + '</button>';
+        }
+
+        const avatar = '<span class="avatar avatar-sm">' + esc(it.owner.initials) + '</span>';
+        const owner = ro
+          ? avatar + '<span class="md-ag-owner">' + esc(it.owner.name) + '</span>'
+          : '<button class="md-ag-owner-btn" type="button" data-md-ag-trigger="owner" data-md-ag-item="' + it.id +
+            '" aria-haspopup="listbox" aria-expanded="false" aria-label="Change owner">' + avatar +
+            '<span class="md-ag-owner">' + esc(it.owner.name) + '</span></button>';
+
+        const body = editing
+          ? '<div class="md-ag-edit">' +
+              '<input class="input" type="text" maxlength="200" autocomplete="off" value="' + esc(it.description) +
+              '" aria-label="Agenda item description" data-md-ag-edit-input="' + it.id + '" />' +
+              '<p class="md-ag-err" hidden data-md-ag-edit-err></p>' +
+              '<div class="md-ag-edit-actions">' +
+                '<button class="btn btn-secondary btn-xs" type="button" data-md-ag-edit-cancel>Cancel</button>' +
+                '<button class="btn btn-primary btn-xs" type="button" data-md-ag-edit-save="' + it.id + '">Save</button>' +
+              '</div>' +
+            '</div>'
+          : '<p class="md-ag-row-desc">' + esc(it.description) + '</p>';
+
+        return '<div class="md-ag-row' + (discussed ? ' is-discussed' : '') + '" data-md-ag-row="' + it.id + '">' +
+          '<div class="md-ag-row-top">' +
+            '<span class="count-badge count-badge-lg count-badge-secondary md-ag-num">' +
+              (group === 'here' ? n : '–') + '</span>' +
+            body +
+            '<div class="md-ag-acts">' + acts.join('') + '</div>' +
+          '</div>' +
+          '<div class="md-ag-row-meta">' +
+            '<span class="md-ag-meta-start">' + cadence + flagBit + projBit + '</span>' +
+            '<span class="md-ag-meta-end">' + owner + '</span>' +
+          '</div>' +
+        '</div>';
+      };
+
+      // ---- paint ---------------------------------------------------------------
+      const body     = sec.querySelector('[data-md-ag-body]');
+      const empty    = sec.querySelector('[data-md-ag-empty]');
+      const total    = sec.querySelector('[data-md-ag-total]');
+      const toggle   = sec.querySelector('[data-md-ag-toggle]');
+      const frozenAl = sec.querySelector('[data-md-ag-frozen]');
+      const frozenMs = sec.querySelector('[data-md-ag-frozen-msg]');
+      const form     = sec.querySelector('[data-md-ag-form]');
+      const addBtns  = [...sec.querySelectorAll('[data-md-ag-open]')];
+      const descIn   = sec.querySelector('[data-md-ag-desc]');
+      const descErr  = sec.querySelector('[data-md-ag-desc-err]');
+      const ownErr   = sec.querySelector('[data-md-ag-owner-err]');
+      const cadField = sec.querySelector('[data-md-ag-field="cadence"]');
+      const projField= sec.querySelector('[data-md-ag-field="project"]');
+      const ownField = sec.querySelector('[data-md-ag-field="owner"]');
+      const cadLabel = sec.querySelector('[data-md-ag-label="cadence"]');
+      const projLabel= sec.querySelector('[data-md-ag-label="project"]');
+      const ownLabel = sec.querySelector('[data-md-ag-label="owner"]');
+
+      let draft = { cadence: 'WEEKLY', project: null, owner: null };
+
+      function render() {
+        const g = groups(viewDate);
+        const historical = isHistorical(viewDate);
+
+        ['here', 'there'].forEach(key => {
+          const which = key === 'here' ? 'this' : 'other';
+          const group = sec.querySelector('[data-md-ag-group="' + which + '"]');
+          const list  = sec.querySelector('[data-md-ag-list="' + which + '"]');
+          const count = sec.querySelector('[data-md-ag-count="' + which + '"]');
+          list.innerHTML = g[key].map((it, i) => rowHtml(it, key, i + 1, viewDate)).join('');
+          count.textContent = String(g[key].length);
+          group.hidden = g[key].length === 0;
+        });
+
+        const n = g.here.length + g.there.length;
+        total.textContent = String(n);
+        empty.hidden = n > 0 || !form.hidden;
+        toggle.hidden = n === 0;
+
+        // A read-only agenda says why, rather than quietly dropping controls.
+        if (cancelled()) {
+          frozenMs.textContent = 'This meeting is cancelled, so its agenda cannot be changed.';
+          frozenAl.hidden = false;
+        } else if (historical && canManage()) {
+          frozenMs.textContent = 'This meeting has passed. Its agenda is a record of what was on it and cannot be changed; items under "Other meetings" still belong to the series and can be.';
+          frozenAl.hidden = false;
+        } else {
+          frozenAl.hidden = true;
+        }
+
+        // The add control follows the same rule as the rows.
+        addBtns.forEach(b => { b.hidden = !editable() || !form.hidden; });
+      }
+
+      function paintDraft() {
+        cadLabel.textContent = CAD[draft.cadence].label;
+        const oneOff = draft.cadence === 'ONE_TIME';
+        projField.hidden = !oneOff;
+        if (!oneOff) draft.project = null;
+        projLabel.textContent = draft.project || 'Project';
+        projLabel.classList.toggle('is-placeholder', !draft.project);
+        ownLabel.textContent = draft.owner ? draft.owner.name : 'Owner';
+        ownLabel.classList.toggle('is-placeholder', !draft.owner);
+      }
+
+      // ---- the add form ----------------------------------------------------------
+      function openForm() {
+        const me = roster().find(p => p.name === meName());
+        draft = { cadence: defaultCadence(), project: null, owner: me || null };
+        descIn.value = '';
+        descErr.hidden = true;
+        ownErr.hidden = true;
+        ownField.classList.remove('is-error');
+        paintDraft();
+        form.hidden = false;
+        addBtns.forEach(b => { b.hidden = true; });
+        empty.hidden = true;
+        descIn.focus();
+      }
+
+      function closeForm() {
+        form.hidden = true;
+        closeMenu();
+        render();
+      }
+
+      function save() {
+        const description = descIn.value.trim();
+        let bad = false;
+        if (!description) { descErr.textContent = 'Description is required'; bad = true; }
+        else if (description.length > MAX) {
+          descErr.textContent = 'Too long. Should be shorter than ' + MAX + ' characters'; bad = true;
+        }
+        descErr.hidden = !bad;
+        if (!draft.owner) {
+          ownErr.textContent = 'Owner is required';
+          ownErr.hidden = false;
+          ownField.classList.add('is-error');
+          bad = true;
+        }
+        if (bad) return;                    // the form stays open until it saves
+        ITEMS.push({
+          id: ++seq, description: description, cadence: draft.cadence,
+          owner: draft.owner, project: draft.project, flag: null,
+          anchor: viewDate, discussed: {}, excluded: {},
+        });
+        closeForm();
+      }
+
+      // ---- per-meeting actions -------------------------------------------------
+      const nextOccurrence = (d) =>
+        OCC.find(x => x > d && !window.robLifecycle?.isCancelled(title(), x)) || null;
+
+      const removeFromMeeting = (it) => {
+        freezePast();
+        if (it.cadence === 'ONE_TIME') { it.archived = true; return; }   // -050
+        const next = nextOccurrence(viewDate);
+        if (next) it.anchor = next;                                       // -051
+        else { it.excluded[viewDate] = true; delete it.discussed[viewDate]; }
+      };
+
+      const moveToMeeting = (it) => {
+        freezePast();
+        if (it.excluded[viewDate]) { delete it.excluded[viewDate]; return; }
+        it.anchor = viewDate;                                             // -048
+      };
+
+      // ---- events ----------------------------------------------------------------
+      sec.addEventListener('click', (e) => {
+        const trig = e.target.closest('[data-md-ag-trigger]');
+        if (trig) {
+          e.stopPropagation();
+          const same = openTrigger === trig;
+          closeMenu();
+          if (!same) openMenu(trig.dataset.mdAgTrigger, trig, trig.dataset.mdAgItem);
+          return;
+        }
+
+        const find = (attr) => {
+          const b = e.target.closest('[' + attr + ']');
+          return b ? ITEMS.find(x => x.id === Number(b.getAttribute(attr))) : null;
+        };
+
+        if (e.target.closest('[data-md-ag-open]')) { openForm(); return; }
+        if (e.target.closest('[data-md-ag-cancel]')) { closeForm(); return; }
+        if (e.target.closest('[data-md-ag-save]')) { save(); return; }
+
+        if (e.target.closest('[data-md-ag-toggle]')) {
+          const open = body.hidden;
+          body.hidden = !open;
+          toggle.textContent = open ? 'Collapse' : 'Expand';
+          toggle.setAttribute('aria-expanded', String(open));
+          return;
+        }
+
+        const disc = e.target.closest('[data-md-ag-discuss]');
+        if (disc) {
+          const id = Number(disc.getAttribute('data-md-ag-discuss'));
+          // The snapshot's handle, so a historical mark lands on the live item.
+          const live = (frozenFor(viewDate).find(x => x.id === id) || {}).live
+                     || ITEMS.find(x => x.id === id);
+          if (live) {
+            if (live.discussed[viewDate]) delete live.discussed[viewDate];
+            else live.discussed[viewDate] = true;
+            render();
+          }
+          return;
+        }
+
+        const ed = e.target.closest('[data-md-ag-edit]');
+        if (ed) { editId = Number(ed.getAttribute('data-md-ag-edit')); render();
+                  sec.querySelector('[data-md-ag-edit-input]')?.focus(); return; }
+        if (e.target.closest('[data-md-ag-edit-cancel]')) { editId = null; render(); return; }
+        const es = e.target.closest('[data-md-ag-edit-save]');
+        if (es) { saveEdit(Number(es.getAttribute('data-md-ag-edit-save'))); return; }
+
+        const unflag = find('data-md-ag-unflag');
+        if (unflag) { freezePast(); unflag.flag = null; render(); return; }
+
+        const rm = find('data-md-ag-remove');
+        if (rm) { removeFromMeeting(rm); render(); return; }
+
+        const mv = find('data-md-ag-move');
+        if (mv) { moveToMeeting(mv); render(); return; }
+
+        const del = e.target.closest('[data-md-ag-del]');
+        if (del) { pending = Number(del.getAttribute('data-md-ag-del')); dlg.hidden = false; return; }
+      });
+
+      function saveEdit(id) {
+        const input = sec.querySelector('[data-md-ag-edit-input="' + id + '"]');
+        const err   = sec.querySelector('[data-md-ag-edit-err]');
+        const it    = ITEMS.find(x => x.id === id);
+        if (!input || !it) return;
+        const v = input.value.trim();
+        if (!v)              { err.textContent = 'Description is required'; err.hidden = false; return; }
+        if (v.length > MAX)  { err.textContent = 'Too long. Should be shorter than ' + MAX + ' characters'; err.hidden = false; return; }
+        if (v !== it.description) { freezePast(); it.description = v; }  // unchanged text just closes
+        editId = null;
+        render();
+      }
+
+      // Delete is the one agenda action with a confirmation, and it is the one
+      // that leaves the series rather than this meeting (ROB-AGENDA-052).
+      let pending = null;
+      dlg?.querySelector('[data-md-ag-delete-go]')?.addEventListener('click', () => {
+        freezePast();
+        const it = ITEMS.find(x => x.id === pending);
+        if (it) it.archived = true;
+        pending = null;
+        dlg.hidden = true;
+        render();
+      });
+
+      sec.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (e.target === descIn) { e.preventDefault(); save(); return; }
+          const inline = e.target.closest('[data-md-ag-edit-input]');
+          if (inline) { e.preventDefault(); saveEdit(Number(inline.getAttribute('data-md-ag-edit-input'))); return; }
+        }
+        if (e.key !== 'Escape') return;
+        // An open menu takes the first Escape, then the form, then the modal
+        // behind it gets its own.
+        if (!menu.hidden) { e.stopPropagation(); closeMenu(); return; }
+        if (editId !== null) { e.stopPropagation(); editId = null; render(); return; }
+        if (!form.hidden) { e.stopPropagation(); closeForm(); }
+      });
+
+      descIn.addEventListener('input', () => { descErr.hidden = true; });
+      document.addEventListener('click', (e) => { if (!sec.contains(e.target)) closeMenu(); });
+
+      // Switching occurrence re-filters the series. The action items section
+      // already tracks which one is open, so this reads that rather than
+      // keeping a second answer that can disagree — and it works whether the
+      // occurrence moved by a calendar chip or by the when-pill's arrows.
+      const syncOccurrence = () => {
+        const d = aiSec?.dataset.currentOccurrence;
+        if (!d || d === viewDate) return;
+        viewDate = d;
+        editId = null;
+        if (!form.hidden) closeForm(); else render();
+      };
+      // Capture phase, like the action items' own listener, so the dataset is
+      // already current by the time this runs.
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-modal-open="meeting-detail"][data-occurrence]')) syncOccurrence();
+      }, true);
+      // The arrows move the occurrence without any chip being clicked.
+      window.robAgendaOccurrenceChanged = syncOccurrence;
+
+      // The role switcher calls this; rights are asked per row, so a re-render
+      // is the whole update.
+      window.robAgendaRefresh = () => { editId = null; closeMenu(); form.hidden = true; render(); };
+
+      render();
+    })();
+  </script>
+
   <!-- Prototype role switcher — ?roles=1. Keys match ROLES in the script. -->
   <div class="rr-switcher" id="rr-switcher" hidden>
     <div class="rr-switcher-head"><span>Viewing as</span><button class="rr-switcher-toggle" type="button" aria-label="Collapse roles">–</button></div>
@@ -16227,6 +17349,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         document.getElementById('reject-meeting')?.setAttribute('hidden', '');
         // Action items re-render from their own permission check.
         window.robRoleChanged?.(role, ROLES[role]);
+        window.robAgendaRefresh?.();
       };
       apply(role);
 
