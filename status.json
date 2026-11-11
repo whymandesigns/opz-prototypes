@@ -16,6 +16,7 @@
   "integrations/v1-connectors": "in-review",
   "integrations/v2-tableau-streams": "in-review",
   "integrations/v3-admin-settings": "in-progress",
+  "integrations/v4-credentials-screen": "in-progress",
   "meeting-grid": "in-progress",
   "onboarding": "in-progress",
   "performance-attributes": "in-progress",
