@@ -4,7 +4,7 @@
   "versions": [
     {
       "folder": "v1-connectors",
-      "label": "v1 · Connectors",
+      "label": "v1 \u00b7 Connectors",
       "date": "2026-06-04",
       "kind": "concept",
       "stage": "review",
@@ -13,7 +13,7 @@
     },
     {
       "folder": "v2-tableau-streams",
-      "label": "v2 · Tableau streams",
+      "label": "v2 \u00b7 Tableau streams",
       "date": "2026-08-04",
       "kind": "concept",
       "stage": "review",
@@ -22,12 +22,21 @@
     },
     {
       "folder": "v3-admin-settings",
-      "label": "v3 · Admin Settings + HireGlobal",
+      "label": "v3 \u00b7 Admin Settings + HireGlobal",
       "date": "2026-09-09",
       "kind": "concept",
       "stage": "review",
       "note": "Integrations inside Admin Settings, with the HireGlobal connect-and-sync flow.",
       "basedOn": "v2-tableau-streams"
+    },
+    {
+      "folder": "v4-credentials-screen",
+      "label": "v4 \u00b7 Credentials screen",
+      "date": "2026-11-11",
+      "kind": "concept",
+      "stage": "review",
+      "note": "Before you connect ActionTrace: register the app, then enter its client ID and secret.",
+      "basedOn": "v3-admin-settings"
     }
   ]
 }
