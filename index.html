@@ -4272,7 +4272,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <img src="./_thumbs/integrations-v3.png" alt="" loading="lazy" />
           <img src="./_thumbs/api-token-management.png" alt="" loading="lazy" />
           <img src="./_thumbs/integrations-v2.png" alt="" loading="lazy" />
-          <span class="thumb-folder-front"><span class="thumb-folder-count">4 prototypes</span></span>
+          <span class="thumb-folder-front"><span class="thumb-folder-count">5 prototypes</span></span>
         </div>
         <div class="card-meta">
           <h3 class="card-title">Integrations <span class="arrow">&rarr;</span></h3>
@@ -5597,5 +5597,22 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 })();
 </script>
 <!-- === /review.js === -->
+<script>
+  // Folder cards: keep "N prototypes" equal to the real card count in that
+  // folder's own index page. Static text (tools/sync-folder-counts.mjs) covers
+  // file:// and first paint; this refreshes it live when served over http.
+  (function () {
+    document.querySelectorAll('.card .thumb-folder-count').forEach(function (el) {
+      var a = el.closest('a.card'); if (!a) return;
+      fetch(a.getAttribute('href'), { cache: 'no-cache' })
+        .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+        .then(function (t) {
+          var n = (t.match(/<a class="card"(?![^>]*\bhidden\b)/g) || []).length;
+          if (n) el.textContent = n + (n === 1 ? ' prototype' : ' prototypes');
+        })
+        .catch(function () { /* keep the static count */ });
+    });
+  })();
+  </script>
 </body>
 </html>
