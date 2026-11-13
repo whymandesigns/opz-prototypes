@@ -32,6 +32,7 @@ still moving — a duplicate drifts within days.)
 |---|---|
 | `rob/` | the admin owner's view — Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen. Sign out returns here |
+| `rob/changelog.html` | this file, rendered — the **Changelog** button on the role chooser |
 | `rob/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
 | `rob/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
 | `rob/?roles=1` | the bottom-left role switcher, for walking all three side by side |

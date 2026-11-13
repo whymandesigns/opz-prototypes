@@ -4071,6 +4071,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
     .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
 
+    /* The title and the changelog CTA share a row. The kit's .page-head is the
+       component for exactly this, but it is product chrome and hides itself at
+       1024px — here that would take the page's own title with it. */
+    .pg-head { display: flex; align-items: center; gap: var(--spacing-4); margin-top: var(--spacing-3); }
+    .pg-head .h1 { margin: 0; }
+    .pg-head .btn { margin-left: auto; flex-shrink: 0; }
+
     .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-4); }
 
     /* A role is a card you can open. The unbuilt one is the same card without
@@ -4181,7 +4188,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     <header style="margin-top: var(--spacing-8)">
       <a class="backlink" href="../">&larr; Feature directory</a>
-      <h1 class="h1" style="margin-top: var(--spacing-3)">RoB</h1>
+      <!-- The changelog sits beside the title rather than on the directory card:
+           by the time you are here you are one click from opening the prototype,
+           which is when "what was decided and why" is actually worth reading. -->
+      <div class="pg-head">
+        <h1 class="h1">RoB</h1>
+        <a class="btn btn-secondary" href="./changelog.html">Changelog</a>
+      </div>
       <p class="body-sm">A RoB looks different depending on who opens it. Pick a role to see its view.</p>
     </header>
 
