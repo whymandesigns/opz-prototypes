@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RoB — prototype changelog</title>
+  <link rel="stylesheet" href="../../designmd/tokens.css" />
+  <link rel="stylesheet" href="../../designmd/semantic.css" />
+  <link rel="stylesheet" href="../../designmd/components.css" />
+  <!-- CHANGELOG.md is the single source: this page fetches and renders it, so
+       the two can never disagree. A raw link to the .md would not do — the dev
+       server has no mime type for it and the browser downloads the file.
+
+       Prose has no component in the kit (there is no .prose, and nothing under
+       dist/kit.json styles an <h2> inside an article), so the rules below style
+       bare elements inside .cl-doc rather than inventing a class per tag. Every
+       value is a semantic token.
+
+       Not a prototype: no app shell, no sidenav, nothing from the product. It
+       is the directory page's sibling — same <main class="page stack"> header
+       as features/index.html — and it is for us, not for a review. -->
+  <style>
+    .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
+    .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    /* 76ch is a reading measure, not a width: below about 620px the column has
+       to give way to the viewport, or every table and code block pushes the
+       page sideways on a phone. */
+    .cl-doc { max-width: min(76ch, 100%); }
+    .cl-doc > *:first-child { margin-top: 0; }
+
+    .cl-doc h2 {
+      font: var(--type-h2);
+      color: var(--color-text);
+      margin: var(--spacing-10) 0 var(--spacing-4);
+      padding-top: var(--spacing-6);
+      border-top: 1px solid var(--color-border);
+    }
+    .cl-doc h3 {
+      font: var(--type-h4);
+      color: var(--color-text);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+    }
+    .cl-doc h4 {
+      font: var(--type-body);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin: var(--spacing-6) 0 var(--spacing-2);
+    }
+    .cl-doc p,
+    .cl-doc li { font: var(--type-body); color: var(--color-text-muted); }
+    .cl-doc p { margin: 0 0 var(--spacing-4); }
+    .cl-doc strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
+    .cl-doc a { color: var(--color-text-link); text-decoration: none; }
+    .cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
+    .cl-doc li { margin-bottom: var(--spacing-2); }
+    .cl-doc li > ul { margin: var(--spacing-2) 0 0; }
+
+    .cl-doc code {
+      font: var(--type-mono);
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0 var(--spacing-1);
+      color: var(--color-text);
+    }
+    .cl-doc pre {
+      font: var(--type-mono);
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-4);
+      margin: 0 0 var(--spacing-4);
+      overflow-x: auto;
+      color: var(--color-text);
+    }
+    .cl-doc pre code { background: none; border: 0; padding: 0; }
+
+    .cl-doc blockquote {
+      margin: 0 0 var(--spacing-4);
+      padding-left: var(--spacing-4);
+      border-left: 3px solid var(--color-border-strong);
+    }
+    .cl-doc blockquote p:last-child { margin-bottom: 0; }
+
+    /* A table of URLs and rule ids has no natural wrap point, so left to itself
+       it sets the page's width and the whole document scrolls sideways. Fixed
+       layout holds it to the prose column and wraps the cells instead. */
+    .cl-doc table { margin-bottom: var(--spacing-6); width: 100%; table-layout: fixed; }
+    .cl-doc td { vertical-align: top; }
+    /* The kit's .table is a data table: components.css sets white-space:nowrap
+       on every th and td, which is right for a row of values and wrong for a
+       sentence. A prose cell has to wrap or it lays out as one long line and
+       takes the page with it. */
+    /* Selector depth matters here: .table tbody td is (0,1,2) and would beat a
+       plain .cl-doc td, so the cells keep nowrap and the fix looks like it did
+       nothing. Match the kit's shape to override it. */
+    .cl-doc table thead th,
+    .cl-doc table tbody td { white-space: normal; overflow-wrap: break-word; }
+    .cl-doc table tbody td code,
+    .cl-doc table thead th code { overflow-wrap: anywhere; }
+
+    /* A heading the in-document links jump to should not land under the
+       sticky nothing — there is no sticky header here, but a little air above
+       the target reads as "this is the thing you asked for". */
+    .cl-doc :target { scroll-margin-top: var(--spacing-6); }
+  </style>
+</head>
+<body>
+
+  <main class="page stack" style="gap: var(--spacing-6)">
+
+    <header style="margin-top: var(--spacing-8)">
+      <a class="backlink" href="../">&larr; Feature directory</a>
+      <h1 class="h1" style="margin-top: var(--spacing-3)">RoB &mdash; prototype changelog</h1>
+      <p class="body-sm">
+        What has been designed into the RoB prototype, in what order, and why.
+        Rendered from <code style="font: var(--type-mono); color: var(--color-text-muted)">rob/CHANGELOG.md</code>.
+        &nbsp;<a class="backlink" href="./roles.html">Open the prototype &rarr;</a>
+      </p>
+    </header>
+
+    <article class="cl-doc" id="doc">
+      <p class="body-sm">Loading&hellip;</p>
+    </article>
+
+  </main>
+
+  <script>
+    // A markdown renderer for the subset CHANGELOG.md actually uses: headings,
+    // paragraphs, bullets (one level of nesting), tables, fenced code, block
+    // quotes, rules, and inline code / bold / italic / links. Deliberately not
+    // a library — this page has three dependencies and they are all designmd.
+    (function () {
+      var esc = function (s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+
+      // GitHub's heading slug, so the file's own [text](#anchor) links land.
+      var slug = function (s) {
+        return s.toLowerCase()
+          .replace(/[`*_[\]()]/g, '')
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+      };
+
+      var inline = function (s) {
+        return esc(s)
+          .replace(/`([^`]+)`/g, function (_, c) { return '<code>' + c + '</code>'; })
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+          .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, t, href) {
+            var safe = /^(https?:|#|\.|\/)/.test(href) ? href : '#';
+            return '<a href="' + safe + '">' + t + '</a>';
+          });
+      };
+
+      var render = function (md) {
+        var lines = md.replace(/\r\n/g, '\n').split('\n');
+        var out = [];
+        var i = 0;
+        var seenH1 = false;
+
+        var flushTable = function () {
+          var rows = [];
+          while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+          if (rows.length < 2) { rows.forEach(function (r) { out.push('<p>' + inline(r) + '</p>'); }); return; }
+          var cells = function (r) {
+            return r.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); });
+          };
+          var head = cells(rows[0]);
+          var body = rows.slice(2).map(cells);
+          out.push('<table class="table">');
+          out.push('<thead><tr>' + head.map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('') + '</tr></thead>');
+          out.push('<tbody>' + body.map(function (r) {
+            return '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
+          }).join('') + '</tbody>');
+          out.push('</table>');
+        };
+
+        // A bullet owns every following line indented past it, so a wrapped
+        // sentence stays in its own <li> instead of starting a paragraph.
+        var flushList = function (indent) {
+          out.push('<ul>');
+          while (i < lines.length) {
+            var m = lines[i].match(/^(\s*)- (.*)$/);
+            if (!m || m[1].length < indent) break;
+            if (m[1].length > indent) { flushList(m[1].length); continue; }
+            var text = [m[2]];
+            i++;
+            while (i < lines.length) {
+              if (/^\s*- /.test(lines[i])) break;
+              if (/^\s+\S/.test(lines[i])) { text.push(lines[i].trim()); i++; continue; }
+              break;
+            }
+            out.push('<li>' + inline(text.join(' ')));
+            if (i < lines.length) {
+              var next = lines[i].match(/^(\s*)- (.*)$/);
+              if (next && next[1].length > indent) flushList(next[1].length);
+            }
+            out.push('</li>');
+          }
+          out.push('</ul>');
+        };
+
+        while (i < lines.length) {
+          var line = lines[i];
+
+          if (!line.trim()) { i++; continue; }
+
+          if (/^```/.test(line)) {
+            i++;
+            var code = [];
+            while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]);
+            i++;
+            out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>');
+            continue;
+          }
+
+          if (/^---+\s*$/.test(line)) { i++; continue; }   // the file's section rules; h2 draws its own
+
+          var h = line.match(/^(#{1,4}) (.*)$/);
+          if (h) {
+            i++;
+            if (h[1].length === 1) {
+              // The page header already carries the document title.
+              if (!seenH1) { seenH1 = true; continue; }
+            }
+            var level = Math.min(h[1].length, 4);
+            out.push('<h' + level + ' id="' + slug(h[2]) + '">' + inline(h[2]) + '</h' + level + '>');
+            continue;
+          }
+
+          if (/^>\s?/.test(line)) {
+            var quote = [];
+            while (i < lines.length && /^>\s?/.test(lines[i])) quote.push(lines[i++].replace(/^>\s?/, ''));
+            out.push('<blockquote><p>' + inline(quote.join(' ')) + '</p></blockquote>');
+            continue;
+          }
+
+          if (/^\s*\|/.test(line)) { flushTable(); continue; }
+
+          if (/^\s*- /.test(line)) { flushList(line.match(/^(\s*)/)[1].length); continue; }
+
+          var para = [];
+          while (i < lines.length && lines[i].trim() && !/^(#{1,4} |```|>|\s*[-|])/.test(lines[i])) para.push(lines[i++]);
+          if (!para.length) { out.push('<p>' + inline(lines[i++]) + '</p>'); continue; }
+          out.push('<p>' + inline(para.join(' ')) + '</p>');
+        }
+
+        return out.join('\n');
+      };
+
+      var doc = document.getElementById('doc');
+      fetch('./CHANGELOG.md', { cache: 'no-cache' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(function (md) {
+          doc.innerHTML = render(md);
+          if (location.hash) {
+            var t = document.getElementById(location.hash.slice(1));
+            if (t) t.scrollIntoView();
+          }
+        })
+        .catch(function (e) {
+          doc.innerHTML = '<div class="alert alert-danger"><span class="alert-message">'
+            + '<strong>CHANGELOG.md could not be read</strong> &mdash; ' + esc(String(e.message || e))
+            + '. It sits beside this page; open <a href="./CHANGELOG.md">the file</a> directly.'
+            + '</span></div>';
+        });
+    })();
+  </script>
+
+</body>
+</html>
