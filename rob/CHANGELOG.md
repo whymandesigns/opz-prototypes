@@ -1,17 +1,6 @@
 # RoB Meetings — prototype changelog
 
-What has been designed into `rob/index.html`, in what order, and **why** — so an
-idea that was tried, parked or deliberately rejected can be found again instead
-of being re-argued from scratch.
-
-It is not a spec. What the product *does* comes from the test oracle; what
-people are *asked* to do comes from `../CONTEXT.md`. This file records what
-**we proposed**, and where a proposal knowingly departs from either.
-
-Rule ids (`ROB-VIEW-053`) are the way back to the oracle, so they are cited.
-The oracle's own prose is not copied in — this repo is public, that one is not.
-
-Three places to look before reading the history:
+Three places to look before the history:
 
 - **[Reach the variants](#reach-the-variants)** — the flows that only exist
   behind a URL. Several good ideas live there and nowhere else.
