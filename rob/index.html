@@ -4570,6 +4570,22 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .rob-filter-label { font: var(--type-body); color: var(--color-text); }
 .rob-filter-field { width: 100%; min-width: 0; }
 .rob-filter-field .input-select-trigger { width: 100%; }
+/* The kit caps .dropdown-menu at 240px and scrolls it, and caps the list
+   inside at 240px too. With a search box above and a count line below, that
+   leaves about two and a half rows of a 446-item list visible. Here the menu
+   stops scrolling and only the list does, so the search box and the count line
+   stay put while the options move under them.
+
+   The height is a clamp rather than a number because the menu is absolutely
+   positioned inside a popover that cannot scroll: anything taller than the
+   room below the field is simply unreachable, count line included. 392px is
+   seven rows and their gaps, which is the point — a list you can scan
+   rather than a slot you peer through. 607px is everything that is not the
+   list: where the menu starts, its search box, its count line, and a margin
+   off the bottom of the window. On a window too short for seven it gives back what it has
+   rather than hiding the footer, and never less than it showed before. */
+.rob-filter-field .dropdown-menu { max-height: none; overflow: visible; }
+.rob-filter-field .dropdown-list { max-height: clamp(141px, calc(100vh - 607px), 392px); }
 /* The "Showing only first N of M items" line under a capped menu. A footer
    rather than a last row: it is about the list, not an option in it, so it
    must not be clickable and must not scroll away with the items. */
@@ -4580,7 +4596,6 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
   font: var(--type-body-sm);
   color: var(--color-text-muted);
 }
-.rob-filter-field .dropdown-menu { max-height: 240px; overflow-y: auto; }
 /* The three switches set scope rather than narrowing a field, so they sit
    below a rule of their own. */
 .rob-filter-toggles {
@@ -16474,7 +16489,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         // the real picker only shows that line on the divisions menu.
         const SEARCH = {
           slack:    { max: SLACK_MAX, hash: true,  placeholder: 'Search channels', label: 'Search channels', empty: 'No slack channels available' },
-          division: { max: DIV_MAX,   count: true, placeholder: 'Search',          label: 'Search divisions', empty: 'No divisions available' },
+          // noAll: the real divisions picker has no "All" row — you clear it by
+          // unpicking, which is what the selected row does here.
+          division: { max: DIV_MAX,   count: true, noAll: true, placeholder: 'Search', label: 'Search divisions', empty: 'No divisions available' },
         };
         const cfg = SEARCH[key];
         const searchable = !!cfg;
@@ -16505,16 +16522,21 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             opts = opts.slice(0, cfg.max);
           }
           list.innerHTML = '';
-          ['All', ...opts].forEach(opt => {
+          (cfg && cfg.noAll ? opts : ['All', ...opts]).forEach(opt => {
             const b = document.createElement('button');
             b.type = 'button';
             b.className = 'dropdown-item' + (opt === (F[key] || 'All') ? ' is-selected' : '');
             b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + optionBody(key, opt);
             b.addEventListener('click', (e) => {
               e.stopPropagation();
-              list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === b));
-              value.textContent = label(opt);
-              if (opt === 'All') delete F[key]; else F[key] = opt;
+              // A menu with no "All" row needs another way back to unfiltered,
+              // or the first pick is a one-way door and only "Clear all" — which
+              // clears every other filter too — gets you out. Clicking the chosen
+              // option again clears it, and the trigger returns to its default.
+              const clear = opt === 'All' || F[key] === opt;
+              list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', !clear && i === b));
+              value.textContent = clear ? sel.dataset.robFDefault : label(opt);
+              if (clear) delete F[key]; else F[key] = opt;
               menu.hidden = true;
               trigger.setAttribute('aria-expanded', 'false');
               apply();
