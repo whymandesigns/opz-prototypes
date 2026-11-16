@@ -59,7 +59,7 @@ not a backlog item.
 
 ### A RoB with no host in the room
 
-**Status** · Researched — the product has one safeguard for this and three documented ways it does not reach.
+**Status** · Researched — the product has one safeguard for this and three documented ways it does not reach. The proposal is a separate item.
 **Added** · 2026-11-16
 **Source** · raised as a red flag: if the owner is away, participants wait in a waiting room and the meeting does not happen.
 **Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, deviation `B-014`
@@ -110,12 +110,71 @@ There is also a way to **see** the problem happening:
 seconds for a host, and `meeting.participant_joined_waiting_room` when someone
 lands in a waiting room. Either is a signal the RoB could act on.
 
-So the proposal is not "add a host field". It is: **what does a RoB look like
-when its owner is not in it?** A standing second name on the series, a
+So the question was never "add a host field". It was: **what does a RoB look
+like when its owner is not in it?** A standing second name on the series, a
 per-occurrence stand-in, or something that is not a Zoom concept at all — the
 agenda and action items do not need a host, and the meeting that matters is the
-working session, not the call. Worth deciding which of those we are proposing
-before any of it is drawn.
+working session, not the call.
+
+**Decided 2026-11-16: the standing second name.** It is drawn up as
+[A backup host on the series](#a-backup-host-on-the-series). The other two are
+not ruled out, but nobody is holding them — if the first goes to review badly,
+this item is where they come back.
+
+### A backup host on the series
+
+**Status** · Ready — the mechanism is a known field, the screen is decided, and nothing here waits on research.
+**Added** · 2026-11-16
+**Source** · the proposal that answers [A RoB with no host in the room](#a-rob-with-no-host-in-the-room).
+**Rule** · `ROB-ZOOM-001`, `ROB-ZOOM-009`, `ROB-OWNER-020`, deviation `B-014` — and the product has no such concept, so this is a proposal, not a description.
+
+**What it is.** One named stand-in who can start the RoB when its owner is not
+there. It maps to Zoom's `settings.alternative_hosts` on the room the product
+already creates, so the whole thing is one field on a call that is already made.
+
+**Where it goes.** A **Backup host** row in the meeting view's details grid,
+directly under the Zoom link — it is a property of the room, and that is where
+the room already is. Empty it reads *No backup host*, with an add affordance for
+whoever can edit the series; set, it reads the person's name.
+
+**Not on the create form.** That is locked as a shell, and a backup host is
+something you decide once the series exists and you know who is on it.
+
+**Who sets it:** whoever can edit the series — the owner and RoB admins, the
+same right as every other field in that grid. Everyone else reads it, because
+reading is never gated.
+
+**One person, not a list.** Zoom's field takes several. A RoB has a singular
+Accountable Owner, and a list of hosts invites the question of who is actually
+running the meeting — which is the one thing the model is clear about. One
+stand-in, and if that is wrong we will hear it at review.
+
+**Called a backup host, not an alternative host.** Zoom's word reads like a
+second owner. *Backup* says when it matters.
+
+**What it touches, and has to answer on screen:**
+
+- **Ownership transfer mints a new Zoom room** (`ROB-OWNER-020`) — the backup
+  host does not follow it unless something carries it across. The transfer modal
+  has to say whether it comes along, and the honest answer today is no.
+- **A person who is no longer eligible.** Zoom refuses an alternative host who
+  is not Licensed or is on another account. The picker should not offer someone
+  it will refuse, and the row needs a state for a backup host who has since
+  stopped qualifying.
+- **No Zoom integration, no row.** Same as the Zoom link it sits under.
+- **Webinars are out of scope** for a first pass — their host model differs, and
+  `ROB-ZOOM-009` already treats them separately.
+- **`B-014` is upstream.** On an unlinked room none of this applies, which is
+  worth a line in the entry rather than a state on the screen.
+
+**One thing for the behaviour spec rather than the screen:** the three settings
+the product enforces do not include `alternative_hosts` (`ROB-ZOOM-009`), so a
+backup host removed in Zoom would stay removed. If the product sets it, it
+should restore it on the same pass — otherwise the field is advice, not a
+setting.
+
+**Edge states to draw:** none set · one set · set but no longer eligible · no
+Zoom integration · the participant's read-only view.
 
 ### What else Zoom could carry
 
