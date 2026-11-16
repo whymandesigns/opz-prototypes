@@ -129,7 +129,7 @@ its start), cannot arise here — the grid stops at 8 pm.
 
 **Status** · Delivered — the behaviour follows the rules. The fixture data is invented and does not resemble the tenant's, which is still [open](#open-and-worth-revisiting).
 
-![The Divisions filter open: each option carries its kind's icon and, under the name, the kind itself as a hint line.](_shots/2026-11-10-divisions-and-slack.png)
+![The Divisions filter open: a search box above the options, each one carrying the division icon and its kind as a hint line, and a footer saying how many of the 446 divisions are being shown.](_shots/2026-11-10-divisions-and-slack.png)
 
 Two of the six filter controls had been built and wired to nothing. They narrow
 the calendar now, which meant inventing the data they narrow by — and that is
