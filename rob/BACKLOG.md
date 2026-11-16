@@ -57,6 +57,75 @@ not a backlog item.
 
 ## Open
 
+### A RoB with no host in the room
+
+**Status** · Researched — the product has one safeguard for this and three documented ways it does not reach.
+**Added** · 2026-11-16
+**Source** · raised as a red flag: if the owner is away, participants wait in a waiting room and the meeting does not happen.
+**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, deviation `B-014`
+
+The product does have an answer, and it is not a host at all: every Zoom meeting
+linked to an upcoming RoB occurrence is **forced to "join before host" ON**,
+along with authenticated-join and a recording mode, and anything changed by hand
+in Zoom is overwritten at the next enforcement (`ROB-ZOOM-009`). When that
+enforcement reaches the room, the owner being away costs the meeting its host,
+not its start.
+
+**It does not always reach the room.** Three cases, all in the spec:
+
+- **Webinars.** Join-before-host is explicitly not touched for them — only
+  authentication and recording mode are.
+- **No active Zoom integration.** Enforcement is conditioned on one, and a
+  tenant without it gets none of these settings.
+- **`B-014`, open.** Only links on `zoom.us` and `toptal.zoom.us` are
+  recognised, so a room on any other host is never linked — and the notes on
+  `ROB-ZOOM-009` say unlinked rooms are not enforced. A regional host such as
+  `us02web.zoom.us` is enough to lose the protection.
+
+**And there is no way to name a second host.** No alternative host, no co-host,
+no per-occurrence delegation anywhere in the spec. The room is created with the
+owner as host and `ROB-ZOOM-001` is explicit that an existing room is never
+reused or chosen by the user. The only lever is a full ownership transfer, which
+creates a **new** Zoom meeting and rewrites the join link across every current
+and future occurrence (`ROB-OWNER-020`) — the right tool for "someone else runs
+this RoB now", the wrong one for "I am away next Tuesday".
+
+So the proposal is not "add a host field". It is: **what does a RoB look like
+when its owner is not in it?** A standing second name on the series, a
+per-occurrence stand-in, or something that is not a Zoom concept at all — the
+agenda and action items do not need a host, and the meeting that matters is the
+working session, not the call. Worth deciding which of those we are proposing
+before any of it is drawn.
+
+### What else Zoom could carry
+
+**Status** · Idea — the integration uses a few of Zoom's capabilities; nobody has looked at the rest.
+**Added** · 2026-11-16
+**Source** · a standing interest in what the RoB feature could get from Zoom beyond what it uses today.
+**Rule** · `ROB-ZOOM-001`, `-005`, `-009`, `-011`, `-073` — the baseline; the rest is not covered because the product does not do it.
+
+What the product already takes from Zoom is narrow and worth writing down before
+asking for more: it creates the room, enforces three settings on it, pulls cloud
+recordings and gates who may watch them, and reads attendance. That is
+provisioning, compliance and evidence — all of it after the fact, none of it in
+the meeting.
+
+The question is which of Zoom's other capabilities would actually serve a RoB,
+given what a RoB is for: a quick round of status, then a working session that
+ends in decisions and actions. Candidates worth checking rather than assuming —
+transcripts and summaries against the agenda, in-meeting polls for the decisions
+a RoB is supposed to produce, breakout rooms for a working session, chat as a
+source of action items, registration or webinar mode for the large ones,
+scheduling privilege for the item above. Which of these Zoom's API actually
+exposes, and on which plan, is the research — not a list to design from.
+
+Two constraints that are already known and should bound it. Enforcement
+overwrites settings changed by hand (`ROB-ZOOM-009`), so anything we propose has
+to be something the product sets, not something a user configures in Zoom. And
+recording access is already decided and does not follow the Zoom host
+(`ROB-ZOOM-073`), so a proposal that re-derives access from Zoom is arguing with
+a settled rule.
+
 ### Pre-reads
 
 **Status** · Researched — the one thing a participant is meant to be able to add, and there is nowhere to add it.
