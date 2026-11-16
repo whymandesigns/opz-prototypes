@@ -26,7 +26,10 @@ Three places to look before reading the history:
 ## Reach the variants
 
 The prototype is one file; a variant is a URL, not a copy. (`rob` is ~1.2 MB and
-still moving — a duplicate drifts within days.)
+still moving — a duplicate drifts within days.) The rule was learned the hard
+way: this started in Aug 2026 as `action-items`, beside a near-duplicate called
+`rob-flow` that every change had to be mirrored into. Both of those early flows
+sit in `../archive/`, and the old `/action-items/` URL 404s.
 
 | URL | What it opens |
 |---|---|
@@ -82,41 +85,6 @@ Both are proposals. Say so when either goes to review.
 ---
 
 ## History
-
-### 2026-11-16 — The changelog moved onto the role chooser *(local on `rob-filters-and-click-to-create`)*
-
-**Status** · Delivered — the two pages swapped what they carry.
-
-![The role chooser: the two role cards, a "What each role can do" button beside the title, and the changelog rendered in full below them.](_shots/2026-11-16-changelog-on-the-chooser.png)
-
-The chooser used to end in the oracle rights table, with the changelog behind a
-button. That is the wrong way round. By the time you are on this page you have
-read two sentences about two roles and you are one click from the prototype;
-what is worth reading next is **what was decided and why**, not a 29-row table
-of permissions you would only consult with a specific question in hand. A page
-that links to its own history mostly gets skipped.
-
-So the changelog is now the body of `roles.html`, rendered in full, and the
-rights table moved to the foot of `changelog.html`, where the title row's
-button — **What each role can do** — links straight to it.
-
-**One renderer, in two files beside the thing it renders.** `changelog.js` and
-`changelog.css` came out of `changelog.html` so both pages load the same ones.
-Two copies of a markdown renderer would drift, which is the exact failure
-rendering from `CHANGELOG.md` exists to avoid. It costs `roles.html` its
-self-containment, but that was already gone: the page reads `CHANGELOG.md` and
-`_shots/` from this folder at runtime either way.
-
-Nested under a page that has its own `<h1>` and a **Changelog** label, the
-document's sections step down a size (`.cl-doc.is-nested`) — otherwise the
-label and the first section it introduces are the same size and read as
-siblings. `changelog.html`, where the `<h1>` *is* the document's title, is
-unchanged.
-
-The rights table needed four icon symbols that `changelog.html` did not have —
-it links designmd's stylesheets but carries no sprite, where `roles.html` is
-baked and has all hundred. They are inlined: four symbols, none of them a
-`<use>` alias, so copying the symbol copies the whole icon.
 
 ### 2026-11-13 — Click to create, on the week view *(7ed5064, local on `rob-filters-and-click-to-create`)*
 
@@ -331,16 +299,6 @@ The role chooser arrives: a RoB reads differently for the Accountable Owner who
 runs it and the Participants invited to it. Filters that genuinely narrow all
 three views are live; the ones with no data behind them are built but inert.
 
-### 2026-10-26 → 2026-11-03 — Estate maintenance
-
-**Status** · Delivered
-
-`d6d04b3` removed 271 dead classes from three prototypes (234 of them here):
-sprite ids doubling as CSS classes, `class="icon i-close"` beside
-`<use href="#i-close">`, from an older convention. Nothing styled them, so they
-were weight that read like meaning. `3f1ef3c` unfroze the estate and gave the
-still-legacy files the `designmd:legacy` marker.
-
 ### 2026-09-29 → 2026-09-30 — The key metric flow (#45–#49)
 
 **Status** · Delivered
@@ -411,13 +369,6 @@ radio** rather than standing alone further down. A checkbox, not a switch: a
 switch implied a separate mode. And the rejection detail became a hover tooltip
 on the person row, composed from the form.
 
-### 2026-09-16 — Renamed `action-items` → `rob` (adc2b14)
-
-**Status** · Delivered
-
-The folder was named when the prototype was only the Action items feature. The
-old `/action-items/` URL 404s from here.
-
 ### 2026-09-10 — Full-screen create and view modals (e7f2f26)
 
 **Status** · Delivered
@@ -430,20 +381,19 @@ semantic icon instead, with the caret still on the right. The right-rail TOC
 highlights the section whose top crosses ~40% of the viewport, chosen so the
 last, short section still becomes active at maximum scroll.
 
-### 2026-08-04 — First appearance (a007a9c)
-
-**Status** · Delivered
-
-Added as `action-items`, alongside `rob-flow` — a near-duplicate that every
-change had to be mirrored into, which is the experience that produced the
-one-file-many-variants rule. Both earlier flows now sit in `../archive/`.
-
 ---
 
 ## Keeping this honest
 
 - An entry records the **reason**, not the diff — `git log --follow -- rob/index.html`
   has the diff, and these entries are distilled from its messages.
+- **History is about the product, not about this repo.** An entry earns its
+  place by changing what a RoB looks like or how it behaves. A rename, a lint
+  pass, a dead-class sweep, a change to this page's own plumbing — those are
+  real work and they are in `git log`, which is where someone goes looking for
+  them. Here they pad the one thing the file is for: what we decided about the
+  product, and why. If an entry has nothing to screenshot, ask whether it has
+  anything to say.
 - When a parked idea is picked up or finally rejected, move it out of
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
@@ -461,14 +411,13 @@ one-file-many-variants rule. Both earlier flows now sit in `../archive/`.
   **Delivered never means the product shipped it.** It means we finished
   designing it. What the product does comes from the oracle; where we propose changing
   it is [Where it departs from the product](#where-it-departs-from-the-product).
-- **A shot is worth one line of the description.** An entry carries one
-  screenshot, written as a plain image on its own line and kept in `_shots/`,
-  named for the entry's date. An entry about the files rather than the screen —
-  a rename, a re-bake — has none, because a screenshot of an unrelated screen
-  would be worse than the gap. The alt text is the caption on the page and the
-  only description on GitHub, so write it as a sentence about what the screen
-  is doing, not "screenshot". Shoot it from the running prototype, not from a
-  design file — the point is what was built.
+- **Every entry carries a shot** — one screenshot, written as a plain image on
+  its own line and kept in `_shots/`, named for the entry's date. An entry with
+  nothing to show is an entry about the repo, and belongs in `git log` instead.
+  The alt text is the caption on the page and the only description on GitHub,
+  so write it as a sentence about what the screen is doing, not "screenshot".
+  Shoot it from the running prototype, not from a design file — the point is
+  what was built.
 - A hash on an unmerged branch is not the hash it will have on `main` — the
   squash rewrites it. An entry cites the branch until it merges, then the
   commit and its PR number, like every entry below 2026-11-10.
