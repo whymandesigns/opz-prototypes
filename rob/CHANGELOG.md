@@ -215,31 +215,6 @@ job title — a bot or unmapped guest can sit on an invite and cannot hold a
 series. Keyed on that marker, not on the name, because the next bot will be
 called something else.
 
-### 2026-11-09 — Hold the role rules to the spec (3c99dbb, #155)
-
-**Status** · Delivered
-
-![What each role can do, row by row, with the oracle named as the source and a Yes, No or qualified answer per role.](_shots/2026-11-09-role-rules.png)
-
-Five corrections from reviewing the roles against the behaviour spec rather than
-against what the prototype happened to do.
-
-- **The admin owner holds the global permission too.** The directory's ⋮ follows
-  "Manage all RoB meetings", not ownership — right as a rule, wrong as a
-  persona. Owning a meeting still never puts the menu on screen.
-- **Answering an invite is identity, not permission.** The RSVP control and the
-  own-row "Going" tick are the participant's alone. As the owner you were
-  answering someone else's invite *for* them. Who is coming stays readable by
-  anyone who can open the RoB.
-- **Two editing leaks, found by enumerating every enabled control** as the
-  participant rather than trusting the gating: the key-metric picker was live,
-  and the "isn't a participant" warning was a button that opened nothing. The
-  participant's enabled controls went 57 → 27, none of which write.
-- **Two rows invert the rest of the rights table**, which is why it was worth
-  writing down: recordings follow *attendance*, not ownership or the admin
-  permission; and the paused-series list is not gated at all — only its link is,
-  which is cosmetic in the product and in here.
-
 ### 2026-11-09 — Viewer roles, a create shell, three display fixes (01731dd, #154)
 
 **Status** · Delivered
@@ -383,6 +358,13 @@ last, short section still becomes active at maximum scroll.
   them. Here they pad the one thing the file is for: what we decided about the
   product, and why. If an entry has nothing to screenshot, ask whether it has
   anything to say.
+- **Correcting the prototype against the spec is operational, not a decision.**
+  Finding that a control was enabled for the wrong role, or that a right
+  follows attendance rather than ownership, changes the prototype but decides
+  nothing: the rule was always the rule. What that work produces belongs in
+  [What each role can do](changelog.html#what-each-role-can-do), which states
+  the rules as they stand — an entry would only add that we were once wrong
+  about them.
 - When a parked idea is picked up or finally rejected, move it out of
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
