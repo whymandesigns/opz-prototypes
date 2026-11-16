@@ -78,6 +78,16 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-muted);
 }
+/* The shot opens full size in a new tab, and nothing said so — a bordered
+   image on a page of prose does not read as a link. It lifts on hover, which
+   is the one affordance that survives being used eleven times down a page:
+   a border darkening alone is a two-step colour change nobody notices, and a
+   "click to enlarge" caption on every entry would compete with the real one. */
+.cl-shot a { display: block; width: fit-content; border-radius: var(--radius-md); }
+.cl-shot a:hover img { border-color: var(--color-border-strong); box-shadow: var(--shadow-2); }
+.cl-shot a:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+.cl-shot img { transition: border-color var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease); }
+
 .cl-shot figcaption { margin-top: var(--spacing-2); font: var(--type-body-xs); color: var(--color-text-muted); }
 
 .cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
