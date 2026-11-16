@@ -90,6 +90,26 @@ creates a **new** Zoom meeting and rewrites the join link across every current
 and future occurrence (`ROB-OWNER-020`) — the right tool for "someone else runs
 this RoB now", the wrong one for "I am away next Tuesday".
 
+**Zoom has two mechanisms for this, and the product uses neither** (checked
+2026-11-16, see *What else Zoom could carry* for the sources):
+
+- **`settings.alternative_hosts`** on the meeting object — a semicolon-separated
+  list of e-mails, settable when the room is created or updated. An alternative
+  host can start the meeting. Both the host and the alternative host must be
+  **Licensed users on the same Zoom account**, which for a company-account RoB
+  is the normal case. This is the direct answer, and it is one field on a call
+  the product already makes (`ROB-ZOOM-001` creates the room).
+- **Scheduling privilege** (`POST /users/{userId}/assistants`) — a standing
+  delegation, one person scheduling and managing on another's behalf. The API
+  adds assistants; the scheduling privilege itself is granted in Zoom's web
+  portal, so it is not fully programmable, and it is a per-person relationship
+  rather than a per-meeting one.
+
+There is also a way to **see** the problem happening:
+`meeting.participant_jbh_waiting` fires when someone has waited at least 30
+seconds for a host, and `meeting.participant_joined_waiting_room` when someone
+lands in a waiting room. Either is a signal the RoB could act on.
+
 So the proposal is not "add a host field". It is: **what does a RoB look like
 when its owner is not in it?** A standing second name on the series, a
 per-occurrence stand-in, or something that is not a Zoom concept at all — the
@@ -99,32 +119,58 @@ before any of it is drawn.
 
 ### What else Zoom could carry
 
-**Status** · Idea — the integration uses a few of Zoom's capabilities; nobody has looked at the rest.
+**Status** · Researched — what the API offers, checked 2026-11-16; which of it a RoB should use is still a design call.
 **Added** · 2026-11-16
 **Source** · a standing interest in what the RoB feature could get from Zoom beyond what it uses today.
-**Rule** · `ROB-ZOOM-001`, `-005`, `-009`, `-011`, `-073` — the baseline; the rest is not covered because the product does not do it.
+**Rule** · `ROB-ZOOM-001`, `-005`, `-009`, `-011`, `-073` — the baseline; the rest is not covered, because the product does not do it.
 
-What the product already takes from Zoom is narrow and worth writing down before
-asking for more: it creates the room, enforces three settings on it, pulls cloud
-recordings and gates who may watch them, and reads attendance. That is
-provisioning, compliance and evidence — all of it after the fact, none of it in
-the meeting.
+What the product takes from Zoom today is narrow: it creates the room, enforces
+three settings on it, pulls cloud recordings and gates who may watch them, and
+reads attendance. Provisioning, compliance and evidence — all after the fact,
+none of it in the meeting.
 
-The question is which of Zoom's other capabilities would actually serve a RoB,
-given what a RoB is for: a quick round of status, then a working session that
-ends in decisions and actions. Candidates worth checking rather than assuming —
-transcripts and summaries against the agenda, in-meeting polls for the decisions
-a RoB is supposed to produce, breakout rooms for a working session, chat as a
-source of action items, registration or webinar mode for the large ones,
-scheduling privilege for the item above. Which of these Zoom's API actually
-exposes, and on which plan, is the research — not a list to design from.
+**What the API offers that a RoB could use.** Each of these is a published
+endpoint or field, not a guess; what none of them is yet is a decision.
 
-Two constraints that are already known and should bound it. Enforcement
-overwrites settings changed by hand (`ROB-ZOOM-009`), so anything we propose has
-to be something the product sets, not something a user configures in Zoom. And
-recording access is already decided and does not follow the Zoom host
-(`ROB-ZOOM-073`), so a proposal that re-derives access from Zoom is arguing with
-a settled rule.
+| Capability | Where | What it would give a RoB | Gate |
+|---|---|---|---|
+| **Alternative hosts** | `settings.alternative_hosts` on the meeting object | someone who can start the meeting when the owner is away — see the item above | both users Licensed, same account |
+| **Scheduling privilege** | `POST /users/{userId}/assistants`, `GET /users/{userId}/schedulers` | a standing stand-in for a person rather than a meeting | Licensed; the privilege itself is granted in Zoom's portal, not by API |
+| **AI Companion summary** | `GET` meeting summary, `meeting.summary_completed` webhook with `summary_content` as Markdown | the written record a RoB is supposed to leave, next to the agenda it was meant to follow | Pro+, AI Companion summary on, not E2EE |
+| **Transcript** | `TRANSCRIPT` / `CC` cloud-recording files; `meeting.aic_transcript_completed` | what was said under each agenda item, if the timing can be matched | cloud recording on |
+| **Polls** | `POST /meetings/{id}/polls`, `batch_polls`, past-results and report scopes | a RoB's output is decisions — a poll is the one place Zoom records one | Pro+, polling enabled, **not instant meetings** |
+| **Breakout rooms** | `settings.breakout_room.rooms[]`, pre-assigned by e-mail | a working session split by workstream, pre-assigned from the RACI we already hold | pre-assign only; live control is SDK, not REST |
+| **In-meeting chat** | `CHAT` (text) and `CHAT_MESSAGE` (JSON, incl. waiting-room and deleted) recording files | action items people type instead of saying | cloud recording on |
+| **Waiting-room / join-before-host signals** | `meeting.participant_jbh_waiting`, `meeting.participant_joined_waiting_room` | the absent-owner problem, observable instead of reported | webhook subscription |
+
+**Where the value is, on this reading.** The summary and transcript are the ones
+that touch what a RoB is *for* — it exists to produce decisions and actions, and
+those are the only Zoom artefacts that contain them. Polls are the narrow,
+unglamorous version of the same thing and are the easiest to act on, because a
+poll result is structured where a summary is prose. Breakout rooms are a real
+fit for the working session and the cheapest to try, since the RACI already
+tells us who goes where. Chat is a long shot: people do type actions into it,
+but separating those from "can you hear me" is the whole problem.
+
+**Three constraints that bound any of it.**
+
+- **The product sets it, not the user.** Enforcement overwrites settings changed
+  by hand in Zoom at the next pass (`ROB-ZOOM-009`), so a proposal that asks
+  someone to configure something in Zoom is a proposal that will be undone.
+- **Recording access is already decided** and deliberately does not follow the
+  Zoom host (`ROB-ZOOM-073`). A design that re-derives who may read a summary or
+  transcript from Zoom is arguing with a settled rule — summaries and
+  transcripts should inherit the recording rules, not invent their own.
+- **`B-014` is upstream of all of it.** A room on a host other than `zoom.us` or
+  `toptal.zoom.us` is never linked, so nothing here reaches it. Anything built
+  on this list inherits that hole.
+
+**Not checked in this pass**, and worth knowing before committing: the plan tier
+Toptal is actually on, whether AI Companion summaries are enabled on the
+account, and the live in-meeting surfaces (Zoom Apps and the Meeting SDK), which
+are a different kind of integration from everything above — an app running
+inside the call rather than a server reading it afterwards. That is the obvious
+next question if any of this looks worth having.
 
 ### Pre-reads
 
