@@ -87,6 +87,8 @@ Both are proposals. Say so when either goes to review.
 
 **Status** · Proposed · Needs review · Parked — it asks before opening the form where the product opens it (`ROB-VIEW-053`), so it is a change to propose, not a screen to copy. The group has not seen it, and RoB is not what the team is working on, so expect it to sit for a few weeks.
 
+![The week view: an empty future slot clicked, drawing a dashed 30-minute draft, with the popover beside it asking Cancel or Create meeting.](_shots/2026-11-13-click-to-create.png)
+
 An hour in the week grid is now two 30-minute slots, as real elements rather
 than arithmetic on a column click — "a past slot shows no pointer"
 (`ROB-VIEW-053`) is a per-slot affordance a column cannot carry. Clicking an
@@ -113,6 +115,8 @@ its start), cannot arise here — the grid stops at 8 pm.
 ### 2026-11-10 — Divisions and Slack channels start filtering *(ea3d17c, local on `rob-filters-and-click-to-create`)*
 
 **Status** · Needs review · Parked — the behaviour follows the rules, but the fixture data is invented and does not look like the tenant's (see [Open, and worth revisiting](#open-and-worth-revisiting)). Unmerged on the same branch.
+
+![The Divisions filter open: each option carries its kind's icon and, under the name, the kind itself as a hint line.](_shots/2026-11-10-divisions-and-slack.png)
 
 Two of the six filter controls had been built and wired to nothing. They narrow
 the calendar now, which meant inventing the data they narrow by — and that is
@@ -376,6 +380,12 @@ one-file-many-variants rule. Both earlier flows now sit in `../archive/`.
   in grey, so adding one is an edit here rather than a code change. **No Status
   line means the entry is merged to `main`**; what is still open about it lives
   in [Open, and worth revisiting](#open-and-worth-revisiting).
+- **A shot is worth one line of the description.** An entry may carry one
+  screenshot, written as a plain image on its own line and kept in `_shots/`,
+  named for the entry's date. The alt text is the caption on the page and the
+  only description on GitHub, so write it as a sentence about what the screen
+  is doing, not "screenshot". Shoot it from the running prototype, not from a
+  design file — the point is what was built.
 - A hash on an unmerged branch is not the hash it will have on `main` — the
   squash rewrites it. An entry cites the branch until it merges, then the
   commit and its PR number, like every entry below 2026-11-10.

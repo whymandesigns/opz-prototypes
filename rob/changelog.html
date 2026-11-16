@@ -59,6 +59,20 @@
     .cl-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin: calc(var(--spacing-2) * -1) 0 var(--spacing-4); }
     .cl-status-note { font: var(--type-body-sm); color: var(--color-text-muted); }
 
+    /* A shot is evidence, not decoration: wide enough to read the screen it
+       shows, bordered so a white UI on a white page still has an edge. */
+    .cl-shot { margin: 0 0 var(--spacing-6); }
+    .cl-shot img {
+      display: block;
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-muted);
+    }
+    .cl-shot figcaption { margin-top: var(--spacing-2); font: var(--type-body-xs); color: var(--color-text-muted); }
+
     .cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
     .cl-doc li { margin-bottom: var(--spacing-2); }
     .cl-doc li > ul { margin: var(--spacing-2) 0 0; }
@@ -172,10 +186,49 @@
           .replace(/`([^`]+)`/g, function (_, c) { return '<code>' + c + '</code>'; })
           .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
           .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+          .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function (_, alt, src) {
+            return shotImg(alt, src);
+          })
           .replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, t, href) {
             var safe = /^(https?:|#|\.|\/)/.test(href) ? href : '#';
             return '<a href="' + safe + '">' + t + '</a>';
           });
+      };
+
+      // Only a relative path, and only an image: a changelog shot lives beside
+      // the file it documents. Anything else renders as the alt text, which is
+      // what a reader needs anyway.
+      var shotImg = function (alt, src) {
+        if (!/^[\w./-]+\.(png|jpg|jpeg|gif|webp|svg)$/i.test(src) || src.indexOf('..') === 0) {
+          return esc(alt || src);
+        }
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = alt || '';
+        img.loading = 'lazy';
+        return img.outerHTML;
+      };
+
+      // A paragraph that is nothing but an image becomes a figure: the shot at
+      // a readable width, its alt doubling as the caption, and a link to the
+      // file so a detail too small to read here can be opened full size.
+      var figure = function (alt, src) {
+        var html = shotImg(alt, src);
+        if (html.indexOf('<img') !== 0) return '<p>' + html + '</p>';
+        var fig = document.createElement('figure');
+        fig.className = 'cl-shot';
+        var a = document.createElement('a');
+        a.href = src;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.innerHTML = html;
+        fig.appendChild(a);
+        if (alt) {
+          var cap = document.createElement('figcaption');
+          cap.textContent = alt;
+          fig.appendChild(cap);
+        }
+        return fig.outerHTML;
       };
 
       var render = function (md) {
@@ -269,6 +322,10 @@
           while (i < lines.length && lines[i].trim() && !/^(#{1,4} |```|>|\s*[-|])/.test(lines[i])) para.push(lines[i++]);
           if (!para.length) { out.push('<p>' + inline(lines[i++]) + '</p>'); continue; }
           var text = para.join(' ');
+
+          // A line that is only an image is a figure, not a paragraph.
+          var shot = text.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+          if (shot) { out.push(figure(shot[1], shot[2])); continue; }
 
           // "**Status** · Proposed · Parked — why" becomes a row of tags and a
           // note. Written as an ordinary bold line so the raw file still reads
