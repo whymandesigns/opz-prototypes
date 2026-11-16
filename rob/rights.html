@@ -119,6 +119,21 @@
         </p>
       </div>
 
+      <!-- Both of these describe the table itself rather than a row in it,
+           so they sit above it. The first is why it is a table at all; the
+           second is what a "No" looks like on screen. -->
+      <ul class="body-sm" style="color: var(--color-text-muted); margin: 0; padding-left: var(--spacing-4)">
+        <li style="margin-bottom: var(--spacing-2)"><strong>Rights are not one ladder.</strong>
+          An owner is not an admin &mdash; &ldquo;Manage all RoB meetings&rdquo; is global &mdash;
+          and an admin is not an owner, because the deck rights stayed with the owner when
+          everything else was handed to admins. A single owner-to-participant scale gets both
+          backwards, which is why these are written out row by row.</li>
+        <li><strong>A &ldquo;No&rdquo; is hidden, not disabled.</strong>
+          <code style="font: var(--type-mono)">ROB-EDIT-001</code> says participants do not see
+          the control, and a disabled one promises a right that does not exist. Disabled is kept
+          for a right the viewer <em>has</em> that something else is blocking.</li>
+      </ul>
+
       <div class="rights">
         <table class="table">
           <thead>

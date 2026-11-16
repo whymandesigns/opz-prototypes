@@ -236,32 +236,6 @@ job title — a bot or unmapped guest can sit on an invite and cannot hold a
 series. Keyed on that marker, not on the name, because the next bot will be
 called something else.
 
-### 2026-11-09 — Viewer roles, a create shell, three display fixes (01731dd, #154)
-
-**Status** · Delivered
-
-![The role chooser: admin and participant side by side, each saying who they are and what they can change.](_shots/2026-11-09-viewer-roles.png)
-
-**Rights are not one ladder**, which is why the table is written out rather than
-modelled as a scale: an owner is not an admin ("Manage all RoB meetings" is
-global), and an admin is not an owner (deck rights stayed with the owner when
-everything else was handed to admins). A single owner-to-participant scale gets
-both backwards.
-
-**Hidden, not disabled** — `ROB-EDIT-001` says participants "do not see them",
-and a disabled control promises a right that does not exist. Disabled is kept
-for a right the viewer *has* that the integration is blocking. Reading is never
-gated: every employee reads every RoB.
-
-Also in this pass: the chooser's cards renamed to Admin role / Participant role;
-a new meeting owned by whoever creates it, read off the topbar account menu so
-the two cannot disagree; the owner, timezone, recurrence, availability, org unit
-and participants fields became real `.input-select`s instead of readonly inputs
-with a chevron glued beside them. And the **migration off the `--ic-*`
-vocabulary** — 764 references across 41 tokens — which is what let the kit reach
-this file again, and immediately surfaced four faults the frozen build had been
-hiding, the off-canvas sidenav among them.
-
 ### 2026-11-05 — Role chooser, calendar views, filters, More menu (4d02f3a, #152)
 
 **Status** · Delivered
