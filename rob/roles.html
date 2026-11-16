@@ -4100,8 +4100,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     .role.is-pending .role-icon { color: var(--color-text-subtle); }
 
   </style>
-  <!-- The changelog's renderer and prose styles, shared verbatim with
-       changelog.html. Relative, beside this file: the page already reads
+  <!-- The changelog's renderer and prose styles, beside the file they
+       render. Relative, beside this page: it already reads
        CHANGELOG.md and _shots/ from this folder at runtime, so the renderer
        living here too costs nothing it had not already spent. -->
   <link rel="stylesheet" href="./changelog.css" />
@@ -4144,7 +4144,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
            through, and now sits at the foot of the changelog page. -->
       <div class="pg-head">
         <h1 class="h1">RoB</h1>
-        <a class="btn btn-secondary" href="./changelog.html#what-each-role-can-do">What each role can do</a>
+        <a class="btn btn-secondary" href="./rights.html">What each role can do</a>
       </div>
       <p class="body-sm">A RoB looks different depending on who opens it. Pick a role to see its view.</p>
     </header>
@@ -4188,14 +4188,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <!-- The changelog itself, not a link to it. Once you have picked a role
          the next useful thing on this page is what was decided and why, and a
          page that merely links to its own history mostly gets skipped. Same
-         changelog.js / changelog.css as changelog.html, reading the same
-         CHANGELOG.md, so the two renderings cannot disagree. -->
+         CHANGELOG.md the file is, rendered by changelog.js / changelog.css
+         beside it. This is the only page that carries it. -->
     <section class="stack" style="gap: var(--spacing-3)">
       <h2 class="h2">Changelog</h2>
       <p class="body-sm">
         What has been designed into this prototype, in what order, and why.
         Rendered from <code style="font: var(--type-mono); color: var(--color-text-muted)">rob/CHANGELOG.md</code>.
-        &nbsp;<a class="backlink" href="./changelog.html">Open it on its own page &rarr;</a>
       </p>
       <article class="cl-doc is-nested" id="doc">
         <p class="body-sm">Loading&hellip;</p>

@@ -1,9 +1,8 @@
 /* changelog.css — how rob/CHANGELOG.md renders as a page.
  *
- * Shared by changelog.html (the standalone, shareable page) and roles.html
- * (which carries the same changelog under the role cards). One file, because
- * the point of rendering from CHANGELOG.md is that there is one source — two
- * copies of the renderer would reintroduce exactly the drift it avoids.
+ * Loaded by roles.html, the role chooser, which carries the changelog under
+ * its role cards — the only page that renders it. Kept out of that file
+ * because it belongs beside CHANGELOG.md, not inside a 350 KB baked page.
  *
  * Prose has no component in the kit (there is no .prose, and nothing under
  * dist/kit.json styles an <h2> inside an article), so the rules below style
@@ -30,8 +29,8 @@
 /* Nested in a page that already carries its own <h1> and a "Changelog"
    label — roles.html does — the document's sections step down one, or its
    first heading is the same size as the label above it and the two read as
-   siblings. On changelog.html, where the <h1> is the document's own title,
-   they stay at h2. */
+   siblings. Without the class — a page whose <h1> is the document's own
+   title — they stay at h2. */
 .cl-doc.is-nested h2 { font: var(--type-h3); }
 
 /* Every h3 in this file is a dated history entry, and each is a self-contained

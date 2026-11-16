@@ -3,28 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RoB — prototype changelog</title>
+  <title>RoB — what each role can do</title>
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-  <!-- CHANGELOG.md is the single source: this page fetches and renders it, so
-       the two can never disagree. A raw link to the .md would not do — the dev
-       server has no mime type for it and the browser downloads the file.
-
-       The renderer and its prose styles are in changelog.js / changelog.css
-       rather than in this file, because roles.html now carries the same
-       changelog under its role cards and two copies of a renderer drift. This
-       page is the standalone, shareable one, and the home of the rights table.
+  <!-- What the admin role and the participant role can each do, row by row.
+       The source is the product's own behaviour spec, which also carries
+       ticket, PR and defect references and an access risk list — none of which
+       belongs on a page in a public repo. So the table says what each role can
+       do and stops there; the reasoning is looked up in the spec itself.
 
        Not a prototype: no app shell, no sidenav, nothing from the product. It
-       is the directory page's sibling — same <main class="page stack"> header
-       as features/index.html — and it is for us, not for a review. -->
-  <link rel="stylesheet" href="./changelog.css" />
+       is the role chooser's sibling, reached from the button beside its title,
+       and it is reference rather than a screen for review. -->
   <style>
-    /* The rights table is a second document, not part of the changelog, so it
-       opens on the same rule .cl-doc h2 draws between sections — otherwise it
-       reads as one more changelog heading. */
-    .rights-section { margin-top: var(--spacing-10); padding-top: var(--spacing-6); border-top: 1px solid var(--color-border); }
+    .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
+    .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     /* ---- Side-by-side rights ----
      * Behaviour only. The source for these rows is the product's own behaviour
@@ -87,7 +81,7 @@
   <!-- Three symbols from designmd/icons.svg, inlined rather than referenced:
        an external <use href="…icons.svg#i-check"> is a second request that
        renders nothing until it lands, and the sprite is 100 symbols for the
-       three this page draws. None of the four is a <use> alias, so copying
+       four this page draws. None of the four is a <use> alias, so copying
        the symbol copies the whole icon. -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <symbol id="i-check" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 18.2998L21.5 4.2998L22.2071 5.00691L8.20711 19.0069L7.5 19.714L6.79289 19.0069L1.79289 14.0069L2.5 13.2998L7.5 18.2998Z" fill="currentColor"/></symbol>
@@ -99,26 +93,19 @@
   <main class="page stack" style="gap: var(--spacing-6)">
 
     <header style="margin-top: var(--spacing-8)">
-      <!-- Back to the role chooser, which is the only way in now that the
-           directory card no longer carries the link. -->
+      <!-- Back to the role chooser, which is the only way in: nothing links
+           here but the button beside its title. -->
       <a class="backlink" href="./roles.html">&larr; RoB</a>
-      <h1 class="h1" style="margin-top: var(--spacing-3)">RoB &mdash; prototype changelog</h1>
+      <h1 class="h1" style="margin-top: var(--spacing-3)">What each role can do</h1>
       <p class="body-sm">
-        What has been designed into the RoB prototype, in what order, and why.
-        Rendered from <code style="font: var(--type-mono); color: var(--color-text-muted)">rob/CHANGELOG.md</code>.
+        The two roles the prototype can be opened as, and what each one is allowed to do.
         &nbsp;<a class="backlink" href="./roles.html">Open the prototype &rarr;</a>
-        &nbsp;<a class="backlink" href="#what-each-role-can-do">What each role can do &darr;</a>
       </p>
     </header>
 
-    <article class="cl-doc" id="doc">
-      <p class="body-sm">Loading&hellip;</p>
-    </article>
 
 
-    <section class="rights-section stack" style="gap: var(--spacing-3)">
-      <h2 class="h4" id="what-each-role-can-do">What each role can do</h2>
-
+    <section class="stack" style="gap: var(--spacing-3)">
       <!-- role="note", not the kit example's role="alert": an alert is an
            assertive live region, which would interrupt a screen reader to
            announce a provenance note that was on the page all along. -->
@@ -306,8 +293,6 @@
       </p>
     </section>
   </main>
-
-  <script src="./changelog.js"></script>
 
 </body>
 </html>

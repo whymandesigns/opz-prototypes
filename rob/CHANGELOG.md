@@ -55,7 +55,7 @@ sit in `../archive/`, and the old `/action-items/` URL 404s.
 |---|---|
 | `rob/` | the admin owner's view — Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen. Sign out returns here |
-| `rob/changelog.html` | this file, rendered, and the oracle rights table under it — **What each role can do** on the role chooser. The chooser renders the same file inline, from the same `changelog.js` / `changelog.css` |
+| `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
 | `rob/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
 | `rob/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
 | `rob/?roles=1` | the bottom-left role switcher, for walking all three side by side |
@@ -388,7 +388,7 @@ last, short section still becomes active at maximum scroll.
   Finding that a control was enabled for the wrong role, or that a right
   follows attendance rather than ownership, changes the prototype but decides
   nothing: the rule was always the rule. What that work produces belongs in
-  [What each role can do](changelog.html#what-each-role-can-do), which states
+  [What each role can do](rights.html), which states
   the rules as they stand — an entry would only add that we were once wrong
   about them.
 - When a parked idea is picked up or finally rejected, move it out of

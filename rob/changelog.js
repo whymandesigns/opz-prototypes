@@ -1,12 +1,12 @@
 // changelog.js — renders rob/CHANGELOG.md into #doc.
 //
-// Loaded by changelog.html and by roles.html; both sit beside CHANGELOG.md and
-// _shots/, so every path here is relative to the folder, not to the page.
+// Loaded by roles.html, which sits beside CHANGELOG.md and _shots/ — every
+// path here is relative to the folder, not to the page.
 //
 // A markdown renderer for the subset CHANGELOG.md actually uses: headings,
 // paragraphs, bullets (one level of nesting), tables, fenced code, block
 // quotes, rules, and inline code / bold / italic / links. Deliberately not
-// a library — the pages that load this have three dependencies, all designmd.
+// a library — the page that loads this has three dependencies, all designmd.
 (function () {
   var esc = function (s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
