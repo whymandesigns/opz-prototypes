@@ -9,6 +9,8 @@ directly below; the rest of the file is how it got there.
   were parked rather than settled, each with the commit that still holds the
   work.
 - **[History](#history)** — what was built, in what order.
+- **[BACKLOG.md](./BACKLOG.md)** — what has not been built: gaps, ideas and the
+  questions worth a screen. Nothing is in both files.
 
 ---
 
@@ -26,7 +28,9 @@ goes to review.
 |---|---|---|
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | Divisions and Slack channels are multi-select, and the tag reads `Divisions: <names>` | `ROB-VIEW-026`, `-027` |
+| Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
+| Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
+| Action items carry threaded comments | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -96,6 +100,39 @@ to the page, and a hash survives both it and Vercel.
 
 ## History
 
+### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
+
+**Status** · Proposed — the clear-by-reselect is ours; the rest of this pass was the prototype catching up with the product.
+
+![The Divisions filter: "Client Services" in the trigger and as a tag above the calendar, a search box over seven options with that one ticked, and a footer reading "Showing only first 200 of 446 items".](_shots/2026-11-16-filter-menus.png)
+
+Most of this was correction. The divisions options drew a different glyph per
+kind, where the product draws one for all of them and lets the type underneath
+tell them apart (`ROB-VIEW-026`); the picker had no search box and no sign that
+it was holding anything back; and all five menus opened with an **All** row.
+
+That last one was the interesting mistake. `ROB-VIEW-019` says every select
+*shows the placeholder "All"* — on the trigger, where ours has always shown it.
+A multi-select has no "All" to pick, because the way to mean "all" is to tick
+nothing. Reading the placeholder as an option put a row in the list that the
+product does not have.
+
+**Taking it out is what costs something.** In the product you clear a filter by
+unticking; ours is single-select, so with the row gone the first pick was a
+one-way door — only **Clear all**, which empties every other filter too, got
+you out. So clicking the chosen option again clears it. That is a gesture the
+product has no need for, and it is in [Where it departs](#where-it-departs-from-the-product)
+as one: it exists only because the single-select does.
+
+The rest, briefly. Divisions is **446** now rather than fifteen, because a
+200-row cap and a search box mean nothing against a list that fits on screen —
+about a hundred names across the six kinds (`ORG-DIV-001`) and a tail crossed
+from verticals and disciplines, so the invention is one decision rather than
+three hundred. The menu shows seven options: its height is clamped to the room
+below the field, because it is absolutely positioned inside a popover that
+cannot scroll, and a fixed height put the count line a quarter of a screen
+below the bottom of the window with no way to reach it.
+
 ### 2026-11-13 — Click to create, on the week view *(7ed5064, local on `rob-filters-and-click-to-create`)*
 
 **Status** · Proposed — it asks before opening the form where the product opens it (`ROB-VIEW-053`), so it is a change to propose, not a screen to copy. The group has not seen it, and RoB is not what the team is working on, so expect it to sit for a few weeks.
@@ -129,7 +166,7 @@ its start), cannot arise here — the grid stops at 8 pm.
 
 **Status** · Delivered — the behaviour follows the rules. The fixture data is invented and does not resemble the tenant's, which is still [open](#open-and-worth-revisiting).
 
-![The Divisions filter open: each option carries its kind's icon and, under the name, the kind itself as a hint line.](_shots/2026-11-10-divisions-and-slack.png)
+![The Divisions filter open: a search box above seven options, each carrying the division icon and its kind as a hint line, and a footer reading "Showing only first 200 of 446 items".](_shots/2026-11-10-divisions-and-slack.png)
 
 Two of the six filter controls had been built and wired to nothing. They narrow
 the calendar now, which meant inventing the data they narrow by — and that is
@@ -346,6 +383,9 @@ last, short section still becomes active at maximum scroll.
 
 - An entry records the **reason**, not the diff — `git log --follow -- rob/index.html`
   has the diff, and these entries are distilled from its messages.
+- **Not yet designed goes in [BACKLOG.md](./BACKLOG.md), not here.** This file is
+  the past: built, parked, or departed from. An idea with no commit behind it
+  belongs in the backlog, and leaves it for a history entry when it is built.
 - **History is about the product, not about this repo.** An entry earns its
   place by changing what a RoB looks like or how it behaves. A rename, a lint
   pass, a dead-class sweep, a change to this page's own plumbing — those are

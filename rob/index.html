@@ -4570,7 +4570,32 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .rob-filter-label { font: var(--type-body); color: var(--color-text); }
 .rob-filter-field { width: 100%; min-width: 0; }
 .rob-filter-field .input-select-trigger { width: 100%; }
-.rob-filter-field .dropdown-menu { max-height: 240px; overflow-y: auto; }
+/* The kit caps .dropdown-menu at 240px and scrolls it, and caps the list
+   inside at 240px too. With a search box above and a count line below, that
+   leaves about two and a half rows of a 446-item list visible. Here the menu
+   stops scrolling and only the list does, so the search box and the count line
+   stay put while the options move under them.
+
+   The height is a clamp rather than a number because the menu is absolutely
+   positioned inside a popover that cannot scroll: anything taller than the
+   room below the field is simply unreachable, count line included. 392px is
+   seven rows and their gaps, which is the point — a list you can scan
+   rather than a slot you peer through. 607px is everything that is not the
+   list: where the menu starts, its search box, its count line, and a margin
+   off the bottom of the window. On a window too short for seven it gives back what it has
+   rather than hiding the footer, and never less than it showed before. */
+.rob-filter-field .dropdown-menu { max-height: none; overflow: visible; }
+.rob-filter-field .dropdown-list { max-height: clamp(141px, calc(100vh - 607px), 392px); }
+/* The "Showing only first N of M items" line under a capped menu. A footer
+   rather than a last row: it is about the list, not an option in it, so it
+   must not be clickable and must not scroll away with the items. */
+.rob-dd-count {
+  margin: 0;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-top: 1px solid var(--color-border);
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+}
 /* The three switches set scope rather than narrowing a field, so they sit
    below a rule of their own. */
 .rob-filter-toggles {
@@ -16306,34 +16331,77 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // and ROB-VIEW-026 sorts the options by level and then by name, so it is
       // stored rather than inferred. "General" is the built-in segment every
       // tenant has, which is why it is the one name here that is not invented.
-      const DIVISIONS = [
-        { name: 'Client Services',             kind: 'Category',       level: 0 },
-        { name: 'Enterprise',                  kind: 'Segment',        level: 0 },
-        { name: 'Financial Services',          kind: 'Vertical',       level: 0 },
-        { name: 'General',                     kind: 'Segment',        level: 0 },
-        { name: 'Healthcare & Life Sciences',  kind: 'Vertical',       level: 0 },
-        { name: 'Mid-Market',                  kind: 'Segment',        level: 0 },
-        { name: 'Platform & Technology',       kind: 'Category',       level: 0 },
-        { name: 'Retail & Consumer',           kind: 'Vertical',       level: 0 },
-        { name: 'Talent Services',             kind: 'Category',       level: 0 },
-        { name: 'Advisory & Consulting',       kind: 'Service',        level: 1 },
-        { name: 'Design Practice',             kind: 'Practice',       level: 1 },
-        { name: 'Digital Health',              kind: 'Specialization', level: 1 },
-        { name: 'Engineering Practice',        kind: 'Practice',       level: 1 },
-        { name: 'Payments & Fintech',          kind: 'Specialization', level: 1 },
-        { name: 'Product Practice',            kind: 'Practice',       level: 1 },
+      const DIV_VERTICALS = [
+        'Automotive & Mobility', 'Aviation & Aerospace', 'Consumer Goods', 'Education & EdTech',
+        'Energy & Utilities', 'Financial Services', 'Gaming & Interactive', 'Government & Public Sector',
+        'Healthcare & Life Sciences', 'Hospitality & Travel', 'Industrial & Manufacturing', 'Insurance',
+        'Legal Services', 'Logistics & Supply Chain', 'Media & Entertainment', 'Nonprofit & Social Impact',
+        'Real Estate & Construction', 'Retail & Consumer', 'Telecommunications',
       ];
+
+      const DIV_SEED = [
+        // Level 0. Three categories, six kinds, and a kind only ever belongs
+        // to its own category (ORG-DIV-001): Categories & Practices hold
+        // Category / Practice / Service, Verticals hold Vertical /
+        // Specialization, Segments hold Segment.
+        ...['Enterprise', 'General', 'Mid-Market', 'Public Sector', 'SMB', 'Strategic Accounts']
+          .map(name => ({ name, kind: 'Segment', level: 0 })),
+        ...['Client Services', 'Creative Services', 'Data & Analytics', 'Delivery Operations',
+            'Engineering Services', 'Finance Operations', 'Management Consulting', 'Marketing Agency',
+            'People Operations', 'Platform & Technology', 'Revenue Operations', 'Talent Services',
+            'Technology Services', 'Trust & Safety']
+          .map(name => ({ name, kind: 'Category', level: 0 })),
+        ...DIV_VERTICALS.map(name => ({ name, kind: 'Vertical', level: 0 })),
+
+        // Level 1.
+        ...['Apps and Integrations', 'Artificial Intelligence', 'Brand Marketing', 'Cloud Services',
+            'Creative and Content Marketing', 'Custom Software Development', 'Data Engineering',
+            'Data Science', 'Design Practice', 'DevOps and Platform', 'Digital Commerce',
+            'Embedded Systems', 'Engineering Practice', 'Growth Marketing', 'Information Security',
+            'Machine Learning Operations', 'Mobile Development', 'Performance Marketing',
+            'Product Practice', 'Quality Engineering', 'Research and Insights', 'Salesforce Practice',
+            'Service Design', 'Site Reliability', 'Technical Writing', 'Web Development']
+          .map(name => ({ name, kind: 'Practice', level: 1 })),
+        ...['Advisory & Consulting', 'Architecture Review', 'Business Analysis', 'Change Management',
+            'Delivery Management', 'Fractional Leadership', 'Managed Services', 'Program Management',
+            'Resource Augmentation', 'Solution Architecture', 'Strategy Consulting', 'Talent Matching',
+            'Technical Due Diligence', 'Training & Enablement']
+          .map(name => ({ name, kind: 'Service', level: 1 })),
+        ...['Computer Vision', 'Conversational AI', 'Digital Health', 'Identity & Access',
+            'Payments & Fintech', 'Streaming Media']
+          .map(name => ({ name, kind: 'Specialization', level: 1 })),
+      ];
+
+      // The tail, crossed rather than written out. A tenant with divisions
+      // switched on runs to hundreds — the reference screenshot shows 450 —
+      // and the menu's 200-row cap and its search box only mean anything
+      // against a list that long. Writing 350 names by hand would be 350
+      // inventions; a cross of verticals and disciplines is one, and it is
+      // visible as one. Every name here is made up; only the shape is real.
+      const DIV_DISCIPLINES = [
+        'Analytics', 'Automation', 'Benchmarking', 'Compliance', 'Data Platforms',
+        'Digital Strategy', 'Experience Design', 'Forecasting', 'Integration', 'Modernization',
+        'Operations', 'Optimization', 'Personalization', 'Platform Engineering', 'Pricing',
+        'Reporting', 'Risk Modelling', 'Transformation', 'Workforce Planning',
+      ];
+
+      // ROB-VIEW-026 sorts the options by hierarchy level and then by name, so
+      // the list is sorted once here rather than at every repaint.
+      const DIVISIONS = DIV_SEED
+        .concat(DIV_VERTICALS.flatMap(v => DIV_DISCIPLINES.map(d =>
+          ({ name: v + ' ' + d, kind: 'Specialization', level: 1 }))))
+        .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+      const DIV_BY_NAME = new Map(DIVISIONS.map(d => [d.name, d]));
+      // One icon for every division, whatever its kind. ROB-VIEW-026 says the
+      // options show "the division icon and type" — one icon, and the type is
+      // what tells them apart; the real app draws the same glyph down the whole
+      // list. A glyph per kind was our own reading of that line, and it made
+      // six symbols carry information the hint underneath already carries.
+      //
       // Whole markup rather than a slug: inline.py narrows the sprite to the
       // ids it can read in the file, so an id assembled at runtime renders
       // blank once the page is baked.
-      const DIV_ICON = {
-        Category:       '<svg class="dropdown-item-icon"><use href="#i-grid"/></svg>',
-        Practice:       '<svg class="dropdown-item-icon"><use href="#i-layers"/></svg>',
-        Service:        '<svg class="dropdown-item-icon"><use href="#i-target"/></svg>',
-        Vertical:       '<svg class="dropdown-item-icon"><use href="#i-buildings"/></svg>',
-        Specialization: '<svg class="dropdown-item-icon"><use href="#i-flag"/></svg>',
-        Segment:        '<svg class="dropdown-item-icon"><use href="#i-globe"/></svg>',
-      };
+      const DIV_ICON = '<svg class="dropdown-item-icon"><use href="#i-multi"/></svg>';
 
       // ROB-VIEW-027: the options are the channels that are the default channel
       // of at least one RoB, newest first, and at most ten are offered at a
@@ -16376,15 +16444,19 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       };
       const INERT = new Set(['attendee', 'subteams', 'no11']);
       const SLACK_MAX = 10;   // ROB-VIEW-027
+      // The divisions picker caps its menu and says so in a footer. No rule
+      // covers the number; it is read off the real picker, which shows
+      // "Showing only first 200 of 450 items" against a tenant's full list.
+      const DIV_MAX = 200;
 
-      // What an option looks like differs by filter: a division carries its
-      // icon and kind (ROB-VIEW-026), a Slack channel its "#" or its private
+      // What an option looks like differs by filter: a division carries the
+      // division icon and its kind (ROB-VIEW-026), a Slack channel its "#" or its private
       // marker (ROB-VIEW-027), and everything else is a plain row.
       const optionBody = (key, opt) => {
         if (opt === 'All') return 'All';
         if (key === 'division') {
-          const d = DIVISIONS.find(x => x.name === opt);
-          return DIV_ICON[d.kind]
+          const d = DIV_BY_NAME.get(opt);
+          return DIV_ICON
             + `<span class="dropdown-item-text"><span class="dropdown-item-label">${esc(opt)}</span>`
             + `<span class="field-hint">${d.kind}</span></span>`;
         }
@@ -16411,50 +16483,81 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         const trigger = sel.querySelector('.input-select-trigger');
         const label = (opt) => (opt === 'All' ? 'All' : key === 'slack' ? slackLabel(opt) : opt);
 
-        // The Slack menu is searchable because it has to be: fifteen channels
-        // and ten rows. A leading "#" in the search text is ignored, which is
-        // what the real box does — people type the channel the way they say it.
-        const searchable = key === 'slack';
+        // Two menus hold more than they can show, so both carry a search box:
+        // Slack offers ten at a time (ROB-VIEW-027) and divisions two hundred.
+        // Divisions also says how many it is hiding; Slack does not, because
+        // the real picker only shows that line on the divisions menu.
+        const SEARCH = {
+          slack:    { max: SLACK_MAX, hash: true,  placeholder: 'Search channels', label: 'Search channels', empty: 'No slack channels available' },
+          division: { max: DIV_MAX,   count: true, placeholder: 'Search',          label: 'Search divisions',  empty: 'No divisions available' },
+        };
+        const cfg = SEARCH[key];
+        const searchable = !!cfg;
         let list = menu;
-        if (searchable) {
+        if (cfg) {
           menu.innerHTML = '<div class="dropdown-search"><div class="input-icon input-icon-left">'
             + '<svg class="icon input-icon-glyph"><use href="#i-search"/></svg>'
-            + '<input class="input" type="search" placeholder="Search channels" aria-label="Search channels" autocomplete="off" data-rob-f-search />'
+            + `<input class="input" type="search" placeholder="${cfg.placeholder}" aria-label="${cfg.label}" autocomplete="off" data-rob-f-search />`
             + '</div></div><div class="dropdown-list"></div>'
-            + '<p class="dropdown-empty" hidden>No slack channels available</p>';
-          list = menu.querySelector('.dropdown-list');
-        } else if (key === 'division') {
-          menu.innerHTML = '<div class="dropdown-list"></div>'
-            + '<p class="dropdown-empty" hidden>No divisions available</p>';
+            + `<p class="dropdown-empty" hidden>${cfg.empty}</p>`
+            + (cfg.count ? '<p class="rob-dd-count" role="status" hidden></p>' : '');
           list = menu.querySelector('.dropdown-list');
         }
         const empty = menu.querySelector('.dropdown-empty');
+        const count = menu.querySelector('.rob-dd-count');
 
         const paint = (q) => {
           let opts = OPTIONS[key] || [];
-          if (searchable) {
-            const term = String(q || '').replace(/^#/, '').trim().toLowerCase();
-            if (term) opts = opts.filter(o => o.includes(term));
-            opts = opts.slice(0, SLACK_MAX);
+          let matched = opts.length;
+          if (cfg) {
+            // A leading "#" is ignored on the Slack box, which is what the
+            // real one does — people type the channel the way they say it.
+            let term = String(q || '');
+            if (cfg.hash) term = term.replace(/^#/, '');
+            term = term.trim().toLowerCase();
+            if (term) opts = opts.filter(o => o.toLowerCase().includes(term));
+            matched = opts.length;
+            opts = opts.slice(0, cfg.max);
           }
+          // No "All" row on any of these: the real pickers have none, and the
+          // value is cleared by unpicking. The trigger still reads "All" when
+          // nothing is chosen, which is a statement of what the filter is
+          // doing, not an option you can land on.
           list.innerHTML = '';
-          ['All', ...opts].forEach(opt => {
+          opts.forEach(opt => {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'dropdown-item' + (opt === (F[key] || 'All') ? ' is-selected' : '');
+            b.className = 'dropdown-item' + (F[key] === opt ? ' is-selected' : '');
             b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + optionBody(key, opt);
             b.addEventListener('click', (e) => {
               e.stopPropagation();
-              list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === b));
-              value.textContent = label(opt);
-              if (opt === 'All') delete F[key]; else F[key] = opt;
+              // Without an "All" row the first pick would be a one-way door,
+              // with only "Clear all" — which clears every other filter too —
+              // to get out. Clicking the chosen option again clears it, and
+              // the trigger returns to its default.
+              const clear = F[key] === opt;
+              list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', !clear && i === b));
+              value.textContent = clear ? sel.dataset.robFDefault : label(opt);
+              if (clear) delete F[key]; else F[key] = opt;
               menu.hidden = true;
               trigger.setAttribute('aria-expanded', 'false');
               apply();
             });
             list.appendChild(b);
           });
-          if (empty) empty.hidden = opts.length > 0;
+          // Two different nothings: a tenant with no divisions at all, which
+          // is the product's own string (TOP-6373), and a search that matched
+          // none of the ones there are.
+          if (empty) {
+            empty.hidden = opts.length > 0;
+            empty.textContent = (cfg && String(q || '').trim()) ? 'Nothing found' : cfg.empty;
+          }
+          // Only when something is actually being withheld: a search that
+          // narrows the list under the cap takes the line away with it.
+          if (count) {
+            count.hidden = matched <= opts.length;
+            if (!count.hidden) count.textContent = `Showing only first ${opts.length} of ${matched} items`;
+          }
         };
         paint('');
         if (searchable) {
@@ -16466,7 +16569,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           e.stopPropagation();
           const open = menu.hidden;
           fWrap.querySelectorAll('[data-rob-f-options]').forEach(m => { if (m !== menu) m.hidden = true; });
-          // A menu opens on its first ten again, not on whatever was last
+          // A menu opens on its first page again, not on whatever was last
           // typed into it: the search text belongs to the act of searching.
           if (open && searchable) { menu.querySelector('[data-rob-f-search]').value = ''; paint(''); }
           menu.hidden = !open;
@@ -16529,7 +16632,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
         fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
           sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
-          sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+          // Nothing is selected, rather than the first row being it: that was
+          // true while row 0 was "All" and would now tick a real option.
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
         });
         apply();
       });
