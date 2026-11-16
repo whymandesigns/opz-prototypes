@@ -32,7 +32,7 @@ still moving — a duplicate drifts within days.)
 |---|---|
 | `rob/` | the admin owner's view — Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen. Sign out returns here |
-| `rob/changelog.html` | this file, rendered — the **Changelog** button on the role chooser |
+| `rob/changelog.html` | this file, rendered, and the oracle rights table under it — **What each role can do** on the role chooser. The chooser renders the same file inline, from the same `changelog.js` / `changelog.css` |
 | `rob/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
 | `rob/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
 | `rob/?roles=1` | the bottom-left role switcher, for walking all three side by side |
@@ -82,6 +82,41 @@ Both are proposals. Say so when either goes to review.
 ---
 
 ## History
+
+### 2026-11-16 — The changelog moved onto the role chooser *(local on `rob-filters-and-click-to-create`)*
+
+**Status** · Delivered — the two pages swapped what they carry.
+
+![The role chooser: the two role cards, a "What each role can do" button beside the title, and the changelog rendered in full below them.](_shots/2026-11-16-changelog-on-the-chooser.png)
+
+The chooser used to end in the oracle rights table, with the changelog behind a
+button. That is the wrong way round. By the time you are on this page you have
+read two sentences about two roles and you are one click from the prototype;
+what is worth reading next is **what was decided and why**, not a 29-row table
+of permissions you would only consult with a specific question in hand. A page
+that links to its own history mostly gets skipped.
+
+So the changelog is now the body of `roles.html`, rendered in full, and the
+rights table moved to the foot of `changelog.html`, where the title row's
+button — **What each role can do** — links straight to it.
+
+**One renderer, in two files beside the thing it renders.** `changelog.js` and
+`changelog.css` came out of `changelog.html` so both pages load the same ones.
+Two copies of a markdown renderer would drift, which is the exact failure
+rendering from `CHANGELOG.md` exists to avoid. It costs `roles.html` its
+self-containment, but that was already gone: the page reads `CHANGELOG.md` and
+`_shots/` from this folder at runtime either way.
+
+Nested under a page that has its own `<h1>` and a **Changelog** label, the
+document's sections step down a size (`.cl-doc.is-nested`) — otherwise the
+label and the first section it introduces are the same size and read as
+siblings. `changelog.html`, where the `<h1>` *is* the document's title, is
+unchanged.
+
+The rights table needed four icon symbols that `changelog.html` did not have —
+it links designmd's stylesheets but carries no sprite, where `roles.html` is
+baked and has all hundred. They are inlined: four symbols, none of them a
+`<use>` alias, so copying the symbol copies the whole icon.
 
 ### 2026-11-13 — Click to create, on the week view *(7ed5064, local on `rob-filters-and-click-to-create`)*
 

@@ -11,123 +11,90 @@
        the two can never disagree. A raw link to the .md would not do — the dev
        server has no mime type for it and the browser downloads the file.
 
-       Prose has no component in the kit (there is no .prose, and nothing under
-       dist/kit.json styles an <h2> inside an article), so the rules below style
-       bare elements inside .cl-doc rather than inventing a class per tag. Every
-       value is a semantic token.
+       The renderer and its prose styles are in changelog.js / changelog.css
+       rather than in this file, because roles.html now carries the same
+       changelog under its role cards and two copies of a renderer drift. This
+       page is the standalone, shareable one, and the home of the rights table.
 
        Not a prototype: no app shell, no sidenav, nothing from the product. It
        is the directory page's sibling — same <main class="page stack"> header
        as features/index.html — and it is for us, not for a review. -->
+  <link rel="stylesheet" href="./changelog.css" />
   <style>
-    .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
-    .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
+    /* The rights table is a second document, not part of the changelog, so it
+       opens on the same rule .cl-doc h2 draws between sections — otherwise it
+       reads as one more changelog heading. */
+    .rights-section { margin-top: var(--spacing-10); padding-top: var(--spacing-6); border-top: 1px solid var(--color-border); }
 
-    /* 76ch is a reading measure, not a width: below about 620px the column has
-       to give way to the viewport, or every table and code block pushes the
-       page sideways on a phone. */
-    .cl-doc { max-width: min(76ch, 100%); }
-    .cl-doc > *:first-child { margin-top: 0; }
+    /* ---- Side-by-side rights ----
+     * Behaviour only. The source for these rows is the product's own behaviour
+     * spec, which also carries ticket, PR and defect references and an access
+     * risk list — none of which belongs on a page in a public repo. So the
+     * table says what each role can do and stops there; look the reasoning up
+     * in the spec itself. */
+    .rights { overflow-x: auto; }
+    /* Fixed layout, or the first column takes max-content: the explainer
+       sentences are long enough to push the two answer columns off the page
+       (1321px of table in a 945px page before this). Fixed makes them wrap. */
+    .rights .table { min-width: 620px; table-layout: fixed; }
+    .rights .table th:first-child,
+    .rights .table td:first-child { width: auto; }
+    .rights .table th:not(:first-child),
+    .rights .table td:not(:first-child) { width: 180px; }
+    /* The kit's table sets white-space: nowrap on every cell — right for short
+       data, wrong here: these cells carry sentences, and nowrap sent the column
+       heads' sub-lines straight across their neighbours. Top-aligned with it,
+       since a three-line cell middle-aligned against a one-word answer reads
+       as a misalignment. */
+    .rights .table th,
+    .rights .table td { white-space: normal; vertical-align: top; }
 
-    .cl-doc h2 {
-      font: var(--type-h2);
-      color: var(--color-text);
-      margin: var(--spacing-10) 0 var(--spacing-4);
+    /* A rule under every action row. The kit leaves tbody borderless — right
+       for a short list, hard to track across 29 rows whose answers sit in two
+       narrow columns a long way right of their subject. A group heading carries
+       none, so a boundary is one line and a gap rather than two lines a few
+       pixels apart, and the last row carries none so the table ends on content. */
+    .rights .table tbody td { border-bottom: 1px solid var(--color-border); }
+    .rights .table tbody .rights-group th { border-bottom: 0; }
+    .rights .table tbody tr:last-child td { border-bottom: 0; }
+
+    /* The column heads read as one block, so the two role names are a header
+       rather than two more rows of text. The empty first cell is filled too,
+       or the band starts two-thirds of the way across. */
+    .rights .table thead th { background: var(--color-surface-muted); }
+    .rights-group th {
       padding-top: var(--spacing-6);
-      border-top: 1px solid var(--color-border);
+      font: var(--font-weight-semibold) var(--text-2xs)/1 var(--font-sans);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--color-text-subtle);
     }
-    .cl-doc h3 {
-      font: var(--type-h4);
-      color: var(--color-text);
-      margin: var(--spacing-8) 0 var(--spacing-3);
-    }
-    .cl-doc h4 {
-      font: var(--type-body);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text);
-      margin: var(--spacing-6) 0 var(--spacing-2);
-    }
-    .cl-doc p,
-    .cl-doc li { font: var(--type-body); color: var(--color-text-muted); }
-    .cl-doc p { margin: 0 0 var(--spacing-4); }
-    .cl-doc strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
-    .cl-doc a { color: var(--color-text-link); text-decoration: none; }
-    .cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
-
-    /* The status row sits tight under its heading — it qualifies that entry,
-       so a paragraph's worth of air between them would read as a new thought. */
-    .cl-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin: calc(var(--spacing-2) * -1) 0 var(--spacing-4); }
-    .cl-status-note { font: var(--type-body-sm); color: var(--color-text-muted); }
-
-    /* A shot is evidence, not decoration: wide enough to read the screen it
-       shows, bordered so a white UI on a white page still has an edge. */
-    .cl-shot { margin: 0 0 var(--spacing-6); }
-    .cl-shot img {
-      display: block;
-      width: 100%;
-      max-width: 640px;
-      height: auto;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      background: var(--color-surface-muted);
-    }
-    .cl-shot figcaption { margin-top: var(--spacing-2); font: var(--type-body-xs); color: var(--color-text-muted); }
-
-    .cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
-    .cl-doc li { margin-bottom: var(--spacing-2); }
-    .cl-doc li > ul { margin: var(--spacing-2) 0 0; }
-
-    .cl-doc code {
-      font: var(--type-mono);
-      background: var(--color-surface-muted);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 0 var(--spacing-1);
-      color: var(--color-text);
-    }
-    .cl-doc pre {
-      font: var(--type-mono);
-      background: var(--color-surface-muted);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--spacing-4);
-      margin: 0 0 var(--spacing-4);
-      overflow-x: auto;
-      color: var(--color-text);
-    }
-    .cl-doc pre code { background: none; border: 0; padding: 0; }
-
-    .cl-doc blockquote {
-      margin: 0 0 var(--spacing-4);
-      padding-left: var(--spacing-4);
-      border-left: 3px solid var(--color-border-strong);
-    }
-    .cl-doc blockquote p:last-child { margin-bottom: 0; }
-
-    /* A table of URLs and rule ids has no natural wrap point, so left to itself
-       it sets the page's width and the whole document scrolls sideways. Fixed
-       layout holds it to the prose column and wraps the cells instead. */
-    .cl-doc table { margin-bottom: var(--spacing-6); width: 100%; table-layout: fixed; }
-    .cl-doc td { vertical-align: top; }
-    /* The kit's .table is a data table: components.css sets white-space:nowrap
-       on every th and td, which is right for a row of values and wrong for a
-       sentence. A prose cell has to wrap or it lays out as one long line and
-       takes the page with it. */
-    /* Selector depth matters here: .table tbody td is (0,1,2) and would beat a
-       plain .cl-doc td, so the cells keep nowrap and the fix looks like it did
-       nothing. Match the kit's shape to override it. */
-    .cl-doc table thead th,
-    .cl-doc table tbody td { white-space: normal; overflow-wrap: break-word; }
-    .cl-doc table tbody td code,
-    .cl-doc table thead th code { overflow-wrap: anywhere; }
-
-    /* A heading the in-document links jump to should not land under the
-       sticky nothing — there is no sticky header here, but a little air above
-       the target reads as "this is the thing you asked for". */
-    .cl-doc :target { scroll-margin-top: var(--spacing-6); }
+    .rights-mark { display: inline-flex; align-items: center; gap: var(--spacing-2); }
+    .rights-mark .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .rights-yes .icon { color: var(--color-success); }
+    .rights-no  { color: var(--color-text-subtle); }
+    .rights-no .icon { color: var(--color-text-subtle); }
+    /* "Elsewhere" — the right exists but neither of these roles carries it, so
+       a cross would be a half-truth. A dash reads as "not from here". */
+    .rights-na { color: var(--color-text-muted); }
+    .rights-na .icon { color: var(--color-text-subtle); }
+    .rights-note { color: var(--color-text-muted); font: var(--type-body-xs); }
+    .rights-why { color: var(--color-text-muted); font: var(--type-body-xs); display: block; margin-top: 2px; }
   </style>
 </head>
 <body>
+
+  <!-- Three symbols from designmd/icons.svg, inlined rather than referenced:
+       an external <use href="…icons.svg#i-check"> is a second request that
+       renders nothing until it lands, and the sprite is 100 symbols for the
+       three this page draws. None of the four is a <use> alias, so copying
+       the symbol copies the whole icon. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 18.2998L21.5 4.2998L22.2071 5.00691L8.20711 19.0069L7.5 19.714L6.79289 19.0069L1.79289 14.0069L2.5 13.2998L7.5 18.2998Z" fill="currentColor"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 11.293L20.5 2.79297L21.2071 3.50008L12.7071 12.0001L21.2071 20.5001L20.5 21.2072L12 12.7072L3.50001 21.2072L2.79291 20.5001L11.2929 12.0001L2.79291 3.50008L3.50001 2.79297L12 11.293Z" fill="currentColor"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><rect x="4" y="10.75" width="16" height="2.5" rx="1.25" fill="currentColor"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.5 22C17.299 22 22 17.299 22 11.5C22 5.70101 17.299 1 11.5 1C5.70101 1 1 5.70101 1 11.5C1 17.299 5.70101 22 11.5 22ZM11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21ZM12 9V16H13V17H10V16H11V10H10V9H11H12ZM12 7V6H11V7H12Z" fill="currentColor"/></symbol>
+  </svg>
 
   <main class="page stack" style="gap: var(--spacing-6)">
 
@@ -140,6 +107,7 @@
         What has been designed into the RoB prototype, in what order, and why.
         Rendered from <code style="font: var(--type-mono); color: var(--color-text-muted)">rob/CHANGELOG.md</code>.
         &nbsp;<a class="backlink" href="./roles.html">Open the prototype &rarr;</a>
+        &nbsp;<a class="backlink" href="#what-each-role-can-do">What each role can do &darr;</a>
       </p>
     </header>
 
@@ -147,236 +115,199 @@
       <p class="body-sm">Loading&hellip;</p>
     </article>
 
+
+    <section class="rights-section stack" style="gap: var(--spacing-3)">
+      <h2 class="h4" id="what-each-role-can-do">What each role can do</h2>
+
+      <!-- role="note", not the kit example's role="alert": an alert is an
+           assertive live region, which would interrupt a screen reader to
+           announce a provenance note that was on the page all along. -->
+      <div class="alert alert-info" role="note">
+        <svg class="icon alert-icon"><use href="#i-info"/></svg>
+        <p class="alert-message">
+          <strong>Source: the test oracle</strong> &mdash; Operationalize&rsquo;s own behaviour spec,
+          written from the platform code. These rows are what the product <em>enforces</em>, which is
+          not always what the Operating Framework material describes; where the two disagree, this is
+          the one that holds. The per-row evidence behind each answer stays in the spec.
+        </p>
+      </div>
+
+      <div class="rights">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">&nbsp;</th>
+              <th scope="col">Admin role</th>
+              <th scope="col">Participant role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Reading</th></tr>
+            <tr>
+              <td>Open and read any RoB in the company<span class="rights-why">Details, occurrences, roster, history, agenda, action items, pre-reads and deck. Not a participant privilege &mdash; every employee can read every RoB, attending or not.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Attendance per occurrence, and the roster&rsquo;s participation icons</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>The aggregate attendance summary</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>The paused series list<span class="rights-why">Its page is open to anyone who has the URL. The admin permission only adds the link to it in the &hellip; menu.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes, and linked</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>By URL only</span></td>
+            </tr>
+            <tr>
+              <td>Search for people to invite, and resolve a Slack card<span class="rights-why">Open to every signed-in account, with no business-line narrowing.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">The meeting itself</th></tr>
+            <tr>
+              <td>Create a new series<span class="rights-why">Any employee can, and may name anyone as its owner.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Edit the series, or one occurrence</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Cancel an occurrence, or restore a cancelled one</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Pause or resume the series</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Delete the series</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Transfer ownership, or the Zoom room</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Retry or discard a failed calendar sync<span class="rights-why">Only where async calendar sync is switched on for the tenant and the person is on its rollout list, so it is absent most of the time.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>As owner, where enabled</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Export the directory as CSV<span class="rights-why">Carried by the global &ldquo;Manage all RoB meetings&rdquo; permission, not by owning a meeting.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Connections</th></tr>
+            <tr>
+              <td>Link an Initiative from the RoB side</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Attach the RoB from the Initiative&rsquo;s side<span class="rights-why">Neither role carries this: it belongs to whoever can update the Initiative &mdash; its accountable owner, its project manager, or a holder of &ldquo;Administer initiatives&rdquo;. No RoB permission is involved, which is how a meeting gets linked by someone who does not own it. Linking is also what pulls the Initiative&rsquo;s RACI in as participants.</span></td>
+              <td><span class="rights-mark rights-na"><svg class="icon"><use href="#i-minus"/></svg>From the Initiative</span></td>
+              <td><span class="rights-mark rights-na"><svg class="icon"><use href="#i-minus"/></svg>From the Initiative</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Agenda items</th></tr>
+            <tr>
+              <td>Add, edit, archive, move, mark discussed<span class="rights-why">One exception: anyone who can edit a linked Initiative may manage that Initiative&rsquo;s items on meetings it is linked to &mdash; a right that comes from the Initiative, not from the meeting.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Action items</th></tr>
+            <tr>
+              <td>Add, edit, archive</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr>
+              <td>Change the status</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Any item</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Their own item only</span></td>
+            </tr>
+            <tr>
+              <td>Mark as read</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>See a person&rsquo;s items on their profile</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Pre-reads</th></tr>
+            <tr>
+              <td>Read the links</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Add a link</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Remove a link</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Deck</th></tr>
+            <tr>
+              <td>View it</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+            </tr>
+            <tr>
+              <td>Generate or remove it<span class="rights-why">The owner&rsquo;s alone. A RoB admin who does not own the series gets view only.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>As owner</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Recordings</th></tr>
+            <tr>
+              <td>Watch one without the passcode<span class="rights-why">The surprise in this table: the admin permission does not carry recording access, and ownership does not either. Attending does. An owner who is not an attendee needs what anyone else needs &mdash; an org-unit &ldquo;RoB recordings viewer&rdquo; grant, RACI membership of a linked Initiative, or an approved request.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>If attending, else by grant</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes, as an attendee</span></td>
+            </tr>
+            <tr>
+              <td>Request access, and answer a request<span class="rights-why">Requests come from readers who cannot already watch. Approve and decline arrive as buttons in the owner&rsquo;s Slack DM.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Answers requests</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Can request</span></td>
+            </tr>
+            <tr>
+              <td>List who watched one</td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Yes</span></td>
+              <td><span class="rights-mark rights-no"><svg class="icon"><use href="#i-close"/></svg>No</span></td>
+            </tr>
+            <tr class="rights-group"><th colspan="3" scope="colgroup">Their own attendance</th></tr>
+            <tr>
+              <td>Answer the invite &mdash; Going, Reject, Maybe<span class="rights-why">Everyone answers on their own row. It is identity, not permission: the owner cannot answer for a participant.</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Own row</span></td>
+              <td><span class="rights-mark rights-yes"><svg class="icon"><use href="#i-check"/></svg>Own row</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="body-sm" style="color: var(--color-text-subtle)">
+        Not in the prototype yet, so the table is ahead of the screens: pre-reads, the aggregate
+        attendance summary, and agenda items as anything more than an empty state.
+      </p>
+    </section>
   </main>
 
-  <script>
-    // A markdown renderer for the subset CHANGELOG.md actually uses: headings,
-    // paragraphs, bullets (one level of nesting), tables, fenced code, block
-    // quotes, rules, and inline code / bold / italic / links. Deliberately not
-    // a library — this page has three dependencies and they are all designmd.
-    (function () {
-      var esc = function (s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      };
-
-      // GitHub's heading slug, so the file's own [text](#anchor) links land.
-      var slug = function (s) {
-        return s.toLowerCase()
-          .replace(/[`*_[\]()]/g, '')
-          .replace(/[^\w\s-]/g, '')
-          .trim()
-          .replace(/\s+/g, '-');
-      };
-
-      // Four states, and an entry is in exactly one of them. A fifth word
-      // still renders — as the neutral grey — so adding one is a changelog
-      // edit rather than a code change; but the point of a short list is that
-      // the tag answers "can I rely on this?" at a glance, which a row of
-      // three qualifiers does not.
-      var TAGS = {
-        'proposed':  'tag-blue-light',   // built here, and a change to the product
-        'in review': 'tag-warning',      // built, waiting on the group
-        'delivered': 'tag-positive',     // merged to main — this prototype, never the product
-        'cancelled': 'tag-negative'      // decided against; the entry stays
-      };
-
-      var inline = function (s) {
-        return esc(s)
-          .replace(/`([^`]+)`/g, function (_, c) { return '<code>' + c + '</code>'; })
-          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-          .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
-          .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function (_, alt, src) {
-            return shotImg(alt, src);
-          })
-          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, t, href) {
-            var safe = /^(https?:|#|\.|\/)/.test(href) ? href : '#';
-            return '<a href="' + safe + '">' + t + '</a>';
-          });
-      };
-
-      // Only a relative path, and only an image: a changelog shot lives beside
-      // the file it documents. Anything else renders as the alt text, which is
-      // what a reader needs anyway.
-      var shotImg = function (alt, src) {
-        if (!/^[\w./-]+\.(png|jpg|jpeg|gif|webp|svg)$/i.test(src) || src.indexOf('..') === 0) {
-          return esc(alt || src);
-        }
-        var img = document.createElement('img');
-        img.src = src;
-        img.alt = alt || '';
-        img.loading = 'lazy';
-        return img.outerHTML;
-      };
-
-      // A paragraph that is nothing but an image becomes a figure: the shot at
-      // a readable width, its alt doubling as the caption, and a link to the
-      // file so a detail too small to read here can be opened full size.
-      var figure = function (alt, src) {
-        var html = shotImg(alt, src);
-        if (html.indexOf('<img') !== 0) return '<p>' + html + '</p>';
-        var fig = document.createElement('figure');
-        fig.className = 'cl-shot';
-        var a = document.createElement('a');
-        a.href = src;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.innerHTML = html;
-        fig.appendChild(a);
-        if (alt) {
-          var cap = document.createElement('figcaption');
-          cap.textContent = alt;
-          fig.appendChild(cap);
-        }
-        return fig.outerHTML;
-      };
-
-      var render = function (md) {
-        var lines = md.replace(/\r\n/g, '\n').split('\n');
-        var out = [];
-        var i = 0;
-        var seenH1 = false;
-
-        var flushTable = function () {
-          var rows = [];
-          while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
-          if (rows.length < 2) { rows.forEach(function (r) { out.push('<p>' + inline(r) + '</p>'); }); return; }
-          var cells = function (r) {
-            return r.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); });
-          };
-          var head = cells(rows[0]);
-          var body = rows.slice(2).map(cells);
-          out.push('<table class="table">');
-          out.push('<thead><tr>' + head.map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('') + '</tr></thead>');
-          out.push('<tbody>' + body.map(function (r) {
-            return '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
-          }).join('') + '</tbody>');
-          out.push('</table>');
-        };
-
-        // A bullet owns every following line indented past it, so a wrapped
-        // sentence stays in its own <li> instead of starting a paragraph.
-        var flushList = function (indent) {
-          out.push('<ul>');
-          while (i < lines.length) {
-            var m = lines[i].match(/^(\s*)- (.*)$/);
-            if (!m || m[1].length < indent) break;
-            if (m[1].length > indent) { flushList(m[1].length); continue; }
-            var text = [m[2]];
-            i++;
-            while (i < lines.length) {
-              if (/^\s*- /.test(lines[i])) break;
-              if (/^\s+\S/.test(lines[i])) { text.push(lines[i].trim()); i++; continue; }
-              break;
-            }
-            out.push('<li>' + inline(text.join(' ')));
-            if (i < lines.length) {
-              var next = lines[i].match(/^(\s*)- (.*)$/);
-              if (next && next[1].length > indent) flushList(next[1].length);
-            }
-            out.push('</li>');
-          }
-          out.push('</ul>');
-        };
-
-        while (i < lines.length) {
-          var line = lines[i];
-
-          if (!line.trim()) { i++; continue; }
-
-          if (/^```/.test(line)) {
-            i++;
-            var code = [];
-            while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]);
-            i++;
-            out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>');
-            continue;
-          }
-
-          if (/^---+\s*$/.test(line)) { i++; continue; }   // the file's section rules; h2 draws its own
-
-          var h = line.match(/^(#{1,4}) (.*)$/);
-          if (h) {
-            i++;
-            if (h[1].length === 1) {
-              // The page header already carries the document title.
-              if (!seenH1) { seenH1 = true; continue; }
-            }
-            var level = Math.min(h[1].length, 4);
-            out.push('<h' + level + ' id="' + slug(h[2]) + '">' + inline(h[2]) + '</h' + level + '>');
-            continue;
-          }
-
-          if (/^>\s?/.test(line)) {
-            var quote = [];
-            while (i < lines.length && /^>\s?/.test(lines[i])) quote.push(lines[i++].replace(/^>\s?/, ''));
-            out.push('<blockquote><p>' + inline(quote.join(' ')) + '</p></blockquote>');
-            continue;
-          }
-
-          if (/^\s*\|/.test(line)) { flushTable(); continue; }
-
-          if (/^\s*- /.test(line)) { flushList(line.match(/^(\s*)/)[1].length); continue; }
-
-          var para = [];
-          while (i < lines.length && lines[i].trim() && !/^(#{1,4} |```|>|\s*[-|])/.test(lines[i])) para.push(lines[i++]);
-          if (!para.length) { out.push('<p>' + inline(lines[i++]) + '</p>'); continue; }
-          var text = para.join(' ');
-
-          // A line that is only an image is a figure, not a paragraph.
-          var shot = text.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-          if (shot) { out.push(figure(shot[1], shot[2])); continue; }
-
-          // "**Status** · Proposed · Parked — why" becomes a row of tags and a
-          // note. Written as an ordinary bold line so the raw file still reads
-          // on GitHub, where there are no tags to render.
-          var st = text.match(/^\*\*Status\*\*\s*[·:]\s*(.*)$/);
-          if (st) {
-            var halves = st[1].split(/\s+—\s+/);
-            // One status, however many are written. Two states at once is the
-            // thing this is meant to stop, so the extras are dropped rather
-            // than rendered smaller or greyer.
-            var chips = halves[0].split(/\s*·\s*/).filter(Boolean).slice(0, 1).map(function (name) {
-              // Built as an element rather than a string. Any literal
-              // class="..." + variable reads to lint.py as a class named after
-              // the variable — which is the runtime-assembled-name trap it
-              // exists to catch, and it is right to flag it. className says the
-              // same thing where the linter is not looking for a class, and
-              // textContent escapes the label for free.
-              var chip = document.createElement('span');
-              chip.className = 'tag ' + (TAGS[name.trim().toLowerCase()] || 'tag-light');
-              chip.textContent = name.trim();
-              return chip.outerHTML;
-            }).join('');
-            var note = halves.slice(1).join(' — ');
-            out.push('<p class="cl-status">' + chips
-              + (note ? '<span class="cl-status-note">' + inline(note) + '</span>' : '') + '</p>');
-            continue;
-          }
-
-          out.push('<p>' + inline(text) + '</p>');
-        }
-
-        return out.join('\n');
-      };
-
-      var doc = document.getElementById('doc');
-      fetch('./CHANGELOG.md', { cache: 'no-cache' })
-        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-        .then(function (md) {
-          doc.innerHTML = render(md);
-          if (location.hash) {
-            var t = document.getElementById(location.hash.slice(1));
-            if (t) t.scrollIntoView();
-          }
-        })
-        .catch(function (e) {
-          doc.innerHTML = '<div class="alert alert-danger"><span class="alert-message">'
-            + '<strong>CHANGELOG.md could not be read</strong> &mdash; ' + esc(String(e.message || e))
-            + '. It sits beside this page; open <a href="./CHANGELOG.md">the file</a> directly.'
-            + '</span></div>';
-        });
-    })();
-  </script>
+  <script src="./changelog.js"></script>
 
 </body>
 </html>

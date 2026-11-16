@@ -1,0 +1,125 @@
+/* changelog.css — how rob/CHANGELOG.md renders as a page.
+ *
+ * Shared by changelog.html (the standalone, shareable page) and roles.html
+ * (which carries the same changelog under the role cards). One file, because
+ * the point of rendering from CHANGELOG.md is that there is one source — two
+ * copies of the renderer would reintroduce exactly the drift it avoids.
+ *
+ * Prose has no component in the kit (there is no .prose, and nothing under
+ * dist/kit.json styles an <h2> inside an article), so the rules below style
+ * bare elements inside .cl-doc rather than inventing a class per tag. Every
+ * value is a semantic token.
+ */
+
+.backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
+.backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* 76ch is a reading measure, not a width: below about 620px the column has
+   to give way to the viewport, or every table and code block pushes the
+   page sideways on a phone. */
+.cl-doc { max-width: min(76ch, 100%); }
+.cl-doc > *:first-child { margin-top: 0; }
+
+.cl-doc h2 {
+  font: var(--type-h2);
+  color: var(--color-text);
+  margin: var(--spacing-10) 0 var(--spacing-4);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+}
+/* Nested in a page that already carries its own <h1> and a "Changelog"
+   label — roles.html does — the document's sections step down one, or its
+   first heading is the same size as the label above it and the two read as
+   siblings. On changelog.html, where the <h1> is the document's own title,
+   they stay at h2. */
+.cl-doc.is-nested h2 { font: var(--type-h3); }
+
+.cl-doc h3 {
+  font: var(--type-h4);
+  color: var(--color-text);
+  margin: var(--spacing-8) 0 var(--spacing-3);
+}
+.cl-doc h4 {
+  font: var(--type-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: var(--spacing-6) 0 var(--spacing-2);
+}
+.cl-doc p,
+.cl-doc li { font: var(--type-body); color: var(--color-text-muted); }
+.cl-doc p { margin: 0 0 var(--spacing-4); }
+.cl-doc strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
+.cl-doc a { color: var(--color-text-link); text-decoration: none; }
+.cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* The status row sits tight under its heading — it qualifies that entry,
+   so a paragraph's worth of air between them would read as a new thought. */
+.cl-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin: calc(var(--spacing-2) * -1) 0 var(--spacing-4); }
+.cl-status-note { font: var(--type-body-sm); color: var(--color-text-muted); }
+
+/* A shot is evidence, not decoration: wide enough to read the screen it
+   shows, bordered so a white UI on a white page still has an edge. */
+.cl-shot { margin: 0 0 var(--spacing-6); }
+.cl-shot img {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+.cl-shot figcaption { margin-top: var(--spacing-2); font: var(--type-body-xs); color: var(--color-text-muted); }
+
+.cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
+.cl-doc li { margin-bottom: var(--spacing-2); }
+.cl-doc li > ul { margin: var(--spacing-2) 0 0; }
+
+.cl-doc code {
+  font: var(--type-mono);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--spacing-1);
+  color: var(--color-text);
+}
+.cl-doc pre {
+  font: var(--type-mono);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+  margin: 0 0 var(--spacing-4);
+  overflow-x: auto;
+  color: var(--color-text);
+}
+.cl-doc pre code { background: none; border: 0; padding: 0; }
+
+.cl-doc blockquote {
+  margin: 0 0 var(--spacing-4);
+  padding-left: var(--spacing-4);
+  border-left: 3px solid var(--color-border-strong);
+}
+.cl-doc blockquote p:last-child { margin-bottom: 0; }
+
+/* A table of URLs and rule ids has no natural wrap point, so left to itself
+   it sets the page's width and the whole document scrolls sideways. Fixed
+   layout holds it to the prose column and wraps the cells instead. */
+.cl-doc table { margin-bottom: var(--spacing-6); width: 100%; table-layout: fixed; }
+.cl-doc td { vertical-align: top; }
+/* The kit's .table is a data table: components.css sets white-space:nowrap
+   on every th and td, which is right for a row of values and wrong for a
+   sentence. A prose cell has to wrap or it lays out as one long line and
+   takes the page with it. */
+/* Selector depth matters here: .table tbody td is (0,1,2) and would beat a
+   plain .cl-doc td, so the cells keep nowrap and the fix looks like it did
+   nothing. Match the kit's shape to override it. */
+.cl-doc table thead th,
+.cl-doc table tbody td { white-space: normal; overflow-wrap: break-word; }
+.cl-doc table tbody td code,
+.cl-doc table thead th code { overflow-wrap: anywhere; }
+
+/* A heading the in-document links jump to should not land under the
+   sticky nothing — there is no sticky header here, but a little air above
+   the target reads as "this is the thing you asked for". */
+.cl-doc :target { scroll-margin-top: var(--spacing-6); }
