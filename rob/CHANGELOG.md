@@ -1,14 +1,45 @@
 # RoB Meetings — prototype changelog
 
-Three places to look before the history:
+Where this prototype and the product disagree, and why. That is the section
+directly below; the rest of the file is how it got there.
 
 - **[Reach the variants](#reach-the-variants)** — the flows that only exist
   behind a URL. Several good ideas live there and nowhere else.
 - **[Open, and worth revisiting](#open-and-worth-revisiting)** — decisions that
   were parked rather than settled, each with the commit that still holds the
   work.
-- **[Where it departs from the product](#where-it-departs-from-the-product)** —
-  the places this prototype proposes a change rather than describing one.
+- **[History](#history)** — what was built, in what order.
+
+---
+
+## Where it departs from the product
+
+**The reason this file exists.** A prototype that matched the product in every
+respect would need no changelog — you could read the product. These are the
+places it does not, each with the rule that says what the product does.
+
+**We propose a change.** Built deliberately against the rule, because we think
+the rule is wrong. Each one is a proposal, and needs saying out loud when it
+goes to review.
+
+| Here | The product | Rule |
+|---|---|---|
+| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
+| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
+| Every filter is single-select | Divisions and Slack channels are multi-select, and the tag reads `Divisions: <names>` | `ROB-VIEW-026`, `-027` |
+
+**We follow the spec where the product does not.** Not proposals: the rule is
+already the rule, and the shipped code has an open deviation from it. Built to
+the rule, with the deviation's id beside it — so a reviewer who tries this in
+the real app and sees something else knows which of the two is the bug.
+
+| Here | The product today | Rule | Deviation |
+|---|---|---|---|
+| A cancelled occurrence's agenda is read-only, and says why | its agenda items, action items and pre-read links stay editable | `ROB-AGENDA-065` | `B-187` |
+| **Mark as discussed** appears only once the occurrence has started | it is offered and accepted on any occurrence, future ones included | `ROB-AGENDA-066` | `B-191` |
+
+A row leaves this section when the product adopts the proposal, overrules it, or
+fixes the deviation — not when we stop thinking about it.
 
 ---
 
@@ -57,19 +88,9 @@ to the page, and a hash survives both it and Vercel.
   `-c-proj-…` and `-ba-bau-…` prefixed channels that look nothing like these.
   The fixtures obey `ROB-VIEW-027`; they do not look like the tenant. Paste the
   real list over `SLACK_CHANNELS` when someone has it.
-- **Click-to-create asks first.** See [below](#where-it-departs-from-the-product).
+- **Click-to-create asks first.** See [the departures](#where-it-departs-from-the-product).
 
 ---
-
-## Where it departs from the product
-
-| Here | The product | Rule |
-|---|---|---|
-| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
-| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | Divisions and Slack channels are multi-select, and the tag reads `Divisions: <names>` | `ROB-VIEW-026`, `-027` |
-
-Both are proposals. Say so when either goes to review.
 
 ---
 
@@ -358,6 +379,11 @@ last, short section still becomes active at maximum scroll.
   them. Here they pad the one thing the file is for: what we decided about the
   product, and why. If an entry has nothing to screenshot, ask whether it has
   anything to say.
+- **A history entry that creates a departure adds the row.** The entry says why
+  we did it once; [Where it departs from the product](#where-it-departs-from-the-product)
+  is where someone finds it without reading the history. An entry that builds a
+  rule the shipped product gets wrong belongs in the second table, with the
+  deviation id — not the first, because following a rule is not a proposal.
 - **Correcting the prototype against the spec is operational, not a decision.**
   Finding that a control was enabled for the wrong role, or that a right
   follows attendance rather than ownership, changes the prototype but decides
