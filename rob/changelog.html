@@ -168,17 +168,16 @@
           .replace(/\s+/g, '-');
       };
 
-      // The status vocabulary. A word nobody has defined yet still renders —
-      // as the neutral grey — so a new one is a changelog edit, not a code
-      // change. Keep the list short: a tag everyone recognises is worth more
-      // than a tag that is exactly right.
+      // Four states, and an entry is in exactly one of them. A fifth word
+      // still renders — as the neutral grey — so adding one is a changelog
+      // edit rather than a code change; but the point of a short list is that
+      // the tag answers "can I rely on this?" at a glance, which a row of
+      // three qualifiers does not.
       var TAGS = {
-        'proposed':     'tag-blue-light',   // a design proposal; the product does not do this
-        'needs review': 'tag-warning',      // waiting on the group
-        'parked':       'tag-light',        // nobody is picking it up right now
-        'reviewed':     'tag-blue',         // the group has seen it
-        'adopted':      'tag-positive',     // the product took it
-        'dropped':      'tag-negative'      // decided against
+        'proposed':  'tag-blue-light',   // built here, and a change to the product
+        'in review': 'tag-warning',      // built, waiting on the group
+        'delivered': 'tag-positive',     // merged to main — this prototype, never the product
+        'cancelled': 'tag-negative'      // decided against; the entry stays
       };
 
       var inline = function (s) {
@@ -333,7 +332,10 @@
           var st = text.match(/^\*\*Status\*\*\s*[·:]\s*(.*)$/);
           if (st) {
             var halves = st[1].split(/\s+—\s+/);
-            var chips = halves[0].split(/\s*·\s*/).filter(Boolean).map(function (name) {
+            // One status, however many are written. Two states at once is the
+            // thing this is meant to stop, so the extras are dropped rather
+            // than rendered smaller or greyer.
+            var chips = halves[0].split(/\s*·\s*/).filter(Boolean).slice(0, 1).map(function (name) {
               // Built as an element rather than a string. Any literal
               // class="..." + variable reads to lint.py as a class named after
               // the variable — which is the runtime-assembled-name trap it
