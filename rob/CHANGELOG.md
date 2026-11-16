@@ -114,7 +114,7 @@ its start), cannot arise here — the grid stops at 8 pm.
 
 ### 2026-11-10 — Divisions and Slack channels start filtering *(ea3d17c, local on `rob-filters-and-click-to-create`)*
 
-**Status** · In review — built and waiting on the group. The behaviour follows the rules; what needs a look is the fixture data, which is invented and does not resemble the tenant's (see [Open, and worth revisiting](#open-and-worth-revisiting)).
+**Status** · Delivered — the behaviour follows the rules. The fixture data is invented and does not resemble the tenant's, which is still [open](#open-and-worth-revisiting).
 
 ![The Divisions filter open: each option carries its kind's icon and, under the name, the kind itself as a hint line.](_shots/2026-11-10-divisions-and-slack.png)
 
@@ -165,6 +165,8 @@ blank. Static-icon count went 72 → 77 when this was fixed.
 
 **Status** · Delivered
 
+![A past meeting's agenda, frozen: the notice that it cannot be changed, and the series' other items grouped under Other meetings with their cadence.](_shots/2026-11-10-agenda-items.png)
+
 **Agenda items belong to the series, not the occurrence.** What a meeting shows
 is a filter over that list, so the section renders two groups — "This meeting",
 numbered, and "Other meetings", dashed — with the add control between them,
@@ -202,6 +204,8 @@ the first match rather than the right one.
 
 **Status** · Delivered
 
+![The paused series list: five series stopped, each with what it drives, its cadence, its accountable owner and the date it was paused.](_shots/2026-11-09-series-lifecycle.png)
+
 One menu in the meeting-view header: Transfer ownership, Pause / Resume series,
 Cancel this meeting only / Restore, and Delete meeting series last and red.
 Cancel and Delete only on an occurrence that is neither cancelled nor started;
@@ -222,6 +226,8 @@ called something else.
 ### 2026-11-09 — Hold the role rules to the spec (3c99dbb, #155)
 
 **Status** · Delivered
+
+![What each role can do, row by row, with the oracle named as the source and a Yes, No or qualified answer per role.](_shots/2026-11-09-role-rules.png)
 
 Five corrections from reviewing the roles against the behaviour spec rather than
 against what the prototype happened to do.
@@ -246,6 +252,8 @@ against what the prototype happened to do.
 
 **Status** · Delivered
 
+![The role chooser: admin and participant side by side, each saying who they are and what they can change.](_shots/2026-11-09-viewer-roles.png)
+
 **Rights are not one ladder**, which is why the table is written out rather than
 modelled as a scale: an owner is not an admin ("Manage all RoB meetings" is
 global), and an admin is not an owner (deck rights stayed with the owner when
@@ -269,6 +277,8 @@ hiding, the off-canvas sidenav among them.
 ### 2026-11-05 — Role chooser, calendar views, filters, More menu (4d02f3a, #152)
 
 **Status** · Delivered
+
+![The schedule view grouped by day, with the More menu open on Export as CSV and Paused meeting series.](_shots/2026-11-05-calendar-views.png)
 
 **Three calendar views from one dataset.** Nineteen series with a weekday and a
 weekly or bi-weekly cadence generate the month (72 occurrences), the week and
@@ -300,6 +310,8 @@ still-legacy files the `designmd:legacy` marker.
 
 **Status** · Delivered
 
+![The key metric picker: create a custom metric, search the OKR catalogue, or take one of the four suggestions offered without scrolling.](_shots/2026-09-29-key-metric-flow.png)
+
 A fixed, hard-coded key result became a full lifecycle: a ghost "+ Add key
 metric" when there is none, a select that searches the OKR catalogue or opens a
 custom-metric modal, then the row itself. The list carries 20 OKRs but offers
@@ -327,6 +339,8 @@ because `overflow` is powerless against the avatar's `clip-path` chamfer.
 
 **Status** · Delivered
 
+![The status menu on your own row in the roster — Going, checked, with Reject and Maybe under it.](_shots/2026-09-23-answering-an-invite.png)
+
 **Declining and going tentative are one decision with two answers**, so the
 modal asks for the answer first and the rest follows: the CTA reads Reject
 meeting or Mark as tentative, the reason prompt changes, and the two options
@@ -346,6 +360,8 @@ reasoning that still governs variants in this prototype.
 ### 2026-09-16 — The meeting view, inline edit, reject flow (#5b220be → 6ef66d4)
 
 **Status** · Delivered
+
+![The meeting view: details on the left, the roster with each person's RACI letter on the right, and the section rail beside them.](_shots/2026-09-16-meeting-view.png)
 
 Edit stopped opening a separate modal: `#meeting-detail.is-editing` swaps the
 read-only icon-row grid for the same input grid the create modal uses, and the
@@ -370,6 +386,8 @@ old `/action-items/` URL 404s from here.
 ### 2026-09-10 — Full-screen create and view modals (e7f2f26)
 
 **Status** · Delivered
+
+![The create form, full screen: details, recurrence, owner and participants, with connections below.](_shots/2026-09-10-create-form.png)
 
 `.modal-full` arrives, the Details section is rebuilt from Figma `31083:50091`,
 and **field labels leave Details entirely** — every input carries a leading
@@ -398,18 +416,21 @@ one-file-many-variants rule. Both earlier flows now sit in `../archive/`.
 - **Every entry carries exactly one status.** A `**Status**` line under the
   heading says which: **Proposed** (built here, and a change to the product
   rather than a description of it), **In review** (built and waiting on the
-  group), **Delivered** (merged to `main` and on the deployed site),
+  group), **Delivered** (built, settled, and in the prototype as it stands),
   **Cancelled** (decided against; the entry stays, because why it was dropped
-  is the useful part). Then an em dash and one sentence, where there is
+  is the useful part). Delivered is about the design, not about git — whether
+  the commit has reached `main` is in the heading, with the branch. Then an em dash and one sentence, where there is
   anything to add. The page renders the first word as a tag and ignores any
   others, so two states is not a thing you can express — pick the one that is
   true today and change it when it changes.
-  **Delivered never means the product shipped it.** It means this prototype
-  did. What the product does comes from the oracle; where we propose changing
+  **Delivered never means the product shipped it.** It means we finished
+  designing it. What the product does comes from the oracle; where we propose changing
   it is [Where it departs from the product](#where-it-departs-from-the-product).
-- **A shot is worth one line of the description.** An entry may carry one
+- **A shot is worth one line of the description.** An entry carries one
   screenshot, written as a plain image on its own line and kept in `_shots/`,
-  named for the entry's date. The alt text is the caption on the page and the
+  named for the entry's date. An entry about the files rather than the screen —
+  a rename, a re-bake — has none, because a screenshot of an unrelated screen
+  would be worse than the gap. The alt text is the caption on the page and the
   only description on GitHub, so write it as a sentence about what the screen
   is doing, not "screenshot". Shoot it from the running prototype, not from a
   design file — the point is what was built.
