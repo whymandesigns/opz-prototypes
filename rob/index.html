@@ -16489,9 +16489,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         // the real picker only shows that line on the divisions menu.
         const SEARCH = {
           slack:    { max: SLACK_MAX, hash: true,  placeholder: 'Search channels', label: 'Search channels', empty: 'No slack channels available' },
-          // noAll: the real divisions picker has no "All" row — you clear it by
-          // unpicking, which is what the selected row does here.
-          division: { max: DIV_MAX,   count: true, noAll: true, placeholder: 'Search', label: 'Search divisions', empty: 'No divisions available' },
+          division: { max: DIV_MAX,   count: true, placeholder: 'Search',          label: 'Search divisions',  empty: 'No divisions available' },
         };
         const cfg = SEARCH[key];
         const searchable = !!cfg;
@@ -16521,19 +16519,23 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             matched = opts.length;
             opts = opts.slice(0, cfg.max);
           }
+          // No "All" row on any of these: the real pickers have none, and the
+          // value is cleared by unpicking. The trigger still reads "All" when
+          // nothing is chosen, which is a statement of what the filter is
+          // doing, not an option you can land on.
           list.innerHTML = '';
-          (cfg && cfg.noAll ? opts : ['All', ...opts]).forEach(opt => {
+          opts.forEach(opt => {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'dropdown-item' + (opt === (F[key] || 'All') ? ' is-selected' : '');
+            b.className = 'dropdown-item' + (F[key] === opt ? ' is-selected' : '');
             b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + optionBody(key, opt);
             b.addEventListener('click', (e) => {
               e.stopPropagation();
-              // A menu with no "All" row needs another way back to unfiltered,
-              // or the first pick is a one-way door and only "Clear all" — which
-              // clears every other filter too — gets you out. Clicking the chosen
-              // option again clears it, and the trigger returns to its default.
-              const clear = opt === 'All' || F[key] === opt;
+              // Without an "All" row the first pick would be a one-way door,
+              // with only "Clear all" — which clears every other filter too —
+              // to get out. Clicking the chosen option again clears it, and
+              // the trigger returns to its default.
+              const clear = F[key] === opt;
               list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', !clear && i === b));
               value.textContent = clear ? sel.dataset.robFDefault : label(opt);
               if (clear) delete F[key]; else F[key] = opt;
@@ -16630,7 +16632,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
         fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
           sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
-          sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+          // Nothing is selected, rather than the first row being it: that was
+          // true while row 0 was "All" and would now tick a real option.
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
         });
         apply();
       });
