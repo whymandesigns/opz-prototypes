@@ -85,6 +85,8 @@ Both are proposals. Say so when either goes to review.
 
 ### 2026-11-13 — Click to create, on the week view *(7ed5064, local on `rob-filters-and-click-to-create`)*
 
+**Status** · Proposed · Needs review · Parked — it asks before opening the form where the product opens it (`ROB-VIEW-053`), so it is a change to propose, not a screen to copy. The group has not seen it, and RoB is not what the team is working on, so expect it to sit for a few weeks.
+
 An hour in the week grid is now two 30-minute slots, as real elements rather
 than arithmetic on a column click — "a past slot shows no pointer"
 (`ROB-VIEW-053`) is a per-slot affordance a column cannot carry. Clicking an
@@ -109,6 +111,8 @@ The rule's known deviation, **B-136** (the 23:30 slot pre-fills an end before
 its start), cannot arise here — the grid stops at 8 pm.
 
 ### 2026-11-10 — Divisions and Slack channels start filtering *(ea3d17c, local on `rob-filters-and-click-to-create`)*
+
+**Status** · Needs review · Parked — the behaviour follows the rules, but the fixture data is invented and does not look like the tenant's (see [Open, and worth revisiting](#open-and-worth-revisiting)). Unmerged on the same branch.
 
 Two of the six filter controls had been built and wired to nothing. They narrow
 the calendar now, which meant inventing the data they narrow by — and that is
@@ -363,6 +367,15 @@ one-file-many-variants rule. Both earlier flows now sit in `../archive/`.
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
   row out of **Where it departs from the product**.
+- **An entry that is not finished says so.** A `**Status**` line under the
+  heading carries the tags: **Proposed** (a change to the product, not a
+  description of it), **Needs review** (waiting on the group), **Parked**
+  (nobody is picking it up now), **Reviewed**, **Adopted**, **Dropped** — then
+  an em dash and one sentence on why. The changelog page renders them as tags;
+  the raw file reads the same on GitHub. A word not in that list still renders,
+  in grey, so adding one is an edit here rather than a code change. **No Status
+  line means the entry is merged to `main`**; what is still open about it lives
+  in [Open, and worth revisiting](#open-and-worth-revisiting).
 - A hash on an unmerged branch is not the hash it will have on `main` — the
   squash rewrites it. An entry cites the branch until it merges, then the
   commit and its PR number, like every entry below 2026-11-10.

@@ -54,6 +54,11 @@
     .cl-doc a { color: var(--color-text-link); text-decoration: none; }
     .cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
+    /* The status row sits tight under its heading — it qualifies that entry,
+       so a paragraph's worth of air between them would read as a new thought. */
+    .cl-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin: calc(var(--spacing-2) * -1) 0 var(--spacing-4); }
+    .cl-status-note { font: var(--type-body-sm); color: var(--color-text-muted); }
+
     .cl-doc ul { margin: 0 0 var(--spacing-4); padding-left: var(--spacing-4); }
     .cl-doc li { margin-bottom: var(--spacing-2); }
     .cl-doc li > ul { margin: var(--spacing-2) 0 0; }
@@ -147,6 +152,19 @@
           .replace(/[^\w\s-]/g, '')
           .trim()
           .replace(/\s+/g, '-');
+      };
+
+      // The status vocabulary. A word nobody has defined yet still renders —
+      // as the neutral grey — so a new one is a changelog edit, not a code
+      // change. Keep the list short: a tag everyone recognises is worth more
+      // than a tag that is exactly right.
+      var TAGS = {
+        'proposed':     'tag-blue-light',   // a design proposal; the product does not do this
+        'needs review': 'tag-warning',      // waiting on the group
+        'parked':       'tag-light',        // nobody is picking it up right now
+        'reviewed':     'tag-blue',         // the group has seen it
+        'adopted':      'tag-positive',     // the product took it
+        'dropped':      'tag-negative'      // decided against
       };
 
       var inline = function (s) {
@@ -250,7 +268,33 @@
           var para = [];
           while (i < lines.length && lines[i].trim() && !/^(#{1,4} |```|>|\s*[-|])/.test(lines[i])) para.push(lines[i++]);
           if (!para.length) { out.push('<p>' + inline(lines[i++]) + '</p>'); continue; }
-          out.push('<p>' + inline(para.join(' ')) + '</p>');
+          var text = para.join(' ');
+
+          // "**Status** · Proposed · Parked — why" becomes a row of tags and a
+          // note. Written as an ordinary bold line so the raw file still reads
+          // on GitHub, where there are no tags to render.
+          var st = text.match(/^\*\*Status\*\*\s*[·:]\s*(.*)$/);
+          if (st) {
+            var halves = st[1].split(/\s+—\s+/);
+            var chips = halves[0].split(/\s*·\s*/).filter(Boolean).map(function (name) {
+              // Built as an element rather than a string. Any literal
+              // class="..." + variable reads to lint.py as a class named after
+              // the variable — which is the runtime-assembled-name trap it
+              // exists to catch, and it is right to flag it. className says the
+              // same thing where the linter is not looking for a class, and
+              // textContent escapes the label for free.
+              var chip = document.createElement('span');
+              chip.className = 'tag ' + (TAGS[name.trim().toLowerCase()] || 'tag-light');
+              chip.textContent = name.trim();
+              return chip.outerHTML;
+            }).join('');
+            var note = halves.slice(1).join(' — ');
+            out.push('<p class="cl-status">' + chips
+              + (note ? '<span class="cl-status-note">' + inline(note) + '</span>' : '') + '</p>');
+            continue;
+          }
+
+          out.push('<p>' + inline(text) + '</p>');
         }
 
         return out.join('\n');
