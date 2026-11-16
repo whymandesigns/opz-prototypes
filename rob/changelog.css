@@ -34,11 +34,20 @@
    they stay at h2. */
 .cl-doc.is-nested h2 { font: var(--type-h3); }
 
+/* Every h3 in this file is a dated history entry, and each is a self-contained
+   story — a decision, its shot, and the reasoning. Without a line between them
+   the closing paragraph of one and the heading of the next read as one block,
+   which is how an entry gets attributed to the wrong date. The first entry
+   takes none: the History h2 already draws a rule directly above it, and two
+   lines a heading apart read as a mistake. */
 .cl-doc h3 {
   font: var(--type-h4);
   color: var(--color-text);
-  margin: var(--spacing-8) 0 var(--spacing-3);
+  margin: var(--spacing-10) 0 var(--spacing-3);
+  padding-top: var(--spacing-8);
+  border-top: 1px solid var(--color-border);
 }
+.cl-doc h2 + h3 { margin-top: var(--spacing-6); padding-top: 0; border-top: 0; }
 .cl-doc h4 {
   font: var(--type-body);
   font-weight: var(--font-weight-semibold);
