@@ -16323,17 +16323,16 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         { name: 'Payments & Fintech',          kind: 'Specialization', level: 1 },
         { name: 'Product Practice',            kind: 'Practice',       level: 1 },
       ];
+      // One icon for every division, whatever its kind. ROB-VIEW-026 says the
+      // options show "the division icon and type" — one icon, and the type is
+      // what tells them apart; the real app draws the same glyph down the whole
+      // list. A glyph per kind was our own reading of that line, and it made
+      // six symbols carry information the hint underneath already carries.
+      //
       // Whole markup rather than a slug: inline.py narrows the sprite to the
       // ids it can read in the file, so an id assembled at runtime renders
       // blank once the page is baked.
-      const DIV_ICON = {
-        Category:       '<svg class="dropdown-item-icon"><use href="#i-grid"/></svg>',
-        Practice:       '<svg class="dropdown-item-icon"><use href="#i-layers"/></svg>',
-        Service:        '<svg class="dropdown-item-icon"><use href="#i-target"/></svg>',
-        Vertical:       '<svg class="dropdown-item-icon"><use href="#i-buildings"/></svg>',
-        Specialization: '<svg class="dropdown-item-icon"><use href="#i-flag"/></svg>',
-        Segment:        '<svg class="dropdown-item-icon"><use href="#i-globe"/></svg>',
-      };
+      const DIV_ICON = '<svg class="dropdown-item-icon"><use href="#i-multi"/></svg>';
 
       // ROB-VIEW-027: the options are the channels that are the default channel
       // of at least one RoB, newest first, and at most ten are offered at a
@@ -16377,14 +16376,14 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const INERT = new Set(['attendee', 'subteams', 'no11']);
       const SLACK_MAX = 10;   // ROB-VIEW-027
 
-      // What an option looks like differs by filter: a division carries its
-      // icon and kind (ROB-VIEW-026), a Slack channel its "#" or its private
+      // What an option looks like differs by filter: a division carries the
+      // division icon and its kind (ROB-VIEW-026), a Slack channel its "#" or its private
       // marker (ROB-VIEW-027), and everything else is a plain row.
       const optionBody = (key, opt) => {
         if (opt === 'All') return 'All';
         if (key === 'division') {
           const d = DIVISIONS.find(x => x.name === opt);
-          return DIV_ICON[d.kind]
+          return DIV_ICON
             + `<span class="dropdown-item-text"><span class="dropdown-item-label">${esc(opt)}</span>`
             + `<span class="field-hint">${d.kind}</span></span>`;
         }
