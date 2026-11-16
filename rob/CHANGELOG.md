@@ -26,7 +26,8 @@ goes to review.
 |---|---|---|
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | Divisions and Slack channels are multi-select, and the tag reads `Divisions: <names>` | `ROB-VIEW-026`, `-027` |
+| Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
+| Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -95,6 +96,39 @@ to the page, and a hash survives both it and Vercel.
 ---
 
 ## History
+
+### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
+
+**Status** · Proposed — the clear-by-reselect is ours; the rest of this pass was the prototype catching up with the product.
+
+![The Divisions filter: "Client Services" in the trigger and as a tag above the calendar, a search box over seven options with that one ticked, and a footer reading "Showing only first 200 of 446 items".](_shots/2026-11-16-filter-menus.png)
+
+Most of this was correction. The divisions options drew a different glyph per
+kind, where the product draws one for all of them and lets the type underneath
+tell them apart (`ROB-VIEW-026`); the picker had no search box and no sign that
+it was holding anything back; and all five menus opened with an **All** row.
+
+That last one was the interesting mistake. `ROB-VIEW-019` says every select
+*shows the placeholder "All"* — on the trigger, where ours has always shown it.
+A multi-select has no "All" to pick, because the way to mean "all" is to tick
+nothing. Reading the placeholder as an option put a row in the list that the
+product does not have.
+
+**Taking it out is what costs something.** In the product you clear a filter by
+unticking; ours is single-select, so with the row gone the first pick was a
+one-way door — only **Clear all**, which empties every other filter too, got
+you out. So clicking the chosen option again clears it. That is a gesture the
+product has no need for, and it is in [Where it departs](#where-it-departs-from-the-product)
+as one: it exists only because the single-select does.
+
+The rest, briefly. Divisions is **446** now rather than fifteen, because a
+200-row cap and a search box mean nothing against a list that fits on screen —
+about a hundred names across the six kinds (`ORG-DIV-001`) and a tail crossed
+from verticals and disciplines, so the invention is one decision rather than
+three hundred. The menu shows seven options: its height is clamped to the room
+below the field, because it is absolutely positioned inside a popover that
+cannot scroll, and a fixed height put the count line a quarter of a screen
+below the bottom of the window with no way to reach it.
 
 ### 2026-11-13 — Click to create, on the week view *(7ed5064, local on `rob-filters-and-click-to-create`)*
 
