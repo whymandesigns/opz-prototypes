@@ -9,6 +9,8 @@ directly below; the rest of the file is how it got there.
   were parked rather than settled, each with the commit that still holds the
   work.
 - **[History](#history)** — what was built, in what order.
+- **[BACKLOG.md](./BACKLOG.md)** — what has not been built: gaps, ideas and the
+  questions worth a screen. Nothing is in both files.
 
 ---
 
@@ -28,6 +30,7 @@ goes to review.
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
 | Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
 | Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
+| Action items carry threaded comments | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -380,6 +383,9 @@ last, short section still becomes active at maximum scroll.
 
 - An entry records the **reason**, not the diff — `git log --follow -- rob/index.html`
   has the diff, and these entries are distilled from its messages.
+- **Not yet designed goes in [BACKLOG.md](./BACKLOG.md), not here.** This file is
+  the past: built, parked, or departed from. An idea with no commit behind it
+  belongs in the backlog, and leaves it for a history entry when it is built.
 - **History is about the product, not about this repo.** An entry earns its
   place by changing what a RoB looks like or how it behaves. A rename, a lint
   pass, a dead-class sweep, a change to this page's own plumbing — those are
