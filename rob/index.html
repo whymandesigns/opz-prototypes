@@ -14399,7 +14399,10 @@ Platform reliability — error budget
       el.className = `toast toast-${variant} is-entering`;
       el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
       const closeHTML = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>` : '';
-      el.innerHTML = `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg><p class="toast-message"></p>${closeHTML}`;
+      // icon: false drops it. .toast is a flex row with a gap between its
+      // children, so one fewer child leaves no hole to tidy up.
+      const iconHTML = icon === false ? '' : `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg>`;
+      el.innerHTML = `${iconHTML}<p class="toast-message"></p>${closeHTML}`;
       el.querySelector('.toast-message').textContent = message;
       region.appendChild(el);
       requestAnimationFrame(() => el.classList.remove('is-entering'));
@@ -16605,9 +16608,11 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         pastToast?.dismiss();
         // Neutral, not warning: this is the system saying what happened, not
         // the page flagging a condition. The dark chip reads as chrome over
-        // the grid rather than as a problem in it.
+        // the grid rather than as a problem in it, and with one message and
+        // no state to signal there is nothing for an icon to add.
         pastToast = window.toast?.({
           variant: 'neutral',
+          icon: false,
           message: 'That time has already passed. Pick a later slot to create a meeting.',
         });
       }
