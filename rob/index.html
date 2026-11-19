@@ -16006,16 +16006,21 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // so a cancelled Tuesday is cancelled in all three.
       const weekEl  = document.querySelector('.cal-week');
       const schedEl = document.querySelector('[data-cal-sched]');
-      const HOUR_0 = 10, HOUR_N = 20;           // the band the day is drawn over
+      // The band the day is drawn over. It starts at 08:00 because a working
+      // day does, and a grid that opens at 10 hides the early meetings rather
+      // than showing an empty hour.
+      const HOUR_0 = 8, HOUR_N = 20;
       const HOUR_PX = 64;
       // The hour label is centred on its own line, so the first one needs room
       // above it or it is cut off by the top edge. Everything placed by time
       // starts from this offset.
       const PAD = 10;
       const PX_PER_MIN = HOUR_PX / 60;
-      // "Now" rides on the pinned today, not the wall clock: the month grid
-      // marks a fixed day, and a line drawn from the real time would contradict it.
-      const NOW_MINS = 14 * 60 + 5;
+      // "Now" is the wall clock, and it moves. The line spans every column from
+      // the axis rather than sitting in one of them, so it marks the time of
+      // day across the week — which stays true even though the pinned today is
+      // the fixture's anchor rather than the real date.
+      const nowMins = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
 
       const toMins = (t) => {
         const m = /^(\d+):(\d+)(am|pm)$/.exec(t.trim());
@@ -16099,6 +16104,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           axis.appendChild(lab);
         }
 
+        const nowM = nowMins();
         weekDays.forEach(d => {
           const date = iso(d);
           const dh = document.createElement('div');
@@ -16118,9 +16124,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             slot.className = 'cal-week-slot';
             slot.dataset.date = date;
             slot.dataset.start = String(m);
-            // Past is the pinned today and NOW_MINS, not the wall clock, so it
-            // agrees with the now-line drawn a few lines below.
-            if (date < todayIso || (date === todayIso && m < NOW_MINS)) {
+            // Read once per render so every slot agrees with the line, which
+            // paintNow then keeps in step as the clock moves.
+            if (date < todayIso || (date === todayIso && m < nowM)) {
               slot.classList.add('is-past');
             } else {
               slot.setAttribute('role', 'button');
@@ -16158,13 +16164,40 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 
         // Drawn only when today is in view. Where it starts and stops is the
         // stylesheet's business — it spans the body from the time column.
+        // Built empty and placed by paintNow, so there is one piece of code
+        // deciding where it goes rather than two that can disagree.
         if (weekDays.some(d => iso(d) === todayIso)) {
-          const now = document.createElement('div');
-          now.className = 'cal-week-now';
-          now.style.top = `${(NOW_MINS - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
-          cols.appendChild(now);
+          cols.appendChild(Object.assign(document.createElement('div'), { className: 'cal-week-now' }));
         }
+        paintNow();
       }
+
+      // The line follows the clock, so only it and the slots behind it are
+      // repainted — re-rendering the week on a timer would close an open
+      // create-draft or popover under the reader. Outside the band it is
+      // hidden rather than clamped to an edge, where it would read as 8:00 or
+      // 8:00 pm and be wrong twice a day.
+      function paintNow() {
+        const m = nowMins();
+        const line = weekEl.querySelector('.cal-week-now');
+        if (line) {
+          const inBand = m >= HOUR_0 * 60 && m <= HOUR_N * 60;
+          line.hidden = !inBand;
+          if (inBand) line.style.top = `${(m - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
+        }
+        // Only ever forwards: a slot that has started does not un-start, so
+        // this takes the affordance away and never gives it back.
+        weekEl.querySelectorAll('.cal-week-slot:not(.is-past)').forEach(slot => {
+          if (slot.dataset.date !== todayIso || Number(slot.dataset.start) >= m) return;
+          slot.classList.add('is-past');
+          slot.removeAttribute('role');
+          slot.removeAttribute('tabindex');
+          slot.removeAttribute('aria-label');
+        });
+      }
+      // Half a minute: the grid is 64px an hour, so a minute is about a pixel
+      // and anything finer moves nothing anyone can see.
+      setInterval(paintNow, 30000);
 
       function renderSchedule(mineOnly) {
         schedEl.replaceChildren();
