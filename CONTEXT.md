@@ -368,6 +368,24 @@ everyone, for giving an assessment.
 
 **Prototypes** — `performance-reviews` (has a full `PLAN.md` — **read it first**).
 
+### Notifications
+
+**What it is** — a bell in the top bar, next to the avatar, with a dot while
+something is unread. It opens a panel of what needs a decision and what is new,
+and links to the full list. It is not a sidenav item.
+
+**What the product does today** — almost every notification is a Slack message;
+e-mail and in-app are reserved channels with no adapter (`PLAT-NOTIF-011`), and
+people have no notification preferences (`PLAT-NOTIF-012`). Someone without a
+linked Slack account gets nothing (`PLAT-NOTIF-003`). So the centre itself, and
+its settings, are a proposal; the *types* in it are real, each row citing the
+rule it comes from (`ROB-NOTIF-*`, `ROB-ACTION-058`, `INIT-NOTIF-*`,
+`OKR-SIGN-*`, `FDBK-NOTIF-*`, `PERF-ASMT-*`, `TOFF-LIFE-*`, `PEOP-*`).
+
+**Who uses it** — everyone. **When** — whenever the dot is on.
+
+**Prototypes** — `notifications`.
+
 ### Integrations and Admin Settings
 
 **What it is** — connecting external systems, and workspace-wide settings.
