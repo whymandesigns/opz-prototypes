@@ -14398,7 +14398,12 @@ Platform reliability — error budget
       const el = document.createElement('div');
       el.className = `toast toast-${variant} is-entering`;
       el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
-      const closeHTML = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>` : '';
+      // The kit's close is a real button — `btn btn-icon-only btn-ghost btn-xs
+      // toast-close` with #i-x, as example.html#toasts shows it. This helper
+      // was building a bare <button class="toast-close">, which carries no
+      // button styling at all, so every persistent toast here had an unstyled
+      // X. Timed toasts never showed it, which is why it went unnoticed.
+      const closeHTML = behavior !== 'timed' ? `<button type="button" class="btn btn-icon-only btn-ghost btn-xs toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>` : '';
       // icon: false drops it. .toast is a flex row with a gap between its
       // children, so one fewer child leaves no hole to tidy up.
       const iconHTML = icon === false ? '' : `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg>`;
