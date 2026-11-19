@@ -16613,7 +16613,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         pastToast = window.toast?.({
           variant: 'neutral',
           icon: false,
-          message: 'That time has already passed. Pick a later slot to create a meeting.',
+          // One line, and no "can't": UXCopy asks for the positive form, so it
+          // says what happened and what to do instead of what is forbidden.
+          message: 'That slot has passed — pick a later one.',
         });
       }
 
