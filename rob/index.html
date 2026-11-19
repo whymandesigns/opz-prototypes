@@ -16603,8 +16603,11 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       let pastToast = null;
       function refusePast() {
         pastToast?.dismiss();
+        // Neutral, not warning: this is the system saying what happened, not
+        // the page flagging a condition. The dark chip reads as chrome over
+        // the grid rather than as a problem in it.
         pastToast = window.toast?.({
-          variant: 'warning',
+          variant: 'neutral',
           message: 'That time has already passed. Pick a later slot to create a meeting.',
         });
       }
