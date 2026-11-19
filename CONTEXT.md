@@ -291,10 +291,13 @@ by its auto-invite settings (`ROB-LINK-024`).
 - **Name and description carry the purpose**, and the agenda keeps the
   discussion on it — they are load-bearing fields, not optional metadata.
 
-**Prototypes** — `rob` (meeting action items, respond-via-menu), `action-trace`
-(connects ActionTrace processes to a RoB meeting, then reviews worker recordings
-with timeline annotations — the oracle covers this as *label RoBs*,
-`ROB-LINK-046`), `test` (a 34-board design canvas of the master calendar: week
+**Prototypes** — `rob` (the whole flow: the directory calendar in month, week
+and schedule, viewer roles, the create form, the meeting view, agenda and action
+items, and the series lifecycle — **read `rob/CHANGELOG.md` first**, which
+records what was decided, what was parked and where it departs from the
+product), `action-trace` (connects ActionTrace processes to a RoB meeting, then
+reviews worker recordings with timeline annotations — the oracle covers this as
+*label RoBs*, `ROB-LINK-046`), `test` (a 34-board design canvas of the master calendar: week
 view, propose / respond / decline, drag-to-move, custom Zoom links), and five
 older flows under `archive/`.
 

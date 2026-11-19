@@ -1,0 +1,358 @@
+# RoB Meetings — backlog
+
+What has not been designed yet, and why it is worth designing.
+[CHANGELOG.md](CHANGELOG.md) is what has.
+
+## Where a thing goes
+
+Three files, and an item belongs to exactly one of them:
+
+| | Holds | Tense |
+|---|---|---|
+| **This file** | work not started — a gap, an idea, a question worth a screen | future |
+| `CHANGELOG.md` › **Open, and worth revisiting** | decisions taken, built, then parked, each with the commit that still holds the work | past, paused |
+| `CHANGELOG.md` › **History** | what was built and why | past |
+
+An item **leaves** this file when it is built: delete it here, and write the
+history entry there. Nothing is in both.
+
+## What does not belong here
+
+- **Anything about the repo.** A rename, a lint pass, a tooling change, a
+  re-bake. Real work, and `git log` is where someone looks for it.
+- **A bug in the prototype.** Fix it, or it is not worth writing down.
+- **A deviation in the product.** The oracle already tracks those, with ids.
+  Cite one here only as the *reason* an item is interesting.
+- **A design that is already decided but unbuilt.** That is *Open, and worth
+  revisiting* — it has a commit behind it; these do not.
+
+## How to write an item
+
+An `###` heading, then these lines in this order. Every one of them, even when
+the answer is short — a missing line reads as an oversight rather than a
+deliberate blank.
+
+```markdown
+### A short title, as a noun phrase
+
+**Status** · Idea — one sentence, where there is anything to add.
+**Added** · 2026-11-16
+**Source** · where this came from: a rule, a screenshot, a conversation.
+**Rule** · `ROB-PREREAD-010`, `B-206` — or: the spec does not cover this.
+
+Two or three paragraphs: what is missing, what the product does, and what the
+interesting decision is. If there is no interesting decision, it is a chore,
+not a backlog item.
+```
+
+**Four statuses, and an item is in exactly one:**
+
+- **Idea** — noticed, not yet looked into. May turn out to be nothing.
+- **Researched** — checked against the oracle, with ids; the scope is understood.
+- **Ready** — we know what we would build and could start.
+- **Dropped** — decided against. The item stays, under *Dropped*, because why it
+  was dropped is the useful part.
+
+---
+
+## Open
+
+### A RoB with no host in the room
+
+**Status** · Researched — the product has one safeguard for this and three documented ways it does not reach. The proposal is a separate item.
+**Added** · 2026-11-16
+**Source** · raised as a red flag: if the owner is away, participants wait in a waiting room and the meeting does not happen.
+**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, deviation `B-014`
+
+The product does have an answer, and it is not a host at all: every Zoom meeting
+linked to an upcoming RoB occurrence is **forced to "join before host" ON**,
+along with authenticated-join and a recording mode, and anything changed by hand
+in Zoom is overwritten at the next enforcement (`ROB-ZOOM-009`). When that
+enforcement reaches the room, the owner being away costs the meeting its host,
+not its start.
+
+**It does not always reach the room.** Three cases, all in the spec:
+
+- **Webinars.** Join-before-host is explicitly not touched for them — only
+  authentication and recording mode are.
+- **No active Zoom integration.** Enforcement is conditioned on one, and a
+  tenant without it gets none of these settings.
+- **`B-014`, open.** Only links on `zoom.us` and `toptal.zoom.us` are
+  recognised, so a room on any other host is never linked — and the notes on
+  `ROB-ZOOM-009` say unlinked rooms are not enforced. A regional host such as
+  `us02web.zoom.us` is enough to lose the protection.
+
+**And there is no way to name a second host.** No alternative host, no co-host,
+no per-occurrence delegation anywhere in the spec. The room is created with the
+owner as host and `ROB-ZOOM-001` is explicit that an existing room is never
+reused or chosen by the user. The only lever is a full ownership transfer, which
+creates a **new** Zoom meeting and rewrites the join link across every current
+and future occurrence (`ROB-OWNER-020`) — the right tool for "someone else runs
+this RoB now", the wrong one for "I am away next Tuesday".
+
+**Zoom has two mechanisms for this, and the product uses neither** (checked
+2026-11-16, see *What else Zoom could carry* for the sources):
+
+- **`settings.alternative_hosts`** on the meeting object — a semicolon-separated
+  list of e-mails, settable when the room is created or updated. An alternative
+  host can start the meeting. Both the host and the alternative host must be
+  **Licensed users on the same Zoom account**, which for a company-account RoB
+  is the normal case. This is the direct answer, and it is one field on a call
+  the product already makes (`ROB-ZOOM-001` creates the room).
+- **Scheduling privilege** (`POST /users/{userId}/assistants`) — a standing
+  delegation, one person scheduling and managing on another's behalf. The API
+  adds assistants; the scheduling privilege itself is granted in Zoom's web
+  portal, so it is not fully programmable, and it is a per-person relationship
+  rather than a per-meeting one.
+
+There is also a way to **see** the problem happening:
+`meeting.participant_jbh_waiting` fires when someone has waited at least 30
+seconds for a host, and `meeting.participant_joined_waiting_room` when someone
+lands in a waiting room. Either is a signal the RoB could act on.
+
+So the question was never "add a host field". It was: **what does a RoB look
+like when its owner is not in it?** A standing second name on the series, a
+per-occurrence stand-in, or something that is not a Zoom concept at all — the
+agenda and action items do not need a host, and the meeting that matters is the
+working session, not the call.
+
+**Decided 2026-11-16: the standing second name.** It is drawn up as
+[A backup host on the series](#a-backup-host-on-the-series). The other two are
+not ruled out, but nobody is holding them — if the first goes to review badly,
+this item is where they come back.
+
+### A backup host on the series
+
+**Status** · Ready — the mechanism is a known field, the screen is decided, and nothing here waits on research.
+**Added** · 2026-11-16
+**Source** · the proposal that answers [A RoB with no host in the room](#a-rob-with-no-host-in-the-room).
+**Rule** · `ROB-ZOOM-001`, `ROB-ZOOM-009`, `ROB-OWNER-020`, deviation `B-014` — and the product has no such concept, so this is a proposal, not a description.
+
+**What it is.** One named stand-in who can start the RoB when its owner is not
+there. It maps to Zoom's `settings.alternative_hosts` on the room the product
+already creates, so the whole thing is one field on a call that is already made.
+
+**Where it goes.** A **Backup host** row in the meeting view's details grid,
+directly under the Zoom link — it is a property of the room, and that is where
+the room already is. Empty it reads *No backup host*, with an add affordance for
+whoever can edit the series; set, it reads the person's name.
+
+**Not on the create form.** That is locked as a shell, and a backup host is
+something you decide once the series exists and you know who is on it.
+
+**Who sets it:** whoever can edit the series — the owner and RoB admins, the
+same right as every other field in that grid. Everyone else reads it, because
+reading is never gated.
+
+**One person, not a list.** Zoom's field takes several. A RoB has a singular
+Accountable Owner, and a list of hosts invites the question of who is actually
+running the meeting — which is the one thing the model is clear about. One
+stand-in, and if that is wrong we will hear it at review.
+
+**Called a backup host, not an alternative host.** Zoom's word reads like a
+second owner. *Backup* says when it matters.
+
+**What it touches, and has to answer on screen:**
+
+- **Ownership transfer mints a new Zoom room** (`ROB-OWNER-020`) — the backup
+  host does not follow it unless something carries it across. The transfer modal
+  has to say whether it comes along, and the honest answer today is no.
+- **A person who is no longer eligible.** Zoom refuses an alternative host who
+  is not Licensed or is on another account. The picker should not offer someone
+  it will refuse, and the row needs a state for a backup host who has since
+  stopped qualifying.
+- **No Zoom integration, no row.** Same as the Zoom link it sits under.
+- **Webinars are out of scope** for a first pass — their host model differs, and
+  `ROB-ZOOM-009` already treats them separately.
+- **`B-014` is upstream.** On an unlinked room none of this applies, which is
+  worth a line in the entry rather than a state on the screen.
+
+**One thing for the behaviour spec rather than the screen:** the three settings
+the product enforces do not include `alternative_hosts` (`ROB-ZOOM-009`), so a
+backup host removed in Zoom would stay removed. If the product sets it, it
+should restore it on the same pass — otherwise the field is advice, not a
+setting.
+
+**Edge states to draw:** none set · one set · set but no longer eligible · no
+Zoom integration · the participant's read-only view.
+
+### What else Zoom could carry
+
+**Status** · Researched — what the API offers, checked 2026-11-16; which of it a RoB should use is still a design call.
+**Added** · 2026-11-16
+**Source** · a standing interest in what the RoB feature could get from Zoom beyond what it uses today.
+**Rule** · `ROB-ZOOM-001`, `-005`, `-009`, `-011`, `-073` — the baseline; the rest is not covered, because the product does not do it.
+
+What the product takes from Zoom today is narrow: it creates the room, enforces
+three settings on it, pulls cloud recordings and gates who may watch them, and
+reads attendance. Provisioning, compliance and evidence — all after the fact,
+none of it in the meeting.
+
+**What the API offers that a RoB could use.** Each of these is a published
+endpoint or field, not a guess; what none of them is yet is a decision.
+
+| Capability | Where | What it would give a RoB | Gate |
+|---|---|---|---|
+| **Alternative hosts** | `settings.alternative_hosts` on the meeting object | someone who can start the meeting when the owner is away — see the item above | both users Licensed, same account |
+| **Scheduling privilege** | `POST /users/{userId}/assistants`, `GET /users/{userId}/schedulers` | a standing stand-in for a person rather than a meeting | Licensed; the privilege itself is granted in Zoom's portal, not by API |
+| **AI Companion summary** | `GET` meeting summary, `meeting.summary_completed` webhook with `summary_content` as Markdown | the written record a RoB is supposed to leave, next to the agenda it was meant to follow | Pro+, AI Companion summary on, not E2EE |
+| **Transcript** | `TRANSCRIPT` / `CC` cloud-recording files; `meeting.aic_transcript_completed` | what was said under each agenda item, if the timing can be matched | cloud recording on |
+| **Polls** | `POST /meetings/{id}/polls`, `batch_polls`, past-results and report scopes | a RoB's output is decisions — a poll is the one place Zoom records one | Pro+, polling enabled, **not instant meetings** |
+| **Breakout rooms** | `settings.breakout_room.rooms[]`, pre-assigned by e-mail | a working session split by workstream, pre-assigned from the RACI we already hold | pre-assign only; live control is SDK, not REST |
+| **In-meeting chat** | `CHAT` (text) and `CHAT_MESSAGE` (JSON, incl. waiting-room and deleted) recording files | action items people type instead of saying | cloud recording on |
+| **Waiting-room / join-before-host signals** | `meeting.participant_jbh_waiting`, `meeting.participant_joined_waiting_room` | the absent-owner problem, observable instead of reported | webhook subscription |
+
+**Where the value is, on this reading.** The summary and transcript are the ones
+that touch what a RoB is *for* — it exists to produce decisions and actions, and
+those are the only Zoom artefacts that contain them. Polls are the narrow,
+unglamorous version of the same thing and are the easiest to act on, because a
+poll result is structured where a summary is prose. Breakout rooms are a real
+fit for the working session and the cheapest to try, since the RACI already
+tells us who goes where. Chat is a long shot: people do type actions into it,
+but separating those from "can you hear me" is the whole problem.
+
+**Three constraints that bound any of it.**
+
+- **The product sets it, not the user.** Enforcement overwrites settings changed
+  by hand in Zoom at the next pass (`ROB-ZOOM-009`), so a proposal that asks
+  someone to configure something in Zoom is a proposal that will be undone.
+- **Recording access is already decided** and deliberately does not follow the
+  Zoom host (`ROB-ZOOM-073`). A design that re-derives who may read a summary or
+  transcript from Zoom is arguing with a settled rule — summaries and
+  transcripts should inherit the recording rules, not invent their own.
+- **`B-014` is upstream of all of it.** A room on a host other than `zoom.us` or
+  `toptal.zoom.us` is never linked, so nothing here reaches it. Anything built
+  on this list inherits that hole.
+
+**Not checked in this pass**, and worth knowing before committing: the plan tier
+Toptal is actually on, whether AI Companion summaries are enabled on the
+account, and the live in-meeting surfaces (Zoom Apps and the Meeting SDK), which
+are a different kind of integration from everything above — an app running
+inside the call rather than a server reading it afterwards. That is the obvious
+next question if any of this looks worth having.
+
+### Pre-reads
+
+**Status** · Researched — the one thing a participant is meant to be able to add, and there is nowhere to add it.
+**Added** · 2026-11-16
+**Source** · the prototype has no pre-reads section at all (`grep -c pre-read` on `index.html` is 0).
+**Rule** · `ROB-PREREAD-010`, deviation `B-206`, `ROB-PREREAD-014`
+
+A RoB carries pre-read links per occurrence, and the participant role — which
+otherwise reads everything and writes almost nothing — is supposed to be able
+to add one. Our meeting view has no section for them, so the participant's one
+intended contribution has nowhere to go.
+
+The decision worth having is **whose "Add link" shows.** A PO decision of
+2026-10-29 says participants may add links; the shipped code still refuses them
+and only the owner and RoB admins can (`B-206`, open). So the two roles in this
+prototype would be designed against the rule rather than against the app, which
+puts it in *We follow the spec where the product does not* when it is built.
+Whether a participant may also **remove** a link — their own, or anyone's — is
+not decided; removal stays with the owner and admins today (`ROB-PREREAD-014`).
+
+### The attendance summary
+
+**Status** · Researched — the only admin-only read in the whole rights table, and it is not built.
+**Added** · 2026-11-16
+**Source** · absent from the meeting view; the rights table on `rights.html` already promises it.
+**Rule** · `ROB-OCC-032`, `ROB-OCC-023`, `Q-050` (resolved 2026-10-28)
+
+Per-occurrence attendance is readable by anyone who can open the RoB — that
+much the roster already shows. The **aggregate** summary is the exception:
+owner and RoB admins only, and it needs active integrations. It is the single
+row in *What each role can do* where an admin sees something a participant
+cannot and there is no screen behind it.
+
+`Q-050` asked whether per-occurrence attendance should be restricted too and
+was answered **no** — today's split is the intended one. So the design question
+is not who sees it but what it says: over what span, counting what, and whether
+a person's own record reads differently from everyone else's.
+
+### Multi-select filters
+
+**Status** · Researched — closing this retires two rows from the departures table.
+**Added** · 2026-11-16
+**Source** · [Where it departs from the product](CHANGELOG.md#where-it-departs-from-the-product).
+**Rule** · `ROB-VIEW-019`, `-025`, `-026`, `-027`, `ROB-VIEW-030`
+
+All five directory filters are multi-select in the product; all five are
+single-select here. That is the oldest departure in the file and the only one
+nobody chose — it was never a proposal, just what got built first.
+
+Two things come with it rather than after it. The tags read differently when a
+filter holds several values — `Divisions: <names>`, and "<N> users selected"
+past five people or while names load (`ROB-VIEW-030`). And the
+clear-by-reselect gesture we added when the **All** row came out exists only
+because the selection is single; multi-select would retire it, which is the
+cleanest kind of backlog item — one that deletes code rather than adding it.
+
+### Action-item comments: keep them or cut them
+
+**Status** · Idea — we have a feature the product deliberately removed.
+**Added** · 2026-11-16
+**Source** · `openCommentPop` in `index.html` — a threaded comment popover on every action item.
+**Rule** · `ROB-ACTION-008`
+
+Action items here carry threaded comments. The product carries none, and not by
+omission: notes shipped in late June 2026 and were taken out again within a
+week, data dropped with them (`TOP-7168`, `TOP-7169`). The spec is flat about
+it — discussion about an action item happens outside the product.
+
+So this is a proposal we never made deliberately, and it is now a row in the
+departures table. Two honest endings: cut it, and the prototype stops promising
+something the product dropped on purpose; or keep it and say why it should come
+back, which means knowing why it went — and that is the research this item
+needs before it can move past Idea.
+
+### The roster's own-row is fixed in markup
+
+**Status** · Idea — needs a look before it is worth more than this line.
+**Added** · 2026-11-16
+**Source** · `.md-person.is-me[data-md-me]` is one hard-coded row; the viewer role only changes its CSS.
+**Rule** · the spec does not cover this — it is a fixture problem, not a behaviour one.
+
+"You" in the roster is always the same person, and switching to the participant
+role restyles that row rather than moving it. It reads correctly in both roles
+today because the fixture happens to line up. Worth confirming it still does
+before anything else is built on the roster.
+
+---
+
+## Dropped
+
+*Nothing yet. When something is dropped it moves here with the reason, not out
+of the file.*
+
+---
+
+## For an agent adding to this file
+
+These are rules, not suggestions. An item that breaks one is worse than no item,
+because someone will act on it.
+
+- **Read before writing.** `CHANGELOG.md` — all of it, including *History*,
+  *Open, and worth revisiting* and *Where it departs from the product* — and
+  every item here. An idea already recorded in one of those is not new, and a
+  second copy is how two people end up designing the same screen differently.
+- **Never state what the product does without a rule id.** Query the oracle
+  (`search_oracle`, then `get_rule` for the full card before asserting). If
+  nothing covers it, write *the spec does not cover this*. Do not infer product
+  behaviour from this prototype — it is a proposal, not a description.
+- **Never paste the oracle's prose into this repo.** It is public and the
+  oracle is not. Ids are the way back to it; a short restatement in your own
+  words is fine, a quotation is not. The same goes for internal ticket text.
+- **Check the card's status and date.** A rule can be `Inferred`, a question can
+  be `resolved` with the opposite answer to the one you expected, and an
+  `observed_today` line can mean the shipped app does not do what the rule says.
+  Any of those changes what the item is about, so read them before writing.
+- **Append under *Open*.** Do not reorder, rewrite or re-status an existing item
+  — someone else's judgement is in it. Say so in the chat instead.
+- **Start at Idea.** `Researched` requires ids you actually read. `Ready`
+  requires knowing what you would build, which is a design call, not a research
+  one — leave it to a person.
+- **One item per thing.** If the title needs "and", it is two items.
+- **An item needs a decision in it.** "Build the pre-reads section" is a chore.
+  "Whose *Add link* shows, given the PO said participants and the code says
+  otherwise" is a backlog item. If you cannot find the decision, the honest
+  outcome is not to add the item.

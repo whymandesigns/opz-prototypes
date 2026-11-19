@@ -9,6 +9,10 @@
        page's own CTA") but not static hidden overlays. Flattening a modal's
        confirm to secondary would be the wrong fix. Remove this line once that is
        settled — nothing else here fails. -->
+  <!-- CHANGELOG.md, beside this file, records what each pass decided and why,
+       which variants live behind which URL, what was parked rather than
+       settled, and where this screen proposes a change to the product rather
+       than describing one. Read it before redesigning anything here. -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RoB Meetings — Operationalize</title>
@@ -915,7 +919,7 @@ textarea.input {
 
 /* ---------- Pictogram ----------
  * Detailed 64x64 line-art illustration for empty / error / success / info
- * states — a richer counterpart to the Phosphor icon set. Blue (accent)
+ * states — a richer counterpart to the plain icon set. Blue (accent)
  * strokes over light (accent-subtle) fills; recolour via the `color` property.
  *
  *   <span class="pictogram"><svg viewBox="0 0 64 64">…</svg></span>
@@ -1745,7 +1749,7 @@ button.badge:focus-visible {
   outline-offset: 1px;
 }
 
-/* Leading icon — Phosphor <i> or inline svg */
+/* Leading icon — <svg class="icon"><use href="#i-{slug}"/></svg> */
 .badge-icon { width: 1em; height: 1em; flex-shrink: 0; }
 
 /* Trailing remove × — clicking deletes the pill (delegated handler) */
@@ -1920,7 +1924,7 @@ button.badge:focus-visible {
   display: block;
 }
 
-/* Icon content — Phosphor or inline SVG, sized by --avatar-icon */
+/* Icon content — <svg class="icon">, sized by --avatar-icon */
 .avatar > svg { font-size: var(--avatar-icon); }
 .avatar > svg { width: var(--avatar-icon); height: var(--avatar-icon); }
 
@@ -3653,7 +3657,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .dropdown-item-icon {
   width: 16px;
   height: 16px;
-  font-size: 16px; /* sizes Phosphor <i> icons; harmless for inline SVG */
+  font-size: 16px; /* .icon is 1em, so font-size is still the sizing lever */
   flex-shrink: 0;
   color: var(--color-text-muted);
 }
@@ -4566,7 +4570,32 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .rob-filter-label { font: var(--type-body); color: var(--color-text); }
 .rob-filter-field { width: 100%; min-width: 0; }
 .rob-filter-field .input-select-trigger { width: 100%; }
-.rob-filter-field .dropdown-menu { max-height: 240px; overflow-y: auto; }
+/* The kit caps .dropdown-menu at 240px and scrolls it, and caps the list
+   inside at 240px too. With a search box above and a count line below, that
+   leaves about two and a half rows of a 446-item list visible. Here the menu
+   stops scrolling and only the list does, so the search box and the count line
+   stay put while the options move under them.
+
+   The height is a clamp rather than a number because the menu is absolutely
+   positioned inside a popover that cannot scroll: anything taller than the
+   room below the field is simply unreachable, count line included. 392px is
+   seven rows and their gaps, which is the point — a list you can scan
+   rather than a slot you peer through. 607px is everything that is not the
+   list: where the menu starts, its search box, its count line, and a margin
+   off the bottom of the window. On a window too short for seven it gives back what it has
+   rather than hiding the footer, and never less than it showed before. */
+.rob-filter-field .dropdown-menu { max-height: none; overflow: visible; }
+.rob-filter-field .dropdown-list { max-height: clamp(141px, calc(100vh - 607px), 392px); }
+/* The "Showing only first N of M items" line under a capped menu. A footer
+   rather than a last row: it is about the list, not an option in it, so it
+   must not be clickable and must not scroll away with the items. */
+.rob-dd-count {
+  margin: 0;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-top: 1px solid var(--color-border);
+  font: var(--type-body-sm);
+  color: var(--color-text-muted);
+}
 /* The three switches set scope rather than narrowing a field, so they sit
    below a rule of their own. */
 .rob-filter-toggles {
@@ -4635,7 +4664,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 }
 .cal-week-cols { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .cal-week-col { position: relative; border-left: 1px solid var(--color-border); }
-.cal-week-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--color-border); }
+.cal-week-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--color-border); pointer-events: none; }
 /* Now — the one amber thing on the page, so it reads as a position in time
    rather than as another event state. It is drawn from the time column, not
    from today's column: the axis is where the hour is read off, so a line that
@@ -4683,6 +4712,50 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .cal-week-ev.is-cancelled { --cal-accent: var(--color-text-subtle); }
 .cal-week-ev.is-cancelled .cal-event-name,
 .cal-week-ev.is-cancelled .cal-event-meta { text-decoration: line-through; }
+
+/* ---- Click to create ----
+   ROB-VIEW-053: an hour is two 30-minute slots, and a slot that has not
+   started yet is a place to put a meeting. They are real elements rather than
+   arithmetic on a column click, because "past slots show no pointer" is a
+   per-slot affordance a column cannot carry. They sit under the hour rules so
+   the hover tint does not swallow them, and under the events (z-index 2), so
+   a click on a meeting still belongs to that meeting. */
+.cal-week-slots { position: absolute; left: 0; right: 0; }
+.cal-week-slot { height: calc(var(--cal-hour) / 2); }
+.cal-week-slot:not(.is-past) { cursor: pointer; }
+.cal-week-slot:not(.is-past):hover { background: color-mix(in srgb, var(--color-accent) 8%, transparent); }
+.cal-week-slot:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+/* The draft is the meeting it would become — same block, dashed while it is
+   still only a proposal. It outranks the real ones so the popover's subject is
+   never behind a meeting it overlaps. */
+.cal-week-draft,
+.cal-week-draft:hover {
+  border: 1px dashed var(--color-accent);
+  border-left: 3px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+  cursor: default;
+  z-index: 6;
+}
+
+/* ---- Draft popover ----
+   Fixed, not absolute: .cal-week-body clips, so a panel beside a Friday slot
+   or a 7pm one would be cut in half. Lives here for the same reason
+   .rob-filter-pop does — this file carries the designmd:legacy marker, so no
+   kit change reaches it, and the kit has no popover component yet. */
+.cal-pop {
+  position: fixed;
+  z-index: var(--z-overlay);
+  width: 264px;
+  padding: var(--spacing-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-4);
+}
+.cal-pop-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
+.cal-pop-when { font: var(--type-body-sm); color: var(--color-text-muted); margin: var(--spacing-1) 0 var(--spacing-4); }
+.cal-pop-actions { display: flex; justify-content: flex-end; gap: var(--spacing-2); }
 
 /* ---- Schedule view ---- */
 .cal-sched { position: relative; display: flex; flex-direction: column; gap: var(--spacing-8); }
@@ -15797,25 +15870,25 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // dow: 0=Sun … 6=Sat. every: 1 weekly, 2 bi-weekly. mine: on my calendar.
       // CONTEXT.md: Processes, never BAU — the product's older word.
       const SERIES = [
-        { title: '[RoB] [Initiative] Operationalize Launch', time: '10:00am', unit: 'New Business',        dow: 1, every: 1, mine: true, mins: 60, owner: 'Bill Bryck' },
-        { title: '[RoB] [Initiative] Business Propellant',   time: '2:30pm',  unit: 'New Business',        dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
-        { title: 'Business Propellant Call',                 time: '4:00pm',  unit: 'Toptal',              dow: 1, every: 1, mins: 90, owner: 'Owen Clarke' },
-        { title: '[RoB] [Process] HireGlobal Outbound Motion', time: '2:00pm', unit: 'New Business, Services', dow: 2, every: 1, mins: 30, owner: 'Maria Santos' },
-        { title: 'Operationalize Integrations',              time: '2:30pm',  unit: 'New Business',        dow: 2, every: 1, mins: 30, owner: 'Nina Gupta' },
-        { title: '[RoB] [Team] Executive Team',              time: '5:00pm',  unit: 'Toptal',              dow: 2, every: 2, mins: 60, owner: 'Bill Bryck' },
-        { title: 'HireGlobal — Paid Marketing weekly',  time: '5:30pm',  unit: 'New Business',        dow: 2, every: 2, mins: 30, owner: 'Maria Santos' },
-        { title: '[RoB] Operationalize QAs Sync',            time: '12:30pm', unit: 'New Business',        dow: 3, every: 1, mins: 30, owner: 'Nina Gupta' },
-        { title: '[RoB] ExpertCrowd <> ActionTrace Integration', time: '2:30pm', unit: 'New Business',     dow: 3, every: 1, mins: 25, owner: 'Daniel Reyes' },
-        { title: '[RoB] Engineering Weekly',                 time: '2:30pm',  unit: 'Engineering',         dow: 3, every: 1, mine: true, mins: 60, owner: 'Daniel Reyes' },
-        { title: '[RoB] [Process] New Business Strategy',    time: '4:00pm',  unit: 'New Business',        dow: 3, every: 2, mins: 90, owner: 'Owen Clarke' },
-        { title: 'HireGlobal — Client Advisor Weekly',  time: '3:30pm',  unit: 'New Business',        dow: 3, every: 2, mins: 30, owner: 'Aisha Khan' },
-        { title: '[RoB] [Initiative] TechResume — improve profile quality', time: '4:30pm', unit: 'New Business', dow: 4, every: 1, mins: 60, owner: 'Sofia Jensen' },
-        { title: '[RoB] [Initiative] Expert Crowd',          time: '5:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Owen Clarke' },
-        { title: '[RoB] HUD <> EC Integration & Benchmarks', time: '6:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Daniel Reyes' },
-        { title: '[RoB] [Team] Product All Hands',           time: '4:00pm',  unit: 'Product Management',  dow: 4, every: 2, mine: true, mins: 60, owner: 'Matthew Vella' },
-        { title: '[RoB] [Process] HireGlobal Weekly GTM Review', time: '2:30pm', unit: 'Marketing, New Business', dow: 5, every: 1, mins: 50, owner: 'Maria Santos' },
-        { title: '[RoB] [Process] SEO for HireGlobal',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Liam Wong' },
-        { title: '[RoB] [Initiative] Creator Website',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Sofia Jensen' },
+        { title: '[RoB] [Initiative] Operationalize Launch', time: '10:00am', unit: 'New Business',        dow: 1, every: 1, mine: true, mins: 60, owner: 'Bill Bryck', division: 'Platform & Technology', slack: 'operationalize-launch' },
+        { title: '[RoB] [Initiative] Business Propellant',   time: '2:30pm',  unit: 'New Business',        dow: 1, every: 1, mins: 90, owner: 'Owen Clarke', division: 'Client Services', slack: 'business-propellant' },
+        { title: 'Business Propellant Call',                 time: '4:00pm',  unit: 'Toptal',              dow: 1, every: 1, mins: 90, owner: 'Owen Clarke', division: 'Client Services', slack: 'business-propellant' },
+        { title: '[RoB] [Process] HireGlobal Outbound Motion', time: '2:00pm', unit: 'New Business, Services', dow: 2, every: 1, mins: 30, owner: 'Maria Santos', division: 'Enterprise', slack: 'hireglobal-gtm' },
+        { title: 'Operationalize Integrations',              time: '2:30pm',  unit: 'New Business',        dow: 2, every: 1, mins: 30, owner: 'Nina Gupta', division: 'Platform & Technology', slack: 'integrations' },
+        { title: '[RoB] [Team] Executive Team',              time: '5:00pm',  unit: 'Toptal',              dow: 2, every: 2, mins: 60, owner: 'Bill Bryck', division: 'General', slack: 'rob-exec-team' },
+        { title: 'HireGlobal — Paid Marketing weekly',  time: '5:30pm',  unit: 'New Business',        dow: 2, every: 2, mins: 30, owner: 'Maria Santos', division: 'Mid-Market', slack: 'hireglobal-gtm' },
+        { title: '[RoB] Operationalize QAs Sync',            time: '12:30pm', unit: 'New Business',        dow: 3, every: 1, mins: 30, owner: 'Nina Gupta', division: 'Platform & Technology', slack: 'qa-sync' },
+        { title: '[RoB] ExpertCrowd <> ActionTrace Integration', time: '2:30pm', unit: 'New Business',     dow: 3, every: 1, mins: 25, owner: 'Daniel Reyes', division: 'Talent Services', slack: 'expert-crowd' },
+        { title: '[RoB] Engineering Weekly',                 time: '2:30pm',  unit: 'Engineering',         dow: 3, every: 1, mine: true, mins: 60, owner: 'Daniel Reyes', division: 'Engineering Practice', slack: 'eng-weekly' },
+        { title: '[RoB] [Process] New Business Strategy',    time: '4:00pm',  unit: 'New Business',        dow: 3, every: 2, mins: 90, owner: 'Owen Clarke', division: 'Client Services', slack: 'new-business-strategy' },
+        { title: 'HireGlobal — Client Advisor Weekly',  time: '3:30pm',  unit: 'New Business',        dow: 3, every: 2, mins: 30, owner: 'Aisha Khan', division: 'Advisory & Consulting', slack: 'client-advisors' },
+        { title: '[RoB] [Initiative] TechResume — improve profile quality', time: '4:30pm', unit: 'New Business', dow: 4, every: 1, mins: 60, owner: 'Sofia Jensen', division: 'Talent Services', slack: 'techresume' },
+        { title: '[RoB] [Initiative] Expert Crowd',          time: '5:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Owen Clarke', division: 'Talent Services', slack: 'expert-crowd' },
+        { title: '[RoB] HUD <> EC Integration & Benchmarks', time: '6:00pm',  unit: 'New Business',        dow: 4, every: 1, mins: 30, owner: 'Daniel Reyes', division: 'Platform & Technology', slack: 'hud-benchmarks' },
+        { title: '[RoB] [Team] Product All Hands',           time: '4:00pm',  unit: 'Product Management',  dow: 4, every: 2, mine: true, mins: 60, owner: 'Matthew Vella', division: 'Product Practice', slack: 'product-all-hands' },
+        { title: '[RoB] [Process] HireGlobal Weekly GTM Review', time: '2:30pm', unit: 'Marketing, New Business', dow: 5, every: 1, mins: 50, owner: 'Maria Santos', division: 'Enterprise', slack: 'hireglobal-gtm' },
+        { title: '[RoB] [Process] SEO for HireGlobal',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Liam Wong', division: 'Mid-Market', slack: 'seo-hireglobal' },
+        { title: '[RoB] [Initiative] Creator Website',       time: '4:00pm',  unit: 'New Business',        dow: 5, every: 1, mins: 30, owner: 'Sofia Jensen', division: 'Design Practice', slack: 'creator-website' },
       ];
 
       // State belongs to one occurrence, not to the series: a meeting that lost
@@ -15935,6 +16008,10 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const schedEl = document.querySelector('[data-cal-sched]');
       const HOUR_0 = 10, HOUR_N = 20;           // the band the day is drawn over
       const HOUR_PX = 64;
+      // The hour label is centred on its own line, so the first one needs room
+      // above it or it is cut off by the top edge. Everything placed by time
+      // starts from this offset.
+      const PAD = 10;
       const PX_PER_MIN = HOUR_PX / 60;
       // "Now" rides on the pinned today, not the wall clock: the month grid
       // marks a fixed day, and a line drawn from the real time would contradict it.
@@ -16006,9 +16083,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         const cols = weekEl.querySelector('[data-cal-week-cols]');
         head.replaceChildren(); axis.replaceChildren(); cols.replaceChildren();
 
-        // The hour label is centred on its own line, so the first one needs
-        // room above it or it is cut off by the top edge.
-        const PAD = 10;
+        // A draft belongs to the week as it was drawn; this redraws it.
+        closeDraft();
+
         const height = (HOUR_N - HOUR_0) * HOUR_PX + PAD;
         axis.style.height = `${height}px`;
         cols.style.height = `${height}px`;
@@ -16032,6 +16109,29 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 
           const col = document.createElement('div');
           col.className = 'cal-week-col';
+
+          const slots = document.createElement('div');
+          slots.className = 'cal-week-slots';
+          slots.style.top = `${PAD}px`;
+          for (let m = HOUR_0 * 60; m < HOUR_N * 60; m += 30) {
+            const slot = document.createElement('div');
+            slot.className = 'cal-week-slot';
+            slot.dataset.date = date;
+            slot.dataset.start = String(m);
+            // Past is the pinned today and NOW_MINS, not the wall clock, so it
+            // agrees with the now-line drawn a few lines below.
+            if (date < todayIso || (date === todayIso && m < NOW_MINS)) {
+              slot.classList.add('is-past');
+            } else {
+              slot.setAttribute('role', 'button');
+              slot.tabIndex = 0;
+              slot.setAttribute('aria-label',
+                `Create a meeting on ${d.toLocaleDateString('en-US', { weekday: 'long' })} at ${clock(m)}`);
+            }
+            slots.appendChild(slot);
+          }
+          col.appendChild(slots);
+
           for (let h = HOUR_0 + 1; h < HOUR_N; h++) {
             const line = document.createElement('div');
             line.className = 'cal-week-line';
@@ -16110,6 +16210,110 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         schedEl.appendChild(end);
       }
 
+      // ---- Click to create ----
+      // ROB-VIEW-053 has a slot click open the Create meeting form straight
+      // away. Here it draws the slot first and asks: the week is dense, the
+      // form is full-screen, and a mis-click is far cheaper to make than to
+      // get out of. What Create meeting finally opens is that same form,
+      // pre-filled the same way — date, slot start, slot start + 30 minutes.
+      const weekCols = weekEl.querySelector('[data-cal-week-cols]');
+      let draft = null, pop = null;
+
+      // UXCopy "Short": 12-hour, capital AM/PM, a space before it. The axis
+      // reads 10:00am because it is a compact label; a sentence does not.
+      const clock = (n) => {
+        const h24 = Math.floor(n / 60), mm = String(n % 60).padStart(2, '0');
+        return `${h24 % 12 === 0 ? 12 : h24 % 12}:${mm} ${h24 < 12 ? 'AM' : 'PM'}`;
+      };
+      // What the form's time fields are authored in.
+      const hhmm = (n) => `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+
+      function closeDraft() {
+        draft?.remove();
+        pop?.remove();
+        draft = null;
+        pop = null;
+      }
+
+      // The popover is fixed, so it is placed against the draft's box on
+      // screen: beside it, flipped to the left when the right would run off,
+      // and pulled up when the bottom would.
+      function placePop() {
+        if (!draft || !pop) return;
+        const GAP = 8;
+        const r = draft.getBoundingClientRect();
+        let left = r.right + GAP;
+        if (left + pop.offsetWidth > window.innerWidth - GAP) left = r.left - GAP - pop.offsetWidth;
+        let top = Math.min(r.top, window.innerHeight - GAP - pop.offsetHeight);
+        pop.style.left = `${Math.max(GAP, left)}px`;
+        pop.style.top = `${Math.max(GAP, top)}px`;
+      }
+
+      function openDraft(slot) {
+        closeDraft();
+        const date = slot.dataset.date;
+        const start = Number(slot.dataset.start);
+        const end = start + 30;
+
+        draft = document.createElement('div');
+        draft.className = 'cal-week-ev cal-week-draft';
+        draft.style.top = `${(start - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
+        draft.style.height = `${30 * PX_PER_MIN - 2}px`;
+        draft.innerHTML = `<span class="cal-event-title"><span class="cal-event-name">New meeting</span></span>`
+          + `<span class="cal-event-meta"><span class="cal-event-time">${esc(clock(start))} – ${esc(clock(end))}</span></span>`;
+        slot.closest('.cal-week-col').appendChild(draft);
+
+        pop = document.createElement('div');
+        pop.className = 'cal-pop';
+        pop.setAttribute('role', 'dialog');
+        pop.setAttribute('aria-label', 'New meeting');
+        pop.innerHTML = `<p class="cal-pop-title">New meeting</p>`
+          + `<p class="cal-pop-when">${esc(window.robClock.fmt(date, 'longshort'))} at `
+          + `${esc(clock(start))} – ${esc(clock(end))}</p>`
+          + `<div class="cal-pop-actions">`
+          +   `<button class="btn btn-secondary btn-xs" type="button" data-draft-cancel>Cancel</button>`
+          +   `<button class="btn btn-primary btn-xs" type="button" data-draft-create>Create meeting</button>`
+          + `</div>`;
+        document.body.appendChild(pop);
+        placePop();
+        pop.querySelector('[data-draft-create]').focus();
+
+        pop.addEventListener('click', (e) => {
+          if (e.target.closest('[data-draft-cancel]')) { closeDraft(); slot.focus(); return; }
+          if (!e.target.closest('[data-draft-create]')) return;
+          // The same three fields the month grid's click-to-create fills.
+          const field = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+          field('cm-date', window.robClock.fmt(date, 'med'));
+          field('cm-time-start', hhmm(start));
+          field('cm-time-end', hhmm(end));
+          closeDraft();
+          document.getElementById('create-meeting')?.removeAttribute('hidden');   // openModal, from the block above
+        });
+      }
+
+      weekCols.addEventListener('click', (e) => {
+        if (e.target.closest('.cal-week-ev')) return;     // a meeting is not an empty slot
+        const slot = e.target.closest('.cal-week-slot');
+        if (slot && !slot.classList.contains('is-past')) openDraft(slot);
+      });
+      weekCols.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const slot = e.target.closest('.cal-week-slot');
+        if (!slot || slot.classList.contains('is-past')) return;
+        e.preventDefault();
+        openDraft(slot);
+      });
+
+      // Anywhere else is a decision not to create. A slot is excluded so
+      // picking a different one moves the draft rather than closing it first.
+      document.addEventListener('mousedown', (e) => {
+        if (draft && !e.target.closest('.cal-pop, .cal-week-slot')) closeDraft();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDraft(); });
+      // Capture, so any scroller the grid sits in is heard, not just the window.
+      window.addEventListener('scroll', placePop, true);
+      window.addEventListener('resize', placePop);
+
       // ---- Filter popover ----
       // Only the filters this prototype's data can answer actually narrow the
       // calendar; the rest are built but inert. FILTERED says which is which.
@@ -16120,44 +16324,254 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const F = {};   // active filter values
 
       const uniq = (a) => [...new Set(a.filter(Boolean))].sort();
+
+      // Divisions are a taxonomy of their own, not the org-unit tree: three
+      // categories holding six kinds (ORG-DIV-001). Level is the hierarchy
+      // depth a Practice, Service or Specialization sits at under its parent,
+      // and ROB-VIEW-026 sorts the options by level and then by name, so it is
+      // stored rather than inferred. "General" is the built-in segment every
+      // tenant has, which is why it is the one name here that is not invented.
+      const DIV_VERTICALS = [
+        'Automotive & Mobility', 'Aviation & Aerospace', 'Consumer Goods', 'Education & EdTech',
+        'Energy & Utilities', 'Financial Services', 'Gaming & Interactive', 'Government & Public Sector',
+        'Healthcare & Life Sciences', 'Hospitality & Travel', 'Industrial & Manufacturing', 'Insurance',
+        'Legal Services', 'Logistics & Supply Chain', 'Media & Entertainment', 'Nonprofit & Social Impact',
+        'Real Estate & Construction', 'Retail & Consumer', 'Telecommunications',
+      ];
+
+      const DIV_SEED = [
+        // Level 0. Three categories, six kinds, and a kind only ever belongs
+        // to its own category (ORG-DIV-001): Categories & Practices hold
+        // Category / Practice / Service, Verticals hold Vertical /
+        // Specialization, Segments hold Segment.
+        ...['Enterprise', 'General', 'Mid-Market', 'Public Sector', 'SMB', 'Strategic Accounts']
+          .map(name => ({ name, kind: 'Segment', level: 0 })),
+        ...['Client Services', 'Creative Services', 'Data & Analytics', 'Delivery Operations',
+            'Engineering Services', 'Finance Operations', 'Management Consulting', 'Marketing Agency',
+            'People Operations', 'Platform & Technology', 'Revenue Operations', 'Talent Services',
+            'Technology Services', 'Trust & Safety']
+          .map(name => ({ name, kind: 'Category', level: 0 })),
+        ...DIV_VERTICALS.map(name => ({ name, kind: 'Vertical', level: 0 })),
+
+        // Level 1.
+        ...['Apps and Integrations', 'Artificial Intelligence', 'Brand Marketing', 'Cloud Services',
+            'Creative and Content Marketing', 'Custom Software Development', 'Data Engineering',
+            'Data Science', 'Design Practice', 'DevOps and Platform', 'Digital Commerce',
+            'Embedded Systems', 'Engineering Practice', 'Growth Marketing', 'Information Security',
+            'Machine Learning Operations', 'Mobile Development', 'Performance Marketing',
+            'Product Practice', 'Quality Engineering', 'Research and Insights', 'Salesforce Practice',
+            'Service Design', 'Site Reliability', 'Technical Writing', 'Web Development']
+          .map(name => ({ name, kind: 'Practice', level: 1 })),
+        ...['Advisory & Consulting', 'Architecture Review', 'Business Analysis', 'Change Management',
+            'Delivery Management', 'Fractional Leadership', 'Managed Services', 'Program Management',
+            'Resource Augmentation', 'Solution Architecture', 'Strategy Consulting', 'Talent Matching',
+            'Technical Due Diligence', 'Training & Enablement']
+          .map(name => ({ name, kind: 'Service', level: 1 })),
+        ...['Computer Vision', 'Conversational AI', 'Digital Health', 'Identity & Access',
+            'Payments & Fintech', 'Streaming Media']
+          .map(name => ({ name, kind: 'Specialization', level: 1 })),
+      ];
+
+      // The tail, crossed rather than written out. A tenant with divisions
+      // switched on runs to hundreds — the reference screenshot shows 450 —
+      // and the menu's 200-row cap and its search box only mean anything
+      // against a list that long. Writing 350 names by hand would be 350
+      // inventions; a cross of verticals and disciplines is one, and it is
+      // visible as one. Every name here is made up; only the shape is real.
+      const DIV_DISCIPLINES = [
+        'Analytics', 'Automation', 'Benchmarking', 'Compliance', 'Data Platforms',
+        'Digital Strategy', 'Experience Design', 'Forecasting', 'Integration', 'Modernization',
+        'Operations', 'Optimization', 'Personalization', 'Platform Engineering', 'Pricing',
+        'Reporting', 'Risk Modelling', 'Transformation', 'Workforce Planning',
+      ];
+
+      // ROB-VIEW-026 sorts the options by hierarchy level and then by name, so
+      // the list is sorted once here rather than at every repaint.
+      const DIVISIONS = DIV_SEED
+        .concat(DIV_VERTICALS.flatMap(v => DIV_DISCIPLINES.map(d =>
+          ({ name: v + ' ' + d, kind: 'Specialization', level: 1 }))))
+        .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+      const DIV_BY_NAME = new Map(DIVISIONS.map(d => [d.name, d]));
+      // One icon for every division, whatever its kind. ROB-VIEW-026 says the
+      // options show "the division icon and type" — one icon, and the type is
+      // what tells them apart; the real app draws the same glyph down the whole
+      // list. A glyph per kind was our own reading of that line, and it made
+      // six symbols carry information the hint underneath already carries.
+      //
+      // Whole markup rather than a slug: inline.py narrows the sprite to the
+      // ids it can read in the file, so an id assembled at runtime renders
+      // blank once the page is baked.
+      const DIV_ICON = '<svg class="dropdown-item-icon"><use href="#i-multi"/></svg>';
+
+      // ROB-VIEW-027: the options are the channels that are the default channel
+      // of at least one RoB, newest first, and at most ten are offered at a
+      // time — so this list is longer than the menu, and search is how the rest
+      // are reached. Order here is newest first; every entry is the default
+      // channel of a series above.
+      const SLACK_CHANNELS = [
+        { name: 'operationalize-launch' },
+        { name: 'integrations' },
+        { name: 'qa-sync' },
+        { name: 'creator-website' },
+        { name: 'techresume' },
+        { name: 'expert-crowd' },
+        { name: 'hud-benchmarks' },
+        { name: 'business-propellant' },
+        { name: 'client-advisors',      private: true },
+        { name: 'hireglobal-gtm' },
+        { name: 'seo-hireglobal' },
+        { name: 'new-business-strategy' },
+        { name: 'product-all-hands' },
+        { name: 'rob-exec-team',        private: true },
+        { name: 'eng-weekly' },
+      ];
+      // A public channel is written "# name" and a private one as its plain
+      // name, in the option and in the tag alike (ROB-VIEW-027/030).
+      const slackLabel = (n) => {
+        const ch = SLACK_CHANNELS.find(c => c.name === n);
+        return ch && ch.private ? n : '# ' + n;
+      };
+
       const OPTIONS = {
         // "Team" is the org unit a series belongs to; a series can name two.
         team: uniq(SERIES.flatMap(x => x.unit.split(',').map(u => u.trim()))),
         owner: uniq(SERIES.map(x => x.owner)),
-        // No attendee, division or Slack-channel data on this page yet. The
-        // controls are built; these three do not narrow anything.
+        // No attendee data on this page yet: the control is built and does not
+        // narrow anything.
         attendee: uniq(SERIES.map(x => x.owner)),
-        division: ['Go to Market', 'Product and Engineering', 'Operations'],
-        slack: ['#new-business', '#hireglobal', '#operationalize', '#product'],
+        division: DIVISIONS.map(d => d.name),
+        slack: SLACK_CHANNELS.map(c => c.name),
       };
-      const INERT = new Set(['attendee', 'division', 'slack', 'subteams', 'no11']);
+      const INERT = new Set(['attendee', 'subteams', 'no11']);
+      const SLACK_MAX = 10;   // ROB-VIEW-027
+      // The divisions picker caps its menu and says so in a footer. No rule
+      // covers the number; it is read off the real picker, which shows
+      // "Showing only first 200 of 450 items" against a tenant's full list.
+      const DIV_MAX = 200;
+
+      // What an option looks like differs by filter: a division carries the
+      // division icon and its kind (ROB-VIEW-026), a Slack channel its "#" or its private
+      // marker (ROB-VIEW-027), and everything else is a plain row.
+      const optionBody = (key, opt) => {
+        if (opt === 'All') return 'All';
+        if (key === 'division') {
+          const d = DIV_BY_NAME.get(opt);
+          return DIV_ICON
+            + `<span class="dropdown-item-text"><span class="dropdown-item-label">${esc(opt)}</span>`
+            + `<span class="field-hint">${d.kind}</span></span>`;
+        }
+        if (key === 'slack') {
+          // A private channel is marked twice: the padlock in the icon column
+          // and the tag on the right. A public one carries no glyph — the "#"
+          // is its marker — so a private name starts one icon further in.
+          // The padlock goes where the "#" goes — inside the label, as the
+          // name's own prefix — rather than in the icon column, which sits a
+          // whole gap further left and pushed every private name out of line
+          // with the public ones.
+          const ch = SLACK_CHANNELS.find(c => c.name === opt);
+          const mark = ch.private ? '<svg class="icon"><use href="#i-lock"/></svg> ' : '# ';
+          return `<span class="dropdown-item-text"><span class="dropdown-item-label">${mark}${esc(opt)}</span></span>`
+            + (ch.private ? '<span class="tag tag-light">Private</span>' : '');
+        }
+        return esc(opt);
+      };
 
       fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
         const key = sel.dataset.robF;
         const menu = sel.querySelector('[data-rob-f-options]');
         const value = sel.querySelector('[data-rob-f-value]');
         const trigger = sel.querySelector('.input-select-trigger');
-        ['All', ...(OPTIONS[key] || [])].forEach(opt => {
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'dropdown-item' + (opt === 'All' ? ' is-selected' : '');
-          b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>';
-          b.append(opt);
-          b.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', i === b));
-            value.textContent = opt;
-            if (opt === 'All') delete F[key]; else F[key] = opt;
-            menu.hidden = true;
-            trigger.setAttribute('aria-expanded', 'false');
-            apply();
+        const label = (opt) => (opt === 'All' ? 'All' : key === 'slack' ? slackLabel(opt) : opt);
+
+        // Two menus hold more than they can show, so both carry a search box:
+        // Slack offers ten at a time (ROB-VIEW-027) and divisions two hundred.
+        // Divisions also says how many it is hiding; Slack does not, because
+        // the real picker only shows that line on the divisions menu.
+        const SEARCH = {
+          slack:    { max: SLACK_MAX, hash: true,  placeholder: 'Search channels', label: 'Search channels', empty: 'No slack channels available' },
+          division: { max: DIV_MAX,   count: true, placeholder: 'Search',          label: 'Search divisions',  empty: 'No divisions available' },
+        };
+        const cfg = SEARCH[key];
+        const searchable = !!cfg;
+        let list = menu;
+        if (cfg) {
+          menu.innerHTML = '<div class="dropdown-search"><div class="input-icon input-icon-left">'
+            + '<svg class="icon input-icon-glyph"><use href="#i-search"/></svg>'
+            + `<input class="input" type="search" placeholder="${cfg.placeholder}" aria-label="${cfg.label}" autocomplete="off" data-rob-f-search />`
+            + '</div></div><div class="dropdown-list"></div>'
+            + `<p class="dropdown-empty" hidden>${cfg.empty}</p>`
+            + (cfg.count ? '<p class="rob-dd-count" role="status" hidden></p>' : '');
+          list = menu.querySelector('.dropdown-list');
+        }
+        const empty = menu.querySelector('.dropdown-empty');
+        const count = menu.querySelector('.rob-dd-count');
+
+        const paint = (q) => {
+          let opts = OPTIONS[key] || [];
+          let matched = opts.length;
+          if (cfg) {
+            // A leading "#" is ignored on the Slack box, which is what the
+            // real one does — people type the channel the way they say it.
+            let term = String(q || '');
+            if (cfg.hash) term = term.replace(/^#/, '');
+            term = term.trim().toLowerCase();
+            if (term) opts = opts.filter(o => o.toLowerCase().includes(term));
+            matched = opts.length;
+            opts = opts.slice(0, cfg.max);
+          }
+          // No "All" row on any of these: the real pickers have none, and the
+          // value is cleared by unpicking. The trigger still reads "All" when
+          // nothing is chosen, which is a statement of what the filter is
+          // doing, not an option you can land on.
+          list.innerHTML = '';
+          opts.forEach(opt => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'dropdown-item' + (F[key] === opt ? ' is-selected' : '');
+            b.innerHTML = '<svg class="dropdown-item-check"><use href="#i-check"/></svg>' + optionBody(key, opt);
+            b.addEventListener('click', (e) => {
+              e.stopPropagation();
+              // Without an "All" row the first pick would be a one-way door,
+              // with only "Clear all" — which clears every other filter too —
+              // to get out. Clicking the chosen option again clears it, and
+              // the trigger returns to its default.
+              const clear = F[key] === opt;
+              list.querySelectorAll('.dropdown-item').forEach(i => i.classList.toggle('is-selected', !clear && i === b));
+              value.textContent = clear ? sel.dataset.robFDefault : label(opt);
+              if (clear) delete F[key]; else F[key] = opt;
+              menu.hidden = true;
+              trigger.setAttribute('aria-expanded', 'false');
+              apply();
+            });
+            list.appendChild(b);
           });
-          menu.appendChild(b);
-        });
+          // Two different nothings: a tenant with no divisions at all, which
+          // is the product's own string (TOP-6373), and a search that matched
+          // none of the ones there are.
+          if (empty) {
+            empty.hidden = opts.length > 0;
+            empty.textContent = (cfg && String(q || '').trim()) ? 'Nothing found' : cfg.empty;
+          }
+          // Only when something is actually being withheld: a search that
+          // narrows the list under the cap takes the line away with it.
+          if (count) {
+            count.hidden = matched <= opts.length;
+            if (!count.hidden) count.textContent = `Showing only first ${opts.length} of ${matched} items`;
+          }
+        };
+        paint('');
+        if (searchable) {
+          const box = menu.querySelector('[data-rob-f-search]');
+          box.addEventListener('input', () => paint(box.value));
+          box.addEventListener('click', (e) => e.stopPropagation());
+        }
         trigger.addEventListener('click', (e) => {
           e.stopPropagation();
           const open = menu.hidden;
           fWrap.querySelectorAll('[data-rob-f-options]').forEach(m => { if (m !== menu) m.hidden = true; });
+          // A menu opens on its first page again, not on whatever was last
+          // typed into it: the search text belongs to the act of searching.
+          if (open && searchable) { menu.querySelector('[data-rob-f-search]').value = ''; paint(''); }
           menu.hidden = !open;
           trigger.setAttribute('aria-expanded', String(open));
         });
@@ -16181,6 +16595,8 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         if (F.name && !x.title.toLowerCase().includes(String(F.name).toLowerCase())) return false;
         if (F.team && !x.unit.split(',').map(u => u.trim()).includes(F.team)) return false;
         if (F.owner && x.owner !== F.owner) return false;
+        if (F.division && x.division !== F.division) return false;
+        if (F.slack && x.slack !== F.slack) return false;
         if (F.robonly && !/^\[RoB\]/i.test(x.title)) return false;
         return true;
       };
@@ -16216,7 +16632,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
         fWrap.querySelectorAll('.input-select[data-rob-f]').forEach(sel => {
           sel.querySelector('[data-rob-f-value]').textContent = sel.dataset.robFDefault;
-          sel.querySelectorAll('.dropdown-item').forEach((i, idx) => i.classList.toggle('is-selected', idx === 0));
+          // Nothing is selected, rather than the first row being it: that was
+          // true while row 0 was "All" and would now tick a real option.
+          sel.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
         });
         apply();
       });
@@ -16236,7 +16654,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         { key: 'name',     name: 'Meeting name' },
         { key: 'no11',     name: 'Hide 1:1 Meetings', bool: true },
         { key: 'robonly',  name: 'Label RoBs only',   bool: true },
-        { key: 'slack',    name: 'Slack channels' },
+        { key: 'slack',    name: 'Slack channels', fmt: slackLabel },
         { key: 'subteams', name: 'Show sub teams', value: 'Yes' },
       ];
 
@@ -16255,7 +16673,8 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       const paintTags = () => {
         const html = TAG_SPEC.filter(t => t.bool || t.value ? F[t.key] === true : Boolean(F[t.key]))
           .map(t => {
-            const label = t.bool ? t.name : `${t.name}: ${t.value || F[t.key]}`;
+            const shown = t.value || (t.fmt ? t.fmt(F[t.key]) : F[t.key]);
+            const label = t.bool ? t.name : `${t.name}: ${shown}`;
             return `<span class="chip" data-rob-tag="${t.key}">${label}` +
               `<button class="chip-remove" type="button" aria-label="Remove filter ${label}">` +
               `<svg><use href="#i-x"/></svg></button></span>`;
