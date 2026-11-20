@@ -4922,10 +4922,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <section><div class="stack">
           <div class="row" style="justify-content: space-between">
             <div class="row" style="gap: var(--spacing-3); align-items: baseline"><h3 class="h3">Upcoming Time Off</h3><span class="body-sm" id="upcoming-total"></span></div>
+            <div class="row" style="gap: var(--spacing-3)">
+            <!-- Only for someone with direct reports: their own upcoming time off,
+                 or their team's (what they approved and is still ahead). -->
+            <div id="upcoming-scope" hidden><div class="segmented" role="tablist" aria-label="Whose upcoming time off">
+              <button class="segmented-item is-active" type="button" data-scope="mine">Mine</button>
+              <button class="segmented-item" type="button" data-scope="team">My team</button>
+            </div></div>
             <div id="upcoming-nav" hidden><div class="row" style="gap: var(--spacing-1)">
               <button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-act="car-prev" data-list="upcoming-list" aria-label="Previous time off"><svg class="btn-icon"><use href="#i-chevron-left"/></svg></button>
               <button class="btn btn-icon-only btn-ghost btn-xs" type="button" data-act="car-next" data-list="upcoming-list" aria-label="Next time off"><svg class="btn-icon"><use href="#i-chevron-right"/></svg></button>
             </div></div>
+            </div>
           </div>
           <div id="upcoming-list" style="display: flex; gap: var(--spacing-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth"></div>
           <div class="notification-empty" id="upcoming-empty" hidden>
@@ -5489,11 +5497,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       { id: 23, who: 'Sofia Marin', type: 'Personal day', reason: '', from: D(2026, 11, 27), to: D(2026, 11, 27), days: 1, ytd: 12, status: 'pending', asked: 'Nov 18 at 11:05 AM' },
       { id: 26, who: 'Lucas Meyer', type: 'Vacation', reason: 'Trip home', from: D(2026, 12, 14), to: D(2026, 12, 18), days: 5, ytd: 20, status: 'pending', asked: 'Nov 17 at 3:20 PM' },
       { id: 27, who: 'Tomas Novak', type: 'Personal day', reason: 'Moving flat', from: D(2026, 12, 11), to: D(2026, 12, 11), days: 1, ytd: 15, status: 'pending', asked: 'Nov 16 at 10:02 AM' },
+      { id: 28, who: 'Sofia Marin', type: 'Vacation', reason: 'Long weekend', from: D(2026, 12, 1), to: D(2026, 12, 2), days: 2, ytd: 10, status: 'approved', decided: 'Approved by you · Nov 5, 2026', cover: ['Elena Petrova'] },
+      { id: 29, who: 'Lucas Meyer', type: 'Conference', reason: 'Data summit', from: D(2027, 1, 20), to: D(2027, 1, 22), days: 3, ytd: 20, status: 'approved', decided: 'Approved by you · Nov 12, 2026', cover: [] },
       { id: 24, who: 'Tomas Novak', type: 'Vacation', reason: 'Winter break', from: D(2026, 12, 22), to: D(2027, 1, 2), days: 9, ytd: 15, status: 'approved', decided: 'Approved by you · Nov 10, 2026' },
       { id: 25, who: 'Lucas Meyer', type: 'Personal day', reason: '', from: D(2026, 11, 13), to: D(2026, 11, 13), days: 1, ytd: 20, status: 'denied', decided: 'Denied by you · Nov 11, 2026' },
     ];
 
-    let apprView = 'pending', calMonths = 0;
+    let apprView = 'pending', calMonths = 0, upScope = 'mine';
     let role = 'employee';
     let period = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);   // first month on the calendar                   // prototype-only switch; 'manager' has direct reports
     let editing = null, step = 1, half = { first: false, last: false };
@@ -5606,10 +5616,50 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     }
 
     // ---- Upcoming: every request still ahead, beside the calendar ----------
+    // The manager's second view of "Upcoming Time Off": time off of direct
+    // reports that is approved and still ahead. Read-only: a manager decides a
+    // request, but only the member (or a time-off administrator) changes one.
+    function teamUpcoming() {
+      const rows = [];
+      approvals.forEach(a => {
+        if ((a.status === 'approved' || a.status === 'manager-approved') && a.to >= TODAY) rows.push(a);
+        // a pending change request leaves the approved dates in force (TOFF-LIFE-010)
+        if (a.status === 'pending' && a.change && a.change.to >= TODAY)
+          rows.push({ ...a, id: `${a.id}-current`, from: a.change.from, to: a.change.to, days: a.change.days, status: 'approved', changing: true });
+      });
+      return rows.sort((x, y) => x.from - y.from);
+    }
+    function renderTeamUpcoming() {
+      const rows = teamUpcoming();
+      $('#upcoming-total').textContent = rows.length ? `${rows.length} on your team` : '';
+      $('#upcoming-empty').hidden = rows.length > 0;
+      $('.notification-empty-title', $('#upcoming-empty')).textContent = 'No upcoming time off on your team';
+      $('#upcoming-nav').hidden = rows.length <= 3;
+      $('#upcoming-list').innerHTML = rows.map(a => {
+        const second = a.status === 'manager-approved';
+        const cover = (a.cover || []).length ? a.cover.map(esc).join(', ') : 'No one';
+        return `<article class="card stack" style="flex: 0 0 calc((100% - 2 * var(--spacing-4)) / 3); min-width: 17rem; gap: var(--spacing-3); padding: var(--spacing-4); scroll-snap-align: start">
+          ${user(a.who, `${a.type}${a.reason ? ` · ${a.reason}` : ''}`)}
+          <div>
+            <div class="body-lg-semibold">${range(a.from, a.to)}</div>
+            <div class="body-sm">${dayCount(a.days)}</div>
+          </div>
+          <div class="row" style="gap: var(--spacing-2)">${second ? STATUS.pending : STATUS.approved}${second ? `<span class="body-sm">Waiting for ${EXECUTIVE}</span>` : ''}${a.changing ? '<span class="body-sm">Change request waiting</span>' : ''}</div>
+          <div class="row" style="gap: var(--spacing-3); flex-wrap: nowrap; margin-top: auto; padding-top: var(--spacing-3); border-top: 1px solid var(--color-border)"><span class="body-sm" style="white-space: nowrap">Who is covering</span><span class="body-sm-semibold" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">${cover}</span></div>
+        </article>`;
+      }).join('');
+    }
+
     function renderUpcoming() {
+      const manager = role === 'manager';
+      if (!manager) upScope = 'mine';
+      $('#upcoming-scope').hidden = !manager;
+      document.querySelectorAll('#upcoming-scope .segmented-item').forEach(b => b.classList.toggle('is-active', b.dataset.scope === upScope));
+      if (upScope === 'team') { renderTeamUpcoming(); return; }
       const rows = mine.filter(e => active(e) && e.to >= TODAY).sort((a, b) => a.from - b.from);
       $('#upcoming-total').textContent = rows.length ? dayCount(rows.reduce((n, e) => n + e.days, 0)) : '';
       $('#upcoming-empty').hidden = rows.length > 0;
+      $('.notification-empty-title', $('#upcoming-empty')).textContent = 'No upcoming time off';
       $('#upcoming-nav').hidden = rows.length <= 3;
       // Three cards across; a fourth and later ones scroll in (the arrows appear).
       $('#upcoming-list').innerHTML = rows.map(e => {
@@ -5745,6 +5795,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       const seg = e.target.closest('.segmented-item');
       if (seg) {
         seg.parentElement.querySelectorAll('.segmented-item').forEach(b => b.classList.toggle('is-active', b === seg));
+        if (seg.dataset.scope) { upScope = seg.dataset.scope; $('#upcoming-list').scrollLeft = 0; renderUpcoming(); }
       }
     });
     ['#tt-from', '#tt-to'].forEach(id => $(id).addEventListener('change', renderMine));
