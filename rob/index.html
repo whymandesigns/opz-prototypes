@@ -5862,11 +5862,13 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           </div>
         </div>
 
-        <!-- All events is the view this prototype draws; My events is labelled
-             so the shape of the control is right when it arrives. -->
+        <!-- My events first, as production has it. Both are built, and
+             "All events" stays the selected one on open — ROB-VIEW-007 is
+             explicit about the default and says nothing about the order, so
+             only the order moves. -->
         <div class="tabs rob-tabs" role="tablist" aria-label="Meeting scope">
+          <button class="tab" type="button" role="tab" aria-selected="false">My events</button>
           <button class="tab is-active" type="button" role="tab" aria-selected="true">All events</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-rob-todo="My events">My events</button>
         </div>
 
         <!-- Search and filter on the left, the view switcher on the right.
@@ -17072,10 +17074,10 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
       });
 
-      // Tabs: the same grid, narrowed. My events was a stub before.
+      // Tabs: the same grid, narrowed. Read by label rather than position,
+      // so the order on screen is a markup decision and nothing here cares.
       const tabs = [...document.querySelectorAll('.rob-tabs .tab')];
       tabs.forEach(tab => {
-        tab.removeAttribute('data-rob-todo');
         tab.addEventListener('click', () => {
           tabs.forEach(t => {
             const on = t === tab;
