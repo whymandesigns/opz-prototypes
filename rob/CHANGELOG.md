@@ -27,6 +27,9 @@ goes to review.
 | Here | The product | Rule |
 |---|---|---|
 | The directory opens on **My events** | opens on **All events**, every series in the company | `ROB-VIEW-007` |
+| A series can name one **backup host**, who can start the Zoom room when the owner is away | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
+| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
+| An occurrence whose owner is not going, with no backup host, **says so before the meeting** | has no such check — the first sign is a room nobody can start | `ROB-ZOOM-009` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
 | Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
@@ -101,6 +104,57 @@ to the page, and a hash survives both it and Vercel.
 ---
 
 ## History
+
+### 2026-11-20 — A backup host, and who can start the meeting *(local on `rob-week-grid`)*
+
+**Status** · Proposed — all of it. The product has no backup host, does not manage the waiting room, and does not warn anyone.
+
+![The meeting view with no backup host set and the owner marked Not going: an amber alert reading "No one can start this meeting", and a Starting the meeting block under the details grid.](_shots/2026-11-20-backup-host.png)
+
+Raised from the floor: a RoB whose owner is absent can fail to happen at all.
+Participants sit in a waiting room, nobody can start the room, and someone
+improvises a new call and re-invites everyone. Owners are being handed a
+two-step manual fix — add an alternative host who is on the invite, and turn the
+waiting room off for that meeting. Both are Zoom API fields. Neither is
+reachable from Operationalize.
+
+**Our own notes were too generous about the product here, and this corrects
+them.** `ROB-ZOOM-009` holds every RoB-linked Zoom meeting at join-before-host
+ON, which should mean the owner being away costs the meeting its host and not
+its start. `BACKLOG.md` listed three ways that fails to reach a room — webinars,
+no Zoom integration, and `B-014`. There is a fourth, and it is the one ops is
+working around: the product enforces three settings and `settings.waiting_room`
+is not one of them, and **in Zoom the waiting room overrides join-before-host**.
+A room the product manages correctly, on the right host, with a live
+integration, still strands everyone if the waiting room is on at the account,
+group or user level. Join-before-host being ON is not evidence that anyone can
+get in.
+
+So the screen states the guarantee — *Anyone can join before the host* — rather
+than offering it as a toggle. A RoB with a waiting room is broken, not
+configured; the fix belongs in enforcement, as a fourth setting beside the three
+`ROB-ZOOM-009` already holds.
+
+**The backup host is one name, and it belongs to the series.** `ROB-ZOOM-001`
+creates one Zoom meeting per series, of type *recurring with no fixed time*, so
+`settings.alternative_hosts` hangs off that single room — there is nowhere in
+Zoom to put a per-occurrence stand-in. "I am away next Tuesday" is served by
+editing the field ahead of time. One name rather than Zoom's list, because a RoB
+has a singular Accountable Owner and a list of hosts invites the question of who
+is actually running the meeting. Called a *backup host* rather than Zoom's
+*alternative host*: alternative reads like a second owner, backup says when it
+matters.
+
+**A field nobody fills in is not a safeguard**, so the occurrence says when it
+is uncovered. The owner not going with no backup host set is an amber alert with
+the picker on it; a backup host set under the same condition drops it to a blue
+one naming who will start the meeting. It is a standing condition of that
+occurrence rather than something that just happened, so an alert and not a toast.
+
+Candidates come from the roster, which is Toptal's own rule — Zoom only asks for
+a licensed user on the same account. `ROB-OWNER-020` is left open: a transfer
+mints a new Zoom room, and nothing carries a backup host across it. The states
+are on `#backup=set|none|covered|ineligible|nozoom`.
 
 ### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
 
