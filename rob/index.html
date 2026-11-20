@@ -5862,13 +5862,17 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           </div>
         </div>
 
-        <!-- My events first and selected on open. The order matches production;
-             the default does not — ROB-VIEW-007 is explicit that "All events" is
-             selected when the page opens without saved state. It is a departure
-             on purpose: the design task that specified this page (TOP-6814) asked
-             for the person's own meetings as the default scope, and the story that
-             shipped (TOP-6864) made it company-wide instead. A RoB directory opens
-             on 73 meetings nobody in the room owns; 13 of them are yours. -->
+        <!-- My events first and selected on open — and this matches production.
+             topteam#6901 (2026-11-12) made My events the first tab and the
+             default, confirmed by the PO the next day, so ROB-VIEW-007 now reads
+             that way and neither the order nor the default is a departure. It
+             took TOP-6814 three years to arrive: the design task that specified
+             this page asked for the person's own meetings as the default scope,
+             and the story that shipped (TOP-6864, 2026-04) made it company-wide.
+
+             Not carried: the product remembers the tab per browser tab in
+             sessionStorage and a saved ?q= link holds it (ROB-VIEW-013,
+             ROB-VIEW-014). This prototype always opens on My events. -->
         <div class="tabs rob-tabs" role="tablist" aria-label="Meeting scope">
           <button class="tab is-active" type="button" role="tab" aria-selected="true">My events</button>
           <button class="tab" type="button" role="tab" aria-selected="false">All events</button>

@@ -62,7 +62,7 @@ not a backlog item.
 **Status** · Researched — the product has one safeguard for this and three documented ways it does not reach. The proposal is a separate item.
 **Added** · 2026-11-16
 **Source** · raised as a red flag: if the owner is away, participants wait in a waiting room and the meeting does not happen.
-**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, deviation `B-014`
+**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, `ROB-OCC-096`, `ROB-OCC-106`, deviation `B-014`
 
 The product does have an answer, and it is not a host at all: every Zoom meeting
 linked to an upcoming RoB occurrence is **forced to "join before host" ON**,
@@ -107,12 +107,28 @@ exactly "hold this for me while I am away", and it was deprecated on
 replacement. See
 [The temporary ownership transfer the product dropped](#the-temporary-ownership-transfer-the-product-dropped).
 
-**And nothing tells anyone in advance.** `ROB-OCC-025`: a participation status
-exists only from an hour after the occurrence ends, so neither a declined
-invite nor an approved out-of-office day shows on an upcoming meeting. The
-product can only report an absent owner afterwards, as an attendance score. The
-absence is recorded elsewhere, with a named stand-in attached — see
+**Since 2026-11-12 something does tell people in advance, and it stops short of
+the owner.** `TOP-7503` (topteam#6899) added a per-occurrence **Decline** with
+an optional comment (`ROB-OCC-097`), a comment the owner and RoB admins can read
+(`ROB-OCC-098`), and a red ✕ on the upcoming occurrence (`ROB-OCC-067`, where a
+future occurrence used to show no response at all). But `ROB-OCC-096` says the
+actions are **not offered to the owner** — the one person whose absence costs
+the meeting its Zoom host has no way to say so in the product. A decline made
+in Google Calendar does surface, so the signal exists; what is missing is
+anyone reading it as "this meeting now has no host".
+
+Out-of-office is still invisible in advance: `ROB-OCC-025` computes it only from
+an hour after the occurrence ends. The planned absence, with a named stand-in
+attached, is recorded elsewhere — see
 [Carry "who is covering" from time off into the RoB](#carry-who-is-covering-from-time-off-into-the-rob).
+
+**And there is now a second answer to "the owner is away", which is to move the
+meeting.** `ROB-OCC-096` and `ROB-OCC-102` let a participant propose another
+time for one occurrence, with a comment; `ROB-OCC-106` lets anyone who can edit
+accept it with **Move meeting**, which edits that occurrence only and leaves
+everyone's response alone. It is a real alternative to a stand-in — and it is
+not offered to the owner either, so an owner who knows they are away cannot
+propose their own move.
 
 **Zoom has two mechanisms for this, and the product uses neither** (checked
 2026-11-16, see *What else Zoom could carry* for the sources):
@@ -199,18 +215,24 @@ different conversations, and the second one is easier to win.
 **Status** · Researched — both halves exist and neither knows about the other; the join is the open question.
 **Added** · 2026-11-20
 **Source** · the early-warning alert, which needs to know the owner will be away — and the discovery that the product already stores that.
-**Rule** · `TOFF-SLACK-009`, `TOFF-PROF-003`, `TOFF-EDGE-001`, `TOFF-SLACK-005`, `ROB-OCC-025`, `ROB-OCC-067`, `ROB-OCC-038`
+**Rule** · `TOFF-SLACK-009`, `TOFF-PROF-003`, `TOFF-EDGE-001`, `TOFF-SLACK-005`, `ROB-OCC-025`, `ROB-OCC-067`, `ROB-OCC-038` — checked against the oracle at topteam `6805064` (2026-11-20)
 
-**RoB cannot see an upcoming absence, and time off already has one — with a
-named stand-in attached.**
+**RoB can see a decline in advance since 2026-11-12, but not an absence — and
+an absence is the one somebody planned.**
 
-`ROB-OCC-025` is the hard edge: a participation status — Present, OOO, Declined,
-Missing — **exists only from 1 hour after the occurrence ends**, and
-`ROB-OCC-067` confirms no status icon is drawn on a future occurrence. An
-approved out-of-office day and a declined invite both produce nothing in
-advance. RoB reads the OOO day once, afterwards, to score attendance. The only
-forward-looking signal it has is `ROB-OCC-038`, which counts calendar overlaps
-and says *may not attend* — about double-booking, not about leave.
+Declines reach an upcoming occurrence now: `ROB-OCC-067`, changed by `TOP-7503`
+(topteam#6899), draws a red ✕ on a future occurrence where there used to be no
+response at all. Out-of-office does not. `ROB-OCC-025` is the hard edge there: a
+participation status — Present, OOO, Declined, Missing — **exists only from 1
+hour after the occurrence ends**, and OOO has no equivalent of the decline
+marker. So RoB reads the approved out-of-office day once, afterwards, to score
+attendance, and never before the meeting it explains. The only other
+forward-looking signal is `ROB-OCC-038`, which counts calendar overlaps and says
+*may not attend* — about double-booking, not about leave.
+
+This is the sharper version of the gap: the product will tell you someone
+**said** they are not coming, and not that the company already **knows** they
+are away.
 
 **Time off has the other half.** `TOFF-SLACK-009`: an employee assigns coverage
 roles on their own absence, naming a co-worker or a Slack channel, and the

@@ -26,10 +26,9 @@ goes to review.
 
 | Here | The product | Rule |
 |---|---|---|
-| The directory opens on **My events** | opens on **All events**, every series in the company | `ROB-VIEW-007` |
 | A series can name one **backup host**, who can start the Zoom room when the owner is away | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
 | The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
-| An occurrence whose owner is not going, with no backup host, **says so before the meeting** | cannot: a participation status exists only from an hour after the occurrence ends, so a decline or an approved OOO day shows nothing in advance — the first sign is a room nobody can start | `ROB-OCC-025`, `ROB-OCC-067` |
+| An occurrence whose owner is not going, with no backup host, says **nobody can start it** | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
 | Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
@@ -151,20 +150,31 @@ the picker on it; a backup host set under the same condition drops it to a blue
 one naming who will start the meeting. It is a standing condition of that
 occurrence rather than something that just happened, so an alert and not a toast.
 
-**This one asks for data the product does not have yet**, and the row in
-[Where it departs](#where-it-departs-from-the-product) says so. `ROB-OCC-025`:
-a participation status — Present, OOO, Declined, Missing — exists only from an
-hour after the occurrence ends, so neither a declined invite nor an approved
-out-of-office day reaches an upcoming meeting. The product can report an absent
-owner afterwards, as an attendance score, and not before. The one forward-looking
-signal it has, `ROB-OCC-038`, counts calendar overlaps and says *may not attend*
-— about double-booking, not about leave. Where the absence actually lives, with
-a named stand-in already attached to it, is time off, and the two do not speak;
-that is a backlog item rather than part of this.
+**The data for this arrived eight days ago**, which was worth finding out before
+drawing the screen. `TOP-7503` (topteam#6899, 2026-11-12) gave participants a
+per-occurrence **Decline** with an optional comment, and `ROB-OCC-067` now draws
+a red ✕ on an upcoming occurrence — before, a future occurrence showed no
+response at all. So the product does know, in advance, that someone is not
+coming.
+
+What it does not do is read anything into it. A decline is a mark beside a name;
+nothing distinguishes the one person whose absence costs the meeting its Zoom
+host from the eight whose does not. And `ROB-OCC-096` is explicit that the
+actions are **not offered to the owner** — so the one person this turns on
+cannot decline in the product at all, only in Google Calendar, which
+`ROB-OCC-067` does surface. That is the departure: not the signal, the
+consequence.
+
+Out-of-office is still the older story. `ROB-OCC-025` computes OOO only from an
+hour after the occurrence ends, and the absence that an owner actually plans —
+with a named stand-in already attached to it — lives in time off, which the RoB
+cannot read. That is a backlog item rather than part of this.
 
 Candidates come from the roster, which is Toptal's own rule — Zoom only asks for
 a licensed user on the same account. `ROB-OWNER-020` is left open: a transfer
-mints a new Zoom room, and nothing carries a backup host across it. The states
+mints a new Zoom room, and nothing carries a backup host across it — and since
+topteam#6742 (2026-11-05) that room reliably reaches the moved series, so it is
+the behaviour and not a bug that would drop the field. The states
 are on `#backup=set|none|covered|ineligible|nozoom`.
 
 ### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
@@ -476,6 +486,13 @@ last, short section still becomes active at maximum scroll.
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
   row out of **Where it departs from the product**.
+- **Pull the oracle before citing it.** It is a checkout of `topteam`, not a
+  service, and it is as old as the last `git fetch`. On 2026-11-20 a clone
+  fifteen days behind produced a departure row for a thing the product had
+  already shipped — `ROB-VIEW-007` — and a second row built on a limitation
+  `TOP-7503` had lifted eight days earlier. Both read as confident and both were
+  wrong. A rule's **History** line is the cheap check: it says when the card
+  last moved.
 - **Every entry carries exactly one status.** A `**Status**` line under the
   heading says which: **Proposed** (built here, and a change to the product
   rather than a description of it), **In review** (built and waiting on the
