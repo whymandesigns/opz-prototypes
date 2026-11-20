@@ -100,6 +100,20 @@ creates a **new** Zoom meeting and rewrites the join link across every current
 and future occurrence (`ROB-OWNER-020`) — the right tool for "someone else runs
 this RoB now", the wrong one for "I am away next Tuesday".
 
+**The product had the right tool and dropped it**, which is worth knowing before
+anyone proposes building one: the legacy temporary ownership transfer was
+exactly "hold this for me while I am away", and it was deprecated on
+2026-10-29 with Role Inheritance — a permanent handover — named as its
+replacement. See
+[The temporary ownership transfer the product dropped](#the-temporary-ownership-transfer-the-product-dropped).
+
+**And nothing tells anyone in advance.** `ROB-OCC-025`: a participation status
+exists only from an hour after the occurrence ends, so neither a declined
+invite nor an approved out-of-office day shows on an upcoming meeting. The
+product can only report an absent owner afterwards, as an attendance score. The
+absence is recorded elsewhere, with a named stand-in attached — see
+[Carry "who is covering" from time off into the RoB](#carry-who-is-covering-from-time-off-into-the-rob).
+
 **Zoom has two mechanisms for this, and the product uses neither** (checked
 2026-11-16, see *What else Zoom could carry* for the sources):
 
@@ -141,6 +155,92 @@ it does not reach:
   `meeting.participant_joined_waiting_room` are still unused, and a RoB that
   stranded its room is worth knowing about afterwards even once it stops
   happening.
+
+### The temporary ownership transfer the product dropped
+
+**Status** · Researched — the history is established; what to do with it is a decision for review, not a build.
+**Added** · 2026-11-20
+**Source** · looking up what the product offers an owner who will be absent, and finding that it used to offer this.
+**Rule** · `ROB-OWNER-042`, `ROB-OWNER-043`, `ROB-OWNER-044`, `PEOP-ACCESS-007`, `PEOP-TEMP-003`, deviation `PEOP-B-016`
+
+**The product once modelled "hold this for me while I am away", and retired it
+without a replacement.** The legacy temporary ownership transfer took a
+snapshot of a person's owned RoBs, handed them to someone else, and gave them
+back on return — which is the shape of the problem the backup host answers.
+
+`ROB-OWNER-042` (Confirmed, PO 2026-10-29) says it is deprecated: no screen
+creates one and `createUserOwnershipTransfer` refuses every performer.
+Transfers that are still active can only be returned (`ROB-OWNER-043`), which
+is why a profile can still show **Return Temporary Ownership** with no way to
+start one. `PEOP-B-016` notes the API path still works — the capability is in
+the code with nothing calling it.
+
+**What replaced it is not a replacement.** Role Inheritance hands a person's
+items over for good: it is built for someone leaving or changing role, and
+`ROB-OWNER-037` shows the shape — one ongoing request per person, a terminated
+recipient rejected, a pending termination blocking it. Nobody files a role
+inheritance request to go on holiday for a week. `TOP-6180`, "Clean up the Temp
+Ownership Transfer concept", was closed **Abandoned** on 2026-10-26, so the
+half-removed state is where it stops.
+
+**Why this is worth carrying rather than filing as trivia.** It changes how the
+backup host reads at review. The proposal is not a new idea arriving from
+outside the product — it is a smaller, cheaper answer to a problem the product
+already recognised and then stopped answering. A standing name on one series
+costs a field on a call that is already made; the thing it replaces was a
+snapshot, a background job, a return flow and four open deviations.
+
+**The decision to take:** whether to say any of that out loud. Reviving a
+deprecated concept and proposing a field that quietly does its job are
+different conversations, and the second one is easier to win.
+
+### Carry "who is covering" from time off into the RoB
+
+**Status** · Researched — both halves exist and neither knows about the other; the join is the open question.
+**Added** · 2026-11-20
+**Source** · the early-warning alert, which needs to know the owner will be away — and the discovery that the product already stores that.
+**Rule** · `TOFF-SLACK-009`, `TOFF-PROF-003`, `TOFF-EDGE-001`, `TOFF-SLACK-005`, `ROB-OCC-025`, `ROB-OCC-067`, `ROB-OCC-038`
+
+**RoB cannot see an upcoming absence, and time off already has one — with a
+named stand-in attached.**
+
+`ROB-OCC-025` is the hard edge: a participation status — Present, OOO, Declined,
+Missing — **exists only from 1 hour after the occurrence ends**, and
+`ROB-OCC-067` confirms no status icon is drawn on a future occurrence. An
+approved out-of-office day and a declined invite both produce nothing in
+advance. RoB reads the OOO day once, afterwards, to score attendance. The only
+forward-looking signal it has is `ROB-OCC-038`, which counts calendar overlaps
+and says *may not attend* — about double-booking, not about leave.
+
+**Time off has the other half.** `TOFF-SLACK-009`: an employee assigns coverage
+roles on their own absence, naming a co-worker or a Slack channel, and the
+assignee is notified. `TOFF-PROF-003` and `TOFF-EDGE-001`: the profile shows
+**Who Is Covering**, or *"No one is covering this time off"*. `TOFF-SLACK-005`:
+mention someone who is out and the bot replies in-thread with who is covering.
+
+So the company already models *this person is out, here is the stand-in*, and a
+RoB meeting — the one place where an absent owner has a concrete cost — is the
+one place that cannot read it.
+
+**The interesting decision is how far the join goes**, and there are three
+rungs, each a real option rather than a step toward the next:
+
+- **Read it.** The occurrence knows the owner has an approved absence covering
+  its date, and says so. This is the cheapest and it is what the early-warning
+  alert actually needs.
+- **Suggest from it.** If that absence names a coverage role whose assignee is
+  on the roster, offer them as the backup host rather than asking the owner to
+  pick from scratch.
+- **Follow it.** The backup host tracks the coverage role. This is the one to
+  be suspicious of: coverage roles are free text with a title and a type, not a
+  statement about who can host a Zoom call, and `TOFF-VAL-009` allows a Slack
+  channel as the assignee — which cannot host anything.
+
+**What to check before any of it:** whether time off is on for the tenants that
+have RoB. `TOFF-PROF-003` is conditioned on the time-off feature, and the Slack
+coverage roles are TopTeam-only. A RoB that reads an absence has to behave when
+there is no time-off module at all, which is the same shape as the no-Zoom
+state the backup host already draws.
 
 ### Hold the waiting room off
 
