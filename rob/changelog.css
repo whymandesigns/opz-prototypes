@@ -59,6 +59,10 @@
 .cl-doc strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
 .cl-doc a { color: var(--color-text-link); text-decoration: none; }
 .cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* A code span sets its own colour, so `[`v2-backup-host`](…)` renders as a
+   link that does not look like one. Inherit instead, and keep the chip. */
+.cl-doc a code { color: inherit; }
+.cl-doc a:hover code { text-decoration: underline; text-underline-offset: 3px; }
 
 /* The status row sits tight under its heading — it qualifies that entry,
    so a paragraph's worth of air between them would read as a new thought. */

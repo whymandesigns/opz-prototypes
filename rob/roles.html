@@ -4472,38 +4472,6 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     </div>
 
-    <!-- Proposals do not land in the baseline. Each one is a version folder
-         beside it (versions.json), so it can be handed to a reviewer on its
-         own URL, improved in place, or deleted without touching the baseline.
-         Inside a version, ?versions=1 switches between them and ?changes=1
-         outlines what that version changed. -->
-    <section class="stack" style="gap: var(--spacing-3)">
-      <h2 class="h2">Proposals</h2>
-      <p class="body-sm">
-        The two cards above open the baseline &mdash; the closest this prototype gets
-        to the product.
-        Anything we are proposing sits on its own URL so it can be reviewed,
-        improved or dropped on its own.
-      </p>
-      <div class="roles">
-        <a class="card role" href="./v2-backup-host/">
-          <svg class="icon role-icon"><use href="#i-switch"/></svg>
-          <div class="stack" style="gap: var(--spacing-1)">
-            <div class="role-head">
-              <h2 class="h4">Backup host</h2>
-              <span class="tag tag-warning">In review</span>
-            </div>
-            <p class="body-sm" style="color: var(--color-text-muted)">
-              One named stand-in who can start the Zoom room when the owner is away,
-              the join-before-host guarantee stated under it, and a warning when
-              nobody can start the meeting.
-            </p>
-          </div>
-          <div class="role-foot"><span class="role-go">Open the proposal &rarr;</span></div>
-        </a>
-      </div>
-    </section>
-
     <!-- The changelog itself, not a link to it. Once you have picked a role
          the next useful thing on this page is what was decided and why, and a
          page that merely links to its own history mostly gets skipped. Same
