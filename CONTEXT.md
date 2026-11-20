@@ -329,7 +329,10 @@ switcher).
 **When** — TO FILL
 **Why it works this way** — TO FILL
 
-**Prototypes** — none yet. The closest is `initiatives/v3-breadcrumb`, which adds
+**Prototypes** — `time-off` (the member profile's Time Off tab,
+`TOFF-PROF-001`–`004`, extended with self-service: request, status and history
+on your own profile, plus approvals for someone with direct reports; today
+these exist only in the Slack bot, `TOFF-SLACK-001`, `TOFF-LIFE-002`). Also close: `initiatives/v3-breadcrumb`, which adds
 People to the initiative view, and `performance-reviews` (below), which is about
 people but sits under its own nav item.
 
