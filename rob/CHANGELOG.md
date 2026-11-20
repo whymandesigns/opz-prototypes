@@ -95,15 +95,23 @@ into every version folder.
 | `rob/v3-week-slot/` | **a proposal, in review** — the week-view slot click draws a draft and asks before the form opens, and a past slot says why nothing happened |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen, and where the proposals are listed. Sign out returns here |
 | `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
-| `rob/v1-baseline/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
-| `rob/v1-baseline/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
-| `rob/v1-baseline/?roles=1` | the bottom-left role switcher, for walking all three side by side |
-| `rob/v1-baseline/#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
-| `rob/v1-baseline/#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
 
-Inside any version, `?versions=1` switches between them and `?changes=1`
-outlines what that version changed. Every path above also works without
-`v1-baseline/`, through the redirect.
+**The baseline has one row because it is one build.** What used to be five rows
+here — a role, a respond flow, one occurrence — are switches on that same
+screen, not separate things to maintain. They are listed once, below, and they
+work on any version:
+
+| Switch | What it does |
+|---|---|
+| `?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
+| `?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
+| `?roles=1` | the bottom-left role switcher, for walking all three side by side |
+| `#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
+| `#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
+| `?versions=1` | the version switcher |
+| `?changes=1` | what this version changed against the one it branched from |
+
+Every path also works without `v1-baseline/`, through the redirect.
 
 Default respond flow is the **status menu** (Going / Reject / Maybe), not the
 modal. Prefer the hash form: the desktop preview pane drops `?params` on the way
