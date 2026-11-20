@@ -8,7 +8,7 @@
       "date": "2026-11-20",
       "kind": "concept",
       "stage": "shipped",
-      "note": "The baseline proposals branch off. Close to the product, not identical: four proposals have not moved out yet, and two screens follow the spec where the shipped product has an open deviation (B-187, B-191). The changelog's Where column says which is which.",
+      "note": "The baseline proposals branch off. Close to the product, not identical: it is a prototype with fixtures, and in two screens it follows the spec where the shipped product has an open deviation (B-187, B-191).",
       "basedOn": null
     },
     {

@@ -26,15 +26,20 @@ goes to review.
 
 Since 2026-11-20 a proposal lives in its own version folder rather than in the
 baseline, so **Where** is the way in — each one opens the prototype that row
-describes. Rows still reading
-`v1-baseline` are the ones not yet moved out — they are the honest remainder
-of a baseline that used to carry everything.
+describes, and every row here names a version rather than the baseline.
 
-**So the baseline is not 1:1 with the product**, and nothing here should be read
-as saying it is. Four rows below still sit in it, the two rows in the next table
-follow the spec where the shipped product has an open deviation, and underneath
-all of that it is a prototype: fixtures, invented people, no backend, and only
-the directory and the meeting view rather than the module.
+**A difference is not automatically a proposal**, which is why this table is
+shorter than the list of ways the prototype and the product differ. The
+recurrence options model the Operating Framework's policy rather than Google's
+generic rule; the filters are single-select because this prototype never built
+multi-select, which is a limitation and not an argument. Those are described
+where they are built, not here. A row earns its place by being a change we
+would defend.
+
+**The baseline is still not 1:1 with the product.** The two rows in the next
+table follow the spec where the shipped product has an open deviation, and
+underneath that it is a prototype: fixtures, invented people, no backend, and
+only the directory and the meeting view rather than the module.
 
 The **Rule** column cites the Operationalize behaviour spec, an internal
 reference that says what the product does. The ids are checkable by the team
@@ -46,10 +51,6 @@ and not from here, which is why they are not links.
 | The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | [`v2-backup-host`](./v2-backup-host/) | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
 | An occurrence whose owner is not going, with no backup host, says **nobody can start it** | [`v2-backup-host`](./v2-backup-host/) | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
-| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | [`v1-baseline`](./v1-baseline/) | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | [`v1-baseline`](./v1-baseline/) | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
-| Clicking the chosen option again clears that filter | [`v1-baseline`](./v1-baseline/) | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
-| Action items carry threaded comments | [`v1-baseline`](./v1-baseline/) | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
 | Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
@@ -178,11 +179,20 @@ baseline fix now has to be re-baked into every version folder.
 
 **The backup host moved first**, to prove the pattern, and the week-view slot
 behaviour followed the same day as `v3-week-slot` — both rows `ROB-VIEW-053`
-owns, since the confirm step and the past-slot toast are the same gesture. The
-action-item comments and the recurrence options are still in the baseline and
-still marked `v1-baseline` in
-[Where it departs](#where-it-departs-from-the-product) — the honest remainder,
-not a clean sweep.
+owns, since the confirm step and the past-slot toast are the same gesture.
+
+**The rest turned out not to need moving**, which is the more useful finding.
+Four rows were sitting in the departures table describing things that are not
+proposals: recurrence modelling the Operating Framework's policy, and filters
+that are single-select because nobody built multi-select. A limitation is not
+an argument, and policy is not a change we are asking the product to make.
+They came out of the table rather than into a version folder.
+
+One that is a real difference came out with them: the prototype's action items
+carry threaded comments and the product's do not (`ROB-ACTION-008` — notes
+shipped in June 2026 and were removed within a week). Dropping the row does not
+drop the behaviour, so that is still live in the baseline and still needs
+deciding: extract it, or take it out.
 
 Stripping that one taught the shape of the work. The proposal was not a block
 to delete: the baseline had to be given the behaviour the rule describes, which
