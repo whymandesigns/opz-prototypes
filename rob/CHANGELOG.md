@@ -80,7 +80,7 @@ to the page, and a hash survives both it and Vercel.
 
 - **Agenda items in the Create form.** Built, wired against `ROB-AGENDA-001…038`,
   then removed: the product has no agenda section at create time, and whether it
-  should is the open spike **TOP-7338**. The call was "a shell first, populated
+  should is an open spike upstream. The call was "a shell first, populated
   from the meeting view". If the spike lands the other way, the working version
   is in commit **b14f2c6** — take it from there rather than rebuilding.
 - **Eight static `.btn-primary`, one per modal.** The only reason this file still
@@ -151,7 +151,7 @@ one naming who will start the meeting. It is a standing condition of that
 occurrence rather than something that just happened, so an alert and not a toast.
 
 **The data for this arrived eight days ago**, which was worth finding out before
-drawing the screen. `TOP-7503` (topteam#6899, 2026-11-12) gave participants a
+drawing the screen. A change upstream on 2026-11-12 gave participants a
 per-occurrence **Decline** with an optional comment, and `ROB-OCC-067` now draws
 a red ✕ on an upcoming occurrence — before, a future occurrence showed no
 response at all. So the product does know, in advance, that someone is not
@@ -173,8 +173,8 @@ cannot read. That is a backlog item rather than part of this.
 Candidates come from the roster, which is Toptal's own rule — Zoom only asks for
 a licensed user on the same account. `ROB-OWNER-020` is left open: a transfer
 mints a new Zoom room, and nothing carries a backup host across it — and since
-topteam#6742 (2026-11-05) that room reliably reaches the moved series, so it is
-the behaviour and not a bug that would drop the field. The states
+2026-11-05 that room reliably reaches the moved series, so it is the behaviour
+and not a bug that would drop the field. The states
 are on `#backup=set|none|covered|ineligible|nozoom`.
 
 ### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
@@ -490,7 +490,7 @@ last, short section still becomes active at maximum scroll.
   service, and it is as old as the last `git fetch`. On 2026-11-20 a clone
   fifteen days behind produced a departure row for a thing the product had
   already shipped — `ROB-VIEW-007` — and a second row built on a limitation
-  `TOP-7503` had lifted eight days earlier. Both read as confident and both were
+  the product had lifted eight days earlier. Both read as confident and both were
   wrong. A rule's **History** line is the cheap check: it says when the card
   last moved.
 - **Every entry carries exactly one status.** A `**Status**` line under the

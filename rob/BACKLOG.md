@@ -108,7 +108,7 @@ replacement. See
 [The temporary ownership transfer the product dropped](#the-temporary-ownership-transfer-the-product-dropped).
 
 **Since 2026-11-12 something does tell people in advance, and it stops short of
-the owner.** `TOP-7503` (topteam#6899) added a per-occurrence **Decline** with
+the owner.** The product added a per-occurrence **Decline** with
 an optional comment (`ROB-OCC-097`), a comment the owner and RoB admins can read
 (`ROB-OCC-098`), and a red ✕ on the upcoming occurrence (`ROB-OCC-067`, where a
 future occurrence used to show no response at all). But `ROB-OCC-096` says the
@@ -195,8 +195,8 @@ the code with nothing calling it.
 items over for good: it is built for someone leaving or changing role, and
 `ROB-OWNER-037` shows the shape — one ongoing request per person, a terminated
 recipient rejected, a pending termination blocking it. Nobody files a role
-inheritance request to go on holiday for a week. `TOP-6180`, "Clean up the Temp
-Ownership Transfer concept", was closed **Abandoned** on 2026-10-26, so the
+inheritance request to go on holiday for a week. The clean-up ticket that would
+have finished removing the old concept was closed **Abandoned** on 2026-10-26, so the
 half-removed state is where it stops.
 
 **Why this is worth carrying rather than filing as trivia.** It changes how the
@@ -220,8 +220,8 @@ different conversations, and the second one is easier to win.
 **RoB can see a decline in advance since 2026-11-12, but not an absence — and
 an absence is the one somebody planned.**
 
-Declines reach an upcoming occurrence now: `ROB-OCC-067`, changed by `TOP-7503`
-(topteam#6899), draws a red ✕ on a future occurrence where there used to be no
+Declines reach an upcoming occurrence now: `ROB-OCC-067`, changed on 2026-11-12,
+draws a red ✕ on a future occurrence where there used to be no
 response at all. Out-of-office does not. `ROB-OCC-025` is the hard edge there: a
 participation status — Present, OOO, Declined, Missing — **exists only from 1
 hour after the occurrence ends**, and OOO has no equivalent of the decline
@@ -277,7 +277,7 @@ beside the join-before-host, authenticated-join and recording mode that pass
 already holds.
 
 **Why it is not a preference.** The product decided in 2023 that a RoB room
-takes join-before-host (TOP-2826, `ROB-ZOOM-009`), and a waiting room overrides
+takes join-before-host (`ROB-ZOOM-009`), and a waiting room overrides
 it. So a waiting room on a RoB is not a configuration of the decision, it is a
 silent reversal of it. The product does not offer a toggle for the other three
 and should not offer one for this.
@@ -295,7 +295,7 @@ product has to keep rather than a control.
   sharing a room by taking the stricter value. A waiting room has the same
   shape: if any RoB on the room wants it off, off wins, because the alternative
   is a RoB that cannot start.
-- **Enforcement reads from Zoom** since topteam#6534 (`ROB-ZOOM-013`), so a
+- **Enforcement reads from Zoom** since 2026-10-22 (`ROB-ZOOM-013`), so a
   waiting room switched on by hand would be switched back on the next pass,
   which is the behaviour this needs.
 - **`B-014` is upstream.** On a room the product never recognises, none of this
@@ -426,7 +426,7 @@ cleanest kind of backlog item — one that deletes code rather than adding it.
 
 Action items here carry threaded comments. The product carries none, and not by
 omission: notes shipped in late June 2026 and were taken out again within a
-week, data dropped with them (`TOP-7168`, `TOP-7169`). The spec is flat about
+week, data dropped with them (`ROB-ACTION-008`). The spec is flat about
 it — discussion about an action item happens outside the product.
 
 So this is a proposal we never made deliberately, and it is now a row in the

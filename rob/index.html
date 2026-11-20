@@ -4476,7 +4476,7 @@ body { overflow: hidden; }
  *
  * The second column is what isolates manage-deck — an admin who does NOT own
  * this series. Deck rights stayed with the owner when everything else was
- * handed to admins too (topteam#5934, 2026-08-04).
+ * handed to admins too (2026-08-04).
  *
  * Hidden, not disabled. ROB-EDIT-001 is explicit that participants "do not see
  * them"; a disabled control would promise a right that does not exist. Disabled
@@ -5863,12 +5863,13 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
         </div>
 
         <!-- My events first and selected on open — and this matches production.
-             topteam#6901 (2026-11-12) made My events the first tab and the
-             default, confirmed by the PO the next day, so ROB-VIEW-007 now reads
-             that way and neither the order nor the default is a departure. It
-             took TOP-6814 three years to arrive: the design task that specified
-             this page asked for the person's own meetings as the default scope,
-             and the story that shipped (TOP-6864, 2026-04) made it company-wide.
+             The product made My events the first tab and the default on
+             2026-11-12, confirmed by the PO the next day, so ROB-VIEW-007 now
+             reads that way and neither the order nor the default is a
+             departure. It took three years to arrive: the design task that
+             specified this page asked for the person's own meetings as the
+             default scope, and the story that shipped in April 2026 made it
+             company-wide.
 
              Not carried: the product remembers the tab per browser tab in
              sessionStorage and a saved ?q= link holds it (ROB-VIEW-013,
@@ -8121,7 +8122,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     // Create meeting — Agenda items: removed from this flow.
     //
     // The create form never had an agenda section in the product; adding items
-    // while creating was the open spike TOP-7338, and this page carried a
+    // while creating was an open spike upstream, and this page carried a
     // proposal for it. The call is the other way: create a shell, populate it
     // from the meeting view, so the modal asks only for what a meeting cannot
     // exist without.
@@ -17262,7 +17263,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             list.appendChild(b);
           });
           // Two different nothings: a tenant with no divisions at all, which
-          // is the product's own string (TOP-6373), and a search that matched
+          // is the product's own string (ROB-VIEW-026), and a search that matched
           // none of the ones there are.
           if (empty) {
             empty.hidden = opts.length > 0;
