@@ -4998,37 +4998,6 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 .cal-week-slot:not(.is-past):hover { background: color-mix(in srgb, var(--color-accent) 8%, transparent); }
 .cal-week-slot:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
-/* The draft is the meeting it would become — same block, dashed while it is
-   still only a proposal. It outranks the real ones so the popover's subject is
-   never behind a meeting it overlaps. */
-.cal-week-draft,
-.cal-week-draft:hover {
-  border: 1px dashed var(--color-accent);
-  border-left: 3px solid var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
-  cursor: default;
-  z-index: 6;
-}
-
-/* ---- Draft popover ----
-   Fixed, not absolute: .cal-week-body clips, so a panel beside a Friday slot
-   or a 7pm one would be cut in half. Lives here for the same reason
-   .rob-filter-pop does — this file carries the designmd:legacy marker, so no
-   kit change reaches it, and the kit has no popover component yet. */
-.cal-pop {
-  position: fixed;
-  z-index: var(--z-overlay);
-  width: 264px;
-  padding: var(--spacing-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-4);
-}
-.cal-pop-title { font: var(--type-body-semibold); color: var(--color-text); margin: 0; }
-.cal-pop-when { font: var(--type-body-sm); color: var(--color-text-muted); margin: var(--spacing-1) 0 var(--spacing-4); }
-.cal-pop-actions { display: flex; justify-content: flex-end; gap: var(--spacing-2); }
-
 /* ---- Schedule view ---- */
 .cal-sched { position: relative; display: flex; flex-direction: column; gap: var(--spacing-8); }
 .cal-sched-day { display: flex; flex-direction: column; gap: var(--spacing-1); position: relative; }
@@ -16394,9 +16363,6 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         const cols = weekEl.querySelector('[data-cal-week-cols]');
         head.replaceChildren(); axis.replaceChildren(); cols.replaceChildren();
 
-        // A draft belongs to the week as it was drawn; this redraws it.
-        closeDraft();
-
         const height = (HOUR_N - HOUR_0) * HOUR_PX + PAD;
         axis.style.height = `${height}px`;
         cols.style.height = `${height}px`;
@@ -16550,16 +16516,17 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       }
 
       // ---- Click to create ----
-      // ROB-VIEW-053 has a slot click open the Create meeting form straight
-      // away. Here it draws the slot first and asks: the week is dense, the
-      // form is full-screen, and a mis-click is far cheaper to make than to
-      // get out of. What Create meeting finally opens is that same form,
-      // pre-filled the same way — date, slot start, slot start + 30 minutes.
+      // ROB-VIEW-053: an empty slot that has not started yet opens the Create
+      // meeting form pre-filled with that date, the slot's start, and start
+      // plus 30 minutes. A past slot shows no pointer and ignores the click.
+      //
+      // The confirm step this used to draw — a dashed draft block and a
+      // Create meeting / Cancel popover — is a proposal, and proposals do not
+      // live in the baseline. It is v3-week-slot now.
       const weekCols = weekEl.querySelector('[data-cal-week-cols]');
-      let draft = null, pop = null;
 
-      // UXCopy "Short": 12-hour, capital AM/PM, a space before it. The axis
-      // reads 10:00am because it is a compact label; a sentence does not.
+      // UXCopy "Short": 12-hour, capital AM/PM, a space before it. Used by the
+      // slot aria-labels above as well as here.
       const clock = (n) => {
         const h24 = Math.floor(n / 60), mm = String(n % 60).padStart(2, '0');
         return `${h24 % 12 === 0 ? 12 : h24 % 12}:${mm} ${h24 < 12 ? 'AM' : 'PM'}`;
@@ -16567,115 +16534,33 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // What the form's time fields are authored in.
       const hhmm = (n) => `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
 
-      function closeDraft() {
-        draft?.remove();
-        pop?.remove();
-        draft = null;
-        pop = null;
-      }
-
-      // The popover is fixed, so it is placed against the draft's box on
-      // screen: beside it, flipped to the left when the right would run off,
-      // and pulled up when the bottom would.
-      function placePop() {
-        if (!draft || !pop) return;
-        const GAP = 8;
-        const r = draft.getBoundingClientRect();
-        let left = r.right + GAP;
-        if (left + pop.offsetWidth > window.innerWidth - GAP) left = r.left - GAP - pop.offsetWidth;
-        let top = Math.min(r.top, window.innerHeight - GAP - pop.offsetHeight);
-        pop.style.left = `${Math.max(GAP, left)}px`;
-        pop.style.top = `${Math.max(GAP, top)}px`;
-      }
-
-      function openDraft(slot) {
-        closeDraft();
-        const date = slot.dataset.date;
+      function createFromSlot(slot) {
+        const date  = slot.dataset.date;
         const start = Number(slot.dataset.start);
-        const end = start + 30;
-
-        draft = document.createElement('div');
-        draft.className = 'cal-week-ev cal-week-draft';
-        draft.style.top = `${(start - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
-        draft.style.height = `${30 * PX_PER_MIN - 2}px`;
-        draft.innerHTML = `<span class="cal-event-title"><span class="cal-event-name">New meeting</span></span>`
-          + `<span class="cal-event-meta"><span class="cal-event-time">${esc(clock(start))} – ${esc(clock(end))}</span></span>`;
-        slot.closest('.cal-week-col').appendChild(draft);
-
-        pop = document.createElement('div');
-        pop.className = 'cal-pop';
-        pop.setAttribute('role', 'dialog');
-        pop.setAttribute('aria-label', 'New meeting');
-        pop.innerHTML = `<p class="cal-pop-title">New meeting</p>`
-          + `<p class="cal-pop-when">${esc(window.robClock.fmt(date, 'longshort'))} at `
-          + `${esc(clock(start))} – ${esc(clock(end))}</p>`
-          + `<div class="cal-pop-actions">`
-          +   `<button class="btn btn-secondary btn-xs" type="button" data-draft-cancel>Cancel</button>`
-          +   `<button class="btn btn-primary btn-xs" type="button" data-draft-create>Create meeting</button>`
-          + `</div>`;
-        document.body.appendChild(pop);
-        placePop();
-        pop.querySelector('[data-draft-create]').focus();
-
-        pop.addEventListener('click', (e) => {
-          if (e.target.closest('[data-draft-cancel]')) { closeDraft(); slot.focus(); return; }
-          if (!e.target.closest('[data-draft-create]')) return;
-          // The same three fields the month grid's click-to-create fills.
-          const field = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
-          field('cm-date', window.robClock.fmt(date, 'med'));
-          field('cm-time-start', hhmm(start));
-          field('cm-time-end', hhmm(end));
-          closeDraft();
-          document.getElementById('create-meeting')?.removeAttribute('hidden');   // openModal, from the block above
-        });
-      }
-
-      // One at a time: clicking along a row of past slots is one mistake, not
-      // six, and six stacked toasts would bury the grid they are about.
-      let pastToast = null;
-      function refusePast() {
-        pastToast?.dismiss();
-        // Neutral, not warning: this is the system saying what happened, not
-        // the page flagging a condition. The dark chip reads as chrome over
-        // the grid rather than as a problem in it, and with one message and
-        // no state to signal there is nothing for an icon to add.
-        pastToast = window.toast?.({
-          variant: 'neutral',
-          icon: false,
-          // One line, and no "can't": UXCopy asks for the positive form, so it
-          // says what happened and what to do instead of what is forbidden.
-          message: 'That slot has passed — pick a later one.',
-        });
+        // The same three fields the month grid's click-to-create fills.
+        const field = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+        field('cm-date', window.robClock.fmt(date, 'med'));
+        field('cm-time-start', hhmm(start));
+        field('cm-time-end', hhmm(start + 30));
+        document.getElementById('create-meeting')?.removeAttribute('hidden');   // openModal, from the block above
       }
 
       weekCols.addEventListener('click', (e) => {
         if (e.target.closest('.cal-week-ev')) return;     // a meeting is not an empty slot
         const slot = e.target.closest('.cal-week-slot');
-        if (!slot) return;
-        // A past slot shows no pointer and carries no role (ROB-VIEW-053), so
-        // a click on one is a mis-aim rather than an attempt. It gets the
-        // reason instead of silence — the product says nothing here, which is
-        // why this is a proposal rather than a copy of it.
-        if (slot.classList.contains('is-past')) { refusePast(); return; }
-        openDraft(slot);
+        // A past slot has no pointer, no role and no tabindex (paintNow strips
+        // them as the hour passes), so a click on one is a mis-aim. The
+        // product says nothing; so does this.
+        if (!slot || slot.classList.contains('is-past')) return;
+        createFromSlot(slot);
       });
       weekCols.addEventListener('keydown', (e) => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         const slot = e.target.closest('.cal-week-slot');
         if (!slot || slot.classList.contains('is-past')) return;
         e.preventDefault();
-        openDraft(slot);
+        createFromSlot(slot);
       });
-
-      // Anywhere else is a decision not to create. A slot is excluded so
-      // picking a different one moves the draft rather than closing it first.
-      document.addEventListener('mousedown', (e) => {
-        if (draft && !e.target.closest('.cal-pop, .cal-week-slot')) closeDraft();
-      });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDraft(); });
-      // Capture, so any scroller the grid sits in is heard, not just the window.
-      window.addEventListener('scroll', placePop, true);
-      window.addEventListener('resize', placePop);
 
       // ---- Filter popover ----
       // Only the filters this prototype's data can answer actually narrow the

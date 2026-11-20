@@ -31,7 +31,7 @@ describes. Rows still reading
 of a baseline that used to carry everything.
 
 **So the baseline is not 1:1 with the product**, and nothing here should be read
-as saying it is. Six rows below still sit in it, the two rows in the next table
+as saying it is. Four rows below still sit in it, the two rows in the next table
 follow the spec where the shipped product has an open deviation, and underneath
 all of that it is a prototype: fixtures, invented people, no backend, and only
 the directory and the meeting view rather than the module.
@@ -45,12 +45,12 @@ and not from here, which is why they are not links.
 | A series can name one **backup host**, who can start the Zoom room when the owner is away | [`v2-backup-host`](./v2-backup-host/) | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
 | The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | [`v2-backup-host`](./v2-backup-host/) | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
 | An occurrence whose owner is not going, with no backup host, says **nobody can start it** | [`v2-backup-host`](./v2-backup-host/) | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
-| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v1-baseline`](./v1-baseline/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
+| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | [`v1-baseline`](./v1-baseline/) | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
 | Every filter is single-select | [`v1-baseline`](./v1-baseline/) | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
 | Clicking the chosen option again clears that filter | [`v1-baseline`](./v1-baseline/) | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
 | Action items carry threaded comments | [`v1-baseline`](./v1-baseline/) | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
-| Clicking a past slot in the week view says why nothing happened | [`v1-baseline`](./v1-baseline/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
+| Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -92,6 +92,7 @@ into every version folder.
 | `rob/` | redirects to the baseline, carrying the query and hash. Old links keep working |
 | `rob/v1-baseline/` | **the baseline** proposals branch off — close to the product, not identical (see the note under the departures table). The admin owner's view: Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
 | `rob/v2-backup-host/` | **a proposal, in review** — the backup host, the join guarantee and the nobody-can-start warning |
+| `rob/v3-week-slot/` | **a proposal, in review** — the week-view slot click draws a draft and asks before the form opens, and a past slot says why nothing happened |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen, and where the proposals are listed. Sign out returns here |
 | `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
 | `rob/v1-baseline/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
@@ -167,11 +168,20 @@ same decision — a role, a respond flow, one occurrence. It does not hold for a
 and droppable on its own. The duplication is real, and the price is that a
 baseline fix now has to be re-baked into every version folder.
 
-**Only the backup host moved**, to prove the pattern on the one proposal
-actually in review. The week-view slot behaviour, the action-item comments and
-the recurrence options are still in the baseline and still marked
-`v1-baseline` in [Where it departs](#where-it-departs-from-the-product) — the
-honest remainder, not a clean sweep.
+**The backup host moved first**, to prove the pattern, and the week-view slot
+behaviour followed the same day as `v3-week-slot` — both rows `ROB-VIEW-053`
+owns, since the confirm step and the past-slot toast are the same gesture. The
+action-item comments and the recurrence options are still in the baseline and
+still marked `v1-baseline` in
+[Where it departs](#where-it-departs-from-the-product) — the honest remainder,
+not a clean sweep.
+
+Stripping that one taught the shape of the work. The proposal was not a block
+to delete: the baseline had to be given the behaviour the rule describes, which
+is the form opening straight away on a future slot and nothing at all on a past
+one. Two things nearly went out with it — `clock()`, which the slot aria-labels
+use, and a `closeDraft()` call in `renderWeek` that would have thrown on every
+redraw. Neither was part of the proposal; both lived in its block.
 
 ### 2026-11-20 — A backup host, and who can start the meeting *(local on `rob-week-grid`)*
 

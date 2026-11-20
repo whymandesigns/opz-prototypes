@@ -8,7 +8,7 @@
       "date": "2026-11-20",
       "kind": "concept",
       "stage": "shipped",
-      "note": "The baseline proposals branch off. Close to the product, not identical: six proposals have not moved out yet, and two screens follow the spec where the shipped product has an open deviation (B-187, B-191). The changelog's Where column says which is which.",
+      "note": "The baseline proposals branch off. Close to the product, not identical: four proposals have not moved out yet, and two screens follow the spec where the shipped product has an open deviation (B-187, B-191). The changelog's Where column says which is which.",
       "basedOn": null
     },
     {
@@ -30,6 +30,35 @@
           "id": "v2-02",
           "type": "new",
           "summary": "Warns when nobody can start the meeting",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "folder": "v3-week-slot",
+      "label": "v3 · Week-view slot click",
+      "date": "2026-11-20",
+      "kind": "concept",
+      "stage": "review",
+      "note": "A slot click draws the draft and asks Create meeting / Cancel before the form opens, and a click on a past slot says why nothing happened instead of being swallowed.",
+      "basedOn": "v1-baseline",
+      "changes": [
+        {
+          "id": "v3-01",
+          "type": "changed",
+          "summary": "Draws the slot and asks, instead of opening the form",
+          "status": "pending"
+        },
+        {
+          "id": "v3-02",
+          "type": "new",
+          "summary": "Create meeting / Cancel before the form opens",
+          "status": "pending"
+        },
+        {
+          "id": "v3-03",
+          "type": "new",
+          "summary": "A past slot says why nothing happened",
           "status": "pending"
         }
       ]
