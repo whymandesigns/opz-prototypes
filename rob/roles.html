@@ -4439,7 +4439,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <!-- The built one. The admin is the RoB's singular owner — CONTEXT.md
            calls the role Accountable Owner — so theirs is the view with
            create, edit and the admin controls. -->
-      <a class="card role" href="./v1-production/">
+      <a class="card role" href="./v1-baseline/">
         <svg class="icon role-icon"><use href="#i-user"/></svg>
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
@@ -4454,10 +4454,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       <!-- Built. ?role=participant is the same prototype with the viewer role
            switched; ?roles=1 adds the switcher panel, left off here because
-           this page IS the chooser. Both cards open v1-production, the
+           this page IS the chooser. Both cards open v1-baseline, the
            baseline: proposals live in their own version folders so each one
            is reviewed on its own. -->
-      <a class="card role" href="./v1-production/?role=participant">
+      <a class="card role" href="./v1-baseline/?role=participant">
         <svg class="icon role-icon"><use href="#i-participants"/></svg>
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
@@ -4480,7 +4480,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     <section class="stack" style="gap: var(--spacing-3)">
       <h2 class="h2">Proposals</h2>
       <p class="body-sm">
-        The two cards above open the baseline &mdash; what the product does today.
+        The two cards above open the baseline &mdash; the closest this prototype gets
+        to the product.
         Anything we are proposing sits on its own URL so it can be reviewed,
         improved or dropped on its own.
       </p>

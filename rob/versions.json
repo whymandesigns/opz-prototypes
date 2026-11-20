@@ -3,12 +3,12 @@
   "family": "RoB Meetings",
   "versions": [
     {
-      "folder": "v1-production",
-      "label": "v1 · Production",
+      "folder": "v1-baseline",
+      "label": "v1 · Baseline",
       "date": "2026-11-20",
       "kind": "concept",
       "stage": "shipped",
-      "note": "What the product does today. Proposals do not land here — they branch off it, so this one stays reviewable against the real thing.",
+      "note": "The baseline proposals branch off. Close to the product, not identical: six proposals have not moved out yet, and two screens follow the spec where the shipped product has an open deviation (B-187, B-191). The changelog's Where column says which is which.",
       "basedOn": null
     },
     {
@@ -18,7 +18,7 @@
       "kind": "concept",
       "stage": "review",
       "note": "One named stand-in who can start the Zoom room when the owner is away, the join-before-host guarantee stated under it, and a warning when nobody can start the meeting.",
-      "basedOn": "v1-production",
+      "basedOn": "v1-baseline",
       "changes": [
         {
           "id": "v2-01",

@@ -5769,7 +5769,9 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                  link it is. data-rob-todo is gone — that attribute makes the
                  global handler preventDefault and announce "not built", which
                  would now be a lie. -->
-            <a class="dropdown-item" role="menuitem" href="roles.html">Sign out</a>
+            <!-- ../ because this file is a version folder; the chooser lives
+                 at the family root beside versions.json. -->
+            <a class="dropdown-item" role="menuitem" href="../roles.html">Sign out</a>
           </div>
         </div>
       </div>
@@ -12023,7 +12025,7 @@ Platform reliability — error budget
     // <a href="roles.html"> resolve to /<dir>/roles.html
     // instead of /roles.html. Local-only fix — Cloudflare Pages
     // already serves trailing slashes for directory targets.
-    if (/\/rob$/.test(location.pathname)) {
+    if (/\/(rob|v\d+(\.\d+)?-[a-z0-9-]+)$/.test(location.pathname)) {
       history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
     }
 
@@ -12032,7 +12034,12 @@ Platform reliability — error budget
     // slash, which is exactly how the local server hands it over.
     document.querySelectorAll('[data-rob-sibling]').forEach(link => {
       const here = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
-      const base = here.slice(0, here.lastIndexOf('/'));
+      // A version folder sits one level below the feature, so drop it first —
+      // otherwise ../ lands inside the feature instead of beside it.
+      const feature = /\/v\d+(\.\d+)?-[a-z0-9-]+$/.test(here)
+        ? here.slice(0, here.lastIndexOf('/'))
+        : here;
+      const base = feature.slice(0, feature.lastIndexOf('/'));
       link.href = `${base}/${link.dataset.robSibling}/`;
     });
 

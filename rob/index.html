@@ -6,7 +6,7 @@
   <title>RoB Meetings — Operationalize</title>
 
   <!-- /rob/ used to be the prototype itself. It is now the family, and the
-       prototype is a version inside it: v1-production is what the product does
+       prototype is a version inside it: v1-baseline is what the product does
        today, and every proposal branches off it, so the baseline stays
        reviewable against the real thing. See versions.json.
 
@@ -17,8 +17,8 @@
        A redirect rather than the real page because the versions plugin
        resolves each folder against versions.json and its folder names must
        match vN-slug — the baseline cannot both sit here and be in the family. -->
-  <meta http-equiv="refresh" content="0; url=./v1-production/" />
-  <link rel="canonical" href="./v1-production/" />
+  <meta http-equiv="refresh" content="0; url=./v1-baseline/" />
+  <link rel="canonical" href="./v1-baseline/" />
 
   <style>
     body {
@@ -36,11 +36,11 @@
 </head>
 <body>
   <!-- Seen only if the redirect is blocked or scripting is off. -->
-  <p>Opening the <a href="./v1-production/">RoB Meetings baseline</a>…</p>
+  <p>Opening the <a href="./v1-baseline/">RoB Meetings baseline</a>…</p>
 
   <script>
     // Carry the query and hash across, which a meta refresh alone drops.
-    location.replace('./v1-production/' + location.search + location.hash);
+    location.replace('./v1-baseline/' + location.search + location.hash);
   </script>
 </body>
 </html>
