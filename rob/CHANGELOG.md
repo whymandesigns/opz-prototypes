@@ -24,17 +24,26 @@ places it does not, each with the rule that says what the product does.
 the rule is wrong. Each one is a proposal, and needs saying out loud when it
 goes to review.
 
-| Here | The product | Rule |
-|---|---|---|
-| A series can name one **backup host**, who can start the Zoom room when the owner is away | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
-| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
-| An occurrence whose owner is not going, with no backup host, says **nobody can start it** | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
-| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
-| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
-| Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
-| Action items carry threaded comments | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
-| Clicking a past slot in the week view says why nothing happened | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
+Since 2026-11-20 a proposal lives in its own version folder rather than in the
+baseline, so **Where** says which URL to open. Rows still reading
+`v1-production` are the ones not yet moved out — they are the honest remainder
+of a baseline that used to carry everything.
+
+The **Rule** column cites the Operationalize behaviour spec, an internal
+reference that says what the product does. The ids are checkable by the team
+and not from here, which is why they are not links.
+
+| Here | Where | The product | Rule |
+|---|---|---|---|
+| A series can name one **backup host**, who can start the Zoom room when the owner is away | `v2-backup-host` | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
+| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | `v2-backup-host` | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
+| An occurrence whose owner is not going, with no backup host, says **nobody can start it** | `v2-backup-host` | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
+| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | `v1-production` | opens the Create meeting form straight away | `ROB-VIEW-053` |
+| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | `v1-production` | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
+| Every filter is single-select | `v1-production` | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
+| Clicking the chosen option again clears that filter | `v1-production` | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
+| Action items carry threaded comments | `v1-production` | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
+| Clicking a past slot in the week view says why nothing happened | `v1-production` | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -53,22 +62,40 @@ fixes the deviation — not when we stop thinking about it.
 
 ## Reach the variants
 
-The prototype is one file; a variant is a URL, not a copy. (`rob` is ~1.2 MB and
-still moving — a duplicate drifts within days.) The rule was learned the hard
-way: this started in Aug 2026 as `action-items`, beside a near-duplicate called
-`rob-flow` that every change had to be mirrored into. Both of those early flows
-sit in `../archive/`, and the old `/action-items/` URL 404s.
+**Two different things are called a variant here, and they are kept apart.**
+
+A **view** of the same product decision — a role, a respond flow, one
+occurrence — is a URL on the same file, never a copy. That rule was learned the
+hard way: this started in Aug 2026 as `action-items`, beside a near-duplicate
+called `rob-flow` that every change had to be mirrored into. Both sit in
+`../archive/`, and the old `/action-items/` URL 404s. At ~1.3 MB a duplicate
+drifts within days, so a switch stays a switch.
+
+A **proposal** is a copy, on purpose, since 2026-11-20. It is a different
+product decision, and it has to be reviewable on its own, improvable without
+touching the baseline, and droppable by deleting a folder. Keeping proposals
+inside the baseline made `rob/` a thing we described as production-faithful
+while it rendered six changes the product has never seen. So the baseline is
+`v1-production`, each proposal branches off it, and `versions.json` lists them.
+The duplication is real and is the price: a baseline fix now has to be re-baked
+into every version folder.
 
 | URL | What it opens |
 |---|---|
-| `rob/` | the admin owner's view — Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
-| `rob/roles.html` | the role chooser, this prototype's sign-in screen. Sign out returns here |
+| `rob/` | redirects to the baseline, carrying the query and hash. Old links keep working |
+| `rob/v1-production/` | **the baseline** — what the product does today. The admin owner's view: Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
+| `rob/v2-backup-host/` | **a proposal, in review** — the backup host, the join guarantee and the nobody-can-start warning |
+| `rob/roles.html` | the role chooser, this prototype's sign-in screen, and where the proposals are listed. Sign out returns here |
 | `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
-| `rob/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
-| `rob/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
-| `rob/?roles=1` | the bottom-left role switcher, for walking all three side by side |
-| `rob/#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
-| `rob/#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
+| `rob/v1-production/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
+| `rob/v1-production/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
+| `rob/v1-production/?roles=1` | the bottom-left role switcher, for walking all three side by side |
+| `rob/v1-production/#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
+| `rob/v1-production/#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
+
+Inside any version, `?versions=1` switches between them and `?changes=1`
+outlines what that version changed. Every path above also works without
+`v1-production/`, through the redirect.
 
 Default respond flow is the **status menu** (Going / Reject / Maybe), not the
 modal. Prefer the hash form: the desktop preview pane drops `?params` on the way
@@ -103,6 +130,37 @@ to the page, and a hash survives both it and Vercel.
 ---
 
 ## History
+
+### 2026-11-20 — Proposals move out of the baseline *(local on `rob-version-split`)*
+
+**Status** · Structural — no product decision changed, but where each one lives did, and the departures table now says which URL.
+
+![The role chooser: Admin and Participant cards opening the baseline, and below them a Proposals section with the backup host on its own card, tagged In review.](_shots/2026-11-20-proposals-split.png)
+
+`rob/` was described as production-faithful while rendering six changes the
+product has never seen. A proposal and the thing it is a proposal *about* were
+the same URL, so there was no way to hand someone the baseline, or to drop an
+idea without surgery on a 1.3 MB file.
+
+So the family splits. `v1-production` is what the product does today; a
+proposal branches off it into its own folder, listed in `versions.json`, and
+`rob/` is a redirect that carries the query and hash so every existing link
+still lands. The role chooser gained a **Proposals** section, which is where a
+reviewer picks one up.
+
+**This reverses a rule the file used to state**, and the reversal is narrower
+than it looks. "A variant is a URL, not a copy" was written after `action-items`
+and `rob-flow` drifted apart in Aug 2026, and it still holds for a *view* of the
+same decision — a role, a respond flow, one occurrence. It does not hold for a
+*proposal*, which is a different decision and has to be reviewable, improvable
+and droppable on its own. The duplication is real, and the price is that a
+baseline fix now has to be re-baked into every version folder.
+
+**Only the backup host moved**, to prove the pattern on the one proposal
+actually in review. The week-view slot behaviour, the action-item comments and
+the recurrence options are still in the baseline and still marked
+`v1-production` in [Where it departs](#where-it-departs-from-the-product) — the
+honest remainder, not a clean sweep.
 
 ### 2026-11-20 — A backup host, and who can start the meeting *(local on `rob-week-grid`)*
 
@@ -486,6 +544,11 @@ last, short section still becomes active at maximum scroll.
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
   row out of **Where it departs from the product**.
+- **A proposal gets its own version folder; the baseline stays production-faithful.**
+  `v1-production` is what the product does, and a row in
+  [Where it departs](#where-it-departs-from-the-product) names the folder its
+  proposal lives in. A proposal left in the baseline makes this whole file a
+  claim the prototype does not keep.
 - **Pull the oracle before citing it.** It is a checkout of `topteam`, not a
   service, and it is as old as the last `git fetch`. On 2026-11-20 a clone
   fifteen days behind produced a departure row for a thing the product had

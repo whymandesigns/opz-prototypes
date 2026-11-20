@@ -907,7 +907,7 @@ textarea.input {
 
 /* ---------- Pictogram ----------
  * Detailed 64x64 line-art illustration for empty / error / success / info
- * states — a richer counterpart to the Phosphor icon set. Blue (accent)
+ * states — a richer counterpart to the plain icon set. Blue (accent)
  * strokes over light (accent-subtle) fills; recolour via the `color` property.
  *
  *   <span class="pictogram"><svg viewBox="0 0 64 64">…</svg></span>
@@ -1737,7 +1737,7 @@ button.badge:focus-visible {
   outline-offset: 1px;
 }
 
-/* Leading icon — Phosphor <i> or inline svg */
+/* Leading icon — <svg class="icon"><use href="#i-{slug}"/></svg> */
 .badge-icon { width: 1em; height: 1em; flex-shrink: 0; }
 
 /* Trailing remove × — clicking deletes the pill (delegated handler) */
@@ -1874,11 +1874,38 @@ button.badge:focus-visible {
  *
  * Interactive: render as <button> or <a> instead of <span> — picks up
  * pointer cursor, hover dim and focus-visible ring automatically.
+ *
+ * Status flag — a solid square in the bottom-right corner, the letter in
+ * the markup. The modifier on the root picks the colour; put the status in
+ * the image's alt, because the flag itself is aria-hidden:
+ *
+ *   <span class="avatar avatar-xl avatar-newcomer">
+ *     <img src="…" alt="Jane Doe, newcomer"><span class="avatar-flag" aria-hidden="true">N</span>
+ *   </span>
+ *
+ *   .avatar-newcomer  N  green    start date within the last 3 months (PPL-ROW-003)
+ *   .avatar-talent    T  blue     a Talent, not a member (ROB-OCC-069)
+ *   .avatar-pending   P  graphite start date still in the future; the photo
+ *                                 is dimmed as well (PPL-ROW-002, TEAM-PAGE-018)
+ *
+ * Terminated is the one status with no flag: the photo goes greyscale and
+ * fades, like a disabled control, and any flag inside is hidden — the
+ * product shows no newcomer or pending marker for a terminated member
+ * (PROF-VIEW-003). The greyscale treatment itself is a proposal; the
+ * oracle has no rule for it.
+ *
+ *   <span class="avatar avatar-xl avatar-terminated"><img src="…" alt="Jane Doe, terminated"></span>
+ *
+ * The flag is 37.5% of the avatar, so it scales with every size. Below md
+ * there is no room for a letter, so xs and sm show the colour only.
+ * A tooltip ([data-tooltip]) goes on a wrapper, never on the avatar: the
+ * clip-path would cut it off.
  */
 .avatar {
   --avatar-size: 32px;
   --avatar-text: var(--text-sm);
   --avatar-icon: 16px;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1912,7 +1939,7 @@ button.badge:focus-visible {
   display: block;
 }
 
-/* Icon content — Phosphor or inline SVG, sized by --avatar-icon */
+/* Icon content — <svg class="icon">, sized by --avatar-icon */
 .avatar > svg { font-size: var(--avatar-icon); }
 .avatar > svg { width: var(--avatar-icon); height: var(--avatar-icon); }
 
@@ -1922,6 +1949,41 @@ button.badge:focus-visible {
   background: var(--color-surface-muted);
   color: var(--color-text-muted);
 }
+
+/* Status flag — see the header above. Flush to the right and bottom edges,
+ * which the chamfer (bottom-left) never reaches. */
+.avatar-flag {
+  --avatar-flag-bg: var(--color-graphite-800);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 37.5%;
+  height: 37.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--avatar-flag-bg);
+  color: var(--color-text-inverse);
+  font: var(--font-weight-semibold) calc(var(--avatar-size) * 0.26)/1 var(--font-sans);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.avatar-newcomer .avatar-flag { --avatar-flag-bg: var(--color-green-700); }
+.avatar-talent   .avatar-flag { --avatar-flag-bg: var(--color-accent); }
+.avatar-pending  .avatar-flag { --avatar-flag-bg: var(--color-graphite-800); }
+.avatar-xs .avatar-flag,
+.avatar-sm .avatar-flag { font-size: 0; }
+
+/* Pending — the person has not started yet, so the photo (or initials)
+ * recedes and the flag stays solid. */
+.avatar-pending > img { opacity: 0.45; }
+.avatar-pending:not(:has(> img)) { color: var(--color-text-subtle); }
+
+/* Terminated — no flag; the person reads as disabled. Greyscale tells it
+ * apart from pending, whose photo fades but keeps its colour. */
+.avatar-terminated > img { filter: grayscale(1); opacity: 0.5; }
+.avatar-terminated:not(:has(> img)) { color: var(--color-text-subtle); }
+.avatar-terminated .avatar-flag { display: none; }
 
 /* Interactive — applies when rendered as <button> or <a> */
 button.avatar,
@@ -3397,6 +3459,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   max-width: 380px;
   pointer-events: none;
 }
+/* Placement variant. The default corner is right for an action taken in the
+ * page head or a toolbar — the eye is already up there. Bottom-centre is for
+ * feedback about something further down the page, a click in a grid or a drag,
+ * where a toast in the opposite corner is a long way from what the reader is
+ * looking at. Centred on the viewport rather than the content, because the
+ * content it is about may be anywhere. */
+.toast-region-bottom {
+  top: auto;
+  bottom: var(--spacing-6);
+  right: 50%;
+  transform: translateX(50%);
+  align-items: center;
+}
+/* The default slides in from the right edge it is pinned to; one pinned to the
+ * bottom has to come up from it, or it arrives sideways from nowhere. */
+.toast-region-bottom .toast.is-entering,
+.toast-region-bottom .toast.is-leaving { transform: translateY(20%); }
+
 .toast {
   --toast-accent: var(--color-border-strong);
   display: flex;
@@ -3645,7 +3725,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .dropdown-item-icon {
   width: 16px;
   height: 16px;
-  font-size: 16px; /* sizes Phosphor <i> icons; harmless for inline SVG */
+  font-size: 16px; /* .icon is 1em, so font-size is still the sizing lever */
   flex-shrink: 0;
   color: var(--color-text-muted);
 }
@@ -3687,6 +3767,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding: var(--spacing-2) var(--spacing-3) var(--spacing-3);
 }
 .dropdown-header .dropdown-item-label { font-weight: var(--font-weight-semibold); white-space: nowrap; }
+/* A name and a role are identity, not content: they belong on one line each, so
+ * a long role ellipses rather than growing the menu or stacking three lines.
+ * Scoped to the header — an item's own description still wraps, which is what
+ * explanatory rows need. .dropdown-item-text already carries min-width: 0, so
+ * the flex child can shrink far enough for the ellipsis to show. */
+.dropdown-header .dropdown-item-label,
+.dropdown-header .dropdown-item-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-header .dropdown-item-description { white-space: nowrap; }
+/* nowrap alone only stops the wrap: the menu has a min-width and no max, so a
+ * long role widens the whole panel instead of ellipsing. Capping the header's
+ * text block is what makes the ellipsis appear, and it bounds only the identity
+ * row — items still size to their own content. */
+.dropdown-header .dropdown-item-text { max-width: 220px; }
 
 /* Trailing count/badge inside a dropdown item — pushed to the right edge */
 .dropdown-item-count { margin-left: auto; flex-shrink: 0; }
@@ -3731,7 +3827,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  font: var(--font-weight-regular) var(--text-xxs)/1 var(--font-sans);
+  font: var(--font-weight-semibold) var(--text-xxs)/1 var(--font-sans);
   color: var(--color-text);
 }
 /* Tight right padding when a remove button is present */
@@ -3984,6 +4080,194 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-shrink: 0;
 }
 
+/* ---------- Notifications ----------
+ * The bell in the top bar, the panel it opens, and the row both the panel and
+ * the full Notifications page are made of.
+ *
+ *   <div class="dropdown">
+ *     <button class="btn btn-icon-only btn-ghost topbar-bell dropdown-trigger"
+ *             type="button" aria-label="Notifications, 4 unread" aria-expanded="false">
+ *       <svg class="icon"><use href="#i-bell"/></svg>
+ *       <span class="topbar-bell-dot"></span>      ← add [hidden] when nothing is unread
+ *     </button>
+ *     <div class="dropdown-menu dropdown-menu-end notification-panel" hidden>
+ *       <div class="notification-panel-head"> .tabs + .notification-panel-tools </div>
+ *       <div class="notification-list"> .notification-group + .notification … </div>
+ *       <div class="notification-panel-foot"> link to the full page </div>
+ *     </div>
+ *   </div>
+ *
+ *   <article class="notification is-unread">
+ *     <span class="notification-icon"><svg class="icon"><use href="#i-calendar"/></svg></span>
+ *       — or, when a person caused it, <span class="avatar avatar-md">DR</span>
+ *     <div class="notification-body">
+ *       <p class="notification-text"><strong>Who</strong> did what to <strong>which thing</strong>.</p>
+ *       <p class="notification-meta">Module · Today at 2:45 PM</p>
+ *       <div class="notification-actions"> .btn.btn-secondary.btn-xs … </div>
+ *     </div>
+ *     <button class="notification-mark" type="button" aria-label="Mark as read"></button>
+ *   </article>
+ *
+ * The leading slot says what kind of thing it is (module icon) or who did it
+ * (avatar); the meta line names the module in words, so nobody has to learn
+ * the icons. .is-unread is the only state: it fills the trailing dot.
+ */
+.topbar .topbar-bell { position: relative; color: inherit; flex-shrink: 0; }
+.topbar .topbar-bell:hover,
+.topbar .topbar-bell[aria-expanded="true"] { background: rgba(255, 255, 255, 0.12); color: inherit; }
+.topbar-bell-dot {
+  position: absolute;
+  top: 5px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  /* The ring is the bar's own colour, so the dot reads as cut out of the bell. */
+  box-shadow: 0 0 0 2px var(--color-graphite-800);
+}
+.topbar-bell-dot[hidden] { display: none; }
+@media (max-width: 1024px) {
+  .topbar .topbar-bell:hover,
+  .topbar .topbar-bell[aria-expanded="true"] { background: var(--color-surface-muted); }
+  .topbar-bell-dot { box-shadow: 0 0 0 2px var(--color-surface); }
+}
+@container (max-width: 768px) {
+  .topbar .topbar-bell:hover,
+  .topbar .topbar-bell[aria-expanded="true"] { background: var(--color-surface-muted); }
+  .topbar-bell-dot { box-shadow: 0 0 0 2px var(--color-surface); }
+}
+
+/* The panel is a dropdown menu with its padding taken away: the head and the
+ * foot stay put and only the list scrolls. */
+.notification-panel {
+  width: 520px;
+  max-width: calc(100vw - var(--spacing-8));
+  max-height: calc(100vh - var(--header-height) - var(--spacing-6));
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  color: var(--color-text);
+}
+.notification-panel-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4) 0;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.notification-panel-head > .tabs { border-bottom: 0; gap: var(--spacing-6); padding-top: var(--spacing-2); }
+.notification-panel-head .tab { padding-bottom: var(--spacing-3); display: inline-flex; align-items: center; gap: var(--spacing-2); }
+.notification-panel-tools { display: flex; align-items: center; gap: var(--spacing-1); padding-bottom: var(--spacing-2); flex-shrink: 0; }
+.notification-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+  font: var(--type-body-sm);
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  /* A phone has no room to anchor a panel to a button: pin it under the bar. */
+  .notification-panel.dropdown-menu-end {
+    position: fixed;
+    top: calc(var(--header-height) + var(--spacing-1));
+    left: var(--spacing-2); right: var(--spacing-2);
+    width: auto; max-width: none;
+  }
+  .notification-panel-head { flex-direction: column-reverse; align-items: stretch; gap: 0; }
+  .notification-panel-tools { justify-content: flex-end; }
+}
+
+.notification-list { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+/* On a page the list is its own surface; in the panel the panel is. */
+.notification-list-page {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.notification-group {
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-1);
+  font: var(--type-body-xs-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+}
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--duration-fast) var(--ease);
+}
+.notification:last-child { border-bottom: 0; }
+.notification:hover { background: var(--color-surface-muted); }
+.notification[hidden], .notification-group[hidden] { display: none; }
+.notification > .avatar { flex-shrink: 0; }
+.notification-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.notification:hover .notification-icon { background: var(--color-border); }
+.notification-icon.is-warning { background: var(--color-warning-subtle); color: var(--color-text); }
+.notification-icon.is-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
+.notification-body { flex: 1; min-width: 0; }
+.notification-text { margin: 0; font: var(--type-body); color: var(--color-text); overflow-wrap: anywhere; }
+.notification-text strong { font-weight: var(--font-weight-semibold); }
+.notification-text a { color: inherit; text-decoration: none; }
+.notification-text a:hover { text-decoration: underline; }
+.notification-meta { margin: var(--spacing-1) 0 0; font: var(--type-body-xs); color: var(--color-text-muted); }
+.notification-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin-top: var(--spacing-2); }
+/* Read / unread toggle. Empty ring when read, and only on hover, so a read
+ * list is quiet; an accent dot when unread, always. */
+.notification-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  margin-top: var(--spacing-1);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.notification-mark::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+.notification.is-unread .notification-mark::before { background: var(--color-accent); }
+.notification:hover .notification-mark,
+.notification-mark:focus-visible { border-color: var(--color-border-strong); background: var(--color-surface); }
+.notification-mark:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+.notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-10) var(--spacing-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  font: var(--type-body-sm);
+}
+.notification-empty[hidden] { display: none; }
+.notification-empty svg { font-size: 32px; color: var(--color-text-subtle); margin-bottom: var(--spacing-2); }
+.notification-empty-title { margin: 0; font: var(--type-body-semibold); color: var(--color-text); }
+
     /* === devtools.css === */
 /* devtools.css — author/dev tooling only.
  *
@@ -4129,6 +4413,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-participants" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.5719 13.4224C12.5987 12.4593 14 10.3933 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 10.3933 3.40127 12.4593 5.42812 13.4224C2.27153 14.4934 0 17.4814 0 21H1C1 17.134 4.13401 14 8 14C11.866 14 15 17.134 15 21H16C16 17.4814 13.7285 14.4934 10.5719 13.4224ZM8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3C10.7614 3 13 5.23858 13 8C13 10.7614 10.7614 13 8 13Z" fill="currentColor"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M16.9528 16.4371C16.6981 16.5515 16.4536 16.6872 16.2217 16.8424L16.778 17.6734C16.9956 17.5277 17.227 17.4037 17.469 17.3033C17.9498 17.1039 18.4672 17 19 17C21.2091 17 23 18.7909 23 21H24C24 18.9681 22.7879 17.2192 21.0474 16.437C22.2168 15.7389 23 14.4609 23 13C23 10.7909 21.2091 9 19 9C16.7909 9 15 10.7909 15 13C15 14.461 15.7833 15.739 16.9528 16.4371ZM19 16C17.3431 16 16 14.6569 16 13C16 11.3431 17.3431 10 19 10C20.6569 10 22 11.3431 22 13C22 14.6569 20.6569 16 19 16Z" fill="currentColor"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.5 4H11.5V11.5H4V12.5H11.5V20H12.5V12.5H20V11.5H12.5V4Z" fill="currentColor"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8536 15.1465C17.1889 13.6451 18 11.6673 18 9.5C18 4.80558 14.1944 1 9.5 1C4.80558 1 1 4.80558 1 9.5C1 14.1944 4.80558 18 9.5 18C11.6673 18 13.6451 17.1889 15.1465 15.8536L21.5 22.2071L22.2071 21.5L15.8536 15.1465ZM9.5 17C5.35786 17 2 13.6421 2 9.5C2 5.35786 5.35786 2 9.5 2C13.6421 2 17 5.35786 17 9.5C17 13.6421 13.6421 17 9.5 17Z" fill="currentColor"/></symbol>
+  <symbol id="i-switch" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.2072 1.50008L15.7071 8.99998H21V9.99998H15H14V8.99998V2.99998H15V8.29289L22.5001 0.792969L23.2072 1.50008ZM20.6284 22.0063L22.5336 20.0987C23.1555 19.476 23.1555 18.4689 22.5336 17.8462L19.3304 14.6479C18.7087 14.0254 17.7014 14.0254 17.079 14.6486L15.699 16.0304L15.4035 15.8146C12.6337 13.8145 10.1989 11.3788 8.18846 8.59962L7.97058 8.30052L9.35171 6.91758C9.97358 6.29488 9.97358 5.28778 9.35171 4.66508L6.14853 1.46678C5.52685 0.844273 4.5195 0.844273 3.89713 1.46747L1.99197 3.37514C1.02087 4.34752 0.731078 5.80804 1.26374 7.07903C4.21827 14.1495 9.84873 19.7776 16.9278 22.736C18.1978 23.2693 19.6572 22.9789 20.6284 22.0063ZM17.315 21.814C10.4771 18.9564 5.03956 13.5213 2.18642 6.69346C1.81093 5.7975 2.01378 4.76844 2.69954 4.08178L4.6047 2.17411C4.83641 1.9421 5.20987 1.94202 5.44096 2.17342L8.64514 5.37273C8.8761 5.604 8.8761 5.97866 8.64413 6.21093L6.65912 8.19856L7.38018 9.18841C9.45203 12.0524 11.963 14.5637 14.8181 16.6253L15.1092 16.838L15.8011 17.3433L17.7866 15.3552C18.0183 15.1232 18.3918 15.1231 18.6229 15.3545L21.827 18.5538C22.058 18.7851 22.058 19.1597 21.826 19.392L19.9209 21.2997C19.2353 21.9861 18.2083 22.1891 17.315 21.814Z" fill="currentColor"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.765 14.4327C17.2559 13.3606 19 10.884 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 10.884 6.74405 13.3606 9.23499 14.4327C5.61721 15.5994 3 18.9941 3 23H4C4 18.5817 7.58172 15 12 15C16.4183 15 20 18.5817 20 23H21C21 18.9941 18.3828 15.5994 14.765 14.4327ZM12 14C8.68629 14 6 11.3137 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14Z" fill="currentColor"/></symbol>
   <symbol id="i-warning-octagon" viewBox="0 0 24 24"><use href="#i-exclamation-solid"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><use href="#i-close"/></symbol>
@@ -4154,7 +4439,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <!-- The built one. The admin is the RoB's singular owner — CONTEXT.md
            calls the role Accountable Owner — so theirs is the view with
            create, edit and the admin controls. -->
-      <a class="card role" href="./">
+      <a class="card role" href="./v1-production/">
         <svg class="icon role-icon"><use href="#i-user"/></svg>
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
@@ -4169,8 +4454,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       <!-- Built. ?role=participant is the same prototype with the viewer role
            switched; ?roles=1 adds the switcher panel, left off here because
-           this page IS the chooser. -->
-      <a class="card role" href="./?role=participant">
+           this page IS the chooser. Both cards open v1-production, the
+           baseline: proposals live in their own version folders so each one
+           is reviewed on its own. -->
+      <a class="card role" href="./v1-production/?role=participant">
         <svg class="icon role-icon"><use href="#i-participants"/></svg>
         <div class="stack" style="gap: var(--spacing-1)">
           <div class="role-head">
@@ -4184,6 +4471,37 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </a>
 
     </div>
+
+    <!-- Proposals do not land in the baseline. Each one is a version folder
+         beside it (versions.json), so it can be handed to a reviewer on its
+         own URL, improved in place, or deleted without touching the baseline.
+         Inside a version, ?versions=1 switches between them and ?changes=1
+         outlines what that version changed. -->
+    <section class="stack" style="gap: var(--spacing-3)">
+      <h2 class="h2">Proposals</h2>
+      <p class="body-sm">
+        The two cards above open the baseline &mdash; what the product does today.
+        Anything we are proposing sits on its own URL so it can be reviewed,
+        improved or dropped on its own.
+      </p>
+      <div class="roles">
+        <a class="card role" href="./v2-backup-host/">
+          <svg class="icon role-icon"><use href="#i-switch"/></svg>
+          <div class="stack" style="gap: var(--spacing-1)">
+            <div class="role-head">
+              <h2 class="h4">Backup host</h2>
+              <span class="tag tag-warning">In review</span>
+            </div>
+            <p class="body-sm" style="color: var(--color-text-muted)">
+              One named stand-in who can start the Zoom room when the owner is away,
+              the join-before-host guarantee stated under it, and a warning when
+              nobody can start the meeting.
+            </p>
+          </div>
+          <div class="role-foot"><span class="role-go">Open the proposal &rarr;</span></div>
+        </a>
+      </div>
+    </section>
 
     <!-- The changelog itself, not a link to it. Once you have picked a role
          the next useful thing on this page is what was decided and why, and a
