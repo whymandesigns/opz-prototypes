@@ -26,11 +26,15 @@ goes to review.
 
 | Here | The product | Rule |
 |---|---|---|
+| A series can name one **backup host**, who can start the Zoom room when the owner is away | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
+| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
+| An occurrence whose owner is not going, with no backup host, says **nobody can start it** | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
 | Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
 | Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
 | Action items carry threaded comments | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
+| Clicking a past slot in the week view says why nothing happened | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
 **We follow the spec where the product does not.** Not proposals: the rule is
 already the rule, and the shipped code has an open deviation from it. Built to
@@ -76,7 +80,7 @@ to the page, and a hash survives both it and Vercel.
 
 - **Agenda items in the Create form.** Built, wired against `ROB-AGENDA-001…038`,
   then removed: the product has no agenda section at create time, and whether it
-  should is the open spike **TOP-7338**. The call was "a shell first, populated
+  should is an open spike upstream. The call was "a shell first, populated
   from the meeting view". If the spike lands the other way, the working version
   is in commit **b14f2c6** — take it from there rather than rebuilding.
 - **Eight static `.btn-primary`, one per modal.** The only reason this file still
@@ -99,6 +103,79 @@ to the page, and a hash survives both it and Vercel.
 ---
 
 ## History
+
+### 2026-11-20 — A backup host, and who can start the meeting *(local on `rob-week-grid`)*
+
+**Status** · Proposed — all of it. The product has no backup host, does not manage the waiting room, and does not warn anyone.
+
+![The meeting view with no backup host set and the owner marked Not going: an amber alert reading "No one can start this meeting", and a Starting the meeting block under the details grid.](_shots/2026-11-20-backup-host.png)
+
+Raised from the floor: a RoB whose owner is absent can fail to happen at all.
+Participants sit in a waiting room, nobody can start the room, and someone
+improvises a new call and re-invites everyone. Owners are being handed a
+two-step manual fix — add an alternative host who is on the invite, and turn the
+waiting room off for that meeting. Both are Zoom API fields. Neither is
+reachable from Operationalize.
+
+**Our own notes were too generous about the product here, and this corrects
+them.** `ROB-ZOOM-009` holds every RoB-linked Zoom meeting at join-before-host
+ON, which should mean the owner being away costs the meeting its host and not
+its start. `BACKLOG.md` listed three ways that fails to reach a room — webinars,
+no Zoom integration, and `B-014`. There is a fourth, and it is the one ops is
+working around: the product enforces three settings and `settings.waiting_room`
+is not one of them, and **in Zoom the waiting room overrides join-before-host**.
+A room the product manages correctly, on the right host, with a live
+integration, still strands everyone if the waiting room is on at the account,
+group or user level. Join-before-host being ON is not evidence that anyone can
+get in.
+
+So the screen states the guarantee — *Anyone can join before the host* — rather
+than offering it as a toggle. A RoB with a waiting room is broken, not
+configured; the fix belongs in enforcement, as a fourth setting beside the three
+`ROB-ZOOM-009` already holds.
+
+**The backup host is one name, and it belongs to the series.** `ROB-ZOOM-001`
+creates one Zoom meeting per series, of type *recurring with no fixed time*, so
+`settings.alternative_hosts` hangs off that single room — there is nowhere in
+Zoom to put a per-occurrence stand-in. "I am away next Tuesday" is served by
+editing the field ahead of time. One name rather than Zoom's list, because a RoB
+has a singular Accountable Owner and a list of hosts invites the question of who
+is actually running the meeting. Called a *backup host* rather than Zoom's
+*alternative host*: alternative reads like a second owner, backup says when it
+matters.
+
+**A field nobody fills in is not a safeguard**, so the occurrence says when it
+is uncovered. The owner not going with no backup host set is an amber alert with
+the picker on it; a backup host set under the same condition drops it to a blue
+one naming who will start the meeting. It is a standing condition of that
+occurrence rather than something that just happened, so an alert and not a toast.
+
+**The data for this arrived eight days ago**, which was worth finding out before
+drawing the screen. A change upstream on 2026-11-12 gave participants a
+per-occurrence **Decline** with an optional comment, and `ROB-OCC-067` now draws
+a red ✕ on an upcoming occurrence — before, a future occurrence showed no
+response at all. So the product does know, in advance, that someone is not
+coming.
+
+What it does not do is read anything into it. A decline is a mark beside a name;
+nothing distinguishes the one person whose absence costs the meeting its Zoom
+host from the eight whose does not. And `ROB-OCC-096` is explicit that the
+actions are **not offered to the owner** — so the one person this turns on
+cannot decline in the product at all, only in Google Calendar, which
+`ROB-OCC-067` does surface. That is the departure: not the signal, the
+consequence.
+
+Out-of-office is still the older story. `ROB-OCC-025` computes OOO only from an
+hour after the occurrence ends, and the absence that an owner actually plans —
+with a named stand-in already attached to it — lives in time off, which the RoB
+cannot read. That is a backlog item rather than part of this.
+
+Candidates come from the roster, which is Toptal's own rule — Zoom only asks for
+a licensed user on the same account. `ROB-OWNER-020` is left open: a transfer
+mints a new Zoom room, and nothing carries a backup host across it — and since
+2026-11-05 that room reliably reaches the moved series, so it is the behaviour
+and not a bug that would drop the field. The states
+are on `#backup=set|none|covered|ineligible|nozoom`.
 
 ### 2026-11-16 — The filter menus, and the one thing single-select costs *(local on `rob-division-icon`)*
 
@@ -409,6 +486,13 @@ last, short section still becomes active at maximum scroll.
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
   row out of **Where it departs from the product**.
+- **Pull the oracle before citing it.** It is a checkout of `topteam`, not a
+  service, and it is as old as the last `git fetch`. On 2026-11-20 a clone
+  fifteen days behind produced a departure row for a thing the product had
+  already shipped — `ROB-VIEW-007` — and a second row built on a limitation
+  the product had lifted eight days earlier. Both read as confident and both were
+  wrong. A rule's **History** line is the cheap check: it says when the card
+  last moved.
 - **Every entry carries exactly one status.** A `**Status**` line under the
   heading says which: **Proposed** (built here, and a change to the product
   rather than a description of it), **In review** (built and waiting on the

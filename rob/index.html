@@ -1886,11 +1886,38 @@ button.badge:focus-visible {
  *
  * Interactive: render as <button> or <a> instead of <span> — picks up
  * pointer cursor, hover dim and focus-visible ring automatically.
+ *
+ * Status flag — a solid square in the bottom-right corner, the letter in
+ * the markup. The modifier on the root picks the colour; put the status in
+ * the image's alt, because the flag itself is aria-hidden:
+ *
+ *   <span class="avatar avatar-xl avatar-newcomer">
+ *     <img src="…" alt="Jane Doe, newcomer"><span class="avatar-flag" aria-hidden="true">N</span>
+ *   </span>
+ *
+ *   .avatar-newcomer  N  green    start date within the last 3 months (PPL-ROW-003)
+ *   .avatar-talent    T  blue     a Talent, not a member (ROB-OCC-069)
+ *   .avatar-pending   P  graphite start date still in the future; the photo
+ *                                 is dimmed as well (PPL-ROW-002, TEAM-PAGE-018)
+ *
+ * Terminated is the one status with no flag: the photo goes greyscale and
+ * fades, like a disabled control, and any flag inside is hidden — the
+ * product shows no newcomer or pending marker for a terminated member
+ * (PROF-VIEW-003). The greyscale treatment itself is a proposal; the
+ * oracle has no rule for it.
+ *
+ *   <span class="avatar avatar-xl avatar-terminated"><img src="…" alt="Jane Doe, terminated"></span>
+ *
+ * The flag is 37.5% of the avatar, so it scales with every size. Below md
+ * there is no room for a letter, so xs and sm show the colour only.
+ * A tooltip ([data-tooltip]) goes on a wrapper, never on the avatar: the
+ * clip-path would cut it off.
  */
 .avatar {
   --avatar-size: 32px;
   --avatar-text: var(--text-sm);
   --avatar-icon: 16px;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1934,6 +1961,41 @@ button.badge:focus-visible {
   background: var(--color-surface-muted);
   color: var(--color-text-muted);
 }
+
+/* Status flag — see the header above. Flush to the right and bottom edges,
+ * which the chamfer (bottom-left) never reaches. */
+.avatar-flag {
+  --avatar-flag-bg: var(--color-graphite-800);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 37.5%;
+  height: 37.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--avatar-flag-bg);
+  color: var(--color-text-inverse);
+  font: var(--font-weight-semibold) calc(var(--avatar-size) * 0.26)/1 var(--font-sans);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.avatar-newcomer .avatar-flag { --avatar-flag-bg: var(--color-green-700); }
+.avatar-talent   .avatar-flag { --avatar-flag-bg: var(--color-accent); }
+.avatar-pending  .avatar-flag { --avatar-flag-bg: var(--color-graphite-800); }
+.avatar-xs .avatar-flag,
+.avatar-sm .avatar-flag { font-size: 0; }
+
+/* Pending — the person has not started yet, so the photo (or initials)
+ * recedes and the flag stays solid. */
+.avatar-pending > img { opacity: 0.45; }
+.avatar-pending:not(:has(> img)) { color: var(--color-text-subtle); }
+
+/* Terminated — no flag; the person reads as disabled. Greyscale tells it
+ * apart from pending, whose photo fades but keeps its colour. */
+.avatar-terminated > img { filter: grayscale(1); opacity: 0.5; }
+.avatar-terminated:not(:has(> img)) { color: var(--color-text-subtle); }
+.avatar-terminated .avatar-flag { display: none; }
 
 /* Interactive — applies when rendered as <button> or <a> */
 button.avatar,
@@ -3409,6 +3471,24 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   max-width: 380px;
   pointer-events: none;
 }
+/* Placement variant. The default corner is right for an action taken in the
+ * page head or a toolbar — the eye is already up there. Bottom-centre is for
+ * feedback about something further down the page, a click in a grid or a drag,
+ * where a toast in the opposite corner is a long way from what the reader is
+ * looking at. Centred on the viewport rather than the content, because the
+ * content it is about may be anywhere. */
+.toast-region-bottom {
+  top: auto;
+  bottom: var(--spacing-6);
+  right: 50%;
+  transform: translateX(50%);
+  align-items: center;
+}
+/* The default slides in from the right edge it is pinned to; one pinned to the
+ * bottom has to come up from it, or it arrives sideways from nowhere. */
+.toast-region-bottom .toast.is-entering,
+.toast-region-bottom .toast.is-leaving { transform: translateY(20%); }
+
 .toast {
   --toast-accent: var(--color-border-strong);
   display: flex;
@@ -4012,6 +4092,194 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-shrink: 0;
 }
 
+/* ---------- Notifications ----------
+ * The bell in the top bar, the panel it opens, and the row both the panel and
+ * the full Notifications page are made of.
+ *
+ *   <div class="dropdown">
+ *     <button class="btn btn-icon-only btn-ghost topbar-bell dropdown-trigger"
+ *             type="button" aria-label="Notifications, 4 unread" aria-expanded="false">
+ *       <svg class="icon"><use href="#i-bell"/></svg>
+ *       <span class="topbar-bell-dot"></span>      ← add [hidden] when nothing is unread
+ *     </button>
+ *     <div class="dropdown-menu dropdown-menu-end notification-panel" hidden>
+ *       <div class="notification-panel-head"> .tabs + .notification-panel-tools </div>
+ *       <div class="notification-list"> .notification-group + .notification … </div>
+ *       <div class="notification-panel-foot"> link to the full page </div>
+ *     </div>
+ *   </div>
+ *
+ *   <article class="notification is-unread">
+ *     <span class="notification-icon"><svg class="icon"><use href="#i-calendar"/></svg></span>
+ *       — or, when a person caused it, <span class="avatar avatar-md">DR</span>
+ *     <div class="notification-body">
+ *       <p class="notification-text"><strong>Who</strong> did what to <strong>which thing</strong>.</p>
+ *       <p class="notification-meta">Module · Today at 2:45 PM</p>
+ *       <div class="notification-actions"> .btn.btn-secondary.btn-xs … </div>
+ *     </div>
+ *     <button class="notification-mark" type="button" aria-label="Mark as read"></button>
+ *   </article>
+ *
+ * The leading slot says what kind of thing it is (module icon) or who did it
+ * (avatar); the meta line names the module in words, so nobody has to learn
+ * the icons. .is-unread is the only state: it fills the trailing dot.
+ */
+.topbar .topbar-bell { position: relative; color: inherit; flex-shrink: 0; }
+.topbar .topbar-bell:hover,
+.topbar .topbar-bell[aria-expanded="true"] { background: rgba(255, 255, 255, 0.12); color: inherit; }
+.topbar-bell-dot {
+  position: absolute;
+  top: 5px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  /* The ring is the bar's own colour, so the dot reads as cut out of the bell. */
+  box-shadow: 0 0 0 2px var(--color-graphite-800);
+}
+.topbar-bell-dot[hidden] { display: none; }
+@media (max-width: 1024px) {
+  .topbar .topbar-bell:hover,
+  .topbar .topbar-bell[aria-expanded="true"] { background: var(--color-surface-muted); }
+  .topbar-bell-dot { box-shadow: 0 0 0 2px var(--color-surface); }
+}
+@container (max-width: 768px) {
+  .topbar .topbar-bell:hover,
+  .topbar .topbar-bell[aria-expanded="true"] { background: var(--color-surface-muted); }
+  .topbar-bell-dot { box-shadow: 0 0 0 2px var(--color-surface); }
+}
+
+/* The panel is a dropdown menu with its padding taken away: the head and the
+ * foot stay put and only the list scrolls. */
+.notification-panel {
+  width: 520px;
+  max-width: calc(100vw - var(--spacing-8));
+  max-height: calc(100vh - var(--header-height) - var(--spacing-6));
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  color: var(--color-text);
+}
+.notification-panel-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4) 0;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.notification-panel-head > .tabs { border-bottom: 0; gap: var(--spacing-6); padding-top: var(--spacing-2); }
+.notification-panel-head .tab { padding-bottom: var(--spacing-3); display: inline-flex; align-items: center; gap: var(--spacing-2); }
+.notification-panel-tools { display: flex; align-items: center; gap: var(--spacing-1); padding-bottom: var(--spacing-2); flex-shrink: 0; }
+.notification-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+  font: var(--type-body-sm);
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  /* A phone has no room to anchor a panel to a button: pin it under the bar. */
+  .notification-panel.dropdown-menu-end {
+    position: fixed;
+    top: calc(var(--header-height) + var(--spacing-1));
+    left: var(--spacing-2); right: var(--spacing-2);
+    width: auto; max-width: none;
+  }
+  .notification-panel-head { flex-direction: column-reverse; align-items: stretch; gap: 0; }
+  .notification-panel-tools { justify-content: flex-end; }
+}
+
+.notification-list { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+/* On a page the list is its own surface; in the panel the panel is. */
+.notification-list-page {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.notification-group {
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-1);
+  font: var(--type-body-xs-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+}
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--duration-fast) var(--ease);
+}
+.notification:last-child { border-bottom: 0; }
+.notification:hover { background: var(--color-surface-muted); }
+.notification[hidden], .notification-group[hidden] { display: none; }
+.notification > .avatar { flex-shrink: 0; }
+.notification-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.notification:hover .notification-icon { background: var(--color-border); }
+.notification-icon.is-warning { background: var(--color-warning-subtle); color: var(--color-text); }
+.notification-icon.is-danger  { background: var(--color-danger-subtle);  color: var(--color-danger); }
+.notification-body { flex: 1; min-width: 0; }
+.notification-text { margin: 0; font: var(--type-body); color: var(--color-text); overflow-wrap: anywhere; }
+.notification-text strong { font-weight: var(--font-weight-semibold); }
+.notification-text a { color: inherit; text-decoration: none; }
+.notification-text a:hover { text-decoration: underline; }
+.notification-meta { margin: var(--spacing-1) 0 0; font: var(--type-body-xs); color: var(--color-text-muted); }
+.notification-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); margin-top: var(--spacing-2); }
+/* Read / unread toggle. Empty ring when read, and only on hover, so a read
+ * list is quiet; an accent dot when unread, always. */
+.notification-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  margin-top: var(--spacing-1);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.notification-mark::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+.notification.is-unread .notification-mark::before { background: var(--color-accent); }
+.notification:hover .notification-mark,
+.notification-mark:focus-visible { border-color: var(--color-border-strong); background: var(--color-surface); }
+.notification-mark:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+.notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-10) var(--spacing-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  font: var(--type-body-sm);
+}
+.notification-empty[hidden] { display: none; }
+.notification-empty svg { font-size: 32px; color: var(--color-text-subtle); margin-bottom: var(--spacing-2); }
+.notification-empty-title { margin: 0; font: var(--type-body-semibold); color: var(--color-text); }
+
     /* === devtools.css === */
 /* devtools.css — author/dev tooling only.
  *
@@ -4208,7 +4476,7 @@ body { overflow: hidden; }
  *
  * The second column is what isolates manage-deck — an admin who does NOT own
  * this series. Deck rights stayed with the owner when everything else was
- * handed to admins too (topteam#5934, 2026-08-04).
+ * handed to admins too (2026-08-04).
  *
  * Hidden, not disabled. ROB-EDIT-001 is explicit that participants "do not see
  * them"; a disabled control would promise a right that does not exist. Disabled
@@ -5594,11 +5862,21 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           </div>
         </div>
 
-        <!-- All events is the view this prototype draws; My events is labelled
-             so the shape of the control is right when it arrives. -->
+        <!-- My events first and selected on open — and this matches production.
+             The product made My events the first tab and the default on
+             2026-11-12, confirmed by the PO the next day, so ROB-VIEW-007 now
+             reads that way and neither the order nor the default is a
+             departure. It took three years to arrive: the design task that
+             specified this page asked for the person's own meetings as the
+             default scope, and the story that shipped in April 2026 made it
+             company-wide.
+
+             Not carried: the product remembers the tab per browser tab in
+             sessionStorage and a saved ?q= link holds it (ROB-VIEW-013,
+             ROB-VIEW-014). This prototype always opens on My events. -->
         <div class="tabs rob-tabs" role="tablist" aria-label="Meeting scope">
-          <button class="tab is-active" type="button" role="tab" aria-selected="true">All events</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-rob-todo="My events">My events</button>
+          <button class="tab is-active" type="button" role="tab" aria-selected="true">My events</button>
+          <button class="tab" type="button" role="tab" aria-selected="false">All events</button>
         </div>
 
         <!-- Search and filter on the left, the view switcher on the right.
@@ -7844,7 +8122,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     // Create meeting — Agenda items: removed from this flow.
     //
     // The create form never had an agenda section in the product; adding items
-    // while creating was the open spike TOP-7338, and this page carried a
+    // while creating was an open spike upstream, and this page carried a
     // proposal for it. The call is the other way: create a shell, populate it
     // from the meeting view, so the modal asks only for what a meeting cannot
     // exist without.
@@ -8138,6 +8416,9 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
       font: var(--type-body);
       color: var(--color-text);
     }
+    /* display: flex outranks the UA rule for the hidden attribute, so a row
+       hidden in script stays on screen without this. */
+    .md-detail-row[hidden] { display: none !important; }
     .md-detail-row > .icon {
       color: var(--color-text-muted);
       font-size: 16px;
@@ -8147,6 +8428,82 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     .md-detail-row a:hover { text-decoration: underline; }
     .md-detail-row .md-detail-arrow { color: var(--color-text-subtle); }
     .md-detail-row .badge { margin-left: var(--spacing-1); }
+
+    /* Starting the meeting — a small block under the details grid. It is not a
+       detail row: the first line is settable and the second is a guarantee, so
+       they get a heading of their own rather than passing as two more facts. */
+    .md-start {
+      margin-top: var(--spacing-6);
+      margin-bottom: var(--spacing-6);
+      padding-top: var(--spacing-4);
+      border-top: 1px solid var(--color-border);
+    }
+    .md-start-title {
+      font: var(--type-body);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin: 0 0 var(--spacing-3);
+    }
+    .md-start-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      min-height: 28px;
+      font: var(--type-body-sm);
+      color: var(--color-text);
+    }
+    .md-start-row + .md-start-row { margin-top: var(--spacing-2); }
+    .md-start-row > .icon { color: var(--color-icon); font-size: 16px; flex-shrink: 0; }
+    /* A fixed label column keeps the two rows' values on one edge; below it the
+       value wraps under rather than squeezing the label. */
+    .md-start-label { width: 96px; flex-shrink: 0; color: var(--color-text-muted); }
+    .md-start-fact { color: var(--color-text-muted); }
+    /* One slot, three states — empty + add, the picker, or the person. Only one
+       is ever unhidden, so they can share the line without reserving space. */
+    .md-bh-slot { display: inline-flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    .md-bh-slot > [hidden] { display: none !important; }
+    .md-bh-none { color: var(--color-text-muted); }
+    .md-bh-add { padding-left: var(--spacing-1); padding-right: var(--spacing-1); }
+    .md-bh-select { display: inline-flex; position: relative; width: 260px; }
+    .md-bh-menu { width: 280px; }
+    .md-bh-menu .dropdown-search,
+    .md-bh-menu .dropdown-list,
+    .md-bh-menu .dropdown-empty { display: block; }
+    .md-bh-menu .input-icon { display: flex; }
+    /* Seven rows before it scrolls, the same ceiling the filter menus use. */
+    .md-bh-menu .dropdown-list { max-height: 280px; overflow-y: auto; }
+    /* Two-line rows, so the avatar aligns to the name rather than floating
+       between the two lines — the same correction .md-kr-menu makes. */
+    .md-bh-menu .dropdown-item { align-items: flex-start; }
+    .md-bh-menu .dropdown-item[hidden] { display: none !important; }
+    .md-bh-menu .dropdown-item-text { flex: 1; min-width: 0; }
+    .md-bh-menu .dropdown-item-description {
+      font: var(--type-body-xxs);
+      color: var(--color-text-muted);
+    }
+    .md-bh-person { display: inline-flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    /* The name is the only part that can run long, so it is the only part that
+       truncates — the flag and the remove control stay whole. */
+    .md-bh-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* .tag and .dropdown-empty both set display, which outranks the UA rule for
+       the hidden attribute — so each needs saying again, or the flag shows on
+       an eligible backup host and "Nothing found" sits under every search. */
+    .md-bh-flag { flex-shrink: 0; }
+    .md-bh-flag[hidden],
+    .md-bh-menu .dropdown-empty[hidden] { display: none !important; }
+    .md-bh-owner-flag { flex-shrink: 0; margin-right: var(--spacing-1); }
+    /* .alert-actions sets display too, so the covered state would keep offering
+       "Add a backup host" under a line saying one is already set. */
+    .md-start-alert .alert-actions[hidden] { display: none !important; }
+    /* Remove stays quiet until the row is reached for, like the key metric’s. */
+    .md-bh-remove {
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity var(--duration-fast) var(--ease);
+    }
+    .md-bh-person:hover .md-bh-remove,
+    .md-bh-person:focus-within .md-bh-remove { opacity: 1; }
+    .md-start-alert { margin-bottom: var(--spacing-4); }
 
     /* REC dot for the Zoom row. */
     .md-rec-dot {
@@ -9604,6 +9961,20 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
         <div class="md-grid">
           <!-- LEFT COLUMN -->
           <div>
+            <!-- A backup host only helps if somebody set one. When the owner is
+                 not going and nobody else can start the room, say so here
+                 rather than letting the meeting discover it. It is a standing
+                 condition of this occurrence, not something that just
+                 happened, so it is an alert and not a toast (UXCopy). -->
+            <div class="alert alert-warning md-start-alert" role="alert" hidden data-md-bh-alert>
+              <svg class="icon alert-icon" data-md-bh-alert-icon><use href="#i-warning"/></svg>
+              <p class="alert-message"><strong data-md-bh-alert-head></strong> <span data-md-bh-alert-body></span></p>
+              <span class="alert-actions" data-md-bh-alert-actions>
+                <button class="btn btn-secondary btn-xs" type="button"
+                        data-md-bh-alert-cta data-rob-needs="edit-series">Add a backup host</button>
+              </span>
+            </div>
+
             <section id="md-details">
               <h3 class="md-section-title">Details</h3>
 
@@ -9736,6 +10107,81 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                     </div>
                   </div>
                 </section>
+              </div>
+
+              <!-- STARTING THE MEETING — who can start the Zoom room, and
+                   whether anyone can get in before them.
+
+                   Both are settings on the room the product already creates
+                   (ROB-ZOOM-001), and neither is reachable from the product
+                   today, so this block is a proposal rather than a description.
+
+                   The backup host maps to Zoom's settings.alternative_hosts.
+                   The join line is settings.join_before_host, which
+                   ROB-ZOOM-009 already forces ON — but Zoom's Waiting Room
+                   overrides join-before-host and the product does not manage
+                   it, which is why owners are being told by hand to turn the
+                   waiting room off. The line states the guarantee; the fix
+                   belongs in enforcement, not in a toggle here.
+
+                   The room is one recurring-no-fixed-time meeting for the
+                   whole series (ROB-ZOOM-001), so alternative_hosts is a
+                   series property. There is nowhere in Zoom to put a
+                   per-occurrence stand-in. -->
+              <div class="md-start" data-md-start>
+                <h4 class="md-start-title">Starting the meeting</h4>
+
+                <!-- Add -> pick -> the person, one state at a time: the same
+                     three-state flow the key metric uses. -->
+                <div class="md-start-row" data-md-bh-flow>
+                  <svg class="icon"><use href="#i-switch"/></svg>
+                  <span class="md-start-label">Backup host</span>
+
+                  <span class="md-bh-slot">
+                    <span class="md-bh-none" data-md-bh-none>No backup host</span>
+
+                    <button class="btn btn-ghost btn-xs md-bh-add" type="button"
+                            data-md-bh-add data-rob-needs="edit-series">
+                      <svg class="btn-icon"><use href="#i-plus"/></svg>Add
+                    </button>
+
+                    <span class="input-select md-bh-select" hidden data-md-bh-select data-rob-needs="edit-series">
+                      <button class="input-select-trigger" type="button" aria-haspopup="listbox"
+                              aria-expanded="false" data-md-bh-trigger>
+                        <span class="input-select-value input-select-placeholder" data-md-bh-label>Choose a participant</span>
+                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                      </button>
+                      <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
+                        <span class="dropdown-search">
+                          <span class="input-icon input-icon-left">
+                            <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                            <input class="input" type="search" placeholder="Search participants"
+                                   data-md-bh-search aria-label="Search participants" />
+                          </span>
+                        </span>
+                        <span class="dropdown-list" data-md-bh-list>
+                          <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
+                        </span>
+                      </span>
+                    </span>
+
+                    <span class="md-bh-person" hidden data-md-bh-person>
+                      <span class="avatar avatar-xs" data-md-bh-av></span>
+                      <span class="md-bh-name" data-md-bh-name></span>
+                      <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
+                      <button class="btn btn-icon-only btn-ghost btn-xs md-bh-remove" type="button"
+                              data-md-bh-remove aria-label="Remove backup host" data-rob-needs="edit-series">
+                        <svg class="icon"><use href="#i-close"/></svg>
+                      </button>
+                    </span>
+                  </span>
+                </div>
+
+                <div class="md-start-row">
+                  <svg class="icon"><use href="#i-users"/></svg>
+                  <span class="md-start-label">Joining</span>
+                  <span class="md-bh-slot md-start-fact">Anyone can join before the host</span>
+                </div>
               </div>
 
               <!-- VIEW MODE: doc line + bullets + please-do-not-delete stack -->
@@ -10343,7 +10789,7 @@ Platform reliability — error budget
           <div>
             <section>
               <h3 class="md-section-title">Owner</h3>
-              <div class="md-person">
+              <div class="md-person" data-md-owner>
                 <span class="avatar avatar-md">BB</span>
                 <div class="md-person-body">
                   <p class="md-person-name">Bill Bryck <span data-rob-you="owner" style="color: var(--color-text-muted); font-weight: var(--font-weight-regular)">(you)</span></p>
@@ -10492,6 +10938,206 @@ Platform reliability — error budget
     </div>
   </div>
 
+  <script>
+    // Backup host — who can start this RoB when its owner is not there.
+    //
+    // Proposed, not described: the product has no backup-host concept at all
+    // (ROB-ZOOM-001 creates the room with the owner as host and is explicit
+    // that an existing room is never reused or chosen). The field maps to
+    // Zoom's settings.alternative_hosts on that one room.
+    //
+    // One name, not Zoom's semicolon-separated list: a RoB has a singular
+    // Accountable Owner, and a list of hosts invites the question of who is
+    // actually running the meeting, which is the one thing the model is clear
+    // about. Called "backup host" rather than Zoom's "alternative host" —
+    // alternative reads like a second owner, backup says when it matters.
+    (function () {
+      const md = document.getElementById('meeting-detail');
+      const flow = md && md.querySelector('[data-md-bh-flow]');
+      if (!flow) return;
+
+      const q = (sel, root) => (root || flow).querySelector(sel);
+      const block   = md.querySelector('[data-md-start]');
+      const noneEl  = q('[data-md-bh-none]');
+      const addBtn  = q('[data-md-bh-add]');
+      const select  = q('[data-md-bh-select]');
+      const trigger = q('[data-md-bh-trigger]');
+      const menu    = q('[data-md-bh-menu]');
+      const search  = q('[data-md-bh-search]');
+      const list    = q('[data-md-bh-list]');
+      const emptyEl = q('[data-md-bh-empty]');
+      const person  = q('[data-md-bh-person]');
+      const avEl    = q('[data-md-bh-av]');
+      const nameEl  = q('[data-md-bh-name]');
+      const flagEl  = q('[data-md-bh-flag]');
+      const delBtn  = q('[data-md-bh-remove]');
+
+      const alertEl   = md.querySelector('[data-md-bh-alert]');
+      const alertIcon = md.querySelector('[data-md-bh-alert-icon] use');
+      const alertHead = md.querySelector('[data-md-bh-alert-head]');
+      const alertBody = md.querySelector('[data-md-bh-alert-body]');
+      const alertActs = md.querySelector('[data-md-bh-alert-actions]');
+      const alertCta  = md.querySelector('[data-md-bh-alert-cta]');
+
+      // The candidate list is this meeting's roster, read from the markup that
+      // already renders it rather than from a second copy that could drift.
+      // Toptal's own rule is that a backup host must be on the invite; Zoom
+      // itself only asks for a licensed user on the same account.
+      //
+      // A row whose second line is an e-mail rather than a job title is a bot
+      // or an unmapped guest, the same test the agenda-item owner picker makes
+      // — it can sit on the invite and cannot host. The owner is excluded by
+      // definition: they are already the host.
+      const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const roster = () => [...md.querySelectorAll('.md-person')]
+        .filter(r => !r.hasAttribute('data-md-owner'))
+        .map(r => ({
+          name: (r.querySelector('.md-person-name')?.textContent || '').replace(/\(you\)/, '').trim(),
+          initials: (r.querySelector('.avatar')?.textContent || '').trim(),
+          role: (r.querySelector('.md-person-role')?.textContent || '').trim(),
+        }))
+        .filter(p => p.name && p.initials && !EMAIL.test(p.role))
+        .filter((p, i, arr) => arr.findIndex(x => x.name === p.name) === i);
+
+      const PEOPLE = roster();
+      const ownerName = (md.querySelector('[data-md-owner] .md-person-name')?.textContent || 'The owner')
+        .replace(/\(you\)/, '').trim();
+
+      let picked = null;      // one of PEOPLE, or null
+      let eligible = true;    // still a licensed Zoom user on this account
+      let ownerGoing = true;  // the owner has not declined the next occurrence
+
+      // ---- the menu ----
+      const rows = PEOPLE.map(p => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'dropdown-item';
+        b.innerHTML = '<span class="avatar avatar-sm"></span>'
+          + '<span class="dropdown-item-text"><span class="dropdown-item-label"></span>'
+          + '<span class="dropdown-item-description"></span></span>';
+        b.querySelector('.avatar').textContent = p.initials;
+        b.querySelector('.dropdown-item-label').textContent = p.name;
+        b.querySelector('.dropdown-item-description').textContent = p.role;
+        b.addEventListener('click', () => { picked = p; eligible = true; setMenu(false); render(); });
+        return b;
+      });
+      rows.forEach(b => list.insertBefore(b, emptyEl));
+
+      const filter = () => {
+        const term = (search?.value || '').trim().toLowerCase();
+        let shown = 0;
+        rows.forEach((b, i) => {
+          const hit = !term || (PEOPLE[i].name + ' ' + PEOPLE[i].role).toLowerCase().includes(term);
+          b.hidden = !hit;
+          if (hit) shown++;
+        });
+        if (emptyEl) emptyEl.hidden = shown > 0;
+      };
+      search?.addEventListener('input', filter);
+
+      const setMenu = (open) => {
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+        if (open) { search?.focus(); }
+        else if (search?.value) { search.value = ''; filter(); }
+      };
+      trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
+      document.addEventListener('click', (e) => {
+        if (!menu.hidden && !select.contains(e.target)) setMenu(false);
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
+
+      // ---- the three states, and the alert that reads them ----
+      // stopPropagation on both openers: the click that reveals the select
+      // would otherwise reach the document handler below, which closes any menu
+      // opened from outside the select — and these both are.
+      addBtn.addEventListener('click', (e) => { e.stopPropagation(); showOnly(select); setMenu(true); });
+      delBtn.addEventListener('click', () => { picked = null; eligible = true; render(); });
+      alertCta?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showOnly(select);
+        setMenu(true);
+        block?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+
+      function showOnly(el) {
+        [noneEl, addBtn, select, person].forEach(n => { if (n) n.hidden = n !== el; });
+        // "No backup host" and Add are the same state, so they travel together.
+        if (el === null) { noneEl.hidden = false; addBtn.hidden = false; }
+      }
+
+      function render() {
+        if (picked) {
+          avEl.textContent = picked.initials;
+          nameEl.textContent = picked.name;
+          nameEl.title = `${picked.name} · ${picked.role}`;
+          flagEl.hidden = eligible;
+          showOnly(person);
+        } else {
+          showOnly(null);
+        }
+
+        if (!alertEl) return;
+        let variant = null, head = '', body = '', cta = '';
+        if (picked && !eligible) {
+          variant = 'warning';
+          head = `${picked.name} can no longer host.`;
+          body = 'A backup host needs a licensed Zoom account on the company account.';
+          cta  = 'Choose someone else';
+        } else if (!ownerGoing && !picked) {
+          variant = 'warning';
+          head = 'No one can start this meeting.';
+          body = `${ownerName} isn’t going, and there’s no backup host.`;
+          cta  = 'Add a backup host';
+        } else if (!ownerGoing && picked) {
+          variant = 'info';
+          head = `${picked.name} will start this meeting.`;
+          body = `${ownerName} isn’t going.`;
+        }
+
+        alertEl.hidden = !variant;
+        if (!variant) return;
+        alertEl.className = `alert alert-${variant} md-start-alert`;
+        alertIcon?.setAttribute('href', variant === 'warning' ? '#i-warning' : '#i-info');
+        alertHead.textContent = head;
+        alertBody.textContent = body;
+        if (alertActs) alertActs.hidden = !cta;
+        if (cta && alertCta) alertCta.textContent = cta;
+      }
+
+      // Designed states, deep-linked the way #respond= and #occurrence= are.
+      // There is no [data-state] switcher on this prototype, so the hash is
+      // how a reviewer walks them.
+      const state = (location.hash.match(/(?:^|[#&])backup=([a-z]+)/) || [])[1];
+      if (state === 'set')        { picked = PEOPLE[0]; }
+      if (state === 'none')       { ownerGoing = false; }
+      if (state === 'covered')    { ownerGoing = false; picked = PEOPLE[0]; }
+      // An alert saying the owner is not going, over a roster that shows them
+      // as going, reads as a bug rather than a state. The owner's own row has
+      // no answered-glyph — only the logged-in user's does — so the state is
+      // carried by a tag, which is what the rest of the row already uses.
+      if (!ownerGoing) {
+        const row = md.querySelector('[data-md-owner]');
+        const badge = row?.querySelector('.md-person-badge');
+        if (row && badge && !row.querySelector('.md-bh-owner-flag')) {
+          const t = document.createElement('span');
+          t.className = 'tag tag-negative md-bh-owner-flag';
+          t.textContent = 'Not going';
+          row.insertBefore(t, badge);
+        }
+      }
+      if (state === 'ineligible') { picked = PEOPLE[0]; eligible = false; }
+      if (state === 'nozoom') {
+        // No Zoom integration, no room — and so nothing to host. The block goes
+        // with the Zoom link row it belongs to.
+        block?.setAttribute('hidden', '');
+        md.querySelector('[data-detail-zoom]')?.closest('.md-detail-row')?.setAttribute('hidden', '');
+      }
+
+      filter();
+      render();
+    })();
+  </script>
   <script>
     // Meeting-detail: TOC scroll + scrollspy + inline edit mode
     (function () {
@@ -14110,6 +14756,12 @@ Platform reliability — error budget
     </div>
   </div>
 
+  <!-- Declared rather than left to the helper to create, so it carries the
+       placement: this page's feedback is about the calendar grid, not about a
+       control in the page head, and a toast in the top corner is a long way
+       from where the click happened. -->
+  <div class="toast-region toast-region-bottom" aria-live="polite"></div>
+
   <script>
     // Toast helper — mirrors designmd/example.html.
     window.toast = function toast({ variant = 'neutral', message = '', behavior = 'timed', timeout = 4000, action, icon } = {}) {
@@ -14124,8 +14776,16 @@ Platform reliability — error budget
       const el = document.createElement('div');
       el.className = `toast toast-${variant} is-entering`;
       el.setAttribute('role', variant === 'error' ? 'alert' : 'status');
-      const closeHTML = behavior !== 'timed' ? `<button type="button" class="toast-close" aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>` : '';
-      el.innerHTML = `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg><p class="toast-message"></p>${closeHTML}`;
+      // The kit's close is a real button — `btn btn-icon-only btn-ghost btn-xs
+      // toast-close` with #i-x, as example.html#toasts shows it. This helper
+      // was building a bare <button class="toast-close">, which carries no
+      // button styling at all, so every persistent toast here had an unstyled
+      // X. Timed toasts never showed it, which is why it went unnoticed.
+      const closeHTML = behavior !== 'timed' ? `<button type="button" class="btn btn-icon-only btn-ghost btn-xs toast-close" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>` : '';
+      // icon: false drops it. .toast is a flex row with a gap between its
+      // children, so one fewer child leaves no hole to tidy up.
+      const iconHTML = icon === false ? '' : `<svg class="icon toast-icon"><use href="#i-${icon || defaultIcon}"/></svg>`;
+      el.innerHTML = `${iconHTML}<p class="toast-message"></p>${closeHTML}`;
       el.querySelector('.toast-message').textContent = message;
       region.appendChild(el);
       requestAnimationFrame(() => el.classList.remove('is-entering'));
@@ -15848,8 +16508,8 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
     })();
   </script>
   <script>
-    // Calendar occurrences. The month grid is company-wide by default ("All
-    // events"); "My events" narrows it to the series this person sits in.
+    // Calendar occurrences. The grid opens on "My events" — the series this
+    // person sits in; "All events" widens it to every series in the company.
     // Series, not occurrences, are the unit: a RoB recurs on a cadence, so the
     // grid is generated from the cadence rather than hand-placed.
     (function () {
@@ -16006,16 +16666,21 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       // so a cancelled Tuesday is cancelled in all three.
       const weekEl  = document.querySelector('.cal-week');
       const schedEl = document.querySelector('[data-cal-sched]');
-      const HOUR_0 = 10, HOUR_N = 20;           // the band the day is drawn over
+      // The band the day is drawn over. It starts at 08:00 because a working
+      // day does, and a grid that opens at 10 hides the early meetings rather
+      // than showing an empty hour.
+      const HOUR_0 = 8, HOUR_N = 20;
       const HOUR_PX = 64;
       // The hour label is centred on its own line, so the first one needs room
       // above it or it is cut off by the top edge. Everything placed by time
       // starts from this offset.
       const PAD = 10;
       const PX_PER_MIN = HOUR_PX / 60;
-      // "Now" rides on the pinned today, not the wall clock: the month grid
-      // marks a fixed day, and a line drawn from the real time would contradict it.
-      const NOW_MINS = 14 * 60 + 5;
+      // "Now" is the wall clock, and it moves. The line spans every column from
+      // the axis rather than sitting in one of them, so it marks the time of
+      // day across the week — which stays true even though the pinned today is
+      // the fixture's anchor rather than the real date.
+      const nowMins = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
 
       const toMins = (t) => {
         const m = /^(\d+):(\d+)(am|pm)$/.exec(t.trim());
@@ -16099,6 +16764,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
           axis.appendChild(lab);
         }
 
+        const nowM = nowMins();
         weekDays.forEach(d => {
           const date = iso(d);
           const dh = document.createElement('div');
@@ -16118,9 +16784,9 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             slot.className = 'cal-week-slot';
             slot.dataset.date = date;
             slot.dataset.start = String(m);
-            // Past is the pinned today and NOW_MINS, not the wall clock, so it
-            // agrees with the now-line drawn a few lines below.
-            if (date < todayIso || (date === todayIso && m < NOW_MINS)) {
+            // Read once per render so every slot agrees with the line, which
+            // paintNow then keeps in step as the clock moves.
+            if (date < todayIso || (date === todayIso && m < nowM)) {
               slot.classList.add('is-past');
             } else {
               slot.setAttribute('role', 'button');
@@ -16158,13 +16824,40 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
 
         // Drawn only when today is in view. Where it starts and stops is the
         // stylesheet's business — it spans the body from the time column.
+        // Built empty and placed by paintNow, so there is one piece of code
+        // deciding where it goes rather than two that can disagree.
         if (weekDays.some(d => iso(d) === todayIso)) {
-          const now = document.createElement('div');
-          now.className = 'cal-week-now';
-          now.style.top = `${(NOW_MINS - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
-          cols.appendChild(now);
+          cols.appendChild(Object.assign(document.createElement('div'), { className: 'cal-week-now' }));
         }
+        paintNow();
       }
+
+      // The line follows the clock, so only it and the slots behind it are
+      // repainted — re-rendering the week on a timer would close an open
+      // create-draft or popover under the reader. Outside the band it is
+      // hidden rather than clamped to an edge, where it would read as 8:00 or
+      // 8:00 pm and be wrong twice a day.
+      function paintNow() {
+        const m = nowMins();
+        const line = weekEl.querySelector('.cal-week-now');
+        if (line) {
+          const inBand = m >= HOUR_0 * 60 && m <= HOUR_N * 60;
+          line.hidden = !inBand;
+          if (inBand) line.style.top = `${(m - HOUR_0 * 60) * PX_PER_MIN + PAD}px`;
+        }
+        // Only ever forwards: a slot that has started does not un-start, so
+        // this takes the affordance away and never gives it back.
+        weekEl.querySelectorAll('.cal-week-slot:not(.is-past)').forEach(slot => {
+          if (slot.dataset.date !== todayIso || Number(slot.dataset.start) >= m) return;
+          slot.classList.add('is-past');
+          slot.removeAttribute('role');
+          slot.removeAttribute('tabindex');
+          slot.removeAttribute('aria-label');
+        });
+      }
+      // Half a minute: the grid is 64px an hour, so a minute is about a pixel
+      // and anything finer moves nothing anyone can see.
+      setInterval(paintNow, 30000);
 
       function renderSchedule(mineOnly) {
         schedEl.replaceChildren();
@@ -16291,10 +16984,34 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
       }
 
+      // One at a time: clicking along a row of past slots is one mistake, not
+      // six, and six stacked toasts would bury the grid they are about.
+      let pastToast = null;
+      function refusePast() {
+        pastToast?.dismiss();
+        // Neutral, not warning: this is the system saying what happened, not
+        // the page flagging a condition. The dark chip reads as chrome over
+        // the grid rather than as a problem in it, and with one message and
+        // no state to signal there is nothing for an icon to add.
+        pastToast = window.toast?.({
+          variant: 'neutral',
+          icon: false,
+          // One line, and no "can't": UXCopy asks for the positive form, so it
+          // says what happened and what to do instead of what is forbidden.
+          message: 'That slot has passed — pick a later one.',
+        });
+      }
+
       weekCols.addEventListener('click', (e) => {
         if (e.target.closest('.cal-week-ev')) return;     // a meeting is not an empty slot
         const slot = e.target.closest('.cal-week-slot');
-        if (slot && !slot.classList.contains('is-past')) openDraft(slot);
+        if (!slot) return;
+        // A past slot shows no pointer and carries no role (ROB-VIEW-053), so
+        // a click on one is a mis-aim rather than an attempt. It gets the
+        // reason instead of silence — the product says nothing here, which is
+        // why this is a proposal rather than a copy of it.
+        if (slot.classList.contains('is-past')) { refusePast(); return; }
+        openDraft(slot);
       });
       weekCols.addEventListener('keydown', (e) => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -16546,7 +17263,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
             list.appendChild(b);
           });
           // Two different nothings: a tenant with no divisions at all, which
-          // is the product's own string (TOP-6373), and a search that matched
+          // is the product's own string (ROB-VIEW-026), and a search that matched
           // none of the ones there are.
           if (empty) {
             empty.hidden = opts.length > 0;
@@ -16691,7 +17408,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
 
       // ---- View switcher ----
-      let view = 'month', mine = false;
+      let view = 'month', mine = true;   // opens on My events — see the tablist
       const show = () => {
         grid.hidden = view !== 'month';
         weekEl.hidden = view !== 'week';
@@ -16733,10 +17450,10 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
         });
       });
 
-      // Tabs: the same grid, narrowed. My events was a stub before.
+      // Tabs: the same grid, narrowed. Read by label rather than position,
+      // so the order on screen is a markup decision and nothing here cares.
       const tabs = [...document.querySelectorAll('.rob-tabs .tab')];
       tabs.forEach(tab => {
-        tab.removeAttribute('data-rob-todo');
         tab.addEventListener('click', () => {
           tabs.forEach(t => {
             const on = t === tab;

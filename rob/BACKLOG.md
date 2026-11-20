@@ -62,7 +62,7 @@ not a backlog item.
 **Status** · Researched — the product has one safeguard for this and three documented ways it does not reach. The proposal is a separate item.
 **Added** · 2026-11-16
 **Source** · raised as a red flag: if the owner is away, participants wait in a waiting room and the meeting does not happen.
-**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, deviation `B-014`
+**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-001`, `ROB-OWNER-020`, `ROB-OCC-096`, `ROB-OCC-106`, deviation `B-014`
 
 The product does have an answer, and it is not a host at all: every Zoom meeting
 linked to an upcoming RoB occurrence is **forced to "join before host" ON**,
@@ -71,8 +71,18 @@ in Zoom is overwritten at the next enforcement (`ROB-ZOOM-009`). When that
 enforcement reaches the room, the owner being away costs the meeting its host,
 not its start.
 
-**It does not always reach the room.** Three cases, all in the spec:
+**It does not always reach the room.** Four cases. The first three were written
+here on 2026-11-16; the fourth was found on 2026-11-20 and is the one ops is
+actually working around.
 
+- **The waiting room, which the product does not manage.** Enforcement sets
+  three settings and `settings.waiting_room` is not one of them — and in Zoom
+  **the waiting room overrides join-before-host**. A room the product manages
+  correctly, on the right host, with a live integration, still strands everyone
+  if the waiting room is on at the account, group or user level. This is why
+  owners are told by hand to turn it off, and it means join-before-host being ON
+  is not evidence that anyone can get in. Drawn up as
+  [Hold the waiting room off](#hold-the-waiting-room-off).
 - **Webinars.** Join-before-host is explicitly not touched for them — only
   authentication and recording mode are.
 - **No active Zoom integration.** Enforcement is conditioned on one, and a
@@ -89,6 +99,36 @@ reused or chosen by the user. The only lever is a full ownership transfer, which
 creates a **new** Zoom meeting and rewrites the join link across every current
 and future occurrence (`ROB-OWNER-020`) — the right tool for "someone else runs
 this RoB now", the wrong one for "I am away next Tuesday".
+
+**The product had the right tool and dropped it**, which is worth knowing before
+anyone proposes building one: the legacy temporary ownership transfer was
+exactly "hold this for me while I am away", and it was deprecated on
+2026-10-29 with Role Inheritance — a permanent handover — named as its
+replacement. See
+[The temporary ownership transfer the product dropped](#the-temporary-ownership-transfer-the-product-dropped).
+
+**Since 2026-11-12 something does tell people in advance, and it stops short of
+the owner.** The product added a per-occurrence **Decline** with
+an optional comment (`ROB-OCC-097`), a comment the owner and RoB admins can read
+(`ROB-OCC-098`), and a red ✕ on the upcoming occurrence (`ROB-OCC-067`, where a
+future occurrence used to show no response at all). But `ROB-OCC-096` says the
+actions are **not offered to the owner** — the one person whose absence costs
+the meeting its Zoom host has no way to say so in the product. A decline made
+in Google Calendar does surface, so the signal exists; what is missing is
+anyone reading it as "this meeting now has no host".
+
+Out-of-office is still invisible in advance: `ROB-OCC-025` computes it only from
+an hour after the occurrence ends. The planned absence, with a named stand-in
+attached, is recorded elsewhere — see
+[Carry "who is covering" from time off into the RoB](#carry-who-is-covering-from-time-off-into-the-rob).
+
+**And there is now a second answer to "the owner is away", which is to move the
+meeting.** `ROB-OCC-096` and `ROB-OCC-102` let a participant propose another
+time for one occurrence, with a comment; `ROB-OCC-106` lets anyone who can edit
+accept it with **Move meeting**, which edits that occurrence only and leaves
+everyone's response alone. It is a real alternative to a stand-in — and it is
+not offered to the owner either, so an owner who knows they are away cannot
+propose their own move.
 
 **Zoom has two mechanisms for this, and the product uses neither** (checked
 2026-11-16, see *What else Zoom could carry* for the sources):
@@ -116,65 +156,155 @@ per-occurrence stand-in, or something that is not a Zoom concept at all — the
 agenda and action items do not need a host, and the meeting that matters is the
 working session, not the call.
 
-**Decided 2026-11-16: the standing second name.** It is drawn up as
-[A backup host on the series](#a-backup-host-on-the-series). The other two are
-not ruled out, but nobody is holding them — if the first goes to review badly,
-this item is where they come back.
+**Decided 2026-11-16: the standing second name.** Built on 2026-11-20 — see
+the history entry in `CHANGELOG.md`. The other two are not ruled out, but
+nobody is holding them; if the first goes to review badly, this item is where
+they come back.
 
-### A backup host on the series
+**This item stays open** because the backup host does not close it. Two things
+it does not reach:
 
-**Status** · Ready — the mechanism is a known field, the screen is decided, and nothing here waits on research.
-**Added** · 2026-11-16
-**Source** · the proposal that answers [A RoB with no host in the room](#a-rob-with-no-host-in-the-room).
-**Rule** · `ROB-ZOOM-001`, `ROB-ZOOM-009`, `ROB-OWNER-020`, deviation `B-014` — and the product has no such concept, so this is a proposal, not a description.
+- **Ownership transfer mints a new Zoom room** (`ROB-OWNER-020`), and nothing
+  carries a backup host across it. The transfer modal should say so; the honest
+  answer today is that it does not come along.
+- **Seeing it happen.** `meeting.participant_jbh_waiting` and
+  `meeting.participant_joined_waiting_room` are still unused, and a RoB that
+  stranded its room is worth knowing about afterwards even once it stops
+  happening.
 
-**What it is.** One named stand-in who can start the RoB when its owner is not
-there. It maps to Zoom's `settings.alternative_hosts` on the room the product
-already creates, so the whole thing is one field on a call that is already made.
+### The temporary ownership transfer the product dropped
 
-**Where it goes.** A **Backup host** row in the meeting view's details grid,
-directly under the Zoom link — it is a property of the room, and that is where
-the room already is. Empty it reads *No backup host*, with an add affordance for
-whoever can edit the series; set, it reads the person's name.
+**Status** · Researched — the history is established; what to do with it is a decision for review, not a build.
+**Added** · 2026-11-20
+**Source** · looking up what the product offers an owner who will be absent, and finding that it used to offer this.
+**Rule** · `ROB-OWNER-042`, `ROB-OWNER-043`, `ROB-OWNER-044`, `PEOP-ACCESS-007`, `PEOP-TEMP-003`, deviation `PEOP-B-016`
 
-**Not on the create form.** That is locked as a shell, and a backup host is
-something you decide once the series exists and you know who is on it.
+**The product once modelled "hold this for me while I am away", and retired it
+without a replacement.** The legacy temporary ownership transfer took a
+snapshot of a person's owned RoBs, handed them to someone else, and gave them
+back on return — which is the shape of the problem the backup host answers.
 
-**Who sets it:** whoever can edit the series — the owner and RoB admins, the
-same right as every other field in that grid. Everyone else reads it, because
-reading is never gated.
+`ROB-OWNER-042` (Confirmed, PO 2026-10-29) says it is deprecated: no screen
+creates one and `createUserOwnershipTransfer` refuses every performer.
+Transfers that are still active can only be returned (`ROB-OWNER-043`), which
+is why a profile can still show **Return Temporary Ownership** with no way to
+start one. `PEOP-B-016` notes the API path still works — the capability is in
+the code with nothing calling it.
 
-**One person, not a list.** Zoom's field takes several. A RoB has a singular
-Accountable Owner, and a list of hosts invites the question of who is actually
-running the meeting — which is the one thing the model is clear about. One
-stand-in, and if that is wrong we will hear it at review.
+**What replaced it is not a replacement.** Role Inheritance hands a person's
+items over for good: it is built for someone leaving or changing role, and
+`ROB-OWNER-037` shows the shape — one ongoing request per person, a terminated
+recipient rejected, a pending termination blocking it. Nobody files a role
+inheritance request to go on holiday for a week. The clean-up ticket that would
+have finished removing the old concept was closed **Abandoned** on 2026-10-26, so the
+half-removed state is where it stops.
 
-**Called a backup host, not an alternative host.** Zoom's word reads like a
-second owner. *Backup* says when it matters.
+**Why this is worth carrying rather than filing as trivia.** It changes how the
+backup host reads at review. The proposal is not a new idea arriving from
+outside the product — it is a smaller, cheaper answer to a problem the product
+already recognised and then stopped answering. A standing name on one series
+costs a field on a call that is already made; the thing it replaces was a
+snapshot, a background job, a return flow and four open deviations.
 
-**What it touches, and has to answer on screen:**
+**The decision to take:** whether to say any of that out loud. Reviving a
+deprecated concept and proposing a field that quietly does its job are
+different conversations, and the second one is easier to win.
 
-- **Ownership transfer mints a new Zoom room** (`ROB-OWNER-020`) — the backup
-  host does not follow it unless something carries it across. The transfer modal
-  has to say whether it comes along, and the honest answer today is no.
-- **A person who is no longer eligible.** Zoom refuses an alternative host who
-  is not Licensed or is on another account. The picker should not offer someone
-  it will refuse, and the row needs a state for a backup host who has since
-  stopped qualifying.
-- **No Zoom integration, no row.** Same as the Zoom link it sits under.
-- **Webinars are out of scope** for a first pass — their host model differs, and
-  `ROB-ZOOM-009` already treats them separately.
-- **`B-014` is upstream.** On an unlinked room none of this applies, which is
-  worth a line in the entry rather than a state on the screen.
+### Carry "who is covering" from time off into the RoB
 
-**One thing for the behaviour spec rather than the screen:** the three settings
-the product enforces do not include `alternative_hosts` (`ROB-ZOOM-009`), so a
-backup host removed in Zoom would stay removed. If the product sets it, it
-should restore it on the same pass — otherwise the field is advice, not a
-setting.
+**Status** · Researched — both halves exist and neither knows about the other; the join is the open question.
+**Added** · 2026-11-20
+**Source** · the early-warning alert, which needs to know the owner will be away — and the discovery that the product already stores that.
+**Rule** · `TOFF-SLACK-009`, `TOFF-PROF-003`, `TOFF-EDGE-001`, `TOFF-SLACK-005`, `ROB-OCC-025`, `ROB-OCC-067`, `ROB-OCC-038` — checked against the oracle at topteam `6805064` (2026-11-20)
 
-**Edge states to draw:** none set · one set · set but no longer eligible · no
-Zoom integration · the participant's read-only view.
+**RoB can see a decline in advance since 2026-11-12, but not an absence — and
+an absence is the one somebody planned.**
+
+Declines reach an upcoming occurrence now: `ROB-OCC-067`, changed on 2026-11-12,
+draws a red ✕ on a future occurrence where there used to be no
+response at all. Out-of-office does not. `ROB-OCC-025` is the hard edge there: a
+participation status — Present, OOO, Declined, Missing — **exists only from 1
+hour after the occurrence ends**, and OOO has no equivalent of the decline
+marker. So RoB reads the approved out-of-office day once, afterwards, to score
+attendance, and never before the meeting it explains. The only other
+forward-looking signal is `ROB-OCC-038`, which counts calendar overlaps and says
+*may not attend* — about double-booking, not about leave.
+
+This is the sharper version of the gap: the product will tell you someone
+**said** they are not coming, and not that the company already **knows** they
+are away.
+
+**Time off has the other half.** `TOFF-SLACK-009`: an employee assigns coverage
+roles on their own absence, naming a co-worker or a Slack channel, and the
+assignee is notified. `TOFF-PROF-003` and `TOFF-EDGE-001`: the profile shows
+**Who Is Covering**, or *"No one is covering this time off"*. `TOFF-SLACK-005`:
+mention someone who is out and the bot replies in-thread with who is covering.
+
+So the company already models *this person is out, here is the stand-in*, and a
+RoB meeting — the one place where an absent owner has a concrete cost — is the
+one place that cannot read it.
+
+**The interesting decision is how far the join goes**, and there are three
+rungs, each a real option rather than a step toward the next:
+
+- **Read it.** The occurrence knows the owner has an approved absence covering
+  its date, and says so. This is the cheapest and it is what the early-warning
+  alert actually needs.
+- **Suggest from it.** If that absence names a coverage role whose assignee is
+  on the roster, offer them as the backup host rather than asking the owner to
+  pick from scratch.
+- **Follow it.** The backup host tracks the coverage role. This is the one to
+  be suspicious of: coverage roles are free text with a title and a type, not a
+  statement about who can host a Zoom call, and `TOFF-VAL-009` allows a Slack
+  channel as the assignee — which cannot host anything.
+
+**What to check before any of it:** whether time off is on for the tenants that
+have RoB. `TOFF-PROF-003` is conditioned on the time-off feature, and the Slack
+coverage roles are TopTeam-only. A RoB that reads an absence has to behave when
+there is no time-off module at all, which is the same shape as the no-Zoom
+state the backup host already draws.
+
+### Hold the waiting room off
+
+**Status** · Ready — the mechanism is a known field on a call the product already makes, and the screen that depends on it is built.
+**Added** · 2026-11-20
+**Source** · the second half of the manual fix ops hands RoB owners: turn the waiting room off for the meeting.
+**Rule** · `ROB-ZOOM-009`, `ROB-ZOOM-011`, `ROB-ZOOM-013`
+
+**What it is.** A fourth setting on the enforcement pass: every Zoom meeting
+linked to an upcoming RoB occurrence is held at `settings.waiting_room = false`,
+beside the join-before-host, authenticated-join and recording mode that pass
+already holds.
+
+**Why it is not a preference.** The product decided in 2023 that a RoB room
+takes join-before-host (`ROB-ZOOM-009`), and a waiting room overrides
+it. So a waiting room on a RoB is not a configuration of the decision, it is a
+silent reversal of it. The product does not offer a toggle for the other three
+and should not offer one for this.
+
+**No screen.** This is enforcement, not UI. The meeting view already states the
+result — *Anyone can join before the host* — and that line is a promise the
+product has to keep rather than a control.
+
+**What it touches:**
+
+- **Webinars.** `ROB-ZOOM-009` does not touch join-before-host for them, so this
+  should follow the same line and leave webinar waiting rooms alone until
+  somebody decides what a webinar RoB wants.
+- **Shared rooms.** `ROB-ZOOM-011` already resolves a conflict between two RoBs
+  sharing a room by taking the stricter value. A waiting room has the same
+  shape: if any RoB on the room wants it off, off wins, because the alternative
+  is a RoB that cannot start.
+- **Enforcement reads from Zoom** since 2026-10-22 (`ROB-ZOOM-013`), so a
+  waiting room switched on by hand would be switched back on the next pass,
+  which is the behaviour this needs.
+- **`B-014` is upstream.** On a room the product never recognises, none of this
+  is enforced — the same hole the other three settings fall down.
+
+**One thing to check before building:** whether Toptal's Zoom account locks the
+waiting room at the account or group level. A locked setting cannot be turned
+off per meeting by the API, and if that is the case this item becomes a Zoom
+admin change rather than a code one.
 
 ### What else Zoom could carry
 
@@ -193,7 +323,7 @@ endpoint or field, not a guess; what none of them is yet is a decision.
 
 | Capability | Where | What it would give a RoB | Gate |
 |---|---|---|---|
-| **Alternative hosts** | `settings.alternative_hosts` on the meeting object | someone who can start the meeting when the owner is away — see the item above | both users Licensed, same account |
+| **Alternative hosts** | `settings.alternative_hosts` on the meeting object | someone who can start the meeting when the owner is away — **used**, as the backup host, 2026-11-20 | both users Licensed, same account |
 | **Scheduling privilege** | `POST /users/{userId}/assistants`, `GET /users/{userId}/schedulers` | a standing stand-in for a person rather than a meeting | Licensed; the privilege itself is granted in Zoom's portal, not by API |
 | **AI Companion summary** | `GET` meeting summary, `meeting.summary_completed` webhook with `summary_content` as Markdown | the written record a RoB is supposed to leave, next to the agenda it was meant to follow | Pro+, AI Companion summary on, not E2EE |
 | **Transcript** | `TRANSCRIPT` / `CC` cloud-recording files; `meeting.aic_transcript_completed` | what was said under each agenda item, if the timing can be matched | cloud recording on |
@@ -296,7 +426,7 @@ cleanest kind of backlog item — one that deletes code rather than adding it.
 
 Action items here carry threaded comments. The product carries none, and not by
 omission: notes shipped in late June 2026 and were taken out again within a
-week, data dropped with them (`TOP-7168`, `TOP-7169`). The spec is flat about
+week, data dropped with them (`ROB-ACTION-008`). The spec is flat about
 it — discussion about an action item happens outside the product.
 
 So this is a proposal we never made deliberately, and it is now a row in the
