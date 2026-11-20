@@ -5862,13 +5862,16 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
           </div>
         </div>
 
-        <!-- My events first, as production has it. Both are built, and
-             "All events" stays the selected one on open — ROB-VIEW-007 is
-             explicit about the default and says nothing about the order, so
-             only the order moves. -->
+        <!-- My events first and selected on open. The order matches production;
+             the default does not — ROB-VIEW-007 is explicit that "All events" is
+             selected when the page opens without saved state. It is a departure
+             on purpose: the design task that specified this page (TOP-6814) asked
+             for the person's own meetings as the default scope, and the story that
+             shipped (TOP-6864) made it company-wide instead. A RoB directory opens
+             on 73 meetings nobody in the room owns; 13 of them are yours. -->
         <div class="tabs rob-tabs" role="tablist" aria-label="Meeting scope">
-          <button class="tab" type="button" role="tab" aria-selected="false">My events</button>
-          <button class="tab is-active" type="button" role="tab" aria-selected="true">All events</button>
+          <button class="tab is-active" type="button" role="tab" aria-selected="true">My events</button>
+          <button class="tab" type="button" role="tab" aria-selected="false">All events</button>
         </div>
 
         <!-- Search and filter on the left, the view switcher on the right.
@@ -16132,8 +16135,8 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
     })();
   </script>
   <script>
-    // Calendar occurrences. The month grid is company-wide by default ("All
-    // events"); "My events" narrows it to the series this person sits in.
+    // Calendar occurrences. The grid opens on "My events" — the series this
+    // person sits in; "All events" widens it to every series in the company.
     // Series, not occurrences, are the unit: a RoB recurs on a cadence, so the
     // grid is generated from the cadence rather than hand-placed.
     (function () {
@@ -17032,7 +17035,7 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       });
 
       // ---- View switcher ----
-      let view = 'month', mine = false;
+      let view = 'month', mine = true;   // opens on My events — see the tablist
       const show = () => {
         grid.hidden = view !== 'month';
         weekEl.hidden = view !== 'week';
