@@ -43,6 +43,18 @@
           "type": "new",
           "summary": "The join guarantee stated at creation",
           "status": "pending"
+        },
+        {
+          "id": "v2-05",
+          "type": "changed",
+          "summary": "Alternative hosts is a multi-select — several participants can cover the owner, matching Zoom's alternative_hosts list",
+          "status": "pending"
+        },
+        {
+          "id": "v2-06",
+          "type": "changed",
+          "summary": "Dropdown search removed on the meeting view — the options are the meeting's own participants on both screens",
+          "status": "pending"
         }
       ]
     },
@@ -71,6 +83,41 @@
           "id": "v3-03",
           "type": "new",
           "summary": "A past slot says why nothing happened",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "folder": "v4-recording-parts",
+      "label": "v4 · Recording parts",
+      "date": "2026-11-23",
+      "kind": "concept",
+      "stage": "review",
+      "note": "A stop-restart recording leaves an occurrence with several parts nothing tells apart. The owner tags each part with one click — Main discussion, Action items recap, False start — the tag shows beside the link for everyone, and a False start fades the way a ≤5-minute recording already does.",
+      "basedOn": "v1-baseline",
+      "changes": [
+        {
+          "id": "v4-01",
+          "type": "new",
+          "summary": "Recording parts listed per occurrence with times and durations",
+          "status": "pending"
+        },
+        {
+          "id": "v4-02",
+          "type": "new",
+          "summary": "One-click tag per part: Main discussion, Action items recap, False start",
+          "status": "pending"
+        },
+        {
+          "id": "v4-03",
+          "type": "new",
+          "summary": "The chosen tag reads beside the link for every viewer",
+          "status": "pending"
+        },
+        {
+          "id": "v4-04",
+          "type": "new",
+          "summary": "A False start part fades like a short recording",
           "status": "pending"
         }
       ]
