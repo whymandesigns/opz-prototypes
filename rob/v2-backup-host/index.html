@@ -8444,6 +8444,9 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     /* The folded-in permission: it joins the two rows above rather than
        starting its own list, and its explanation hangs under the checkbox. */
     .md-start-perm { margin-top: var(--spacing-3); }
+    /* The heading already sets the gap under itself, so the first row does not
+       add a second one. */
+    .md-section-title + .md-start-perm { margin-top: 0; }
     .md-start-perm-note {
       font: var(--type-body-sm);
       color: var(--color-text-muted);
@@ -8454,7 +8457,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     /* A labelled field, stacked: the label on its own line and the control
        under it at the column's full width, which is the only way 256px fits a
        name, a caret and a 256px-wide menu. */
-    .md-start-field { font: var(--type-body-sm); color: var(--color-text); }
+    .md-start-field { font: var(--type-body-sm); color: var(--color-text); margin-top: var(--spacing-3); }
     .md-start-field-label {
       display: flex;
       align-items: center;
@@ -10859,6 +10862,37 @@ Platform reliability — error budget
             <div class="md-start" data-md-start>
               <h3 class="md-section-title">Permissions</h3>
 
+              <!-- The baseline's Permissions checkbox, unchanged, and first:
+                   it is the one permission the product already has. The two
+                   below it are also permissions — who may get in before the
+                   owner, and who may start the room without them — and both
+                   are proposals, so they follow it. -->
+              <label class="checkbox md-start-perm">
+                <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Editable RoB by participants</span>
+              </label>
+              <p class="md-start-perm-note">
+                Anyone in the participants list can update the details, deck, agenda items, and action items.
+              </p>
+
+              <!-- Zoom's own name for settings.join_before_host, which is
+                   what this row has always been about. Checked and locked:
+                   ROB-ZOOM-009 holds it ON for every Zoom meeting linked to an
+                   upcoming RoB occurrence and overwrites anything changed by
+                   hand, so an editable control here would promise a change
+                   that the next enforcement pass undoes. -->
+              <label class="checkbox md-start-perm" data-md-zoom-only data-change="new"
+                     data-change-note="States the join guarantee the owner used to arrange by hand"
+                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
+                <input type="checkbox" class="checkbox-input" checked disabled />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Allow participants to join anytime</span>
+              </label>
+              <p class="md-start-perm-note" data-md-zoom-only>
+                Nobody waits for the owner, so the meeting starts without them.
+              </p>
+
               <!-- The field is always on screen with the chosen person in it,
                    the way Zoom's own Alternative hosts field is — not an Add
                    button that reveals one. Three states sharing one line was
@@ -10908,35 +10942,6 @@ Platform reliability — error budget
                      The value says itself in plain text for them. -->
                 <span class="md-bh-ro" data-md-bh-ro>No alternative hosts selected</span>
               </div>
-
-              <!-- Zoom's own name for settings.join_before_host, which is
-                   what this row has always been about. Checked and locked:
-                   ROB-ZOOM-009 holds it ON for every Zoom meeting linked to an
-                   upcoming RoB occurrence and overwrites anything changed by
-                   hand, so an editable control here would promise a change
-                   that the next enforcement pass undoes. -->
-              <label class="checkbox md-start-perm" data-md-zoom-only data-change="new"
-                     data-change-note="States the join guarantee the owner used to arrange by hand"
-                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
-                <input type="checkbox" class="checkbox-input" checked disabled />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">Allow participants to join anytime</span>
-              </label>
-              <p class="md-start-perm-note" data-md-zoom-only>
-                Nobody waits for the owner, so the meeting starts without them.
-              </p>
-
-              <!-- The baseline's Permissions checkbox, unchanged. It kept the
-                   heading: the two rows above it are also permissions — who
-                   may start the room, and who may get in before them. -->
-              <label class="checkbox md-start-perm">
-                <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
-                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
-                <span class="checkbox-label">Editable RoB by participants</span>
-              </label>
-              <p class="md-start-perm-note">
-                Anyone in the participants list can update the details, deck, agenda items, and action items.
-              </p>
             </div>
             </section>
           </div>
