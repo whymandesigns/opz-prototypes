@@ -13,11 +13,22 @@
 .backlink { font: var(--type-body-sm); color: var(--color-text-link); text-decoration: none; }
 .backlink:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* 76ch is a reading measure, not a width: below about 620px the column has
-   to give way to the viewport, or every table and code block pushes the
-   page sideways on a phone. */
-.cl-doc { max-width: min(76ch, 100%); }
+/* 76ch is a reading measure, not a width — so it belongs on the prose and
+   not on the document. The tables here are the opposite problem: four columns
+   of sentences in 76ch wrap to four or five lines a cell and are read by
+   scanning down a column, which a narrow table makes hard. They get the full
+   content width; paragraphs and lists keep the measure.
+
+   Headings are full width on purpose: their top border is a section rule, and
+   a rule that stops short of the table under it reads as a mistake. */
+.cl-doc { max-width: 100%; }
 .cl-doc > *:first-child { margin-top: 0; }
+.cl-doc > p,
+.cl-doc > ul,
+.cl-doc > ol,
+.cl-doc > blockquote,
+.cl-doc > pre,
+.cl-doc > .cl-status { max-width: min(76ch, 100%); }
 
 .cl-doc h2 {
   font: var(--type-h2);
@@ -59,6 +70,10 @@
 .cl-doc strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
 .cl-doc a { color: var(--color-text-link); text-decoration: none; }
 .cl-doc a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* A code span sets its own colour, so `[`v2-backup-host`](…)` renders as a
+   link that does not look like one. Inherit instead, and keep the chip. */
+.cl-doc a code { color: inherit; }
+.cl-doc a:hover code { text-decoration: underline; text-underline-offset: 3px; }
 
 /* The status row sits tight under its heading — it qualifies that entry,
    so a paragraph's worth of air between them would read as a new thought. */
@@ -120,10 +135,16 @@
 }
 .cl-doc blockquote p:last-child { margin-bottom: 0; }
 
-/* A table of URLs and rule ids has no natural wrap point, so left to itself
-   it sets the page's width and the whole document scrolls sideways. Fixed
-   layout holds it to the prose column and wraps the cells instead. */
-.cl-doc table { margin-bottom: var(--spacing-6); width: 100%; table-layout: fixed; }
+/* A table of URLs and rule ids has no natural wrap point, so left to itself it
+   would set the page's width and the whole document would scroll sideways.
+   That is handled below, by letting the cells break inside a word — which
+   fixed layout used to do the blunt way, by giving every column an equal
+   share. Auto layout spends the width where the sentences are: in the
+   departures table, 387px on what the product does and 90px on a folder name,
+   instead of 163px each. Checked at 375px: no sideways scroll. */
+/* The scroller carries the spacing; the table fills it. */
+.cl-table { margin-bottom: var(--spacing-6); overflow-x: auto; }
+.cl-doc table { margin-bottom: 0; width: 100%; }
 .cl-doc td { vertical-align: top; }
 /* The kit's .table is a data table: components.css sets white-space:nowrap
    on every th and td, which is right for a row of values and wrong for a
@@ -134,8 +155,13 @@
    nothing. Match the kit's shape to override it. */
 .cl-doc table thead th,
 .cl-doc table tbody td { white-space: normal; overflow-wrap: break-word; }
-.cl-doc table tbody td code,
-.cl-doc table thead th code { overflow-wrap: anywhere; }
+/* A code span in a table is an identifier — a folder, a rule id, a URL — and
+   a broken one is worse than a scrollbar: `v2-backup-host` split as v2- /
+   backup- / host reads as three things. They stay whole, and the scroller
+   above takes the consequence on a narrow screen. Prose in the same cell
+   still wraps normally. */
+.cl-doc table td code,
+.cl-doc table th code { white-space: nowrap; overflow-wrap: normal; }
 
 /* A heading the in-document links jump to should not land under the
    sticky nothing — there is no sticky header here, but a little air above

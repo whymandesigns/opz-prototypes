@@ -1,0 +1,126 @@
+{
+  "$schema": "../../designmd/versions.schema.json",
+  "family": "RoB Meetings",
+  "versions": [
+    {
+      "folder": "v1-baseline",
+      "label": "v1 · Baseline",
+      "date": "2026-11-20",
+      "kind": "concept",
+      "stage": "shipped",
+      "note": "The baseline proposals branch off. Close to the product, not identical: it is a prototype with fixtures, and in two screens it follows the spec where the shipped product has an open deviation (B-187, B-191).",
+      "basedOn": null
+    },
+    {
+      "folder": "v2-backup-host",
+      "label": "v2 · Backup host",
+      "date": "2026-11-23",
+      "kind": "concept",
+      "stage": "review",
+      "note": "One named stand-in who can start the Zoom room when the owner is away, the join guarantee stated under it, and a warning when nobody can start the meeting — on the create form as well as the meeting view, since the ops checklist it replaces is handed to the owner while the meeting is being made.",
+      "basedOn": "v1-baseline",
+      "changes": [
+        {
+          "id": "v2-01",
+          "type": "new",
+          "summary": "Backup host and the join guarantee",
+          "status": "pending"
+        },
+        {
+          "id": "v2-02",
+          "type": "new",
+          "summary": "Warns when nobody can start the meeting",
+          "status": "pending"
+        },
+        {
+          "id": "v2-03",
+          "type": "new",
+          "summary": "Alternative hosts in the create form",
+          "status": "pending"
+        },
+        {
+          "id": "v2-04",
+          "type": "new",
+          "summary": "The join guarantee stated at creation",
+          "status": "pending"
+        },
+        {
+          "id": "v2-05",
+          "type": "changed",
+          "summary": "Alternative hosts is a multi-select — several participants can cover the owner, matching Zoom's alternative_hosts list",
+          "status": "pending"
+        },
+        {
+          "id": "v2-06",
+          "type": "changed",
+          "summary": "Dropdown search removed on the meeting view — the options are the meeting's own participants on both screens",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "folder": "v3-week-slot",
+      "label": "v3 · Week-view slot click",
+      "date": "2026-11-20",
+      "kind": "concept",
+      "stage": "review",
+      "note": "A slot click draws the draft and asks Create meeting / Cancel before the form opens, and a click on a past slot says why nothing happened instead of being swallowed.",
+      "basedOn": "v1-baseline",
+      "changes": [
+        {
+          "id": "v3-01",
+          "type": "changed",
+          "summary": "Draws the slot and asks, instead of opening the form",
+          "status": "pending"
+        },
+        {
+          "id": "v3-02",
+          "type": "new",
+          "summary": "Create meeting / Cancel before the form opens",
+          "status": "pending"
+        },
+        {
+          "id": "v3-03",
+          "type": "new",
+          "summary": "A past slot says why nothing happened",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "folder": "v4-recording-parts",
+      "label": "v4 · Recording parts",
+      "date": "2026-11-23",
+      "kind": "concept",
+      "stage": "review",
+      "note": "A stop-restart recording leaves an occurrence with several parts nothing tells apart. The owner tags each part with one click — Main discussion, Action items recap, False start — the tag shows beside the link for everyone, and a False start fades the way a ≤5-minute recording already does.",
+      "basedOn": "v1-baseline",
+      "changes": [
+        {
+          "id": "v4-01",
+          "type": "new",
+          "summary": "Recording parts listed per occurrence with times and durations",
+          "status": "pending"
+        },
+        {
+          "id": "v4-02",
+          "type": "new",
+          "summary": "One-click tag per part: Main discussion, Action items recap, False start",
+          "status": "pending"
+        },
+        {
+          "id": "v4-03",
+          "type": "new",
+          "summary": "The chosen tag reads beside the link for every viewer",
+          "status": "pending"
+        },
+        {
+          "id": "v4-04",
+          "type": "new",
+          "summary": "A False start part fades like a short recording",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}

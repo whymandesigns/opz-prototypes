@@ -98,12 +98,17 @@
       };
       var head = cells(rows[0]);
       var body = rows.slice(2).map(cells);
+      // Wrapped, so a table too wide for a phone scrolls inside its own box
+      // instead of taking the page sideways with it. That is what lets the
+      // columns be sized by content rather than squeezed into equal shares.
+      out.push('<div class="cl-table">');
       out.push('<table class="table">');
       out.push('<thead><tr>' + head.map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('') + '</tr></thead>');
       out.push('<tbody>' + body.map(function (r) {
         return '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody>');
       out.push('</table>');
+      out.push('</div>');
     };
 
     // A bullet owns every following line indented past it, so a wrapped

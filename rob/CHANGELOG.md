@@ -3,8 +3,6 @@
 Where this prototype and the product disagree, and why. That is the section
 directly below; the rest of the file is how it got there.
 
-- **[Reach the variants](#reach-the-variants)** — the flows that only exist
-  behind a URL. Several good ideas live there and nowhere else.
 - **[Open, and worth revisiting](#open-and-worth-revisiting)** — decisions that
   were parked rather than settled, each with the commit that still holds the
   work.
@@ -16,63 +14,31 @@ directly below; the rest of the file is how it got there.
 
 ## Where it departs from the product
 
-**The reason this file exists.** A prototype that matched the product in every
-respect would need no changelog — you could read the product. These are the
-places it does not, each with the rule that says what the product does.
+Each row is a change we would defend, not every way the two differ — a
+limitation is not a proposal. **Where** opens the version that makes the
+change. **Rule** cites the internal behaviour spec: checkable by the team, not
+from here, which is why the ids are not links.
 
-**We propose a change.** Built deliberately against the rule, because we think
-the rule is wrong. Each one is a proposal, and needs saying out loud when it
-goes to review.
+| Here | Where | The product | Rule |
+|---|---|---|---|
+| A series can name **alternative hosts** — one or more of the meeting's own participants, no other names offered — who can start the Zoom room when the owner is away, on the create form and on the meeting view afterwards; the "nobody can start it" warning fires only when the owner is away **and** none of them is going | [`v2-backup-host`](./v2-backup-host/) | has no such concept on either screen — the room is created with the owner as its only host, an existing room is never reused or chosen, and `settings.alternative_hosts` (itself a list) is never written | `ROB-ZOOM-001`, `ROB-OWNER-020` |
+| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | [`v2-backup-host`](./v2-backup-host/) | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
+| An occurrence whose owner is not going, with no alternative host going, says **nobody can start it** | [`v2-backup-host`](./v2-backup-host/) | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
+| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
+| Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
+| A recording part can be **tagged by the owner** — Main discussion, Action items recap, False start — one click per part, the tag visible to everyone, a False start faded | [`v4-recording-parts`](./v4-recording-parts/) | shows "Part n (duration)" and nothing else — parts are modelled and numbered but carry no user-set label anywhere | `ROB-ZOOM-024`, `ROB-ZOOM-032`, `ROB-ZOOM-034` |
 
-| Here | The product | Rule |
-|---|---|---|
-| A series can name one **backup host**, who can start the Zoom room when the owner is away | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
-| The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
-| An occurrence whose owner is not going, with no backup host, says **nobody can start it** | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
-| A week-view slot click draws a draft block and asks **Create meeting / Cancel** | opens the Create meeting form straight away | `ROB-VIEW-053` |
-| Recurrence offers weekly and bi-weekly, with monthly marked approval-only | defaults to Every weekday, and offers daily, custom and the rest | `ROB-SCHED-002`, `-004` |
-| Every filter is single-select | **all five** are multi-select — Team, Meeting owners, Attendee, Divisions, Slack channels — and a tag lists the chosen names, `Divisions: <names>` | `ROB-VIEW-019`, `-025`, `-026`, `-027` |
-| Clicking the chosen option again clears that filter | nothing to clear this way: you untick one of several, and the only "none" is having ticked none | `ROB-VIEW-019` |
-| Action items carry threaded comments | has none, and not by omission — notes shipped in June 2026 and were removed within a week, data dropped with them | `ROB-ACTION-008` |
-| Clicking a past slot in the week view says why nothing happened | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
-
-**We follow the spec where the product does not.** Not proposals: the rule is
-already the rule, and the shipped code has an open deviation from it. Built to
-the rule, with the deviation's id beside it — so a reviewer who tries this in
-the real app and sees something else knows which of the two is the bug.
+**Not proposals — the rule is already the rule, and the shipped code deviates
+from it.** Built to the rule, with the deviation's id beside it, so a reviewer
+who sees something else in the real app knows which of the two is the bug.
 
 | Here | The product today | Rule | Deviation |
 |---|---|---|---|
 | A cancelled occurrence's agenda is read-only, and says why | its agenda items, action items and pre-read links stay editable | `ROB-AGENDA-065` | `B-187` |
 | **Mark as discussed** appears only once the occurrence has started | it is offered and accepted on any occurrence, future ones included | `ROB-AGENDA-066` | `B-191` |
 
-A row leaves this section when the product adopts the proposal, overrules it, or
-fixes the deviation — not when we stop thinking about it.
-
----
-
-## Reach the variants
-
-The prototype is one file; a variant is a URL, not a copy. (`rob` is ~1.2 MB and
-still moving — a duplicate drifts within days.) The rule was learned the hard
-way: this started in Aug 2026 as `action-items`, beside a near-duplicate called
-`rob-flow` that every change had to be mirrored into. Both of those early flows
-sit in `../archive/`, and the old `/action-items/` URL 404s.
-
-| URL | What it opens |
-|---|---|
-| `rob/` | the admin owner's view — Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
-| `rob/roles.html` | the role chooser, this prototype's sign-in screen. Sign out returns here |
-| `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
-| `rob/?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
-| `rob/?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
-| `rob/?roles=1` | the bottom-left role switcher, for walking all three side by side |
-| `rob/#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
-| `rob/#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
-
-Default respond flow is the **status menu** (Going / Reject / Maybe), not the
-modal. Prefer the hash form: the desktop preview pane drops `?params` on the way
-to the page, and a hash survives both it and Vercel.
+A row leaves when the product adopts the proposal, overrules it, or fixes the
+deviation — not when we stop thinking about it.
 
 ---
 
@@ -103,6 +69,109 @@ to the page, and a hash survives both it and Vercel.
 ---
 
 ## History
+
+### 2026-11-23 — Alternative hosts, and the create form *(local on `rob-version-split`)*
+
+**Status** · In review — `v2-backup-host`
+
+The field v2 put in the meeting view works, now, and is named the way Zoom
+names the setting it writes.
+
+Three things were wrong with it before that. It opened from an `Add` button
+that sat against the panel edge with a few pixels to hit, the menu it opened
+was a fixed 280px hanging inside a 256px column, and both were consequences of
+the same decision: label, value and control sharing one line in the narrowest
+column on the screen. It is a labelled field on its own line now, always on
+screen, with the chosen person inside it — and the menu is pinned to the
+field's own edges rather than given a width. Clearing it moved into the list as
+`No alternative hosts`, so one control both sets and unsets the value.
+
+The naming went with it. **Alternative hosts**, Zoom's words, not the
+`backup host` the first pass argued for — and the two alerts still say
+`backup host`, which is the last of the old vocabulary on screen. The section
+kept the baseline's own **Permissions** heading rather than the
+`Who can do what` it briefly had, which collided with `rights.html`'s
+*What each role can do*; and it reads shipped-first now — `Editable RoB`,
+then the join guarantee, then the field.
+
+**The same two rows are in the create form.** That is where the problem
+actually lands: the ops instruction owners are given today — add an
+alternative host, turn the waiting room off — is handed to them while they are
+making the meeting, not a screen later. Candidates are the participants being
+invited and nobody else (`ROB-ZOOM-001` creates one room for the series, and
+Toptal's own rule is that the host must be on the invite), so the field fills
+as people are added and clears itself if the chosen one is taken back off. It
+has no search box: nine roster rows wanted one, three fresh picks do not. What
+is chosen is carried into the meeting on Create, the way
+`editableByParticipants` already was — a field whose value is dropped at Create
+would be decoration.
+
+This started as its own folder, `v4-create-hosts`, and was folded back the
+same day. It was never a separate decision: a proposal that puts a field on one
+screen and not the other is half a proposal, and reviewing the halves apart
+invites agreeing to one of them. One version, both screens.
+
+Two notes against it. The create form was locked on 2026-11-09 as a shell,
+which is why this lives in a version folder at all — the lock holds in
+`v1-baseline`. And the create → view hand-off only restores state for meetings
+made in the session; opening a seeded meeting afterwards leaves the field as
+the last one left it, which is pre-existing in the same handler and still wants
+fixing.
+
+---
+
+### 2026-11-20 — Proposals move out of the baseline *(local on `rob-version-split`)*
+
+**Status** · Structural — no product decision changed, but where each one lives did, and the departures table now says which URL.
+
+![The departures table with a Where column: three rows linking to v2-backup-host and the rest to v1-baseline, each one opening the prototype that row describes.](_shots/2026-11-20-proposals-split.png)
+
+`rob/` was described as production-faithful while rendering six changes the
+product has never seen. A proposal and the thing it is a proposal *about* were
+the same URL, so there was no way to hand someone the baseline, or to drop an
+idea without surgery on a 1.3 MB file.
+
+So the family splits. `v1-baseline` is the closest thing to the product this
+repo holds; a proposal branches off it into its own folder, listed in
+`versions.json`, and
+`rob/` is a redirect that carries the query and hash so every existing link
+still lands. [Where it departs](#where-it-departs-from-the-product) gained a
+**Where** column, and that is how a reviewer picks one up: the row that
+describes a proposal is also the link that opens it. A separate card listing
+the proposals was built first and taken out again — it put the same thing in
+two places, and the table was the one already saying what each proposal is.
+
+**This reverses a rule the file used to state**, and the reversal is narrower
+than it looks. "A variant is a URL, not a copy" was written after `action-items`
+and `rob-flow` drifted apart in Aug 2026, and it still holds for a *view* of the
+same decision — a role, a respond flow, one occurrence. It does not hold for a
+*proposal*, which is a different decision and has to be reviewable, improvable
+and droppable on its own. The duplication is real, and the price is that a
+baseline fix now has to be re-baked into every version folder.
+
+**The backup host moved first**, to prove the pattern, and the week-view slot
+behaviour followed the same day as `v3-week-slot` — both rows `ROB-VIEW-053`
+owns, since the confirm step and the past-slot toast are the same gesture.
+
+**The rest turned out not to need moving**, which is the more useful finding.
+Four rows were sitting in the departures table describing things that are not
+proposals: recurrence modelling the Operating Framework's policy, and filters
+that are single-select because nobody built multi-select. A limitation is not
+an argument, and policy is not a change we are asking the product to make.
+They came out of the table rather than into a version folder.
+
+One that is a real difference came out with them: the prototype's action items
+carry threaded comments and the product's do not (`ROB-ACTION-008` — notes
+shipped in June 2026 and were removed within a week). Dropping the row does not
+drop the behaviour, so that is still live in the baseline and still needs
+deciding: extract it, or take it out.
+
+Stripping that one taught the shape of the work. The proposal was not a block
+to delete: the baseline had to be given the behaviour the rule describes, which
+is the form opening straight away on a future slot and nothing at all on a past
+one. Two things nearly went out with it — `clock()`, which the slot aria-labels
+use, and a `closeDraft()` call in `renderWeek` that would have thrown on every
+redraw. Neither was part of the proposal; both lived in its block.
 
 ### 2026-11-20 — A backup host, and who can start the meeting *(local on `rob-week-grid`)*
 
@@ -479,13 +548,21 @@ last, short section still becomes active at maximum scroll.
   Finding that a control was enabled for the wrong role, or that a right
   follows attendance rather than ownership, changes the prototype but decides
   nothing: the rule was always the rule. What that work produces belongs in
-  [What each role can do](rights.html), which states
+  [What each role can do](./rights.html), which states
   the rules as they stand — an entry would only add that we were once wrong
   about them.
 - When a parked idea is picked up or finally rejected, move it out of
   **Open, and worth revisiting** and say which it was.
 - When a proposal here is adopted by the product, or overruled by it, move the
   row out of **Where it departs from the product**.
+- **A proposal gets its own version folder, and the baseline says how far it
+  still is from the product.** `v1-baseline` is not a port — it is a prototype
+  with fixtures, it still holds proposals that have not moved out, and in two
+  places it follows the spec where the shipped product has an open deviation.
+  Calling it *production* would be a promise it does not keep. A row in
+  [Where it departs](#where-it-departs-from-the-product) names the folder its
+  proposal lives in. A proposal left in the baseline makes this whole file a
+  claim the prototype does not keep.
 - **Pull the oracle before citing it.** It is a checkout of `topteam`, not a
   service, and it is as old as the last `git fetch`. On 2026-11-20 a clone
   fifteen days behind produced a departure row for a thing the product had
