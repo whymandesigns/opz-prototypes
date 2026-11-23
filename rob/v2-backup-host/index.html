@@ -8442,6 +8442,16 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
        column's own <hr> draws the rule and the heading comes from
        .md-section-title. No border or margin of its own. */
     .md-start { margin: 0; }
+    /* The folded-in permission: it joins the two rows above rather than
+       starting its own list, and its explanation hangs under the checkbox. */
+    .md-start-perm { margin-top: var(--spacing-3); }
+    .md-start-perm-note {
+      font: var(--type-body-sm);
+      color: var(--color-text-muted);
+      margin: var(--spacing-1) 0 0;
+      padding-left: 24px;
+      line-height: 1.4;
+    }
     .md-start-row {
       display: flex;
       align-items: center;
@@ -10852,7 +10862,7 @@ Platform reliability — error budget
                  per-occurrence stand-in. -->
             <div class="md-start" data-md-start data-change="new"
                  data-change-note="Backup host and the join guarantee">
-              <h3 class="md-section-title">Starting the meeting</h3>
+              <h3 class="md-section-title">Who can do what</h3>
 
               <!-- Add -> pick -> the person, one state at a time: the same
                    three-state flow the key metric uses. -->
@@ -10905,18 +10915,18 @@ Platform reliability — error budget
                 <span class="md-start-label">Joining</span>
                 <span class="md-bh-slot md-start-fact">Anyone can join before the host</span>
               </div>
-            </div>
 
-              <hr style="border: 0; border-top: 1px solid var(--color-gray-200); margin: var(--spacing-4) 0 var(--spacing-3)" />
-              <h3 class="md-section-title">Permissions</h3>
-              <label class="checkbox">
+              <!-- Permissions folded in: all three rows answer "who may do
+                   what to this meeting", and the checkbox is the third. -->
+              <label class="checkbox md-start-perm">
                 <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
                 <span class="checkbox-label">Editable RoB by participants</span>
               </label>
-              <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: -8px 0 0; padding-left: 24px; line-height: 1.4">
+              <p class="md-start-perm-note">
                 Anyone in the participants list can update the details, deck, agenda items, and action items.
               </p>
+            </div>
             </section>
           </div>
 
