@@ -10872,14 +10872,14 @@ Platform reliability — error budget
                    same one that unsets it. -->
               <div class="md-start-field" data-md-bh-flow data-md-zoom-only data-change="new"
                    data-change-note="One named stand-in who can start the Zoom room">
-                <span class="md-start-field-label">Select alternative hosts</span>
+                <span class="md-start-field-label">Alternative hosts</span>
 
                 <span class="input-select md-bh-select" data-md-bh-select data-rob-needs="edit-series">
                   <button class="input-select-trigger" type="button" aria-haspopup="listbox"
                           aria-expanded="false" data-md-bh-trigger>
                     <span class="input-select-value input-select-placeholder md-bh-value" data-md-bh-value>
                       <span class="avatar avatar-xs md-bh-av" hidden data-md-bh-av></span>
-                      <span class="md-bh-name" data-md-bh-label>No backup host</span>
+                      <span class="md-bh-name" data-md-bh-label>No alternative hosts selected</span>
                     </span>
                     <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
@@ -10894,7 +10894,7 @@ Platform reliability — error budget
                     <span class="dropdown-list" data-md-bh-list>
                       <button class="dropdown-item md-bh-clear" type="button" hidden data-md-bh-clear>
                         <svg class="icon dropdown-item-icon"><use href="#i-close"/></svg>
-                        <span class="dropdown-item-text"><span class="dropdown-item-label">No backup host</span></span>
+                        <span class="dropdown-item-text"><span class="dropdown-item-label">No alternative hosts</span></span>
                       </button>
                       <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
                     </span>
@@ -10906,7 +10906,7 @@ Platform reliability — error budget
                 <!-- ROB-EDIT-001 hides rather than disables, so a participant
                      gets no field at all — and a label with nothing after it.
                      The value says itself in plain text for them. -->
-                <span class="md-bh-ro" data-md-bh-ro>No backup host</span>
+                <span class="md-bh-ro" data-md-bh-ro>No alternative hosts selected</span>
               </div>
 
               <!-- Zoom's own name for settings.join_before_host, which is
@@ -11096,11 +11096,11 @@ Platform reliability — error budget
         } else {
           avEl.hidden = true;
           avEl.textContent = '';
-          labelEl.textContent = 'No backup host';
+          labelEl.textContent = 'No alternative hosts selected';
           labelEl.removeAttribute('title');
           valueEl.classList.add('input-select-placeholder');
           flagEl.hidden = true;
-          roEl.textContent = 'No backup host';
+          roEl.textContent = 'No alternative hosts selected';
         }
         if (clearBtn) clearBtn.hidden = !picked;
 
