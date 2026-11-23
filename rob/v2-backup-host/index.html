@@ -10860,13 +10860,13 @@ Platform reliability — error budget
                  whole series (ROB-ZOOM-001), so alternative_hosts is a
                  series property. There is nowhere in Zoom to put a
                  per-occurrence stand-in. -->
-            <div class="md-start" data-md-start data-change="new"
-                 data-change-note="Backup host and the join guarantee">
-              <h3 class="md-section-title">Who can do what</h3>
+            <div class="md-start" data-md-start>
+              <h3 class="md-section-title">Permissions</h3>
 
               <!-- Add -> pick -> the person, one state at a time: the same
                    three-state flow the key metric uses. -->
-              <div class="md-start-row" data-md-bh-flow>
+              <div class="md-start-row" data-md-bh-flow data-change="new"
+                   data-change-note="One named stand-in who can start the Zoom room">
                 <svg class="icon"><use href="#i-switch"/></svg>
                 <span class="md-start-label">Backup host</span>
 
@@ -10916,7 +10916,8 @@ Platform reliability — error budget
                    upcoming RoB occurrence and overwrites anything changed by
                    hand, so an editable control here would promise a change
                    that the next enforcement pass undoes. -->
-              <label class="checkbox md-start-perm"
+              <label class="checkbox md-start-perm" data-change="new"
+                     data-change-note="States the join guarantee the owner used to arrange by hand"
                      data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
                 <input type="checkbox" class="checkbox-input" checked disabled />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
@@ -10926,8 +10927,9 @@ Platform reliability — error budget
                 Nobody waits for the owner, so the meeting starts without them.
               </p>
 
-              <!-- Permissions folded in: all three rows answer "who may do
-                   what to this meeting", and the checkbox is the third. -->
+              <!-- The baseline's Permissions checkbox, unchanged. It kept the
+                   heading: the two rows above it are also permissions — who
+                   may start the room, and who may get in before them. -->
               <label class="checkbox md-start-perm">
                 <input type="checkbox" class="checkbox-input" disabled data-md-edit-lock data-md-editable-rob />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
