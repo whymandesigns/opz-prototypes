@@ -8438,18 +8438,10 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     /* Starting the meeting — a small block under the details grid. It is not a
        detail row: the first line is settable and the second is a guarantee, so
        they get a heading of their own rather than passing as two more facts. */
-    .md-start {
-      margin-top: var(--spacing-6);
-      margin-bottom: var(--spacing-6);
-      padding-top: var(--spacing-4);
-      border-top: 1px solid var(--color-border);
-    }
-    .md-start-title {
-      font: var(--type-body);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text);
-      margin: 0 0 var(--spacing-3);
-    }
+    /* In the right column it is a peer of Owner and Participants, so the
+       column's own <hr> draws the rule and the heading comes from
+       .md-section-title. No border or margin of its own. */
+    .md-start { margin: 0; }
     .md-start-row {
       display: flex;
       align-items: center;
@@ -8460,9 +8452,10 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     }
     .md-start-row + .md-start-row { margin-top: var(--spacing-2); }
     .md-start-row > .icon { color: var(--color-icon); font-size: 16px; flex-shrink: 0; }
-    /* A fixed label column keeps the two rows' values on one edge; below it the
-       value wraps under rather than squeezing the label. */
-    .md-start-label { width: 96px; flex-shrink: 0; color: var(--color-text-muted); }
+    /* A fixed label column keeps the two rows' values on one edge. 76px, not
+       96: the right column is 320px, and every pixel the label does not take
+       is one the person's name gets before it truncates. */
+    .md-start-label { width: 76px; flex-shrink: 0; color: var(--color-text-muted); }
     .md-start-fact { color: var(--color-text-muted); }
     /* One slot, three states — empty + add, the picker, or the person. Only one
        is ever unhidden, so they can share the line without reserving space. */
@@ -10116,82 +10109,6 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                 </section>
               </div>
 
-              <!-- STARTING THE MEETING — who can start the Zoom room, and
-                   whether anyone can get in before them.
-
-                   Both are settings on the room the product already creates
-                   (ROB-ZOOM-001), and neither is reachable from the product
-                   today, so this block is a proposal rather than a description.
-
-                   The backup host maps to Zoom's settings.alternative_hosts.
-                   The join line is settings.join_before_host, which
-                   ROB-ZOOM-009 already forces ON — but Zoom's Waiting Room
-                   overrides join-before-host and the product does not manage
-                   it, which is why owners are being told by hand to turn the
-                   waiting room off. The line states the guarantee; the fix
-                   belongs in enforcement, not in a toggle here.
-
-                   The room is one recurring-no-fixed-time meeting for the
-                   whole series (ROB-ZOOM-001), so alternative_hosts is a
-                   series property. There is nowhere in Zoom to put a
-                   per-occurrence stand-in. -->
-              <div class="md-start" data-md-start data-change="new"
-                   data-change-note="Backup host and the join guarantee">
-                <h4 class="md-start-title">Starting the meeting</h4>
-
-                <!-- Add -> pick -> the person, one state at a time: the same
-                     three-state flow the key metric uses. -->
-                <div class="md-start-row" data-md-bh-flow>
-                  <svg class="icon"><use href="#i-switch"/></svg>
-                  <span class="md-start-label">Backup host</span>
-
-                  <span class="md-bh-slot">
-                    <span class="md-bh-none" data-md-bh-none>No backup host</span>
-
-                    <button class="btn btn-ghost btn-xs md-bh-add" type="button"
-                            data-md-bh-add data-rob-needs="edit-series">
-                      <svg class="btn-icon"><use href="#i-plus"/></svg>Add
-                    </button>
-
-                    <span class="input-select md-bh-select" hidden data-md-bh-select data-rob-needs="edit-series">
-                      <button class="input-select-trigger" type="button" aria-haspopup="listbox"
-                              aria-expanded="false" data-md-bh-trigger>
-                        <span class="input-select-value input-select-placeholder" data-md-bh-label>Choose a participant</span>
-                        <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
-                      </button>
-                      <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
-                        <span class="dropdown-search">
-                          <span class="input-icon input-icon-left">
-                            <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                            <input class="input" type="search" placeholder="Search participants"
-                                   data-md-bh-search aria-label="Search participants" />
-                          </span>
-                        </span>
-                        <span class="dropdown-list" data-md-bh-list>
-                          <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
-                        </span>
-                      </span>
-                    </span>
-
-                    <span class="md-bh-person" hidden data-md-bh-person>
-                      <span class="avatar avatar-xs" data-md-bh-av></span>
-                      <span class="md-bh-name" data-md-bh-name></span>
-                      <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
-                      <button class="btn btn-icon-only btn-ghost btn-xs md-bh-remove" type="button"
-                              data-md-bh-remove aria-label="Remove backup host" data-rob-needs="edit-series">
-                        <svg class="icon"><use href="#i-close"/></svg>
-                      </button>
-                    </span>
-                  </span>
-                </div>
-
-                <div class="md-start-row">
-                  <svg class="icon"><use href="#i-users"/></svg>
-                  <span class="md-start-label">Joining</span>
-                  <span class="md-bh-slot md-start-fact">Anyone can join before the host</span>
-                </div>
-              </div>
-
               <!-- VIEW MODE: doc line + bullets + please-do-not-delete stack -->
               <div data-md-view-only>
                 <div class="md-doc-line">
@@ -10912,6 +10829,83 @@ Platform reliability — error budget
                 </span>
                 <span class="md-person-badge md-badge-r">R</span>
               </div>
+
+              <hr style="border: 0; border-top: 1px solid var(--color-gray-200); margin: var(--spacing-4) 0 var(--spacing-3)" />
+            <!-- STARTING THE MEETING — who can start the Zoom room, and
+                 whether anyone can get in before them.
+
+                 Both are settings on the room the product already creates
+                 (ROB-ZOOM-001), and neither is reachable from the product
+                 today, so this block is a proposal rather than a description.
+
+                 The backup host maps to Zoom's settings.alternative_hosts.
+                 The join line is settings.join_before_host, which
+                 ROB-ZOOM-009 already forces ON — but Zoom's Waiting Room
+                 overrides join-before-host and the product does not manage
+                 it, which is why owners are being told by hand to turn the
+                 waiting room off. The line states the guarantee; the fix
+                 belongs in enforcement, not in a toggle here.
+
+                 The room is one recurring-no-fixed-time meeting for the
+                 whole series (ROB-ZOOM-001), so alternative_hosts is a
+                 series property. There is nowhere in Zoom to put a
+                 per-occurrence stand-in. -->
+            <div class="md-start" data-md-start data-change="new"
+                 data-change-note="Backup host and the join guarantee">
+              <h3 class="md-section-title">Starting the meeting</h3>
+
+              <!-- Add -> pick -> the person, one state at a time: the same
+                   three-state flow the key metric uses. -->
+              <div class="md-start-row" data-md-bh-flow>
+                <svg class="icon"><use href="#i-switch"/></svg>
+                <span class="md-start-label">Backup host</span>
+
+                <span class="md-bh-slot">
+                  <span class="md-bh-none" data-md-bh-none>No backup host</span>
+
+                  <button class="btn btn-ghost btn-xs md-bh-add" type="button"
+                          data-md-bh-add data-rob-needs="edit-series">
+                    <svg class="btn-icon"><use href="#i-plus"/></svg>Add
+                  </button>
+
+                  <span class="input-select md-bh-select" hidden data-md-bh-select data-rob-needs="edit-series">
+                    <button class="input-select-trigger" type="button" aria-haspopup="listbox"
+                            aria-expanded="false" data-md-bh-trigger>
+                      <span class="input-select-value input-select-placeholder" data-md-bh-label>Choose a participant</span>
+                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                    </button>
+                    <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
+                      <span class="dropdown-search">
+                        <span class="input-icon input-icon-left">
+                          <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                          <input class="input" type="search" placeholder="Search participants"
+                                 data-md-bh-search aria-label="Search participants" />
+                        </span>
+                      </span>
+                      <span class="dropdown-list" data-md-bh-list>
+                        <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
+                      </span>
+                    </span>
+                  </span>
+
+                  <span class="md-bh-person" hidden data-md-bh-person>
+                    <span class="avatar avatar-xs" data-md-bh-av></span>
+                    <span class="md-bh-name" data-md-bh-name></span>
+                    <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
+                    <button class="btn btn-icon-only btn-ghost btn-xs md-bh-remove" type="button"
+                            data-md-bh-remove aria-label="Remove backup host" data-rob-needs="edit-series">
+                      <svg class="icon"><use href="#i-close"/></svg>
+                    </button>
+                  </span>
+                </span>
+              </div>
+
+              <div class="md-start-row">
+                <svg class="icon"><use href="#i-users"/></svg>
+                <span class="md-start-label">Joining</span>
+                <span class="md-bh-slot md-start-fact">Anyone can join before the host</span>
+              </div>
+            </div>
 
               <hr style="border: 0; border-top: 1px solid var(--color-gray-200); margin: var(--spacing-4) 0 var(--spacing-3)" />
               <h3 class="md-section-title">Permissions</h3>
