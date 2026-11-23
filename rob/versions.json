@@ -62,6 +62,29 @@
           "status": "pending"
         }
       ]
+    },
+    {
+      "folder": "v4-create-hosts",
+      "label": "v4 · Alternative hosts on create",
+      "date": "2026-11-23",
+      "kind": "revision",
+      "stage": "review",
+      "note": "v2's two rows, in the create form as well: the ops checklist they replace is handed to the owner while the meeting is being made, not after. Candidates are the participants being invited, so the field fills as they are added and clears if the chosen one is taken off.",
+      "basedOn": "v2-backup-host",
+      "changes": [
+        {
+          "id": "v4-01",
+          "type": "new",
+          "summary": "Alternative hosts in the create form",
+          "status": "pending"
+        },
+        {
+          "id": "v4-02",
+          "type": "new",
+          "summary": "The join guarantee stated at creation",
+          "status": "pending"
+        }
+      ]
     }
   ]
 }
