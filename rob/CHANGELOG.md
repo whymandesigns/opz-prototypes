@@ -3,8 +3,6 @@
 Where this prototype and the product disagree, and why. That is the section
 directly below; the rest of the file is how it got there.
 
-- **[Reach the variants](#reach-the-variants)** — the flows that only exist
-  behind a URL. Several good ideas live there and nowhere else.
 - **[Open, and worth revisiting](#open-and-worth-revisiting)** — decisions that
   were parked rather than settled, each with the commit that still holds the
   work.
@@ -16,34 +14,10 @@ directly below; the rest of the file is how it got there.
 
 ## Where it departs from the product
 
-**The reason this file exists.** A prototype that matched the product in every
-respect would need no changelog — you could read the product. These are the
-places it does not, each with the rule that says what the product does.
-
-**We propose a change.** Built deliberately against the rule, because we think
-the rule is wrong. Each one is a proposal, and needs saying out loud when it
-goes to review.
-
-Since 2026-11-20 a proposal lives in its own version folder rather than in the
-baseline, so **Where** is the way in — each one opens the prototype that row
-describes, and every row here names a version rather than the baseline.
-
-**A difference is not automatically a proposal**, which is why this table is
-shorter than the list of ways the prototype and the product differ. The
-recurrence options model the Operating Framework's policy rather than Google's
-generic rule; the filters are single-select because this prototype never built
-multi-select, which is a limitation and not an argument. Those are described
-where they are built, not here. A row earns its place by being a change we
-would defend.
-
-**The baseline is still not 1:1 with the product.** The two rows in the next
-table follow the spec where the shipped product has an open deviation, and
-underneath that it is a prototype: fixtures, invented people, no backend, and
-only the directory and the meeting view rather than the module.
-
-The **Rule** column cites the Operationalize behaviour spec, an internal
-reference that says what the product does. The ids are checkable by the team
-and not from here, which is why they are not links.
+Each row is a change we would defend, not every way the two differ — a
+limitation is not a proposal. **Where** opens the version that makes the
+change. **Rule** cites the internal behaviour spec: checkable by the team, not
+from here, which is why the ids are not links.
 
 | Here | Where | The product | Rule |
 |---|---|---|---|
@@ -53,70 +27,17 @@ and not from here, which is why they are not links.
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
-**We follow the spec where the product does not.** Not proposals: the rule is
-already the rule, and the shipped code has an open deviation from it. Built to
-the rule, with the deviation's id beside it — so a reviewer who tries this in
-the real app and sees something else knows which of the two is the bug.
+**Not proposals — the rule is already the rule, and the shipped code deviates
+from it.** Built to the rule, with the deviation's id beside it, so a reviewer
+who sees something else in the real app knows which of the two is the bug.
 
 | Here | The product today | Rule | Deviation |
 |---|---|---|---|
 | A cancelled occurrence's agenda is read-only, and says why | its agenda items, action items and pre-read links stay editable | `ROB-AGENDA-065` | `B-187` |
 | **Mark as discussed** appears only once the occurrence has started | it is offered and accepted on any occurrence, future ones included | `ROB-AGENDA-066` | `B-191` |
 
-A row leaves this section when the product adopts the proposal, overrules it, or
-fixes the deviation — not when we stop thinking about it.
-
----
-
-## Reach the variants
-
-**Two different things are called a variant here, and they are kept apart.**
-
-A **view** of the same product decision — a role, a respond flow, one
-occurrence — is a URL on the same file, never a copy. That rule was learned the
-hard way: this started in Aug 2026 as `action-items`, beside a near-duplicate
-called `rob-flow` that every change had to be mirrored into. Both sit in
-`../archive/`, and the old `/action-items/` URL 404s. At ~1.3 MB a duplicate
-drifts within days, so a switch stays a switch.
-
-A **proposal** is a copy, on purpose, since 2026-11-20. It is a different
-product decision, and it has to be reviewable on its own, improvable without
-touching the baseline, and droppable by deleting a folder. Keeping proposals
-inside the baseline made `rob/` a thing we described as production-faithful
-while it rendered six changes the product has never seen. So the baseline is
-`v1-baseline`, each proposal branches off it, and `versions.json` lists them.
-The duplication is real and is the price: a baseline fix now has to be re-baked
-into every version folder.
-
-| URL | What it opens |
-|---|---|
-| `rob/` | redirects to the baseline, carrying the query and hash. Old links keep working |
-| `rob/v1-baseline/` | **the baseline** proposals branch off — close to the product, not identical (see the note under the departures table). The admin owner's view: Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
-| `rob/v2-backup-host/` | **a proposal, in review** — alternative hosts, the join guarantee and the nobody-can-start warning, on the meeting view **and** the create form |
-| `rob/v3-week-slot/` | **a proposal, in review** — the week-view slot click draws a draft and asks before the form opens, and a past slot says why nothing happened |
-| `rob/roles.html` | the role chooser, this prototype's sign-in screen, and where the proposals are listed. Sign out returns here |
-| `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
-
-**The baseline has one row because it is one build.** What used to be five rows
-here — a role, a respond flow, one occurrence — are switches on that same
-screen, not separate things to maintain. They are listed once, below, and they
-work on any version:
-
-| Switch | What it does |
-|---|---|
-| `?role=participant` | the participant's view — Matthew Vella, attending, assignee of one action item |
-| `?role=rob-admin` | an admin who does **not** own the series, so the deck rights are absent (`ROB-ACCESS-002`) |
-| `?roles=1` | the bottom-left role switcher, for walking all three side by side |
-| `#respond=modal` | the original respond flow — the row's icon opens the reject modal directly. `=direct` is a synonym, and `?respond=` works too |
-| `#occurrence=YYYY-MM-DD` | deep-links one occurrence of the meeting named in the view |
-| `?versions=1` | the version switcher |
-| `?changes=1` | what this version changed against the one it branched from |
-
-Every path also works without `v1-baseline/`, through the redirect.
-
-Default respond flow is the **status menu** (Going / Reject / Maybe), not the
-modal. Prefer the hash form: the desktop preview pane drops `?params` on the way
-to the page, and a hash survives both it and Vercel.
+A row leaves when the product adopts the proposal, overrules it, or fixes the
+deviation — not when we stop thinking about it.
 
 ---
 
@@ -626,7 +547,7 @@ last, short section still becomes active at maximum scroll.
   Finding that a control was enabled for the wrong role, or that a right
   follows attendance rather than ownership, changes the prototype but decides
   nothing: the rule was always the rule. What that work produces belongs in
-  [What each role can do](rights.html), which states
+  [What each role can do](./rights.html), which states
   the rules as they stand — an entry would only add that we were once wrong
   about them.
 - When a parked idea is picked up or finally rejected, move it out of
