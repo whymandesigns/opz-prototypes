@@ -8452,29 +8452,37 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
       padding-left: 24px;
       line-height: 1.4;
     }
-    .md-start-row {
+    /* A labelled field, stacked: the label on its own line and the control
+       under it at the column's full width, which is the only way 256px fits a
+       name, a caret and a 256px-wide menu. */
+    .md-start-field { font: var(--type-body-sm); color: var(--color-text); }
+    .md-start-field-label {
       display: flex;
       align-items: center;
       gap: var(--spacing-2);
       min-height: 28px;
-      font: var(--type-body-sm);
-      color: var(--color-text);
+      color: var(--color-text-muted);
     }
-    .md-start-row + .md-start-row { margin-top: var(--spacing-2); }
-    .md-start-row > .icon { color: var(--color-icon); font-size: 16px; flex-shrink: 0; }
-    /* A fixed label column keeps the two rows' values on one edge. 76px, not
-       96: the right column is 320px, and every pixel the label does not take
-       is one the person's name gets before it truncates. */
-    .md-start-label { width: 76px; flex-shrink: 0; color: var(--color-text-muted); }
-    .md-start-fact { color: var(--color-text-muted); }
-    /* One slot, three states — empty + add, the picker, or the person. Only one
-       is ever unhidden, so they can share the line without reserving space. */
-    .md-bh-slot { display: inline-flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
-    .md-bh-slot > [hidden] { display: none !important; }
-    .md-bh-none { color: var(--color-text-muted); }
-    .md-bh-add { padding-left: var(--spacing-1); padding-right: var(--spacing-1); }
-    .md-bh-select { display: inline-flex; position: relative; width: 260px; }
-    .md-bh-menu { width: 280px; }
+    .md-start-field-label > .icon { color: var(--color-icon); font-size: 16px; flex-shrink: 0; }
+    .md-bh-select { display: flex; position: relative; width: 100%; }
+    .md-bh-select .input-select-trigger { width: 100%; }
+    /* Pinned to both edges rather than given a width, so the menu is the field
+       — the old fixed 280px is what hung over the column's right edge. */
+    .md-bh-menu { left: 0; right: 0; width: auto; }
+    /* The avatar rides inside the field's value, the way the key metric's icon
+       does, so a chosen person reads as one thing and not as a row. */
+    .md-bh-value { display: flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
+    .md-bh-av { flex-shrink: 0; }
+    /* .avatar, .tag and .dropdown-item all set display, which outranks the UA
+       rule for the hidden attribute — so each has to say it again, or the
+       avatar shows empty on an unset field and "Not licensed" shows on an
+       eligible host. */
+    .md-bh-av[hidden],
+    .md-bh-clear[hidden] { display: none !important; }
+    .md-bh-flag { display: inline-flex; margin-top: var(--spacing-2); }
+    /* Participants get no field (see the markup), so this stands in for it. */
+    .md-bh-ro { display: none; margin-top: var(--spacing-1); }
+    html[data-rob-role="participant"] .md-bh-ro { display: block; color: var(--color-text-muted); }
     .md-bh-menu .dropdown-search,
     .md-bh-menu .dropdown-list,
     .md-bh-menu .dropdown-empty { display: block; }
@@ -8490,28 +8498,18 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
       font: var(--type-body-xxs);
       color: var(--color-text-muted);
     }
-    .md-bh-person { display: inline-flex; align-items: center; gap: var(--spacing-2); min-width: 0; }
-    /* The name is the only part that can run long, so it is the only part that
-       truncates — the flag and the remove control stay whole. */
+    /* The name is the only part of the field that can run long, so it is the
+       only part that truncates — the avatar and the caret stay whole. */
     .md-bh-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    /* .tag and .dropdown-empty both set display, which outranks the UA rule for
-       the hidden attribute — so each needs saying again, or the flag shows on
-       an eligible backup host and "Nothing found" sits under every search. */
-    .md-bh-flag { flex-shrink: 0; }
     .md-bh-flag[hidden],
     .md-bh-menu .dropdown-empty[hidden] { display: none !important; }
+    /* .checkbox sets display too, so the no-Zoom state would keep promising a
+       join guarantee for a room that does not exist. */
+    .md-start-perm[hidden] { display: none !important; }
     .md-bh-owner-flag { flex-shrink: 0; margin-right: var(--spacing-1); }
     /* .alert-actions sets display too, so the covered state would keep offering
        "Add a backup host" under a line saying one is already set. */
     .md-start-alert .alert-actions[hidden] { display: none !important; }
-    /* Remove stays quiet until the row is reached for, like the key metric’s. */
-    .md-bh-remove {
-      flex-shrink: 0;
-      opacity: 0;
-      transition: opacity var(--duration-fast) var(--ease);
-    }
-    .md-bh-person:hover .md-bh-remove,
-    .md-bh-person:focus-within .md-bh-remove { opacity: 1; }
     .md-start-alert { margin-bottom: var(--spacing-4); }
 
     /* REC dot for the Zoom row. */
@@ -10863,51 +10861,56 @@ Platform reliability — error budget
             <div class="md-start" data-md-start>
               <h3 class="md-section-title">Permissions</h3>
 
-              <!-- Add -> pick -> the person, one state at a time: the same
-                   three-state flow the key metric uses. -->
-              <div class="md-start-row" data-md-bh-flow data-change="new"
+              <!-- The field is always on screen with the chosen person in it,
+                   the way Zoom's own Alternative hosts field is — not an Add
+                   button that reveals one. Three states sharing one line was
+                   the mistake: label, value and control had 256px of column
+                   between them, the Add button ended up against the panel
+                   edge, and the 280px menu it opened overflowed the column it
+                   hung in. A labelled field on its own line has the width.
+
+                   Clearing it is an item in the list rather than a hover-only
+                   remove button, so the control that sets the value is the
+                   same one that unsets it. -->
+              <div class="md-start-field" data-md-bh-flow data-md-zoom-only data-change="new"
                    data-change-note="One named stand-in who can start the Zoom room">
-                <svg class="icon"><use href="#i-switch"/></svg>
-                <span class="md-start-label">Backup host</span>
+                <span class="md-start-field-label">
+                  <svg class="icon"><use href="#i-switch"/></svg>Backup host
+                </span>
 
-                <span class="md-bh-slot">
-                  <span class="md-bh-none" data-md-bh-none>No backup host</span>
-
-                  <button class="btn btn-ghost btn-xs md-bh-add" type="button"
-                          data-md-bh-add data-rob-needs="edit-series">
-                    <svg class="btn-icon"><use href="#i-plus"/></svg>Add
+                <span class="input-select md-bh-select" data-md-bh-select data-rob-needs="edit-series">
+                  <button class="input-select-trigger" type="button" aria-haspopup="listbox"
+                          aria-expanded="false" data-md-bh-trigger>
+                    <span class="input-select-value input-select-placeholder md-bh-value" data-md-bh-value>
+                      <span class="avatar avatar-xs md-bh-av" hidden data-md-bh-av></span>
+                      <span class="md-bh-name" data-md-bh-label>No backup host</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
-
-                  <span class="input-select md-bh-select" hidden data-md-bh-select data-rob-needs="edit-series">
-                    <button class="input-select-trigger" type="button" aria-haspopup="listbox"
-                            aria-expanded="false" data-md-bh-trigger>
-                      <span class="input-select-value input-select-placeholder" data-md-bh-label>Choose a participant</span>
-                      <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
-                    </button>
-                    <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
-                      <span class="dropdown-search">
-                        <span class="input-icon input-icon-left">
-                          <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                          <input class="input" type="search" placeholder="Search participants"
-                                 data-md-bh-search aria-label="Search participants" />
-                        </span>
-                      </span>
-                      <span class="dropdown-list" data-md-bh-list>
-                        <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
+                  <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
+                    <span class="dropdown-search">
+                      <span class="input-icon input-icon-left">
+                        <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
+                        <input class="input" type="search" placeholder="Search participants"
+                               data-md-bh-search aria-label="Search participants" />
                       </span>
                     </span>
-                  </span>
-
-                  <span class="md-bh-person" hidden data-md-bh-person>
-                    <span class="avatar avatar-xs" data-md-bh-av></span>
-                    <span class="md-bh-name" data-md-bh-name></span>
-                    <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
-                    <button class="btn btn-icon-only btn-ghost btn-xs md-bh-remove" type="button"
-                            data-md-bh-remove aria-label="Remove backup host" data-rob-needs="edit-series">
-                      <svg class="icon"><use href="#i-close"/></svg>
-                    </button>
+                    <span class="dropdown-list" data-md-bh-list>
+                      <button class="dropdown-item md-bh-clear" type="button" hidden data-md-bh-clear>
+                        <svg class="icon dropdown-item-icon"><use href="#i-close"/></svg>
+                        <span class="dropdown-item-text"><span class="dropdown-item-label">No backup host</span></span>
+                      </button>
+                      <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
+                    </span>
                   </span>
                 </span>
+
+                <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
+
+                <!-- ROB-EDIT-001 hides rather than disables, so a participant
+                     gets no field at all — and a label with nothing after it.
+                     The value says itself in plain text for them. -->
+                <span class="md-bh-ro" data-md-bh-ro>No backup host</span>
               </div>
 
               <!-- Zoom's own name for settings.join_before_host, which is
@@ -10916,14 +10919,14 @@ Platform reliability — error budget
                    upcoming RoB occurrence and overwrites anything changed by
                    hand, so an editable control here would promise a change
                    that the next enforcement pass undoes. -->
-              <label class="checkbox md-start-perm" data-change="new"
+              <label class="checkbox md-start-perm" data-md-zoom-only data-change="new"
                      data-change-note="States the join guarantee the owner used to arrange by hand"
                      data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
                 <input type="checkbox" class="checkbox-input" checked disabled />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
                 <span class="checkbox-label">Allow participants to join anytime</span>
               </label>
-              <p class="md-start-perm-note">
+              <p class="md-start-perm-note" data-md-zoom-only>
                 Nobody waits for the owner, so the meeting starts without them.
               </p>
 
@@ -10982,19 +10985,18 @@ Platform reliability — error budget
 
       const q = (sel, root) => (root || flow).querySelector(sel);
       const block   = md.querySelector('[data-md-start]');
-      const noneEl  = q('[data-md-bh-none]');
-      const addBtn  = q('[data-md-bh-add]');
       const select  = q('[data-md-bh-select]');
       const trigger = q('[data-md-bh-trigger]');
       const menu    = q('[data-md-bh-menu]');
       const search  = q('[data-md-bh-search]');
       const list    = q('[data-md-bh-list]');
       const emptyEl = q('[data-md-bh-empty]');
-      const person  = q('[data-md-bh-person]');
+      const clearBtn= q('[data-md-bh-clear]');
+      const valueEl = q('[data-md-bh-value]');
       const avEl    = q('[data-md-bh-av]');
-      const nameEl  = q('[data-md-bh-name]');
+      const labelEl = q('[data-md-bh-label]');
       const flagEl  = q('[data-md-bh-flag]');
-      const delBtn  = q('[data-md-bh-remove]');
+      const roEl    = q('[data-md-bh-ro]');
 
       const alertEl   = md.querySelector('[data-md-bh-alert]');
       const alertIcon = md.querySelector('[data-md-bh-alert-icon] use');
@@ -11056,6 +11058,9 @@ Platform reliability — error budget
           if (hit) shown++;
         });
         if (emptyEl) emptyEl.hidden = shown > 0;
+        // Clearing the field is not a search result. It belongs to the field,
+        // so it steps aside while a term is being matched against people.
+        if (clearBtn) clearBtn.hidden = !picked || !!term;
       };
       search?.addEventListener('input', filter);
 
@@ -11071,35 +11076,37 @@ Platform reliability — error budget
       });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
 
-      // ---- the three states, and the alert that reads them ----
-      // stopPropagation on both openers: the click that reveals the select
-      // would otherwise reach the document handler below, which closes any menu
-      // opened from outside the select — and these both are.
-      addBtn.addEventListener('click', (e) => { e.stopPropagation(); showOnly(select); setMenu(true); });
-      delBtn.addEventListener('click', () => { picked = null; eligible = true; render(); });
+      // ---- setting, clearing, and the alert that reads the field ----
+      clearBtn?.addEventListener('click', () => {
+        picked = null; eligible = true; setMenu(false); render();
+      });
+      // stopPropagation: the alert sits outside the select, so its click would
+      // reach the document handler above and close the menu it just opened.
       alertCta?.addEventListener('click', (e) => {
         e.stopPropagation();
-        showOnly(select);
         setMenu(true);
         block?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       });
 
-      function showOnly(el) {
-        [noneEl, addBtn, select, person].forEach(n => { if (n) n.hidden = n !== el; });
-        // "No backup host" and Add are the same state, so they travel together.
-        if (el === null) { noneEl.hidden = false; addBtn.hidden = false; }
-      }
-
       function render() {
         if (picked) {
           avEl.textContent = picked.initials;
-          nameEl.textContent = picked.name;
-          nameEl.title = `${picked.name} · ${picked.role}`;
+          avEl.hidden = false;
+          labelEl.textContent = picked.name;
+          labelEl.title = `${picked.name} · ${picked.role}`;
+          valueEl.classList.remove('input-select-placeholder');
           flagEl.hidden = eligible;
-          showOnly(person);
+          roEl.textContent = picked.name;
         } else {
-          showOnly(null);
+          avEl.hidden = true;
+          avEl.textContent = '';
+          labelEl.textContent = 'No backup host';
+          labelEl.removeAttribute('title');
+          valueEl.classList.add('input-select-placeholder');
+          flagEl.hidden = true;
+          roEl.textContent = 'No backup host';
         }
+        if (clearBtn) clearBtn.hidden = !picked;
 
         if (!alertEl) return;
         let variant = null, head = '', body = '', cta = '';
@@ -11152,9 +11159,11 @@ Platform reliability — error budget
       }
       if (state === 'ineligible') { picked = PEOPLE[0]; eligible = false; }
       if (state === 'nozoom') {
-        // No Zoom integration, no room — and so nothing to host. The block goes
-        // with the Zoom link row it belongs to.
-        block?.setAttribute('hidden', '');
+        // No Zoom integration, no room — and so nothing to host, and no join
+        // setting to guarantee. Those two go with the Zoom link row they
+        // belong to. The section itself stays: "Editable RoB by participants"
+        // is the product's own permission and has nothing to do with Zoom.
+        md.querySelectorAll('[data-md-zoom-only]').forEach(el => el.setAttribute('hidden', ''));
         md.querySelector('[data-detail-zoom]')?.closest('.md-detail-row')?.setAttribute('hidden', '');
       }
 
