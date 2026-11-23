@@ -7037,6 +7037,63 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
               <p style="font: var(--type-body-sm); color: var(--color-text-muted); margin: -8px 0 0; padding-left: 24px; line-height: 1.4">
                 Anyone in the participants list can update the details, deck, agenda items, and action items.
               </p>
+
+              <!-- The same two rows as the meeting view, in the same order.
+                   One proposal, both screens: the ops checklist they replace —
+                   set an alternative host, turn the waiting room off — is
+                   handed to the owner at exactly this moment, and saying it
+                   only afterwards, on a meeting that already exists, is a
+                   screen later than the problem.
+
+                   ROB-ZOOM-009 holds join-before-host ON for every Zoom
+                   meeting linked to an upcoming occurrence and overwrites it
+                   when it is changed by hand, so this is checked and locked
+                   here too. -->
+              <label class="checkbox md-start-perm" data-change="new"
+                     data-change-note="States the join guarantee at the moment the room is made"
+                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
+                <input type="checkbox" class="checkbox-input" checked disabled />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Allow participants to join anytime</span>
+              </label>
+              <p class="md-start-perm-note">
+                Nobody waits for the owner, so the meeting starts without them.
+              </p>
+
+              <!-- Candidates are the participants added above and nobody else:
+                   Toptal's rule is that an alternative host must be on the
+                   invite, and on create there is no roster to read until one
+                   has been built. So the field follows that list — it fills as
+                   people are added, and clears itself if the person chosen is
+                   taken off again.
+
+                   No search box, unlike the meeting view's: there the roster
+                   is nine people already on the series, here it is however few
+                   were just picked, and a filter over three names is furniture. -->
+              <div class="md-start-field" data-cm-bh-flow data-change="new"
+                   data-change-note="One named stand-in, chosen from the participants being invited">
+                <span class="md-start-field-label">Alternative hosts</span>
+
+                <span class="input-select md-bh-select" data-cm-bh-select>
+                  <button class="input-select-trigger" type="button" aria-haspopup="listbox"
+                          aria-expanded="false" data-cm-bh-trigger>
+                    <span class="input-select-value input-select-placeholder md-bh-value" data-cm-bh-value>
+                      <span class="avatar avatar-xs md-bh-av" hidden data-cm-bh-av></span>
+                      <span class="md-bh-name" data-cm-bh-label>No alternative hosts selected</span>
+                    </span>
+                    <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
+                  </button>
+                  <span class="dropdown-menu md-bh-menu" hidden data-cm-bh-menu>
+                    <span class="dropdown-list" data-cm-bh-list>
+                      <button class="dropdown-item md-bh-clear" type="button" hidden data-cm-bh-clear>
+                        <svg class="icon dropdown-item-icon"><use href="#i-close"/></svg>
+                        <span class="dropdown-item-text"><span class="dropdown-item-label">No alternative hosts</span></span>
+                      </button>
+                      <span class="dropdown-empty" data-cm-bh-empty>Add participants first</span>
+                    </span>
+                  </span>
+                </span>
+              </div>
             </section>
           </div>
 
@@ -7920,7 +7977,12 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 
           const id = 'um-' + (seq++);
           const editableByParticipants = !!modal.querySelector('[data-cm-editable-rob]')?.checked;
-          userMeetings[id] = { id, title: t, date, iso, start, end, editableByParticipants };
+          // The alternative host is read from the field's own block, which owns
+          // the pick — the same way editable-by-participants is read from its
+          // checkbox. A field whose value is dropped at Create would be
+          // decoration.
+          const altHost = modal.querySelector('[data-cm-bh-flow]')?.__getAltHost?.() || null;
+          userMeetings[id] = { id, title: t, date, iso, start, end, editableByParticipants, altHost };
 
           const btn = document.createElement('button');
           btn.type = 'button';
@@ -7979,6 +8041,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
         // pattern. Editable-by-participants is one of them.
         const editableInput = md.querySelector('[data-md-editable-rob]');
         if (editableInput) editableInput.checked = !!m.editableByParticipants;
+        md.querySelector('[data-md-bh-flow]')?.__setAltHost?.(m.altHost);
         // Design system's data-modal-open handler is attached per-element on
         // load, so it doesn't fire for dynamically-inserted triggers. Open manually.
         md.removeAttribute('hidden');
@@ -11137,6 +11200,18 @@ Platform reliability — error budget
         if (cta && alertCta) alertCta.textContent = cta;
       }
 
+      // Set from outside: a meeting opened straight after being created
+      // carries the host chosen in the create form. picked lives in this
+      // closure and the alert is computed from it, so the setter has to come
+      // from in here rather than the hydration handler writing the DOM.
+      flow.__setAltHost = (p) => {
+        picked = p && p.name
+          ? { name: p.name, role: p.role || '', initials: p.initials || '' }
+          : null;
+        eligible = true;
+        render();
+      };
+
       // Designed states, deep-linked the way #respond= and #occurrence= are.
       // There is no [data-state] switcher on this prototype, so the hash is
       // how a reviewer walks them.
@@ -11169,6 +11244,116 @@ Platform reliability — error budget
       }
 
       filter();
+      render();
+    })();
+  </script>
+
+  <script>
+    // Alternative hosts on create — the same field, sourced differently.
+    //
+    // In the meeting view the candidates are the series roster, which already
+    // exists. Here there is no roster: the participants are being chosen in the
+    // section above, so the field reads that list and follows it. Adding people
+    // fills the menu; taking the chosen one back off clears the field, because a
+    // meeting cannot be created naming a host who is not on it.
+    //
+    // It watches the list rather than hooking the existing add and remove
+    // handlers: the create flow is locked, and an observer cannot change what
+    // those handlers do.
+    (function () {
+      const cm = document.getElementById('create-meeting');
+      const flow = cm && cm.querySelector('[data-cm-bh-flow]');
+      const list = cm && cm.querySelector('[data-cm-participants-list]');
+      if (!flow || !list) return;
+
+      const q = (sel) => flow.querySelector(sel);
+      const select  = q('[data-cm-bh-select]');
+      const trigger = q('[data-cm-bh-trigger]');
+      const menu    = q('[data-cm-bh-menu]');
+      const rowList = q('[data-cm-bh-list]');
+      const emptyEl = q('[data-cm-bh-empty]');
+      const clearBtn= q('[data-cm-bh-clear]');
+      const valueEl = q('[data-cm-bh-value]');
+      const avEl    = q('[data-cm-bh-av]');
+      const labelEl = q('[data-cm-bh-label]');
+
+      const EMPTY = 'No alternative hosts selected';
+      let picked = null;   // { id, name, role, initials } or null
+
+      // Whoever is in the participants list right now. A row whose second line
+      // is an e-mail is a bot or an unmapped guest — it can sit on the invite
+      // and cannot host — the same test the meeting view's picker makes.
+      const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const people = () => [...list.querySelectorAll('.md-person')]
+        .map(r => ({
+          id: r.dataset.cmPerson || '',
+          name: (r.querySelector('.md-person-name')?.textContent || '').trim(),
+          role: (r.querySelector('.md-person-role')?.textContent || '').trim(),
+          initials: (r.querySelector('.avatar')?.textContent || '').trim(),
+        }))
+        .filter(p => p.id && p.name && !EMAIL.test(p.role));
+
+      const setMenu = (open) => {
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+      };
+      trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
+      document.addEventListener('click', (e) => {
+        if (!menu.hidden && !select.contains(e.target)) setMenu(false);
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
+
+      clearBtn?.addEventListener('click', () => { picked = null; setMenu(false); render(); });
+
+      // The menu is rebuilt from the list rather than filtered, because the
+      // list is what changed — there is no fixed set of rows to hide.
+      function fill() {
+        [...rowList.querySelectorAll('[data-cm-bh-person]')].forEach(b => b.remove());
+        people().forEach(p => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'dropdown-item';
+          b.setAttribute('data-cm-bh-person', p.id);
+          b.innerHTML = '<span class="avatar avatar-sm"></span>'
+            + '<span class="dropdown-item-text"><span class="dropdown-item-label"></span>'
+            + '<span class="dropdown-item-description"></span></span>';
+          b.querySelector('.avatar').textContent = p.initials;
+          b.querySelector('.dropdown-item-label').textContent = p.name;
+          b.querySelector('.dropdown-item-description').textContent = p.role;
+          b.addEventListener('click', () => { picked = p; setMenu(false); render(); });
+          rowList.insertBefore(b, emptyEl);
+        });
+      }
+
+      function render() {
+        const now = people();
+        // The chosen person may have just been removed from the invite.
+        if (picked && !now.some(p => p.id === picked.id)) picked = null;
+
+        if (picked) {
+          avEl.textContent = picked.initials;
+          avEl.hidden = false;
+          labelEl.textContent = picked.name;
+          labelEl.title = `${picked.name} · ${picked.role}`;
+          valueEl.classList.remove('input-select-placeholder');
+        } else {
+          avEl.hidden = true;
+          avEl.textContent = '';
+          labelEl.textContent = EMPTY;
+          labelEl.removeAttribute('title');
+          valueEl.classList.add('input-select-placeholder');
+        }
+        if (clearBtn) clearBtn.hidden = !picked;
+        if (emptyEl) emptyEl.hidden = now.length > 0;
+      }
+
+      // Read at Create, so the meeting keeps who was chosen.
+      flow.__getAltHost = () => picked && { ...picked };
+
+      new MutationObserver(() => { fill(); render(); })
+        .observe(list, { childList: true, subtree: true });
+
+      fill();
       render();
     })();
   </script>

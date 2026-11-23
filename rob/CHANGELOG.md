@@ -50,7 +50,7 @@ and not from here, which is why they are not links.
 | A series can name one **backup host**, who can start the Zoom room when the owner is away | [`v2-backup-host`](./v2-backup-host/) | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
 | The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | [`v2-backup-host`](./v2-backup-host/) | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
 | An occurrence whose owner is not going, with no backup host, says **nobody can start it** | [`v2-backup-host`](./v2-backup-host/) | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
-| The **create form** names an alternative host, chosen from the participants being invited | [`v4-create-hosts`](./v4-create-hosts/) | has no such field on create — the Zoom room is made with the owner as its only host (`ROB-ZOOM-001`), and `settings.alternative_hosts` is never written | `ROB-ZOOM-001`, `ROB-ZOOM-009` |
+| The **create form** names an alternative host, chosen from the participants being invited | [`v2-backup-host`](./v2-backup-host/) | has no such field on create — the Zoom room is made with the owner as its only host (`ROB-ZOOM-001`), and `settings.alternative_hosts` is never written | `ROB-ZOOM-001`, `ROB-ZOOM-009` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
@@ -93,9 +93,8 @@ into every version folder.
 |---|---|
 | `rob/` | redirects to the baseline, carrying the query and hash. Old links keep working |
 | `rob/v1-baseline/` | **the baseline** proposals branch off — close to the product, not identical (see the note under the departures table). The admin owner's view: Bill Bryck, who owns this series *and* holds "Manage all RoB meetings" |
-| `rob/v2-backup-host/` | **a proposal, in review** — the backup host, the join guarantee and the nobody-can-start warning |
+| `rob/v2-backup-host/` | **a proposal, in review** — alternative hosts, the join guarantee and the nobody-can-start warning, on the meeting view **and** the create form |
 | `rob/v3-week-slot/` | **a proposal, in review** — the week-view slot click draws a draft and asks before the form opens, and a past slot says why nothing happened |
-| `rob/v4-create-hosts/` | **a proposal, in review** — v2's two rows in the create form as well, with the candidate list following the participants being invited |
 | `rob/roles.html` | the role chooser, this prototype's sign-in screen, and where the proposals are listed. Sign out returns here |
 | `rob/rights.html` | the oracle rights table — **What each role can do**, from the button beside the chooser's title. This file is rendered on the chooser itself, below the role cards |
 
@@ -152,7 +151,7 @@ to the page, and a hash survives both it and Vercel.
 
 ### 2026-11-23 — Alternative hosts, and the create form *(local on `rob-version-split`)*
 
-**Status** · In review — `v4-create-hosts`, branched from `v2-backup-host`
+**Status** · In review — `v2-backup-host`
 
 The field v2 put in the meeting view works, now, and is named the way Zoom
 names the setting it writes.
@@ -174,8 +173,8 @@ kept the baseline's own **Permissions** heading rather than the
 *What each role can do*; and it reads shipped-first now — `Editable RoB`,
 then the join guarantee, then the field.
 
-**`v4-create-hosts` is the same two rows in the create form.** That is where
-the problem actually lands: the ops instruction owners are given today — add an
+**The same two rows are in the create form.** That is where the problem
+actually lands: the ops instruction owners are given today — add an
 alternative host, turn the waiting room off — is handed to them while they are
 making the meeting, not a screen later. Candidates are the participants being
 invited and nobody else (`ROB-ZOOM-001` creates one room for the series, and
@@ -186,12 +185,17 @@ is chosen is carried into the meeting on Create, the way
 `editableByParticipants` already was — a field whose value is dropped at Create
 would be decoration.
 
-Two notes against this version. The create form was locked on 2026-11-09 as a
-shell, which is exactly why this is a version folder and not a baseline change:
-the lock holds in `v1-baseline`. And the create → view hand-off only restores
-state for meetings made in the session; opening a seeded meeting afterwards
-leaves the field as the last one left it, which is pre-existing in the same
-handler and still wants fixing.
+This started as its own folder, `v4-create-hosts`, and was folded back the
+same day. It was never a separate decision: a proposal that puts a field on one
+screen and not the other is half a proposal, and reviewing the halves apart
+invites agreeing to one of them. One version, both screens.
+
+Two notes against it. The create form was locked on 2026-11-09 as a shell,
+which is why this lives in a version folder at all — the lock holds in
+`v1-baseline`. And the create → view hand-off only restores state for meetings
+made in the session; opening a seeded meeting afterwards leaves the field as
+the last one left it, which is pre-existing in the same handler and still wants
+fixing.
 
 ---
 
