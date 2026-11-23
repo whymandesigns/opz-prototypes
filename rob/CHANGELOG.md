@@ -47,10 +47,9 @@ and not from here, which is why they are not links.
 
 | Here | Where | The product | Rule |
 |---|---|---|---|
-| A series can name one **backup host**, who can start the Zoom room when the owner is away | [`v2-backup-host`](./v2-backup-host/) | has no backup-host concept at all — the room is created with the owner as host and an existing room is never reused or chosen | `ROB-ZOOM-001`, `ROB-OWNER-020` |
+| A series can name one **alternative host**, who can start the Zoom room when the owner is away — on the create form, and on the meeting view afterwards | [`v2-backup-host`](./v2-backup-host/) | has no such concept on either screen — the room is created with the owner as its only host, an existing room is never reused or chosen, and `settings.alternative_hosts` is never written | `ROB-ZOOM-001`, `ROB-OWNER-020` |
 | The meeting view states that **anyone can join before the host**, and the proposal is that the product hold the waiting room off | [`v2-backup-host`](./v2-backup-host/) | forces join-before-host ON but never touches `settings.waiting_room`, and in Zoom the waiting room overrides join-before-host | `ROB-ZOOM-009` |
 | An occurrence whose owner is not going, with no backup host, says **nobody can start it** | [`v2-backup-host`](./v2-backup-host/) | marks the declined person on the upcoming occurrence and stops there — it draws no consequence from the one decline that costs the meeting its host, and the owner has no way to decline in the product at all | `ROB-OCC-067`, `ROB-OCC-096` |
-| The **create form** names an alternative host, chosen from the participants being invited | [`v2-backup-host`](./v2-backup-host/) | has no such field on create — the Zoom room is made with the owner as its only host (`ROB-ZOOM-001`), and `settings.alternative_hosts` is never written | `ROB-ZOOM-001`, `ROB-ZOOM-009` |
 | A week-view slot click draws a draft block and asks **Create meeting / Cancel** | [`v3-week-slot`](./v3-week-slot/) | opens the Create meeting form straight away | `ROB-VIEW-053` |
 | Clicking a past slot in the week view says why nothing happened | [`v3-week-slot`](./v3-week-slot/) | nothing happens — the slot has no pointer and no handler, and the click is swallowed | `ROB-VIEW-053` |
 
