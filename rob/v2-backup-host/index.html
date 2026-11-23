@@ -10910,11 +10910,21 @@ Platform reliability — error budget
                 </span>
               </div>
 
-              <div class="md-start-row">
-                <svg class="icon"><use href="#i-users"/></svg>
-                <span class="md-start-label">Joining</span>
-                <span class="md-bh-slot md-start-fact">Anyone can join before the host</span>
-              </div>
+              <!-- Zoom's own name for settings.join_before_host, which is
+                   what this row has always been about. Checked and locked:
+                   ROB-ZOOM-009 holds it ON for every Zoom meeting linked to an
+                   upcoming RoB occurrence and overwrites anything changed by
+                   hand, so an editable control here would promise a change
+                   that the next enforcement pass undoes. -->
+              <label class="checkbox md-start-perm"
+                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
+                <input type="checkbox" class="checkbox-input" checked disabled />
+                <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
+                <span class="checkbox-label">Allow participants to join anytime</span>
+              </label>
+              <p class="md-start-perm-note">
+                Nobody waits for the owner, so the meeting starts without them.
+              </p>
 
               <!-- Permissions folded in: all three rows answer "who may do
                    what to this meeting", and the checkbox is the third. -->
