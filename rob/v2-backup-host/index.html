@@ -7064,14 +7064,16 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                    Toptal's rule is that an alternative host must be on the
                    invite, and on create there is no roster to read until one
                    has been built. So the field follows that list — it fills as
-                   people are added, and clears itself if the person chosen is
-                   taken off again.
+                   people are added, and a pick drops out if the person chosen
+                   is taken off again.
 
-                   No search box, unlike the meeting view's: there the roster
-                   is nine people already on the series, here it is however few
-                   were just picked, and a filter over three names is furniture. -->
+                   The same multi-select as the meeting view's: rows toggle,
+                   the menu stays open between picks, and the chosen people sit
+                   as chips under the field. No search box on either screen —
+                   both lists are the meeting's own participants, and a filter
+                   over a list that short is furniture. -->
               <div class="md-start-field" data-cm-bh-flow data-change="new"
-                   data-change-note="One named stand-in, chosen from the participants being invited">
+                   data-change-note="Named stand-ins, chosen from the participants being invited">
                 <span class="md-start-field-label">Alternative hosts</span>
 
                 <span class="input-select md-bh-select" data-cm-bh-select>
@@ -7085,14 +7087,12 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
                   </button>
                   <span class="dropdown-menu md-bh-menu" hidden data-cm-bh-menu>
                     <span class="dropdown-list" data-cm-bh-list>
-                      <button class="dropdown-item md-bh-clear" type="button" hidden data-cm-bh-clear>
-                        <svg class="icon dropdown-item-icon"><use href="#i-close"/></svg>
-                        <span class="dropdown-item-text"><span class="dropdown-item-label">No alternative hosts</span></span>
-                      </button>
                       <span class="dropdown-empty" data-cm-bh-empty>Add participants first</span>
                     </span>
                   </span>
                 </span>
+
+                <span class="dropdown-chips md-bh-chips" hidden data-cm-bh-chips></span>
               </div>
             </section>
           </div>
@@ -7977,12 +7977,12 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 
           const id = 'um-' + (seq++);
           const editableByParticipants = !!modal.querySelector('[data-cm-editable-rob]')?.checked;
-          // The alternative host is read from the field's own block, which owns
-          // the pick — the same way editable-by-participants is read from its
-          // checkbox. A field whose value is dropped at Create would be
+          // The alternative hosts are read from the field's own block, which
+          // owns the picks — the same way editable-by-participants is read from
+          // its checkbox. A field whose value is dropped at Create would be
           // decoration.
-          const altHost = modal.querySelector('[data-cm-bh-flow]')?.__getAltHost?.() || null;
-          userMeetings[id] = { id, title: t, date, iso, start, end, editableByParticipants, altHost };
+          const altHosts = modal.querySelector('[data-cm-bh-flow]')?.__getAltHosts?.() || [];
+          userMeetings[id] = { id, title: t, date, iso, start, end, editableByParticipants, altHosts };
 
           const btn = document.createElement('button');
           btn.type = 'button';
@@ -8041,7 +8041,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
         // pattern. Editable-by-participants is one of them.
         const editableInput = md.querySelector('[data-md-editable-rob]');
         if (editableInput) editableInput.checked = !!m.editableByParticipants;
-        md.querySelector('[data-md-bh-flow]')?.__setAltHost?.(m.altHost);
+        md.querySelector('[data-md-bh-flow]')?.__setAltHosts?.(m.altHosts);
         // Design system's data-modal-open handler is attached per-element on
         // load, so it doesn't fire for dynamically-inserted triggers. Open manually.
         md.removeAttribute('hidden');
@@ -8541,16 +8541,19 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
        rule for the hidden attribute — so each has to say it again, or the
        avatar shows empty on an unset field and "Not licensed" shows on an
        eligible host. */
-    .md-bh-av[hidden],
-    .md-bh-clear[hidden] { display: none !important; }
+    .md-bh-av[hidden] { display: none !important; }
     .md-bh-flag { display: inline-flex; margin-top: var(--spacing-2); }
+    /* The chip row borrows .dropdown-chips for its wrap-and-gap only; the
+       panel padding it also carries belongs to a menu, not to a field. */
+    .md-bh-chips { padding: 0; margin-top: var(--spacing-2); }
+    .md-bh-chips[hidden] { display: none !important; }
+    /* The check column rides the first text line of a two-line row. */
+    .md-bh-menu .dropdown-item-check { margin-top: 2px; }
     /* Participants get no field (see the markup), so this stands in for it. */
     .md-bh-ro { display: none; margin-top: var(--spacing-1); }
     html[data-rob-role="participant"] .md-bh-ro { display: block; color: var(--color-text-muted); }
-    .md-bh-menu .dropdown-search,
     .md-bh-menu .dropdown-list,
     .md-bh-menu .dropdown-empty { display: block; }
-    .md-bh-menu .input-icon { display: flex; }
     /* Seven rows before it scrolls, the same ceiling the filter menus use. */
     .md-bh-menu .dropdown-list { max-height: 280px; overflow-y: auto; }
     /* Two-line rows, so the avatar aligns to the name rather than floating
@@ -8572,7 +8575,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     .md-start-perm[hidden] { display: none !important; }
     .md-bh-owner-flag { flex-shrink: 0; margin-right: var(--spacing-1); }
     /* .alert-actions sets display too, so the covered state would keep offering
-       "Add a backup host" under a line saying one is already set. */
+       "Add alternative hosts" under a line saying someone is already set. */
     .md-start-alert .alert-actions[hidden] { display: none !important; }
     .md-start-alert { margin-bottom: var(--spacing-4); }
 
@@ -10032,10 +10035,10 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
         <div class="md-grid">
           <!-- LEFT COLUMN -->
           <div>
-            <!-- A backup host only helps if somebody set one. When the owner is
-                 not going and nobody else can start the room, say so here
-                 rather than letting the meeting discover it. It is a standing
-                 condition of this occurrence, not something that just
+            <!-- Alternative hosts only help if somebody set them. When the
+                 owner is not going and nobody else can start the room, say so
+                 here rather than letting the meeting discover it. It is a
+                 standing condition of this occurrence, not something that just
                  happened, so it is an alert and not a toast (UXCopy). -->
             <div class="alert alert-warning md-start-alert" role="alert" hidden data-md-bh-alert
                  data-change="new" data-change-note="Warns when nobody can start the meeting">
@@ -10043,7 +10046,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
               <p class="alert-message"><strong data-md-bh-alert-head></strong> <span data-md-bh-alert-body></span></p>
               <span class="alert-actions" data-md-bh-alert-actions>
                 <button class="btn btn-secondary btn-xs" type="button"
-                        data-md-bh-alert-cta data-rob-needs="edit-series">Add a backup host</button>
+                        data-md-bh-alert-cta data-rob-needs="edit-series">Add alternative hosts</button>
               </span>
             </div>
 
@@ -10910,7 +10913,7 @@ Platform reliability — error budget
                  (ROB-ZOOM-001), and neither is reachable from the product
                  today, so this block is a proposal rather than a description.
 
-                 The backup host maps to Zoom's settings.alternative_hosts.
+                 The alternative hosts map to Zoom's settings.alternative_hosts.
                  The join line is settings.join_before_host, which
                  ROB-ZOOM-009 already forces ON — but Zoom's Waiting Room
                  overrides join-before-host and the product does not manage
@@ -10956,7 +10959,7 @@ Platform reliability — error budget
                 Nobody waits for the owner, so the meeting starts without them.
               </p>
 
-              <!-- The field is always on screen with the chosen person in it,
+              <!-- The field is always on screen with the chosen people in it,
                    the way Zoom's own Alternative hosts field is — not an Add
                    button that reveals one. Three states sharing one line was
                    the mistake: label, value and control had 256px of column
@@ -10964,11 +10967,15 @@ Platform reliability — error budget
                    edge, and the 280px menu it opened overflowed the column it
                    hung in. A labelled field on its own line has the width.
 
-                   Clearing it is an item in the list rather than a hover-only
-                   remove button, so the control that sets the value is the
-                   same one that unsets it. -->
+                   A multi-select, because Zoom's settings.alternative_hosts
+                   is itself a list: each row toggles, the menu stays open
+                   between picks, and the chosen people sit as chips under the
+                   field, where each chip's remove is the control that unsets
+                   it. No search box: the candidates are the participants
+                   already on the series — nine people — and a filter over a
+                   list that short is furniture. -->
               <div class="md-start-field" data-md-bh-flow data-md-zoom-only data-change="new"
-                   data-change-note="One named stand-in who can start the Zoom room">
+                   data-change-note="Named stand-ins who can start the Zoom room">
                 <span class="md-start-field-label">Alternative hosts</span>
 
                 <span class="input-select md-bh-select" data-md-bh-select data-rob-needs="edit-series">
@@ -10981,22 +10988,11 @@ Platform reliability — error budget
                     <svg class="btn-icon"><use href="#i-arrows-select"/></svg>
                   </button>
                   <span class="dropdown-menu md-bh-menu" hidden data-md-bh-menu>
-                    <span class="dropdown-search">
-                      <span class="input-icon input-icon-left">
-                        <svg class="icon input-icon-glyph"><use href="#i-search"/></svg>
-                        <input class="input" type="search" placeholder="Search participants"
-                               data-md-bh-search aria-label="Search participants" />
-                      </span>
-                    </span>
-                    <span class="dropdown-list" data-md-bh-list>
-                      <button class="dropdown-item md-bh-clear" type="button" hidden data-md-bh-clear>
-                        <svg class="icon dropdown-item-icon"><use href="#i-close"/></svg>
-                        <span class="dropdown-item-text"><span class="dropdown-item-label">No alternative hosts</span></span>
-                      </button>
-                      <span class="dropdown-empty" hidden data-md-bh-empty>Nothing found</span>
-                    </span>
+                    <span class="dropdown-list" data-md-bh-list></span>
                   </span>
                 </span>
+
+                <span class="dropdown-chips md-bh-chips" hidden data-md-bh-chips data-rob-needs="edit-series"></span>
 
                 <span class="tag tag-warning md-bh-flag" hidden data-md-bh-flag>Not licensed</span>
 
@@ -11030,18 +11026,18 @@ Platform reliability — error budget
   </div>
 
   <script>
-    // Backup host — who can start this RoB when its owner is not there.
+    // Alternative hosts — who can start this RoB when its owner is not there.
     //
-    // Proposed, not described: the product has no backup-host concept at all
-    // (ROB-ZOOM-001 creates the room with the owner as host and is explicit
-    // that an existing room is never reused or chosen). The field maps to
-    // Zoom's settings.alternative_hosts on that one room.
+    // Proposed, not described: the product has no alternative-host concept at
+    // all (ROB-ZOOM-001 creates the room with the owner as host and is
+    // explicit that an existing room is never reused or chosen). The field
+    // maps to Zoom's settings.alternative_hosts on that one room.
     //
-    // One name, not Zoom's semicolon-separated list: a RoB has a singular
-    // Accountable Owner, and a list of hosts invites the question of who is
-    // actually running the meeting, which is the one thing the model is clear
-    // about. Called "backup host" rather than Zoom's "alternative host" —
-    // alternative reads like a second owner, backup says when it matters.
+    // A list, because Zoom's own field is one — a semicolon-separated set of
+    // licensed users — and because a single stand-in reproduces the problem
+    // one level down: when they are away too, nobody can start the room. The
+    // RoB still has its singular Accountable Owner; an alternative host can
+    // start the meeting, not run it.
     (function () {
       const md = document.getElementById('meeting-detail');
       const flow = md && md.querySelector('[data-md-bh-flow]');
@@ -11052,10 +11048,8 @@ Platform reliability — error budget
       const select  = q('[data-md-bh-select]');
       const trigger = q('[data-md-bh-trigger]');
       const menu    = q('[data-md-bh-menu]');
-      const search  = q('[data-md-bh-search]');
       const list    = q('[data-md-bh-list]');
-      const emptyEl = q('[data-md-bh-empty]');
-      const clearBtn= q('[data-md-bh-clear]');
+      const chipsEl = q('[data-md-bh-chips]');
       const valueEl = q('[data-md-bh-value]');
       const avEl    = q('[data-md-bh-av]');
       const labelEl = q('[data-md-bh-label]');
@@ -11071,8 +11065,8 @@ Platform reliability — error budget
 
       // The candidate list is this meeting's roster, read from the markup that
       // already renders it rather than from a second copy that could drift.
-      // Toptal's own rule is that a backup host must be on the invite; Zoom
-      // itself only asks for a licensed user on the same account.
+      // Toptal's own rule is that an alternative host must be on the invite;
+      // Zoom itself only asks for a licensed user on the same account.
       //
       // A row whose second line is an e-mail rather than a job title is a bot
       // or an unmapped guest, the same test the agenda-item owner picker makes
@@ -11093,46 +11087,40 @@ Platform reliability — error budget
       const ownerName = (md.querySelector('[data-md-owner] .md-person-name')?.textContent || 'The owner')
         .replace(/\(you\)/, '').trim();
 
-      let picked = null;      // one of PEOPLE, or null
-      let eligible = true;    // still a licensed Zoom user on this account
+      let picked = [];        // a subset of PEOPLE, in pick order
+      let eligible = true;    // every pick is still a licensed Zoom user here
       let ownerGoing = true;  // the owner has not declined the next occurrence
 
+      const isPicked = (p) => picked.some(x => x.name === p.name);
+
       // ---- the menu ----
+      // Toggle rows, not a pick-one list: each click flips the person in or
+      // out and the menu stays open, so choosing two people is two clicks and
+      // not two open-choose-close round trips. The check glyph is on every
+      // row (opacity holds the slot) per the kit's .dropdown-item-check.
       const rows = PEOPLE.map(p => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'dropdown-item';
-        b.innerHTML = '<span class="avatar avatar-sm"></span>'
+        b.innerHTML = '<svg class="icon dropdown-item-check"><use href="#i-check"/></svg>'
+          + '<span class="avatar avatar-sm"></span>'
           + '<span class="dropdown-item-text"><span class="dropdown-item-label"></span>'
           + '<span class="dropdown-item-description"></span></span>';
         b.querySelector('.avatar').textContent = p.initials;
         b.querySelector('.dropdown-item-label').textContent = p.name;
         b.querySelector('.dropdown-item-description').textContent = p.role;
-        b.addEventListener('click', () => { picked = p; eligible = true; setMenu(false); render(); });
+        b.addEventListener('click', () => {
+          picked = isPicked(p) ? picked.filter(x => x.name !== p.name) : [...picked, p];
+          eligible = true;
+          render();
+        });
         return b;
       });
-      rows.forEach(b => list.insertBefore(b, emptyEl));
-
-      const filter = () => {
-        const term = (search?.value || '').trim().toLowerCase();
-        let shown = 0;
-        rows.forEach((b, i) => {
-          const hit = !term || (PEOPLE[i].name + ' ' + PEOPLE[i].role).toLowerCase().includes(term);
-          b.hidden = !hit;
-          if (hit) shown++;
-        });
-        if (emptyEl) emptyEl.hidden = shown > 0;
-        // Clearing the field is not a search result. It belongs to the field,
-        // so it steps aside while a term is being matched against people.
-        if (clearBtn) clearBtn.hidden = !picked || !!term;
-      };
-      search?.addEventListener('input', filter);
+      rows.forEach(b => list.appendChild(b));
 
       const setMenu = (open) => {
         menu.hidden = !open;
         trigger.setAttribute('aria-expanded', String(open));
-        if (open) { search?.focus(); }
-        else if (search?.value) { search.value = ''; filter(); }
       };
       trigger.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
       document.addEventListener('click', (e) => {
@@ -11140,10 +11128,7 @@ Platform reliability — error budget
       });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
 
-      // ---- setting, clearing, and the alert that reads the field ----
-      clearBtn?.addEventListener('click', () => {
-        picked = null; eligible = true; setMenu(false); render();
-      });
+      // ---- setting, removing, and the alert that reads the field ----
       // stopPropagation: the alert sits outside the select, so its click would
       // reach the document handler above and close the menu it just opened.
       alertCta?.addEventListener('click', (e) => {
@@ -11152,41 +11137,77 @@ Platform reliability — error budget
         block?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       });
 
+      const names = (ps) => ps.map(p => p.name);
+      const listNames = (ps, word) => {
+        const n = names(ps);
+        return n.length <= 1 ? n.join('')
+          : `${n.slice(0, -1).join(', ')} ${word} ${n[n.length - 1]}`;
+      };
+
       function render() {
-        if (picked) {
-          avEl.textContent = picked.initials;
+        rows.forEach((b, i) => b.classList.toggle('is-selected', isPicked(PEOPLE[i])));
+
+        if (picked.length === 1) {
+          avEl.textContent = picked[0].initials;
           avEl.hidden = false;
-          labelEl.textContent = picked.name;
-          labelEl.title = `${picked.name} · ${picked.role}`;
+          labelEl.textContent = picked[0].name;
+          labelEl.title = `${picked[0].name} · ${picked[0].role}`;
           valueEl.classList.remove('input-select-placeholder');
-          flagEl.hidden = eligible;
-          roEl.textContent = picked.name;
+        } else if (picked.length > 1) {
+          avEl.hidden = true;
+          avEl.textContent = '';
+          labelEl.textContent = `${picked.length} alternative hosts`;
+          labelEl.title = names(picked).join(', ');
+          valueEl.classList.remove('input-select-placeholder');
         } else {
           avEl.hidden = true;
           avEl.textContent = '';
           labelEl.textContent = 'No alternative hosts selected';
           labelEl.removeAttribute('title');
           valueEl.classList.add('input-select-placeholder');
-          flagEl.hidden = true;
-          roEl.textContent = 'No alternative hosts selected';
         }
-        if (clearBtn) clearBtn.hidden = !picked;
+        flagEl.hidden = eligible || !picked.length;
+        roEl.textContent = picked.length ? names(picked).join(', ') : 'No alternative hosts selected';
+
+        // Each chip's remove is the control that unsets its person.
+        if (chipsEl) {
+          chipsEl.textContent = '';
+          picked.forEach(p => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.append(p.name);
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'chip-remove';
+            rm.setAttribute('aria-label', `Remove ${p.name}`);
+            rm.innerHTML = '<svg><use href="#i-close"/></svg>';
+            rm.addEventListener('click', () => {
+              picked = picked.filter(x => x.name !== p.name);
+              render();
+            });
+            chip.appendChild(rm);
+            chipsEl.appendChild(chip);
+          });
+          chipsEl.hidden = !picked.length;
+        }
 
         if (!alertEl) return;
         let variant = null, head = '', body = '', cta = '';
-        if (picked && !eligible) {
+        if (picked.length && !eligible) {
           variant = 'warning';
-          head = `${picked.name} can no longer host.`;
-          body = 'A backup host needs a licensed Zoom account on the company account.';
+          head = `${picked[0].name} can no longer host.`;
+          body = 'An alternative host needs a licensed Zoom account on the company account.';
           cta  = 'Choose someone else';
-        } else if (!ownerGoing && !picked) {
+        } else if (!ownerGoing && !picked.length) {
           variant = 'warning';
           head = 'No one can start this meeting.';
-          body = `${ownerName} isn’t going, and there’s no backup host.`;
-          cta  = 'Add a backup host';
-        } else if (!ownerGoing && picked) {
+          body = `${ownerName} isn’t going, and no alternative host is set.`;
+          cta  = 'Add alternative hosts';
+        } else if (!ownerGoing && picked.length) {
           variant = 'info';
-          head = `${picked.name} will start this meeting.`;
+          head = picked.length === 1
+            ? `${picked[0].name} will start this meeting.`
+            : `${listNames(picked, 'or')} can start this meeting.`;
           body = `${ownerName} isn’t going.`;
         }
 
@@ -11201,13 +11222,12 @@ Platform reliability — error budget
       }
 
       // Set from outside: a meeting opened straight after being created
-      // carries the host chosen in the create form. picked lives in this
+      // carries the hosts chosen in the create form. picked lives in this
       // closure and the alert is computed from it, so the setter has to come
       // from in here rather than the hydration handler writing the DOM.
-      flow.__setAltHost = (p) => {
-        picked = p && p.name
-          ? { name: p.name, role: p.role || '', initials: p.initials || '' }
-          : null;
+      flow.__setAltHosts = (ps) => {
+        picked = (Array.isArray(ps) ? ps : []).filter(p => p && p.name)
+          .map(p => ({ name: p.name, role: p.role || '', initials: p.initials || '' }));
         eligible = true;
         render();
       };
@@ -11216,9 +11236,9 @@ Platform reliability — error budget
       // There is no [data-state] switcher on this prototype, so the hash is
       // how a reviewer walks them.
       const state = (location.hash.match(/(?:^|[#&])backup=([a-z]+)/) || [])[1];
-      if (state === 'set')        { picked = PEOPLE[0]; }
+      if (state === 'set')        { picked = PEOPLE.slice(0, 2); }
       if (state === 'none')       { ownerGoing = false; }
-      if (state === 'covered')    { ownerGoing = false; picked = PEOPLE[0]; }
+      if (state === 'covered')    { ownerGoing = false; picked = PEOPLE.slice(0, 2); }
       // An alert saying the owner is not going, over a roster that shows them
       // as going, reads as a bug rather than a state. The owner's own row has
       // no answered-glyph — only the logged-in user's does — so the state is
@@ -11233,7 +11253,7 @@ Platform reliability — error budget
           row.insertBefore(t, badge);
         }
       }
-      if (state === 'ineligible') { picked = PEOPLE[0]; eligible = false; }
+      if (state === 'ineligible') { picked = [PEOPLE[0]]; eligible = false; }
       if (state === 'nozoom') {
         // No Zoom integration, no room — and so nothing to host, and no join
         // setting to guarantee. Those two go with the Zoom link row they
@@ -11243,7 +11263,6 @@ Platform reliability — error budget
         md.querySelector('[data-detail-zoom]')?.closest('.md-detail-row')?.setAttribute('hidden', '');
       }
 
-      filter();
       render();
     })();
   </script>
@@ -11254,8 +11273,8 @@ Platform reliability — error budget
     // In the meeting view the candidates are the series roster, which already
     // exists. Here there is no roster: the participants are being chosen in the
     // section above, so the field reads that list and follows it. Adding people
-    // fills the menu; taking the chosen one back off clears the field, because a
-    // meeting cannot be created naming a host who is not on it.
+    // fills the menu; taking a chosen one back off drops them from the field,
+    // because a meeting cannot be created naming a host who is not on it.
     //
     // It watches the list rather than hooking the existing add and remove
     // handlers: the create flow is locked, and an observer cannot change what
@@ -11272,13 +11291,13 @@ Platform reliability — error budget
       const menu    = q('[data-cm-bh-menu]');
       const rowList = q('[data-cm-bh-list]');
       const emptyEl = q('[data-cm-bh-empty]');
-      const clearBtn= q('[data-cm-bh-clear]');
+      const chipsEl = q('[data-cm-bh-chips]');
       const valueEl = q('[data-cm-bh-value]');
       const avEl    = q('[data-cm-bh-av]');
       const labelEl = q('[data-cm-bh-label]');
 
       const EMPTY = 'No alternative hosts selected';
-      let picked = null;   // { id, name, role, initials } or null
+      let picked = [];   // [{ id, name, role, initials }], in pick order
 
       // Whoever is in the participants list right now. A row whose second line
       // is an e-mail is a bot or an unmapped guest — it can sit on the invite
@@ -11303,10 +11322,12 @@ Platform reliability — error budget
       });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
 
-      clearBtn?.addEventListener('click', () => { picked = null; setMenu(false); render(); });
+      const isPicked = (p) => picked.some(x => x.id === p.id);
 
       // The menu is rebuilt from the list rather than filtered, because the
-      // list is what changed — there is no fixed set of rows to hide.
+      // list is what changed — there is no fixed set of rows to hide. The
+      // same toggle rows as the meeting view's: a click flips the person in
+      // or out and the menu stays open between picks.
       function fill() {
         [...rowList.querySelectorAll('[data-cm-bh-person]')].forEach(b => b.remove());
         people().forEach(p => {
@@ -11314,27 +11335,42 @@ Platform reliability — error budget
           b.type = 'button';
           b.className = 'dropdown-item';
           b.setAttribute('data-cm-bh-person', p.id);
-          b.innerHTML = '<span class="avatar avatar-sm"></span>'
+          b.innerHTML = '<svg class="icon dropdown-item-check"><use href="#i-check"/></svg>'
+            + '<span class="avatar avatar-sm"></span>'
             + '<span class="dropdown-item-text"><span class="dropdown-item-label"></span>'
             + '<span class="dropdown-item-description"></span></span>';
           b.querySelector('.avatar').textContent = p.initials;
           b.querySelector('.dropdown-item-label').textContent = p.name;
           b.querySelector('.dropdown-item-description').textContent = p.role;
-          b.addEventListener('click', () => { picked = p; setMenu(false); render(); });
+          b.addEventListener('click', () => {
+            picked = isPicked(p) ? picked.filter(x => x.id !== p.id) : [...picked, p];
+            render();
+          });
           rowList.insertBefore(b, emptyEl);
         });
       }
 
       function render() {
         const now = people();
-        // The chosen person may have just been removed from the invite.
-        if (picked && !now.some(p => p.id === picked.id)) picked = null;
+        // A chosen person may have just been removed from the invite.
+        picked = picked.filter(x => now.some(p => p.id === x.id));
 
-        if (picked) {
-          avEl.textContent = picked.initials;
+        [...rowList.querySelectorAll('[data-cm-bh-person]')].forEach(b => {
+          b.classList.toggle('is-selected',
+            picked.some(x => x.id === b.getAttribute('data-cm-bh-person')));
+        });
+
+        if (picked.length === 1) {
+          avEl.textContent = picked[0].initials;
           avEl.hidden = false;
-          labelEl.textContent = picked.name;
-          labelEl.title = `${picked.name} · ${picked.role}`;
+          labelEl.textContent = picked[0].name;
+          labelEl.title = `${picked[0].name} · ${picked[0].role}`;
+          valueEl.classList.remove('input-select-placeholder');
+        } else if (picked.length > 1) {
+          avEl.hidden = true;
+          avEl.textContent = '';
+          labelEl.textContent = `${picked.length} alternative hosts`;
+          labelEl.title = picked.map(p => p.name).join(', ');
           valueEl.classList.remove('input-select-placeholder');
         } else {
           avEl.hidden = true;
@@ -11343,12 +11379,33 @@ Platform reliability — error budget
           labelEl.removeAttribute('title');
           valueEl.classList.add('input-select-placeholder');
         }
-        if (clearBtn) clearBtn.hidden = !picked;
         if (emptyEl) emptyEl.hidden = now.length > 0;
+
+        // Each chip's remove is the control that unsets its person.
+        if (chipsEl) {
+          chipsEl.textContent = '';
+          picked.forEach(p => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.append(p.name);
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'chip-remove';
+            rm.setAttribute('aria-label', `Remove ${p.name}`);
+            rm.innerHTML = '<svg><use href="#i-close"/></svg>';
+            rm.addEventListener('click', () => {
+              picked = picked.filter(x => x.id !== p.id);
+              render();
+            });
+            chip.appendChild(rm);
+            chipsEl.appendChild(chip);
+          });
+          chipsEl.hidden = !picked.length;
+        }
       }
 
       // Read at Create, so the meeting keeps who was chosen.
-      flow.__getAltHost = () => picked && { ...picked };
+      flow.__getAltHosts = () => picked.map(p => ({ ...p }));
 
       new MutationObserver(() => { fill(); render(); })
         .observe(list, { childList: true, subtree: true });
