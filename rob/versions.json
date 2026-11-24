@@ -55,6 +55,12 @@
           "type": "changed",
           "summary": "Dropdown search removed on the meeting view — the options are the meeting's own participants on both screens",
           "status": "pending"
+        },
+        {
+          "id": "v2-07",
+          "type": "changed",
+          "summary": "Join anytime becomes the owner's choice — on by default at creation, no longer locked",
+          "status": "pending"
         }
       ]
     },

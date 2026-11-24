@@ -7047,17 +7047,22 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
 
                    ROB-ZOOM-009 holds join-before-host ON for every Zoom
                    meeting linked to an upcoming occurrence and overwrites it
-                   when it is changed by hand, so this is checked and locked
-                   here too. -->
+                   when it is changed by hand. This screen proposes loosening
+                   that rule: the owner may turn it off per series, and the
+                   product stops overwriting what they chose. On by default at
+                   creation, so the join guarantee stays the norm and turning
+                   it off is a decision, not an accident. -->
               <label class="checkbox md-start-perm" data-change="new"
-                     data-change-note="States the join guarantee at the moment the room is made"
-                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
-                <input type="checkbox" class="checkbox-input" checked disabled />
+                     data-change-note="The join guarantee is the default, and the owner may turn it off">
+                <input type="checkbox" class="checkbox-input" checked />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
                 <span class="checkbox-label">Allow participants to join anytime</span>
               </label>
-              <p class="md-start-perm-note">
-                Nobody waits for the owner, so the meeting starts without them.
+              <!-- Inside the create form's 16px flex stack, so the note pulls
+                   itself back to sit 8px under its checkbox, same as the
+                   editable-RoB note above. -->
+              <p class="md-start-perm-note" style="margin-top: -8px">
+                Participants can join before the owner, so the meeting can start without them.
               </p>
 
               <!-- Candidates are the participants added above and nobody else:
@@ -8513,7 +8518,7 @@ html:not([data-rob-role="participant"]) #meeting-detail .md-person.is-me:not(.is
     .md-start-perm-note {
       font: var(--type-body-sm);
       color: var(--color-text-muted);
-      margin: var(--spacing-1) 0 0;
+      margin: var(--spacing-2) 0 0;
       padding-left: 24px;
       line-height: 1.4;
     }
@@ -10943,20 +10948,19 @@ Platform reliability — error budget
               </p>
 
               <!-- Zoom's own name for settings.join_before_host, which is
-                   what this row has always been about. Checked and locked:
-                   ROB-ZOOM-009 holds it ON for every Zoom meeting linked to an
-                   upcoming RoB occurrence and overwrites anything changed by
-                   hand, so an editable control here would promise a change
-                   that the next enforcement pass undoes. -->
+                   what this row has always been about. Was checked and locked
+                   per ROB-ZOOM-009; this screen now proposes the owner may
+                   turn it off per series (default on), and the product stops
+                   overwriting the choice. The note under it tells the truth
+                   for whichever state is chosen. -->
               <label class="checkbox md-start-perm" data-md-zoom-only data-change="new"
-                     data-change-note="States the join guarantee the owner used to arrange by hand"
-                     data-tooltip="Held on for every RoB. Changing it in Zoom is overwritten.">
-                <input type="checkbox" class="checkbox-input" checked disabled />
+                     data-change-note="The join guarantee is the default, and the owner may turn it off">
+                <input type="checkbox" class="checkbox-input" checked disabled data-md-edit-lock />
                 <span class="checkbox-box"><svg class="checkbox-mark"><use href="#i-check"/></svg></span>
                 <span class="checkbox-label">Allow participants to join anytime</span>
               </label>
               <p class="md-start-perm-note" data-md-zoom-only>
-                Nobody waits for the owner, so the meeting starts without them.
+                Participants can join before the owner, so the meeting can start without them.
               </p>
 
               <!-- The field is always on screen with the chosen people in it,
@@ -18792,5 +18796,6 @@ body:has([id$="-switcher"]:not([hidden])) .vr-dock { left: 264px; }
       toggle.addEventListener('click', () => setCollapsed(!sw.classList.contains('is-collapsed')));
     })();
   </script>
+
 </body>
 </html>
