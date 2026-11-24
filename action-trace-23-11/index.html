@@ -4706,6 +4706,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 <span class="checkbox-box"><svg class="checkbox-mark" aria-hidden="true"><use href="#i-check"/></svg></span>
 </span>
 </span>
+<span class="alert" data-taken-note="steps" hidden style="align-items: flex-start">
+<svg class="icon alert-icon" aria-hidden="true"><use href="#i-lock"/></svg>
+<span class="alert-message" style="display: block"><span class="body-sm-semibold" style="display: block">Already labeled in another meeting</span><a href="#" style="color: var(--color-text-link); text-decoration: none">[RoB] Refund QA · Labeling</a> already labels this goal for this process. Each goal can have one labeling meeting, so disconnect it there first to label it here.</span>
+</span>
 <span role="img" aria-label="A recording split into three steps. The first two are right; the third starts too early." style="display: flex; flex-direction: column; gap: var(--spacing-3); margin-top: auto">
 <span style="display: flex; flex-direction: column; height: 136px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-surface); overflow: hidden">
 <span style="display: flex; align-items: center; gap: var(--spacing-1); height: 24px; padding: 0 var(--spacing-2); background: var(--color-surface-muted); border-bottom: 1px solid var(--color-border)">
@@ -4754,6 +4758,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 <input type="checkbox" class="checkbox-input" data-choice-input="rate" aria-label="Rate how the work is done" />
 <span class="checkbox-box"><svg class="checkbox-mark" aria-hidden="true"><use href="#i-check"/></svg></span>
 </span>
+</span>
+<span class="alert" data-taken-note="rate" hidden style="align-items: flex-start">
+<svg class="icon alert-icon" aria-hidden="true"><use href="#i-lock"/></svg>
+<span class="alert-message" style="display: block"><span class="body-sm-semibold" style="display: block">Already labeled in another meeting</span><a href="#" style="color: var(--color-text-link); text-decoration: none">[RoB] Refund QA · Labeling</a> already labels this goal for this process. Each goal can have one labeling meeting, so disconnect it there first to label it here.</span>
 </span>
 <span role="img" aria-label="The same recording with one part of the screen pointed at, each step rated, and the result rated." style="display: flex; flex-direction: column; gap: var(--spacing-3); margin-top: auto">
 <span style="display: flex; flex-direction: column; height: 136px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-surface); overflow: hidden">
@@ -5239,6 +5247,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <button class="segmented-item" type="button" data-state="waiting">Waiting for recordings</button>
       <button class="segmented-item" type="button" data-state="live">2 months in</button>
     </div>
+    <span class="caption">Already labeled</span>
+    <div class="segmented" role="tablist" aria-label="Goals another labeling meeting already covers">
+      <button class="segmented-item is-active" type="button" data-taken="none">None</button>
+      <button class="segmented-item" type="button" data-taken="steps">Check the steps</button>
+      <button class="segmented-item" type="button" data-taken="rate">Rate</button>
+      <button class="segmented-item" type="button" data-taken="both">Both</button>
+    </div>
   </div>
 
   <!-- The Roles key (C3b), cloned into every [data-roles-key] slot. Hover,
@@ -5448,6 +5463,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const S = {
       state: 'zero', step: 0, edit: false, dirty: false, prog: -1, timer: null,
       goals: { steps: true, rate: false },
+      taken: { steps: false, rate: false },
       roster: { setup: setupRoster(), live: liveRoster() },
       pool:   { setup: [INES, KOFI], live: [() => P('ps', 'PS', 'Pablo Sandoval', 'Senior Project Coordinator', 'ic')] },
     };
@@ -5606,6 +5622,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       S.goals = { steps: true, rate: false };
       S.roster.setup = setupRoster(); S.pool.setup = [INES, KOFI];
       $$('[data-choice-input]').forEach(i => { i.checked = S.goals[i.dataset.choiceInput]; });
+      applyTaken();
+    }
+    // A goal another labeling meeting already covers can't be chosen here: ActionTrace
+    // keeps one labeling setup per process and goal. Its card stays visible but
+    // dimmed and locked, and says which meeting to disconnect first. If the goal
+    // that would be pre-selected is taken, the other one is pre-selected instead.
+    function applyTaken() {
+      ['steps', 'rate'].forEach(key => {
+        const taken = S.taken[key];
+        const card = $('[data-choice="' + key + '"]'), input = $('[data-choice-input="' + key + '"]', card);
+        input.disabled = taken;
+        if (taken) { input.checked = false; S.goals[key] = false; }
+        card.style.cursor = taken ? 'not-allowed' : 'pointer';
+        card.style.background = taken ? 'var(--color-surface-muted)' : '';
+        card.setAttribute('aria-disabled', String(taken));
+        Array.from(card.children).forEach(el => { if (!el.hasAttribute('data-taken-note')) el.style.opacity = taken ? '0.5' : ''; });
+        show($('[data-taken-note]', card), taken);
+      });
+      if (!S.goals.steps && !S.goals.rate) {
+        const free = ['steps', 'rate'].find(k => !S.taken[k]);
+        if (free) { S.goals[free] = true; $('[data-choice-input="' + free + '"]').checked = true; }
+      }
+      const now = S.taken.steps && S.taken.rate ? 'both' : S.taken.steps ? 'steps' : S.taken.rate ? 'rate' : 'none';
+      $$('#state-switch [data-taken]').forEach(b => b.classList.toggle('is-active', b.dataset.taken === now));
     }
     function leave() {
       if (S.step === 4) { if (S.prog < 5) finishProgress(); closeWizard(true); return; }
@@ -5630,6 +5670,17 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.addEventListener('click', e => {
       const link = e.target.closest('a[href="#"]');
       if (link) e.preventDefault();
+
+      const tk = e.target.closest('#state-switch [data-taken]');
+      if (tk) {
+        const t = tk.dataset.taken;
+        S.taken = { steps: t === 'steps' || t === 'both', rate: t === 'rate' || t === 'both' };
+        S.goals = { steps: true, rate: false };
+        $$('[data-choice-input]').forEach(i => { i.checked = S.goals[i.dataset.choiceInput]; });
+        applyTaken();
+        if ($('#view-wizard').hidden) openWizard(1); else { S.step = 1; renderWizard(); }
+        return;
+      }
 
       const st = e.target.closest('#state-switch [data-state]');
       if (st) { setState(st.dataset.state); overlay('process-drawer', true); return; }
