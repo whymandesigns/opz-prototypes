@@ -1105,6 +1105,10 @@ def with_tabs(html, group, panels, suffix=''):
     return out + ('\n' + suffix if suffix else '')
 
 
+def SORTED(label):
+    return f'<span class="row" style="gap: var(--spacing-1)">{label}{icon("i-arrow-up-minor", "icon icon-16")}</span>'
+
+
 def table(heads, rows):
     th = ''.join(f'<th>{h}</th>' for h in heads)
     return f'<div class="table-scroll" style="max-height: none"><table class="table"><thead><tr>{th}</tr></thead><tbody>{rows}</tbody></table></div>'
@@ -1190,8 +1194,11 @@ def profile_panels():
     rob = rob_tab('Cara attends 4 RoB Meetings', '4 meetings', 'Role', ('All', 'Owner', 'Attendee'),
                   [((0, '10:00am'), ('[RoB] Onboarding in one week', 'Operations')), ((2, '1:00pm'), ('[RoB] Refund requests', 'Delivery')),
                    ((0, '3:00pm'), ('Delivery All Hands', 'Delivery')), ((3, '4:00pm'), ('[RoB] Partner marketing sites', 'Partnerships'))])
-    actions = (f'<div class="list-row"><div><p class="list-row-meta">[RoB] Onboarding in one week · August 3, 2026</p><p class="list-row-title">Draft the kick-off checklist for new customers</p>'
-               f'<p class="list-row-meta">Cara Keane</p></div>{tag("Done", "positive")}</div>')
+    actions = (f'<h2 class="body-semibold row" style="margin: 0 0 var(--spacing-3)">[RoB] Onboarding in one week · August 3, 2026'
+               f'<a class="btn btn-icon-only btn-ghost btn-xs" href="../rob-meeting-view/index.html" aria-label="Open the meeting">{icon("i-link", "btn-icon")}</a></h2>'
+               f'<div class="ps-action is-done"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span>'
+               f'<span class="row" style="gap: var(--spacing-1)"><span class="avatar avatar-xs">{ini("ck")}</span><span class="body-xs-semibold">Cara Keane</span></span></div>'
+               f'<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>')
     side = lambda t, body: f'<div><h3 class="body-semibold" style="margin: 0 0 var(--spacing-2)">{t}</h3>{body}</div>'
     time_off_p = (f'<h2 class="h3" style="margin: 0 0 var(--spacing-4)">Time Off</h2><div style="margin-bottom: var(--spacing-6)">{period_nav("Nov 2026")}</div>'
                   f'<div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8)">{month_table("November 2026", 6, 30, (25,))}{month_table("December 2026", 1, 31, tuple(range(21, 32)))}'
@@ -1202,7 +1209,9 @@ def profile_panels():
 
 # Team profile
 def team_profile_panels():
-    show = f'<div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-sm" {MUTED}>Show</span>{segmented(("All", "Direct Members Only", "Associated Members Only"), 0, "Members shown")}</div>'
+    def show(name):
+        return (f'<div class="row" style="flex-wrap: wrap; gap: var(--spacing-4); margin-bottom: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm)">'
+                f'<span class="body-sm-semibold">Show</span>{radios(name, ("All", "Direct Members Only", "Associated Members Only"))}</div>')
     okrs_p = (f'<p class="body" style="margin: 0 0 var(--spacing-4)">OKRs owned by Operations are managed on the OKRs page.</p><div class="row">'
               f'<a class="btn btn-secondary" href="../okrs/index.html#tab-2" style="text-decoration: none">Open Function Annual OKRs</a>'
               f'<a class="btn btn-secondary" href="../okrs/index.html#tab-3" style="text-decoration: none">Open Function Quarterly OKRs</a></div>')
@@ -1213,7 +1222,7 @@ def team_profile_panels():
     time_off_p = (f'<div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-semibold">Nov 2026</span><button class="btn btn-secondary" type="button">Today</button></div>'
                   + table(heads, ooo('lk', ()) + ooo('ck', (26, 27)) + ooo('lh', ()) + ooo('tl', (30, 1, 2))))
     rob = rob_tab('', 'No meetings', 'Show', ('All', 'Function', 'Subfunction'), [])
-    return [okrs_p, show + table(WORK_HEADS, work_rows(WORK)), show + empty_state('i-cpu-2', 'Operations doesn’t own any Processes', 'No Processes yet'), time_off_p, rob]
+    return [okrs_p, show('tp-show-ini') + table(WORK_HEADS, work_rows(WORK)), show('tp-show-proc') + empty_state('i-cpu-2', 'Operations doesn’t own any Processes', 'No Processes yet'), time_off_p, rob]
 
 
 # People
@@ -1247,9 +1256,9 @@ def team_panels():
                  + unit('Developer', 'Vertical', '', 'Consists of 13 Specializations ● Owned By Technology Services')
                  + unit('Design', 'Vertical', '', 'Consists of 2 Specializations'))
     def t(k, unit_, mgr, loc, time):
-        return f'<tr><td>{user(k)}</td><td>{two(*unit_)}</td><td>{two(*PEOPLE[mgr])}</td><td>{sub("-")}</td><td>{two(*loc)}</td><td>{sub(time)}</td></tr>'
+        return f'<tr><td>{user_marked(k, "talent")}</td><td>{two(*unit_)}</td><td>{user(mgr)}</td><td>{sub("-")}</td><td>{two(*loc)}</td><td>{sub(time)}</td></tr>'
     talents = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)"><button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button></div>'
-               + table(('Name', 'Associated Org Units', 'Manager', 'Division', 'Location', 'Local Time'),
+               + table((SORTED('Name'), 'Associated Org Units', 'Manager', 'Division', 'Location', 'Local Time'),
                        t('nr', ('Delivery', 'Subfunction in Operations'), 'sr', ('Lisbon', 'Portugal'), '09:17') + t('km', ('Northwind Hire', 'Team in Recruiting'), 'mv', ('Accra', 'Ghana'), '09:17')
                        + t('tl', ('Delivery', 'Subfunction in Operations'), 'lk', ('Malmö', 'Sweden'), '10:17')))
     skills_rows = ''.join(f'<tr><td><a class="body-sm" href="#" {LINK}>{n}</a></td><td>{sub(o)}</td><td>{sub(c)}</td><td>{sub(p)}</td><td>{sub(v)}</td></tr>' for n, o, c, p, v in (
@@ -1293,7 +1302,12 @@ def ooo_details():
         ('ck', 'Vacation', ('Delivery', 'Operations'), 'Feb 23, 2026 - Mar 2, 2026', '6 days', 'Approved'),
         ('lh', 'Sick leave', ('Delivery', 'Operations'), 'Apr 7, 2026 - Apr 8, 2026', '2 days', 'Approved'),
         ('tl', 'Vacation', ('Delivery', 'Operations'), 'Jul 13, 2026 - Jul 31, 2026', '15 days', 'Approved')))
-    return table(('Name', 'OOO type', 'Org unit', 'OOO dates', 'OOO length', 'Status'), rows)
+    bar = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name" aria-label="Search by name" /></div>'
+           f'<span class="row" data-view="desktop">{select("Direct reports", ("Direct reports", "All reports", "Everyone"), label="People shown", width=170)}'
+           f'<div class="input-icon input-icon-left" style="width: 230px">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" value="Jan 1, 2026 - Dec 31, 2026" aria-label="Date range" /></div>'
+           f'{ph_select("OOO type", "OOO type", 170)}{select("Approved, Pending", ("Approved", "Pending", "Rejected", "Cancelled"), label="Status", width=190)}'
+           f'<button class="btn btn-icon-only btn-ghost" type="button" aria-label="Reset filters">{icon("i-reset", "btn-icon")}</button></span></div>')
+    return bar + table(('Name', 'OOO type', 'Org unit', SORTED('OOO dates'), 'OOO length', 'Status'), rows)
 
 
 def badges():
@@ -1352,11 +1366,11 @@ def process_overlays():
         <div class="stack" data-panel="pdrawer:0">
         <div {GRID}>{field_row("Accountable owner", user("ck", "Delivery"))}{field_row("End date", sub("Jun 30, 2027"))}</div>
         <div><span class="body-sm" {MUTED}>Description</span><p class="body" style="margin: var(--spacing-2) 0 0">Read the customer’s request, check the order and what arrived, issue the refund for the right items, reply to the customer and close the ticket.</p></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Connections</h3>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Connections</h3>
           <div class="row">{add_btn("Add Processes")}</div>
           <div class="row"><button class="btn btn-ghost" type="button" data-modal-open="raci-drawer">{icon("i-table", "btn-icon")}View RACI</button></div></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></div>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
         </div>
         <div data-panel="pdrawer:1" hidden>{timeline((('Nov 24, 2026', 'Status was changed from Not started to Active by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Accountable owner was added by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Process was created by Cara Keane on Nov 24, 2026, 7:34 PM')))}</div>
       </div></div>
@@ -1376,7 +1390,10 @@ def process_overlays():
         <div class="alert alert-info">{icon("i-info", "icon alert-icon")}<p class="alert-message">RACI members with the roles selected for auto-invite in the RACI drawer will become the RoB participants</p></div>
         <article class="card"><div class="row">{icon("i-slack", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this process</p></div></div></article>
         <article class="card"><div class="row">{icon("i-calendar", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings.</p></div></div></article>
-        <div class="row" style="flex-wrap: wrap">{add_btn("Add business lines")}{add_btn("Add beneficiary function")}{add_btn("Add tags")}{add_btn("Add URL links")}</div>
+        <div class="accordion-group"><div class="accordion">
+          <button class="accordion-summary" type="button" aria-expanded="false"><span class="accordion-title">More details</span>{icon("i-chevron-down", "icon accordion-chevron")}</button>
+          <div class="accordion-details"><div><div class="accordion-content"><div class="row" style="flex-wrap: wrap">{add_btn("Add business lines")}{add_btn("Add beneficiary function")}{add_btn("Add tags")}{add_btn("Add URL links")}</div></div></div></div>
+        </div></div>
       </div></div>
       <footer class="drawer-footer" style="padding-right: calc(var(--spacing-6) + var(--spacing-12))"><button class="btn btn-secondary" type="button" data-modal-close>Cancel</button><button class="btn btn-secondary" type="button">Create</button></footer>
     </aside>
@@ -2062,6 +2079,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
     dict(date='Nov 25, 2026', span='12:23–12:26', minutes=6,
          screens=['profile', 'team-profile', 'team', 'initiative-create', 'profile-edit'],
          note='Compared with staging: Work History is a timeline with checkboxes, Time Off and the RoB tab have their period navigation and radios, lists of org units are striped, and two forms get their icons and hints.'),
+    dict(date='Nov 25, 2026', span='12:28–12:34', minutes=6,
+         screens=['profile', 'team-profile', 'team', 'time-off', 'processes'],
+         note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),
 ]
 
 
@@ -2171,6 +2191,11 @@ def elements_page():
          '<span class="body-sm">Jul 2022 - Apr 2024</span></div></div>'),
         ('Tree rows', 'ps-row-child', 'Processes and Initiatives: rows that fold under a parent row. Click the caret on Refund requests.', 'processes/index.html',
          table(('Name', 'Status'), f'<tr><td><span class="cell-title">Refund requests</span></td><td>{tag("Active")}</td></tr><tr class="ps-row-child"><td><span class="cell-title">Refund review</span></td><td>{tag("Active")}</td></tr>')),
+        ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
+         f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
+         '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
+         '<div class="ps-action" style="max-width: 560px; margin-top: var(--spacing-2)"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>To do</span><span class="body-xs-semibold">Cara Keane</span></div>'
+         '<p class="ps-action-text">Send the refund policy to the partner team</p></div>'),
     ]
     out = []
     for name, cls, where, link, demo in items:

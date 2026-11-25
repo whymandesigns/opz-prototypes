@@ -103,6 +103,8 @@ VIEW_SCRIPT = '''  <script>
     document.addEventListener('click', e => {
       const tab = e.target.closest('[data-tabs] .tab, [data-tabs] .segmented-item');
       if (tab) { const strip = tab.closest('[data-tabs]'); pick(strip.dataset.tabs, items(strip).indexOf(tab)); }
+      const acc = e.target.closest('.accordion-summary');
+      if (acc) { const on = acc.parentElement.classList.toggle('is-open'); acc.setAttribute('aria-expanded', String(on)); }
       const tog = e.target.closest('[data-toggle]');
       if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
     });

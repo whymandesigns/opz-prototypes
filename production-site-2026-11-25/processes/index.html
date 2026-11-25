@@ -4501,6 +4501,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-timeline-item { position: relative; display: flex; justify-content: space-between; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); }
 .ps-timeline-item::before { content: ""; position: absolute; left: calc(-1 * var(--spacing-8) + 4px); top: var(--spacing-4); width: 12px; height: 12px; border-radius: var(--radius-full); background: var(--color-accent); }
 .ps-timeline-item.is-current { border-color: var(--color-accent); }
+
+/* Action item: a grey box with who it is for, its state, and the text struck
+   through once done. */
+.ps-action { padding: var(--spacing-3) var(--spacing-4); border-radius: var(--radius-sm); background: var(--color-bg); }
+.ps-action-status { display: inline-flex; align-items: center; gap: var(--spacing-2); font: var(--type-body-xs-semibold); color: var(--color-text); }
+.ps-action-dot { width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-border-strong); }
+.ps-action.is-done .ps-action-dot { background: var(--color-success); }
+.ps-action-text { margin: var(--spacing-2) 0 0; font: var(--type-body-sm); color: var(--color-text); }
+.ps-action.is-done .ps-action-text { text-decoration: line-through; color: var(--color-text-muted); }
 </style>
 </head>
 <body>
@@ -4697,11 +4706,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="stack" data-panel="pdrawer:0">
         <div style="display: flex; flex-direction: column; gap: var(--spacing-4)"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Accountable owner</span><div style="flex: 1 1 240px; min-width: 0"><div class="cell-user"><span class="avatar avatar-md">CK</span><div class="cell-user-meta"><span class="cell-user-name">Cara Keane</span><span class="cell-user-role">Delivery</span></div></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">End date</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Jun 30, 2027</span></div></div></div>
         <div><span class="body-sm" style="color: var(--color-text-muted)">Description</span><p class="body" style="margin: var(--spacing-2) 0 0">Read the customer’s request, check the order and what arrived, issue the refund for the right items, reply to the customer and close the ticket.</p></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Connections</h3>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Connections</h3>
           <div class="row"><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add Processes</button></div>
           <div class="row"><button class="btn btn-ghost" type="button" data-modal-open="raci-drawer"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg>View RACI</button></div></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-search"/></svg><span class="body-sm">No attachments</span></div></div>
-        <div class="stack"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-search"/></svg><span class="body-sm">No attachments</span></div></div>
+        <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
         </div>
         <div data-panel="pdrawer:1" hidden><div class="list-row"><div><p class="list-row-meta">Nov 24, 2026</p><p class="list-row-title">Status was changed from Not started to Active by Cara Keane on Nov 24, 2026, 7:34 PM</p></div></div><div class="list-row"><div><p class="list-row-meta">Nov 24, 2026</p><p class="list-row-title">Accountable owner was added by Cara Keane on Nov 24, 2026, 7:34 PM</p></div></div><div class="list-row"><div><p class="list-row-meta">Nov 24, 2026</p><p class="list-row-title">Process was created by Cara Keane on Nov 24, 2026, 7:34 PM</p></div></div></div>
       </div></div>
@@ -4721,7 +4730,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="alert alert-info"><svg class="icon alert-icon" aria-hidden="true"><use href="#i-info"/></svg><p class="alert-message">RACI members with the roles selected for auto-invite in the RACI drawer will become the RoB participants</p></div>
         <article class="card"><div class="row"><svg class="icon icon-24" aria-hidden="true"><use href="#i-slack"/></svg><div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this process</p></div></div></article>
         <article class="card"><div class="row"><svg class="icon icon-24" aria-hidden="true"><use href="#i-calendar"/></svg><div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings.</p></div></div></article>
-        <div class="row" style="flex-wrap: wrap"><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add business lines</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add beneficiary function</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add tags</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add URL links</button></div>
+        <div class="accordion-group"><div class="accordion">
+          <button class="accordion-summary" type="button" aria-expanded="false"><span class="accordion-title">More details</span><svg class="icon accordion-chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+          <div class="accordion-details"><div><div class="accordion-content"><div class="row" style="flex-wrap: wrap"><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add business lines</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add beneficiary function</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add tags</button><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add URL links</button></div></div></div></div>
+        </div></div>
       </div></div>
       <footer class="drawer-footer" style="padding-right: calc(var(--spacing-6) + var(--spacing-12))"><button class="btn btn-secondary" type="button" data-modal-close>Cancel</button><button class="btn btn-secondary" type="button">Create</button></footer>
     </aside>
@@ -4888,6 +4900,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.addEventListener('click', e => {
       const tab = e.target.closest('[data-tabs] .tab, [data-tabs] .segmented-item');
       if (tab) { const strip = tab.closest('[data-tabs]'); pick(strip.dataset.tabs, items(strip).indexOf(tab)); }
+      const acc = e.target.closest('.accordion-summary');
+      if (acc) { const on = acc.parentElement.classList.toggle('is-open'); acc.setAttribute('aria-expanded', String(on)); }
       const tog = e.target.closest('[data-toggle]');
       if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
     });

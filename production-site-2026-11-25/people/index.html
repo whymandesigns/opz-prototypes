@@ -4501,6 +4501,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-timeline-item { position: relative; display: flex; justify-content: space-between; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); }
 .ps-timeline-item::before { content: ""; position: absolute; left: calc(-1 * var(--spacing-8) + 4px); top: var(--spacing-4); width: 12px; height: 12px; border-radius: var(--radius-full); background: var(--color-accent); }
 .ps-timeline-item.is-current { border-color: var(--color-accent); }
+
+/* Action item: a grey box with who it is for, its state, and the text struck
+   through once done. */
+.ps-action { padding: var(--spacing-3) var(--spacing-4); border-radius: var(--radius-sm); background: var(--color-bg); }
+.ps-action-status { display: inline-flex; align-items: center; gap: var(--spacing-2); font: var(--type-body-xs-semibold); color: var(--color-text); }
+.ps-action-dot { width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-border-strong); }
+.ps-action.is-done .ps-action-dot { background: var(--color-success); }
+.ps-action-text { margin: var(--spacing-2) 0 0; font: var(--type-body-sm); color: var(--color-text); }
+.ps-action.is-done .ps-action-text { text-decoration: line-through; color: var(--color-text-muted); }
 </style>
 </head>
 <body>
@@ -4808,6 +4817,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.addEventListener('click', e => {
       const tab = e.target.closest('[data-tabs] .tab, [data-tabs] .segmented-item');
       if (tab) { const strip = tab.closest('[data-tabs]'); pick(strip.dataset.tabs, items(strip).indexOf(tab)); }
+      const acc = e.target.closest('.accordion-summary');
+      if (acc) { const on = acc.parentElement.classList.toggle('is-open'); acc.setAttribute('aria-expanded', String(on)); }
       const tog = e.target.closest('[data-toggle]');
       if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
     });
