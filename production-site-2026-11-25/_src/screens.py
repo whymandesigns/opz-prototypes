@@ -333,6 +333,14 @@ def crumbs(last):
             f'<span class="breadcrumb is-current" aria-current="page">{last}</span></nav>')
 
 
+def doc_row(name, views):
+    """A document on an initiative: the file as a link, a tick once it is
+    uploaded, and how many people have opened it."""
+    return (f'<div class="row" style="justify-content: space-between; flex-wrap: nowrap"><span class="row" style="gap: var(--spacing-2); min-width: 0">{icon("i-attachment", "icon icon-16")}'
+            f'<a class="body-sm" href="#" {LINK}>{name}</a><span style="color: var(--color-success); display: inline-flex">{icon("i-check", "icon icon-16")}</span></span>'
+            f'<span class="row body-sm" style="gap: var(--spacing-1)">{icon("i-eye", "icon icon-16")}{views}</span></div>')
+
+
 def initiative_view():
     general = ''.join((
         field_row('Status', tag('Execution')),
@@ -395,7 +403,7 @@ def initiative_view():
             <div class="row" style="padding: var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm)">{icon("i-list-unordered", "icon icon-16")}<span class="body-sm">No Agenda Items yet</span></div>
           </section>
           <section class="stack" id="sec-documents"><h2 class="h4" {RULE}>Documents</h2>
-            <div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></section>
+            <div class="stack" style="gap: var(--spacing-2)">{"".join(doc_row(n, v) for n, v in (("Onboarding roadmap, reviewed Nov 20", 4), ("Kick-off checklist v3", 2), ("First-week survey results, October", 1), ("Handoff notes from Sales", 0)))}</div></section>
           <section class="stack" id="sec-projects"><h2 class="h4" {RULE}>Projects</h2>
             <div>{"".join(f'<a class="ps-linkrow" href="#"><span class="body-sm">{n}</span>{icon("i-chevron-right", "icon icon-16")}</a>' for n in ("Kick-off checklist", "Account setup in one day", "Onboarding status page", "Contract to workspace handoff", "First-week survey"))}</div></section>
         </div>
@@ -442,14 +450,19 @@ def initiative_create():
         fld('Working team', add_btn('Add team member')),
     ))
     timeline = ''.join((
-        fld('Estimated duration', ph_select('Select a duration', 'Estimated duration')),
-        fld('Start date', date_input('Start date')), fld('End date', date_input('End date')),
-        fld('Initial impact date', date_input('Initial impact date')), fld('Full impact date', date_input('Full impact date')),
+        fld('Estimated duration', ph_select('Add estimated duration', 'Estimated duration')),
+        fld('Start date', date_input('Start date').replace('Add date', 'Add start date')), fld('End date', date_input('End date').replace('Add date', 'Add end date')),
+        fld('Initial impact date', ph_select('Add quarter', 'Initial impact date')), fld('Full impact date', ph_select('Add quarter', 'Full impact date')),
     ))
-    raci = raci_table([('Operationalize', 'Team', user('ck'), '', '', '')])
+    raci = (raci_table([('Operationalize', 'Team', user('ck'), f'<span class="body-sm" {MUTED}>Unassigned</span>', '', '')])
+            + f'<div class="row" style="justify-content: space-between"><span class="body-xs" {MUTED}>Max limit reached for Accountable</span><span class="body-xs" {MUTED}>1 people added (max 40)</span></div>')
 
-    def area(label, ph):
-        return f'<label class="field"><span class="field-label">{label}</span><textarea class="input" rows="3" placeholder="{ph}"></textarea></label>'
+    def numbered(label, ph, add):
+        return (f'<div class="stack" style="gap: var(--spacing-2)"><span class="field-label row" style="gap: var(--spacing-1)">{label}{icon("i-info", "icon icon-16")}</span>'
+                f'<div class="row" style="flex-wrap: nowrap"><span class="body-sm" {MUTED}>1.</span><input class="input" type="text" placeholder="{ph}" aria-label="{label} 1" style="flex: 1; max-width: none" />'
+                f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Reorder">{icon("i-drag", "btn-icon")}</button>'
+                f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Remove">{icon("i-x", "btn-icon")}</button></div>'
+                f'<div class="row">{add_btn(add)}</div></div>')
     return f'''      <div style="display: flex; flex-direction: column; min-height: calc(100vh - var(--header-height))">
       <div style="flex: 1; padding: var(--spacing-6) var(--spacing-10) var(--spacing-10)">
       {crumbs("New initiative")}
@@ -463,20 +476,25 @@ def initiative_create():
             <div class="row" style="justify-content: space-between"><h3 class="body-semibold" style="margin: 0">RACI</h3><a class="row body-sm" href="#" {LINK}>{icon("i-info", "icon icon-16")}RACI Guide</a></div>{raci}</section>
           <section class="stack" id="sec-timeline"><h2 class="h4" {RULE}>Timeline</h2><div {GRID}>{timeline}</div></section>
           <section class="stack" id="sec-description"><h2 class="h4" {RULE}>Description</h2>
-            {area("Problem / Opportunity", "What problem does this solve, or what opportunity does it open?")}
-            {area("Objective(s)", "What will be true when this is done?")}
-            <div class="row">{add_btn("Add objective")}</div>
-            {area("Success metrics", "How will you measure it?")}
-            <div class="row">{add_btn("Add success metric")}</div>
+            <label class="field"><span class="field-label">Problem / Opportunity</span><textarea class="input" rows="5" data-plain placeholder="What gap, need or opportunity does this initiative address?" style="max-width: none"></textarea>
+              <span class="field-hint" style="text-align: right">0 / 500</span></label>
+            {numbered("Objective(s)", "Establish a scalable partner management model", "Add objective")}
+            {numbered("Success metrics", "75% of strategic partners activated within 90 days", "Add success metric")}
           </section>
           <section class="stack" id="sec-connections"><h2 class="h4" {RULE}>Connections</h2>
             <div class="alert">{icon("i-info", "icon alert-icon")}<p class="alert-message">RACI members with the roles selected for auto-invite in the RACI drawer will become the RoB participants</p></div>
-            <article class="card"><div class="row">{icon("i-slack-color", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this initiative</p></div></div></article>
-            <article class="card"><div class="row">{icon("i-calendar", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings.</p></div></div></article>
+            <article class="card"><div class="row">{icon("i-slack-color", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this Initiative</p></div></div></article>
+            <article class="card"><div class="row">{icon("i-calendar", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings</p></div></div></article>
+            <article class="card"><div class="row">{icon("i-jira-software", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Jira</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Link your initiative to Jira to bridge planning and execution</p></div></div></article>
           </section>
-          <section class="stack" id="sec-documents"><h2 class="h4" {RULE}>Documents</h2><div class="row">{add_btn("Add URL links")}</div></section>
+          <section class="stack" id="sec-documents"><h2 class="h4" {RULE}>Documents</h2>
+            <div class="dropzone-field" style="max-width: none" data-dropzone><label class="dropzone"><input class="dropzone-input" type="file" multiple aria-label="Upload files" />{icon("i-upload", "icon icon-24 dropzone-icon")}
+              <p class="dropzone-title">Choose a file to upload</p><p class="dropzone-hint">Max file size: 25Mb</p></label></div>
+            <p class="body-xs" style="margin: 0; text-align: center; color: var(--color-text-muted)">Add documents, screenshots, or anything else relevant to this initiative.</p>
+            <div class="alert alert-warning">{icon("i-info", "icon alert-icon")}<p class="alert-message">Remember to upload roadmaps that have been reviewed.</p></div>
+            <div class="row">{add_btn("Add URL links")}</div></section>
           <section class="stack" id="sec-projects"><h2 class="h4" {RULE}>Projects</h2>
-            <p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Projects can be added once the initiative is created.</p></section>
+            <p class="row body-sm" style="margin: 0; justify-content: center; color: var(--color-text-muted)">{icon("i-lock", "icon icon-16")}You can add Projects after you create this initiative.</p></section>
         </div>
         {section_nav()}
       </div>
@@ -848,7 +866,7 @@ def team_profile():
     return f'''{head("Team Profile")}
 
       <div class="row" style="align-items: flex-start; gap: var(--spacing-6)">
-        <span class="avatar avatar-2xl avatar-team">{icon("i-function")}</span>
+        {art("i-art-team-logo", 120, "Operations")}
         <div class="stack" style="gap: var(--spacing-2)">
           <h2 class="h2" style="margin: 0">Operations</h2>
           <span class="body" {MUTED}>Function</span>
@@ -2515,7 +2533,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Measured staging’s sizes against ours and matched them on every screen: tighter page padding, tabs straight under the title, tables without an outer box, shorter rows, larger pictures. Blue main buttons where the product has them, OKRs opening empty as there, the dashboard’s other tab as a tree. Each screen now carries a match estimate.'),    dict(date='Nov 25, 2026', span='14:23–14:25', minutes=2, screens=['profile-edit', 'team'],
          note='Checked the tabs marked as not yet compared. Edit Profile was first compared while staging was still loading: its About box is a rich-text editor and Save Changes is green after all, so both are put back, and the form is filled in. Divisions rows lose their borders.'),    dict(date='Nov 25, 2026', span='14:27–14:34', minutes=7,
          screens=['okrs', 'rob-meetings', 'rob-meeting-view', 'profile', 'team-profile', 'people', 'talent-profile', 'self-review', 'dashboard', 'processes'],
-         note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),
+         note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),    dict(date='Nov 25, 2026', span='14:36–14:41', minutes=5, screens=['initiative-view', 'initiative-create', 'team-profile'],
+         note='The last three under 95%. The create form’s lower half now follows staging: numbered objective and metric lines, quarter pickers, the Jira card, the upload box with its reminder, and the locked Projects note. The initiative view lists documents with a tick and a view count. Team Profile has a drawn logo.'),
 ]
 
 
@@ -2525,15 +2544,15 @@ MATCH = {
     'dashboard': (95, 'Spreadsheet view kept from the first capture; made-up data'),
     'processes': (95, 'Named Processes where staging says Business as Usual'),
     'initiatives': (95, 'Made-up data only'),
-    'initiative-view': (93, 'No documents; fields filled where staging has dashes'),
-    'initiative-create': (94, 'Only the first screen of the form was compared'),
+    'initiative-view': (95, 'Made-up data; staging’s example leaves some fields empty'),
+    'initiative-create': (95, 'Jira mark is the kit’s one-colour version'),
     'rob-meetings': (95, 'Made-up meetings; Schedule and Week views not re-compared'),
     'rob-meeting-view': (95, 'Deck shows a title card where staging’s example was empty'),
     'okrs': (95, 'Every tab is empty for 2026 on staging, so the OKR card is only on the elements page; Team Quarterly’s owner filter is assumed'),
     'people': (96, 'Made-up data only'),
     'profile': (95, 'Photo and map are placeholders'),
     'team': (95, 'Skills rows are striped here, plain on staging'),
-    'team-profile': (94, 'Logo is a generic icon; OKRs tab is my own summary'),
+    'team-profile': (95, 'Logo is a drawn stand-in for the team’s own picture'),
     'rob-paused-meetings': (96, 'Made-up data only'),
     'profile-edit': (95, 'Field labels on Work and Contacts match; their layout was compared by text only'),
     'watercooler': (95, 'Fewer channels, made-up text'),
@@ -2712,6 +2731,7 @@ def icons_page():
         ('Empty list', 'i-art-empty-list', 'Recognitions: the drawing above “No recognitions”.', 'recognitions/index.html', big('i-art-empty-list', 'Empty list')),
         ('Roadmap', 'i-roadmap', 'Dashboard, Roadmap column.', 'dashboard/index.html', line('i-roadmap')),
         ('Page not found', 'i-art-not-found', 'The 404 page: the drawing above “Page not found”.', 'not-found/index.html', big('i-art-not-found', 'Page not found')),
+        ('Team logo', 'i-art-team-logo', 'Team Profile: a stand-in for the picture a team uploads. In the product each team has its own.', 'team-profile/index.html', big('i-art-team-logo', 'Team logo')),
         ('Nothing owned', 'i-art-empty-alert', 'Profile and Team Profile, Processes tab: the drawing above “No Processes yet”.', 'profile/index.html#tab-2', big('i-art-empty-alert', 'Nothing owned')),
     ]
     return library_page('New icons', 'icons', items)
