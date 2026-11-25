@@ -187,7 +187,7 @@ def dashboard():
       <article class="card" style="margin-bottom: var(--spacing-6)">
         <div class="row" style="flex-wrap: wrap; gap: var(--spacing-2); margin: calc(-1 * var(--spacing-2)) 0 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted)">
           <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">6</span> Objectives</span>{icon("i-chevron-right", "icon icon-16")}
-          <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">28</span> Initiatives</span>{icon("i-chevron-right", "icon icon-16")}
+          <a class="body-sm" href="../initiatives/index.html" style="color: inherit; text-decoration: none"><span class="body-sm-semibold" style="color: var(--color-text)">28</span> Initiatives</a>{icon("i-chevron-right", "icon icon-16")}
           <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">138</span> Projects</span>{icon("i-chevron-right", "icon icon-16")}
           <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">118</span> Sub-projects</span>
         </div>
@@ -1607,7 +1607,7 @@ def indent(n, lvl, bold=False):
 
 
 def processes_views():
-    comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True,
+    comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True, default='href="#open-process-drawer" data-modal-open="process-drawer"', 
                       links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}) + pager()
     return comp, sheet_tree(PROC_TREE, 'procs', with_health=False)
 
@@ -1679,7 +1679,7 @@ TREE_COLS = {'objective': ('Strategic Objective', 192), 'owner': ('Objective Own
 
 
 def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roadmap', 'rob', 'actions'), kinds=KINDS, prefix='dash', sticky=True,
-               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs='', compact=False, roles=None):
+               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs='', compact=False, roles=None, default='href="../initiative-view/index.html"'):
     """A work list as the product draws it: rows that open a second and a
     third layer. With sticky, the name column stays put while the rest scrolls
     sideways (the dashboard); without, the table fills the page (the lists).
@@ -1693,7 +1693,7 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
         rid = f'{prefix}-{n[0]}'
         caret = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle {name}" data-rows="{rid}">{icon("i-chevron-down")}</button>' if kids
                  else '<span class="row-toggle-spacer"></span>')
-        link = f'<a class="ps-wtree-title" {links[name]}>{name}</a>' if name in links else f'<span class="ps-wtree-title">{name}</span>'
+        link = f'<a class="ps-wtree-title" {links.get(name, default)}>{name}</a>'
         first = (f'<div class="ps-wtree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
                  f'{"" if compact else tag(kinds[level]) + tags(name, level)}</div></div>')
         if rob:
@@ -1850,6 +1850,13 @@ def dashboard_with_states():
     ccards = ''.join(work_card(nd[0], health(nd[2], HEALTH_KIND[nd[2]]) + tag("Initiative") + tag(nd[1], STATUS_KIND.get(nd[1], "light")) + tag("# Core Strategy"), nd[3], nd[4], caret=bool(nd[6])) for o, k, nd in DASH_TREE)
     h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE, links=DASH_LINKS)}</div>\n<div data-panel="view:1" hidden>{tree_table(DASH_TREE, links=DASH_LINKS, compact=True, prefix="dashc")}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
          + mobile('<div class="stack">' + ccards + '</div>') + h[e:])
+    fb = '<button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button>'
+    qb = '<button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>'
+    assert fb in h and qb in h
+    h = h.replace(fb, fb.replace('type="button">', 'type="button" data-toggle="filters-panel">')).replace(qb, qb.replace('type="button">', 'type="button" data-toggle="query-panel">'))
+    k = '<div data-view="desktop"><div data-panel="view:0">'
+    assert h.count(k) == 1
+    h = h.replace(k, work_filters('Initiative', ('Initiative', 'Project', 'Sub-project')) + INIT_QUERY + k)
     charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
     bars = [healthbar(170, 1, 1, 112), healthbar(206, 0, 6, 59)]
@@ -1991,7 +1998,7 @@ def processes_with_states():
     h = h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
     h = toggle(h, 'Filters', 'filters-panel')
     h = h.replace('<button class="btn btn-ghost btn-xs" type="button">Expand all</button>', '<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button>')
-    h = swap_table(h, tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='proc', sticky=False, attrs=' data-view="desktop"',
+    h = swap_table(h, tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='proc', sticky=False, attrs=' data-view="desktop"', default='href="#open-process-drawer" data-modal-open="process-drawer"', 
                                  tags=lambda name, level: tag('Northwind Hire', 'blue-light') if name == 'Northwind Hire' else '',
                                  links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}))
     h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
@@ -2008,7 +2015,7 @@ def sign_in():
       <img class="sidenav-logo" src="../../../designmd/assets/logo-dark.svg" alt="Operationalize" />
       <div class="stack" style="align-items: center; justify-content: center; min-height: 60vh; width: 100%; max-width: 500px; gap: var(--spacing-4)">
         <h1 class="h2" style="margin: 0 0 var(--spacing-2)">Log in to Operationalize</h1>
-        <button class="btn btn-secondary" type="button" style="width: 100%">{icon("i-google", "btn-icon")}Log in with Google</button>
+        <a class="btn btn-secondary" href="../dashboard/index.html" style="width: 100%; text-decoration: none">{icon("i-google", "btn-icon")}Log in with Google</a>
       </div>
     </div>'''
 
@@ -2534,7 +2541,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Checked the tabs marked as not yet compared. Edit Profile was first compared while staging was still loading: its About box is a rich-text editor and Save Changes is green after all, so both are put back, and the form is filled in. Divisions rows lose their borders.'),    dict(date='Nov 25, 2026', span='14:27–14:34', minutes=7,
          screens=['okrs', 'rob-meetings', 'rob-meeting-view', 'profile', 'team-profile', 'people', 'talent-profile', 'self-review', 'dashboard', 'processes'],
          note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),    dict(date='Nov 25, 2026', span='14:36–14:41', minutes=5, screens=['initiative-view', 'initiative-create', 'team-profile'],
-         note='The last three under 95%. The create form’s lower half now follows staging: numbered objective and metric lines, quarter pickers, the Jira card, the upload box with its reminder, and the locked Projects note. The initiative view lists documents with a tick and a view count. Team Profile has a drawn logo.'),
+         note='The last three under 95%. The create form’s lower half now follows staging: numbered objective and metric lines, quarter pickers, the Jira card, the upload box with its reminder, and the locked Projects note. The initiative view lists documents with a tick and a view count. Team Profile has a drawn logo.'),    dict(date='Nov 25, 2026', span='14:44–14:44', minutes=0, screens='all',
+         note='Wired into a clickable prototype. Every person’s name opens a profile, every unit a team profile, every meeting the meeting view, every initiative or project the initiative view, every process its drawer. Create and Save buttons land where the product lands, RACI buttons open the RACI drawer on every screen, the dashboard’s Filters and Query open their panels. Checked by clicking through 24 flows.'),
 ]
 
 

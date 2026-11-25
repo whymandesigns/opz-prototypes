@@ -139,6 +139,14 @@ VIEW_SCRIPT = '''  <script>
       stripe();
     };
     stripe();
+    // Prototype links: a button that finishes a flow, and a person's cell or card.
+    document.addEventListener('click', e => {
+      const go = e.target.closest('[data-go]');
+      if (go) { location.href = go.dataset.go; return; }
+      if (e.target.closest('a, button, input, label')) return;
+      const who = e.target.closest('.table .cell-user, .org-node, .ps-tree-node');
+      if (who) location.href = who.querySelector('.is-talent') ? '../talent-profile/index.html' : '../profile/index.html';
+    });
     document.addEventListener('click', e => {
       const caret = e.target.closest('[data-rows]');
       if (caret) fold(caret, caret.getAttribute('aria-expanded') !== 'true');
@@ -255,6 +263,69 @@ def plain(title, body):
 '''
 
 
+def wire(html, folder):
+    """Make the reference click through like the product: every name that is a
+    person, a unit, a meeting or a piece of work goes to its screen, and the
+    buttons that finish a flow land where the product would land."""
+    people = {n for n, _ in screens.PEOPLE.values()}
+    talents = {'Rosa Dahl', 'Imran Suleiman', 'Greta Lund', 'Samir Haddad', 'Lina Okoye', 'Paolo Ferri'}
+    units = ({u[0] for u in screens.UNITS} | {k[0] for kids in screens.UNIT_KIDS.values() for k in kids} | set(screens.UNIT_OF.values())) - {''}
+    work = set()
+
+    def collect(node):
+        work.add(node[0])
+        for kid in node[6]:
+            collect(kid)
+    for tree in (screens.DASH_TREE, screens.INIT_TREE):
+        for _, _, node in tree:
+            collect(node)
+    work |= {'Contract to workspace handoff', 'First-week survey', 'Self-serve account setup'}
+    procs = set()
+    for _, _, node in screens.PROC_TREE:
+        procs.add(node[0])
+
+    def target(text):
+        if text in talents:
+            return '../talent-profile/index.html'
+        if text in people:
+            return '../profile/index.html'
+        if text in units:
+            return '../team-profile/index.html'
+        if text.startswith('['):
+            return '../rob-meeting-view/index.html'
+        if text in work:
+            return '../initiative-view/index.html'
+        if text in procs:
+            return '../processes/index.html#open-process-drawer'
+        return None
+
+    def link(m):
+        text = re.sub(r'<[^>]+>', '', m.group(3)).strip()
+        to = target(text)
+        return m.group(0) if not to else f'<a{m.group(1)}href="{to}"{m.group(2)}>{m.group(3)}</a>'
+    html = re.sub(r'<a\b([^>]*?)href="#"([^>]*)>(.*?)</a>', link, html, flags=re.S)
+    html = html.replace('<a class="topbar-brand" href="#">', '<a class="topbar-brand" href="../dashboard/index.html">')
+    # buttons that finish a flow
+    go = {'Create Initiative': '../initiative-view/index.html', 'Save Changes': '../profile/index.html', 'Save changes': '../profile/index.html',
+          'Log in with Google': '../dashboard/index.html', 'Edit': '../profile-edit/index.html' if folder == 'self-review' else None}
+    for label, to in go.items():
+        if to:
+            html = re.sub(r'<button class="(btn [^"]*)" type="button"((?: style="[^"]*")?)>((?:<svg[^>]*>.*?</svg>)?)' + re.escape(label) + '</button>',
+                          lambda m: f'<button class="{m.group(1)}" type="button"{m.group(2)} data-go="{to}">{m.group(3)}{label}</button>', html, flags=re.S)
+    if 'id="give-feedback"' in html:
+        html = html.replace('<button class="btn btn-primary" type="button">Give feedback</button>', '<button class="btn btn-primary" type="button" data-modal-open="give-feedback">Give feedback</button>')
+        html = html.replace('<button class="btn btn-secondary" type="button">Continue</button>', '<button class="btn btn-secondary" type="button" data-modal-close>Continue</button>')
+    html = html.replace('<button class="btn btn-secondary" type="button">Create</button>', '<button class="btn btn-secondary" type="button" data-modal-close>Create</button>')
+    # every RACI button opens the RACI drawer, on whichever screen it sits
+    raci = '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">'
+    if raci in html:
+        if 'id="raci-drawer"' not in html:
+            html = html.replace('<script', screens.raci_overlay('Onboarding in one week') + '\n  <script', 1)
+        html = html.replace(raci, raci.replace('>', ' data-modal-open="raci-drawer">'))
+    html = re.sub(r'<a\b([^>]*?)href="#"([^>]*)>(.*?)</a>', link, html, flags=re.S)   # again, for what the drawer brought in
+    return re.sub(r'<a class="ps-cal-more body-xs-semibold" href="#">', '<a class="ps-cal-more body-xs-semibold" href="#show-robview-0">', html)
+
+
 def with_icons(html):
     """Icons drawn for this reference live in _src/icons.svg until promote.py
     moves them into the kit's sprite. A page gets the ones it names."""
@@ -279,6 +350,7 @@ def main():
             html = page(s['title'], s['nav'], s['main'], s.get('ctas', ()), s.get('overlays', ''), padded=s.get('padded', True))
         d = OUT / s['folder']
         d.mkdir(exist_ok=True)
+        html = wire(html, s['folder'])
         html = html.replace('</body>', screens.staging_link(s['folder']) + '</body>', 1)
         (d / 'index.html').write_text(with_icons(html))
         built.append(s['folder'])
