@@ -99,3 +99,9 @@ the nearest list instead and says so. The paths are in `STAGING` in
 `_src/screens.py`. Staging needs a login. On eight screens the link follows
 the open tab (`STAGING_TABS`); RoB Meetings and OKRs tabs have no stable
 address on staging, so there it opens the screen.
+
+## Side menu
+
+The menu ends as staging does for a non-admin account: a group holding
+Confluence, Watercooler and TopTaste, then the Learning hub. The group is
+labelled "Team Fun" here; the product names it after the company.

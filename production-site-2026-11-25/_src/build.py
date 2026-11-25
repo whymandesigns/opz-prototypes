@@ -163,6 +163,39 @@ VIEW_SCRIPT = '''  <script>
 
 def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
     t = TEMPLATE.replace('{{FEATURE_TITLE}}', title)
+    # The menu's foot as the product has it for this account: a group that
+    # opens (with the Watercooler in it) and the learning hub. No admin settings.
+    fun_open = active == 'Watercooler'
+    up = '../' * depth
+    sub = lambda label, href, on=False: f'<li><a class="sidenav-item sidenav-subitem{" is-active" if on else ""}" href="{href}"><span class="sidenav-item-label">{label}</span></a></li>'
+    foot = f'''<div class="sidenav-footer">
+        <div class="sidenav-group">
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="{str(fun_open).lower()}">
+            <svg class="sidenav-item-icon"><use href="#i-group-3"/></svg>
+            <span class="sidenav-item-label">Team Fun</span>
+            <svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg>
+          </button>
+          <ul class="sidenav-sublist">
+            {sub("Confluence", "#")}
+            {sub("Watercooler", up + "watercooler/index.html", fun_open)}
+            {sub("TopTaste", "#")}
+          </ul>
+        </div>
+        <div class="sidenav-group">
+          <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="false">
+            <svg class="sidenav-item-icon"><use href="#i-lightbulb"/></svg>
+            <span class="sidenav-item-label">Learning hub</span>
+            <svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg>
+          </button>
+          <ul class="sidenav-sublist">
+            {sub("Demo: create a Process", "#")}
+            {sub("Complete your profile", up + "profile-edit/index.html")}
+            {sub("Onboarding", "#")}
+          </ul>
+        </div>
+      </div>'''
+    t, n = re.subn(r'<div class="sidenav-footer">.*?</div>\n    </aside>', lambda m: foot + '\n    </aside>', t, count=1, flags=re.S)
+    assert n == 1
     if depth == 1:
         t = t.replace('../../designmd/', '../../../designmd/')
     # top bar: the collapsed-bar CTAs mirror this page's head, action for action
