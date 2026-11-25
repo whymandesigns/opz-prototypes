@@ -25,14 +25,19 @@ shows every primary screen with a tick when built, when it was built and
 updated, and how long each took. The times come from `BATCHES` and `UPDATES`
 in `_src/screens.py`: add an entry there after every build or update pass.
 
-Where the kit has no component, the nearest kit one stands in, and says so here
-rather than in invented CSS:
+Where the kit has no component, the element is built here rather than
+approximated: `_src/elements.css` holds fifteen of them (`ps-*` classes, kit
+tokens only, no media queries), and `elements/index.html` shows each one live
+as a candidate for `components.css`. The linter reports them as `local-class`
+warnings, which is the point: they are the list of what the kit is missing.
 
-| In the app | Here |
+Three things still differ from the product on purpose:
+
+| In the product | Here |
 |---|---|
-| Dashboard status bar chart | stat cards, one per status |
-| RoB month calendar grid | a five-column table with the meetings as list rows |
-| Profile location map | a card with the city |
+| A real map on People › Geography and on a profile | a placeholder panel with pins; a map needs a map provider |
+| Curved lines in the reporting-relationships graph | the same tree with straight lines |
+| Illustrated badges and empty-state pictures | an icon in a ring |
 
 ## Rebuilding
 
