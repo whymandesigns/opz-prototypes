@@ -4601,6 +4601,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Agenda row in a meeting: number, item, how often, who brings it. */
 .ps-agenda-row { display: grid; grid-template-columns: var(--spacing-6) 1fr auto auto; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
 .ps-agenda-row + .ps-agenda-row { margin-top: var(--spacing-2); }
+
+/* Compact tree table: one line per row. */
+.ps-wtree-compact .ps-wtree-row > td { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.ps-wtree-compact .ps-wtree-name { align-items: center; }
+
+/* Sheet table: the spreadsheet view. Numbered rows, ruled cells, every layer open. */
+.ps-sheet { border-collapse: collapse; }
+.ps-sheet th, .ps-sheet td { border: 1px solid var(--color-border); padding: var(--spacing-2) var(--spacing-3); white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.ps-sheet thead th { background: var(--color-surface-muted); }
+.ps-sheet td:first-child, .ps-sheet td:nth-child(2) { text-align: center; }
+.ps-sheet .row-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
+.ps-sheet .row-toggle[aria-expanded="true"] svg { transform: none; }
+.ps-sheet tr[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4877,6 +4890,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     const items = strip => [...strip.querySelectorAll('.tab, .segmented-item')];
     const pick = (group, i) => {
       document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      // a control can also drop out of, or appear in, one choice of a switch
+      document.querySelectorAll('[data-hide-in^="' + group + ':"]').forEach(el => show(el, el.dataset.hideIn !== group + ':' + i));
+      document.querySelectorAll('[data-show-in^="' + group + ':"]').forEach(el => show(el, el.dataset.showIn === group + ':' + i));
       document.querySelectorAll('[data-tabs="' + group + '"]').forEach(strip => items(strip).forEach((t, n) => {
         const on = n === Number(i);
         t.classList.toggle('is-active', on); if (t.matches('.tab')) t.setAttribute('aria-selected', String(on));
