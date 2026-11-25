@@ -277,7 +277,7 @@ def initiatives():
     for i, (n, s, kind, h, k, unit, road, r) in enumerate(INITIATIVES):
         name = (f'<a class="cell-title" href="../initiative-view/index.html" {LINK}>{n}</a>' if i == 0 else f'<span class="cell-title">{n}</span>')
         rows.append(f'<tr><td>{name}<div>{tag("Initiative")}</div></td><td>{tag(s, kind)}</td><td>{health(*h)}</td><td>{user(k, unit)}</td>'
-                    f'<td><span class="body-sm">{road}</span></td><td>{rob_cell(r)}</td></tr>')
+                    f'<td><span class="body-sm">{road}</span></td><td>{rob_cell(r)}</td><td>{raci_btn()}</td></tr>')
     cards = ''.join(work_card(n, health(*h) + tag("Initiative") + tag(s, kind), k, unit, '../initiative-view/index.html' if i == 0 else None)
                     for i, (n, s, kind, h, k, unit, road, r) in enumerate(INITIATIVES))
     return f'''{head("Initiatives", '<a class="btn btn-primary" href="../initiative-create/index.html" style="text-decoration: none">Create Initiative</a>')}
@@ -287,7 +287,7 @@ def initiatives():
       {mobile('<div class="stack">' + cards + '</div>')}
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
-          <thead><tr><th>Name</th><th>Status</th><th>Health</th><th>Accountability</th><th>Roadmap</th><th>RoB Meeting</th></tr></thead>
+          <thead><tr><th>Name</th><th>Status</th><th>Health</th><th>Accountability</th><th>Roadmap</th><th>RoB Meeting</th><th style="text-align: right">Actions</th></tr></thead>
           <tbody>{"".join(rows)}</tbody>
         </table>
       </div>
@@ -1236,7 +1236,7 @@ def okr_panels():
     return [cards([('Customers start in a week', 'Active', 'positive', [('Median time to first delivery is 7 days', 64)])]),
             cards([('Operations: one handoff, not three', 'Active', 'positive', [('Contract to workspace handoff is automatic', 50), ('Kick-off checklist used on every engagement', 80)])]),
             cards([('Operations Q4: checklist live', 'Active', 'positive', [('Checklist in use on 20 engagements', 45)]), ('IT Q4: self-serve setup', 'Draft', 'light', [('Billing setup without a call', 10)])]),
-            cards([('Delivery Q4: first-week survey', 'Draft', 'light', [('Survey sent to every new customer', 0)])]),
+            empty_state('i-okr', 'No OKRs found', 'No OKRs have been created for this level and period yet.'),
             cards([('Shared: time to first delivery', 'Active', 'positive', [('Median time to first delivery is 7 days', 64)])])]
 
 
@@ -1486,13 +1486,56 @@ INIT_QUERY = QUERY_PANEL.replace('Show processes being supported', 'Show initiat
 
 def initiatives_with_states():
     h = toggle(toggle(initiatives(), 'Filters', 'filters-panel'), 'Query', 'query-panel')
+    h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
     return with_views(h, *initiatives_views(), extra_panels=work_filters('Initiative', ('Initiative', 'Project', 'Sub-project')) + INIT_QUERY)
+
+
+def raci_overlay(name):
+    o = process_overlays()
+    return o[o.index('  <div class="drawer-overlay" id="raci-drawer"'):].replace('Refund requests', name)
+
+
+def no_access():
+    return f'''      <div class="alert alert-warning">{icon("i-warning", "icon alert-icon")}<p class="alert-message">You do not have rights to edit the Org Unit</p></div>'''
 
 
 def dashboard_with_states():
     h = dashboard()
+    more = '<button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions">' + icon("i-dots-three-vertical", "btn-icon") + '</button>'
+    assert h.count(more) == 1
+    h = h.replace(more, '<div class="dropdown">' + more.replace('class="btn btn-icon-only btn-ghost"', 'class="btn btn-icon-only btn-ghost dropdown-trigger" aria-expanded="false"')
+                  + '<div class="dropdown-menu dropdown-menu-end" id="dash-more" hidden><button class="dropdown-item" type="button">Edit strategic objectives</button></div></div>')
+    seg = '<div class="segmented" role="group" aria-label="Initiatives shown">'
+    assert h.count(seg) == 2
+    h = h.replace(seg, seg.replace('>', ' data-tabs="scope">'))
+    k0 = '      <article class="card" style="margin-bottom: var(--spacing-6)">'
+    assert h.count(k0) == 1
+    j = h.index(k0)
+    stats = ''.join(f'<div class="stat-card"><p class="stat-card-label">{l}</p><p class="stat-card-value">{v}</p></div>'
+                    for l, v in (('Idea', 9), ('Opportunity assessment', 0), ('Definition', 8), ('Execution', 31), ('Impact assessment', 7), ('Complete', 60), ('On hold', 18)))
+    orow = ''.join(f'<tr><td><span class="cell-title">{n}</span><div>{tag("Initiative")}</div></td><td>{tag(st, kind)}</td><td>{health(*hh)}</td><td>{user(k, unit)}</td><td>{sub(road)}</td><td>{rob_cell(r)}</td><td>{raci_btn()}</td></tr>'
+                   for n, st, kind, hh, k, unit, road, r in INITIATIVES[2:7])
+    other = f'''<article class="card" style="margin-bottom: var(--spacing-6)">
+        <div class="row" style="flex-wrap: wrap; gap: var(--spacing-3)"><span class="body"><span class="body-semibold">34</span> Initiatives</span>{icon("i-caret-right", "icon icon-16")}
+          <span class="body"><span class="body-semibold">136</span> Projects</span>{icon("i-caret-right", "icon icon-16")}<span class="body"><span class="body-semibold">104</span> Sub-projects</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-top: var(--spacing-6)">
+          <div class="stack" style="flex: 1 1 320px; min-width: 0">
+            <div class="row" style="justify-content: space-between"><h2 class="body-semibold" style="margin: 0">Health</h2><span class="body-sm"><span class="body-sm-semibold">76%</span> on track</span></div>
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="76" aria-label="On track"><div class="progress-track"><div class="progress-fill" style="width: 76%"></div></div><span class="progress-value" hidden>76%</span></div>
+            <div class="row" style="flex-wrap: wrap">{health("206 On track", "positive")}{health("0 At risk", "warning")}{health("6 Off track", "negative")}{health("59 Not active", "light")}</div>
+          </div>
+          <div class="stack" style="flex: 2 1 480px; min-width: 0"><h2 class="body-semibold" style="margin: 0">Status</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--spacing-3)">{stats}</div></div>
+        </div>
+      </article>
+      <div class="toolbar" style="margin-bottom: var(--spacing-4)">
+        <div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" /></div>
+        <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button><button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
+      </div>
+      {table(("Name", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting", '<span style="display: block; text-align: right">Actions</span>'), orow)}'''
+    h = h[:j] + '<div data-panel="scope:0">' + h[j:] + '</div>\n<div data-panel="scope:1" hidden>' + other + '</div>'
     k = '      <div class="table-scroll" style="max-height: none">'
-    assert h.count(k) == 1
+    assert h.count(k) == 2   # the spreadsheet table, then the Other initiatives one
     i = h.index(k)
     heads = ('Name', 'Strategic Objective', 'Objective Owner', 'Status', 'Health', 'Accountability', 'Roadmap', 'RoB Meeting')
     hl = {'Execution': ('On track', 'positive'), 'Complete': ('On track', 'positive')}
@@ -1500,7 +1543,8 @@ def dashboard_with_states():
                   f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td>{user(k)}</td><td>{sub("Q4 2026" if st == "Execution" else "")}</td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     comp = ''.join(f'<tr><td><span class="row"><span class="cell-title">{n}</span>{tag("Initiative")}</span></td><td>{sub(o)}</td><td>{sub(PEOPLE[k][0])}</td><td>{tag(st, kind)}</td>'
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
-    h = h[:i] + f'<div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:] + '</div>'
+    e = h.index('</div>\n<div data-panel="scope:1" hidden>')
+    h = (h[:i] + f'<div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:e] + '</div>' + h[e:])
     return h
 
 
@@ -1620,7 +1664,12 @@ STATES_2 = [
     ('rob-meetings', 'Filters', 'Panel', '#open-rob-filters'),
     ('okrs', 'Performance attributes', 'Modal', '#open-perf-attrs'), ('dashboard', 'User menu', 'Menu', '#open-user-menu'),
 ]
-STATE_GROUPS = [(STATES, 4), (STATES_2, 6)]   # each list of states, and the pass that built it
+STATES_3 = [
+    ('dashboard', 'Other initiatives', 'View', '#show-scope-1'), ('dashboard', 'More actions menu', 'Menu', '#open-dash-more'),
+    ('okrs', 'A level with no OKRs', 'Tab', '#tab-4'), ('initiatives', 'RACI', 'Drawer', '#open-raci-drawer'),
+    ('no-access', 'No rights to edit', 'Page', ''),
+]
+STATE_GROUPS = [(STATES, 4), (STATES_2, 6), (STATES_3, 7)]   # each list of states, and the pass that built it
 
 
 P1 = ('btn-primary',)
@@ -1629,7 +1678,7 @@ SCREENS = [
          ctas=[('btn-secondary', 'More actions', 'i-dots-three-vertical')]),
     dict(folder='processes', title='Processes', nav='Processes', main=processes_with_states(), overlays=process_overlays(), route='/bau/list',
          ctas=[('btn-primary', 'Create Process', 'i-plus')]),
-    dict(folder='initiatives', title='Initiatives', nav='Initiatives', main=initiatives_with_states(), route='/initiatives/list',
+    dict(folder='initiatives', title='Initiatives', nav='Initiatives', main=initiatives_with_states(), overlays=raci_overlay('Onboarding in one week'), route='/initiatives/list',
          ctas=[('btn-primary', 'Create Initiative', 'i-plus')]),
     dict(folder='initiative-view', title='Onboarding in one week', nav='Initiatives', main=with_tabs(initiative_view(), 'initiative', [activity_log()], suffix='      </div>'), route='/initiatives/:id', padded=False),
     dict(folder='initiative-create', title='New initiative', nav='Initiatives', main=initiative_create(), route='/initiatives/create', padded=False),
@@ -1655,6 +1704,7 @@ SCREENS = [
     dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
     dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
     dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=with_tabs(talent_profile(), 'talent', [empty_state('i-cpu-2', 'Rosa doesn’t own any Processes', 'No Processes yet')]), route='/talent/:talentId'),
+    dict(folder='no-access', batch=7, title='Edit org unit', nav='Team', main=no_access(), route='/teams/:teamId/edit'),
     dict(folder='sign-in', batch=5, plain=True, title='Log in', nav=None, main=sign_in(), route='/signin'),
     dict(folder='profile-public-edit', batch=3, title='Edit public profile', nav='People', main=public_profile_edit(), route='/people/:userId/edit-public-profile',
          ctas=[('btn-secondary', 'Cancel', 'i-x'), ('btn-primary', 'Save changes', 'i-check')]),
@@ -1716,6 +1766,8 @@ BATCHES = {
             note='Mostly spent finding what staging lets this account open; two screens came out of it.'),
     5: dict(date='Nov 25, 2026', span='10:46–10:52', minutes=6,
             note='Staging signed the account out mid-pass, which showed the sign-in page; nothing else could be captured.'),
+    7: dict(date='Nov 25, 2026', span='11:16–11:18', minutes=4, states=True,
+            note='Little of what is left opens for this account on staging: Create OKR and Create meeting are disabled, and the top-bar popovers did not open.'),
     6: dict(date='Nov 25, 2026', span='11:10–11:14', minutes=6, states=True,
             note='View modes, filter and query panels, the calendar views, the Performance attributes modal and the account menu.'),
     4: dict(date='Nov 25, 2026', span='10:21–10:27', minutes=8, states=True,
@@ -1763,7 +1815,7 @@ def index():
                          f'<td colspan="4">{why}</td>')
             body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td>{cells}</tr>')
     srows = ''.join(
-        f'<tr><td style="width: var(--spacing-10)">{yes}</td><td><span class="body-sm">{titles[f]}</span></td>'
+        f'<tr><td style="width: var(--spacing-10)">{yes}</td><td><span class="body-sm">{titles.get(f, "Edit org unit")}</span></td>'
         f'<td><a class="cell-title" href="{f}/index.html{h}" {LINK}>{n}</a></td><td>{tag(k)}</td><td><span class="body-sm">Nov 25, 2026</span></td>'
         f'<td><span class="body-sm">{BATCHES[b]["minutes"] / len(group):.1f} min</span></td><td>{dash}</td><td>{dash}</td></tr>' for group, b in STATE_GROUPS for f, n, k, h in group)
     n_states = sum(len(g) for g, _ in STATE_GROUPS)
