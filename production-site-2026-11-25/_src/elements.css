@@ -219,3 +219,8 @@
 .ps-chain-item:first-child::after { top: 50%; }
 .ps-chain-item:last-child::after { bottom: 50%; }
 .ps-chain-item.is-current .org-node { border-color: var(--color-accent); background: var(--color-accent-subtle); }
+.ps-staging.is-raised { bottom: calc(var(--spacing-6) + var(--spacing-12) + var(--spacing-4)); }
+
+/* Link row: a row that is one link, with a chevron at the end. */
+.ps-linkrow { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4); padding: var(--spacing-3) 0; border-bottom: 1px solid var(--color-border); color: var(--color-text); text-decoration: none; }
+.ps-linkrow:hover { background: var(--color-surface-muted); }

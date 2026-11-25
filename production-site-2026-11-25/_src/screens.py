@@ -333,7 +333,7 @@ def crumbs(last):
 
 def initiative_view():
     general = ''.join((
-        field_row('Status', tag('Execution', 'blue')),
+        field_row('Status', tag('Execution')),
         field_row('Health', health('On track', 'positive')),
         field_row('Executive sponsor', user('ho')),
         field_row('Beneficiary function', f'<div class="row">{icon("i-function", "icon icon-16")}<span class="body-sm-semibold">Operations</span></div>'),
@@ -386,14 +386,16 @@ def initiative_view():
               <div><a class="body-sm" href="../rob-meeting-view/index.html" {LINK}>[RoB] Onboarding in one week</a><div class="row"><span class="body-sm">Oct 13 • 10:30am</span>{tag("Every week on Tuesday")}</div></div>
               <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-slack-color")}</span><span class="body-sm">Slack channels</span></div>
               <div class="row"><a class="body-sm" href="#" {LINK}># onboarding-one-week</a>{tag("Default")}</div>
-              <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-okr")}</span><span class="body-sm">OKRs</span></div>
-              <div><a class="body-sm" href="../okrs/index.html" {LINK}>Faster customer onboarding</a></div>
+              <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-bookmark")}</span><span class="body-sm">Tags</span></div>
+              <div class="row"><span class="chip">#Core Strategy</span></div>
             </div>
+            <h3 class="body-semibold row" style="margin: var(--spacing-2) 0 0">Agenda{tag("0")}</h3>
+            <div class="row" style="padding: var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm)">{icon("i-list-unordered", "icon icon-16")}<span class="body-sm">No Agenda Items yet</span></div>
           </section>
           <section class="stack" id="sec-documents"><h2 class="h4" {RULE}>Documents</h2>
             <div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></section>
           <section class="stack" id="sec-projects"><h2 class="h4" {RULE}>Projects</h2>
-            <div class="table-scroll" style="max-height: none"><table class="table"><thead><tr><th>Name</th><th>Status</th><th>Accountability</th></tr></thead><tbody>{projects}</tbody></table></div></section>
+            <div>{"".join(f'<a class="ps-linkrow" href="#"><span class="body-sm">{n}</span>{icon("i-chevron-right", "icon icon-16")}</a>' for n in ("Kick-off checklist", "Account setup in one day", "Onboarding status page", "Contract to workspace handoff", "First-week survey"))}</div></section>
         </div>
         {section_nav()}
       </div>
@@ -2395,7 +2397,8 @@ def staging_link(folder):
   </script>
 """)
     data = f' data-staging-host="{STAGING_HOST}" data-staging-tabs="{" ".join(tabs_)}"' if tabs_ else ''
-    return (f'  <a class="btn btn-secondary ps-staging" href="{STAGING_HOST}{path}" target="_blank" rel="noopener" title="{tip}"{data}>'
+    raised = ' is-raised' if folder in ('initiative-create',) else ''   # a bar of form buttons sits at the bottom of these
+    return (f'  <a class="btn btn-secondary ps-staging{raised}" href="{STAGING_HOST}{path}" target="_blank" rel="noopener" title="{tip}"{data}>'
             f'{icon("i-external-link", "btn-icon")}{"Open on staging" if exact else "Staging: nearest list"}</a>\n' + follow)
 
 
@@ -2427,7 +2430,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),    dict(date='Nov 25, 2026', span='13:38–13:41', minutes=3, screens=['team', 'people', 'okrs'],
          note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:41–13:46', minutes=5, screens=['profile', 'team-profile', 'rob-meetings'],
          note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:45–13:49', minutes=4, screens='all',
-         note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),
+         note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),    dict(date='Nov 25, 2026', span='13:49–13:52', minutes=3, screens=['initiative-view', 'initiative-create'],
+         note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),
 ]
 
 
@@ -2547,6 +2551,8 @@ def elements_page():
          '<article class="card"><div class="ps-split"><div style="flex: 1 1 200px"><p class="body-semibold" style="margin: 0">Health</p></div><div style="flex: 2 1 300px"><p class="body-semibold" style="margin: 0">Status</p></div></div></article>'),
         ('Reporting chain', 'ps-chain', 'Profile, Reporting Relationships: who someone reports to, left to right, ending in the column of people beside them with that person marked.', 'profile/index.html',
          chain(("sr", "lk"), ("nr", "ck", "lh"), "ck")),
+        ('Link row', 'ps-linkrow', 'Initiative view, Projects: a row that is one link, with a chevron at the end.', 'initiative-view/index.html',
+         '<div style="max-width: 560px">' + ''.join(f'<a class="ps-linkrow" href="#"><span class="body-sm">{n}</span>{icon("i-chevron-right", "icon icon-16")}</a>' for n in ('Kick-off checklist', 'Account setup in one day')) + '</div>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
