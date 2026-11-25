@@ -26,7 +26,7 @@ updated, and how long each took. The times come from `BATCHES` and `UPDATES`
 in `_src/screens.py`: add an entry there after every build or update pass.
 
 Where the kit has no component, the element is built here rather than
-approximated: `_src/elements.css` holds twenty-two of them (`ps-*` classes, kit
+approximated: `_src/elements.css` holds twenty-six of them (`ps-*` classes, kit
 tokens only, no media queries), and `elements/index.html` shows each one live
 as a candidate for `components.css`. The linter reports them as `local-class`
 warnings, which is the point: they are the list of what the kit is missing.

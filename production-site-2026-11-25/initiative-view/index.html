@@ -4537,6 +4537,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Open on staging: our own link, floating over the screen, not part of it. */
 .ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }
+
+/* Status dot: the coloured dot inside a grey tag (health). */
+.ps-dot { width: var(--spacing-2); height: var(--spacing-2); margin-right: var(--spacing-1); border-radius: 50%; background: var(--color-border-strong); flex-shrink: 0; display: inline-block; }
+.ps-dot.is-positive { background: var(--color-success); }
+.ps-dot.is-warning { background: var(--color-warning); }
+.ps-dot.is-negative { background: var(--color-danger); }
+
+/* Split card: two halves with a rule between them. */
+.ps-split { display: flex; flex-wrap: wrap; gap: var(--spacing-6) var(--spacing-8); }
+.ps-split-next { padding-left: var(--spacing-8); border-left: 1px solid var(--color-border); }
+
+/* Tree table: rows open a second and a third layer; the name column stays
+   put while the rest scrolls sideways; stripes follow the rows that are open. */
+.ps-tree th:first-child, .ps-tree td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
+.ps-tree thead th:first-child { z-index: 2; }
+.ps-tree tbody td { background: var(--color-surface); vertical-align: middle; }
+.ps-tree tbody tr.is-alt > td { background: var(--color-surface-muted); }
+.ps-tree td { overflow: hidden; }
+.ps-tree .cell-user-name { font-weight: var(--font-weight-semibold); }
+.ps-tree .cell-user-meta { min-width: 0; }
+.ps-tree .cell-user-name, .ps-tree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-tree s { color: var(--color-text-muted); }
+.ps-tree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
+.ps-tree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-tree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-tree-title { font: var(--type-body-sm-semibold); color: var(--color-text); text-decoration: none; }
+.ps-tree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
+.ps-tree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* Roadmap marker: the button that opens a roadmap, with a dot for its health. */
+.ps-roadmap { position: relative; }
+.ps-roadmap::after { content: ""; position: absolute; top: 0; right: 0; width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-border-strong); }
+.ps-roadmap.is-positive::after { background: var(--color-success); }
+.ps-roadmap.is-warning::after { background: var(--color-warning); }
+.ps-roadmap.is-negative::after { background: var(--color-danger); }
+.ps-dot.is-light, .ps-roadmap.is-light::after { background: var(--color-text-subtle); }
+.ps-tree-row > td { height: calc(2 * var(--spacing-10)); }
+.ps-split .ps-health { margin-top: auto; }
 </style>
 </head>
 <body>
@@ -4682,7 +4720,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       <div style="display: flex; align-items: flex-start; gap: var(--spacing-10); margin-top: var(--spacing-6)">
         <div class="stack" style="flex: 1; min-width: 0; gap: var(--spacing-8)">
-          <section class="stack" id="sec-general"><h2 class="h4" style="margin: 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border)">General</h2><div style="display: flex; flex-direction: column; gap: var(--spacing-4)"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Status</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-blue">Execution</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Health</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-indicator tag-positive">On track</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Executive sponsor</span><div style="flex: 1 1 240px; min-width: 0"><div class="cell-user"><span class="avatar avatar-md">HO</span><div class="cell-user-meta"><span class="cell-user-name">Hannah Okafor</span><span class="cell-user-role">CEO</span></div></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Beneficiary function</span><div style="flex: 1 1 240px; min-width: 0"><div class="row"><svg class="icon icon-16" aria-hidden="true"><use href="#i-function"/></svg><span class="body-sm-semibold">Operations</span></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Related initiatives &amp; projects</span><div style="flex: 1 1 240px; min-width: 0"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Self-serve account setup</a></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Core strategy</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-indicator tag-positive">On</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Company strategic objective</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Faster customer onboarding</span></div></div></div></section>
+          <section class="stack" id="sec-general"><h2 class="h4" style="margin: 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border)">General</h2><div style="display: flex; flex-direction: column; gap: var(--spacing-4)"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Status</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-blue">Execution</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Health</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-light"><span class="ps-dot is-positive"></span>On track</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Executive sponsor</span><div style="flex: 1 1 240px; min-width: 0"><div class="cell-user"><span class="avatar avatar-md">HO</span><div class="cell-user-meta"><span class="cell-user-name">Hannah Okafor</span><span class="cell-user-role">CEO</span></div></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Beneficiary function</span><div style="flex: 1 1 240px; min-width: 0"><div class="row"><svg class="icon icon-16" aria-hidden="true"><use href="#i-function"/></svg><span class="body-sm-semibold">Operations</span></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Related initiatives &amp; projects</span><div style="flex: 1 1 240px; min-width: 0"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Self-serve account setup</a></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Core strategy</span><div style="flex: 1 1 240px; min-width: 0"><span class="tag tag-light"><span class="ps-dot is-positive"></span>On</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Company strategic objective</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Faster customer onboarding</span></div></div></div></section>
           <section class="stack" id="sec-people"><h2 class="h4" style="margin: 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border)">People</h2><div style="display: flex; flex-direction: column; gap: var(--spacing-4)"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Accountable owner</span><div style="flex: 1 1 240px; min-width: 0"><div class="cell-user"><span class="avatar avatar-md">SR</span><div class="cell-user-meta"><span class="cell-user-name">Sofia Romano</span><span class="cell-user-role">Chief Operating Officer</span></div></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Project manager</span><div style="flex: 1 1 240px; min-width: 0"><div class="cell-user"><span class="avatar avatar-md">CK</span><div class="cell-user-meta"><span class="cell-user-name">Cara Keane</span><span class="cell-user-role">Delivery Manager</span></div></div></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Working team</span><div style="flex: 1 1 240px; min-width: 0"><div class="row" style="flex-wrap: wrap; gap: var(--spacing-4)"><div class="cell-user"><span class="avatar avatar-md">LH</span><div class="cell-user-meta"><span class="cell-user-name">Laszlo Hartley</span><span class="cell-user-role">Delivery Manager</span></div></div><div class="cell-user"><span class="avatar avatar-md">TL</span><div class="cell-user-meta"><span class="cell-user-name">Tobias Lindqvist</span><span class="cell-user-role">Quality Lead</span></div></div><div class="cell-user"><span class="avatar avatar-md">NR</span><div class="cell-user-meta"><span class="cell-user-name">Nadia Rahman</span><span class="cell-user-role">Senior Product Designer</span></div></div></div></div></div></div>
             <h3 class="body-semibold" style="margin: var(--spacing-2) 0 0">RACI</h3><div class="table-scroll" style="max-height: none"><table class="table ps-striped"><thead><tr><th>Org Unit</th><th>Accountable <span style="color: var(--color-text-muted)">(max 1)</span></th><th>Responsible <span style="color: var(--color-text-muted)">(max 20)</span></th><th>Consulted <span style="color: var(--color-text-muted)">(max 20)</span></th><th>Informed <span style="color: var(--color-text-muted)">(max 20)</span></th></tr></thead><tbody><tr data-search-item><td><span class="cell-title">Operations</span><div><span class="body-xs" style="color: var(--color-text-muted)">Function</span></div></td><td><div class="cell-user"><span class="avatar avatar-md">SR</span><div class="cell-user-meta"><span class="cell-user-name">Sofia Romano</span><span class="cell-user-role">Chief Operating Officer</span></div></div></td><td><div class="cell-user"><span class="avatar avatar-md">CK</span><div class="cell-user-meta"><span class="cell-user-name">Cara Keane</span><span class="cell-user-role">Delivery Manager</span></div></div></td><td><div class="cell-user"><span class="avatar avatar-md">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lydia Kaminski</span><span class="cell-user-role">Operations Director</span></div></div></td><td><div class="cell-user"><span class="avatar avatar-md">HO</span><div class="cell-user-meta"><span class="cell-user-name">Hannah Okafor</span><span class="cell-user-role">CEO</span></div></div></td></tr><tr data-search-item><td><span class="cell-title">Delivery</span><div><span class="body-xs" style="color: var(--color-text-muted)">Subfunction</span></div></td><td></td><td><div class="cell-user"><span class="avatar avatar-md">LH</span><div class="cell-user-meta"><span class="cell-user-name">Laszlo Hartley</span><span class="cell-user-role">Delivery Manager</span></div></div></td><td><div class="cell-user"><span class="avatar avatar-md">TL</span><div class="cell-user-meta"><span class="cell-user-name">Tobias Lindqvist</span><span class="cell-user-role">Quality Lead</span></div></div></td><td></td></tr></tbody></table></div></section>
           <section class="stack" id="sec-timeline"><h2 class="h4" style="margin: 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border)">Timeline</h2><div style="display: flex; flex-direction: column; gap: var(--spacing-4)"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Estimated duration</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">6 months</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Start date</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Jul 1, 2026</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">End date</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Dec 18, 2026</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Initial impact date</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Oct 1, 2026</span></div></div><div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2) var(--spacing-6)"><span class="body-sm" style="flex: 0 0 200px; color: var(--color-text-muted)">Full impact date</span><div style="flex: 1 1 240px; min-width: 0"><span class="body-sm">Mar 1, 2027</span></div></div></div></section>
@@ -4880,10 +4918,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     addEventListener('hashchange', route); route();
 
     // Work lists: a caret folds a row's children; Expand all does every row.
+    // A tree table stripes the rows that are open, not every second row in the markup.
+    const stripe = () => document.querySelectorAll('.ps-tree tbody').forEach(tb => {
+      let i = 0;
+      tb.querySelectorAll('tr').forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
+    });
     const fold = (btn, on) => {
       btn.setAttribute('aria-expanded', String(on));
-      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => show(r, on));
+      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => {
+        show(r, on);
+        if (!on) r.querySelectorAll('[data-rows]').forEach(inner => fold(inner, false));   // closing a row closes what is under it
+      });
+      stripe();
     };
+    stripe();
     document.addEventListener('click', e => {
       const caret = e.target.closest('[data-rows]');
       if (caret) fold(caret, caret.getAttribute('aria-expanded') !== 'true');
@@ -4900,7 +4948,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.addEventListener('input', e => {
       if (!e.target.matches('[data-search]')) return;
       const q = e.target.value.trim().toLowerCase();
-      document.querySelectorAll('[data-search-item]').forEach(el => show(el, !q || el.textContent.toLowerCase().includes(q)));
+      document.querySelectorAll('[data-search-item]').forEach(el => show(el, q ? el.textContent.toLowerCase().includes(q) : !el.dataset.childOf));
+      if (!q) document.querySelectorAll('[data-rows]').forEach(c => c.setAttribute('aria-expanded', 'false'));
+      stripe();
     });
   })();
   </script>

@@ -50,7 +50,7 @@ def tag(text, kind='light'):
 
 
 def health(text, kind):
-    return f'<span class="tag tag-indicator tag-{kind}">{text}</span>'
+    return f'<span class="tag tag-light"><span class="ps-dot is-{kind}"></span>{text}</span>'
 
 
 def tabs(items, active=0):
@@ -184,13 +184,13 @@ def dashboard():
       {mobile('<div class="ps-seg-fill" style="margin-bottom: var(--spacing-4)">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Initiatives shown') + '</div>')}
 
       <article class="card" style="margin-bottom: var(--spacing-6)">
-        <div class="row" style="flex-wrap: wrap; gap: var(--spacing-3)">
-          <span class="body"><span class="body-semibold">6</span> Objectives</span>{icon("i-caret-right", "icon icon-16")}
-          <span class="body"><span class="body-semibold">28</span> Initiatives</span>{icon("i-caret-right", "icon icon-16")}
-          <span class="body"><span class="body-semibold">138</span> Projects</span>{icon("i-caret-right", "icon icon-16")}
-          <span class="body"><span class="body-semibold">118</span> Sub-projects</span>
+        <div class="row" style="flex-wrap: wrap; gap: var(--spacing-2); margin: calc(-1 * var(--spacing-2)) 0 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted)">
+          <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">6</span> Objectives</span>{icon("i-chevron-right", "icon icon-16")}
+          <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">28</span> Initiatives</span>{icon("i-chevron-right", "icon icon-16")}
+          <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">138</span> Projects</span>{icon("i-chevron-right", "icon icon-16")}
+          <span class="body-sm"><span class="body-sm-semibold" style="color: var(--color-text)">118</span> Sub-projects</span>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-top: var(--spacing-6)">
+        <div class="ps-split" style="margin-top: var(--spacing-4)">
           <div class="stack" style="flex: 1 1 320px; min-width: 0">
             <div class="row" style="justify-content: space-between"><h2 class="body-semibold" style="margin: 0">Health</h2><span class="body-sm"><span class="body-sm-semibold">60%</span> on track</span></div>
             <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60" aria-label="On track">
@@ -199,7 +199,7 @@ def dashboard():
             </div>
             <div class="row" style="flex-wrap: wrap">{health("170 On track", "positive")}{health("1 At risk", "warning")}{health("1 Off track", "negative")}{health("112 Not active", "light")}</div>
           </div>
-          <div class="stack" style="flex: 2 1 480px; min-width: 0">
+          <div class="stack ps-split-next" style="flex: 2 1 480px; min-width: 0">
             <h2 class="body-semibold" style="margin: 0">Status</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--spacing-3)">{stats}</div>
           </div>
@@ -208,14 +208,16 @@ def dashboard():
 
       {mobile_toolbar("Search by name, owner or function")}
       <div class="toolbar" data-view="desktop" style="margin-bottom: var(--spacing-3)">
-        <div class="input-icon input-icon-left toolbar-search">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 0 1 290px">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" />
         </div>
-        {"".join(f'<span data-panel="view:{i}" hidden><span class="row"><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span></span>' for i in (0, 1))}
+        {"".join(f'<span data-panel="view:{i}"{"" if i == 0 else " hidden"}><span class="row"><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span></span>' for i in (0, 1))}
+        {select("Strategic Objective, Objective Owner", ("Strategic Objective", "Objective Owner", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting"), label="Columns", width=150, lead="i-settings")}
+        {select("Updated at", ("Updated at", "Name", "Status", "Health"), label="Sort by", width=160)}
+        <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button>
         <span class="toolbar-spacer"></span>
-        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="View settings">{icon("i-controls", "btn-icon")}</button>
-        {view_modes(2)}
+        {view_modes(0)}
       </div>
       <div class="row" style="margin-bottom: var(--spacing-4)"><span class="chip">Tags: Core Strategy<button class="chip-remove" type="button" aria-label="Remove">{icon("i-x", "")}</button></span></div>
 
@@ -1566,6 +1568,84 @@ def no_access():
     return f'''      <div class="alert alert-warning">{icon("i-warning", "icon alert-icon")}<p class="alert-message">You do not have rights to edit the Org Unit</p></div>'''
 
 
+HEALTH_KIND = {'On track': 'positive', 'At risk': 'warning', 'Off track': 'negative', 'Not active': 'light'}
+STATUS_KIND = {'Execution': 'blue', 'Impact assessment': 'blue-light', 'Complete': 'positive'}
+# Core Strategy work as a tree: initiative > project > sub-project.
+# (name, status, health, accountable, unit, rob meeting (date, recurrence, past) or None, children)
+DASH_TREE = [
+    ('Faster customer onboarding', 'sr', ('Onboarding in one week', 'Impact assessment', 'On track', 'ck', 'Delivery', ('Oct 27 • 4:00pm', 'Every 2 weeks on Tuesday', True), [
+        ('Kick-off checklist', 'Execution', 'On track', 'lh', 'Delivery', None, [
+            ('Checklist template', 'Complete', 'On track', 'lh', 'Delivery', None, []),
+            ('Customer welcome call', 'Execution', 'Not active', 'tl', 'Delivery', None, [])]),
+        ('Account setup in one day', 'Definition', 'Not active', 'el', 'IT', None, []),
+        ('Onboarding status page', 'Complete', 'On track', 'nr', 'Operations', None, [])])),
+    ('Faster customer onboarding', 'sr', ('Self-serve account setup', 'Execution', 'On track', 'el', 'IT', ('Dec 01 • 5:00pm', 'Every week on Tuesday', False), [
+        ('Billing setup wizard', 'Execution', 'Not active', 'el', 'IT', None, []),
+        ('Invite your team flow', 'Execution', 'On track', 'nr', 'Operations', None, [
+            ('Bulk invite by file', 'Definition', 'Not active', 'nr', 'Operations', None, []),
+            ('Role presets', 'Complete', 'On track', 'nr', 'Operations', None, [])]),
+        ('Usage dashboard for admins', 'Definition', 'Not active', 'mt', 'Business Analytics', None, []),
+        ('Help centre rewrite', 'Complete', 'On track', 'jp', 'Learning & Development', None, [])])),
+    ('Reliable delivery', 'lk', ('Delivery health reviews', 'Idea', 'Not active', 'lk', 'Operations', ('Oct 22 • 5:00pm', 'Every week on Thursday', True), [])),
+    ('Reliable delivery', 'lk', ('Refund handling', 'Execution', 'On track', 'ck', 'Delivery', ('Nov 26 • 12:00pm', 'Every weekday', False), [
+        ('One refund policy', 'Complete', 'On track', 'og', 'Legal', None, []),
+        ('Refund review queue', 'Execution', 'At risk', 'ck', 'Delivery', None, [
+            ('Queue triage rules', 'Execution', 'At risk', 'tl', 'Delivery', None, [])])])),
+    ('A stronger partner channel', 'ad', ('Partner marketing sites', 'Idea', 'Not active', 'ad', 'Partnerships', None, [])),
+    ('A stronger partner channel', 'ad', ('Partner certification', 'Execution', 'On track', 'ad', 'Partnerships', ('Nov 25 • 3:00pm', 'Every 2 weeks on Wednesday', False), [
+        ('Certification syllabus', 'Complete', 'On track', 'jp', 'Learning & Development', None, []),
+        ('Partner exam', 'Execution', 'Off track', 'ad', 'Partnerships', None, [])])),
+    ('Grow the team well', 'ac', ('Learning programs', 'Execution', 'On track', 'jp', 'Learning & Development', ('Nov 30 • 6:00pm', 'Every week on Monday', False), [])),
+    ('Grow the team well', 'ac', ('Recruiting pipeline', 'Execution', 'On track', 'mv', 'Recruiting', ('Oct 14 • 6:00pm', 'Every week on Wednesday', True), [
+        ('One pipeline view', 'Complete', 'On track', 'mv', 'Recruiting', None, []),
+        ('Interview scorecards', 'Execution', 'On track', 'km', 'Northwind Hire', None, [])])),
+    ('Reliable delivery', 'lk', ('Engagement health score', 'Execution', 'On track', 'mt', 'Business Analytics', None, [])),
+    ('Faster customer onboarding', 'sr', ('First-week success plan', 'Execution', 'On track', 'ck', 'Delivery', ('Oct 27 • 4:00pm', 'Every 2 weeks on Tuesday', True), [])),
+]
+KINDS = ('Initiative', 'Project', 'Sub-project')
+TREE_HEADS = (('Name', 256), ('Strategic Objective', 192), ('Objective Owner', 136), ('Status', 144), ('Health', 96), ('Accountability', 152), ('Roadmap', 88), ('RoB Meeting', 184), ('Actions', 104))
+
+
+def tree_table(tree):
+    """The dashboard's work list: rows that open a second and a third layer,
+    a name column that stays put while the rest scrolls sideways."""
+    out, n = [], [0]
+
+    def row(node, level, objective, owner, parent):
+        name, status, hlth, k, unit, rob, kids = node
+        n[0] += 1
+        rid = f'dash-{n[0]}'
+        caret = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle {name}" data-rows="{rid}">{icon("i-chevron-down")}</button>' if kids
+                 else '<span class="row-toggle-spacer"></span>')
+        link = f'<a class="ps-tree-title" href="../initiative-view/index.html">{name}</a>' if level == 0 else f'<span class="ps-tree-title">{name}</span>'
+        first = (f'<div class="ps-tree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
+                 f'{tag(KINDS[level])}{tag("# Core Strategy")}</div></div>')
+        if rob:
+            date = f'<s>{rob[0]}</s>' if rob[2] else rob[0]
+            meet = (f'<div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2); flex-wrap: nowrap">{icon("i-calendar", "icon icon-16")}<span style="white-space: nowrap">{date}</span></span>'
+                    f'<span class="cell-meta-sub">{tag(rob[1])}</span></div>')
+        else:
+            meet = f'<span class="row body-sm" style="gap: var(--spacing-1); flex-wrap: nowrap; white-space: nowrap; color: var(--color-text-muted)"><span style="color: var(--color-warning); display: inline-flex">{icon("i-info", "icon icon-16")}</span>No meeting connected</span>'
+        road = (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>'
+                if level == 0 else '')
+        cells = (first, sub(objective), sub(PEOPLE[owner][0]), tag(status, STATUS_KIND.get(status, 'light')), health(hlth, HEALTH_KIND[hlth]), user(k, unit), road, meet, raci_btn())
+        attrs = f' data-child-of="{parent}" hidden' if parent else ''
+        out.append(f'<tr class="ps-tree-row" data-search-item{attrs}>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>')
+        for kid in kids:
+            row(kid, level + 1, objective, owner, rid)
+
+    for objective, owner, node in tree:
+        row(node, 0, objective, owner, '')
+    th = ''
+    for h, w in TREE_HEADS:
+        inner = (f'<span class="row" style="gap: var(--spacing-2); flex-wrap: nowrap">Name<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></span>' if h == 'Name'
+                 else f'<span class="row" style="gap: var(--spacing-1); flex-wrap: nowrap">Health{icon("i-info", "icon icon-16")}</span>' if h == 'Health'
+                 else '<span style="display: block; text-align: right">Actions</span>' if h == 'Actions' else h)
+        th += f'<th style="width: {w}px">{inner}</th>'
+    return (f'<div class="table-scroll" style="max-height: none"><table class="table ps-tree" style="min-width: {sum(w for _, w in TREE_HEADS)}px; table-layout: fixed">'
+            f'<thead><tr>{th}</tr></thead><tbody>{"".join(out)}</tbody></table></div>')
+
+
 def dashboard_with_states():
     h = dashboard()
     more = '<button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions">' + icon("i-dots-three-vertical", "btn-icon") + '</button>'
@@ -1615,8 +1695,8 @@ def dashboard_with_states():
     comp = ''.join(f'<tr><td><span class="row"><span class="cell-title">{n}</span>{tag("Initiative")}</span></td><td>{sub(o)}</td><td>{sub(PEOPLE[k][0])}</td><td>{tag(st, kind)}</td>'
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     e = h.index('</div>\n<div data-panel="scope:1" hidden>')
-    ccards = ''.join(work_card(n, health(*hl.get(st, ("Not active", "light"))) + tag("Initiative") + tag(st, kind) + tag("# Core Strategy"), k, PEOPLE[k][1], caret=True) for o, k, n, d, st, kind in OBJECTIVES)
-    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:e] + '</div></div>'
+    ccards = ''.join(work_card(nd[0], health(nd[2], HEALTH_KIND[nd[2]]) + tag("Initiative") + tag(nd[1], STATUS_KIND.get(nd[1], "light")) + tag("# Core Strategy"), nd[3], nd[4], caret=bool(nd[6])) for o, k, nd in DASH_TREE)
+    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
          + mobile('<div class="stack">' + ccards + '</div>') + h[e:])
     charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
@@ -2274,7 +2354,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Twelve icons the kit lacks were drawn and put in place: open in new tab, Slack in colour, the eight badges and the two empty-state drawings. They have their own list with See it in place and Add to library.'),    dict(date='Nov 25, 2026', span='13:18–13:22', minutes=4, screens='all',
          note='Every screen has a floating Open on staging link that opens the same view on the staging server in a new tab, for comparing the two.'),    dict(date='Nov 25, 2026', span='13:21–13:28', minutes=7,
          screens=['profile', 'team-profile', 'people', 'team', 'time-off', 'recognitions', 'watercooler', 'peer-feedback'],
-         note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),
+         note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),    dict(date='Nov 25, 2026', span='13:28–13:35', minutes=7, screens=['dashboard'],
+         note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),
 ]
 
 
@@ -2384,6 +2465,14 @@ def elements_page():
          '<span class="body-sm">Jul 2022 - Apr 2024</span></div></div>'),
         ('Tree rows', 'ps-row-child', 'Processes and Initiatives: rows that fold under a parent row. Click the caret on Refund requests.', 'processes/index.html',
          table(('Name', 'Status'), f'<tr><td><span class="cell-title">Refund requests</span></td><td>{tag("Active")}</td></tr><tr class="ps-row-child"><td><span class="cell-title">Refund review</span></td><td>{tag("Active")}</td></tr>')),
+        ('Tree table', 'ps-tree', 'Dashboard: rows open a second and a third layer, each layer set in with a rule; the name column stays in place while the others scroll sideways; stripes follow the rows that are open.', 'dashboard/index.html',
+         '<div style="max-width: 760px">' + tree_table(DASH_TREE[:2]) + '</div>'),
+        ('Status dot', 'ps-dot', 'Health everywhere: the coloured dot inside a grey tag.', 'dashboard/index.html',
+         f'<div class="row">{health("On track", "positive")}{health("At risk", "warning")}{health("Off track", "negative")}{health("Not active", "light")}</div>'),
+        ('Roadmap marker', 'ps-roadmap', 'Dashboard, Roadmap column: a button that opens the roadmap, with a dot for its health.', 'dashboard/index.html',
+         ''.join(f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{k}" type="button" aria-label="View roadmap">{icon("i-roadmap", "btn-icon")}</button>' for k in ('positive', 'warning', 'negative', 'light'))),
+        ('Split card', 'ps-split', 'Dashboard: two halves of a card with a rule between them, stacking on a narrow screen.', 'dashboard/index.html',
+         '<article class="card"><div class="ps-split"><div style="flex: 1 1 200px"><p class="body-semibold" style="margin: 0">Health</p></div><div style="flex: 2 1 300px"><p class="body-semibold" style="margin: 0">Status</p></div></div></article>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
@@ -2416,6 +2505,7 @@ def icons_page():
         ('Badge: HiPo', 'i-badge-hipo', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-hipo', 'HiPo')),
         ('Badge: Inspiring', 'i-badge-inspiring', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-inspiring', 'Inspiring')),
         ('Empty list', 'i-art-empty-list', 'Recognitions: the drawing above “No recognitions”.', 'recognitions/index.html', big('i-art-empty-list', 'Empty list')),
+        ('Roadmap', 'i-roadmap', 'Dashboard, Roadmap column.', 'dashboard/index.html', line('i-roadmap')),
         ('Nothing owned', 'i-art-empty-alert', 'Profile and Team Profile, Processes tab: the drawing above “No Processes yet”.', 'profile/index.html#tab-2', big('i-art-empty-alert', 'Nothing owned')),
     ]
     return library_page('New icons', 'icons', items)

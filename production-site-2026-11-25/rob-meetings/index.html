@@ -4537,6 +4537,44 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Open on staging: our own link, floating over the screen, not part of it. */
 .ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }
+
+/* Status dot: the coloured dot inside a grey tag (health). */
+.ps-dot { width: var(--spacing-2); height: var(--spacing-2); margin-right: var(--spacing-1); border-radius: 50%; background: var(--color-border-strong); flex-shrink: 0; display: inline-block; }
+.ps-dot.is-positive { background: var(--color-success); }
+.ps-dot.is-warning { background: var(--color-warning); }
+.ps-dot.is-negative { background: var(--color-danger); }
+
+/* Split card: two halves with a rule between them. */
+.ps-split { display: flex; flex-wrap: wrap; gap: var(--spacing-6) var(--spacing-8); }
+.ps-split-next { padding-left: var(--spacing-8); border-left: 1px solid var(--color-border); }
+
+/* Tree table: rows open a second and a third layer; the name column stays
+   put while the rest scrolls sideways; stripes follow the rows that are open. */
+.ps-tree th:first-child, .ps-tree td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
+.ps-tree thead th:first-child { z-index: 2; }
+.ps-tree tbody td { background: var(--color-surface); vertical-align: middle; }
+.ps-tree tbody tr.is-alt > td { background: var(--color-surface-muted); }
+.ps-tree td { overflow: hidden; }
+.ps-tree .cell-user-name { font-weight: var(--font-weight-semibold); }
+.ps-tree .cell-user-meta { min-width: 0; }
+.ps-tree .cell-user-name, .ps-tree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-tree s { color: var(--color-text-muted); }
+.ps-tree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
+.ps-tree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-tree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-tree-title { font: var(--type-body-sm-semibold); color: var(--color-text); text-decoration: none; }
+.ps-tree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
+.ps-tree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* Roadmap marker: the button that opens a roadmap, with a dot for its health. */
+.ps-roadmap { position: relative; }
+.ps-roadmap::after { content: ""; position: absolute; top: 0; right: 0; width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-border-strong); }
+.ps-roadmap.is-positive::after { background: var(--color-success); }
+.ps-roadmap.is-warning::after { background: var(--color-warning); }
+.ps-roadmap.is-negative::after { background: var(--color-danger); }
+.ps-dot.is-light, .ps-roadmap.is-light::after { background: var(--color-text-subtle); }
+.ps-tree-row > td { height: calc(2 * var(--spacing-10)); }
+.ps-split .ps-health { margin-top: auto; }
 </style>
 </head>
 <body>
@@ -4871,10 +4909,20 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     addEventListener('hashchange', route); route();
 
     // Work lists: a caret folds a row's children; Expand all does every row.
+    // A tree table stripes the rows that are open, not every second row in the markup.
+    const stripe = () => document.querySelectorAll('.ps-tree tbody').forEach(tb => {
+      let i = 0;
+      tb.querySelectorAll('tr').forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
+    });
     const fold = (btn, on) => {
       btn.setAttribute('aria-expanded', String(on));
-      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => show(r, on));
+      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => {
+        show(r, on);
+        if (!on) r.querySelectorAll('[data-rows]').forEach(inner => fold(inner, false));   // closing a row closes what is under it
+      });
+      stripe();
     };
+    stripe();
     document.addEventListener('click', e => {
       const caret = e.target.closest('[data-rows]');
       if (caret) fold(caret, caret.getAttribute('aria-expanded') !== 'true');
@@ -4891,7 +4939,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     document.addEventListener('input', e => {
       if (!e.target.matches('[data-search]')) return;
       const q = e.target.value.trim().toLowerCase();
-      document.querySelectorAll('[data-search-item]').forEach(el => show(el, !q || el.textContent.toLowerCase().includes(q)));
+      document.querySelectorAll('[data-search-item]').forEach(el => show(el, q ? el.textContent.toLowerCase().includes(q) : !el.dataset.childOf));
+      if (!q) document.querySelectorAll('[data-rows]').forEach(c => c.setAttribute('aria-expanded', 'false'));
+      stripe();
     });
   })();
   </script>
