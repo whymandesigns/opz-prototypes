@@ -77,3 +77,14 @@ the page (`elements/#added`) lists just the added ones: that is the list to
 hand to developers, who do not have them in their library yet. `--list` shows what can be moved,
 `--dry-run` shows the change without making it. Nothing is committed: review
 and commit the designmd change as any other.
+
+## Icons the kit lacks
+
+Twelve icons and drawings the product has and the kit's sprite does not were
+drawn for the reference and kept in `_src/icons.svg`: open in new tab, Slack
+in colour, the eight recognition badges and the two empty-state drawings. They
+are coloured with the kit's tokens. `icons/index.html` lists them with the
+same See it in place, Add to library, badge and filter as the elements page;
+`promote.py i-external-link` moves one into designmd's `icons.svg`. The badges
+are redrawn, not copied: the Culture Ambassador flag is plain where the
+product's carries the company mark.

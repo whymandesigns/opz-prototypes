@@ -3,6 +3,7 @@
 
     python3 production-site-2026-11-25/_src/promote.py ps-bars [ps-health ...]
     python3 production-site-2026-11-25/_src/promote.py --dry-run ps-bars
+    python3 production-site-2026-11-25/_src/promote.py i-external-link   (an icon)
     python3 production-site-2026-11-25/_src/promote.py --list
 
 The element's rules leave _src/elements.css and are appended to designmd's
@@ -48,10 +49,17 @@ def main(argv):
     names = [a for a in argv if not a.startswith('--')]
     bl = blocks()
     if '--list' in argv or not names:
+        for m in re.finditer(r'<symbol id="([^"]+)"', (HERE / 'icons.svg').read_text()):
+            print(m.group(1), '- icon')
         for b in bl[1:]:
             first = re.search(r'\.(ps-[a-z-]+)', re.sub(r'/\*.*?\*/', '', b, flags=re.S))
             print(first.group(1) if first else '?', '-', b.strip().splitlines()[0][:80])
         return
+    icons = [n for n in names if n.startswith('i-')]
+    if icons:
+        if len(icons) != len(names):
+            sys.exit('move icons (i-…) and elements (ps-…) in separate runs')
+        return promote_icons(icons, dry)
     moved, keep = [], []
     for b in bl:
         (moved if any(owns(b, n) for n in names) and not b.startswith('/* ===') else keep).append(b)
@@ -72,6 +80,37 @@ def main(argv):
     subprocess.run([sys.executable, str(designmd() / 'tools' / 'build-packages.py')], check=True)
     subprocess.run([sys.executable, str(HERE / 'build.py')], check=True)
     print('moved into the library: ' + ', '.join(names) + '\nNext: lint and inline the reference, then commit designmd and this repo.')
+
+
+def promote_icons(names, dry):
+    """Icons: the <symbol> leaves _src/icons.svg and joins the kit's sprite."""
+    src = HERE / 'icons.svg'
+    text = src.read_text()
+    syms = {m.group(1): m.group(0) for m in re.finditer(r'  <symbol id="([^"]+)".*?</symbol>\n', text, flags=re.S)}
+    missing = [n for n in names if n not in syms]
+    if missing:
+        sys.exit('not in _src/icons.svg (already in the library?): ' + ', '.join(missing))
+    lib = designmd() / 'icons.svg'
+    kit = lib.read_text()
+    clash = [n for n in names if f'id="{n}"' in kit]
+    if clash:
+        sys.exit('the kit already has: ' + ', '.join(clash))
+    add = ''.join(syms[n] for n in names)
+    if dry:
+        print(f'would move {len(names)} symbol(s) into {lib}:\n{add}')
+        return
+    i = kit.rindex('</svg>')
+    lib.write_text(kit[:i] + add + kit[i:])
+    for n in names:
+        text = text.replace(syms[n], '')
+    src.write_text(text)
+    log = HERE / 'promoted.json'
+    done = json.loads(log.read_text()) if log.exists() else {}
+    done.update({n: date.today().strftime('%b %-d, %Y') for n in names})
+    log.write_text(json.dumps(done, indent=2) + '\n')
+    subprocess.run([sys.executable, str(designmd() / 'tools' / 'build-packages.py')], check=True)
+    subprocess.run([sys.executable, str(HERE / 'build.py')], check=True)
+    print('moved into the kit sprite: ' + ', '.join(names) + '\nNext: lint and inline the reference, then commit designmd and this repo.')
 
 
 if __name__ == '__main__':
