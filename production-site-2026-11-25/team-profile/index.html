@@ -4494,8 +4494,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Striped list: the same tint for stacked rows that are not a table */
 .ps-striped-list > * { border: 0; border-radius: 0; }
-.ps-tree-list > [hidden] { display: none; }
-.ps-striped-list:not(.ps-tree-list) > :nth-child(even), .ps-tree-list > .is-alt { background: var(--color-surface-muted); }
+.ps-wtree-list > [hidden] { display: none; }
+.ps-striped-list:not(.ps-wtree-list) > :nth-child(even), .ps-wtree-list > .is-alt { background: var(--color-surface-muted); }
 /* A person's name in a list is set a step heavier, as the product does. */
 .table .cell-user-name { font-weight: var(--font-weight-semibold); }
 
@@ -4554,21 +4554,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Tree table: rows open a second and a third layer; the name column stays
    put while the rest scrolls sideways; stripes follow the rows that are open. */
-.ps-tree-sticky th:first-child, .ps-tree-sticky td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
-.ps-tree-sticky thead th:first-child { z-index: 2; }
-.ps-tree tbody td { background: var(--color-surface); vertical-align: middle; }
-.ps-tree tbody tr.is-alt > td { background: var(--color-surface-muted); }
-.ps-tree-sticky td { overflow: hidden; }
-.ps-tree .cell-user-name { font-weight: var(--font-weight-semibold); }
-.ps-tree .cell-user-meta { min-width: 0; }
-.ps-tree .cell-user-name, .ps-tree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ps-tree s { color: var(--color-text-muted); }
-.ps-tree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
-.ps-tree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
-.ps-tree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
-.ps-tree-title { font: var(--type-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); text-decoration: none; }
-.ps-tree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
-.ps-tree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.ps-wtree-sticky th:first-child, .ps-wtree-sticky td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
+.ps-wtree-sticky thead th:first-child { z-index: 2; }
+.ps-wtree tbody td { background: var(--color-surface); vertical-align: middle; }
+.ps-wtree tbody tr.is-alt > td { background: var(--color-surface-muted); }
+.ps-wtree-sticky td { overflow: hidden; }
+.ps-wtree .cell-user-name { font-weight: var(--font-weight-semibold); }
+.ps-wtree .cell-user-meta { min-width: 0; }
+.ps-wtree .cell-user-name, .ps-wtree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-wtree s { color: var(--color-text-muted); }
+.ps-wtree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
+.ps-wtree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-wtree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-wtree-title { font: var(--type-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); text-decoration: none; }
+.ps-wtree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
+.ps-wtree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 
 /* Roadmap marker: the button that opens a roadmap, with a dot for its health. */
 .ps-roadmap { position: relative; }
@@ -4577,8 +4577,21 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-roadmap.is-warning::after { background: var(--color-warning); }
 .ps-roadmap.is-negative::after { background: var(--color-danger); }
 .ps-dot.is-light, .ps-roadmap.is-light::after { background: var(--color-text-subtle); }
-.ps-tree-row > td { height: calc(2 * var(--spacing-10)); }
+.ps-wtree-row > td { height: calc(2 * var(--spacing-10)); }
 .ps-split .ps-health { margin-top: auto; }
+
+/* Reporting chain: managers left to right, then the column of people beside
+   the person, who is marked. */
+.ps-chain { display: flex; align-items: center; overflow-x: auto; padding: var(--spacing-4) 0; }
+.ps-chain-node, .ps-chain-item { flex: none; width: 264px; }
+.ps-chain-link { flex: none; width: var(--spacing-12); border-top: 1px solid var(--color-border-strong); }
+.ps-chain-col { display: flex; flex-direction: column; gap: var(--spacing-3); padding-left: var(--spacing-6); }
+.ps-chain-item { position: relative; }
+.ps-chain-item::before { content: ""; position: absolute; right: 100%; top: 50%; width: var(--spacing-6); border-top: 1px solid var(--color-border-strong); }
+.ps-chain-item::after { content: ""; position: absolute; left: calc(-1 * var(--spacing-6)); top: calc(-1 * var(--spacing-3)); bottom: 0; border-left: 1px solid var(--color-border-strong); }
+.ps-chain-item:first-child::after { top: 50%; }
+.ps-chain-item:last-child::after { bottom: 50%; }
+.ps-chain-item.is-current .org-node { border-color: var(--color-accent); background: var(--color-accent-subtle); }
 </style>
 </head>
 <body>
@@ -4741,10 +4754,14 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
       <h2 class="h3" style="margin: var(--spacing-6) 0 var(--spacing-1)">Reporting Relationships</h2>
       <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">5 people comprise Operations, and 6 Talents are associated with it</p>
-      <div class="org-chart"><div class="org-chart-group">
+      <div class="org-chart"><div class="org-chart-group" style="flex: 1 1 420px">
+        <p class="body-sm-semibold" style="margin: 0 0 var(--spacing-3)">Operations</p>
         <div class="org-node"><span class="avatar avatar-lg">LK</span><div class="org-node-meta"><span class="org-node-name">Lydia Kaminski</span><span class="org-node-role">Operations Director</span></div></div>
         <ul class="org-node-children"><li><div class="org-node"><span class="avatar avatar-lg">CK</span><div class="org-node-meta"><span class="org-node-name">Cara Keane</span><span class="org-node-role">Delivery Manager</span></div></div>
           <ul class="org-node-children"><li><div class="org-node"><span class="avatar avatar-lg">LH</span><div class="org-node-meta"><span class="org-node-name">Laszlo Hartley</span><span class="org-node-role">Delivery Manager</span></div></div></li><li><div class="org-node"><span class="avatar avatar-lg">TL</span><div class="org-node-meta"><span class="org-node-name">Tobias Lindqvist</span><span class="org-node-role">Quality Lead</span></div></div></li></ul></li><li><div class="org-node"><span class="avatar avatar-lg">NR</span><div class="org-node-meta"><span class="org-node-name">Nadia Rahman</span><span class="org-node-role">Senior Product Designer</span></div></div></li></ul>
+      </div><div class="org-chart-group">
+        <p class="body-sm-semibold" style="margin: 0 0 var(--spacing-3)">Talent Network Members (6)</p>
+        <div class="stack" style="gap: var(--spacing-3)"><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">RD</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Rosa Dahl</span><span class="org-node-role">Product Manager</span></div></div><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">IS</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Imran Suleiman</span><span class="org-node-role">Product Manager</span></div></div><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">GL</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Greta Lund</span><span class="org-node-role">Designer</span></div></div><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">SH</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Samir Haddad</span><span class="org-node-role">Developer</span></div></div><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">LO</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Lina Okoye</span><span class="org-node-role">Sales Analyst</span></div></div><div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">PF</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span><div class="org-node-meta"><span class="org-node-name">Paolo Ferri</span><span class="org-node-role">Developer</span></div></div></div>
       </div></div></div>
 <div data-panel="teamprofile:1" hidden style="margin-top: var(--spacing-6)"><p class="body" style="margin: 0 0 var(--spacing-4)">OKRs owned by Operations are managed on the OKRs page.</p><div class="row"><a class="btn btn-secondary" href="../okrs/index.html#tab-2" style="text-decoration: none">Open Function Annual OKRs</a><a class="btn btn-secondary" href="../okrs/index.html#tab-3" style="text-decoration: none">Open Function Quarterly OKRs</a></div></div>
 <div data-panel="teamprofile:2" hidden style="margin-top: var(--spacing-6)"><div class="row" style="flex-wrap: wrap; gap: var(--spacing-4); margin-bottom: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm)"><span class="body-sm-semibold">Show</span><label class="radio"><input type="radio" class="radio-input" name="tp-show-ini" checked /><span class="radio-circle"></span><span class="radio-label">All</span></label><label class="radio"><input type="radio" class="radio-input" name="tp-show-ini" /><span class="radio-circle"></span><span class="radio-label">Direct Members Only</span></label><label class="radio"><input type="radio" class="radio-input" name="tp-show-ini" /><span class="radio-circle"></span><span class="radio-label">Associated Members Only</span></label></div><div class="table-scroll" style="max-height: none"><table class="table ps-striped"><thead><tr><th>Name</th><th>Status</th><th>RoB Meeting</th><th>Roles</th><th><span style="display: block; text-align: right">Actions</span></th></tr></thead><tbody><tr data-search-item><td><div style="padding-left: calc(0 * var(--spacing-6))"><span class="cell-title">Onboarding in one week</span><div><span class="tag tag-light">Initiative</span></div></div></td><td><span class="tag tag-blue">Execution</span></td><td><div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-calendar"/></svg>Nov 30 • 10:00am</span><span class="cell-meta-sub"><span class="tag tag-light">Every week on Monday</span></span></div></td><td></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel"><svg class="btn-icon" aria-hidden="true"><use href="#i-slack-color"/></svg></button></div></td></tr><tr data-search-item><td><div style="padding-left: calc(1 * var(--spacing-6))"><span class="cell-title">Kick-off checklist</span><div><span class="tag tag-light">Project</span></div></div></td><td><span class="tag tag-blue">Execution</span></td><td><div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-calendar"/></svg>Nov 30 • 10:00am</span><span class="cell-meta-sub"><span class="tag tag-light">Every week on Monday</span></span></div></td><td><span class="tag tag-positive">R</span></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel"><svg class="btn-icon" aria-hidden="true"><use href="#i-slack-color"/></svg></button></div></td></tr><tr data-search-item><td><div style="padding-left: calc(0 * var(--spacing-6))"><span class="cell-title">Delivery health reviews</span><div><span class="tag tag-light">Initiative</span></div></div></td><td><span class="tag tag-blue">Execution</span></td><td><div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-calendar"/></svg>Dec 03 • 2:00pm</span><span class="cell-meta-sub"><span class="tag tag-light">Every 2 weeks on Thursday</span></span></div></td><td><span class="tag tag-positive">C</span></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel"><svg class="btn-icon" aria-hidden="true"><use href="#i-slack-color"/></svg></button></div></td></tr></tbody></table></div></div>
@@ -4929,7 +4946,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     // Work lists: a caret folds a row's children; Expand all does every row.
     // A tree table stripes the rows that are open, not every second row in the markup.
-    const stripe = () => document.querySelectorAll('.ps-tree tbody, .ps-tree-list').forEach(tb => {
+    const stripe = () => document.querySelectorAll('.ps-wtree tbody, .ps-wtree-list').forEach(tb => {
       let i = 0;
       [...tb.children].forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
     });
