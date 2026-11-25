@@ -4503,10 +4503,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
       <p class="body-xs" style="margin: var(--spacing-1) 0 var(--spacing-4); color: var(--color-text-muted)">Last edit was made 18 hours ago by <a href="#" style="color: var(--color-text-link); text-decoration: none">Sofia Romano</a></p>
-      <div class="tabs" role="tablist">
-<button class="tab is-active" role="tab" aria-selected="true" type="button">Overview</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Activity log</button>
+      <div class="tabs" role="tablist" data-tabs="initiative">
+<button data-tab="0" class="tab is-active" role="tab" aria-selected="true" type="button">Overview</button>
+<button data-tab="1" class="tab" role="tab" aria-selected="false" type="button">Activity log</button>
 </div>
+<div data-panel="initiative:0">
 
       <div style="display: flex; align-items: flex-start; gap: var(--spacing-10); margin-top: var(--spacing-6)">
         <div class="stack" style="flex: 1; min-width: 0; gap: var(--spacing-8)">
@@ -4536,6 +4537,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
         <nav class="stack" data-view="desktop" aria-label="Sections" style="position: sticky; top: var(--spacing-6); gap: var(--spacing-1); flex: 0 0 200px"><a class="btn btn-ghost" href="#sec-general" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-list"/></svg>General</a><a class="btn btn-ghost" href="#sec-people" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-participants"/></svg>People</a><a class="btn btn-ghost" href="#sec-timeline" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-calendar"/></svg>Timeline</a><a class="btn btn-ghost" href="#sec-description" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-list-unordered"/></svg>Description</a><a class="btn btn-ghost" href="#sec-connections" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-link"/></svg>Connections</a><a class="btn btn-ghost" href="#sec-documents" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-attachment"/></svg>Documents</a><a class="btn btn-ghost" href="#sec-projects" style="justify-content: flex-start; text-decoration: none"><svg class="btn-icon" aria-hidden="true"><use href="#i-folder"/></svg>Projects</a></nav>
       </div>
+      </div>
+<div data-panel="initiative:1" hidden style="margin-top: var(--spacing-6)"><div style="padding: 0 var(--spacing-10) var(--spacing-10)"><h2 class="h4" style="margin: 0; padding-bottom: var(--spacing-3); border-bottom: 1px solid var(--color-border)">Timeline</h2><div class="list-row"><div><p class="list-row-meta">Nov 24, 2026</p><p class="list-row-title">Status was changed from Definition to Execution by Sofia Romano on Nov 24, 2026, 4:10 PM</p></div></div><div class="list-row"><div><p class="list-row-meta">Jul 3, 2026</p><p class="list-row-title">Project Manager was added by Sofia Romano on Jul 3, 2026, 9:12 AM</p></div></div><div class="list-row"><div><p class="list-row-meta">Jul 1, 2026</p><p class="list-row-title">Accountable owner was added by Sofia Romano on Jul 1, 2026, 2:40 PM</p></div></div><div class="list-row"><div><p class="list-row-meta">Jul 1, 2026</p><p class="list-row-title">Initiative was created by Sofia Romano on Jul 1, 2026, 2:38 PM</p></div></div></div></div>
       </div>
     </main>
   </div>
@@ -4673,6 +4676,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->

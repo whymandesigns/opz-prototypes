@@ -4504,14 +4504,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
 
-      <div class="tabs" role="tablist">
-<button class="tab is-active" role="tab" aria-selected="true" type="button">Company Vision</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Company Objective</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Function Annual</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Function Quarterly</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Team Quarterly</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Shared Key Results</button>
+      <div class="tabs" role="tablist" data-tabs="okrs">
+<button data-tab="0" class="tab is-active" role="tab" aria-selected="true" type="button">Company Vision</button>
+<button data-tab="1" class="tab" role="tab" aria-selected="false" type="button">Company Objective</button>
+<button data-tab="2" class="tab" role="tab" aria-selected="false" type="button">Function Annual</button>
+<button data-tab="3" class="tab" role="tab" aria-selected="false" type="button">Function Quarterly</button>
+<button data-tab="4" class="tab" role="tab" aria-selected="false" type="button">Team Quarterly</button>
+<button data-tab="5" class="tab" role="tab" aria-selected="false" type="button">Shared Key Results</button>
 </div>
+<div data-panel="okrs:0">
 
       <div class="toolbar" style="margin: var(--spacing-4) 0">
         <div class="input-icon input-icon-left toolbar-search">
@@ -4524,7 +4525,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </div>
 
       <div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Faster customer onboarding</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Median time from contract to first delivery is 7 days</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">64%</span></div></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Nine in ten customers finish setup without a call</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">40%</span></div></div></article><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Reliable delivery</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Every engagement has a weekly health review</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">85%</span></div></div></article><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">A stronger partner channel</h3><span class="tag tag-light">Draft</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Ten partner sites live</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">30%</span></div></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Fifty certified partner sellers</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">0%</span></div></div></article><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Grow the team well</h3><span class="tag tag-light">Draft</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Every manager completes the learning program</p></div><div class="row"><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg> 1</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-initiatives"/></svg> 2</span><span class="tag tag-light"><svg class="icon" aria-hidden="true"><use href="#i-okr"/></svg> 0</span><span class="body-sm-semibold">0%</span></div></div></article></div>
-      <div class="row" style="margin-top: var(--spacing-4)"><button class="btn btn-secondary btn-xs" type="button" disabled>Prev</button><button class="btn btn-secondary btn-xs" type="button" aria-current="page">1</button><button class="btn btn-secondary btn-xs" type="button">2</button><button class="btn btn-secondary btn-xs" type="button">Next</button></div>
+      <div class="row" style="margin-top: var(--spacing-4)"><button class="btn btn-secondary btn-xs" type="button" disabled>Prev</button><button class="btn btn-secondary btn-xs" type="button" aria-current="page">1</button><button class="btn btn-secondary btn-xs" type="button">2</button><button class="btn btn-secondary btn-xs" type="button">Next</button></div></div>
+<div data-panel="okrs:1" hidden style="margin-top: var(--spacing-6)"><div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Customers start in a week</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Median time to first delivery is 7 days</p></div><span class="body-sm-semibold">64%</span></div></article></div></div>
+<div data-panel="okrs:2" hidden style="margin-top: var(--spacing-6)"><div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Operations: one handoff, not three</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Contract to workspace handoff is automatic</p></div><span class="body-sm-semibold">50%</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Kick-off checklist used on every engagement</p></div><span class="body-sm-semibold">80%</span></div></article></div></div>
+<div data-panel="okrs:3" hidden style="margin-top: var(--spacing-6)"><div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Operations Q4: checklist live</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Checklist in use on 20 engagements</p></div><span class="body-sm-semibold">45%</span></div></article><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">IT Q4: self-serve setup</h3><span class="tag tag-light">Draft</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Billing setup without a call</p></div><span class="body-sm-semibold">10%</span></div></article></div></div>
+<div data-panel="okrs:4" hidden style="margin-top: var(--spacing-6)"><div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Delivery Q4: first-week survey</h3><span class="tag tag-light">Draft</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Survey sent to every new customer</p></div><span class="body-sm-semibold">0%</span></div></article></div></div>
+<div data-panel="okrs:5" hidden style="margin-top: var(--spacing-6)"><div class="stack"><article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">Shared: time to first delivery</h3><span class="tag tag-positive">Active</span></div><div class="list-row" style="flex-wrap: wrap"><div><p class="list-row-title">Median time to first delivery is 7 days</p></div><span class="body-sm-semibold">64%</span></div></article></div></div>
     </main>
   </div>
 
@@ -4661,6 +4667,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->

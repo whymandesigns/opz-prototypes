@@ -4518,10 +4518,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <span class="row"><svg class="icon icon-16" aria-hidden="true"><use href="#i-slack"/></svg><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Rosa Dahl</a></span>
         </div></div>
 
-      <div class="tabs" role="tablist">
-<button class="tab is-active" role="tab" aria-selected="true" type="button">Initiatives</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Processes</button>
+      <div class="tabs" role="tablist" data-tabs="talent">
+<button data-tab="0" class="tab is-active" role="tab" aria-selected="true" type="button">Initiatives</button>
+<button data-tab="1" class="tab" role="tab" aria-selected="false" type="button">Processes</button>
 </div>
+<div data-panel="talent:0">
 
       <div data-view="mobile" hidden><div class="stack" style="margin-top: var(--spacing-4)"><article class="card"><div class="stack" style="gap: var(--spacing-3)"><span class="body-semibold">Onboarding in one week</span><div class="row" style="flex-wrap: wrap"><span class="tag tag-light">Initiative</span><span class="tag tag-blue">Execution</span></div><div class="row" style="justify-content: space-between"><div class="cell-user"><span class="avatar avatar-md">SR</span><div class="cell-user-meta"><span class="cell-user-name">Sofia Romano</span><span class="cell-user-role">Operations</span></div></div><span class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><svg class="icon icon-16" aria-hidden="true"><use href="#i-slack"/></svg></span></div></div></article><article class="card"><div class="stack" style="gap: var(--spacing-3)"><span class="body-semibold">Kick-off checklist</span><div class="row" style="flex-wrap: wrap"><span class="tag tag-light">Project</span><span class="tag tag-blue">Execution</span></div><div class="row" style="justify-content: space-between"><div class="cell-user"><span class="avatar avatar-md">SR</span><div class="cell-user-meta"><span class="cell-user-name">Sofia Romano</span><span class="cell-user-role">Operations</span></div></div><span class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><svg class="icon icon-16" aria-hidden="true"><use href="#i-slack"/></svg></span></div></div></article><article class="card"><div class="stack" style="gap: var(--spacing-3)"><span class="body-semibold">First-week survey</span><div class="row" style="flex-wrap: wrap"><span class="tag tag-light">Sub-project</span><span class="tag tag-positive">Complete</span></div><div class="row" style="justify-content: space-between"><div class="cell-user"><span class="avatar avatar-md">SR</span><div class="cell-user-meta"><span class="cell-user-name">Sofia Romano</span><span class="cell-user-role">Operations</span></div></div><span class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button><svg class="icon icon-16" aria-hidden="true"><use href="#i-slack"/></svg></span></div></div></article></div></div>
       <div class="table-scroll" style="max-height: none; margin-top: var(--spacing-4)" data-view="desktop">
@@ -4529,7 +4530,8 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           <thead><tr><th>Name</th><th>Status</th><th>RoB Meeting</th><th>Roles</th><th style="text-align: right">Actions</th></tr></thead>
           <tbody><tr><td><div style="padding-left: calc(0 * var(--spacing-6))"><span class="cell-title">Onboarding in one week</span><div><span class="tag tag-light">Initiative</span></div></div></td><td><span class="tag tag-blue">Execution</span></td><td><div class="cell-meta"><span class="cell-meta-title">Dec 01 • 4:00pm</span><span class="cell-meta-sub"><span class="tag tag-light">Every week on Tuesday</span></span></div></td><td></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button></div></td></tr><tr><td><div style="padding-left: calc(1 * var(--spacing-6))"><span class="cell-title">Kick-off checklist</span><div><span class="tag tag-light">Project</span></div></div></td><td><span class="tag tag-blue">Execution</span></td><td><div class="cell-meta"><span class="cell-meta-title">Dec 01 • 5:30pm</span><span class="cell-meta-sub"><span class="tag tag-light">Every week on Tuesday</span></span></div></td><td></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button></div></td></tr><tr><td><div style="padding-left: calc(2 * var(--spacing-6))"><span class="cell-title">First-week survey</span><div><span class="tag tag-light">Sub-project</span></div></div></td><td><span class="tag tag-positive">Complete</span></td><td><span class="row body-sm"><svg class="icon icon-16" aria-hidden="true"><use href="#i-warning"/></svg>No meeting connected</span></td><td><span class="tag tag-positive">R</span></td><td><div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI"><svg class="btn-icon" aria-hidden="true"><use href="#i-table"/></svg></button></div></td></tr></tbody>
         </table>
-      </div>
+      </div></div>
+<div data-panel="talent:1" hidden style="margin-top: var(--spacing-6)"><div class="stack" style="align-items: center; text-align: center; padding: var(--spacing-12) 0; gap: var(--spacing-2)"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-cpu-2"/></svg></span><p class="body-semibold" style="margin: var(--spacing-2) 0 0">Rosa doesn’t own any Processes</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Processes yet</p></div></div>
     </main>
   </div>
 
@@ -4666,6 +4668,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->

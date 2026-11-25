@@ -4501,11 +4501,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
 
-      <div class="tabs" role="tablist">
-<button class="tab is-active" role="tab" aria-selected="true" type="button">Pending (2)</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Received</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Given</button>
+      <div class="tabs" role="tablist" data-tabs="feedback">
+<button data-tab="0" class="tab is-active" role="tab" aria-selected="true" type="button">Pending (2)</button>
+<button data-tab="1" class="tab" role="tab" aria-selected="false" type="button">Received</button>
+<button data-tab="2" class="tab" role="tab" aria-selected="false" type="button">Given</button>
 </div>
+<div data-panel="feedback:0">
 
       <div class="toolbar" style="margin: var(--spacing-4) 0">
         <div class="input-icon input-icon-left toolbar-search">
@@ -4517,16 +4518,33 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters" data-view="mobile" hidden><svg class="btn-icon" aria-hidden="true"><use href="#i-filter"/></svg></button>
       </div>
 
-      <div data-view="mobile" hidden><div class="stack"><article class="card"><div class="stack" style="gap: var(--spacing-3)"><div class="cell-user"><span class="avatar avatar-md">AD</span><div class="cell-user-meta"><span class="cell-user-name">Adele Delacroix</span><span class="cell-user-role">Partnerships Lead</span></div></div><div class="row"><span class="tag tag-light">Peer feedback</span><span class="body-sm">Sep 11, 2026</span></div><div class="row row-end"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></div></article><article class="card"><div class="stack" style="gap: var(--spacing-3)"><div class="cell-user"><span class="avatar avatar-md">MT</span><div class="cell-user-meta"><span class="cell-user-name">Maya Thompson</span><span class="cell-user-role">Analytics Director</span></div></div><div class="row"><span class="tag tag-light">Peer request</span><span class="body-sm">Apr 12, 2026</span></div><div class="row row-end"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></div></article></div></div>
+      <div data-view="mobile" hidden><div class="stack"><article class="card"><div class="stack" style="gap: var(--spacing-3)"><div class="cell-user"><span class="avatar avatar-md">AD</span><div class="cell-user-meta"><span class="cell-user-name">Adele Delacroix</span><span class="cell-user-role">Partnerships Lead</span></div></div><div class="row"><span class="tag tag-light">Peer feedback</span><span class="body-sm">Sep 11, 2026</span></div><div class="row row-end"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button" data-modal-open="give-feedback">Give Feedback</button></div></div></article><article class="card"><div class="stack" style="gap: var(--spacing-3)"><div class="cell-user"><span class="avatar avatar-md">MT</span><div class="cell-user-meta"><span class="cell-user-name">Maya Thompson</span><span class="cell-user-role">Analytics Director</span></div></div><div class="row"><span class="tag tag-light">Peer request</span><span class="body-sm">Apr 12, 2026</span></div><div class="row row-end"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button" data-modal-open="give-feedback">Give Feedback</button></div></div></article></div></div>
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
           <thead><tr><th>Feedback receiver</th><th>Relationship</th><th>Date Received</th><th style="text-align: right">Actions</th></tr></thead>
-          <tbody><tr><td><div class="cell-user"><span class="avatar avatar-md">AD</span><div class="cell-user-meta"><span class="cell-user-name">Adele Delacroix</span><span class="cell-user-role">Partnerships Lead</span></div></div></td><td><span class="tag tag-light">Peer feedback</span></td><td><span class="body-sm">Sep 11, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">MT</span><div class="cell-user-meta"><span class="cell-user-name">Maya Thompson</span><span class="cell-user-role">Analytics Director</span></div></div></td><td><span class="tag tag-light">Peer request</span></td><td><span class="body-sm">Apr 12, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></td></tr></tbody>
+          <tbody><tr><td><div class="cell-user"><span class="avatar avatar-md">AD</span><div class="cell-user-meta"><span class="cell-user-name">Adele Delacroix</span><span class="cell-user-role">Partnerships Lead</span></div></div></td><td><span class="tag tag-light">Peer feedback</span></td><td><span class="body-sm">Sep 11, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button" data-modal-open="give-feedback">Give Feedback</button></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">MT</span><div class="cell-user-meta"><span class="cell-user-name">Maya Thompson</span><span class="cell-user-role">Analytics Director</span></div></div></td><td><span class="tag tag-light">Peer request</span></td><td><span class="body-sm">Apr 12, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">Skip</a><button class="btn btn-secondary btn-xs" type="button" data-modal-open="give-feedback">Give Feedback</button></div></td></tr></tbody>
         </table>
-      </div>
+      </div></div>
+<div data-panel="feedback:1" hidden style="margin-top: var(--spacing-6)"><div class="table-scroll" style="max-height: none"><table class="table"><thead><tr><th>Feedback provider</th><th>Relationship</th><th>Date Received</th><th><span style="display: block; text-align: right">Actions</span></th></tr></thead><tbody><tr><td><div class="cell-user"><span class="avatar avatar-md">LH</span><div class="cell-user-meta"><span class="cell-user-name">Laszlo Hartley</span><span class="cell-user-role">Delivery Manager</span></div></div></td><td><div class="row"><span class="tag tag-light">RACI</span><span class="tag tag-light">Team</span></div></td><td><span class="body-sm">Jun 19, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">TL</span><div class="cell-user-meta"><span class="cell-user-name">Tobias Lindqvist</span><span class="cell-user-role">Quality Lead</span></div></div></td><td><div class="row"><span class="tag tag-light">Team</span></div></td><td><span class="body-sm">Feb 14, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">LK</span><div class="cell-user-meta"><span class="cell-user-name">Lydia Kaminski</span><span class="cell-user-role">Operations Director</span></div></div></td><td><div class="row"><span class="tag tag-light">RACI</span></div></td><td><span class="body-sm">Feb 14, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr></tbody></table></div></div>
+<div data-panel="feedback:2" hidden style="margin-top: var(--spacing-6)"><div class="table-scroll" style="max-height: none"><table class="table"><thead><tr><th>Feedback receiver</th><th>Relationship</th><th>Status</th><th>Date Submitted</th><th><span style="display: block; text-align: right">Actions</span></th></tr></thead><tbody><tr><td><div class="cell-user"><span class="avatar avatar-md">NR</span><div class="cell-user-meta"><span class="cell-user-name">Nadia Rahman</span><span class="cell-user-role">Senior Product Designer</span></div></div></td><td><span class="tag tag-light">Peer feedback</span></td><td><span class="tag tag-positive">Submitted</span></td><td><span class="body-sm">Oct 11, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">EL</span><div class="cell-user-meta"><span class="cell-user-name">Elias Lowe</span><span class="cell-user-role">IT Manager</span></div></div></td><td><span class="tag tag-light">Manager request</span></td><td><span class="tag tag-positive">Submitted</span></td><td><span class="body-sm">Apr 5, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr><tr><td><div class="cell-user"><span class="avatar avatar-md">JP</span><div class="cell-user-meta"><span class="cell-user-name">Julian Park</span><span class="cell-user-role">Head of Learning</span></div></div></td><td><span class="tag tag-light">Team</span></td><td><span class="tag tag-positive">Submitted</span></td><td><span class="body-sm">Mar 20, 2026</span></td><td><div class="cell-actions"><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none">View</a></div></td></tr></tbody></table></div></div>
     </main>
   </div>
 
+  <div class="modal-overlay" id="give-feedback" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="give-feedback-title">
+      <header class="modal-header"><h2 class="modal-title" id="give-feedback-title">Give feedback</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+      <div class="modal-body"><div class="stack">
+        <div class="row" style="align-items: flex-start"><span class="avatar avatar-xl">AD</span><div><p class="body-semibold" style="margin: 0">Adele Delacroix</p>
+          <p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Partnerships Lead in Partnerships</p><span class="tag tag-light">Peer feedback</span></div></div>
+        <p class="body" style="margin: 0">Please select a minimum of two attributes for Adele.<br />Your feedback helps build stronger teams.</p>
+        <p class="body-semibold" style="margin: 0">Sharing options</p>
+        <label class="checkbox"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box"><svg class="checkbox-mark" aria-hidden="true"><use href="#i-check"/></svg></span><span class="checkbox-label">Share with Adele</span></label>
+        <label class="checkbox"><input type="checkbox" class="checkbox-input" checked disabled /><span class="checkbox-box"><svg class="checkbox-mark" aria-hidden="true"><use href="#i-check"/></svg></span><span class="checkbox-label">Share with Adele’s Manager</span></label>
+      </div></div>
+      <footer class="modal-footer"><button class="btn btn-secondary" type="button" data-modal-close>Cancel</button><button class="btn btn-secondary" type="button">Continue</button></footer>
+    </div>
+  </div>
   <script>
   // ---------------------------------------------------------------------
   // Dev-time icon sprite. The three stylesheets do NOT carry it — only
@@ -4660,6 +4678,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->

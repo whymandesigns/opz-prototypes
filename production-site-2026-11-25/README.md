@@ -11,8 +11,11 @@ instead of from memory.
   tenant says "Business as Usual"; these screens say "Processes", as every
   Operationalize prototype does (`BAU-TERM-001`). The top bar and side nav are
   the kit's, so the business-line switcher is not there.
-- **What is missing:** only each screen's basic state is built. Tabs other than
-  the first, drawers and modals come later.
+- **States:** tabs switch panels, and the Processes list opens its drawer,
+  create drawer, RACI and query panel. Add `#tab-2` to a screen's address to
+  open its third tab, or `#open-<id>` to open a drawer or modal. `STATES` in
+  `_src/screens.py` lists every state built; view modes, filters and the
+  remaining drawers and modals are not built yet.
 
 `index.html` is our own list, not a product screen, so it has no app shell. It
 shows every primary screen with a tick when built, when it was built and

@@ -4493,11 +4493,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         </div>
       </div>
 
-      <div class="tabs" role="tablist">
-<button class="tab is-active" role="tab" aria-selected="true" type="button">Personal</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Work</button>
-<button class="tab" role="tab" aria-selected="false" type="button">Contacts</button>
+      <div class="tabs" role="tablist" data-tabs="profileedit">
+<button data-tab="0" class="tab is-active" role="tab" aria-selected="true" type="button">Personal</button>
+<button data-tab="1" class="tab" role="tab" aria-selected="false" type="button">Work</button>
+<button data-tab="2" class="tab" role="tab" aria-selected="false" type="button">Contacts</button>
 </div>
+<div data-panel="profileedit:0">
 
       <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-top: var(--spacing-6)">
         <div class="stack" style="flex: 3 1 420px; min-width: 0; max-width: 640px">
@@ -4522,7 +4523,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       <div class="row" style="margin-top: var(--spacing-6)">
         <a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>
         <button class="btn btn-primary" type="button" disabled>Save Changes</button>
-      </div>
+      </div></div>
+<div data-panel="profileedit:1" hidden style="margin-top: var(--spacing-6)"><div class="stack" style="max-width: 640px"><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><label class="field" style="flex: 1 1 220px"><span class="field-label">Hire date</span><input class="input" type="text" placeholder="" /></label><label class="field" style="flex: 1 1 220px"><span class="field-label">Termination date (optional)</span><input class="input" type="text" placeholder="" /></label></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><div class="field" style="flex: 1 1 220px"><span class="field-label">User Type (optional)</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="User type"><span class="input-select-value input-select-placeholder">Select a type</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div><label class="field" style="flex: 1 1 220px"><span class="field-label">Job title</span><input class="input" type="text" placeholder="" /></label></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><div class="field" style="flex: 1 1 220px"><span class="field-label">Primary manager (optional)</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Primary manager"><span class="input-select-value">Lydia Kaminski</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item is-selected" type="button">Lydia Kaminski</button></div></div></div><div class="field" style="flex: 1 1 220px"><span class="field-label">Secondary manager (optional)</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Secondary manager"><span class="input-select-value input-select-placeholder">Select a manager</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><div class="field" style="flex: 1 1 220px"><span class="field-label">Direct team</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Direct team"><span class="input-select-value">Delivery in Operations</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item is-selected" type="button">Delivery in Operations</button></div></div></div><div class="field" style="flex: 1 1 220px"><span class="field-label">Associated teams</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Associated teams"><span class="input-select-value">Delivery in Operations</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden><button class="dropdown-item is-selected" type="button">Delivery in Operations</button></div></div></div></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><div class="field" style="flex: 1 1 220px"><span class="field-label">Business lines (optional)</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Business lines"><span class="input-select-value input-select-placeholder">Select business lines</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div><div class="field" style="flex: 1 1 220px"><span class="field-label">Special groups (optional)</span><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Special groups"><span class="input-select-value input-select-placeholder">Select special groups</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div></div></div><div class="row" style="margin-top: var(--spacing-6)"><a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a><button class="btn btn-secondary" type="button" disabled>Save Changes</button></div></div>
+<div data-panel="profileedit:2" hidden style="margin-top: var(--spacing-6)"><div class="stack" style="max-width: 640px"><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><label class="field" style="flex: 1 1 220px"><span class="field-label">Work Email</span><input class="input" type="text" placeholder="" /></label><label class="field" style="flex: 1 1 220px"><span class="field-label">Slack (optional)</span><input class="input" type="text" placeholder="" /></label></div><div class="field"><span class="field-label">Phone (optional)</span><div><button class="btn btn-ghost" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>Add phone number</button></div></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><label class="field" style="flex: 1 1 220px"><span class="field-label">LinkedIn (optional)</span><input class="input" type="text" placeholder="" /></label><label class="field" style="flex: 1 1 220px"><span class="field-label">GitHub (optional)</span><input class="input" type="text" placeholder="" /></label></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><label class="field" style="flex: 1 1 220px"><span class="field-label">Dribbble (optional)</span><input class="input" type="text" placeholder="" /></label><label class="field" style="flex: 1 1 220px"><span class="field-label">X (optional)</span><input class="input" type="text" placeholder="" /></label></div><div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"><label class="field" style="flex: 1 1 220px"><span class="field-label">WhatsApp (optional)</span><input class="input" type="text" placeholder="" /></label><label class="field" style="flex: 1 1 220px"><span class="field-label">Telegram (optional)</span><input class="input" type="text" placeholder="" /></label></div></div><div class="row" style="margin-top: var(--spacing-6)"><a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a><button class="btn btn-secondary" type="button" disabled>Save Changes</button></div></div>
     </main>
   </div>
 
@@ -4659,6 +4662,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->
