@@ -4480,6 +4480,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Tree rows in a work list: child rows sit under a parent and fold away */
 .ps-row-child > td:first-child { padding-left: var(--spacing-10); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+
+/* Striped table: every second row of a work list is tinted */
+.ps-striped tbody tr:nth-child(even) > td { background: var(--color-surface-muted); }
 </style>
 </head>
 <body>

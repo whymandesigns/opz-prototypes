@@ -56,9 +56,11 @@ def tabs(items, active=0):
     return '\n'.join(out) + '\n</div>'
 
 
-def select(value, options=(), label=None, width=None):
+def select(value, options=(), label=None, width=None, lead=None):
     if width:
-        return f'<div style="flex: 0 0 auto; width: {width}px">{select(value, options, label)}</div>'
+        return f'<div style="flex: 0 0 auto; width: {width}px">{select(value, options, label, lead=lead)}</div>'
+    if lead:
+        return select(value, options, label).replace('<span class="input-select-value">', icon(lead, 'btn-icon') + '<span class="input-select-value">', 1)
     opts = ''.join(f'<button class="dropdown-item{" is-selected" if o == value else ""}" type="button">{o}</button>' for o in (options or (value,)))
     aria = f' aria-label="{label}"' if label else ''
     return (f'<div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false"{aria}>'
@@ -125,13 +127,14 @@ def pager(pages=('1', '2', '3', '…', '6')):
 
 def work_toolbar(placeholder, columns, view=0):
     return desktop(f'''<div class="toolbar" style="margin-bottom: var(--spacing-4)">
-        <div class="input-icon input-icon-left toolbar-search">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 0 1 300px">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="{placeholder}" aria-label="Search" />
         </div>
         <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button>
         <button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
-        {select(columns, label="Columns", width=220)}
+        <span class="toolbar-spacer"></span>
+        {select(columns, label="Columns", width=190, lead="i-settings")}
         {select("Updated at", ("Updated at", "Name", "Status"), label="Sort by", width=150)}
         <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button>
         {view_modes(view)}
@@ -201,6 +204,7 @@ def dashboard():
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" />
         </div>
+        {"".join(f'<span class="row" data-panel="view:{i}" hidden><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span>' for i in (0, 1))}
         <span class="toolbar-spacer"></span>
         <button class="btn btn-icon-only btn-ghost" type="button" aria-label="View settings">{icon("i-controls", "btn-icon")}</button>
         {view_modes(2)}
@@ -233,11 +237,12 @@ PROCESSES = [
 def rob_cell(r):
     if not r:
         return ''
-    return f'<div class="cell-meta"><span class="cell-meta-title">{r[0]}</span><span class="cell-meta-sub">{tag(r[1])}</span></div>'
+    return f'<div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2)">{icon("i-calendar", "icon icon-16")}{r[0]}</span><span class="cell-meta-sub">{tag(r[1])}</span></div>'
 
 
 def raci_btn():
-    return f'<div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">{icon("i-table", "btn-icon")}</button></div>'
+    return (f'<div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">{icon("i-table", "btn-icon")}</button>'
+            f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel">{icon("i-slack", "btn-icon")}</button></div>')
 
 
 def processes():
@@ -287,7 +292,7 @@ def initiatives():
       {mobile('<div class="stack">' + cards + '</div>')}
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
-          <thead><tr><th>Name</th><th>Status</th><th>Health</th><th>Accountability</th><th>Roadmap</th><th>RoB Meeting</th><th style="text-align: right">Actions</th></tr></thead>
+          <thead><tr><th>Name</th><th>Status</th><th>Health {icon("i-info", "icon icon-16")}</th><th>Accountability</th><th>Roadmap</th><th>RoB Meeting</th><th style="text-align: right">Actions</th></tr></thead>
           <tbody>{"".join(rows)}</tbody>
         </table>
       </div>
@@ -685,7 +690,7 @@ def profile():
     def contact(ic, text):
         return (f'<div class="row" style="justify-content: space-between"><span class="row">{icon(ic, "icon icon-16")}<a class="body-sm" href="#" {LINK}>{text}</a></span>'
                 f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy">{icon("i-copy", "btn-icon")}</button></div>')
-    return f'''{head("My Profile", '<a class="btn btn-secondary" href="../profile-edit/index.html" style="text-decoration: none">Edit profile</a>')}
+    return f'''{head("My Profile", '<a class="btn btn-secondary" href="../profile-edit/index.html" style="text-decoration: none">Edit profile</a>' + f'<button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions">{icon("i-dots-three-vertical", "btn-icon")}</button>')}
 
       <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-6)">
         <span class="avatar avatar-2xl">CK</span>
@@ -1486,9 +1491,10 @@ INIT_QUERY = QUERY_PANEL.replace('Show processes being supported', 'Show initiat
 
 def initiatives_with_states():
     h = toggle(toggle(initiatives(), 'Filters', 'filters-panel'), 'Query', 'query-panel')
-    kid = lambda n, st, kind, k: (f'<span class="cell-title">{n}</span><div>{tag("Project")}</div>', tag(st, kind), health('On track', 'positive'), user(k, 'Operations'), '', '', raci_btn())
+    kid = lambda n, st, kind, k: (kid_cell(n, 'Project'), tag(st, kind), health('On track', 'positive'), user(k, 'Operations'), '', '', raci_btn())
     h = child_rows(h, '>Onboarding in one week</a>', 'onboarding', [kid('Kick-off checklist', 'Execution', 'blue', 'ck'), kid('Contract to workspace handoff', 'Execution', 'blue', 'lh'), kid('First-week survey', 'Idea', 'light', 'tl')], 7)
-    h = h.replace('<thead><tr><th>Name</th><th>Status</th><th>Health</th>', '<thead><tr><th>Name <button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></th><th>Status</th><th>Health</th>')
+    h = tree_cells(h)
+    h = h.replace('<thead><tr><th>Name</th><th>Status</th><th>Health', '<thead><tr><th>Name <button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></th><th>Status</th><th>Health')
     h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
     return with_views(h, *initiatives_views(), extra_panels=work_filters('Initiative', ('Initiative', 'Project', 'Sub-project')) + INIT_QUERY)
 
@@ -1536,6 +1542,7 @@ def dashboard_with_states():
         <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button><button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
       </div>
       {table(("Name", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting", '<span style="display: block; text-align: right">Actions</span>'), orow)}'''
+    h = h.replace('<table class="table">', '<table class="table ps-striped">')
     h = h[:j] + '<div data-panel="scope:0">' + h[j:] + '</div>\n<div data-panel="scope:1" hidden>' + other + '</div>'
     k = '      <div class="table-scroll" style="max-height: none">'
     assert h.count(k) == 2   # the spreadsheet table, then the Other initiatives one
@@ -1548,7 +1555,7 @@ def dashboard_with_states():
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     e = h.index('</div>\n<div data-panel="scope:1" hidden>')
     h = (h[:i] + f'<div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:e] + '</div>' + h[e:])
-    charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success')]),
+    charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
     bars = [healthbar(170, 1, 1, 112), healthbar(206, 0, 6, 59)]
     h, n = _re.subn(r'<div style="display: grid; grid-template-columns: repeat\(auto-fit, minmax\(120px, 1fr\)\); gap: var\(--spacing-3\)">(?:<div class="stat-card">.*?</div>)+</div>', lambda m: charts.pop(0), h, flags=_re.S)
@@ -1614,6 +1621,25 @@ def okrs_with_states():
     return h.replace(k, k.replace('type="button">', 'type="button" data-modal-open="perf-attrs">'))
 
 
+def tree_cells(html):
+    """A work list's name cell as the kit means it: a caret, the name, and its
+    kind under it. Every top-level row gets the caret; a row with children
+    built in keeps its own, which is the one that folds."""
+    spare = f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle children">{icon("i-caret-right")}</button>'
+
+    def cell(m):
+        own, el, attrs, name, kind = m.groups()
+        return (f'<td><div class="cell-title-row">{(own or spare).strip()}<div class="cell-title"><{el} class="cell-title-text"{attrs}>{name}</{el}>'
+                f'<span class="cell-title-sub">{kind}</span></div></div></td>')
+    html = _re.sub(r'<td>(<button class="row-toggle"[^>]*>.*?</button> )?<(span|a) class="cell-title"([^>]*)>(.*?)</\2><div>(.*?)</div></td>', cell, html, flags=_re.S)
+    return html.replace('<table class="table">\n          <thead><tr><th>Name', '<table class="table ps-striped">\n          <thead><tr><th>Name')
+
+
+def kid_cell(name, kind):
+    return (f'<div class="cell-title-row"><span class="row-toggle-spacer"></span><div class="cell-title"><span class="cell-title-text">{name}</span>'
+            f'<span class="cell-title-sub">{tag(kind)}</span></div></div>')
+
+
 def processes_with_states():
     h = processes()
     k = '<button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>'
@@ -1628,8 +1654,9 @@ def processes_with_states():
     h = h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
     h = toggle(h, 'Filters', 'filters-panel')
     h = h.replace('<button class="btn btn-ghost btn-xs" type="button">Expand all</button>', '<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button>')
-    kid = lambda n, kind, st, k: (f'<span class="cell-title">{n}</span><div>{tag(kind)}</div>', tag(st), user(k, 'Delivery'), '', raci_btn())
+    kid = lambda n, kind, st, k: (kid_cell(n, kind), tag(st), user(k, 'Delivery'), '', raci_btn())
     h = child_rows(h, '>Refund requests</a>', 'refund', [kid('Refund review', 'Activity', 'Active', 'lh'), kid('Partial refunds', 'Sub-activity', 'Active', 'tl')], 5)
+    h = tree_cells(h)
     return with_views(h, *processes_views(), extra_panels=work_filters('Process', ('Process', 'Activity', 'Sub-activity')))
 
 
@@ -1795,8 +1822,9 @@ def filters_panel(pid, rows):
 
 def child_rows(html, anchor_text, rid, children, cols):
     """Give one row of a work list a caret and the rows that fold under it."""
-    i = html.index(anchor_text)
-    a = html.rfind('<a class="cell-title"', 0, i) if '<a class="cell-title"' in html[:i] else html.rfind('<span class="cell-title"', 0, i)
+    m = _re.search(r'<a class="cell-title"[^>]*' + _re.escape(anchor_text), html)   # the table's link, not the phone card's
+    assert m, anchor_text
+    a, i = m.start(), m.end()
     caret = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle children" data-rows="{rid}">{icon("i-caret-right")}</button> ')
     html = html[:a] + caret + html[a:]
     end = html.index('</tr>', i) + len('</tr>')
@@ -1991,6 +2019,9 @@ WHY = {n: reason for reason, names in BLOCKED.items() for n in names}
 UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) per update pass
     dict(date='Nov 25, 2026', span='11:56–12:01', minutes=8, screens='all',
          note='Fifteen elements the kit lacks were built and put in place of the stand-ins on every screen; rows fold, the search box filters, filters drop as a popover.'),
+    dict(date='Nov 25, 2026', span='12:14–12:17', minutes=6,
+         screens=['dashboard', 'processes', 'initiatives', 'people', 'profile', 'time-off', 'peer-feedback', 'rob-paused-meetings', 'talent-profile', 'team', 'team-profile', 'initiative-view', 'initiative-create'],
+         note='Compared with staging: lists are striped, every row has its caret, the toolbar is ordered as in the product, and the RoB and action cells carry their icons.'),
 ]
 
 

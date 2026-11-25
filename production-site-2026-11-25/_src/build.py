@@ -48,6 +48,7 @@ def finish(html):
         return f'<nav class="ps-anchors" data-view="desktop" aria-label="Sections">{links}</nav>'
     html = re.sub(r'<nav class="stack" data-view="desktop" aria-label="Sections" style="[^"]*">(.*?)</nav>', nav, html, flags=re.S)
     html = re.sub(r'<textarea class="input" rows="\d+"(?: placeholder="([^"]*)")?></textarea>', lambda m: screens.editor(m.group(1) or ''), html)
+    html = html.replace('<table class="table">', '<table class="table ps-striped">')   # the product stripes its lists
     html = html.replace('<tr><td>', '<tr data-search-item><td>')
     html = html.replace('<article class="card"><div class="stack" style="gap: var(--spacing-3)">', '<article class="card" data-search-item><div class="stack" style="gap: var(--spacing-3)">')
     html = re.sub(r'(<div class="input-icon input-icon-left toolbar-search">\s*<svg[^>]*>.*?</svg>\s*<input class="input")', r'\1 data-search', html, flags=re.S)
