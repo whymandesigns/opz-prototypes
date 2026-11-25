@@ -36,6 +36,11 @@ def user(k, role=None, size='md'):
             f'<span class="cell-user-name">{name}</span><span class="cell-user-role">{role or r}</span></div></div>')
 
 
+def art(slug, size, label=''):
+    """Artwork from the sprite at a fixed size: a badge or an illustration."""
+    return f'<svg width="{size}" height="{size}" role="img" aria-label="{label}" style="flex-shrink: 0"><use href="#{slug}"/></svg>'
+
+
 def icon(slug, cls='icon'):
     return f'<svg class="{cls}" aria-hidden="true"><use href="#{slug}"/></svg>'
 
@@ -106,7 +111,7 @@ def work_card(title, tags, k, unit, href=None, caret=False):
     return (f'<article class="card"><div class="stack" style="gap: var(--spacing-3)">{name}<div class="row" style="flex-wrap: wrap">{tags}</div>'
             f'<div class="row" style="justify-content: space-between">{user(k, unit)}<span class="row">'
             f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">{icon("i-table", "btn-icon")}</button>'
-            f'{icon("i-slack", "icon icon-16")}</span></div></div></article>')
+            f'{icon("i-slack-color", "icon icon-16")}</span></div></div></article>')
 
 
 def head(title, actions='', after_title=''):
@@ -245,7 +250,7 @@ def rob_cell(r):
 
 def raci_btn():
     return (f'<div class="cell-actions"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">{icon("i-table", "btn-icon")}</button>'
-            f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel">{icon("i-slack", "btn-icon")}</button></div>')
+            f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Open Slack channel">{icon("i-slack-color", "btn-icon")}</button></div>')
 
 
 def processes():
@@ -377,7 +382,7 @@ def initiative_view():
             <div style="display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: var(--spacing-4); align-items: center">
               <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-calendar")}</span><span class="body-sm">RoB Meetings</span></div>
               <div><a class="body-sm" href="../rob-meeting-view/index.html" {LINK}>[RoB] Onboarding in one week</a><div class="row"><span class="body-sm">Oct 13 • 10:30am</span>{tag("Every week on Tuesday")}</div></div>
-              <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-slack")}</span><span class="body-sm">Slack channels</span></div>
+              <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-slack-color")}</span><span class="body-sm">Slack channels</span></div>
               <div class="row"><a class="body-sm" href="#" {LINK}># onboarding-one-week</a>{tag("Default")}</div>
               <div class="row"><span class="icon-tile icon-tile-sm">{icon("i-okr")}</span><span class="body-sm">OKRs</span></div>
               <div><a class="body-sm" href="../okrs/index.html" {LINK}>Faster customer onboarding</a></div>
@@ -460,7 +465,7 @@ def initiative_create():
           </section>
           <section class="stack" id="sec-connections"><h2 class="h4" {RULE}>Connections</h2>
             <div class="alert">{icon("i-info", "icon alert-icon")}<p class="alert-message">RACI members with the roles selected for auto-invite in the RACI drawer will become the RoB participants</p></div>
-            <article class="card"><div class="row">{icon("i-slack", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this initiative</p></div></div></article>
+            <article class="card"><div class="row">{icon("i-slack-color", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this initiative</p></div></div></article>
             <article class="card"><div class="row">{icon("i-calendar", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings.</p></div></div></article>
           </section>
           <section class="stack" id="sec-documents"><h2 class="h4" {RULE}>Documents</h2><div class="row">{add_btn("Add URL links")}</div></section>
@@ -718,7 +723,7 @@ def profile():
           <span class="body" {MUTED}>Delivery Manager</span>
           <span class="row body-sm" {MUTED}>{icon("i-cake", "icon icon-16")}March 14</span>
         </div>
-        <div class="row"><span class="icon-tile">{icon("i-award")}</span><span class="icon-tile">{icon("i-badge-star")}</span></div>
+        <div class="row">{art("i-badge-culture", 40, "Culture Ambassador")}{art("i-badge-anniversary", 40, "Anniversary")}</div>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--spacing-6); margin: var(--spacing-6) 0; padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border)">
@@ -731,7 +736,7 @@ def profile():
 
       <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-bottom: var(--spacing-8)">
         <div class="stack" style="flex: 0 1 220px; min-width: 0"><span class="body-sm" {MUTED}>Contacts</span>
-          {contact("i-email", "cara.keane@harborsupport.com")}{contact("i-slack", "Cara Keane")}{contact("i-phone", "+353 1 555 0142")}</div>
+          {contact("i-email", "cara.keane@harborsupport.com")}{contact("i-slack-color", "Cara Keane")}{contact("i-phone", "+353 1 555 0142")}</div>
         <div class="stack" style="flex: 1 1 320px; min-width: 0"><span class="body-sm" {MUTED}>About</span>
           <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p>
           <div><button class="btn btn-ghost btn-xs" type="button">Read more</button></div></div>
@@ -1039,7 +1044,7 @@ def talent_profile():
       <div class="stack" style="margin: var(--spacing-6) 0; gap: var(--spacing-2)"><span class="body-sm" {MUTED}>Contacts</span>
         <div class="row" style="flex-wrap: wrap; gap: var(--spacing-6)">
           <span class="row">{icon("i-email", "icon icon-16")}<a class="body-sm" href="#" {LINK}>rosa.dahl@harborsupport.com</a></span>
-          <span class="row">{icon("i-slack", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Rosa Dahl</a></span>
+          <span class="row">{icon("i-slack-color", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Rosa Dahl</a></span>
         </div></div>
 
       {tabs(("Initiatives", "Processes"))}
@@ -1198,7 +1203,7 @@ def profile_panels():
                   [((0, '10:00am'), ('[RoB] Onboarding in one week', 'Operations')), ((2, '1:00pm'), ('[RoB] Refund requests', 'Delivery')),
                    ((0, '3:00pm'), ('Delivery All Hands', 'Delivery')), ((3, '4:00pm'), ('[RoB] Partner marketing sites', 'Partnerships'))])
     actions = (f'<h2 class="body-semibold row" style="margin: 0 0 var(--spacing-3)">[RoB] Onboarding in one week · August 3, 2026'
-               f'<a class="btn btn-icon-only btn-ghost btn-xs" href="../rob-meeting-view/index.html" aria-label="Open the meeting">{icon("i-link", "btn-icon")}</a></h2>'
+               f'<a class="btn btn-icon-only btn-ghost btn-xs" href="../rob-meeting-view/index.html" aria-label="Open the meeting">{icon("i-external-link", "btn-icon")}</a></h2>'
                f'<div class="ps-action is-done"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span>'
                f'<span class="row" style="gap: var(--spacing-1)"><span class="avatar avatar-xs">{ini("ck")}</span><span class="body-xs-semibold">Cara Keane</span></span></div>'
                f'<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>')
@@ -1314,12 +1319,12 @@ def ooo_details():
 
 
 def badges():
-    cards = ''.join(f'<article class="card"><div class="stack" style="align-items: center; text-align: center; gap: var(--spacing-2)"><span class="icon-tile">{icon(ic)}</span>'
+    cards = ''.join(f'<article class="card"><div class="stack" style="align-items: center; text-align: center; gap: var(--spacing-2)">{art(ic, 72, n)}'
                     f'<h3 class="card-title">{n}</h3><p class="card-body">{d}</p></div></article>' for ic, n, d in (
-        ('i-rocket', 'Ambitious', 'You set your sights on extraordinary outcomes and push estimates and expectations.'), ('i-award', 'Anniversary', 'Awarded for years of service'),
-        ('i-flash', 'Challenging', 'You question and challenge ideas, from policy to product decisions.'), ('i-flag', 'Culture Ambassador', 'Recognized for being a Culture Ambassador'),
-        ('i-target', 'Driven', 'You are driven to achieve.'), ('i-heart', 'Helpful', 'You are always available to help.'),
-        ('i-star', 'High potential', 'Recognized for graduating from the high-potential program'), ('i-lightbulb', 'Inspiring', 'You care deeply about what you do.')))
+        ('i-badge-ambitious', 'Ambitious', 'You set your sights on extraordinary outcomes and push estimates and expectations.'), ('i-badge-anniversary', 'Anniversary', 'Awarded for years of service'),
+        ('i-badge-challenging', 'Challenging', 'You question and challenge ideas, from policy to product decisions.'), ('i-badge-culture', 'Culture Ambassador', 'Recognized for being a Culture Ambassador'),
+        ('i-badge-driven', 'Driven', 'You are driven to achieve.'), ('i-badge-helpful', 'Helpful', 'You are always available to help.'),
+        ('i-badge-hipo', 'HiPo', 'Recognized for graduating from the high-potential program'), ('i-badge-inspiring', 'Inspiring', 'You care deeply about what you do.')))
     return f'<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--spacing-4)">{cards}</div>'
 
 
@@ -1391,7 +1396,7 @@ def process_overlays():
         <label class="field"><span class="field-label">Description</span><textarea class="input" rows="6" placeholder="Describe the core of this process and start adding activities that support it"></textarea><span class="field-hint">300 characters minimum</span></label>
         <h3 class="h4" style="margin: 0">Connections</h3>
         <div class="alert alert-info">{icon("i-info", "icon alert-icon")}<p class="alert-message">RACI members with the roles selected for auto-invite in the RACI drawer will become the RoB participants</p></div>
-        <article class="card"><div class="row">{icon("i-slack", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this process</p></div></div></article>
+        <article class="card"><div class="row">{icon("i-slack-color", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">Slack</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Create or add Slack channels to sync conversations with this process</p></div></div></article>
         <article class="card"><div class="row">{icon("i-calendar", "icon icon-24")}<div><p class="body-semibold" style="margin: 0">RoB Meetings</p><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Keep your team aligned with recurring meetings.</p></div></div></article>
         <div class="accordion-group"><div class="accordion">
           <button class="accordion-summary" type="button" aria-expanded="false"><span class="accordion-title">More details</span>{icon("i-chevron-down", "icon accordion-chevron")}</button>
@@ -1806,6 +1811,75 @@ STATE_GROUPS = [(STATES, 4), (STATES_2, 6), (STATES_3, 7)]   # each list of stat
 
 
 # ------------------------------------------------------------ New elements
+def library_page(title, kind, items):
+    """The list of what this reference added to the kit: elements or icons.
+    Each has See it in place and Add to library; what promote.py has moved
+    into the kit stays listed, badged, and the filter picks those out."""
+    icons = kind == 'icons'
+    noun = 'icon' if icons else 'element'
+    other = (f'<a href="../elements/index.html" {LINK}>New elements</a>' if icons else f'<a href="../icons/index.html" {LINK}>New icons</a>')
+    intro = ((f'Icons and artwork the product has and the kit does not. These {len(items)} were drawn for the reference screens, coloured with the kit’s tokens, and kept in one sprite, <code>_src/icons.svg</code>. '
+              if icons else
+              f'What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. ')
+             + f'<span class="body-semibold">Add to library</span> copies the request for that {noun}: paste it to Claude, or run the command in it, and the {noun} moves into the kit. '
+               f'It stays on this page with an <span class="body-semibold">Added to library</span> badge, so the filter below gives developers the list of what they still have to implement. See also: {other}.')
+    out = []
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        here = _P(__file__).resolve()
+        kit = next(p for p in (here.parents[3] / 'designmd' / 'dist' / 'kit.json', here.parents[2] / 'designmd' / 'dist' / 'kit.json') if p.exists()).read_text()
+        kit_icons = (here.parents[3] / 'designmd' / 'icons.svg').read_text() if (here.parents[3] / 'designmd' / 'icons.svg').exists() else (here.parents[2] / 'designmd' / 'icons.svg').read_text()
+    except Exception:
+        kit = kit_icons = ''
+    try:   # what promote.py has moved into the library, and when
+        added = _json.loads((_P(__file__).resolve().parent / 'promoted.json').read_text())
+    except Exception:
+        added = {}
+    n_added = 0
+    for name, cls, where, link, demo in items:
+        slug = cls.replace('ps-', 'el-')
+        code = cls if icons else '.' + cls
+        ask = f'Add the {name} {noun} ({code}) from production-site-2026-11-25 to the Icarus library: python3 production-site-2026-11-25/_src/promote.py {cls}'
+        inlib = cls in added or (f'id="{cls}"' in kit_icons if icons else f'"{cls}"' in kit)
+        n_added += inlib
+        lib = (tag('Added to library' + (' · ' + added[cls] if cls in added else ''), 'positive') if inlib else
+               f'<button class="btn btn-secondary btn-xs" type="button" data-add-to-library="{ask}">{icon("i-plus", "btn-icon")}<span>Add to library</span></button>')
+        out.append(f'<section class="stack" id="{slug}" data-lib="{"added" if inlib else "new"}" style="gap: var(--spacing-3); padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border)">'
+                   f'<div class="row" style="flex-wrap: wrap; justify-content: space-between"><div><h2 class="h3" style="margin: 0">{name}</h2>'
+                   f'<p class="body-sm" style="margin: var(--spacing-1) 0 0; color: var(--color-text-muted)">{where}</p></div>'
+                   f'<div class="row"><code class="body-sm">{code}</code><a class="btn btn-secondary btn-xs" href="../{link}" style="text-decoration: none">See it in place</a>{lib}</div></div>{demo}</section>')
+    return f'''    <p class="body-sm" style="margin: 0 0 var(--spacing-2)"><a href="../index.html" {LINK}>Production site · Nov 25, 2026</a></p>
+    <h1 class="h1" style="margin: 0 0 var(--spacing-2)">{title}</h1>
+    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">{intro}</p>
+    <div class="segmented" role="group" aria-label="Shown" data-lib-filter style="margin-bottom: var(--spacing-6)">
+      <button class="segmented-item is-active" type="button" data-show="all">All {len(items)}</button>
+      <button class="segmented-item" type="button" data-show="added">Added to library {n_added}</button>
+      <button class="segmented-item" type="button" data-show="new">Not in library yet {len(items) - n_added}</button>
+    </div>
+    <p class="body-sm" data-lib-none hidden style="margin: 0; color: var(--color-text-muted)">Nothing here yet.</p>
+    {"".join(out)}
+    <script>
+    const filter = show => {{
+      let n = 0;
+      document.querySelectorAll('section[data-lib]').forEach(s => {{ const on = show === 'all' || s.dataset.lib === show; s.style.display = on ? '' : 'none'; n += on; }});
+      document.querySelectorAll('[data-lib-filter] .segmented-item').forEach(b => b.classList.toggle('is-active', b.dataset.show === show));
+      document.querySelector('[data-lib-none]').hidden = n > 0;
+    }};
+    document.addEventListener('click', e => {{
+      const f = e.target.closest('[data-lib-filter] .segmented-item');
+      if (f) {{ filter(f.dataset.show); history.replaceState(null, '', '#' + f.dataset.show); }}
+    }});
+    if (['added', 'new'].includes(location.hash.slice(1))) filter(location.hash.slice(1));
+    document.addEventListener('click', e => {{
+      const b = e.target.closest('[data-add-to-library]');
+      if (!b) return;
+      const label = b.querySelector('span'), done = () => {{ label.textContent = 'Copied. Paste it to Claude'; setTimeout(() => {{ label.textContent = 'Add to library'; }}, 2500); }};
+      navigator.clipboard ? navigator.clipboard.writeText(b.dataset.addToLibrary).then(done, () => prompt('Copy this request:', b.dataset.addToLibrary)) : prompt('Copy this request:', b.dataset.addToLibrary);
+    }});
+    </script>'''
+
+
 # What the product has and the kit does not, built in elements.css (ps-*).
 # The functions below replace the kit stand-ins the first passes used.
 def barchart(items):
@@ -1827,7 +1901,13 @@ def pager(pages=('1', '2', '3', '…', '6')):
     return f'<nav class="ps-pagination" aria-label="Pages"><button class="ps-page" type="button" disabled>Prev</button>{b}<button class="ps-page" type="button">Next</button></nav>'
 
 
+EMPTY_ART = {'i-recognize': 'i-art-empty-list', 'i-cpu-2': 'i-art-empty-alert'}
+
+
 def empty_state(ic, title, text):
+    if ic in EMPTY_ART:
+        return (f'<div class="ps-empty">{art(EMPTY_ART[ic], 96)}<p class="body-semibold" style="margin: 0">{title}</p>'
+                f'<p class="body-sm" style="margin: 0; color: var(--color-text-muted)">{text}</p></div>')
     return (f'<div class="ps-empty"><span class="ps-empty-art">{icon(ic)}</span><p class="body-semibold" style="margin: 0">{title}</p>'
             f'<p class="body-sm" style="margin: 0; color: var(--color-text-muted)">{text}</p></div>')
 
@@ -2134,7 +2214,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          screens=['dashboard', 'rob-meetings', 'profile', 'processes', 'initiatives'],
          note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),    dict(date='Nov 25, 2026', span='12:59–13:04', minutes=5, screens=[],
          note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),    dict(date='Nov 25, 2026', span='13:05–13:10', minutes=5, screens=[],
-         note='Elements page: an element moved into the library stays listed with an Added to library badge and the date, and a filter on top shows all, added, or not yet in the library.'),
+         note='Elements page: an element moved into the library stays listed with an Added to library badge and the date, and a filter on top shows all, added, or not yet in the library.'),    dict(date='Nov 25, 2026', span='13:09–13:17', minutes=8,
+         screens=['recognitions', 'profile', 'team-profile', 'talent-profile', 'processes', 'initiatives', 'dashboard', 'initiative-view', 'initiative-create'],
+         note='Twelve icons the kit lacks were drawn and put in place: open in new tab, Slack in colour, the eight badges and the two empty-state drawings. They have their own list with See it in place and Add to library.'),
 ]
 
 
@@ -2185,7 +2267,7 @@ def index():
         ('Primary screens built', f'{done} of {total}'), ('Build time so far', f'{spent} min'), ('Average per screen', f'{avg:.1f} min'),
         ('Tabs, drawers and modals built', f'{n_states}'), ('Time on those', f'{spent_states} min'), ('Update passes', str(len(UPDATES)) if UPDATES else 'None yet')))
     return f'''    <h1 class="h1" style="margin: 0 0 var(--spacing-2)">Production site · Nov 25, 2026</h1>
-    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">Our own list, not a product screen: which primary screens of the product are rebuilt on the kit, when, and how long each took to build and to update. A green tick links to the screen. Each screen covers desktop and phone width. What the kit did not have was built as <a href="elements/index.html" {LINK}>new elements</a>. The second table lists the tabs, drawers and modals built on top of them; each links straight to that state.</p>
+    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">Our own list, not a product screen: which primary screens of the product are rebuilt on the kit, when, and how long each took to build and to update. A green tick links to the screen. Each screen covers desktop and phone width. What the kit did not have was built as <a href="elements/index.html" {LINK}>new elements</a> and <a href="icons/index.html" {LINK}>new icons</a>. The second table lists the tabs, drawers and modals built on top of them; each links straight to that state.</p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-8)">{stats}</div>
 
@@ -2256,56 +2338,26 @@ def elements_page():
         ('Fill switch', 'ps-seg-fill', 'Dashboard on a phone: the kit’s segmented control stretched to the full row.', 'dashboard/index.html',
          '<div class="ps-seg-fill" style="max-width: 360px">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Example switch') + '</div>'),
     ]
-    out = []
-    try:
-        import json as _json
-        from pathlib import Path as _P
-        here = _P(__file__).resolve()
-        kit = next(p for p in (here.parents[3] / 'designmd' / 'dist' / 'kit.json', here.parents[2] / 'designmd' / 'dist' / 'kit.json') if p.exists()).read_text()
-    except Exception:
-        kit = ''
-    try:   # what promote.py has moved into the library, and when
-        added = _json.loads((_P(__file__).resolve().parent / 'promoted.json').read_text())
-    except Exception:
-        added = {}
-    n_added = 0
-    for name, cls, where, link, demo in items:
-        slug = cls.replace('ps-', 'el-')
-        ask = f'Add the {name} element (.{cls}) from production-site-2026-11-25 to the Icarus library: python3 production-site-2026-11-25/_src/promote.py {cls}'
-        inlib = cls in added or f'"{cls}"' in kit
-        n_added += inlib
-        lib = (tag('Added to library' + (' · ' + added[cls] if cls in added else ''), 'positive') if inlib else
-               f'<button class="btn btn-secondary btn-xs" type="button" data-add-to-library="{ask}">{icon("i-plus", "btn-icon")}<span>Add to library</span></button>')
-        out.append(f'<section class="stack" id="{slug}" data-lib="{"added" if inlib else "new"}" style="gap: var(--spacing-3); padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border)">'
-                   f'<div class="row" style="flex-wrap: wrap; justify-content: space-between"><div><h2 class="h3" style="margin: 0">{name}</h2>'
-                   f'<p class="body-sm" style="margin: var(--spacing-1) 0 0; color: var(--color-text-muted)">{where}</p></div>'
-                   f'<div class="row"><code class="body-sm">.{cls}</code><a class="btn btn-secondary btn-xs" href="../{link}" style="text-decoration: none">See it in place</a>{lib}</div></div>{demo}</section>')
-    return f'''    <p class="body-sm" style="margin: 0 0 var(--spacing-2)"><a href="../index.html" {LINK}>Production site · Nov 25, 2026</a></p>
-    <h1 class="h1" style="margin: 0 0 var(--spacing-2)">New elements</h1>
-    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. They are candidates for the library. <span class="body-semibold">Add to library</span> copies the request for that element: paste it to Claude, or run the command in it, and the element moves into <code>components.css</code>. It stays on this page with an <span class="body-semibold">Added to library</span> badge, so the filter below gives developers the list of library elements they still have to implement.</p>
-    <div class="segmented" role="group" aria-label="Elements shown" data-lib-filter style="margin-bottom: var(--spacing-6)">
-      <button class="segmented-item is-active" type="button" data-show="all">All {len(items)}</button>
-      <button class="segmented-item" type="button" data-show="added">Added to library {n_added}</button>
-      <button class="segmented-item" type="button" data-show="new">Not in library yet {len(items) - n_added}</button>
-    </div>
-    <p class="body-sm" data-lib-none hidden style="margin: 0; color: var(--color-text-muted)">Nothing here yet.</p>
-    {"".join(out)}
-    <script>
-    const filter = show => {{
-      let n = 0;
-      document.querySelectorAll('section[data-lib]').forEach(s => {{ const on = show === 'all' || s.dataset.lib === show; s.style.display = on ? '' : 'none'; n += on; }});
-      document.querySelectorAll('[data-lib-filter] .segmented-item').forEach(b => b.classList.toggle('is-active', b.dataset.show === show));
-      document.querySelector('[data-lib-none]').hidden = n > 0;
-    }};
-    document.addEventListener('click', e => {{
-      const f = e.target.closest('[data-lib-filter] .segmented-item');
-      if (f) {{ filter(f.dataset.show); history.replaceState(null, '', '#' + f.dataset.show); }}
-    }});
-    if (['added', 'new'].includes(location.hash.slice(1))) filter(location.hash.slice(1));
-    document.addEventListener('click', e => {{
-      const b = e.target.closest('[data-add-to-library]');
-      if (!b) return;
-      const label = b.querySelector('span'), done = () => {{ label.textContent = 'Copied. Paste it to Claude'; setTimeout(() => {{ label.textContent = 'Add to library'; }}, 2500); }};
-      navigator.clipboard ? navigator.clipboard.writeText(b.dataset.addToLibrary).then(done, () => prompt('Copy this request:', b.dataset.addToLibrary)) : prompt('Copy this request:', b.dataset.addToLibrary);
-    }});
-    </script>'''
+    return library_page('New elements', 'elements', items)
+
+
+def icons_page():
+    big = lambda slug, name: f'<div class="row" style="gap: var(--spacing-6); align-items: flex-end">{art(slug, 96, name)}{art(slug, 64, name)}{art(slug, 40, name)}</div>'
+    line = lambda slug: (f'<div class="row" style="gap: var(--spacing-6)">{icon(slug, "icon icon-24")}{icon(slug, "icon icon-16")}'
+                         f'<button class="btn btn-secondary btn-icon-only" type="button" aria-label="Example">{icon(slug, "btn-icon")}</button></div>')
+    badge_where = 'Recognitions, Badges tab'
+    items = [
+        ('Open in new tab', 'i-external-link', 'Profile, Action Items tab: the link beside the meeting name.', 'profile/index.html#tab-5', line('i-external-link')),
+        ('Slack, in colour', 'i-slack-color', 'Work lists, Create Process and profiles: the kit’s Slack mark in four colours, from the kit’s tokens rather than Slack’s own shades.', 'initiatives/index.html', line('i-slack-color')),
+        ('Badge: Ambitious', 'i-badge-ambitious', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-ambitious', 'Ambitious')),
+        ('Badge: Anniversary', 'i-badge-anniversary', badge_where + ' and the profile header.', 'recognitions/index.html#tab-1', big('i-badge-anniversary', 'Anniversary')),
+        ('Badge: Challenging', 'i-badge-challenging', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-challenging', 'Challenging')),
+        ('Badge: Culture Ambassador', 'i-badge-culture', badge_where + ' and the profile header. The product’s flag carries the company mark; this one is plain.', 'recognitions/index.html#tab-1', big('i-badge-culture', 'Culture Ambassador')),
+        ('Badge: Driven', 'i-badge-driven', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-driven', 'Driven')),
+        ('Badge: Helpful', 'i-badge-helpful', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-helpful', 'Helpful')),
+        ('Badge: HiPo', 'i-badge-hipo', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-hipo', 'HiPo')),
+        ('Badge: Inspiring', 'i-badge-inspiring', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-inspiring', 'Inspiring')),
+        ('Empty list', 'i-art-empty-list', 'Recognitions: the drawing above “No recognitions”.', 'recognitions/index.html', big('i-art-empty-list', 'Empty list')),
+        ('Nothing owned', 'i-art-empty-alert', 'Profile and Team Profile, Processes tab: the drawing above “No Processes yet”.', 'profile/index.html#tab-2', big('i-art-empty-alert', 'Nothing owned')),
+    ]
+    return library_page('New icons', 'icons', items)

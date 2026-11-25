@@ -207,6 +207,21 @@ def plain(title, body):
 '''
 
 
+def with_icons(html):
+    """Icons drawn for this reference live in _src/icons.svg until promote.py
+    moves them into the kit's sprite. A page gets the ones it names."""
+    src = HERE / 'icons.svg'
+    if not src.exists():
+        return html
+    names = set(re.findall(r'href="#([\w-]+)"', html))
+    syms = [s for s in re.findall(r'  <symbol id="([^"]+)".*?</symbol>\n', src.read_text(), flags=re.S) if s in names]
+    if not syms:
+        return html
+    body = ''.join(m.group(0) for m in re.finditer(r'  <symbol id="([^"]+)".*?</symbol>\n', src.read_text(), flags=re.S) if m.group(1) in names)
+    sprite = '<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" data-local-icons style="position:absolute;width:0;height:0;overflow:hidden">\n' + body + '</svg>\n'
+    return re.sub(r'(<body[^>]*>\n)', lambda m: m.group(1) + sprite, html, count=1)
+
+
 def main():
     built = []
     for s in screens.SCREENS:
@@ -216,11 +231,13 @@ def main():
             html = page(s['title'], s['nav'], s['main'], s.get('ctas', ()), s.get('overlays', ''), padded=s.get('padded', True))
         d = OUT / s['folder']
         d.mkdir(exist_ok=True)
-        (d / 'index.html').write_text(html)
+        (d / 'index.html').write_text(with_icons(html))
         built.append(s['folder'])
     (OUT / 'index.html').write_text(plain('Production site · Nov 25, 2026', screens.index()))
     (OUT / 'elements').mkdir(exist_ok=True)
-    (OUT / 'elements' / 'index.html').write_text(plain('New elements · Production site', screens.elements_page()).replace('../../designmd/', '../../../designmd/'))
+    (OUT / 'elements' / 'index.html').write_text(with_icons(plain('New elements · Production site', screens.elements_page()).replace('../../designmd/', '../../../designmd/')))
+    (OUT / 'icons').mkdir(exist_ok=True)
+    (OUT / 'icons' / 'index.html').write_text(with_icons(plain('New icons · Production site', screens.icons_page()).replace('../../designmd/', '../../../designmd/')))
     print('wrote', len(built), 'screens:', ', '.join(built))
 
 
