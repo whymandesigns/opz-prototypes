@@ -161,3 +161,6 @@
 .ps-agenda-item.is-maybe { border-left-color: var(--color-warning); }
 .ps-agenda-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); }
 .ps-agenda-now::before { content: ""; position: absolute; left: 0; top: calc(-1 * var(--spacing-1) - 1px); width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-warning); }
+
+/* Open on staging: our own link, floating over the screen, not part of it. */
+.ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }

@@ -88,3 +88,12 @@ same See it in place, Add to library, badge and filter as the elements page;
 `promote.py i-external-link` moves one into designmd's `icons.svg`. The badges
 are redrawn, not copied: the Culture Ambassador flag is plain where the
 product's carries the company mark.
+
+## Comparing with staging
+
+Every screen carries a floating **Open on staging** link (bottom right) that
+opens the same view on the staging server in a new tab. It is ours, not part
+of the product. Three screens need a record id the reference does not keep
+(an initiative, a meeting, a talent; and the self-review): their link opens
+the nearest list instead and says so. The paths are in `STAGING` in
+`_src/screens.py`. Staging needs a login.

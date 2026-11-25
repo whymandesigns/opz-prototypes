@@ -2196,6 +2196,32 @@ BLOCKED = {
     'Redirects to Sign in on this tenant, which logs in with Google only': ['Sign up', 'Forgot password', 'Reset password'],
 }
 WHY = {n: reason for reason, names in BLOCKED.items() for n in names}
+# Where each screen lives on staging, for the floating "Open on staging" link.
+# exact=False: the screen needs a record id this reference does not keep, so
+# the link opens the nearest list and the record is one click from there.
+STAGING_HOST = 'https://team-staging.toptal.net'
+STAGING = {
+    'dashboard': ('/dashboard', True), 'processes': ('/bau/list', True), 'initiatives': ('/initiatives/list', True),
+    'initiative-view': ('/initiatives/list', False), 'initiative-create': ('/initiatives/create', True),
+    'rob-meetings': ('/rob', True), 'rob-meeting-view': ('/rob', False), 'okrs': ('/okrs/list', True),
+    'people': ('/people/directory', True), 'profile': ('/people/me', True), 'team': ('/org-structure/org-units', True),
+    'team-profile': ('/teams/1103', True), 'rob-paused-meetings': ('/rob/paused-meetings', True), 'profile-edit': ('/people/me/edit', True),
+    'watercooler': ('/watercooler', True), 'time-off': ('/time-off', True), 'recognitions': ('/recognitions', True),
+    'peer-feedback': ('/peer-feedbacks', True), 'self-review': ('/people/me', False), 'not-found': ('/404', True),
+    'talent-profile': ('/org-structure/talents', False), 'no-access': ('/teams/1103/edit', True), 'sign-in': ('/signin', True),
+    'profile-public-edit': ('/people/me/edit-public-profile', True),
+}
+
+
+def staging_link(folder):
+    if folder not in STAGING:
+        return ''
+    path, exact = STAGING[folder]
+    tip = 'Open this screen on staging in a new tab' if exact else 'Staging needs a record id for this screen: opens the nearest list in a new tab'
+    return (f'  <a class="btn btn-secondary ps-staging" href="{STAGING_HOST}{path}" target="_blank" rel="noopener" title="{tip}">'
+            f'{icon("i-external-link", "btn-icon")}{"Open on staging" if exact else "Staging: nearest list"}</a>\n')
+
+
 UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) per update pass
     dict(date='Nov 25, 2026', span='11:56–12:01', minutes=8, screens='all',
          note='Fifteen elements the kit lacks were built and put in place of the stand-ins on every screen; rows fold, the search box filters, filters drop as a popover.'),
@@ -2216,7 +2242,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),    dict(date='Nov 25, 2026', span='13:05–13:10', minutes=5, screens=[],
          note='Elements page: an element moved into the library stays listed with an Added to library badge and the date, and a filter on top shows all, added, or not yet in the library.'),    dict(date='Nov 25, 2026', span='13:09–13:17', minutes=8,
          screens=['recognitions', 'profile', 'team-profile', 'talent-profile', 'processes', 'initiatives', 'dashboard', 'initiative-view', 'initiative-create'],
-         note='Twelve icons the kit lacks were drawn and put in place: open in new tab, Slack in colour, the eight badges and the two empty-state drawings. They have their own list with See it in place and Add to library.'),
+         note='Twelve icons the kit lacks were drawn and put in place: open in new tab, Slack in colour, the eight badges and the two empty-state drawings. They have their own list with See it in place and Add to library.'),    dict(date='Nov 25, 2026', span='13:18–13:22', minutes=4, screens='all',
+         note='Every screen has a floating Open on staging link that opens the same view on the staging server in a new tab, for comparing the two.'),
 ]
 
 

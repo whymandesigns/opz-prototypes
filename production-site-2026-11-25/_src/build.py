@@ -231,6 +231,7 @@ def main():
             html = page(s['title'], s['nav'], s['main'], s.get('ctas', ()), s.get('overlays', ''), padded=s.get('padded', True))
         d = OUT / s['folder']
         d.mkdir(exist_ok=True)
+        html = html.replace('</body>', screens.staging_link(s['folder']) + '</body>', 1)
         (d / 'index.html').write_text(with_icons(html))
         built.append(s['folder'])
     (OUT / 'index.html').write_text(plain('Production site · Nov 25, 2026', screens.index()))
