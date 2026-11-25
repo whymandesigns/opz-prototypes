@@ -1401,6 +1401,16 @@ def peer_feedback_with_states():
     return h.replace('<button class="btn btn-secondary btn-xs" type="button">Give Feedback</button>', '<button class="btn btn-secondary btn-xs" type="button" data-modal-open="give-feedback">Give Feedback</button>')
 
 
+def sign_in():
+    return f'''    <div class="stack" style="align-items: center; gap: var(--spacing-6)">
+      <img class="sidenav-logo" src="../../../designmd/assets/logo-dark.svg" alt="Operationalize" />
+      <div class="stack" style="align-items: center; justify-content: center; min-height: 60vh; width: 100%; max-width: 500px; gap: var(--spacing-4)">
+        <h1 class="h2" style="margin: 0 0 var(--spacing-2)">Log in to Operationalize</h1>
+        <button class="btn btn-secondary" type="button" style="width: 100%">{icon("i-google", "btn-icon")}Log in with Google</button>
+      </div>
+    </div>'''
+
+
 # Every state built so far: screen folder, name, kind, and the address that opens it.
 STATES = (
     [('profile', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Initiatives', 'Processes', 'Work History', 'RoB Meetings', 'Action Items', 'Time Off'), 1)]
@@ -1448,6 +1458,7 @@ SCREENS = [
     dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
     dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
     dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=with_tabs(talent_profile(), 'talent', [empty_state('i-cpu-2', 'Rosa doesn’t own any Processes', 'No Processes yet')]), route='/talent/:talentId'),
+    dict(folder='sign-in', batch=5, plain=True, title='Log in', nav=None, main=sign_in(), route='/signin'),
     dict(folder='profile-public-edit', batch=3, title='Edit public profile', nav='People', main=public_profile_edit(), route='/people/:userId/edit-public-profile',
          ctas=[('btn-secondary', 'Cancel', 'i-x'), ('btn-primary', 'Save changes', 'i-check')]),
 ]
@@ -1480,7 +1491,7 @@ INVENTORY = [
         ('Assessment', '/performance-review/assessment/:reviewId/:userId', None), ('Reports', '/performance-review/reports', None),
         ('Cycle report', '/performance-review/reports/:cycleId', None), ('Reviewee breakdown', '/performance-review/reports/:cycleId/:revieweeId', None),
         ('Self-review', '/self-review/:userId', 'self-review'), ('Team self-review', '/self-review/team', None)]),
-    ('Outside the main navigation', [('Sign in', '/signin', None), ('Sign up', '/signup', None), ('Forgot password', '/forgot-password', None),
+    ('Outside the main navigation', [('Sign in', '/signin', 'sign-in'), ('Sign up', '/signup', None), ('Forgot password', '/forgot-password', None),
                                      ('Reset password', '/reset-password', None), ('Page not found', '/404', 'not-found'), ('Onboarding', '/onboarding', None),
                                      ('Demo: create a Process', '/demo/create-a-process', None), ('Demo: create an Initiative', '/demo/create-an-initiative', None)]),
     ('Admin settings', [(n, r, None) for n, r in (
@@ -1506,6 +1517,8 @@ BATCHES = {
             note='Capturing eight more screens on staging and building them.'),
     3: dict(date='Nov 25, 2026', span='10:16–10:19', minutes=4,
             note='Mostly spent finding what staging lets this account open; two screens came out of it.'),
+    5: dict(date='Nov 25, 2026', span='10:46–10:52', minutes=6,
+            note='Staging signed the account out mid-pass, which showed the sign-in page; nothing else could be captured.'),
     4: dict(date='Nov 25, 2026', span='10:21–10:27', minutes=8, states=True,
             note='The other tabs of every built screen, the Processes drawers and query panel, and the give-feedback modal.'),
 }
@@ -1516,7 +1529,7 @@ BLOCKED = {
     'Errors on staging': ['Self-assessment', 'Manager view', 'Assessments', 'Edit assessment', 'Assessment', 'Reports', 'Cycle report', 'Reviewee breakdown'],
     'Not a separate screen on desktop': ['Filters'],
     'Full-screen page the kit has no layout for': ['Onboarding', 'Demo: create a Process', 'Demo: create an Initiative'],
-    'Needs signing out': ['Sign in', 'Sign up', 'Forgot password', 'Reset password'],
+    'Redirects to Sign in on this tenant, which logs in with Google only': ['Sign up', 'Forgot password', 'Reset password'],
 }
 WHY = {n: reason for reason, names in BLOCKED.items() for n in names}
 UPDATES = []  # one dict(date, span, minutes, screens=[folders], note) per update pass; none yet
