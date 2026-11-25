@@ -13,8 +13,8 @@ screens.py, as kit markup.
 What this folder is: the product as it ran on 2026-11-25, rebuilt on the kit as
 a reference to start updates and new versions from. Layout, labels and
 structure follow the app; the people and the records are made up. The app's
-own tenant says "Business as Usual"; these screens say "Processes", as every
-Operationalize prototype does (BAU-TERM-001).
+own tenant says "Business as Usual", and so do these screens: this reference
+copies that tenant, so it does not follow BAU-TERM-001 as other prototypes do.
 """
 import re
 import sys
@@ -58,7 +58,7 @@ def finish(html):
 
 NAV = [  # label, icon, screen folder
     ('Dashboard', 'i-dashboard', 'dashboard'),
-    ('Processes', 'i-cpu-2', 'processes'),
+    ('Business as Usual', 'i-cpu-2', 'processes'),
     ('Initiatives', 'i-initiatives', 'initiatives'),
     ('RoB Meetings', 'i-calendar', 'rob-meetings'),
     ('OKRs', 'i-okr', 'okrs'),
@@ -173,7 +173,9 @@ VIEW_SCRIPT = '''  <script>
 
 
 def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
-    t = TEMPLATE.replace('{{FEATURE_TITLE}}', title)
+    t = TEMPLATE.replace('{{FEATURE_TITLE}}', title).replace('Search Operationalize', 'Search TopTeam')
+    t, n = re.subn(r'<img class="topbar-brand-logo"[^>]*>', '<span class="ps-wordmark"><span class="ps-wordmark-top">Top</span>Team</span>', t, count=1)
+    assert n == 1
     # The menu's foot as the product has it for this account: a group that
     # opens (with the Watercooler in it) and the learning hub. No admin settings.
     fun_open = active == 'Watercooler'
@@ -183,7 +185,7 @@ def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
         <div class="sidenav-group">
           <button class="sidenav-item sidenav-group-trigger" type="button" aria-expanded="{str(fun_open).lower()}">
             <svg class="sidenav-item-icon"><use href="#i-group-3"/></svg>
-            <span class="sidenav-item-label">Team Fun</span>
+            <span class="sidenav-item-label">Toptal Fun</span>
             <svg class="sidenav-item-chevron"><use href="#i-chevron-down"/></svg>
           </button>
           <ul class="sidenav-sublist">
