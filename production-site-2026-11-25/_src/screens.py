@@ -685,7 +685,7 @@ def profile():
     def contact(ic, text):
         return (f'<div class="row" style="justify-content: space-between"><span class="row">{icon(ic, "icon icon-16")}<a class="body-sm" href="#" {LINK}>{text}</a></span>'
                 f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy">{icon("i-copy", "btn-icon")}</button></div>')
-    return f'''{head("My Profile", '<a class="btn btn-secondary" href="#" style="text-decoration: none">Edit profile</a>')}
+    return f'''{head("My Profile", '<a class="btn btn-secondary" href="../profile-edit/index.html" style="text-decoration: none">Edit profile</a>')}
 
       <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-6)">
         <span class="avatar avatar-2xl">CK</span>
@@ -787,6 +787,201 @@ def team_profile():
       </div></div>'''
 
 
+
+# ----------------------------------------------------- Batch 2: other pages
+def head_sub(title, sub, actions=''):
+    return head(title, actions, after_title=f'\n            <p class="page-head-subtitle">{sub}</p>')
+
+
+def empty_state(ic, title, text):
+    return (f'<div class="stack" style="align-items: center; text-align: center; padding: var(--spacing-12) 0; gap: var(--spacing-2)">'
+            f'<span class="icon-tile">{icon(ic)}</span><p class="body-semibold" style="margin: var(--spacing-2) 0 0">{title}</p>'
+            f'<p class="body-sm" style="margin: 0; color: var(--color-text-muted)">{text}</p></div>')
+
+
+CHANNELS = [
+    ('wc-all-things-running', '', 11, 0), ('wc-bookclub', 'Share what you are reading and join the monthly discussion.', 90, 3),
+    ('wc-dealsandsteals', 'Share your best deals, buys and finds here.', 4, 0), ('wc-formula-1', 'Predictions and race weekends.', 27, 9),
+    ('wc-game-nights', 'Cooperative and competitive game nights.', 21, 1), ('wc-games', 'Talk about video games and board games.', 36, 0),
+    ('wc-greenthumb', 'House plant and gardening tips.', 20, 0), ('wc-history-bits', 'History in bite-sized chunks. No politics.', 7, 0),
+    ('wc-home-improvements', 'Do-it-yourselfers share ideas and pictures.', 15, 0), ('wc-knit-and-crochet', '', 6, 0),
+    ('wc-music-sharing', 'Share what you listen to. No judging.', 23, 0), ('wc-motorcycles', 'For riders, builders and enthusiasts.', 12, 0),
+]
+
+
+def watercooler():
+    cards = ''.join(
+        f'<article class="card"><h3 class="card-title">{n}</h3>' + (f'<p class="card-body">{d}</p>' if d else '') +
+        f'<div class="row" style="gap: var(--spacing-4); margin-top: var(--spacing-3)"><span class="row body-sm">{icon("i-participants", "icon icon-16")}{m}</span>'
+        f'<span class="row body-sm">{icon("i-chat", "icon icon-16")}{c}</span></div></article>' for n, d, m, c in CHANNELS)
+    return f'''{head_sub("Watercooler", "Connect with team members around the world who share similar interests")}
+
+      {tabs(("Channels", "Top Messages"))}
+
+      <h2 class="row body-lg-semibold" style="margin: var(--spacing-6) 0 var(--spacing-4)">{icon("i-happy-emoji", "icon icon-24")}Hobbies</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--spacing-4)">{cards}</div>'''
+
+
+OOO = [('ck', ('Delivery', 'Subfunction in Operations'), ('Dublin', 'Ireland'), '12 days'), ('lh', ('Delivery', 'Subfunction in Operations'), ('Budapest', 'Hungary'), '21 days'),
+       ('nr', ('Delivery', 'Subfunction in Operations'), ('Lisbon', 'Portugal'), '8 days'), ('tl', ('Delivery', 'Subfunction in Operations'), ('Malmö', 'Sweden'), '34 days')]
+
+
+def time_off():
+    rows = ''.join(f'<tr><td>{user(k)}</td><td>{two(*u)}</td><td>{two(*l)}</td><td><span class="body-sm">{d}</span></td></tr>' for k, u, l, d in OOO)
+    cards = ''.join(
+        '<article class="card"><div style="display: grid; grid-template-columns: 96px 1fr; gap: var(--spacing-4); align-items: center">' +
+        ''.join(f'<span class="body-sm-semibold" {MUTED}>{lab}</span><div>{v}</div>' for lab, v in (
+            ('Name', user(k)), ('Org unit', two(*u)), ('Location', two(*l)), ('OOO length', f'<span class="body-sm">{d}</span>'))) + '</div></article>'
+        for k, u, l, d in OOO)
+    return f'''{head("Time off")}
+
+      {tabs(("OOO summary", "OOO details"))}
+
+      <div class="toolbar" style="margin: var(--spacing-4) 0">
+        <div class="input-icon input-icon-left toolbar-search">
+          {icon("i-search", "icon input-icon-glyph")}
+          <input class="input" type="text" placeholder="Search by name" aria-label="Search by name" />
+        </div>
+        <span class="row" data-view="desktop">{select("Direct reports", ("Direct reports", "All reports", "Everyone"), label="People shown", width=180)}
+        <div class="input-icon input-icon-left" style="width: 240px">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" value="Jan 1, 2026 - Dec 31, 2026" aria-label="Date range" /></div>
+        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Reset filters">{icon("i-reset", "btn-icon")}</button></span>
+        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters" data-view="mobile" hidden>{icon("i-filter", "btn-icon")}</button>
+      </div>
+
+      {mobile('<div class="stack">' + cards + '</div>')}
+      <div class="table-scroll" style="max-height: none" data-view="desktop">
+        <table class="table">
+          <thead><tr><th>Name</th><th>Org unit</th><th>Location</th><th>OOO length</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>'''
+
+
+def recognitions():
+    return f'''{head("Recognitions &amp; Badges", '<button class="btn btn-primary" type="button">Give recognition</button>')}
+
+      {tabs(("Recognitions", "Badges"))}
+
+      {empty_state("i-recognize", "No recognitions", "You’ll be notified when you receive a recognition.")}'''
+
+
+PENDING_FB = [('ad', 'Peer feedback', 'Sep 11, 2026'), ('mt', 'Peer request', 'Apr 12, 2026')]
+
+
+def peer_feedback():
+    acts = (f'<div class="cell-actions"><a class="body-sm" href="#" {LINK}>Skip</a>'
+            '<button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div>')
+    rows = ''.join(f'<tr><td>{user(k)}</td><td>{tag(r)}</td><td><span class="body-sm">{d}</span></td><td>{acts}</td></tr>' for k, r, d in PENDING_FB)
+    cards = ''.join(f'<article class="card"><div class="stack" style="gap: var(--spacing-3)">{user(k)}<div class="row">{tag(r)}<span class="body-sm">{d}</span></div>'
+                    f'<div class="row row-end"><a class="body-sm" href="#" {LINK}>Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></div></article>'
+                    for k, r, d in PENDING_FB)
+    actions = '<button class="btn btn-secondary" type="button">Request feedback</button>\n          <button class="btn btn-primary" type="button">Give feedback</button>'
+    return f'''{head_sub("Peer Feedback", "Sharing and receiving feedback across all levels promotes growth, alignment, and stronger teamwork.", actions)}
+
+      {tabs(("Pending (2)", "Received", "Given"))}
+
+      <div class="toolbar" style="margin: var(--spacing-4) 0">
+        <div class="input-icon input-icon-left toolbar-search">
+          {icon("i-search", "icon input-icon-glyph")}
+          <input class="input" type="text" placeholder="Receiver" aria-label="Receiver" />
+        </div>
+        <span class="row" data-view="desktop">{ph_select("Relationship", "Relationship", 220)}
+        <div class="input-icon input-icon-left" style="width: 220px">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Date requested" aria-label="Date requested" /></div></span>
+        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters" data-view="mobile" hidden>{icon("i-filter", "btn-icon")}</button>
+      </div>
+
+      {mobile('<div class="stack">' + cards + '</div>')}
+      <div class="table-scroll" style="max-height: none" data-view="desktop">
+        <table class="table">
+          <thead><tr><th>Feedback receiver</th><th>Relationship</th><th>Date Received</th><th style="text-align: right">Actions</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>'''
+
+
+def self_review():
+    def q(text):
+        return (f'<div><p class="body-sm" style="margin: 0 0 var(--spacing-2)">{text}</p>'
+                f'<div class="card"><span class="body" {MUTED}>—</span></div></div>')
+    return f'''{head("Self-review")}
+
+      <div class="stack" style="max-width: 800px; margin: 0 auto; gap: var(--spacing-6)">
+        <div class="row" style="justify-content: space-between">{user("ck")}<button class="btn btn-secondary" type="button">Edit</button></div>
+        <article class="card"><div class="stack"><h2 class="h4" style="margin: 0">Achievements and opportunities</h2>
+          {q("Please highlight your achievements and wins since your last self review.")}
+          {q("Please highlight your challenges and development opportunities since your last self review.")}</div></article>
+        <article class="card"><div class="stack"><h2 class="h4" style="margin: 0">Career goals</h2>
+          {q("What does career growth mean to you?")}
+          {q("What type of development opportunities would you like to see in order to progress with your growth goals?")}
+          {q("How much time are you able to spend on skill development each month?")}</div></article>
+      </div>'''
+
+
+def profile_edit():
+    def txt(label, ph):
+        return f'<label class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span><input class="input" type="text" placeholder="{ph}" /></label>'
+
+    def sel(label, control):
+        return f'<div class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span>{control}</div>'
+    return f'''{head("Edit Profile")}
+
+      {tabs(("Personal", "Work", "Contacts"))}
+
+      <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-top: var(--spacing-6)">
+        <div class="stack" style="flex: 3 1 420px; min-width: 0; max-width: 640px">
+          <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("First name", "First name")}{txt("Last name", "Last name")}</div>
+          <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("Preferred first name (optional)", "First name")}<span style="flex: 1 1 220px"></span></div>
+          <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">
+            {sel("Location", ph_select("Location", "Location") + '<span class="field-hint">Local time: 10:10</span>')}
+            {sel("Working hours", '<div class="row">' + select("09:00", ("08:00", "09:00", "10:00"), "Working hours start") + select("17:00", ("16:00", "17:00", "18:00"), "Working hours end") + '</div>')}
+          </div>
+          <div class="row" style="flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-4)">
+            {sel("Date of Birth (optional)", '<div class="row">' + ph_select("Month", "Month of birth") + ph_select("Day", "Day of birth") + '</div>')}
+            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile</span></label>
+          </div>
+          <label class="field"><span class="field-label">About (optional)</span><textarea class="input" rows="8" placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
+        </div>
+        <div class="stack" style="flex: 1 1 160px">
+          <span class="field-label">Avatar (optional)</span>
+          <span class="avatar avatar-2xl">CK</span>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: var(--spacing-6)">
+        <a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>
+        <button class="btn btn-primary" type="button" disabled>Save Changes</button>
+      </div>'''
+
+
+PAUSED = [('06 Feb, 10:02 PM', '[Quarterly] Operations business review', 'lk'), ('03 Aug, 7:01 PM', '[RoB] Vendor Management', 'lk'),
+          ('30 Jul, 6:24 PM', '[RoB] Partner certification', 'ad'), ('06 Jul, 2:37 PM', '[RoB] Northwind Hire daily', 'km'),
+          ('09 Mar, 3:54 PM', '[RoB] Learning programs', 'jp'), ('20 Jan, 11:18 PM', '[RoB] Legal Operations', 'og')]
+
+
+def paused_meetings():
+    rows = ''.join(f'<tr><td><span class="body-sm">{d}</span></td><td><a class="body-sm" href="#" {LINK}>{n}</a></td><td>{user(k)}</td></tr>' for d, n, k in PAUSED)
+    cards = ''.join(f'<article class="card"><div class="stack" style="gap: var(--spacing-3)"><a class="body-semibold" href="#" {LINK}>{n}</a>'
+                    f'<span class="body-sm" {MUTED}>Last meeting: {d}</span>{user(k)}</div></article>' for d, n, k in PAUSED)
+    return f'''{head("View Paused Meetings")}
+
+      {mobile('<div class="stack">' + cards + '</div>')}
+      <div class="table-scroll" style="max-height: none" data-view="desktop">
+        <table class="table">
+          <thead><tr><th>Last meeting</th><th>Name</th><th>Accountability</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>'''
+
+
+def not_found():
+    return f'''      <div class="stack" style="align-items: center; justify-content: center; text-align: center; min-height: 60vh; gap: var(--spacing-2)">
+        <span class="icon-tile">{icon("i-exclamation")}</span>
+        <h1 class="h3" style="margin: var(--spacing-2) 0 0">404</h1>
+        <p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Page not found</p>
+        <a class="btn btn-primary" href="../dashboard/index.html" style="text-decoration: none; margin-top: var(--spacing-3)">Go back to dashboard</a>
+      </div>'''
+
+
 P1 = ('btn-primary',)
 SCREENS = [
     dict(folder='dashboard', title='TopTrack Dashboard', nav='Dashboard', main=dashboard(), route='/dashboard',
@@ -808,6 +1003,16 @@ SCREENS = [
          ctas=[('btn-secondary', 'Edit profile', 'i-pencil')]),
     dict(folder='team', title='Organizational Structure', nav='Team', main=team(), route='/org-structure/org-units'),
     dict(folder='team-profile', title='Team Profile', nav='Team', main=team_profile(), route='/teams/:teamId'),
+    dict(folder='rob-paused-meetings', batch=2, title='View Paused Meetings', nav='RoB Meetings', main=paused_meetings(), route='/rob/paused-meetings'),
+    dict(folder='profile-edit', batch=2, title='Edit Profile', nav='People', main=profile_edit(), route='/people/:userId/edit'),
+    dict(folder='watercooler', batch=2, title='Watercooler', nav=None, main=watercooler(), route='/watercooler'),
+    dict(folder='time-off', batch=2, title='Time off', nav=None, main=time_off(), route='/time-off'),
+    dict(folder='recognitions', batch=2, title='Recognitions & Badges', nav=None, main=recognitions(), route='/recognitions',
+         ctas=[('btn-primary', 'Give recognition', 'i-plus')]),
+    dict(folder='peer-feedback', batch=2, title='Peer Feedback', nav=None, main=peer_feedback(), route='/peer-feedbacks/:viewMode/:tab',
+         ctas=[('btn-secondary', 'Request feedback', 'i-comment-ask'), ('btn-primary', 'Give feedback', 'i-plus')]),
+    dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
+    dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
 ]
 
 
@@ -820,26 +1025,26 @@ INVENTORY = [
                      ('Create and edit initiative', '/initiatives/create', 'initiative-create')]),
     ('RoB Meetings', [('RoB Meetings calendar', '/rob', 'rob-meetings'), ('RoB meeting', '/rob?calendarId=…', 'rob-meeting-view'),
                       ('Create and edit meeting', '/rob/create-meeting/:step', None), ('Filters', '/rob/filters', None),
-                      ('Paused meetings', '/rob/paused-meetings', None), ('Slack card', '/rob/slack_cards/:id', None)]),
+                      ('Paused meetings', '/rob/paused-meetings', 'rob-paused-meetings'), ('Slack card', '/rob/slack_cards/:id', None)]),
     ('OKRs', [('OKRs', '/okrs/list', 'okrs')]),
     ('People and profile', [('People', '/people/directory', 'people'), ('Profile', '/people/:userId', 'profile'),
-                            ('Edit profile', '/people/:userId/edit', None), ('Edit public profile', '/people/:userId/edit-public-profile', None),
+                            ('Edit profile', '/people/:userId/edit', 'profile-edit'), ('Edit public profile', '/people/:userId/edit-public-profile', None),
                             ('Create profile', '/people/create', None)]),
     ('Team and org structure', [('Organizational Structure', '/org-structure/org-units', 'team'), ('Team Profile', '/teams/:teamId', 'team-profile'),
                                 ('Create org unit', '/org-structure/create', None), ('Edit org unit', '/teams/:teamId/edit', None),
                                 ('Create division', '/org-structure/divisions/create', None), ('Edit division', '/org-structure/divisions/edit/:id', None),
                                 ('Talent profile', '/talent/:talentId', None), ('Create and edit talent', '/talent/create', None)]),
-    ('Watercooler, Time off, Recognitions', [('Watercooler', '/watercooler', None), ('Time off', '/time-off', None), ('Recognitions', '/recognitions', None)]),
-    ('Peer feedback', [('Peer feedback', '/peer-feedbacks/:viewMode/:tab', None), ('Give feedback', '/peer-feedbacks/:feedbackId/edit', None),
+    ('Watercooler, Time off, Recognitions', [('Watercooler', '/watercooler', 'watercooler'), ('Time off', '/time-off', 'time-off'), ('Recognitions', '/recognitions', 'recognitions')]),
+    ('Peer feedback', [('Peer feedback', '/peer-feedbacks/:viewMode/:tab', 'peer-feedback'), ('Give feedback', '/peer-feedbacks/:feedbackId/edit', None),
                        ('Feedback', '/peer-feedbacks/:feedbackId/view', None)]),
     ('Performance review and self-review', [
         ('Self-assessment', '/performance-review/self-assessment', None), ('Manager view', '/performance-review/manager/:tab', None),
         ('Assessments', '/performance-review/assessments', None), ('Edit assessment', '/performance-review/assessments/edit/:assessmentId', None),
         ('Assessment', '/performance-review/assessment/:reviewId/:userId', None), ('Reports', '/performance-review/reports', None),
         ('Cycle report', '/performance-review/reports/:cycleId', None), ('Reviewee breakdown', '/performance-review/reports/:cycleId/:revieweeId', None),
-        ('Self-review', '/self-review/:userId', None), ('Team self-review', '/self-review/team', None)]),
+        ('Self-review', '/self-review/:userId', 'self-review'), ('Team self-review', '/self-review/team', None)]),
     ('Outside the main navigation', [('Sign in', '/signin', None), ('Sign up', '/signup', None), ('Forgot password', '/forgot-password', None),
-                                     ('Reset password', '/reset-password', None), ('Page not found', '/404', None), ('Onboarding', '/onboarding', None),
+                                     ('Reset password', '/reset-password', None), ('Page not found', '/404', 'not-found'), ('Onboarding', '/onboarding', None),
                                      ('Demo: create a Process', '/demo/create-a-process', None), ('Demo: create an Initiative', '/demo/create-an-initiative', None)]),
     ('Admin settings', [(n, r, None) for n, r in (
         ('Settings', '/admin/settings'), ('Permissions', '/admin/permissions'), ('Roles management', '/admin/settings/roles-management'),
@@ -854,33 +1059,64 @@ INVENTORY = [
 ]
 
 
+# The work log: one entry per sitting. Minutes are wall-clock time from the
+# request to the finished, checked batch, read from file and commit timestamps.
+# A screen's build time is its batch's minutes divided by the batch's screens.
+BATCHES = {
+    1: dict(date='Nov 25, 2026', span='09:51–10:06', minutes=15,
+            note='Includes the one-off setup: the folder, the build script, the phone layouts and this list.'),
+    2: dict(date='Nov 25, 2026', span='10:08–10:14', minutes=6,
+            note='Capturing eight more screens on staging and building them.'),
+}
+UPDATES = []  # one dict(date, span, minutes, screens=[folders], note) per update pass; none yet
+
+
 def index():
+    by_folder = {x['folder']: x for x in SCREENS}
+    per_batch = {b: sum(1 for x in SCREENS if x.get('batch', 1) == b) for b in BATCHES}
     total = sum(len(rows) for _, rows in INVENTORY)
     done = sum(1 for _, rows in INVENTORY for r in rows if r[2])
-    pct = round(100 * done / total)
-    yes = f'<svg class="icon icon-16" role="img" aria-label="Built" style="color: var(--color-success)"><use href="#i-done-solid"/></svg>'
-    no = f'<svg class="icon icon-16" role="img" aria-label="Not built" style="color: var(--color-text-subtle)"><use href="#i-bullet-outline"/></svg>'
+    spent = sum(b['minutes'] for b in BATCHES.values())
+    avg = spent / done
+    left = round((total - done) * avg)
+    yes = '<svg class="icon icon-16" role="img" aria-label="Built" style="color: var(--color-success)"><use href="#i-done-solid"/></svg>'
+    no = '<svg class="icon icon-16" role="img" aria-label="Not built" style="color: var(--color-text-subtle)"><use href="#i-bullet-outline"/></svg>'
+    dash = f'<span class="body-sm" {MUTED}>—</span>'
     body = []
     for area, rows in INVENTORY:
         n = sum(1 for r in rows if r[2])
-        body.append(f'<tr><td colspan="4"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
+        body.append(f'<tr><td colspan="7"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
         for name, route, folder in rows:
-            title = f'<a class="cell-title" href="{folder}/index.html" {LINK}>{name}</a>' if folder else f'<span class="cell-title" {MUTED}>{name}</span>'
-            lay = tag("Desktop and phone") if folder else ''
-            body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td><td>{title}</td><td><code class="body-sm">{route}</code></td><td>{lay}</td></tr>')
-    return f'''{head("Production site · Nov 25, 2026")}
+            if folder:
+                b = by_folder[folder].get('batch', 1)
+                mins = BATCHES[b]['minutes'] / per_batch[b]
+                cells = (f'<td><a class="cell-title" href="{folder}/index.html" {LINK}>{name}</a></td><td><code class="body-sm">{route}</code></td>'
+                         f'<td><span class="body-sm">{BATCHES[b]["date"]}</span></td><td><span class="body-sm">{mins:.1f} min</span></td><td>{dash}</td><td>{dash}</td>')
+            else:
+                cells = (f'<td><span class="cell-title" {MUTED}>{name}</span></td><td><code class="body-sm">{route}</code></td>'
+                         f'<td>{dash}</td><td>{dash}</td><td>{dash}</td><td>{dash}</td>')
+            body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td>{cells}</tr>')
+    log = ''.join(f'<tr><td><span class="body-sm-semibold">Build {b}</span></td><td><span class="body-sm">{v["date"]}, {v["span"]}</span></td>'
+                  f'<td><span class="body-sm">{per_batch[b]} screens</span></td><td><span class="body-sm">{v["minutes"]} min</span></td>'
+                  f'<td><span class="body-sm">{v["note"]}</span></td></tr>' for b, v in BATCHES.items())
+    log += ''.join(f'<tr><td><span class="body-sm-semibold">Update</span></td><td><span class="body-sm">{u["date"]}, {u["span"]}</span></td>'
+                   f'<td><span class="body-sm">{len(u["screens"])} screens</span></td><td><span class="body-sm">{u["minutes"]} min</span></td>'
+                   f'<td><span class="body-sm">{u["note"]}</span></td></tr>' for u in UPDATES)
+    stats = ''.join(f'<div class="stat-card"><p class="stat-card-label">{l}</p><p class="stat-card-value">{v}</p></div>' for l, v in (
+        ('Primary screens built', f'{done} of {total}'), ('Build time so far', f'{spent} min'), ('Average per screen', f'{avg:.1f} min'),
+        ('Left to build, at that rate', f'about {left} min'), ('Update passes', str(len(UPDATES)) if UPDATES else 'None yet')))
+    return f'''    <h1 class="h1" style="margin: 0 0 var(--spacing-2)">Production site · Nov 25, 2026</h1>
+    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">Our own list, not a product screen: which primary screens of the product are rebuilt on the kit, when, and how long each took to build and to update. A green tick links to the screen. Each one covers desktop and phone width, basic state only.</p>
 
-      <div class="alert" style="margin-bottom: var(--spacing-6)">{icon("i-info", "icon alert-icon")}
-        <p class="alert-message">The product as it ran on November 25, 2026, rebuilt on the kit. Start an update or a new version of a screen from its copy here. Layout, labels and structure follow the app; the people and the records are made up. Only each screen’s basic state is built so far: tabs, drawers and modals come next.</p></div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-8)">{stats}</div>
 
-      <div class="stack" style="max-width: 480px; margin-bottom: var(--spacing-6)">
-        <div class="row" style="justify-content: space-between"><span class="body-semibold">{done} of {total} primary screens built</span><span class="body-sm">{pct}%</span></div>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{pct}" aria-label="Screens built">
-          <div class="progress-track"><div class="progress-fill" style="width: {pct}%"></div></div>
-          <span class="progress-value" hidden>{pct}%</span>
-        </div>
-      </div>
+    <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Screens</h2>
+    <div class="table-scroll" style="max-height: none; margin-bottom: var(--spacing-8)">
+      <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Built</th><th>Time to build</th><th>Updated</th><th>Time to update</th></tr></thead><tbody>{"".join(body)}</tbody></table>
+    </div>
 
-      <div class="table-scroll" style="max-height: none">
-        <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Layouts</th></tr></thead><tbody>{"".join(body)}</tbody></table>
-      </div>'''
+    <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Work log</h2>
+    <div class="table-scroll" style="max-height: none; margin-bottom: var(--spacing-4)">
+      <table class="table"><thead><tr><th>Pass</th><th>When</th><th>Covered</th><th>Took</th><th>Notes</th></tr></thead><tbody>{log}</tbody></table>
+    </div>
+    <p class="body-sm" style="margin: 0; max-width: 760px; color: var(--color-text-muted)">Times are wall-clock minutes for the whole pass, from the request to the checked result, so a screen’s time to build is its pass divided by the screens in it. No screen has been updated yet; the first update pass fills in the last two columns.</p>'''

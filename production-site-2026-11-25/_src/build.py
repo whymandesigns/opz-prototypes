@@ -97,6 +97,30 @@ def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
     return t.replace('</body>', VIEW_SCRIPT + '</body>')
 
 
+def plain(title, body):
+    """The list of screens is ours, not the product's: no top bar and no side nav."""
+    sprite = re.search(r"  if \(!document\.getElementById\('i-plus'\)\) \{.*?\n  \}\n", TEMPLATE, flags=re.S).group(0)
+    return f'''<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <link rel="stylesheet" href="../../designmd/tokens.css" />
+  <link rel="stylesheet" href="../../designmd/semantic.css" />
+  <link rel="stylesheet" href="../../designmd/components.css" />
+</head>
+<body>
+  <main style="max-width: 1200px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
+{body}
+  </main>
+  <script>
+{sprite}  </script>
+</body>
+</html>
+'''
+
+
 def main():
     built = []
     for s in screens.SCREENS:
@@ -105,7 +129,7 @@ def main():
         d.mkdir(exist_ok=True)
         (d / 'index.html').write_text(html)
         built.append(s['folder'])
-    (OUT / 'index.html').write_text(page('Production site · Nov 25, 2026', None, screens.index(), depth=0))
+    (OUT / 'index.html').write_text(plain('Production site · Nov 25, 2026', screens.index()))
     print('wrote', len(built), 'screens:', ', '.join(built))
 
 

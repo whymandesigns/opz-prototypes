@@ -12,8 +12,12 @@ instead of from memory.
   Operationalize prototype does (`BAU-TERM-001`). The top bar and side nav are
   the kit's, so the business-line switcher is not there.
 - **What is missing:** only each screen's basic state is built. Tabs other than
-  the first, drawers, modals and the areas listed under "Still to build" on
-  `index.html` come later.
+  the first, drawers and modals come later.
+
+`index.html` is our own list, not a product screen, so it has no app shell. It
+shows every primary screen with a tick when built, when it was built and
+updated, and how long each took. The times come from `BATCHES` and `UPDATES`
+in `_src/screens.py`: add an entry there after every build or update pass.
 
 Where the kit has no component, the nearest kit one stands in, and says so here
 rather than in invented CSS:
