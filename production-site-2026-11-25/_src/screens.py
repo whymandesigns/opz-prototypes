@@ -75,7 +75,7 @@ def view_modes(active):
     modes = [('Detailed view', 'i-wide-tables-row'), ('Compact view', 'i-narrow-tables-row'), ('Spreadsheet view', 'i-table')]
     b = ''.join(f'<button class="segmented-item segmented-icon{" is-active" if i == active else ""}" type="button" aria-label="{l}">{icon(s)}</button>'
                 for i, (l, s) in enumerate(modes))
-    return f'<div class="segmented" role="group" aria-label="View">{b}</div>'
+    return f'<div class="segmented" role="group" aria-label="View" data-tabs="view">{b}</div>'
 
 
 def desktop(html):
@@ -1310,7 +1310,8 @@ def process_overlays():
         <div class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy Link">{icon("i-link", "btn-icon")}</button>{x()}</div>
       </header>
       <div class="drawer-body"><div class="stack">
-        {tabs(("Overview", "Activity log"))}
+        {tabs(("Overview", "Activity log")).replace('role="tablist"', 'role="tablist" data-tabs="pdrawer"')}
+        <div class="stack" data-panel="pdrawer:0">
         <div {GRID}>{field_row("Accountable owner", user("ck", "Delivery"))}{field_row("End date", sub("Jun 30, 2027"))}</div>
         <div><span class="body-sm" {MUTED}>Description</span><p class="body" style="margin: var(--spacing-2) 0 0">Read the customer’s request, check the order and what arrived, issue the refund for the right items, reply to the customer and close the ticket.</p></div>
         <div class="stack"><h3 class="h4" style="margin: 0">Connections</h3>
@@ -1318,6 +1319,8 @@ def process_overlays():
           <div class="row"><button class="btn btn-ghost" type="button" data-modal-open="raci-drawer">{icon("i-table", "btn-icon")}View RACI</button></div></div>
         <div class="stack"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></div>
         <div class="stack"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
+        </div>
+        <div data-panel="pdrawer:1" hidden>{timeline((('Nov 24, 2026', 'Status was changed from Not started to Active by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Accountable owner was added by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Process was created by Cara Keane on Nov 24, 2026, 7:34 PM')))}</div>
       </div></div>
     </aside>
   </div>'''
@@ -1382,18 +1385,201 @@ def give_feedback_modal():
   </div>'''
 
 
+def timeline(items):
+    return ''.join(f'<div class="list-row"><div><p class="list-row-meta">{d}</p><p class="list-row-title">{t}</p></div></div>' for d, t in items)
+
+
+def check(label, on=False):
+    return (f'<label class="checkbox"><input type="checkbox" class="checkbox-input"{" checked" if on else ""} /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span>'
+            f'<span class="checkbox-label">{label}</span></label>')
+
+
+def text_in(ph, ic=None):
+    if ic:
+        return f'<div class="input-icon input-icon-left">{icon(ic, "icon input-icon-glyph")}<input class="input" type="text" placeholder="{ph}" aria-label="{ph}" /></div>'
+    return f'<input class="input" type="text" placeholder="{ph}" aria-label="{ph}" />'
+
+
+def filters_panel(pid, rows):
+    body = ''.join(f'<div {PAIR}><span class="body-sm-semibold" style="flex: 0 0 140px">{l}</span><div class="row" style="flex: 1 1 240px; min-width: 0; flex-wrap: wrap">{c}</div></div>' for l, c in rows)
+    return (f'<article class="card" id="{pid}" hidden style="margin-bottom: var(--spacing-4); max-width: 760px"><div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-4)">'
+            f'<span class="body-semibold">Filters</span><a class="body-sm-semibold" href="#" {LINK}>Clear all</a></div><div class="stack">{body}</div></article>')
+
+
+def work_filters(noun, types):
+    grow = 'style="flex: 1 1 160px; min-width: 0"'
+    return filters_panel('filters-panel', [
+        ('Name', f'<div {grow}>{text_in(noun + " name", "i-search")}</div>'),
+        ('Accountable owner', f'<div {grow}>{text_in("Owner", "i-search")}</div><span class="body-sm-semibold">Accountable function</span><div {grow}>{ph_select("Function", "Accountable function")}</div>'),
+        ('Beneficiary function', f'<div {grow}>{ph_select("Function", "Beneficiary function")}</div>'),
+        ('Type', ''.join(check(t) for t in types)),
+        ('RoB Meeting', f'<div {grow}>{ph_select("RoB meeting name", "RoB meeting")}</div>'),
+        ('Tags', f'<div {grow}>{ph_select("Tags", "Tags")}</div>'),
+        ('Start date', f'<div {grow}>{text_in("Start date", "i-calendar")}</div><span class="body-sm-semibold">End date</span><div {grow}>{text_in("End date", "i-calendar")}</div>'),
+        ('Created at', f'<div {grow}>{text_in("Created at", "i-calendar")}</div><span class="body-sm-semibold">Updated at</span><div {grow}>{text_in("Updated at", "i-calendar")}</div>'),
+        ('Status', ''.join(check(t) for t in ('Not started', 'Planning', 'Active', 'Not active', 'Paused'))),
+        ('', check('Show archived')),
+    ])
+
+
+def with_views(html, compact, sheet, extra_panels=''):
+    """Detailed, compact and spreadsheet views of a work list. The detailed view
+    is what the screen already holds below its toolbars."""
+    k = '<div data-view="mobile" hidden><div class="stack">'
+    assert html.count(k) == 1
+    i = html.index(k)
+    return (html[:i] + extra_panels + '<div data-panel="view:0">' + html[i:] + '</div>'
+            + f'\n<div data-panel="view:1" hidden>{compact}</div>\n<div data-panel="view:2" hidden>{sheet}</div>')
+
+
+def toggle(html, label, pid):
+    k = [x for x in (f'<button class="btn btn-secondary" type="button">{icon(ic, "btn-icon")}{label}</button>' for ic in ('i-filter', 'i-code')) if x in html]
+    assert len(k) == 1 and html.count(k[0]) == 1, label
+    return html.replace(k[0], k[0].replace('type="button">', f'type="button" data-toggle="{pid}">'))
+
+
+def compact_rows(items):
+    return ''.join(f'<tr><td><span class="row"><span class="cell-title">{n}</span>{tag(kind)}</span></td><td>{tag(st, c)}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td>'
+                   f'<td>{sub(r[0]) if r else ""}</td></tr>' for n, kind, st, c, k, r in items)
+
+
+def sheet_table(heads, rows):
+    body = ''.join('<tr><td>' + sub(i) + '</td>' + ''.join(f'<td>{c}</td>' for c in r) + '</tr>' for i, r in enumerate(rows, 1))
+    return table(('#',) + heads, body)
+
+
+def indent(n, lvl, bold=False):
+    cls = 'body-sm-semibold' if bold else 'body-sm'
+    return f'<span class="{cls}" style="padding-left: calc({lvl} * var(--spacing-4))">{n}</span>'
+
+
+def processes_views():
+    comp = table(('Name', 'Status', 'Accountability', 'RoB Meeting'), compact_rows([(n, 'Process', st, 'light', k, r) for n, st, k, unit, r in PROCESSES]))
+    tree = [('Refund requests', 0, 'Read the request, check the order, issue the refund and close the ticket.', 'Active', 'ck', 'Delivery'),
+            ('Refund review', 1, 'Check the order and what arrived against the request.', 'Active', 'lh', 'Delivery'),
+            ('Partial refunds', 2, 'Refund only the items that were wrong or missing.', 'Active', 'tl', 'Delivery'),
+            ('Vendor Management', 0, 'Choose, onboard and review the vendors the company depends on.', 'Not active', 'lk', 'Operations'),
+            ('Vendor onboarding', 1, 'Contracts, security review and access for a new vendor.', 'Not active', 'lk', 'Operations'),
+            ('Workplace and IT', 0, 'Equipment, accounts and access for everyone on the team.', 'Active', 'el', 'IT'),
+            ('Laptop refresh', 1, 'Replace laptops on a three-year cycle.', 'Paused', 'el', 'IT'),
+            ('Legal Operations', 0, 'Contract templates, reviews and renewals.', 'Active', 'og', 'Legal')]
+    sheet = sheet_table(('Name', 'Description', 'Status', 'Owner', 'Beneficiary Function'),
+                        [(indent(n, lvl, lvl < 2), sub(d), tag(st), sub(PEOPLE[k][0]), sub(f)) for n, lvl, d, st, k, f in tree])
+    return comp, sheet
+
+
+def initiatives_views():
+    comp = table(('Name', 'Status', 'Accountability', 'RoB Meeting'), compact_rows([(n, 'Initiative', s_, kind, k, r) for n, s_, kind, h, k, unit, road, r in INITIATIVES]))
+    tree = [('Onboarding in one week', 0, 'Cut the time from signed contract to first delivered work.', 'Execution', 'sr', 'Operations'),
+            ('Kick-off checklist', 1, 'One checklist every engagement starts from.', 'Execution', 'ck', 'Operations'),
+            ('First-week survey', 2, 'Ask every new customer how the first week went.', 'Idea', 'tl', 'Operations'),
+            ('Delivery health reviews', 0, 'A weekly review of every active engagement.', 'Execution', 'lk', 'Operations'),
+            ('Partner marketing sites', 0, 'Co-branded pages for the ten largest partners.', 'Execution', 'ad', 'Partnerships'),
+            ('Learning programs', 0, 'A formal learning program for managers.', 'Execution', 'jp', 'People')]
+    sheet = sheet_table(('Name', 'Description', 'Status', 'Owner', 'Beneficiary Function'),
+                        [(indent(n, lvl, lvl < 2), sub(d), tag(st), sub(PEOPLE[k][0]), sub(f)) for n, lvl, d, st, k, f in tree])
+    return comp, sheet
+
+
+INIT_QUERY = QUERY_PANEL.replace('Show processes being supported', 'Show initiatives being supported').replace('Show processes where', 'Show initiatives where')
+
+
+def initiatives_with_states():
+    h = toggle(toggle(initiatives(), 'Filters', 'filters-panel'), 'Query', 'query-panel')
+    return with_views(h, *initiatives_views(), extra_panels=work_filters('Initiative', ('Initiative', 'Project', 'Sub-project')) + INIT_QUERY)
+
+
+def dashboard_with_states():
+    h = dashboard()
+    k = '      <div class="table-scroll" style="max-height: none">'
+    assert h.count(k) == 1
+    i = h.index(k)
+    heads = ('Name', 'Strategic Objective', 'Objective Owner', 'Status', 'Health', 'Accountability', 'Roadmap', 'RoB Meeting')
+    hl = {'Execution': ('On track', 'positive'), 'Complete': ('On track', 'positive')}
+    det = ''.join(f'<tr><td><span class="cell-title">{n}</span><div>{tag("Initiative")}{tag("# Core Strategy")}</div></td><td>{sub(o)}</td><td>{sub(PEOPLE[k][0])}</td><td>{tag(st, kind)}</td>'
+                  f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td>{user(k)}</td><td>{sub("Q4 2026" if st == "Execution" else "")}</td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
+    comp = ''.join(f'<tr><td><span class="row"><span class="cell-title">{n}</span>{tag("Initiative")}</span></td><td>{sub(o)}</td><td>{sub(PEOPLE[k][0])}</td><td>{tag(st, kind)}</td>'
+                   f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
+    h = h[:i] + f'<div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:] + '</div>'
+    return h
+
+
+def rob_with_states():
+    h = rob_calendar()
+    k = '      <div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-3)">\n        <h2 class="h3" style="margin: 0">November 2026</h2>'
+    assert h.count(k) == 1
+    i = h.index(k)
+    day = ''.join(f'<a class="list-row" href="../rob-meeting-view/index.html" style="text-decoration: none"><div><p class="list-row-title">{t}</p><p class="list-row-meta">{m}</p></div></a>'
+                  for t, m in (('[RoB] Onboarding in one week', '10:30am Operations'), ('Delivery All Hands', '2:00pm Delivery')))
+    nav = (f'<div class="row"><button class="btn btn-secondary btn-icon-only" type="button" aria-label="Previous">{icon("i-arrow-long-left", "btn-icon")}</button>'
+           f'<button class="btn btn-secondary" type="button">Today</button><button class="btn btn-secondary btn-icon-only" type="button" aria-label="Next">{icon("i-arrow-long-right", "btn-icon")}</button></div>')
+    sched = f'<div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-3)"><h2 class="h3" style="margin: 0">23 November 2026, <span class="body">Monday</span></h2>{nav}</div>{day}'
+    week = (f'<div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-3)"><h2 class="h3" style="margin: 0">Nov 23-29</h2>{nav}</div>'
+            + week_grid([((0, '10:00am'), ('[RoB] Onboarding in one week', 'Operations')), ((2, '1:00pm'), ('[RoB] Refund requests', 'Delivery')), ((3, '4:00pm'), ('[RoB] Partner marketing sites', 'Partnerships'))]))
+    grow = 'style="flex: 1 1 200px; min-width: 0"'
+    filt = filters_panel('rob-filters', [('Meeting name', f'<div {grow}>{text_in("Meeting name")}</div>')] +
+                         [(l, f'<div {grow}>{select("All", label=l)}</div>') for l in ('Team', 'Meeting owners', 'Attendee', 'Divisions', 'Slack channels')] +
+                         [('', check('Show sub teams', True) + check('Hide 1:1 Meetings', True))])
+    h = (h[:i] + filt + '<div data-panel="robview:0" hidden>' + sched + '</div>\n<div data-panel="robview:1" hidden>' + week + '</div>\n<div data-panel="robview:2">' + h[i:] + '</div>')
+    h = h.replace('<div class="segmented" role="group" aria-label="Calendar view">', '<div class="segmented" role="group" aria-label="Calendar view" data-tabs="robview">')
+    h = toggle(h, 'Filters', 'rob-filters')
+    # All events: the same month, every team's meetings, with the two default filters on
+    more = {2: 40, 3: 60, 4: 53, 5: 58, 6: 38, 9: 43, 10: 60, 11: 53, 12: 58, 13: 35, 16: 39, 17: 55, 18: 46, 19: 58, 20: 36}
+    weeks = [[2, 3, 4, 5, 6], [9, 10, 11, 12, 13], [16, 17, 18, 19, 20]]
+    body = ''
+    for w in weeks:
+        body += '<tr>' + ''.join(
+            f'<td style="vertical-align: top"><div class="row row-end"><span class="body-xs" {MUTED}>{d:02d}</span></div>'
+            + ''.join(f'<div class="list-row"><div><p class="list-row-title">{t}</p><p class="list-row-meta">{m}</p></div></div>' for t, m in (('[RoB] Onboarding in one week', '10:00am Operations'), ('Delivery daily sync-up', '10:30am Delivery'), ('IT daily sync-up', '11:00am IT')))
+            + f'<a class="body-xs-semibold" href="#" {LINK}>{more[d]} More</a></td>' for d in w) + '</tr>'
+    chip = lambda t: f'<span class="chip">{t}<button class="chip-remove" type="button" aria-label="Remove">{icon("i-x", "")}</button></span>'
+    allev = (f'<div class="toolbar" style="margin-bottom: var(--spacing-3)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search" aria-label="Search meetings" /></div>'
+             f'<button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters (2)</button><span class="toolbar-spacer"></span>{segmented(("Schedule", "Week", "Month"), 2, "Calendar view")}</div>'
+             f'<div class="row" style="margin-bottom: var(--spacing-4)">{chip("Hide 1:1 Meetings")}{chip("Show sub teams: Yes")}</div>'
+             f'<div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-3)"><h2 class="h3" style="margin: 0">November 2026</h2>{nav}</div>'
+             f'<div class="table-scroll" style="max-height: none"><table class="table" style="table-layout: fixed; min-width: 880px"><thead><tr><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th></tr></thead><tbody>{body}</tbody></table></div>')
+    return with_tabs(h, 'rob', [allev])
+
+
+ATTRS = [('Brand', 'How customers, talent and the market see us'), ('Growth', 'New customers, markets and offerings'),
+         ('Dynamic/Process', 'Efficient, adaptable ways of working that keep improving'), ('Growth/Revenue', 'Revenue and margin, directly'),
+         ('People', 'Hiring, developing and keeping great people'), ('Organization', 'Structure, roles and accountability that let teams execute'),
+         ('Speed', 'Deciding and shipping faster'), ('Quality', 'Higher standards, fewer defects, better customer experience')]
+
+
+def perf_attrs_modal():
+    rows = ''.join(f'<div class="list-row"><div><p class="list-row-title">{n}</p><p class="list-row-meta">{d}</p></div><span class="count-badge count-badge-secondary">{c}</span></div>'
+                   for (n, d), c in zip(ATTRS, (0, 2, 1, 0, 1, 0, 0, 0)))
+    return f'''  <div class="modal-overlay" id="perf-attrs" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="perf-attrs-title">
+      <header class="modal-header"><h2 class="modal-title" id="perf-attrs-title">Performance attributes</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" data-modal-close aria-label="Close">{icon("i-x")}</button></header>
+      <div class="modal-body"><p class="body-sm" style="margin: 0 0 var(--spacing-3); color: var(--color-text-muted)">Each objective and key result can support one attribute. Numbers are for 2026.</p>{rows}</div>
+    </div>
+  </div>'''
+
+
+def okrs_with_states():
+    h = with_tabs(okrs(), 'okrs', okr_panels())
+    k = '<button class="btn btn-secondary" type="button">' + icon("i-info", "btn-icon") + 'Performance attributes</button>'
+    assert h.count(k) == 1
+    return h.replace(k, k.replace('type="button">', 'type="button" data-modal-open="perf-attrs">'))
+
+
 def processes_with_states():
     h = processes()
     k = '<button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>'
     assert h.count(k) == 1
     h = h.replace(k, '<button class="btn btn-secondary" type="button" data-toggle="query-panel">' + icon("i-code", "btn-icon") + 'Query</button>')
-    k = '      <div class="table-scroll" style="max-height: none" data-view="desktop">'
+    k = '<div data-view="mobile" hidden><div class="stack">'
     assert h.count(k) == 1
-    h = h.replace(k, '      ' + QUERY_PANEL + '\n' + k)
+    h = h.replace(k, QUERY_PANEL + '\n' + k)
     h = h.replace('<button class="btn btn-primary" type="button">Create Process</button>', '<button class="btn btn-primary" type="button" data-modal-open="create-process">Create Process</button>')
     h = h.replace('<span class="cell-title">Refund requests</span>', f'<a class="cell-title" href="#open-process-drawer" data-modal-open="process-drawer" {LINK}>Refund requests</a>')
     h = h.replace('<span class="body-semibold">Refund requests</span>', f'<a class="body-semibold" href="#open-process-drawer" data-modal-open="process-drawer" {LINK}>Refund requests</a>')
-    return h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
+    h = h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
+    h = toggle(h, 'Filters', 'filters-panel')
+    return with_views(h, *processes_views(), extra_panels=work_filters('Process', ('Process', 'Activity', 'Sub-activity')))
 
 
 def peer_feedback_with_states():
@@ -1424,23 +1610,34 @@ STATES = (
        ('processes', 'Process drawer', 'Drawer', '#open-process-drawer'), ('processes', 'Create Process', 'Drawer', '#open-create-process'),
        ('processes', 'RACI', 'Drawer', '#open-raci-drawer'), ('processes', 'Query panel', 'Panel', '#open-query-panel'),
        ('peer-feedback', 'Give feedback', 'Modal', '#open-give-feedback')])
+STATES_2 = [
+    ('processes', 'Compact view', 'View', '#show-view-1'), ('processes', 'Spreadsheet view', 'View', '#show-view-2'), ('processes', 'Filters', 'Panel', '#open-filters-panel'),
+    ('processes', 'Process drawer, Activity log', 'Tab', '#open-process-drawer&show-pdrawer-1'),
+    ('initiatives', 'Compact view', 'View', '#show-view-1'), ('initiatives', 'Spreadsheet view', 'View', '#show-view-2'), ('initiatives', 'Filters', 'Panel', '#open-filters-panel'),
+    ('initiatives', 'Query panel', 'Panel', '#open-query-panel'),
+    ('dashboard', 'Detailed view', 'View', '#show-view-0'), ('dashboard', 'Compact view', 'View', '#show-view-1'),
+    ('rob-meetings', 'All events', 'Tab', '#tab-1'), ('rob-meetings', 'Schedule view', 'View', '#show-robview-0'), ('rob-meetings', 'Week view', 'View', '#show-robview-1'),
+    ('rob-meetings', 'Filters', 'Panel', '#open-rob-filters'),
+    ('okrs', 'Performance attributes', 'Modal', '#open-perf-attrs'), ('dashboard', 'User menu', 'Menu', '#open-user-menu'),
+]
+STATE_GROUPS = [(STATES, 4), (STATES_2, 6)]   # each list of states, and the pass that built it
 
 
 P1 = ('btn-primary',)
 SCREENS = [
-    dict(folder='dashboard', title='TopTrack Dashboard', nav='Dashboard', main=dashboard(), route='/dashboard',
+    dict(folder='dashboard', title='TopTrack Dashboard', nav='Dashboard', main=dashboard_with_states(), route='/dashboard',
          ctas=[('btn-secondary', 'More actions', 'i-dots-three-vertical')]),
     dict(folder='processes', title='Processes', nav='Processes', main=processes_with_states(), overlays=process_overlays(), route='/bau/list',
          ctas=[('btn-primary', 'Create Process', 'i-plus')]),
-    dict(folder='initiatives', title='Initiatives', nav='Initiatives', main=initiatives(), route='/initiatives/list',
+    dict(folder='initiatives', title='Initiatives', nav='Initiatives', main=initiatives_with_states(), route='/initiatives/list',
          ctas=[('btn-primary', 'Create Initiative', 'i-plus')]),
     dict(folder='initiative-view', title='Onboarding in one week', nav='Initiatives', main=with_tabs(initiative_view(), 'initiative', [activity_log()], suffix='      </div>'), route='/initiatives/:id', padded=False),
     dict(folder='initiative-create', title='New initiative', nav='Initiatives', main=initiative_create(), route='/initiatives/create', padded=False),
-    dict(folder='rob-meetings', title='RoB Meetings', nav='RoB Meetings', main=rob_calendar(), route='/rob',
+    dict(folder='rob-meetings', title='RoB Meetings', nav='RoB Meetings', main=rob_with_states(), route='/rob',
          ctas=[('btn-primary', 'Create meeting', 'i-plus')]),
     dict(folder='rob-meeting-view', title='RoB Meetings', nav='RoB Meetings', main=rob_calendar().replace('btn btn-primary', 'btn btn-secondary'),
          overlays=rob_meeting_view(), route='/rob?calendarId=…&externalId=…', ctas=[('btn-secondary', 'Create meeting', 'i-plus')]),
-    dict(folder='okrs', title='OKRs', nav='OKRs', main=with_tabs(okrs(), 'okrs', okr_panels()), route='/okrs/list',
+    dict(folder='okrs', title='OKRs', nav='OKRs', main=okrs_with_states(), overlays=perf_attrs_modal(), route='/okrs/list',
          ctas=[('btn-secondary', 'Performance attributes', 'i-info'), ('btn-secondary', 'Export as CSV', 'i-download'), ('btn-primary', 'Create OKR', 'i-plus')]),
     dict(folder='people', title='People', nav='People', main=with_tabs(people(), 'people', people_panels()), route='/people/directory'),
     dict(folder='profile', title='My Profile', nav='People', main=with_tabs(profile(), 'profile', profile_panels()), route='/people/:userId',
@@ -1519,6 +1716,8 @@ BATCHES = {
             note='Mostly spent finding what staging lets this account open; two screens came out of it.'),
     5: dict(date='Nov 25, 2026', span='10:46–10:52', minutes=6,
             note='Staging signed the account out mid-pass, which showed the sign-in page; nothing else could be captured.'),
+    6: dict(date='Nov 25, 2026', span='11:10–11:14', minutes=6, states=True,
+            note='View modes, filter and query panels, the calendar views, the Performance attributes modal and the account menu.'),
     4: dict(date='Nov 25, 2026', span='10:21–10:27', minutes=8, states=True,
             note='The other tabs of every built screen, the Processes drawers and query panel, and the give-feedback modal.'),
 }
@@ -1566,16 +1765,18 @@ def index():
     srows = ''.join(
         f'<tr><td style="width: var(--spacing-10)">{yes}</td><td><span class="body-sm">{titles[f]}</span></td>'
         f'<td><a class="cell-title" href="{f}/index.html{h}" {LINK}>{n}</a></td><td>{tag(k)}</td><td><span class="body-sm">Nov 25, 2026</span></td>'
-        f'<td><span class="body-sm">{spent_states / len(STATES):.1f} min</span></td><td>{dash}</td><td>{dash}</td></tr>' for f, n, k, h in STATES)
+        f'<td><span class="body-sm">{BATCHES[b]["minutes"] / len(group):.1f} min</span></td><td>{dash}</td><td>{dash}</td></tr>' for group, b in STATE_GROUPS for f, n, k, h in group)
+    n_states = sum(len(g) for g, _ in STATE_GROUPS)
+    by_pass = {b: len(g) for g, b in STATE_GROUPS}
     log = ''.join(f'<tr><td><span class="body-sm-semibold">Build {b}</span></td><td><span class="body-sm">{v["date"]}, {v["span"]}</span></td>'
-                  f'<td><span class="body-sm">{str(len(STATES)) + " states" if v.get("states") else str(per_batch[b]) + " screens"}</span></td><td><span class="body-sm">{v["minutes"]} min</span></td>'
+                  f'<td><span class="body-sm">{str(by_pass[b]) + " states" if v.get("states") else str(per_batch[b]) + " screens"}</span></td><td><span class="body-sm">{v["minutes"]} min</span></td>'
                   f'<td><span class="body-sm">{v["note"]}</span></td></tr>' for b, v in BATCHES.items())
     log += ''.join(f'<tr><td><span class="body-sm-semibold">Update</span></td><td><span class="body-sm">{u["date"]}, {u["span"]}</span></td>'
                    f'<td><span class="body-sm">{len(u["screens"])} screens</span></td><td><span class="body-sm">{u["minutes"]} min</span></td>'
                    f'<td><span class="body-sm">{u["note"]}</span></td></tr>' for u in UPDATES)
     stats = ''.join(f'<div class="stat-card"><p class="stat-card-label">{l}</p><p class="stat-card-value">{v}</p></div>' for l, v in (
         ('Primary screens built', f'{done} of {total}'), ('Build time so far', f'{spent} min'), ('Average per screen', f'{avg:.1f} min'),
-        ('Tabs, drawers and modals built', f'{len(STATES)}'), ('Time on those', f'{spent_states} min'), ('Update passes', str(len(UPDATES)) if UPDATES else 'None yet')))
+        ('Tabs, drawers and modals built', f'{n_states}'), ('Time on those', f'{spent_states} min'), ('Update passes', str(len(UPDATES)) if UPDATES else 'None yet')))
     return f'''    <h1 class="h1" style="margin: 0 0 var(--spacing-2)">Production site · Nov 25, 2026</h1>
     <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">Our own list, not a product screen: which primary screens of the product are rebuilt on the kit, when, and how long each took to build and to update. A green tick links to the screen. Each screen covers desktop and phone width. The second table lists the tabs, drawers and modals built on top of them; each links straight to that state.</p>
 

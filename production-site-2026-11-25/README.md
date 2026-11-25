@@ -14,8 +14,11 @@ instead of from memory.
 - **States:** tabs switch panels, and the Processes list opens its drawer,
   create drawer, RACI and query panel. Add `#tab-2` to a screen's address to
   open its third tab, or `#open-<id>` to open a drawer or modal. `STATES` in
-  `_src/screens.py` lists every state built; view modes, filters and the
-  remaining drawers and modals are not built yet.
+  `_src/screens.py` lists every state built, `STATES_2` the second round
+  (view modes with `#show-view-1`, filter and query panels, calendar views,
+  the account menu). The Initiatives filters follow the Processes ones by
+  analogy; they were not opened on staging. Drawers and modals on Initiatives,
+  OKRs and RoB Meetings are not built yet.
 
 `index.html` is our own list, not a product screen, so it has no app shell. It
 shows every primary screen with a tick when built, when it was built and
