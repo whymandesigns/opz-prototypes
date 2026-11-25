@@ -2213,13 +2213,42 @@ STAGING = {
 }
 
 
+# The staging address of each tab, in the order of the screen's tab strip, so
+# the link follows the tab that is open. RoB Meetings and OKRs are not here:
+# their tabs do not have a stable address on staging.
+STAGING_TABS = {
+    'profile': ['/people/me', '/people/me/initiatives', '/people/me/bau', '/people/me/work-history', '/people/me/rob', '/people/me/action-items', '/people/me/time-off'],
+    'team-profile': ['/teams/1103/structure', '/teams/1103/OKRs', '/teams/1103/initiatives', '/teams/1103/bau', '/teams/1103/time-off', '/teams/1103/RoB'],
+    'people': ['/people/directory', '/people/reporting-relationships', '/people/geography'],
+    'team': ['/org-structure/org-units', '/org-structure/divisions', '/org-structure/talents', '/org-structure/skills'],
+    'time-off': ['/time-off/summary', '/time-off/events'],
+    'recognitions': ['/recognitions', '/recognitions/badges'],
+    'watercooler': ['/watercooler/channels', '/watercooler/top-messages'],
+    'peer-feedback': ['/peer-feedbacks/individual-contributor/pending', '/peer-feedbacks/individual-contributor/received', '/peer-feedbacks/individual-contributor/given'],
+}
+
+
 def staging_link(folder):
     if folder not in STAGING:
         return ''
     path, exact = STAGING[folder]
     tip = 'Open this screen on staging in a new tab' if exact else 'Staging needs a record id for this screen: opens the nearest list in a new tab'
-    return (f'  <a class="btn btn-secondary ps-staging" href="{STAGING_HOST}{path}" target="_blank" rel="noopener" title="{tip}">'
-            f'{icon("i-external-link", "btn-icon")}{"Open on staging" if exact else "Staging: nearest list"}</a>\n')
+    tabs_ = STAGING_TABS.get(folder, [])
+    follow = '' if not tabs_ else ("""  <script>
+  (() => {   // the staging link follows the open tab
+    const a = document.querySelector('.ps-staging'), strip = document.querySelector('.tabs[data-tabs]');
+    if (!a || !strip) return;
+    const paths = a.dataset.stagingTabs.split(' ');
+    const sync = () => { const i = [...strip.querySelectorAll('.tab')].findIndex(t => t.classList.contains('is-active')); if (paths[i]) a.href = a.dataset.stagingHost + paths[i]; };
+    document.addEventListener('click', () => setTimeout(sync, 0));
+    addEventListener('hashchange', () => setTimeout(sync, 0));
+    setTimeout(sync, 0);
+  })();
+  </script>
+""")
+    data = f' data-staging-host="{STAGING_HOST}" data-staging-tabs="{" ".join(tabs_)}"' if tabs_ else ''
+    return (f'  <a class="btn btn-secondary ps-staging" href="{STAGING_HOST}{path}" target="_blank" rel="noopener" title="{tip}"{data}>'
+            f'{icon("i-external-link", "btn-icon")}{"Open on staging" if exact else "Staging: nearest list"}</a>\n' + follow)
 
 
 UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) per update pass
@@ -2243,7 +2272,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Elements page: an element moved into the library stays listed with an Added to library badge and the date, and a filter on top shows all, added, or not yet in the library.'),    dict(date='Nov 25, 2026', span='13:09–13:17', minutes=8,
          screens=['recognitions', 'profile', 'team-profile', 'talent-profile', 'processes', 'initiatives', 'dashboard', 'initiative-view', 'initiative-create'],
          note='Twelve icons the kit lacks were drawn and put in place: open in new tab, Slack in colour, the eight badges and the two empty-state drawings. They have their own list with See it in place and Add to library.'),    dict(date='Nov 25, 2026', span='13:18–13:22', minutes=4, screens='all',
-         note='Every screen has a floating Open on staging link that opens the same view on the staging server in a new tab, for comparing the two.'),
+         note='Every screen has a floating Open on staging link that opens the same view on the staging server in a new tab, for comparing the two.'),    dict(date='Nov 25, 2026', span='13:21–13:28', minutes=7,
+         screens=['profile', 'team-profile', 'people', 'team', 'time-off', 'recognitions', 'watercooler', 'peer-feedback'],
+         note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),
 ]
 
 

@@ -96,4 +96,6 @@ opens the same view on the staging server in a new tab. It is ours, not part
 of the product. Three screens need a record id the reference does not keep
 (an initiative, a meeting, a talent; and the self-review): their link opens
 the nearest list instead and says so. The paths are in `STAGING` in
-`_src/screens.py`. Staging needs a login.
+`_src/screens.py`. Staging needs a login. On eight screens the link follows
+the open tab (`STAGING_TABS`); RoB Meetings and OKRs tabs have no stable
+address on staging, so there it opens the screen.
