@@ -4665,6 +4665,29 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       el.hidden = !on; el.style.display = on ? '' : 'none';
     });
     phone.addEventListener('change', sync); sync();
+
+    // Tabs switch panels, and a control with data-toggle shows or hides a panel.
+    const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const pick = (group, i) => {
+      document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
+        const on = t.dataset.tab === String(i);
+        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+      });
+    };
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tabs] .tab');
+      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
+    });
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    const route = () => {
+      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
+      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+    };
+    addEventListener('hashchange', route); route();
   })();
   </script>
 <!-- === review.css === -->
