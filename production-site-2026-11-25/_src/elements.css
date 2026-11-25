@@ -177,11 +177,11 @@
 
 /* Tree table: rows open a second and a third layer; the name column stays
    put while the rest scrolls sideways; stripes follow the rows that are open. */
-.ps-tree th:first-child, .ps-tree td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
-.ps-tree thead th:first-child { z-index: 2; }
+.ps-tree-sticky th:first-child, .ps-tree-sticky td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
+.ps-tree-sticky thead th:first-child { z-index: 2; }
 .ps-tree tbody td { background: var(--color-surface); vertical-align: middle; }
 .ps-tree tbody tr.is-alt > td { background: var(--color-surface-muted); }
-.ps-tree td { overflow: hidden; }
+.ps-tree-sticky td { overflow: hidden; }
 .ps-tree .cell-user-name { font-weight: var(--font-weight-semibold); }
 .ps-tree .cell-user-meta { min-width: 0; }
 .ps-tree .cell-user-name, .ps-tree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -189,7 +189,7 @@
 .ps-tree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
 .ps-tree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
 .ps-tree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
-.ps-tree-title { font: var(--type-body-sm-semibold); color: var(--color-text); text-decoration: none; }
+.ps-tree-title { font: var(--type-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); text-decoration: none; }
 .ps-tree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
 .ps-tree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 
