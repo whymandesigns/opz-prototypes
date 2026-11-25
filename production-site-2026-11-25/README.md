@@ -124,3 +124,12 @@ reference adjusts (`KIT_VARIATIONS` in `_src/screens.py`). Add `#audit` to a
 screen's address to open it switched on. The list page shows the count per
 screen; it is taken from the markup, so it can differ by one from the
 button, which counts what is on the page at that moment.
+
+## Names and colours
+
+Decided Nov 25, 2026: this reference uses staging's own names, because it is
+a copy of that tenant. So it says Business as Usual and BAU, TopTeam and
+Toptal Fun, and does not follow the repo's "write Processes everywhere" rule
+(BAU-TERM-001), which still holds for every other prototype. Folder names
+and the list page keep "Processes". The top bar carries a TopTeam wordmark
+set in type, not the product's logo artwork.

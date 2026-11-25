@@ -4658,6 +4658,18 @@ a.ps-wtree-title:hover { color: var(--color-text-link); }
 .ps-audit-layer { position: fixed; inset: 0; z-index: var(--z-tooltip); pointer-events: none; }
 .ps-audit-mark { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--color-danger); box-shadow: 0 0 0 2px var(--color-surface); pointer-events: auto; }
 .ps-audit-panel[hidden], .ps-audit-layer[hidden] { display: none; }
+
+/* Wordmark: the product's name in the top bar, set in type. Stands in for the product's logo. */
+.ps-wordmark { font: var(--type-h2); color: var(--color-text-inverse); letter-spacing: -0.01em; font-weight: var(--font-weight-regular); }
+.ps-wordmark-top { font-weight: var(--font-weight-semibold); }
+
+/* Staging palette (.ps-palette is only its name on the elements page): the four
+   values where the product differs from the kit. */
+.ps-palette { display: block; }
+:root { --color-text: rgb(0, 0, 0); --color-text-muted: rgb(69, 80, 101); }
+.segmented-item.is-active { background: rgb(69, 80, 101); border-color: rgb(69, 80, 101); }
+.btn-secondary, .input-select-trigger, .input { border-color: rgb(216, 217, 220); }
+.btn { font-weight: var(--font-weight-semibold); }
 </style>
 </head>
 <body>

@@ -259,10 +259,10 @@ def raci_btn():
 
 def processes():
     rows = ''.join(
-        f'<tr><td><span class="cell-title">{n}</span><div>{tag("Process")}</div></td><td>{tag(s)}</td><td>{user(k, unit)}</td><td>{rob_cell(r)}</td><td>{raci_btn()}</td></tr>'
+        f'<tr><td><span class="cell-title">{n}</span><div>{tag("BAU")}</div></td><td>{tag(s)}</td><td>{user(k, unit)}</td><td>{rob_cell(r)}</td><td>{raci_btn()}</td></tr>'
         for n, s, k, unit, r in PROCESSES)
-    cards = ''.join(work_card(n, tag("Process") + tag(s), k, unit) for n, s, k, unit, r in PROCESSES)
-    return f'''{head("Processes", '<button class="btn btn-primary" type="button">Create Process</button>')}
+    cards = ''.join(work_card(n, tag("BAU") + tag(s), k, unit) for n, s, k, unit, r in PROCESSES)
+    return f'''{head("Business as Usual", '<button class="btn btn-primary" type="button">Create Business as Usual</button>')}
 
 {work_toolbar("Search by name, owner or function", "Status, Accountability, RoB Meeting")}
 
@@ -809,7 +809,7 @@ def profile():
           <article class="card"><div class="row">{icon("i-pin", "icon icon-16")}<span class="body-sm">Dublin, Ireland</span></div></article></div>
       </div>
 
-      {tabs(("Reporting Relationships", "Initiatives", "Processes", "Work History", "RoB Meetings", "Action Items", "Time Off"))}
+      {tabs(("Reporting Relationships", "Initiatives", "Business as Usual", "Work History", "RoB Meetings", "Action Items", "Time Off"))}
 
       <h2 class="h3" style="margin: var(--spacing-6) 0 var(--spacing-1)">Reporting Relationships</h2>
       <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">5 people associated with Cara as Delivery Manager</p>
@@ -881,7 +881,7 @@ def team_profile():
           <span class="body-sm" {MUTED}>No Slack channels attached</span></div>
       </div>
 
-      {tabs(("Org Structure", "OKRs", "Initiatives", "Processes", "Time off", "RoB Meetings"))}
+      {tabs(("Org Structure", "OKRs", "Initiatives", "Business as Usual", "Time off", "RoB Meetings"))}
 
       <h2 class="h3" style="margin: var(--spacing-6) 0 var(--spacing-1)">Reporting Relationships</h2>
       <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">5 people comprise Operations, and 6 Talents are associated with it</p>
@@ -1051,7 +1051,7 @@ def profile_edit():
           </div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-4)">
             {sel("Date of Birth (optional)", '<div class="row" style="flex-wrap: nowrap">' + select("March", label="Month of birth", width=150) + select("14", label="Day of birth", width=110) + '</div>')}
-            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" checked /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile {icon("i-help", "icon icon-16")}</span></label>
+            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" checked /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my TopTeam profile {icon("i-help", "icon icon-16")}</span></label>
           </div>
           <label class="field"><span class="field-label">About Cara (optional)</span><textarea class="input" rows="8" placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
         </div>
@@ -1132,7 +1132,7 @@ def talent_profile():
           <span class="row">{icon("i-slack-color", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Rosa Dahl</a></span>
         </div></div>
 
-      {tabs(("Initiatives", "Processes"))}
+      {tabs(("Initiatives", "Business as Usual"))}
 
       {mobile('<div class="stack" style="margin-top: var(--spacing-4)">' + cards + '</div>')}
       <div style="margin-top: var(--spacing-4)" data-view="desktop">{talent_tree()}</div>'''
@@ -1279,7 +1279,7 @@ def month_table(title, first, days, marks=()):
 # Profile
 def profile_panels():
     initiatives_p = table(WORK_HEADS, work_rows(WORK))
-    processes_p = empty_state('i-cpu-2', 'You don’t own any Processes', 'No Processes yet')
+    processes_p = empty_state('i-cpu-2', 'You don’t own any Business as Usual', 'No Business as Usual yet')
     hist = ''.join(f'<div class="ps-timeline-item{" is-current" if i == 0 else ""}"><div><p class="body-semibold" style="margin: 0">{t}</p>'
                    f'<p class="row body-sm" style="margin: var(--spacing-1) 0 0">{icon("i-org-unit", "icon icon-16")}{u}</p></div><span class="body-sm" style="text-align: right; color: var(--color-text-muted)">{d}</span></div>'
                    for i, (t, u, d) in enumerate((
@@ -1320,7 +1320,7 @@ def team_profile_panels():
     time_off_p = (f'<div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-semibold">Nov 2026</span><button class="btn btn-secondary" type="button">Today</button></div>'
                   + table(heads, ooo('lk', ()) + ooo('ck', (26, 27)) + ooo('lh', ()) + ooo('tl', (30, 1, 2))))
     rob = rob_tab('', 'No meetings', 'Show', ('All', 'Function', 'Subfunction'), [])
-    return [okrs_p, show('tp-show-ini') + table(WORK_HEADS, work_rows(WORK)), show('tp-show-proc') + empty_state('i-cpu-2', 'Operations doesn’t own any Processes', 'No Processes yet'), time_off_p, rob]
+    return [okrs_p, show('tp-show-ini') + table(WORK_HEADS, work_rows(WORK)), show('tp-show-proc') + empty_state('i-cpu-2', 'Operations doesn’t own any Business as Usual', 'No Business as Usual yet'), time_off_p, rob]
 
 
 # People
@@ -1456,7 +1456,7 @@ def process_overlays():
     <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-labelledby="process-drawer-title">
       <header class="drawer-header">
         <div><h2 class="modal-title" id="process-drawer-title">Refund requests</h2>
-          <div class="row" style="margin-top: var(--spacing-1); flex-wrap: wrap">{tag("Process", "blue")}{tag("Active")}<span class="body-sm" {MUTED}>Last edit was made 14 hours ago by <a href="#" {LINK}>Cara Keane</a></span></div></div>
+          <div class="row" style="margin-top: var(--spacing-1); flex-wrap: wrap">{tag("BAU", "blue")}{tag("Active")}<span class="body-sm" {MUTED}>Last edit was made 14 hours ago by <a href="#" {LINK}>Cara Keane</a></span></div></div>
         <div class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy Link">{icon("i-link", "btn-icon")}</button>{x()}</div>
       </header>
       <div class="drawer-body"><div class="stack">
@@ -1465,20 +1465,20 @@ def process_overlays():
         <div {GRID}>{field_row("Accountable owner", user("ck", "Delivery"))}{field_row("End date", sub("Jun 30, 2027"))}</div>
         <div><span class="body-sm" {MUTED}>Description</span><p class="body" style="margin: var(--spacing-2) 0 0">Read the customer’s request, check the order and what arrived, issue the refund for the right items, reply to the customer and close the ticket.</p></div>
         <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Connections</h3>
-          <div class="row">{add_btn("Add Processes")}</div>
+          <div class="row">{add_btn("Add Business as Usual")}</div>
           <div class="row"><button class="btn btn-ghost" type="button" data-modal-open="raci-drawer">{icon("i-table", "btn-icon")}View RACI</button></div></div>
         <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Documents</h3><div class="row" style="justify-content: center; color: var(--color-text-muted)">{icon("i-search", "icon icon-16")}<span class="body-sm">No attachments</span></div></div>
         <div class="stack" style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border)"><h3 class="h4" style="margin: 0">Activities</h3><p class="body-sm" style="margin: 0; color: var(--color-text-muted)">No Activities yet. Update the process to start creating Activities</p></div>
         </div>
-        <div data-panel="pdrawer:1" hidden>{timeline((('Nov 24, 2026', 'Status was changed from Not started to Active by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Accountable owner was added by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Process was created by Cara Keane on Nov 24, 2026, 7:34 PM')))}</div>
+        <div data-panel="pdrawer:1" hidden>{timeline((('Nov 24, 2026', 'Status was changed from Not started to Active by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'Accountable owner was added by Cara Keane on Nov 24, 2026, 7:34 PM'), ('Nov 24, 2026', 'BAU was created by Cara Keane on Nov 24, 2026, 7:34 PM')))}</div>
       </div></div>
     </aside>
   </div>'''
     create = f'''  <div class="drawer-overlay" id="create-process" hidden>
-    <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-label="Create Process">
+    <aside class="drawer drawer-regular" role="dialog" aria-modal="true" aria-label="Create Business as Usual">
       <header class="drawer-header">
         <div style="flex: 1; min-width: 0"><input class="input" type="text" placeholder="Add process name" aria-label="Process name" style="width: 100%; max-width: none" />
-          <div class="row" style="margin-top: var(--spacing-2)">{tag("Process", "blue")}{tag("Not started")}</div></div>
+          <div class="row" style="margin-top: var(--spacing-2)">{tag("BAU", "blue")}{tag("Not started")}</div></div>
         {x()}
       </header>
       <div class="drawer-body"><div class="stack">
@@ -1607,7 +1607,7 @@ def indent(n, lvl, bold=False):
 
 
 def processes_views():
-    comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True, default='href="#open-process-drawer" data-modal-open="process-drawer"', 
+    comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('BAU', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True, default='href="#open-process-drawer" data-modal-open="process-drawer"', 
                       links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}) + pager()
     return comp, sheet_tree(PROC_TREE, 'procs', with_health=False)
 
@@ -1992,17 +1992,17 @@ def processes_with_states():
     k = '<div data-view="mobile" hidden><div class="stack">'
     assert h.count(k) == 1
     h = h.replace(k, QUERY_PANEL + '\n' + k)
-    h = h.replace('<button class="btn btn-primary" type="button">Create Process</button>', '<button class="btn btn-primary" type="button" data-modal-open="create-process">Create Process</button>')
+    h = h.replace('<button class="btn btn-primary" type="button">Create Business as Usual</button>', '<button class="btn btn-primary" type="button" data-modal-open="create-process">Create Business as Usual</button>')
     h = h.replace('<span class="cell-title">Refund requests</span>', f'<a class="cell-title" href="#open-process-drawer" data-modal-open="process-drawer" {LINK}>Refund requests</a>')
     h = h.replace('<span class="body-semibold">Refund requests</span>', f'<a class="body-semibold" href="#open-process-drawer" data-modal-open="process-drawer" {LINK}>Refund requests</a>')
     h = h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
     h = toggle(h, 'Filters', 'filters-panel')
     h = h.replace('<button class="btn btn-ghost btn-xs" type="button">Expand all</button>', '<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button>')
-    h = swap_table(h, tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='proc', sticky=False, attrs=' data-view="desktop"', default='href="#open-process-drawer" data-modal-open="process-drawer"', 
+    h = swap_table(h, tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('BAU', 'Activity', 'Sub-activity'), prefix='proc', sticky=False, attrs=' data-view="desktop"', default='href="#open-process-drawer" data-modal-open="process-drawer"', 
                                  tags=lambda name, level: tag('Northwind Hire', 'blue-light') if name == 'Northwind Hire' else '',
                                  links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}))
     h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
-    return with_views(h, *processes_views(), extra_panels=work_filters('Process', ('Process', 'Activity', 'Sub-activity')))
+    return with_views(h, *processes_views(), extra_panels=work_filters('BAU', ('BAU', 'Activity', 'Sub-activity')))
 
 
 def peer_feedback_with_states():
@@ -2014,7 +2014,7 @@ def sign_in():
     return f'''    <div class="stack" style="align-items: center; gap: var(--spacing-6)">
       <img class="sidenav-logo" src="../../../designmd/assets/logo-dark.svg" alt="Operationalize" />
       <div class="stack" style="align-items: center; justify-content: center; min-height: 60vh; width: 100%; max-width: 500px; gap: var(--spacing-4)">
-        <h1 class="h2" style="margin: 0 0 var(--spacing-2)">Log in to Operationalize</h1>
+        <h1 class="h2" style="margin: 0 0 var(--spacing-2)">Log in to TopTeam</h1>
         <a class="btn btn-secondary" href="../dashboard/index.html" style="width: 100%; text-decoration: none">{icon("i-google", "btn-icon")}Log in with Google</a>
       </div>
     </div>'''
@@ -2022,15 +2022,15 @@ def sign_in():
 
 # Every state built so far: screen folder, name, kind, and the address that opens it.
 STATES = (
-    [('profile', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Initiatives', 'Processes', 'Work History', 'RoB Meetings', 'Action Items', 'Time Off'), 1)]
-    + [('team-profile', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('OKRs', 'Initiatives', 'Processes', 'Time off', 'RoB Meetings'), 1)]
+    [('profile', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Initiatives', 'Business as Usual', 'Work History', 'RoB Meetings', 'Action Items', 'Time Off'), 1)]
+    + [('team-profile', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('OKRs', 'Initiatives', 'Business as Usual', 'Time off', 'RoB Meetings'), 1)]
     + [('people', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Reporting relationships', 'Geography'), 1)]
     + [('team', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Divisions', 'Talent Network Members', 'Skills'), 1)]
     + [('okrs', n, 'Tab', f'#tab-{i}') for i, n in enumerate(('Company Objective', 'Function Annual', 'Function Quarterly', 'Team Quarterly', 'Shared Key Results'), 1)]
     + [('initiative-view', 'Activity log', 'Tab', '#tab-1'), ('watercooler', 'Top Messages', 'Tab', '#tab-1'), ('time-off', 'OOO details', 'Tab', '#tab-1'),
        ('recognitions', 'Badges', 'Tab', '#tab-1'), ('peer-feedback', 'Received', 'Tab', '#tab-1'), ('peer-feedback', 'Given', 'Tab', '#tab-2'),
-       ('profile-edit', 'Work', 'Tab', '#tab-1'), ('profile-edit', 'Contacts', 'Tab', '#tab-2'), ('talent-profile', 'Processes', 'Tab', '#tab-1'),
-       ('processes', 'Process drawer', 'Drawer', '#open-process-drawer'), ('processes', 'Create Process', 'Drawer', '#open-create-process'),
+       ('profile-edit', 'Work', 'Tab', '#tab-1'), ('profile-edit', 'Contacts', 'Tab', '#tab-2'), ('talent-profile', 'Business as Usual', 'Tab', '#tab-1'),
+       ('processes', 'Process drawer', 'Drawer', '#open-process-drawer'), ('processes', 'Create Business as Usual', 'Drawer', '#open-create-process'),
        ('processes', 'RACI', 'Drawer', '#open-raci-drawer'), ('processes', 'Query panel', 'Panel', '#open-query-panel'),
        ('peer-feedback', 'Give feedback', 'Modal', '#open-give-feedback')])
 STATES_2 = [
@@ -2451,8 +2451,8 @@ P1 = ('btn-primary',)
 SCREENS = [
     dict(folder='dashboard', title='TopTrack Dashboard', nav='Dashboard', main=dashboard_with_states(), route='/dashboard',
          ctas=[('btn-secondary', 'More actions', 'i-dots-three-vertical')]),
-    dict(folder='processes', title='Processes', nav='Processes', main=processes_with_states(), overlays=process_overlays(), route='/bau/list',
-         ctas=[('btn-primary', 'Create Process', 'i-plus')]),
+    dict(folder='processes', title='Business as Usual', nav='Business as Usual', main=processes_with_states(), overlays=process_overlays(), route='/bau/list',
+         ctas=[('btn-primary', 'Create Business as Usual', 'i-plus')]),
     dict(folder='initiatives', title='Initiatives', nav='Initiatives', main=initiatives_with_states(), overlays=raci_overlay('Onboarding in one week'), route='/initiatives/list',
          ctas=[('btn-primary', 'Create Initiative', 'i-plus')]),
     dict(folder='initiative-view', title='Onboarding in one week', nav='Initiatives', main=with_tabs(initiative_view(), 'initiative', [activity_log()], suffix='      </div>'), route='/initiatives/:id', padded=False),
@@ -2478,7 +2478,7 @@ SCREENS = [
          ctas=[('btn-secondary', 'Request feedback', 'i-comment-ask'), ('btn-primary', 'Give feedback', 'i-plus')]),
     dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
     dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
-    dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=with_tabs(talent_profile(), 'talent', [empty_state('i-cpu-2', 'Rosa doesn’t own any Processes', 'No Processes yet')]), route='/talent/:talentId'),
+    dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=with_tabs(talent_profile(), 'talent', [empty_state('i-cpu-2', 'Rosa doesn’t own any Business as Usual', 'No Business as Usual yet')]), route='/talent/:talentId'),
     dict(folder='no-access', batch=7, title='Edit org unit', nav='Team', main=no_access(), padded=False, route='/teams/:teamId/edit'),
     dict(folder='sign-in', batch=5, plain=True, title='Log in', nav=None, main=sign_in(), route='/signin'),
     dict(folder='profile-public-edit', batch=3, title='Edit public profile', nav='People', main=public_profile_edit(), route='/people/:userId/edit-public-profile',
@@ -2653,7 +2653,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),    dict(date='Nov 25, 2026', span='14:36–14:41', minutes=5, screens=['initiative-view', 'initiative-create', 'team-profile'],
          note='The last three under 95%. The create form’s lower half now follows staging: numbered objective and metric lines, quarter pickers, the Jira card, the upload box with its reminder, and the locked Projects note. The initiative view lists documents with a tick and a view count. Team Profile has a drawn logo.'),    dict(date='Nov 25, 2026', span='14:44–14:44', minutes=0, screens='all',
          note='Wired into a clickable prototype. Every person’s name opens a profile, every unit a team profile, every meeting the meeting view, every initiative or project the initiative view, every process its drawer. Create and Save buttons land where the product lands, RACI buttons open the RACI drawer on every screen, the dashboard’s Filters and Query open their panels. Checked by clicking through 24 flows.'),    dict(date='Nov 25, 2026', span='14:44–14:48', minutes=4, screens='all',
-         note='Every screen has a Not in library button. It marks with red dots, and lists, what on that screen is not a library component as it ships: new elements, new icons, and library components this reference adjusts. The list page shows the count per screen.'),
+         note='Every screen has a Not in library button. It marks with red dots, and lists, what on that screen is not a library component as it ships: new elements, new icons, and library components this reference adjusts. The list page shows the count per screen.'),    dict(date='Nov 25, 2026', span='14:47–14:51', minutes=4, screens='all',
+         note='Took staging’s own names, as decided: Business as Usual and BAU in place of Processes and Process, TopTeam as the product name with a TopTeam wordmark, Toptal Fun in the menu. Measured staging’s colours: the palette is the kit’s, apart from four values (text, muted text, the active switch and button borders), now matched.'),
 ]
 
 
@@ -2661,7 +2662,7 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
 # by side, not a measurement. The second item is what still differs.
 MATCH = {
     'dashboard': (95, 'Spreadsheet view kept from the first capture; made-up data'),
-    'processes': (95, 'Named Processes where staging says Business as Usual'),
+    'processes': (96, 'Made-up data only'),
     'initiatives': (95, 'Made-up data only'),
     'initiative-view': (95, 'Made-up data; staging’s example leaves some fields empty'),
     'initiative-create': (95, 'Jira mark is the kit’s one-colour version'),
@@ -2825,6 +2826,10 @@ def elements_page():
          '<p class="body-sm" style="margin: 0">See any list screen; this entry has no markup of its own.</p>'),
         ('RACI letter', 'ps-raci', 'Meeting view: the role a person has, as a small round letter.', 'rob-meeting-view/index.html',
          '<div class="row"><span class="ps-raci is-r">R</span><span class="ps-raci is-a">A</span><span class="ps-raci is-c">C</span><span class="ps-raci is-i">I</span></div>'),
+        ('Wordmark', 'ps-wordmark', 'Top bar: the product’s name set in type, standing in for its logo artwork.', 'dashboard/index.html',
+         '<div style="display: inline-flex; padding: var(--spacing-3) var(--spacing-4); background: var(--color-graphite-800)"><span class="ps-wordmark"><span class="ps-wordmark-top">Top</span>Team</span></div>'),
+        ('Staging palette', 'ps-palette', 'Every screen: the four values where the product differs from the kit. Text is black, muted text and the active switch are a blue-grey, and button and field borders are a step darker.', 'initiatives/index.html',
+         '<p class="body-sm" style="margin: 0">See any screen; this entry has no markup of its own.</p>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
