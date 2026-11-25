@@ -507,7 +507,7 @@ def rob_calendar():
                          for t, m in EVENTS.get(d, ()))
             tds.append(f'<td style="vertical-align: top; height: 120px"><div class="row row-end">{num}</div>{ev}</td>')
         body.append('<tr>' + ''.join(tds) + '</tr>')
-    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
+    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button" disabled title="Creating meetings is closed for this account on staging">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
 
       {tabs(("My events", "All events"))}
 
@@ -709,6 +709,20 @@ def org_node(k, role=None):
             f'<span class="org-node-role">{role or r}</span></div></div>')
 
 
+def talent_node(name, role):
+    initials = ''.join(w[0] for w in name.split())
+    return (f'<div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">{initials}</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span>'
+            f'<div class="org-node-meta"><span class="org-node-name">{name}</span><span class="org-node-role">{role}</span></div></div>')
+
+
+def chain(ancestors, peers, current):
+    """Who someone reports to, left to right, ending in the column of people
+    beside them, with that person marked."""
+    link = '<span class="ps-chain-link"></span>'
+    col = ''.join(f'<div class="ps-chain-item{" is-current" if k == current else ""}">{org_node(k)}</div>' for k in peers)
+    return '<div class="ps-chain">' + ''.join(f'<div class="ps-chain-node">{org_node(k)}</div>{link}' for k in ancestors) + f'<div class="ps-chain-col">{col}</div></div>'
+
+
 def profile():
     def f(label, value):
         return f'<div><span class="body-sm" {MUTED}>{label}</span><div>{value}</div></div>'
@@ -749,12 +763,8 @@ def profile():
       {tabs(("Reporting Relationships", "Initiatives", "Processes", "Work History", "RoB Meetings", "Action Items", "Time Off"))}
 
       <h2 class="h3" style="margin: var(--spacing-6) 0 var(--spacing-1)">Reporting Relationships</h2>
-      <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">4 people associated with Cara as Delivery Manager</p>
-      <div class="org-chart"><div class="org-chart-group">
-        {org_node("lk")}
-        <ul class="org-node-children"><li>{org_node("ck")}
-          <ul class="org-node-children"><li>{org_node("lh")}</li><li>{org_node("tl")}</li><li>{org_node("nr")}</li></ul></li></ul>
-      </div></div>'''
+      <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">5 people associated with Cara as Delivery Manager</p>
+      {chain(("sr", "lk"), ("nr", "ck", "lh", "tl"), "ck")}'''
 
 
 # --------------------------------------------------------------------- Team
@@ -800,7 +810,7 @@ def team():
 
       <div style="max-width: 400px; margin: var(--spacing-4) 0">{ph_select("Select org unit", "Org unit")}</div>
 
-      <div class="ps-striped-list ps-tree-list">{"".join(rows)}</div>'''
+      <div class="ps-striped-list ps-wtree-list">{"".join(rows)}</div>'''
 
 
 def team_profile():
@@ -826,10 +836,14 @@ def team_profile():
 
       <h2 class="h3" style="margin: var(--spacing-6) 0 var(--spacing-1)">Reporting Relationships</h2>
       <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">5 people comprise Operations, and 6 Talents are associated with it</p>
-      <div class="org-chart"><div class="org-chart-group">
+      <div class="org-chart"><div class="org-chart-group" style="flex: 1 1 420px">
+        <p class="body-sm-semibold" style="margin: 0 0 var(--spacing-3)">Operations</p>
         {org_node("lk")}
         <ul class="org-node-children"><li>{org_node("ck")}
           <ul class="org-node-children"><li>{org_node("lh")}</li><li>{org_node("tl")}</li></ul></li><li>{org_node("nr")}</li></ul>
+      </div><div class="org-chart-group">
+        <p class="body-sm-semibold" style="margin: 0 0 var(--spacing-3)">Talent Network Members (6)</p>
+        <div class="stack" style="gap: var(--spacing-3)">{"".join(talent_node(n, r) for n, r in (("Rosa Dahl", "Product Manager"), ("Imran Suleiman", "Product Manager"), ("Greta Lund", "Designer"), ("Samir Haddad", "Developer"), ("Lina Okoye", "Sales Analyst"), ("Paolo Ferri", "Developer")))}</div>
       </div></div>'''
 
 
@@ -1636,8 +1650,8 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
         rid = f'{prefix}-{n[0]}'
         caret = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle {name}" data-rows="{rid}">{icon("i-chevron-down")}</button>' if kids
                  else '<span class="row-toggle-spacer"></span>')
-        link = f'<a class="ps-tree-title" {links[name]}>{name}</a>' if name in links else f'<span class="ps-tree-title">{name}</span>'
-        first = (f'<div class="ps-tree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
+        link = f'<a class="ps-wtree-title" {links[name]}>{name}</a>' if name in links else f'<span class="ps-wtree-title">{name}</span>'
+        first = (f'<div class="ps-wtree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
                  f'{tag(kinds[level])}{tags(name, level)}</div></div>')
         if rob:
             date = f'<s>{rob[0]}</s>' if rob[2] else rob[0]
@@ -1652,7 +1666,7 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
                 'roadmap': lambda: (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>' if level == 0 else ''),
                 'rob': lambda: meet, 'actions': raci_btn}
         hide = f' data-child-of="{parent}" hidden' if parent else ''
-        out.append(f'<tr class="ps-tree-row" data-search-item{hide}><td>{first}</td>' + ''.join(f'<td>{cell[c]()}</td>' for c in cols) + '</tr>')
+        out.append(f'<tr class="ps-wtree-row" data-search-item{hide}><td>{first}</td>' + ''.join(f'<td>{cell[c]()}</td>' for c in cols) + '</tr>')
         for kid in kids:
             row(kid, level + 1, objective, owner, rid)
 
@@ -1667,7 +1681,7 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
         th += f'<th{width(w)}>{inner}</th>'
     total = 256 + sum(TREE_COLS[c][1] for c in cols)
     style = f' style="min-width: {total}px; table-layout: fixed"' if sticky else ''
-    return (f'<div class="table-scroll" style="max-height: none"{attrs}><table class="table ps-tree{" ps-tree-sticky" if sticky else ""}"{style}>'
+    return (f'<div class="table-scroll" style="max-height: none"{attrs}><table class="table ps-wtree{" ps-wtree-sticky" if sticky else ""}"{style}>'
             f'<thead><tr>{th}</tr></thead><tbody>{"".join(out)}</tbody></table></div>')
 
 
@@ -2188,7 +2202,7 @@ def okr_panels():
 def rob_calendar():
     weeks = [[2, 3, 4, 5, 6], [9, 10, 11, 12, 13], [16, 17, 18, 19, 20], [23, 24, 25, 26, 27], [30, None, None, None, None]]
     grid = cal_month(weeks, lambda d: [(t, m, True) for t, m in EVENTS.get(d, ())])
-    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
+    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button" disabled title="Creating meetings is closed for this account on staging">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
 
       {tabs(("My events", "All events"))}
 
@@ -2406,7 +2420,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),    dict(date='Nov 25, 2026', span='13:28–13:35', minutes=7, screens=['dashboard'],
          note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),    dict(date='Nov 25, 2026', span='13:34–13:39', minutes=5, screens=['processes', 'initiatives'],
          note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),    dict(date='Nov 25, 2026', span='13:38–13:41', minutes=3, screens=['team', 'people', 'okrs'],
-         note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),
+         note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:41–13:46', minutes=5, screens=['profile', 'team-profile', 'rob-meetings'],
+         note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),
 ]
 
 
@@ -2516,7 +2531,7 @@ def elements_page():
          '<span class="body-sm">Jul 2022 - Apr 2024</span></div></div>'),
         ('Tree rows', 'ps-row-child', 'Processes and Initiatives: rows that fold under a parent row. Click the caret on Refund requests.', 'processes/index.html',
          table(('Name', 'Status'), f'<tr><td><span class="cell-title">Refund requests</span></td><td>{tag("Active")}</td></tr><tr class="ps-row-child"><td><span class="cell-title">Refund review</span></td><td>{tag("Active")}</td></tr>')),
-        ('Tree table', 'ps-tree', 'Dashboard: rows open a second and a third layer, each layer set in with a rule; the name column stays in place while the others scroll sideways; stripes follow the rows that are open.', 'dashboard/index.html',
+        ('Tree table', 'ps-wtree', 'Dashboard: rows open a second and a third layer, each layer set in with a rule; the name column stays in place while the others scroll sideways; stripes follow the rows that are open.', 'dashboard/index.html',
          '<div style="max-width: 760px">' + tree_table(DASH_TREE[:2]) + '</div>'),
         ('Status dot', 'ps-dot', 'Health everywhere: the coloured dot inside a grey tag.', 'dashboard/index.html',
          f'<div class="row">{health("On track", "positive")}{health("At risk", "warning")}{health("Off track", "negative")}{health("Not active", "light")}</div>'),
@@ -2524,6 +2539,8 @@ def elements_page():
          ''.join(f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{k}" type="button" aria-label="View roadmap">{icon("i-roadmap", "btn-icon")}</button>' for k in ('positive', 'warning', 'negative', 'light'))),
         ('Split card', 'ps-split', 'Dashboard: two halves of a card with a rule between them, stacking on a narrow screen.', 'dashboard/index.html',
          '<article class="card"><div class="ps-split"><div style="flex: 1 1 200px"><p class="body-semibold" style="margin: 0">Health</p></div><div style="flex: 2 1 300px"><p class="body-semibold" style="margin: 0">Status</p></div></div></article>'),
+        ('Reporting chain', 'ps-chain', 'Profile, Reporting Relationships: who someone reports to, left to right, ending in the column of people beside them with that person marked.', 'profile/index.html',
+         chain(("sr", "lk"), ("nr", "ck", "lh"), "ck")),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'

@@ -121,8 +121,8 @@
 
 /* Striped list: the same tint for stacked rows that are not a table */
 .ps-striped-list > * { border: 0; border-radius: 0; }
-.ps-tree-list > [hidden] { display: none; }
-.ps-striped-list:not(.ps-tree-list) > :nth-child(even), .ps-tree-list > .is-alt { background: var(--color-surface-muted); }
+.ps-wtree-list > [hidden] { display: none; }
+.ps-striped-list:not(.ps-wtree-list) > :nth-child(even), .ps-wtree-list > .is-alt { background: var(--color-surface-muted); }
 /* A person's name in a list is set a step heavier, as the product does. */
 .table .cell-user-name { font-weight: var(--font-weight-semibold); }
 
@@ -181,21 +181,21 @@
 
 /* Tree table: rows open a second and a third layer; the name column stays
    put while the rest scrolls sideways; stripes follow the rows that are open. */
-.ps-tree-sticky th:first-child, .ps-tree-sticky td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
-.ps-tree-sticky thead th:first-child { z-index: 2; }
-.ps-tree tbody td { background: var(--color-surface); vertical-align: middle; }
-.ps-tree tbody tr.is-alt > td { background: var(--color-surface-muted); }
-.ps-tree-sticky td { overflow: hidden; }
-.ps-tree .cell-user-name { font-weight: var(--font-weight-semibold); }
-.ps-tree .cell-user-meta { min-width: 0; }
-.ps-tree .cell-user-name, .ps-tree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ps-tree s { color: var(--color-text-muted); }
-.ps-tree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
-.ps-tree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
-.ps-tree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
-.ps-tree-title { font: var(--type-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); text-decoration: none; }
-.ps-tree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
-.ps-tree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.ps-wtree-sticky th:first-child, .ps-wtree-sticky td:first-child { position: sticky; left: 0; z-index: 1; border-right: 1px solid var(--color-border); }
+.ps-wtree-sticky thead th:first-child { z-index: 2; }
+.ps-wtree tbody td { background: var(--color-surface); vertical-align: middle; }
+.ps-wtree tbody tr.is-alt > td { background: var(--color-surface-muted); }
+.ps-wtree-sticky td { overflow: hidden; }
+.ps-wtree .cell-user-name { font-weight: var(--font-weight-semibold); }
+.ps-wtree .cell-user-meta { min-width: 0; }
+.ps-wtree .cell-user-name, .ps-wtree .cell-user-role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-wtree s { color: var(--color-text-muted); }
+.ps-wtree-name { display: flex; align-items: flex-start; gap: var(--spacing-1); min-width: 0; }
+.ps-wtree-name[data-level="1"] { margin-left: var(--spacing-2); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-wtree-name[data-level="2"] { margin-left: var(--spacing-6); padding-left: var(--spacing-2); box-shadow: inset 3px 0 0 var(--color-border-strong); }
+.ps-wtree-title { font: var(--type-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); text-decoration: none; }
+.ps-wtree-name .row-toggle svg { transition: transform var(--duration-fast) var(--ease); }
+.ps-wtree-name .row-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 
 /* Roadmap marker: the button that opens a roadmap, with a dot for its health. */
 .ps-roadmap { position: relative; }
@@ -204,5 +204,18 @@
 .ps-roadmap.is-warning::after { background: var(--color-warning); }
 .ps-roadmap.is-negative::after { background: var(--color-danger); }
 .ps-dot.is-light, .ps-roadmap.is-light::after { background: var(--color-text-subtle); }
-.ps-tree-row > td { height: calc(2 * var(--spacing-10)); }
+.ps-wtree-row > td { height: calc(2 * var(--spacing-10)); }
 .ps-split .ps-health { margin-top: auto; }
+
+/* Reporting chain: managers left to right, then the column of people beside
+   the person, who is marked. */
+.ps-chain { display: flex; align-items: center; overflow-x: auto; padding: var(--spacing-4) 0; }
+.ps-chain-node, .ps-chain-item { flex: none; width: 264px; }
+.ps-chain-link { flex: none; width: var(--spacing-12); border-top: 1px solid var(--color-border-strong); }
+.ps-chain-col { display: flex; flex-direction: column; gap: var(--spacing-3); padding-left: var(--spacing-6); }
+.ps-chain-item { position: relative; }
+.ps-chain-item::before { content: ""; position: absolute; right: 100%; top: 50%; width: var(--spacing-6); border-top: 1px solid var(--color-border-strong); }
+.ps-chain-item::after { content: ""; position: absolute; left: calc(-1 * var(--spacing-6)); top: calc(-1 * var(--spacing-3)); bottom: 0; border-left: 1px solid var(--color-border-strong); }
+.ps-chain-item:first-child::after { top: 50%; }
+.ps-chain-item:last-child::after { bottom: 50%; }
+.ps-chain-item.is-current .org-node { border-color: var(--color-accent); background: var(--color-accent-subtle); }
