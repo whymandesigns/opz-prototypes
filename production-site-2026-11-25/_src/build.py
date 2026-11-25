@@ -147,7 +147,10 @@ def plain(title, body):
 def main():
     built = []
     for s in screens.SCREENS:
-        html = page(s['title'], s['nav'], s['main'], s.get('ctas', ()), s.get('overlays', ''), padded=s.get('padded', True))
+        if s.get('plain'):
+            html = plain(s['title'], s['main']).replace('../../designmd/', '../../../designmd/')
+        else:
+            html = page(s['title'], s['nav'], s['main'], s.get('ctas', ()), s.get('overlays', ''), padded=s.get('padded', True))
         d = OUT / s['folder']
         d.mkdir(exist_ok=True)
         (d / 'index.html').write_text(html)
