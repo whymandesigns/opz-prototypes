@@ -329,6 +329,7 @@ def initiative_view():
         field_row('Beneficiary function', f'<div class="row">{icon("i-function", "icon icon-16")}<span class="body-sm-semibold">Operations</span></div>'),
         field_row('Related initiatives &amp; projects', f'<a class="body-sm" href="#" {LINK}>Self-serve account setup</a>'),
         field_row('Core strategy', health('On', 'positive')),
+        field_row('Company strategic objective', '<span class="body-sm">Faster customer onboarding</span>'),
     ))
     people = ''.join((
         field_row('Accountable owner', user('sr')),
@@ -353,7 +354,6 @@ def initiative_view():
         <h1 class="h2" style="margin: 0">Onboarding in one week</h1>
         <div class="row">
           <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Copy Link">{icon("i-link", "btn-icon")}</button>
-          <button class="btn btn-secondary" type="button">{icon("i-pencil", "btn-icon")}Edit</button>
         </div>
       </div>
       <p class="body-xs" style="margin: var(--spacing-1) 0 var(--spacing-4); color: var(--color-text-muted)">Last edit was made 18 hours ago by <a href="#" {LINK}>Sofia Romano</a></p>
@@ -497,7 +497,7 @@ def rob_calendar():
                          for t, m in EVENTS.get(d, ()))
             tds.append(f'<td style="vertical-align: top; height: 120px"><div class="row row-end">{num}</div>{ev}</td>')
         body.append('<tr>' + ''.join(tds) + '</tr>')
-    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>')}
+    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
 
       {tabs(("My events", "All events"))}
 
@@ -528,25 +528,40 @@ def rob_calendar():
       </div>'''
 
 
+def user_marked(k, mark='', size='md'):
+    """A person with a mark on the avatar: 'yes' or 'no' for whether they
+    accepted the meeting, 'talent' for a talent network member."""
+    name, r = PEOPLE[k]
+    m = {'yes': f'<span class="ps-avatar-mark is-yes" title="Accepted">{icon("i-check-minor", "icon")}</span>', 'no': f'<span class="ps-avatar-mark is-no" title="Declined">{icon("i-close-minor", "icon")}</span>',
+         'talent': '<span class="ps-avatar-mark is-talent" title="Talent network member">T</span>'}.get(mark, '')
+    return (f'<div class="cell-user"><span class="ps-avatar-wrap"><span class="avatar avatar-{size}">{ini(k)}</span>{m}</span><div class="cell-user-meta">'
+            f'<span class="cell-user-name">{name}</span><span class="cell-user-role">{r}</span></div></div>')
+
+
 def rob_meeting_view():
     def sec(title, inner, sid):
         return f'<section class="stack" id="mv-{sid}"><h3 class="h4" {RULE}>{title}</h3>{inner}</section>'
 
     def empty(text):
         return f'<div class="row" style="color: var(--color-text-muted)">{icon("i-list-unordered", "icon icon-16")}<span class="body-sm">{text}</span></div>'
-    details = f'''<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-4)">
+    details = f'''<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-4)">
               <div class="row">{icon("i-calendar", "icon icon-16")}<span class="body-sm">Tuesday, November 10</span></div>
               <div class="row">{icon("i-time", "icon icon-16")}<span class="body-sm">10:30 AM – 11:30 AM</span></div>
               <div class="row">{icon("i-globe", "icon icon-16")}<span class="body-sm">GMT+1</span></div>
-              <div class="row">{icon("i-update", "icon icon-16")}<span class="body-sm">Every week on Tuesday until Dec 22, 2026</span></div>
-              <div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom: 954 0000 0000</a></div>
+              <div class="row">{icon("i-update", "icon icon-16")}<span class="body-sm">Every week on Tuesday until Dec 22, 2026</span>{health("High", "warning")}</div>
+              <div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom: 954 0000 0000</a>{health("REC", "negative")}</div>
               <div class="row">{icon("i-availability-full-time", "icon icon-16")}<span class="body-sm">Busy</span></div>
               <div class="row">{icon("i-function", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Operations</a></div>
             </div>
             <div class="row" style="align-items: flex-start">{icon("i-list-unordered", "icon icon-16")}<p class="body-sm" style="margin: 0">A weekly working session for the team that runs Onboarding in one week: a short round of status, then decisions and actions.</p></div>'''
-    people = ''.join(f'<div class="row" style="justify-content: space-between">{user(k)}</div>' for k in ('ck', 'lh', 'tl', 'lk', 'nr', 'el'))
+    people = ''.join(f'<div class="row" style="justify-content: space-between">{user_marked(k, m)}{tag(r, "positive") if r else ""}</div>'
+                     for k, m, r in (('ck', 'yes', 'R'), ('lh', 'yes', 'R'), ('tl', 'no', ''), ('lk', 'yes', 'C'), ('nr', 'yes', ''), ('el', '', '')))
+    deck = (f'<article class="card" style="background: var(--color-accent); color: var(--color-text-inverse); min-height: 200px; display: flex; align-items: flex-end">'
+            f'<p class="h2" style="margin: 0; color: inherit">Onboarding in one week</p></article>')
+    metric = (f'<div class="row" style="justify-content: space-between"><span class="row">{icon("i-target", "icon icon-16")}<span class="body-sm">Add key metric</span></span>'
+              f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Edit key metric">{icon("i-pencil", "btn-icon")}</button></div>')
     nav = ''.join(f'<a class="btn btn-ghost" href="#mv-{i}" style="justify-content: flex-start; text-decoration: none">{icon(s, "btn-icon")}{l}</a>'
-                  for l, s, i in (('Details', 'i-list', 'details'), ('Recording', 'i-video-on', 'recording'), ('Agenda', 'i-list-unordered', 'agenda'), ('Action items', 'i-list-checkboxes', 'actions'),
+                  for l, s, i in (('Details', 'i-list', 'details'), ('Recording', 'i-video-on', 'recording'), ('Deck', 'i-presenter', 'deck'), ('Agenda', 'i-list-unordered', 'agenda'), ('Action items', 'i-list-checkboxes', 'actions'),
                                   ('Pre-read materials', 'i-attachment', 'preread'), ('Connections', 'i-link', 'connections'), ('History', 'i-time', 'history')))
     return f'''  <div class="modal-overlay" id="meeting-view">
     <div class="modal modal-full" role="dialog" aria-modal="true" aria-labelledby="meeting-view-title">
@@ -563,8 +578,9 @@ def rob_meeting_view():
       <div class="modal-body">
         <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-10)">
           <div class="stack" style="flex: 3 1 320px; min-width: 0; gap: var(--spacing-8)">
-            {sec("Details", details, "details")}
+            {sec("Details", details + metric, "details")}
             {sec("Recording", f'<div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom Recording</a><span class="body-sm" {MUTED}>(1h 8m)</span></div>', "recording")}
+            {sec("Deck", deck, "deck")}
             {sec("Agenda", empty("No Agenda items yet"), "agenda")}
             {sec('Action items <span class="count-badge count-badge-secondary">0</span>', empty("No action items were added in this meeting."), "actions")}
             {sec("Pre-read materials", empty("No pre-read materials yet"), "preread")}
@@ -573,8 +589,8 @@ def rob_meeting_view():
           </div>
           <div class="stack" style="flex: 2 1 240px; min-width: 0">
             <h3 class="h4" style="margin: 0">Owner</h3>
-            {user("sr")}
-            <h3 class="h4" style="margin: var(--spacing-4) 0 0">Participants <span class="count-badge count-badge-secondary">6</span></h3>
+            <div class="row" style="justify-content: space-between">{user_marked("sr", "yes")}{tag("A", "negative")}</div>
+            <h3 class="h4 row" style="margin: var(--spacing-4) 0 0">Participants <span class="count-badge count-badge-secondary">6</span>{icon("i-info", "icon icon-16")}</h3>
             {people}
           </div>
           <nav class="stack" data-view="desktop" aria-label="Sections" style="position: sticky; top: 0; gap: var(--spacing-1); flex: 0 0 200px">{nav}</nav>
@@ -856,7 +872,7 @@ def time_off():
       {mobile('<div class="stack">' + cards + '</div>')}
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
-          <thead><tr><th>Name</th><th>Org unit</th><th>Location</th><th>OOO length</th></tr></thead>
+          <thead><tr><th>Name {icon("i-arrow-up-minor", "icon icon-16")}</th><th>Org unit</th><th>Location</th><th>OOO length</th></tr></thead>
           <tbody>{rows}</tbody>
         </table>
       </div>'''
@@ -898,7 +914,7 @@ def peer_feedback():
       {mobile('<div class="stack">' + cards + '</div>')}
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
-          <thead><tr><th>Feedback receiver</th><th>Relationship</th><th>Date Received</th><th style="text-align: right">Actions</th></tr></thead>
+          <thead><tr><th>Feedback receiver</th><th>Relationship {icon("i-help", "icon icon-16")}</th><th>Date Received</th><th style="text-align: right">Actions</th></tr></thead>
           <tbody>{rows}</tbody>
         </table>
       </div>'''
@@ -1005,7 +1021,7 @@ def talent_profile():
       <div class="alert alert-warning" style="margin-bottom: var(--spacing-6)">{icon("i-warning", "icon alert-icon")}<p class="alert-message">Not a Core Team member: Please reach out to Sofia Romano for more details</p></div>
 
       <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-6)">
-        <span class="avatar avatar-2xl">RD</span>
+        <span class="ps-avatar-wrap"><span class="avatar avatar-2xl">RD</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span>
         <div class="stack" style="flex: 1 1 240px; min-width: 0">
           <h2 class="h2" style="margin: 0">Rosa Dahl</h2>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, max-content)); gap: var(--spacing-6)">
@@ -1879,7 +1895,7 @@ def okr_panels():
 def rob_calendar():
     weeks = [[2, 3, 4, 5, 6], [9, 10, 11, 12, 13], [16, 17, 18, 19, 20], [23, 24, 25, 26, 27], [30, None, None, None, None]]
     grid = cal_month(weeks, lambda d: [(t, m, True) for t, m in EVENTS.get(d, ())])
-    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>')}
+    return f'''{head("RoB Meetings", '<button class="btn btn-primary" type="button">Create meeting</button>', after_title=icon("i-info", "icon icon-16"))}
 
       {tabs(("My events", "All events"))}
 
@@ -2022,6 +2038,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
     dict(date='Nov 25, 2026', span='12:14–12:17', minutes=6,
          screens=['dashboard', 'processes', 'initiatives', 'people', 'profile', 'time-off', 'peer-feedback', 'rob-paused-meetings', 'talent-profile', 'team', 'team-profile', 'initiative-view', 'initiative-create'],
          note='Compared with staging: lists are striped, every row has its caret, the toolbar is ordered as in the product, and the RoB and action cells carry their icons.'),
+    dict(date='Nov 25, 2026', span='12:20–12:21', minutes=5,
+         screens=['rob-meeting-view', 'initiative-view', 'rob-meetings', 'talent-profile', 'time-off', 'peer-feedback'],
+         note='Compared with staging: the meeting view gains its Deck section, key metric row, priority and recording tags, RACI letters and attendance marks; smaller fixes on five more screens.'),
 ]
 
 
@@ -2121,6 +2140,10 @@ def elements_page():
         ('Business line switcher', 'ps-bizline', 'Top bar of every screen. Its options are assumed: the menu did not open on staging.', 'dashboard/index.html#open-bizline-menu',
          '<div style="display: inline-flex; padding: var(--spacing-2); background: var(--color-graphite-800); border-radius: var(--radius-sm)"><button class="ps-bizline body-sm-semibold" type="button" style="margin: 0; border-left: 0">All Business Lines'
          + icon("i-chevron-down", "icon icon-16") + '</button></div>'),
+        ('Avatar mark', 'ps-avatar-mark', 'Meeting view: who accepted or declined. Talent profile: the T that marks a talent network member.', 'rob-meeting-view/index.html',
+         f'<div class="row" style="gap: var(--spacing-8)">{user_marked("ck", "yes")}{user_marked("tl", "no")}{user_marked("nr", "talent")}</div>'),
+        ('Striped table', 'ps-striped', 'Every list: each second row is tinted.', 'people/index.html',
+         table(('Name', 'Status'), ''.join(f'<tr><td><span class="cell-title">{n}</span></td><td>{tag("Active")}</td></tr>' for n in ('Vendor Management', 'Learning Programs', 'Workplace and IT', 'Refund requests'))).replace('class="table"', 'class="table ps-striped"')),
         ('Tree rows', 'ps-row-child', 'Processes and Initiatives: rows that fold under a parent row. Click the caret on Refund requests.', 'processes/index.html',
          table(('Name', 'Status'), f'<tr><td><span class="cell-title">Refund requests</span></td><td>{tag("Active")}</td></tr><tr class="ps-row-child"><td><span class="cell-title">Refund review</span></td><td>{tag("Active")}</td></tr>')),
     ]

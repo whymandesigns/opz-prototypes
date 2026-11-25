@@ -110,3 +110,10 @@
 
 /* Striped table: every second row of a work list is tinted */
 .ps-striped tbody tr:nth-child(even) > td { background: var(--color-surface-muted); }
+
+/* Avatar mark: a small sign on the corner of an avatar */
+.ps-avatar-wrap { position: relative; display: inline-flex; flex: none; }
+.ps-avatar-mark { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; display: grid; place-items: center; border: 2px solid var(--color-surface); border-radius: var(--radius-full); color: var(--color-text-inverse); font-size: 10px; font-weight: 600; line-height: 1; }
+.ps-avatar-mark.is-yes { background: var(--color-success); }
+.ps-avatar-mark.is-no { background: var(--color-danger); }
+.ps-avatar-mark.is-talent { border-radius: var(--radius-sm); background: var(--color-accent); }
