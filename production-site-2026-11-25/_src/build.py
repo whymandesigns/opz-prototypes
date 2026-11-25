@@ -123,9 +123,9 @@ VIEW_SCRIPT = '''  <script>
 
     // Work lists: a caret folds a row's children; Expand all does every row.
     // A tree table stripes the rows that are open, not every second row in the markup.
-    const stripe = () => document.querySelectorAll('.ps-tree tbody').forEach(tb => {
+    const stripe = () => document.querySelectorAll('.ps-tree tbody, .ps-tree-list').forEach(tb => {
       let i = 0;
-      tb.querySelectorAll('tr').forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
+      [...tb.children].forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
     });
     const fold = (btn, on) => {
       btn.setAttribute('aria-expanded', String(on));

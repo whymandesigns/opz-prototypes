@@ -628,7 +628,7 @@ def okrs():
             f'<span class="body-sm-semibold">{pct}%</span></div></div>' for kr, pct in krs)
         cards.append(f'<article class="card"><div class="row"><h3 class="body-lg-semibold" style="margin: 0">{name}</h3>{tag(st, kind)}</div>{rows}</article>')
     actions = (f'<button class="btn btn-secondary" type="button">{icon("i-info", "btn-icon")}Performance attributes</button>\n          '
-               '<button class="btn btn-secondary" type="button">Export as CSV</button>\n          <button class="btn btn-primary" type="button">Create OKR</button>')
+               '<button class="btn btn-secondary" type="button">Export as CSV</button>\n          <button class="btn btn-primary" type="button" disabled title="Creating OKRs is closed for this account on staging">Create OKR</button>')
     return f'''{head("OKRs", actions, after_title=select("2026", ("2025", "2026", "2027"), "Year"))}
 
       {tabs(("Company Vision", "Company Objective", "Function Annual", "Function Quarterly", "Team Quarterly", "Shared Key Results"))}
@@ -696,7 +696,7 @@ def people():
       {mobile('<div class="stack">' + "".join(cards) + '</div>')}
       <div class="table-scroll" style="max-height: none" data-view="desktop">
         <table class="table">
-          <thead><tr><th>Name</th><th>Org unit</th><th>Manager</th><th>Location</th><th>Local Time</th></tr></thead>
+          <thead><tr><th>{SORTED("Name")}</th><th>Org unit</th><th>Manager</th><th>Location</th><th>Local Time</th></tr></thead>
           <tbody>{"".join(rows)}</tbody>
         </table>
       </div>
@@ -770,22 +770,37 @@ UNITS = [
 ]
 
 
+UNIT_KIDS = {
+    'Business Analytics': [('Reporting', 'Team', 'mt', '5 members'), ('Data Engineering', 'Team', 'mt', '4 members'), ('Forecasting', 'Team', 'mt', '2 members'), ('Insights', 'Team', 'mt', '2 members')],
+    'Customer': [('Customer Support', 'Subfunction', 'ad', '61 members'), ('Customer Success', 'Subfunction', 'ad', '48 members'), ('Sales', 'Subfunction', 'ad', '44 members'), ('Sales Operations', 'Subfunction', 'ad', '16 members')],
+    'Finance': [('Accounting', 'Subfunction', 'og', '11 members'), ('Billing', 'Subfunction', 'og', '8 members'), ('Planning', 'Subfunction', 'og', '4 members')],
+    'Operations': [('Delivery', 'Subfunction', 'ck', '29 members'), ('Quality', 'Subfunction', 'tl', '18 members')],
+    'People': [('Learning & Development', 'Subfunction', 'jp', '9 members'), ('Recruiting', 'Subfunction', 'mv', '14 members'), ('People Operations', 'Subfunction', 'ac', '8 members')],
+}
+
+
 def team():
     rows = []
-    for n, k, line, kids in UNITS:
-        toggle = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle children">{icon("i-caret-right")}</button>' if kids
+
+    def unit(n, kind, k, line, rid='', parent=''):
+        toggle = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle {n}" data-rows="{rid}">{icon("i-caret-right")}</button>' if rid
                   else '<span class="row-toggle-spacer"></span>')
         name = (f'<a class="body-semibold" href="../team-profile/index.html" {LINK}>{n}</a>' if n == 'Operations' else f'<a class="body-semibold" href="#" {LINK}>{n}</a>')
-        rows.append(f'<div class="list-row"><div class="cell-title-row">{toggle}<span class="avatar avatar-sm avatar-team">{icon("i-function")}</span>'
-                    f'<div><p class="list-row-title">{name} {tag("Function")}</p><p class="list-row-meta">Led by <a href="#" {LINK}>{PEOPLE[k][0]}</a>, {PEOPLE[k][1]}</p>'
-                    f'<p class="list-row-meta">{line}</p></div></div></div>')
+        hide = f' data-child-of="{parent}" hidden style="padding-left: var(--spacing-10)"' if parent else ''
+        return (f'<div class="list-row"{hide}><div class="cell-title-row">{toggle}<span class="avatar avatar-sm avatar-team">{icon("i-function")}</span>'
+                f'<div><p class="list-row-title">{name} {tag(kind)}</p><p class="list-row-meta">Led by <a href="#" {LINK}>{PEOPLE[k][0]}</a>, {PEOPLE[k][1]}</p>'
+                f'<p class="list-row-meta">{line}</p></div></div></div>')
+    for n, k, line, kids in UNITS:
+        rid = 'unit-' + n.lower().replace(' ', '-').replace('&', 'and') if kids else ''
+        rows.append(unit(n, 'Function', k, line, rid))
+        rows += [unit(kn, kk, kp, kl, parent=rid) for kn, kk, kp, kl in UNIT_KIDS.get(n, [])]
     return f'''{head("Organizational Structure")}
 
       {tabs(("Organizational Units", "Divisions", "Talent Network Members", "Skills"))}
 
-      <div style="max-width: 420px; margin: var(--spacing-4) 0">{ph_select("Select org unit", "Org unit")}</div>
+      <div style="max-width: 400px; margin: var(--spacing-4) 0">{ph_select("Select org unit", "Org unit")}</div>
 
-      <div class="ps-striped-list">{"".join(rows)}</div>'''
+      <div class="ps-striped-list ps-tree-list">{"".join(rows)}</div>'''
 
 
 def team_profile():
@@ -2390,7 +2405,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          screens=['profile', 'team-profile', 'people', 'team', 'time-off', 'recognitions', 'watercooler', 'peer-feedback'],
          note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),    dict(date='Nov 25, 2026', span='13:28–13:35', minutes=7, screens=['dashboard'],
          note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),    dict(date='Nov 25, 2026', span='13:34–13:39', minutes=5, screens=['processes', 'initiatives'],
-         note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),
+         note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),    dict(date='Nov 25, 2026', span='13:38–13:41', minutes=3, screens=['team', 'people', 'okrs'],
+         note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),
 ]
 
 
