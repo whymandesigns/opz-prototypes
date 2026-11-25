@@ -4534,6 +4534,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-agenda-item.is-maybe { border-left-color: var(--color-warning); }
 .ps-agenda-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); }
 .ps-agenda-now::before { content: ""; position: absolute; left: 0; top: calc(-1 * var(--spacing-1) - 1px); width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-warning); }
+
+/* Open on staging: our own link, floating over the screen, not part of it. */
+.ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -4595,6 +4598,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-x" viewBox="0 0 24 24"><use href="#i-close"/></symbol>
 </svg>
 <!-- === /icons.svg === -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" data-local-icons style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-external-link" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 6h6v1H6v11h11v-5h1v6H5V6Zm8-1h6v6h-1V6.707l-6.646 6.647-.708-.708L17.293 6H13V5Z" fill="currentColor"/></symbol>
+</svg>
 
   <!-- TOPBAR
        .topbar-menu, .topbar-title and .topbar-cta are invisible until the bar
@@ -4947,6 +4953,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     });
   })();
   </script>
+  <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/rob" target="_blank" rel="noopener" title="Staging needs a record id for this screen: opens the nearest list in a new tab"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Staging: nearest list</a>
 <!-- === review.css === -->
 <style>
 /* review.css — the review bar (author/reviewer tooling).

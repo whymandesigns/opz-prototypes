@@ -4534,6 +4534,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-agenda-item.is-maybe { border-left-color: var(--color-warning); }
 .ps-agenda-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); }
 .ps-agenda-now::before { content: ""; position: absolute; left: 0; top: calc(-1 * var(--spacing-1) - 1px); width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-warning); }
+
+/* Open on staging: our own link, floating over the screen, not part of it. */
+.ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -4575,6 +4578,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 </svg>
 <!-- === /icons.svg === -->
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" data-local-icons style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-external-link" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 6h6v1H6v11h11v-5h1v6H5V6Zm8-1h6v6h-1V6.707l-6.646 6.647-.708-.708L17.293 6H13V5Z" fill="currentColor"/></symbol>
   <symbol id="i-badge-ambitious" viewBox="0 0 64 64"><path d="M32 2 58 17v30L32 62 6 47V17Z" fill="var(--color-accent)"/><path d="M12 46 24 24l6 10 8-14 14 26Z" fill="var(--color-text-inverse)"/><path d="M24 24l6 10-4 4-5-6Zm14-4 5 9-5 4-4-6Z" fill="var(--color-accent-subtle)"/></symbol>
   <symbol id="i-badge-anniversary" viewBox="0 0 64 64"><path d="M32 2 58 17v30L32 62 6 47V17Z" fill="var(--color-graphite-800)"/><circle cx="32" cy="32" r="17" fill="none" stroke="var(--color-success)" stroke-width="5" stroke-dasharray="4 3.12"/><path d="M28.5 26.5 33 23h2.5v19h-4V28l-3 2Z" fill="var(--color-text-inverse)"/></symbol>
   <symbol id="i-badge-challenging" viewBox="0 0 64 64"><path d="M32 2 58 17v30L32 62 6 47V17Z" fill="var(--color-graphite-800)"/><path d="M27 33l-6 8h6Zm10 0 6 8h-6Z" fill="var(--color-warning)"/><path d="M28 41h8l-4 11Z" fill="var(--color-warning)"/><path d="M32 12c6 6 7 16 5 27H27c-2-11-1-21 5-27Z" fill="var(--color-text-inverse)"/><circle cx="32" cy="25" r="3.5" fill="var(--color-accent)"/></symbol>
@@ -4876,6 +4880,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     });
   })();
   </script>
+  <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/recognitions" target="_blank" rel="noopener" title="Open this screen on staging in a new tab"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Open on staging</a>
 <!-- === review.css === -->
 <style>
 /* review.css — the review bar (author/reviewer tooling).

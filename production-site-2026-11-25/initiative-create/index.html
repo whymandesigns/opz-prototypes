@@ -4534,6 +4534,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-agenda-item.is-maybe { border-left-color: var(--color-warning); }
 .ps-agenda-now { position: relative; height: 0; border-top: 2px solid var(--color-warning); }
 .ps-agenda-now::before { content: ""; position: absolute; left: 0; top: calc(-1 * var(--spacing-1) - 1px); width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-warning); }
+
+/* Open on staging: our own link, floating over the screen, not part of it. */
+.ps-staging { position: fixed; right: calc(4 * var(--spacing-6)); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -4584,6 +4587,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 </svg>
 <!-- === /icons.svg === -->
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" data-local-icons style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-external-link" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 6h6v1H6v11h11v-5h1v6H5V6Zm8-1h6v6h-1V6.707l-6.646 6.647-.708-.708L17.293 6H13V5Z" fill="currentColor"/></symbol>
   <symbol id="i-slack-color" viewBox="0 0 16 16"><path d="M5.88929 3.36143C4.96429 3.36143 4.20857 2.60571 4.20857 1.68071C4.20857 0.755714 4.96429 0 5.88929 0C6.81429 0 7.57 0.755714 7.57 1.68071V3.36143H5.88929Z" fill="var(--color-accent)"/><path d="M1.68071 11.7914C2.60571 11.7914 3.36143 11.0357 3.36143 10.1107V8.43H1.68071C0.755714 8.43 0 9.18571 0 10.1107C0 11.0357 0.755714 11.7914 1.68071 11.7914Z" fill="var(--color-danger)"/><path d="M5.88929 8.43C4.96429 8.43 4.20857 9.18571 4.20857 10.1107V14.3193C4.20857 15.2443 4.96429 16 5.88929 16C6.81429 16 7.57 15.2443 7.57 14.3193V10.1107C7.57 9.18571 6.81429 8.43 5.88929 8.43Z" fill="var(--color-danger)"/><path d="M7.57 5.88929C7.57 4.96429 6.81429 4.20857 5.88929 4.20857H1.68071C0.755714 4.20857 0 4.96429 0 5.88929C0 6.81429 0.755714 7.57 1.68071 7.57H5.88929C6.81429 7.57 7.57 6.81429 7.57 5.88929Z" fill="var(--color-accent)"/><path d="M12.6386 5.88929C12.6386 4.96429 13.3943 4.20857 14.3193 4.20857C15.2443 4.20857 16 4.96429 16 5.88929C16 6.81429 15.2443 7.57 14.3193 7.57H12.6386V5.88929Z" fill="var(--color-success)"/><path d="M10.1107 7.57C11.0357 7.57 11.7914 6.81429 11.7914 5.88929V1.68071C11.7914 0.755714 11.0357 0 10.1107 0C9.18571 0 8.43 0.755714 8.43 1.68071V5.88929C8.43 6.81429 9.18571 7.57 10.1107 7.57Z" fill="var(--color-success)"/><path d="M10.1107 12.6386C11.0357 12.6386 11.7914 13.3943 11.7914 14.3193C11.7914 15.2443 11.0357 16 10.1107 16C9.18571 16 8.43 15.2443 8.43 14.3193V12.6386H10.1107Z" fill="var(--color-warning)"/><path d="M8.43 10.1107C8.43 11.0357 9.18571 11.7914 10.1107 11.7914H14.3193C15.2443 11.7914 16 11.0357 16 10.1107C16 9.18571 15.2443 8.43 14.3193 8.43H10.1107C9.18571 8.43 8.43 9.18571 8.43 10.1107Z" fill="var(--color-warning)"/></symbol>
 </svg>
 
@@ -4893,6 +4897,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     });
   })();
   </script>
+  <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/initiatives/create" target="_blank" rel="noopener" title="Open this screen on staging in a new tab"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Open on staging</a>
 <!-- === review.css === -->
 <style>
 /* review.css — the review bar (author/reviewer tooling).
