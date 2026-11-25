@@ -4493,7 +4493,11 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-month-day.is-weekend { background: var(--color-surface-muted); border-radius: var(--radius-sm); }
 
 /* Striped list: the same tint for stacked rows that are not a table */
-.ps-striped-list > :nth-child(even) { background: var(--color-surface-muted); }
+.ps-striped-list > * { border: 0; border-radius: 0; }
+.ps-tree-list > [hidden] { display: none; }
+.ps-striped-list:not(.ps-tree-list) > :nth-child(even), .ps-tree-list > .is-alt { background: var(--color-surface-muted); }
+/* A person's name in a list is set a step heavier, as the product does. */
+.table .cell-user-name { font-weight: var(--font-weight-semibold); }
 
 /* Timeline: cards down a rail, as in a work history */
 .ps-timeline { position: relative; display: flex; flex-direction: column; gap: var(--spacing-3); padding-left: var(--spacing-8); }
@@ -4711,7 +4715,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="page-head-actions">
           <button class="btn btn-secondary" type="button" data-modal-open="perf-attrs"><svg class="btn-icon" aria-hidden="true"><use href="#i-info"/></svg>Performance attributes</button>
           <button class="btn btn-secondary" type="button">Export as CSV</button>
-          <button class="btn btn-primary" type="button">Create OKR</button>
+          <button class="btn btn-primary" type="button" disabled title="Creating OKRs is closed for this account on staging">Create OKR</button>
         </div>
       </div>
 
@@ -4919,9 +4923,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     // Work lists: a caret folds a row's children; Expand all does every row.
     // A tree table stripes the rows that are open, not every second row in the markup.
-    const stripe = () => document.querySelectorAll('.ps-tree tbody').forEach(tb => {
+    const stripe = () => document.querySelectorAll('.ps-tree tbody, .ps-tree-list').forEach(tb => {
       let i = 0;
-      tb.querySelectorAll('tr').forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
+      [...tb.children].forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
     });
     const fold = (btn, on) => {
       btn.setAttribute('aria-expanded', String(on));
