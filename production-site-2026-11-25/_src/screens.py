@@ -2132,7 +2132,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          screens=['profile', 'team-profile', 'team', 'time-off', 'processes'],
          note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),    dict(date='Nov 25, 2026', span='12:34–12:41', minutes=7,
          screens=['dashboard', 'rob-meetings', 'profile', 'processes', 'initiatives'],
-         note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),
+         note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),    dict(date='Nov 25, 2026', span='12:59–13:04', minutes=5, screens=[],
+         note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),
 ]
 
 
@@ -2255,13 +2256,31 @@ def elements_page():
          '<div class="ps-seg-fill" style="max-width: 360px">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Example switch') + '</div>'),
     ]
     out = []
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        here = _P(__file__).resolve()
+        kit = next(p for p in (here.parents[3] / 'designmd' / 'dist' / 'kit.json', here.parents[2] / 'designmd' / 'dist' / 'kit.json') if p.exists()).read_text()
+    except Exception:
+        kit = ''
     for name, cls, where, link, demo in items:
         slug = cls.replace('ps-', 'el-')
+        ask = f'Add the {name} element (.{cls}) from production-site-2026-11-25 to the Icarus library: python3 production-site-2026-11-25/_src/promote.py {cls}'
+        lib = (tag('In library', 'positive') if f'"{cls}"' in kit else
+               f'<button class="btn btn-secondary btn-xs" type="button" data-add-to-library="{ask}">{icon("i-plus", "btn-icon")}<span>Add to library</span></button>')
         out.append(f'<section class="stack" id="{slug}" style="gap: var(--spacing-3); padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border)">'
                    f'<div class="row" style="flex-wrap: wrap; justify-content: space-between"><div><h2 class="h3" style="margin: 0">{name}</h2>'
                    f'<p class="body-sm" style="margin: var(--spacing-1) 0 0; color: var(--color-text-muted)">{where}</p></div>'
-                   f'<div class="row"><code class="body-sm">.{cls}</code><a class="btn btn-secondary btn-xs" href="../{link}" style="text-decoration: none">See it in place</a></div></div>{demo}</section>')
+                   f'<div class="row"><code class="body-sm">.{cls}</code><a class="btn btn-secondary btn-xs" href="../{link}" style="text-decoration: none">See it in place</a>{lib}</div></div>{demo}</section>')
     return f'''    <p class="body-sm" style="margin: 0 0 var(--spacing-2)"><a href="../index.html" {LINK}>Production site · Nov 25, 2026</a></p>
     <h1 class="h1" style="margin: 0 0 var(--spacing-2)">New elements</h1>
-    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. They are candidates for the library: take the ones worth keeping into <code>components.css</code>.</p>
-    {"".join(out)}'''
+    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. They are candidates for the library. <span class="body-semibold">Add to library</span> copies the request for that element: paste it to Claude, or run the command in it, and the element moves into <code>components.css</code> and shows here as In library.</p>
+    {"".join(out)}
+    <script>
+    document.addEventListener('click', e => {{
+      const b = e.target.closest('[data-add-to-library]');
+      if (!b) return;
+      const label = b.querySelector('span'), done = () => {{ label.textContent = 'Copied. Paste it to Claude'; setTimeout(() => {{ label.textContent = 'Add to library'; }}, 2500); }};
+      navigator.clipboard ? navigator.clipboard.writeText(b.dataset.addToLibrary).then(done, () => prompt('Copy this request:', b.dataset.addToLibrary)) : prompt('Copy this request:', b.dataset.addToLibrary);
+    }});
+    </script>'''
