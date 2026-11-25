@@ -4597,6 +4597,10 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Link row: a row that is one link, with a chevron at the end. */
 .ps-linkrow { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4); padding: var(--spacing-3) 0; border-bottom: 1px solid var(--color-border); color: var(--color-text); text-decoration: none; }
 .ps-linkrow:hover { background: var(--color-surface-muted); }
+
+/* Agenda row in a meeting: number, item, how often, who brings it. */
+.ps-agenda-row { display: grid; grid-template-columns: var(--spacing-6) 1fr auto auto; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.ps-agenda-row + .ps-agenda-row { margin-top: var(--spacing-2); }
 </style>
 </head>
 <body>

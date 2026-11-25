@@ -405,7 +405,7 @@ def initiative_view():
 def fld(label, control, hint=''):
     h = f'<span class="field-hint">{hint}</span>' if hint else ''
     return (f'<div {PAIR}><span class="body-sm" style="flex: 0 0 200px">{label}</span>'
-            f'<div style="flex: 1 1 240px; min-width: 0; max-width: 420px">{control}{h}</div></div>')
+            f'<div style="flex: 1 1 240px; min-width: 0">{control}{h}</div></div>')
 
 
 def ph_select(text, label, width=None):
@@ -451,10 +451,10 @@ def initiative_create():
     return f'''      <div style="display: flex; flex-direction: column; min-height: calc(100vh - var(--header-height))">
       <div style="flex: 1; padding: var(--spacing-6) var(--spacing-10) var(--spacing-10)">
       {crumbs("New initiative")}
-      <input class="input" type="text" placeholder="Add initiative name" aria-label="Initiative name" style="width: 100%; max-width: none; margin: var(--spacing-3) 0 var(--spacing-6)" />
 
-      <div style="display: flex; align-items: flex-start; gap: var(--spacing-10)">
+      <div style="display: flex; align-items: flex-start; gap: var(--spacing-10); margin-top: var(--spacing-3)">
         <div class="stack" style="flex: 1; min-width: 0; gap: var(--spacing-8)">
+          <input class="input" type="text" placeholder="Add initiative name" aria-label="Initiative name" style="width: 100%; max-width: none" />
           <section class="stack" id="sec-general"><h2 class="h4" {RULE}>General</h2><div {GRID}>{general}</div>
             <div class="row">{add_btn("Add business lines")}{add_btn("Add tags")}</div></section>
           <section class="stack" id="sec-people"><h2 class="h4" {RULE}>People</h2><div {GRID}>{people}</div>
@@ -564,10 +564,20 @@ def rob_meeting_view():
               <div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom: 954 0000 0000</a>{health("REC", "negative")}</div>
               <div class="row">{icon("i-availability-full-time", "icon icon-16")}<span class="body-sm">Busy</span></div>
               <div class="row">{icon("i-function", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Operations</a></div>
+              <div class="row">{icon("i-org-unit", "icon icon-16")}<span class="body-sm">Services</span></div>
             </div>
             <div class="row" style="align-items: flex-start">{icon("i-list-unordered", "icon icon-16")}<p class="body-sm" style="margin: 0">A weekly working session for the team that runs Onboarding in one week: a short round of status, then decisions and actions.</p></div>'''
     people = ''.join(f'<div class="row" style="justify-content: space-between">{user_marked(k, m)}{tag(r, "positive") if r else ""}</div>'
                      for k, m, r in (('ck', 'yes', 'R'), ('lh', 'yes', 'R'), ('tl', 'no', ''), ('lk', 'yes', 'C'), ('nr', 'yes', ''), ('el', '', '')))
+    def item(no, text, freq, k):
+        return (f'<div class="ps-agenda-row"><span class="body-sm" {MUTED}>{no}</span><span class="body-sm">{text}</span>{tag(freq)}'
+                f'<span class="row" style="gap: var(--spacing-1); flex-wrap: nowrap"><span class="avatar avatar-xs">{ini(k)}</span><span class="body-xs" style="white-space: nowrap">{PEOPLE[k][0]}</span></span></div>')
+    agenda_block = (f'<p class="body-sm-semibold row" style="margin: 0">This meeting{tag("1")}</p>'
+                    + item('1', 'Onboarding status: where each new customer is in the first week, and what is blocking them', 'Weekly', 'ck')
+                    + f'<p class="body-sm-semibold row" style="margin: var(--spacing-3) 0 0">Other meetings{tag("3")}</p>'
+                    + item('-', 'Roadmap review: scope and any shifts to milestones or dates since last time', 'Monthly', 'sr')
+                    + item('-', 'Decisions needed: open questions that need sign-off before work starts', 'Bi-weekly', 'lk')
+                    + item('-', 'Handoff problems: what went wrong between sales and delivery this week', 'Weekly', 'ck'))
     deck = (f'<article class="card" style="background: var(--color-accent); color: var(--color-text-inverse); min-height: 200px; display: flex; align-items: flex-end">'
             f'<p class="h2" style="margin: 0; color: inherit">Onboarding in one week</p></article>')
     metric = (f'<div class="row" style="justify-content: space-between"><span class="row">{icon("i-target", "icon icon-16")}<span class="body-sm">Add key metric</span></span>'
@@ -591,9 +601,9 @@ def rob_meeting_view():
         <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-10)">
           <div class="stack" style="flex: 3 1 320px; min-width: 0; gap: var(--spacing-8)">
             {sec("Details", details + metric, "details")}
-            {sec("Recording", f'<div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom Recording</a><span class="body-sm" {MUTED}>(1h 8m)</span></div>', "recording")}
+            {sec("Recording", f'<div class="row">{icon("i-video-on", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Zoom Recording</a><span class="body-sm" {MUTED}>(1h 8m)</span><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy link">{icon("i-copy", "btn-icon")}</button></div>', "recording")}
             {sec("Deck", deck, "deck")}
-            {sec("Agenda", empty("No Agenda items yet"), "agenda")}
+            {sec("Agenda", agenda_block, "agenda")}
             {sec('Action items <span class="count-badge count-badge-secondary">0</span>', empty("No action items were added in this meeting."), "actions")}
             {sec("Pre-read materials", empty("No pre-read materials yet"), "preread")}
             {sec("Connections", f'<div class="row"><span class="icon-tile icon-tile-sm">{icon("i-initiatives")}</span><a class="body-sm" href="../initiative-view/index.html" {LINK}>Onboarding in one week</a>{tag("Initiative")}</div>', "connections")}
@@ -1003,10 +1013,10 @@ def profile_edit():
             {sel("Working hours " + icon("i-help", "icon icon-16"), '<div class="row">' + "".join(f'<div class="input-icon input-icon-right" style="flex: 1 1 0; min-width: 0">{icon("i-time", "icon input-icon-glyph")}<input class="input" type="text" value="{v}" aria-label="{l}" /></div>' for v, l in (("09:00", "Working hours start"), ("17:00", "Working hours end"))) + '</div>')}
           </div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-4)">
-            {sel("Date of Birth (optional)", '<div class="row">' + ph_select("Month", "Month of birth") + ph_select("Day", "Day of birth") + '</div>')}
+            {sel("Date of Birth (optional)", '<div class="row" style="flex-wrap: nowrap">' + ph_select("Month", "Month of birth", 150) + ph_select("Day", "Day of birth", 110) + '</div>')}
             <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile {icon("i-help", "icon icon-16")}</span></label>
           </div>
-          <label class="field"><span class="field-label">About (optional)</span><textarea class="input" rows="8" placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
+          <label class="field"><span class="field-label">About (optional)</span><textarea class="input" rows="8" data-plain placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
         </div>
         <div class="stack" style="flex: 1 1 160px">
           <span class="field-label">Avatar (optional)</span>
@@ -2431,7 +2441,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:41–13:46', minutes=5, screens=['profile', 'team-profile', 'rob-meetings'],
          note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:45–13:49', minutes=4, screens='all',
          note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),    dict(date='Nov 25, 2026', span='13:49–13:52', minutes=3, screens=['initiative-view', 'initiative-create'],
-         note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),
+         note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),    dict(date='Nov 25, 2026', span='13:56–14:00', minutes=4, screens=['initiative-create', 'profile-edit', 'rob-meeting-view'],
+         note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),
 ]
 
 
@@ -2553,6 +2564,8 @@ def elements_page():
          chain(("sr", "lk"), ("nr", "ck", "lh"), "ck")),
         ('Link row', 'ps-linkrow', 'Initiative view, Projects: a row that is one link, with a chevron at the end.', 'initiative-view/index.html',
          '<div style="max-width: 560px">' + ''.join(f'<a class="ps-linkrow" href="#"><span class="body-sm">{n}</span>{icon("i-chevron-right", "icon icon-16")}</a>' for n in ('Kick-off checklist', 'Account setup in one day')) + '</div>'),
+        ('Agenda row', 'ps-agenda-row', 'Meeting view, Agenda: its number, the item, how often it comes up and who brings it.', 'rob-meeting-view/index.html',
+         '<div style="max-width: 640px"><div class="ps-agenda-row"><span class="body-sm">1</span><span class="body-sm">Onboarding status: where each new customer is in the first week</span>' + tag('Weekly') + '<span class="body-xs">Cara Keane</span></div></div>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
