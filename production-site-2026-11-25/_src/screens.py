@@ -2132,7 +2132,7 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          screens=['profile', 'team-profile', 'team', 'time-off', 'processes'],
          note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),    dict(date='Nov 25, 2026', span='12:34–12:41', minutes=7,
          screens=['dashboard', 'rob-meetings', 'profile', 'processes', 'initiatives'],
-         note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),    dict(date='Nov 25, 2026', span='12:59–13:08', minutes=9, screens=[],
+         note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),    dict(date='Nov 25, 2026', span='12:59–13:04', minutes=5, screens=[],
          note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),
 ]
 
