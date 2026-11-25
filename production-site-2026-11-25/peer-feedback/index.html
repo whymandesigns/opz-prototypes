@@ -4909,7 +4909,18 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     });
   })();
   </script>
-  <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/peer-feedbacks" target="_blank" rel="noopener" title="Open this screen on staging in a new tab"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Open on staging</a>
+  <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/peer-feedbacks" target="_blank" rel="noopener" title="Open this screen on staging in a new tab" data-staging-host="https://team-staging.toptal.net" data-staging-tabs="/peer-feedbacks/individual-contributor/pending /peer-feedbacks/individual-contributor/received /peer-feedbacks/individual-contributor/given"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Open on staging</a>
+  <script>
+  (() => {   // the staging link follows the open tab
+    const a = document.querySelector('.ps-staging'), strip = document.querySelector('.tabs[data-tabs]');
+    if (!a || !strip) return;
+    const paths = a.dataset.stagingTabs.split(' ');
+    const sync = () => { const i = [...strip.querySelectorAll('.tab')].findIndex(t => t.classList.contains('is-active')); if (paths[i]) a.href = a.dataset.stagingHost + paths[i]; };
+    document.addEventListener('click', () => setTimeout(sync, 0));
+    addEventListener('hashchange', () => setTimeout(sync, 0));
+    setTimeout(sync, 0);
+  })();
+  </script>
 <!-- === review.css === -->
 <style>
 /* review.css — the review bar (author/reviewer tooling).
