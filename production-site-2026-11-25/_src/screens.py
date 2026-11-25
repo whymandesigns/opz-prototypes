@@ -89,8 +89,8 @@ def mobile(html):
 
 
 def mobile_toolbar(placeholder):
-    return mobile(f'''<div class="toolbar" style="margin-bottom: var(--spacing-4)">
-        <div class="input-icon input-icon-left toolbar-search">
+    return mobile(f'''<div class="toolbar" style="margin-bottom: var(--spacing-4); flex-wrap: nowrap">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 1 1 0; min-width: 0">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="{placeholder}" aria-label="Search" />
         </div>
@@ -99,8 +99,10 @@ def mobile_toolbar(placeholder):
       </div>''')
 
 
-def work_card(title, tags, k, unit, href=None):
+def work_card(title, tags, k, unit, href=None, caret=False):
     name = f'<a class="body-semibold" href="{href}" {LINK}>{title}</a>' if href else f'<span class="body-semibold">{title}</span>'
+    if caret:
+        name = f'<div class="cell-title-row"><button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle children">{icon("i-caret-right")}</button>{name}</div>'
     return (f'<article class="card"><div class="stack" style="gap: var(--spacing-3)">{name}<div class="row" style="flex-wrap: wrap">{tags}</div>'
             f'<div class="row" style="justify-content: space-between">{user(k, unit)}<span class="row">'
             f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">{icon("i-table", "btn-icon")}</button>'
@@ -174,7 +176,7 @@ def dashboard():
     actions = (segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Initiatives shown') +
                f'\n          <button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions">{icon("i-dots-three-vertical", "btn-icon")}</button>')
     return f'''{head("TopTrack Dashboard", actions)}
-      {mobile('<div style="margin-bottom: var(--spacing-4)">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Initiatives shown') + '</div>')}
+      {mobile('<div class="ps-seg-fill" style="margin-bottom: var(--spacing-4)">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Initiatives shown') + '</div>')}
 
       <article class="card" style="margin-bottom: var(--spacing-6)">
         <div class="row" style="flex-wrap: wrap; gap: var(--spacing-3)">
@@ -199,12 +201,13 @@ def dashboard():
         </div>
       </article>
 
-      <div class="toolbar" style="margin-bottom: var(--spacing-3)">
+      {mobile_toolbar("Search by name, owner or function")}
+      <div class="toolbar" data-view="desktop" style="margin-bottom: var(--spacing-3)">
         <div class="input-icon input-icon-left toolbar-search">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" />
         </div>
-        {"".join(f'<span class="row" data-panel="view:{i}" hidden><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span>' for i in (0, 1))}
+        {"".join(f'<span data-panel="view:{i}" hidden><span class="row"><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span></span>' for i in (0, 1))}
         <span class="toolbar-spacer"></span>
         <button class="btn btn-icon-only btn-ghost" type="button" aria-label="View settings">{icon("i-controls", "btn-icon")}</button>
         {view_modes(2)}
@@ -704,13 +707,13 @@ def profile():
         return f'<div><span class="body-sm" {MUTED}>{label}</span><div>{value}</div></div>'
 
     def contact(ic, text):
-        return (f'<div class="row" style="justify-content: space-between"><span class="row">{icon(ic, "icon icon-16")}<a class="body-sm" href="#" {LINK}>{text}</a></span>'
+        return (f'<div class="row" style="justify-content: space-between; flex-wrap: nowrap"><span class="row" style="min-width: 0; flex-wrap: nowrap">{icon(ic, "icon icon-16")}<a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{text}</a></span>'
                 f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy">{icon("i-copy", "btn-icon")}</button></div>')
     return f'''{head("My Profile", '<a class="btn btn-secondary" href="../profile-edit/index.html" style="text-decoration: none">Edit profile</a>' + f'<button class="btn btn-icon-only btn-ghost" type="button" aria-label="More actions">{icon("i-dots-three-vertical", "btn-icon")}</button>')}
 
       <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-6)">
         <span class="avatar avatar-2xl">CK</span>
-        <div class="stack" style="flex: 1 1 200px; min-width: 0; gap: var(--spacing-2)">
+        <div class="stack" style="flex: 1 1 140px; min-width: 0; gap: var(--spacing-2)">
           <div class="row"><h2 class="h2" style="margin: 0">Cara Keane</h2><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Hear the name">{icon("i-sound-on", "btn-icon")}</button></div>
           <span class="body" {MUTED}>Delivery Manager</span>
           <span class="row body-sm" {MUTED}>{icon("i-cake", "icon icon-16")}March 14</span>
@@ -718,7 +721,7 @@ def profile():
         <div class="row"><span class="icon-tile">{icon("i-award")}</span><span class="icon-tile">{icon("i-badge-star")}</span></div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--spacing-6); margin: var(--spacing-6) 0; padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border)">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--spacing-6); margin: var(--spacing-6) 0; padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border)">
         {f("Manager", f'<a class="body" href="#" {LINK}>Lydia Kaminski</a>')}
         {f("Function", f'<a class="body" href="../team-profile/index.html" {LINK}>Operations</a>')}
         {f("Team", f'<a class="body" href="#" {LINK}>Delivery</a>')}
@@ -1574,6 +1577,7 @@ def dashboard_with_states():
                     for l, v in (('Idea', 9), ('Opportunity assessment', 0), ('Definition', 8), ('Execution', 31), ('Impact assessment', 7), ('Complete', 60), ('On hold', 18)))
     orow = ''.join(f'<tr><td><span class="cell-title">{n}</span><div>{tag("Initiative")}</div></td><td>{tag(st, kind)}</td><td>{health(*hh)}</td><td>{user(k, unit)}</td><td>{sub(road)}</td><td>{rob_cell(r)}</td><td>{raci_btn()}</td></tr>'
                    for n, st, kind, hh, k, unit, road, r in INITIATIVES[2:7])
+    ocards = ''.join(work_card(n, health(*hh) + tag("Initiative") + tag(st, kind), k, unit, caret=True) for n, st, kind, hh, k, unit, road, r in INITIATIVES[2:7])
     other = f'''<article class="card" style="margin-bottom: var(--spacing-6)">
         <div class="row" style="flex-wrap: wrap; gap: var(--spacing-3)"><span class="body"><span class="body-semibold">34</span> Initiatives</span>{icon("i-caret-right", "icon icon-16")}
           <span class="body"><span class="body-semibold">136</span> Projects</span>{icon("i-caret-right", "icon icon-16")}<span class="body"><span class="body-semibold">104</span> Sub-projects</span></div>
@@ -1587,11 +1591,13 @@ def dashboard_with_states():
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--spacing-3)">{stats}</div></div>
         </div>
       </article>
-      <div class="toolbar" style="margin-bottom: var(--spacing-4)">
+      {mobile_toolbar("Search by name, owner or function")}
+      <div data-view="desktop"><div class="toolbar" style="margin-bottom: var(--spacing-4)">
         <div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" /></div>
         <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button><button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
       </div>
-      {table(("Name", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting", '<span style="display: block; text-align: right">Actions</span>'), orow)}'''
+      {table(("Name", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting", '<span style="display: block; text-align: right">Actions</span>'), orow)}</div>
+      {mobile('<div class="stack">' + ocards + '</div>')}'''
     h = h.replace('<table class="table">', '<table class="table ps-striped">')
     h = h[:j] + '<div data-panel="scope:0">' + h[j:] + '</div>\n<div data-panel="scope:1" hidden>' + other + '</div>'
     k = '      <div class="table-scroll" style="max-height: none">'
@@ -1604,7 +1610,9 @@ def dashboard_with_states():
     comp = ''.join(f'<tr><td><span class="row"><span class="cell-title">{n}</span>{tag("Initiative")}</span></td><td>{sub(o)}</td><td>{sub(PEOPLE[k][0])}</td><td>{tag(st, kind)}</td>'
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     e = h.index('</div>\n<div data-panel="scope:1" hidden>')
-    h = (h[:i] + f'<div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:e] + '</div>' + h[e:])
+    ccards = ''.join(work_card(n, health(*hl.get(st, ("Not active", "light"))) + tag("Initiative") + tag(st, kind) + tag("# Core Strategy"), k, PEOPLE[k][1], caret=True) for o, k, n, d, st, kind in OBJECTIVES)
+    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0" hidden>{table(heads, det)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2">' + h[i:e] + '</div></div>'
+         + mobile('<div class="stack">' + ccards + '</div>') + h[e:])
     charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
     bars = [healthbar(170, 1, 1, 112), healthbar(206, 0, 6, 59)]
@@ -1643,7 +1651,48 @@ def rob_with_states():
              f'<button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters (2)</button><span class="toolbar-spacer"></span>{segmented(("Schedule", "Week", "Month"), 2, "Calendar view")}</div>'
              f'<div class="row" style="margin-bottom: var(--spacing-4)">{chip("Hide 1:1 Meetings")}{chip("Show sub teams: Yes")}</div>'
              f'<div class="row" style="justify-content: space-between; margin-bottom: var(--spacing-3)"><h2 class="h3" style="margin: 0">November 2026</h2>{nav}</div>'             + allgrid)
-    return with_tabs(h, 'rob', [allev])
+    t = '      <div class="toolbar" style="margin: var(--spacing-4) 0">'
+    assert h.count(t) == 1
+    j = h.index(t)
+    h = h[:j] + desktop(h[j:]) + mobile(rob_phone(False))
+    return with_tabs(h, 'rob', [desktop(allev) + mobile(rob_phone(True))])
+
+
+def minical(title, lead, days, tail, today, dots=()):
+    """A small month: seven weekdays across, the days before and after the
+    month greyed, today filled, a dot under days that have meetings."""
+    cells = ''.join(f'<span class="ps-minical-head">{d}</span>' for d in ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'))
+    cells += ''.join(f'<span class="ps-minical-day is-out">{d}</span>' for d in lead)
+    cells += ''.join(f'<button class="ps-minical-day{" is-today" if d == today else ""}{" has-events" if d in dots else ""}" type="button">{d}</button>' for d in range(1, days + 1))
+    cells += ''.join(f'<span class="ps-minical-day is-out">{d}</span>' for d in tail)
+    return (f'<div class="ps-minical"><div class="ps-minical-nav"><button class="btn btn-icon-only btn-ghost" type="button" aria-label="Previous month">{icon("i-chevron-left", "btn-icon")}</button>'
+            f'<span class="body-lg-semibold">{title}</span><button class="btn btn-icon-only btn-ghost" type="button" aria-label="Next month">{icon("i-chevron-right", "btn-icon")}</button></div>'
+            f'<div class="ps-minical-grid">{cells}</div></div>')
+
+
+def agenda(items):
+    """The day's meetings, one per line: time, name, a coloured rule at the
+    left. 'now' draws the line that marks the current time."""
+    out = []
+    for it in items:
+        if it == 'now':
+            out.append('<div class="ps-agenda-now"></div>')
+            continue
+        time, name, cls = it
+        out.append(f'<a class="ps-agenda-item {cls}" href="../rob-meeting-view/index.html"><span>{time}</span><span>{name}</span></a>')
+    return '<div class="ps-agenda">' + ''.join(out) + '</div>'
+
+
+def rob_phone(everyone):
+    chip = lambda t: f'<span class="chip">{t}<button class="chip-remove" type="button" aria-label="Remove">{icon("i-x", "")}</button></span>'
+    count = '<span class="count-badge">2</span>' if everyone else ''
+    bar = (f'<div class="toolbar" style="margin: var(--spacing-4) 0 var(--spacing-3)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search" aria-label="Search meetings" /></div>'
+           f'<button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters">{icon("i-filter", "btn-icon")}</button>{count}</div>')
+    chips = f'<div class="row" style="flex-wrap: wrap; margin-bottom: var(--spacing-4)">{chip("Hide 1:1 Meetings")}{chip("Show sub teams: Yes")}</div>' if everyone else ''
+    mine = [('10:30am - 11:30am', '[RoB] Onboarding in one week', 'is-past'), 'now', ('2:00pm - 3:00pm', 'Delivery All Hands', '')]
+    allm = [('10:00am - 10:30am', '[RoB] Onboarding in one week', 'is-past is-declined'), ('10:30am - 10:50am', 'Delivery daily sync-up', 'is-past is-declined'), ('11:00am - 11:30am', 'IT daily sync-up', 'is-past is-maybe'),
+            ('12:00pm - 1:00pm', '[RoB] Refund requests', ''), 'now', ('1:30pm - 1:55pm', '[RoB] Partner marketing sites', ''), ('2:00pm - 3:00pm', 'Delivery All Hands', ''), ('4:00pm - 4:30pm', '[RoB] Legal operations', '')]
+    return bar + chips + minical('November 2026', (26, 27, 28, 29, 30, 31), 30, (1, 2, 3, 4, 5, 6), 25, (25,)) + agenda(allm if everyone else mine)
 
 
 ATTRS = [('Brand', 'How customers, talent and the market see us'), ('Growth', 'New customers, markets and offerings'),
@@ -2081,7 +2130,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared with staging: Work History is a timeline with checkboxes, Time Off and the RoB tab have their period navigation and radios, lists of org units are striped, and two forms get their icons and hints.'),
     dict(date='Nov 25, 2026', span='12:28–12:34', minutes=6,
          screens=['profile', 'team-profile', 'team', 'time-off', 'processes'],
-         note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),
+         note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),    dict(date='Nov 25, 2026', span='12:34–12:41', minutes=7,
+         screens=['dashboard', 'rob-meetings', 'profile', 'processes', 'initiatives'],
+         note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),
 ]
 
 
@@ -2196,6 +2247,12 @@ def elements_page():
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
          '<div class="ps-action" style="max-width: 560px; margin-top: var(--spacing-2)"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>To do</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Send the refund policy to the partner team</p></div>'),
+        ('Small month', 'ps-minical', 'RoB Meetings on a phone: seven days across, today filled, a dot under a day with meetings.', 'rob-meetings/index.html',
+         '<div style="max-width: 360px">' + minical('November 2026', (26, 27, 28, 29, 30, 31), 30, (1, 2, 3, 4, 5, 6), 25, (25,)) + '</div>'),
+        ('Agenda', 'ps-agenda', 'RoB Meetings on a phone: the day’s meetings under the small month, past ones greyed, a line at the current time.', 'rob-meetings/index.html',
+         '<div style="max-width: 360px">' + agenda([('10:30am - 11:30am', '[RoB] Onboarding in one week', 'is-past'), 'now', ('2:00pm - 3:00pm', 'Delivery All Hands', '')]) + '</div>'),
+        ('Fill switch', 'ps-seg-fill', 'Dashboard on a phone: the kit’s segmented control stretched to the full row.', 'dashboard/index.html',
+         '<div class="ps-seg-fill" style="max-width: 360px">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Example switch') + '</div>'),
     ]
     out = []
     for name, cls, where, link, demo in items:

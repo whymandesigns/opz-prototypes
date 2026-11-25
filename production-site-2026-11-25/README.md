@@ -26,7 +26,7 @@ updated, and how long each took. The times come from `BATCHES` and `UPDATES`
 in `_src/screens.py`: add an entry there after every build or update pass.
 
 Where the kit has no component, the element is built here rather than
-approximated: `_src/elements.css` holds twenty of them (`ps-*` classes, kit
+approximated: `_src/elements.css` holds twenty-two of them (`ps-*` classes, kit
 tokens only, no media queries), and `elements/index.html` shows each one live
 as a candidate for `components.css`. The linter reports them as `local-class`
 warnings, which is the point: they are the list of what the kit is missing.
@@ -53,3 +53,10 @@ for f in production-site-2026-11-25/index.html production-site-2026-11-25/*/inde
 `_src/screens.py` holds each screen's content as kit markup; `_src/build.py`
 wraps it in designmd's `template/index.html`, the same shell
 `tools/new-prototype.py` copies.
+
+## Phone versions
+
+Every screen is one file that changes layout under 1024px. On staging, a phone
+is sent from Processes, Initiatives and OKRs to RoB Meetings: the product has
+no phone layout for those three lists. The reference keeps a phone layout for
+them anyway, built from the same cards as the dashboard.
