@@ -1052,7 +1052,7 @@ def paused_meetings():
 
 def not_found():
     return f'''      <div class="stack" style="align-items: center; justify-content: center; text-align: center; min-height: 60vh; gap: var(--spacing-2)">
-        <span class="icon-tile">{icon("i-exclamation")}</span>
+        {art("i-art-not-found", 112, "Page not found")}
         <h1 class="h3" style="margin: var(--spacing-2) 0 0">404</h1>
         <p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Page not found</p>
         <a class="btn btn-primary" href="../dashboard/index.html" style="text-decoration: none; margin-top: var(--spacing-3)">Go back to dashboard</a>
@@ -1610,7 +1610,7 @@ def raci_overlay(name):
 
 
 def no_access():
-    return f'''      <div class="alert alert-warning">{icon("i-warning", "icon alert-icon")}<p class="alert-message">You do not have rights to edit the Org Unit</p></div>'''
+    return f'''      <div class="alert alert-warning" style="border-radius: 0; border-width: 0 0 1px; padding-left: var(--spacing-12)">{icon("i-exclamation-solid" if False else "i-warning", "icon alert-icon")}<p class="alert-message">You do not have rights to edit the Org Unit</p></div>'''
 
 
 HEALTH_KIND = {'On track': 'positive', 'At risk': 'warning', 'Off track': 'negative', 'Not active': 'light'}
@@ -2277,7 +2277,7 @@ SCREENS = [
     dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
     dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
     dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=with_tabs(talent_profile(), 'talent', [empty_state('i-cpu-2', 'Rosa doesn’t own any Processes', 'No Processes yet')]), route='/talent/:talentId'),
-    dict(folder='no-access', batch=7, title='Edit org unit', nav='Team', main=no_access(), route='/teams/:teamId/edit'),
+    dict(folder='no-access', batch=7, title='Edit org unit', nav='Team', main=no_access(), padded=False, route='/teams/:teamId/edit'),
     dict(folder='sign-in', batch=5, plain=True, title='Log in', nav=None, main=sign_in(), route='/signin'),
     dict(folder='profile-public-edit', batch=3, title='Edit public profile', nav='People', main=public_profile_edit(), route='/people/:userId/edit-public-profile',
          ctas=[('btn-secondary', 'Cancel', 'i-x'), ('btn-primary', 'Save changes', 'i-check')]),
@@ -2367,7 +2367,7 @@ STAGING = {
     'people': ('/people/directory', True), 'profile': ('/people/me', True), 'team': ('/org-structure/org-units', True),
     'team-profile': ('/teams/1103', True), 'rob-paused-meetings': ('/rob/paused-meetings', True), 'profile-edit': ('/people/me/edit', True),
     'watercooler': ('/watercooler', True), 'time-off': ('/time-off', True), 'recognitions': ('/recognitions', True),
-    'peer-feedback': ('/peer-feedbacks', True), 'self-review': ('/people/me', False), 'not-found': ('/404', True),
+    'peer-feedback': ('/peer-feedbacks', True), 'self-review': ('/self-review/me', True), 'not-found': ('/404', True),
     'talent-profile': ('/org-structure/talents', False), 'no-access': ('/teams/1103/edit', True), 'sign-in': ('/signin', True),
     'profile-public-edit': ('/people/me/edit-public-profile', True),
 }
@@ -2442,7 +2442,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:45–13:49', minutes=4, screens='all',
          note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),    dict(date='Nov 25, 2026', span='13:49–13:52', minutes=3, screens=['initiative-view', 'initiative-create'],
          note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),    dict(date='Nov 25, 2026', span='13:56–14:00', minutes=4, screens=['initiative-create', 'profile-edit', 'rob-meeting-view'],
-         note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),
+         note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),    dict(date='Nov 25, 2026', span='14:00–14:04', minutes=4, screens=['not-found', 'no-access', 'self-review', 'talent-profile', 'rob-paused-meetings', 'profile-public-edit'],
+         note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),
 ]
 
 
@@ -2599,6 +2600,7 @@ def icons_page():
         ('Badge: Inspiring', 'i-badge-inspiring', badge_where + '.', 'recognitions/index.html#tab-1', big('i-badge-inspiring', 'Inspiring')),
         ('Empty list', 'i-art-empty-list', 'Recognitions: the drawing above “No recognitions”.', 'recognitions/index.html', big('i-art-empty-list', 'Empty list')),
         ('Roadmap', 'i-roadmap', 'Dashboard, Roadmap column.', 'dashboard/index.html', line('i-roadmap')),
+        ('Page not found', 'i-art-not-found', 'The 404 page: the drawing above “Page not found”.', 'not-found/index.html', big('i-art-not-found', 'Page not found')),
         ('Nothing owned', 'i-art-empty-alert', 'Profile and Team Profile, Processes tab: the drawing above “No Processes yet”.', 'profile/index.html#tab-2', big('i-art-empty-alert', 'Nothing owned')),
     ]
     return library_page('New icons', 'icons', items)
