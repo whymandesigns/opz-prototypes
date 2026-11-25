@@ -35,6 +35,25 @@ def find_designmd():
 
 
 TEMPLATE = (find_designmd() / 'template' / 'index.html').read_text()
+ELEMENTS = '<style>\n' + (HERE / 'elements.css').read_text() + '</style>\n'
+
+
+def finish(html):
+    """What every screen gets after its content is written: the anchor nav in
+    place of ghost buttons, the kit's editor in place of a bare textarea, and
+    the hooks the search box filters on."""
+    def nav(m):
+        links = re.sub(r'<a class="btn btn-ghost" href="([^"]+)" style="[^"]*">', r'<a class="ps-anchor body-sm" href="\1">', m.group(1)).replace('class="btn-icon"', 'class="icon icon-16"')
+        links = links.replace('class="ps-anchor body-sm"', 'class="ps-anchor body-sm is-active"', 1)
+        return f'<nav class="ps-anchors" data-view="desktop" aria-label="Sections">{links}</nav>'
+    html = re.sub(r'<nav class="stack" data-view="desktop" aria-label="Sections" style="[^"]*">(.*?)</nav>', nav, html, flags=re.S)
+    html = re.sub(r'<textarea class="input" rows="\d+"(?: placeholder="([^"]*)")?></textarea>', lambda m: screens.editor(m.group(1) or ''), html)
+    html = html.replace('<tr><td>', '<tr data-search-item><td>')
+    html = html.replace('<article class="card"><div class="stack" style="gap: var(--spacing-3)">', '<article class="card" data-search-item><div class="stack" style="gap: var(--spacing-3)">')
+    html = re.sub(r'(<div class="input-icon input-icon-left toolbar-search">\s*<svg[^>]*>.*?</svg>\s*<input class="input")', r'\1 data-search', html, flags=re.S)
+    return html
+
+
 
 NAV = [  # label, icon, screen folder
     ('Dashboard', 'i-dashboard', 'dashboard'),
@@ -98,6 +117,30 @@ VIEW_SCRIPT = '''  <script>
       });
     };
     addEventListener('hashchange', route); route();
+
+    // Work lists: a caret folds a row's children; Expand all does every row.
+    const fold = (btn, on) => {
+      btn.setAttribute('aria-expanded', String(on));
+      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => show(r, on));
+    };
+    document.addEventListener('click', e => {
+      const caret = e.target.closest('[data-rows]');
+      if (caret) fold(caret, caret.getAttribute('aria-expanded') !== 'true');
+      const all = e.target.closest('[data-expand-all]');
+      if (all) {
+        const on = all.textContent.trim() === 'Expand all';
+        all.textContent = on ? 'Collapse all' : 'Expand all';
+        document.querySelectorAll('[data-rows]').forEach(b => fold(b, on));
+      }
+      const anchor = e.target.closest('.ps-anchor');
+      if (anchor) anchor.parentElement.querySelectorAll('.ps-anchor').forEach(a => a.classList.toggle('is-active', a === anchor));
+    });
+    // The search box filters the rows and cards on the page as you type.
+    document.addEventListener('input', e => {
+      if (!e.target.matches('[data-search]')) return;
+      const q = e.target.value.trim().toLowerCase();
+      document.querySelectorAll('[data-search-item]').forEach(el => show(el, !q || el.textContent.toLowerCase().includes(q)));
+    });
   })();
   </script>
 '''
@@ -129,6 +172,11 @@ def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
     if overlays:
         i = t.index('\n  <script>')
         t = t[:i] + '\n' + overlays + t[i:]
+    brand = re.search(r'<a class="topbar-brand" href="#">.*?</a>', t, flags=re.S)
+    t = t[:brand.end()] + '''
+    <div class="dropdown" data-view="desktop"><button class="ps-bizline body-sm-semibold dropdown-trigger" type="button" aria-expanded="false">All Business Lines<svg class="icon icon-16" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+      <div class="dropdown-menu dropdown-menu-start" id="bizline-menu" hidden><button class="dropdown-item is-selected" type="button">All Business Lines</button><button class="dropdown-item" type="button">Services</button><button class="dropdown-item" type="button">Operationalize</button></div></div>''' + t[brand.end():]
+    t = finish(t).replace('</head>', ELEMENTS + '</head>')
     return t.replace('</body>', VIEW_SCRIPT + '</body>')
 
 
@@ -144,7 +192,7 @@ def plain(title, body):
   <link rel="stylesheet" href="../../designmd/tokens.css" />
   <link rel="stylesheet" href="../../designmd/semantic.css" />
   <link rel="stylesheet" href="../../designmd/components.css" />
-</head>
+{ELEMENTS}</head>
 <body>
   <main style="max-width: 1200px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
 {body}
@@ -168,6 +216,8 @@ def main():
         (d / 'index.html').write_text(html)
         built.append(s['folder'])
     (OUT / 'index.html').write_text(plain('Production site · Nov 25, 2026', screens.index()))
+    (OUT / 'elements').mkdir(exist_ok=True)
+    (OUT / 'elements' / 'index.html').write_text(plain('New elements · Production site', screens.elements_page()).replace('../../designmd/', '../../../designmd/'))
     print('wrote', len(built), 'screens:', ', '.join(built))
 
 

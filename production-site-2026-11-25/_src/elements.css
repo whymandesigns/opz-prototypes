@@ -1,0 +1,109 @@
+/* === production-site elements ===
+ * Elements the product has and the kit does not. Each one is built here, on the
+ * kit's tokens, so the reference can match the product; elements/index.html
+ * shows them all as candidates for components.css. The prefix is ps-.
+ * No @media in here: where a layout changes on a phone, the page's data-view
+ * blocks do it. */
+
+/* Bar chart: counts per status on the dashboard */
+.ps-bars { display: flex; align-items: flex-end; gap: var(--spacing-3); height: 168px; }
+.ps-bar { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: var(--spacing-2); }
+.ps-bar-col { width: 100%; max-width: 48px; min-height: 24px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: var(--spacing-1); border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--color-border-strong); color: var(--color-text); font-weight: 600; }
+.ps-bar.is-accent .ps-bar-col { background: var(--color-accent); color: var(--color-text-inverse); }
+.ps-bar.is-success .ps-bar-col { background: var(--color-success); color: var(--color-text-inverse); }
+.ps-bar.is-empty .ps-bar-col { background: none; }
+.ps-bar-label { min-height: 2.8em; max-width: 100%; text-align: center; overflow-wrap: anywhere; color: var(--color-text-muted); }
+
+/* Health bar: one track split into on track, at risk, off track, not active */
+.ps-health { display: flex; height: 8px; border-radius: var(--radius-full); overflow: hidden; background: var(--color-surface-sunken); }
+.ps-health > span { height: 100%; }
+.ps-health > .is-success { background: var(--color-success); }
+.ps-health > .is-warning { background: var(--color-warning); }
+.ps-health > .is-danger { background: var(--color-danger); }
+
+/* Month calendar */
+.ps-cal-scroll { overflow-x: auto; }
+.ps-cal { display: grid; grid-template-columns: repeat(5, minmax(168px, 1fr)); min-width: 840px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
+.ps-cal-head { padding: var(--spacing-2); text-align: center; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); background: var(--color-surface-muted); border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); }
+.ps-cal-day { min-height: 136px; padding: var(--spacing-2); display: flex; flex-direction: column; gap: var(--spacing-1); border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); min-width: 0; }
+.ps-cal-num { align-self: flex-end; min-width: 20px; padding: 0 var(--spacing-1); text-align: center; color: var(--color-text-muted); }
+.ps-cal-day.is-today .ps-cal-num { border-radius: var(--radius-full); background: var(--color-accent); color: var(--color-text-inverse); }
+.ps-cal-event { display: block; min-width: 0; padding: var(--spacing-1) var(--spacing-2); border-left: 2px solid var(--color-border-strong); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: inherit; text-decoration: none; }
+.ps-cal-event:hover { background: var(--color-surface-muted); }
+.ps-cal-event.is-mine { border-left-color: var(--color-accent); }
+.ps-cal-event-title, .ps-cal-event-meta { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ps-cal-event-meta { color: var(--color-text-muted); }
+.ps-cal-more { padding-left: var(--spacing-2); color: var(--color-text-link); text-decoration: none; }
+
+/* Week grid: hours down, weekdays across */
+.ps-week { display: grid; grid-template-columns: 72px repeat(5, minmax(150px, 1fr)); min-width: 840px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
+.ps-week-head { padding: var(--spacing-2); text-align: center; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); background: var(--color-surface-muted); border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); }
+.ps-week-time { padding: var(--spacing-1) var(--spacing-2); text-align: right; color: var(--color-text-muted); border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); }
+.ps-week-slot { min-height: 48px; padding: 2px; border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); min-width: 0; }
+
+/* Mini month: the time-off calendar on a profile */
+.ps-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.ps-month-dow, .ps-month-day { padding: var(--spacing-2) 0; text-align: center; }
+.ps-month-dow { color: var(--color-text-muted); text-transform: uppercase; }
+.ps-month-day.is-outside { color: var(--color-text-subtle); }
+.ps-month-day.is-off { background: var(--color-warning-subtle); border-radius: var(--radius-sm); }
+.ps-month-day.is-today { box-shadow: inset 0 0 0 1px var(--color-accent); border-radius: var(--radius-sm); }
+
+/* Out-of-office grid: one row per person, one column per day */
+.ps-ooo { display: grid; min-width: 760px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
+.ps-ooo-head, .ps-ooo-cell, .ps-ooo-name { border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); }
+.ps-ooo-head { padding: var(--spacing-1) 0; text-align: center; color: var(--color-text-muted); background: var(--color-surface-muted); }
+.ps-ooo-head.is-weekend, .ps-ooo-cell.is-weekend { background: var(--color-surface-sunken); }
+.ps-ooo-name { padding: var(--spacing-2) var(--spacing-3); }
+.ps-ooo-cell.is-off { background: var(--color-warning); }
+
+/* Pagination */
+.ps-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-1); margin-top: var(--spacing-4); }
+.ps-page { min-width: 28px; height: 28px; padding: 0 var(--spacing-2); display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font: inherit; font-weight: 600; cursor: pointer; }
+.ps-page:hover { background: var(--color-surface-muted); }
+.ps-page.is-current { background: var(--color-text); border-color: var(--color-text); color: var(--color-text-inverse); }
+.ps-page:disabled { color: var(--color-text-subtle); cursor: default; }
+.ps-page-gap { padding: 0 var(--spacing-1); color: var(--color-text-muted); }
+
+/* Empty state */
+.ps-empty { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-2); padding: var(--spacing-12) var(--spacing-4); text-align: center; }
+.ps-empty-art { width: 72px; height: 72px; display: grid; place-items: center; margin-bottom: var(--spacing-2); border: 1px solid var(--color-accent); border-radius: var(--radius-full); background: var(--color-accent-subtle); color: var(--color-accent); font-size: 32px; }
+
+/* Anchor nav: the list of sections beside a long page */
+.ps-anchors { position: sticky; top: var(--spacing-6); flex: 0 0 200px; display: flex; flex-direction: column; gap: var(--spacing-1); }
+.ps-anchor { display: flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-2) var(--spacing-3); border-radius: var(--radius-sm); color: var(--color-text-muted); font-weight: 600; text-decoration: none; }
+.ps-anchor:hover, .ps-anchor.is-active { background: var(--color-surface-muted); color: var(--color-text); }
+
+/* Popover panel: filters that drop from a toolbar button */
+.ps-popover-anchor { position: relative; height: 0; }
+.ps-popover { position: absolute; top: calc(-1 * var(--spacing-2)); left: 0; z-index: 20; width: 760px; max-width: 100%; padding: var(--spacing-6); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-2); }
+
+/* Reporting tree: who reports to whom, as a node-and-line tree */
+.ps-tree, .ps-tree ul { list-style: none; margin: 0; padding: 0; }
+.ps-tree ul { margin-left: var(--spacing-3); padding-left: var(--spacing-10); border-left: 1px solid var(--color-border-strong); }
+.ps-tree li { padding: var(--spacing-2) 0; }
+.ps-tree-node { position: relative; display: inline-flex; align-items: center; gap: var(--spacing-3); color: inherit; text-decoration: none; }
+.ps-tree ul .ps-tree-node::before { content: ""; position: absolute; right: 100%; top: 50%; width: var(--spacing-10); border-top: 1px solid var(--color-border-strong); }
+.ps-tree-dot { flex: none; width: 12px; height: 12px; border: 2px solid var(--color-accent); border-radius: var(--radius-full); background: var(--color-surface); }
+.ps-tree-node.is-current .ps-tree-dot { background: var(--color-accent); }
+.ps-tree-node.is-current .ps-tree-name { color: var(--color-text-link); }
+.ps-tree-name, .ps-tree-role { display: block; }
+.ps-tree-role { color: var(--color-text-muted); }
+
+/* Map panel: where people are. A placeholder field with pins, not a real map */
+.ps-map { position: relative; min-height: 420px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background-color: var(--color-surface-muted); background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1px); background-size: 24px 24px; }
+.ps-map.is-small { min-height: 140px; }
+.ps-map-pin { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--color-surface); border-radius: var(--radius-full); background: var(--color-accent); }
+.ps-map-count { position: absolute; left: var(--spacing-3); bottom: var(--spacing-3); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); background: var(--color-surface); }
+
+/* OKR card: an objective with its key results */
+.ps-okr { border: 1px solid var(--color-border); border-left: 3px solid var(--color-accent); border-radius: var(--radius-sm); background: var(--color-surface); }
+.ps-okr-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); padding: var(--spacing-3) var(--spacing-4); }
+.ps-okr-kr { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--spacing-2) var(--spacing-4); padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) var(--spacing-8); border-top: 1px solid var(--color-border); }
+.ps-okr-pct { min-width: 40px; text-align: right; font-weight: 600; }
+
+/* Business line switcher in the top bar */
+.ps-bizline { display: inline-flex; align-items: center; gap: var(--spacing-2); height: 32px; margin-left: var(--spacing-3); padding: 0 var(--spacing-3); border: 0; border-left: 1px solid var(--color-text-inverse); background: none; color: var(--color-text-inverse); font: inherit; cursor: pointer; }
+
+/* Tree rows in a work list: child rows sit under a parent and fold away */
+.ps-row-child > td:first-child { padding-left: var(--spacing-10); box-shadow: inset 3px 0 0 var(--color-border-strong); }
