@@ -2133,7 +2133,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared the remaining tabs and drawers with staging: Action Items is the grey box with its done mark, Show is a row of radios, talents carry the T mark and a manager with a picture, OOO details has its own type and status filters, and Create Process folds its optional fields under More details.'),    dict(date='Nov 25, 2026', span='12:34–12:41', minutes=7,
          screens=['dashboard', 'rob-meetings', 'profile', 'processes', 'initiatives'],
          note='Compared the phone versions with staging: the dashboard list is cards with its own search, filter and sort, the status chart scrolls sideways, RoB Meetings is a small month with the day’s agenda, and the profile header and fields sit two across.'),    dict(date='Nov 25, 2026', span='12:59–13:04', minutes=5, screens=[],
-         note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),
+         note='Compared the remaining phone screens with staging and found nothing to change. Each new element got an Add to library button, with the script that moves it into the kit.'),    dict(date='Nov 25, 2026', span='13:05–13:10', minutes=5, screens=[],
+         note='Elements page: an element moved into the library stays listed with an Added to library badge and the date, and a filter on top shows all, added, or not yet in the library.'),
 ]
 
 
@@ -2263,20 +2264,44 @@ def elements_page():
         kit = next(p for p in (here.parents[3] / 'designmd' / 'dist' / 'kit.json', here.parents[2] / 'designmd' / 'dist' / 'kit.json') if p.exists()).read_text()
     except Exception:
         kit = ''
+    try:   # what promote.py has moved into the library, and when
+        added = _json.loads((_P(__file__).resolve().parent / 'promoted.json').read_text())
+    except Exception:
+        added = {}
+    n_added = 0
     for name, cls, where, link, demo in items:
         slug = cls.replace('ps-', 'el-')
         ask = f'Add the {name} element (.{cls}) from production-site-2026-11-25 to the Icarus library: python3 production-site-2026-11-25/_src/promote.py {cls}'
-        lib = (tag('In library', 'positive') if f'"{cls}"' in kit else
+        inlib = cls in added or f'"{cls}"' in kit
+        n_added += inlib
+        lib = (tag('Added to library' + (' · ' + added[cls] if cls in added else ''), 'positive') if inlib else
                f'<button class="btn btn-secondary btn-xs" type="button" data-add-to-library="{ask}">{icon("i-plus", "btn-icon")}<span>Add to library</span></button>')
-        out.append(f'<section class="stack" id="{slug}" style="gap: var(--spacing-3); padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border)">'
+        out.append(f'<section class="stack" id="{slug}" data-lib="{"added" if inlib else "new"}" style="gap: var(--spacing-3); padding: var(--spacing-6) 0; border-top: 1px solid var(--color-border)">'
                    f'<div class="row" style="flex-wrap: wrap; justify-content: space-between"><div><h2 class="h3" style="margin: 0">{name}</h2>'
                    f'<p class="body-sm" style="margin: var(--spacing-1) 0 0; color: var(--color-text-muted)">{where}</p></div>'
                    f'<div class="row"><code class="body-sm">.{cls}</code><a class="btn btn-secondary btn-xs" href="../{link}" style="text-decoration: none">See it in place</a>{lib}</div></div>{demo}</section>')
     return f'''    <p class="body-sm" style="margin: 0 0 var(--spacing-2)"><a href="../index.html" {LINK}>Production site · Nov 25, 2026</a></p>
     <h1 class="h1" style="margin: 0 0 var(--spacing-2)">New elements</h1>
-    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. They are candidates for the library. <span class="body-semibold">Add to library</span> copies the request for that element: paste it to Claude, or run the command in it, and the element moves into <code>components.css</code> and shows here as In library.</p>
+    <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">What the product has and the kit does not. Each of these {len(items)} elements was built for the reference screens on the kit’s tokens, in one stylesheet, <code>_src/elements.css</code>. They are candidates for the library. <span class="body-semibold">Add to library</span> copies the request for that element: paste it to Claude, or run the command in it, and the element moves into <code>components.css</code>. It stays on this page with an <span class="body-semibold">Added to library</span> badge, so the filter below gives developers the list of library elements they still have to implement.</p>
+    <div class="segmented" role="group" aria-label="Elements shown" data-lib-filter style="margin-bottom: var(--spacing-6)">
+      <button class="segmented-item is-active" type="button" data-show="all">All {len(items)}</button>
+      <button class="segmented-item" type="button" data-show="added">Added to library {n_added}</button>
+      <button class="segmented-item" type="button" data-show="new">Not in library yet {len(items) - n_added}</button>
+    </div>
+    <p class="body-sm" data-lib-none hidden style="margin: 0; color: var(--color-text-muted)">Nothing here yet.</p>
     {"".join(out)}
     <script>
+    const filter = show => {{
+      let n = 0;
+      document.querySelectorAll('section[data-lib]').forEach(s => {{ const on = show === 'all' || s.dataset.lib === show; s.style.display = on ? '' : 'none'; n += on; }});
+      document.querySelectorAll('[data-lib-filter] .segmented-item').forEach(b => b.classList.toggle('is-active', b.dataset.show === show));
+      document.querySelector('[data-lib-none]').hidden = n > 0;
+    }};
+    document.addEventListener('click', e => {{
+      const f = e.target.closest('[data-lib-filter] .segmented-item');
+      if (f) {{ filter(f.dataset.show); history.replaceState(null, '', '#' + f.dataset.show); }}
+    }});
+    if (['added', 'new'].includes(location.hash.slice(1))) filter(location.hash.slice(1));
     document.addEventListener('click', e => {{
       const b = e.target.closest('[data-add-to-library]');
       if (!b) return;

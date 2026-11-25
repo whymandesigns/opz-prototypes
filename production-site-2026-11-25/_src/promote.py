@@ -8,15 +8,19 @@
 The element's rules leave _src/elements.css and are appended to designmd's
 components.css; the kit packages are regenerated so dist/kit.json lists the
 classes, and the reference is rebuilt. From then on the linter treats the
-element as a kit class, the elements page shows it as "In library", and the
-next screen takes it from the library instead of building it again.
+element as a kit class and the next screen takes it from the library instead
+of building it again. The element stays on the elements page with an "Added
+to library" badge and its date (kept in promoted.json), so developers can
+filter the page to the library elements they still have to implement.
 
 It edits the designmd checkout next to this one and commits nothing: review
 the diff there and commit it as any other library change.
 """
+import json
 import re
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -61,6 +65,10 @@ def main(argv):
         return
     lib.write_text(lib.read_text().rstrip('\n') + add)
     CSS.write_text('\n\n'.join(b.strip('\n') for b in keep) + '\n')
+    log = HERE / 'promoted.json'   # the elements page reads this for its badge and filter
+    done = json.loads(log.read_text()) if log.exists() else {}
+    done.update({n: date.today().strftime('%b %-d, %Y') for n in names})
+    log.write_text(json.dumps(done, indent=2) + '\n')
     subprocess.run([sys.executable, str(designmd() / 'tools' / 'build-packages.py')], check=True)
     subprocess.run([sys.executable, str(HERE / 'build.py')], check=True)
     print('moved into the library: ' + ', '.join(names) + '\nNext: lint and inline the reference, then commit designmd and this repo.')

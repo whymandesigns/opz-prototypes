@@ -70,7 +70,10 @@ with the command behind it:
 
 The script moves that element's rules from `_src/elements.css` into designmd's
 `components.css`, regenerates `dist/kit.json` and rebuilds the reference. The
-element then shows as "In library", the linter stops flagging it as local, and
-the next screen picks it up from the kit. `--list` shows what can be moved,
+element stays on the elements page with an "Added to library" badge and the
+date (recorded in `_src/promoted.json`), the linter stops flagging it as
+local, and the next screen picks it up from the kit. The filter at the top of
+the page (`elements/#added`) lists just the added ones: that is the list to
+hand to developers, who do not have them in their library yet. `--list` shows what can be moved,
 `--dry-run` shows the change without making it. Nothing is committed: review
 and commit the designmd change as any other.
