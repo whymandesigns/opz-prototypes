@@ -552,6 +552,10 @@ def user_marked(k, mark='', size='md'):
             f'<span class="cell-user-name">{name}</span><span class="cell-user-role">{r}</span></div></div>')
 
 
+def raci_letter(r):
+    return f'<span class="ps-raci is-{r.lower()}">{r}</span>' if r else ''
+
+
 def rob_meeting_view():
     def sec(title, inner, sid):
         return f'<section class="stack" id="mv-{sid}"><h3 class="h4" {RULE}>{title}</h3>{inner}</section>'
@@ -569,7 +573,7 @@ def rob_meeting_view():
               <div class="row">{icon("i-org-unit", "icon icon-16")}<span class="body-sm">Services</span></div>
             </div>
             <div class="row" style="align-items: flex-start">{icon("i-list-unordered", "icon icon-16")}<p class="body-sm" style="margin: 0">A weekly working session for the team that runs Onboarding in one week: a short round of status, then decisions and actions.</p></div>'''
-    people = ''.join(f'<div class="row" style="justify-content: space-between">{user_marked(k, m)}{tag(r, "positive") if r else ""}</div>'
+    people = ''.join(f'<div class="row" style="justify-content: space-between">{user_marked(k, m)}{raci_letter(r)}</div>'
                      for k, m, r in (('ck', 'yes', 'R'), ('lh', 'yes', 'R'), ('tl', 'no', ''), ('lk', 'yes', 'C'), ('nr', 'yes', ''), ('el', '', '')))
     def item(no, text, freq, k):
         return (f'<div class="ps-agenda-row"><span class="body-sm" {MUTED}>{no}</span><span class="body-sm">{text}</span>{tag(freq)}'
@@ -613,7 +617,7 @@ def rob_meeting_view():
           </div>
           <div class="stack" style="flex: 2 1 240px; min-width: 0">
             <h3 class="h4" style="margin: 0">Owner</h3>
-            <div class="row" style="justify-content: space-between">{user_marked("sr", "yes")}{tag("A", "negative")}</div>
+            <div class="row" style="justify-content: space-between">{user_marked("sr", "yes")}<span class="ps-raci is-a">A</span></div>
             <h3 class="h4 row" style="margin: var(--spacing-4) 0 0">Participants <span class="count-badge count-badge-secondary">6</span>{icon("i-info", "icon icon-16")}</h3>
             {people}
           </div>
@@ -717,16 +721,30 @@ def people():
       {pager()}'''
 
 
+UNIT_OF = {'ho': '', 'sr': 'Operations', 'lk': 'Operations', 'ck': 'Delivery', 'lh': 'Delivery', 'tl': 'Delivery', 'nr': 'Delivery', 'el': 'IT', 'ac': 'People',
+           'ad': 'Partnerships', 'og': 'Legal', 'jp': 'Learning & Development', 'mv': 'Recruiting', 'mt': 'Business Analytics', 'km': 'Northwind Hire'}
+
+
+def short(name):
+    first, last = name.split(' ', 1)
+    return f'{first} {last[0]}.'
+
+
 def org_node(k, role=None):
+    """A person's card as the product draws it: short name and role on one
+    line, the unit as a link under it."""
     name, r = PEOPLE[k]
-    return (f'<div class="org-node"><span class="avatar avatar-lg">{ini(k)}</span><div class="org-node-meta"><span class="org-node-name">{name}</span>'
-            f'<span class="org-node-role">{role or r}</span></div></div>')
+    unit = UNIT_OF.get(k, '')
+    under = f'<a class="org-node-role" href="../team-profile/index.html" {LINK}>{unit}</a>' if unit else ''
+    return (f'<div class="org-node"><span class="avatar avatar-lg">{ini(k)}</span><div class="org-node-meta"><span class="ps-node-line"><span class="body-sm-semibold">{short(name)}</span> '
+            f'<span class="body-xs" {MUTED}>{role or r}</span></span>{under}</div></div>')
 
 
 def talent_node(name, role):
     initials = ''.join(w[0] for w in name.split())
     return (f'<div class="org-node"><span class="ps-avatar-wrap"><span class="avatar avatar-md">{initials}</span><span class="ps-avatar-mark is-talent" title="Talent network member">T</span></span>'
-            f'<div class="org-node-meta"><span class="org-node-name">{name}</span><span class="org-node-role">{role}</span></div></div>')
+            f'<div class="org-node-meta"><span class="ps-node-line"><span class="body-sm-semibold">{short(name)}</span> <span class="body-xs" {MUTED}>{role}</span></span>'
+            f'<a class="org-node-role" href="#" {LINK}>Operations</a></div></div>')
 
 
 def chain(ancestors, peers, current):
@@ -981,7 +999,7 @@ def self_review():
     def q(text):
         return (f'<div><p class="body-sm" style="margin: 0 0 var(--spacing-2)">{text}</p>'
                 f'<div class="card"><span class="body" {MUTED}>—</span></div></div>')
-    return f'''{head("Self-review")}
+    return f'''{head('<a class="body-sm" href="../profile/index.html" style="color: var(--color-text-link); text-decoration: none; font-weight: var(--font-weight-regular); margin-right: var(--spacing-3)">‹ Back</a>Self-review')}
 
       <div class="stack" style="max-width: 800px; margin: 0 auto; gap: var(--spacing-6)">
         <div class="row" style="justify-content: space-between">{user("ck")}<button class="btn btn-secondary" type="button">Edit</button></div>
@@ -1099,12 +1117,17 @@ def talent_profile():
       {tabs(("Initiatives", "Processes"))}
 
       {mobile('<div class="stack" style="margin-top: var(--spacing-4)">' + cards + '</div>')}
-      <div class="table-scroll" style="max-height: none; margin-top: var(--spacing-4)" data-view="desktop">
-        <table class="table">
-          <thead><tr><th>Name</th><th>Status</th><th>RoB Meeting</th><th>Roles</th><th style="text-align: right">Actions</th></tr></thead>
-          <tbody>{rows}</tbody>
-        </table>
-      </div>'''
+      <div style="margin-top: var(--spacing-4)" data-view="desktop">{talent_tree()}</div>'''
+
+
+def talent_tree():
+    tree = [(None, None, ('Onboarding in one week', 'Execution', 'On track', 'sr', 'Operations', ('Dec 01 • 4:00pm', 'Every week on Tuesday', False), [
+        ('Kick-off checklist', 'Execution', 'On track', 'ck', 'Delivery', ('Dec 01 • 5:30pm', 'Every week on Tuesday', False), [
+            ('First-week survey', 'Complete', 'On track', 'tl', 'Delivery', None, [])])]))]
+    h = tree_table(tree, cols=('status', 'rob', 'roles', 'actions'), prefix='talent', sticky=False, tags=lambda name, level: tag('# Core Strategy') if level == 0 else '',
+                   roles={'First-week survey': 'R'})
+    h = h.replace('aria-expanded="false"', 'aria-expanded="true"').replace(' hidden>', '>')   # the product shows this one open
+    return h.replace('<th style="width: 30%"><span class="row" style="gap: var(--spacing-2); flex-wrap: nowrap">Name<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></span></th>', '<th style="width: 30%">Name</th>')
 
 
 def public_profile_edit():
@@ -1634,11 +1657,11 @@ DASH_TREE = [
 ]
 KINDS = ('Initiative', 'Project', 'Sub-project')
 TREE_COLS = {'objective': ('Strategic Objective', 192), 'owner': ('Objective Owner', 136), 'status': ('Status', 144), 'health': ('Health', 96),
-             'acc': ('Accountability', 152), 'roadmap': ('Roadmap', 88), 'rob': ('RoB Meeting', 184), 'actions': ('Actions', 104)}
+             'acc': ('Accountability', 152), 'roadmap': ('Roadmap', 88), 'rob': ('RoB Meeting', 184), 'roles': ('Roles', 80), 'actions': ('Actions', 104)}
 
 
 def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roadmap', 'rob', 'actions'), kinds=KINDS, prefix='dash', sticky=True,
-               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs='', compact=False):
+               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs='', compact=False, roles=None):
     """A work list as the product draws it: rows that open a second and a
     third layer. With sticky, the name column stays put while the rest scrolls
     sideways (the dashboard); without, the table fills the page (the lists).
@@ -1669,7 +1692,7 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
                 'health': lambda: health(hlth, HEALTH_KIND[hlth]),
                 'acc': lambda: f'<span class="body-sm-semibold" style="white-space: nowrap">{PEOPLE[k][0]}</span>' if compact else user(k, unit),
                 'roadmap': lambda: (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>' if level == 0 else ''),
-                'rob': lambda: meet, 'actions': raci_btn}
+                'rob': lambda: meet, 'roles': lambda: raci_letter((roles or {}).get(name, '')), 'actions': raci_btn}
         hide = f' data-child-of="{parent}" hidden' if parent else ''
         out.append(f'<tr class="ps-wtree-row" data-search-item{hide}><td>{first}</td>' + ''.join(f'<td>{cell[c]()}</td>' for c in cols) + '</tr>')
         for kid in kids:
@@ -1840,7 +1863,8 @@ def rob_with_states():
     h = toggle(h, 'Filters', 'rob-filters')
     # All events: the same month, every team's meetings, with the two default filters on
     more = {2: 40, 3: 60, 4: 53, 5: 58, 6: 38, 9: 43, 10: 60, 11: 53, 12: 58, 13: 35, 16: 39, 17: 55, 18: 46, 19: 58, 20: 36}
-    allgrid = cal_month([[2, 3, 4, 5, 6], [9, 10, 11, 12, 13], [16, 17, 18, 19, 20]],
+    more.update({23: 44, 24: 61, 25: 52, 26: 57, 27: 36, 30: 41})
+    allgrid = cal_month([[2, 3, 4, 5, 6], [9, 10, 11, 12, 13], [16, 17, 18, 19, 20], [23, 24, 25, 26, 27], [30, None, None, None, None]],
                         lambda d: [('[RoB] Onboarding in one week', '10:00am Operations', True), ('Delivery daily sync-up', '10:30am Delivery', False), ('IT daily sync-up', '11:00am IT', False)], more)
     chip = lambda t: f'<span class="chip">{t}<button class="chip-remove" type="button" aria-label="Remove">{icon("i-x", "")}</button></span>'
     allev = (f'<div class="toolbar" style="margin-bottom: var(--spacing-3)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search" aria-label="Search meetings" /></div>'
@@ -2115,7 +2139,7 @@ def cal_month(weeks, events, more=None, today=25):
             ev = ''.join(f'<a class="ps-cal-event{" is-mine" if mine else ""}" href="../rob-meeting-view/index.html"><span class="ps-cal-event-title body-sm">{t}</span>'
                          f'<span class="ps-cal-event-meta body-xs">{m}</span></a>' for t, m, mine in events(d))
             extra = f'<a class="ps-cal-more body-xs-semibold" href="#">{more[d]} More</a>' if more and d in more else ''
-            cells += f'<div class="ps-cal-day{" is-today" if d == today else ""}"><span class="ps-cal-num body-xs">{d:02d}</span>{ev}{extra}</div>'
+            cells += f'<div class="ps-cal-day{" is-today" if d == today else " is-past" if d < today else ""}"><span class="ps-cal-num body-xs">{d:02d}</span>{ev}{extra}</div>'
     return f'<div class="ps-cal-scroll"><div class="ps-cal">{heads}{cells}</div></div>'
 
 
@@ -2232,20 +2256,31 @@ def people_panels():
     return [tree, geo]
 
 
+def okr_bar(quarters=(), who='', attributes=True):
+    """The OKR toolbar as each tab has it: a narrow search, then a period
+    switch, an owner filter and the sort, pushed to the right."""
+    seg = segmented(quarters, len(quarters) - 1 if quarters[:1] != ('Full year',) else 0, 'Period') if quarters else ''
+    return (f'<div class="toolbar" style="margin: var(--spacing-4) 0"><div class="input-icon input-icon-left toolbar-search" style="flex: 0 1 200px">{icon("i-search", "icon input-icon-glyph")}'
+            f'<input class="input" type="text" placeholder="Search OKR" aria-label="Search OKR" /></div><span class="toolbar-spacer"></span>{seg}'
+            + (select(who, label="Owner", width=180) if who else '') + (select("All attributes", label="Attributes", width=180) if attributes else '')
+            + select("Date Created", ("Date Created", "Name", "Progress"), label="Sort by", width=160)
+            + f'<button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort ascending">{icon("i-arrow-down", "btn-icon")}</button></div>')
+
+
+def okr_none(title='No OKRs found', text='No OKRs have been created for this level and period yet.'):
+    return f'<div style="margin-top: var(--spacing-12)">{empty_state("i-okr", title, text)}</div>'
+
+
 def okrs():
     h = _okrs()
-    a = h.index('      <div class="stack">')
-    b = h.index('<nav class="ps-pagination"') if '<nav class="ps-pagination"' in h else h.index('<div class="row" style="margin-top: var(--spacing-4)">')
-    return h[:a] + '      ' + empty_state('i-okr', 'No OKRs found', 'No OKRs have been created for this level and period yet.')
+    a = h.index('      <div class="toolbar"')
+    return h[:a] + '      ' + okr_bar() + okr_none()
 
 
 def okr_panels():
-    one = lambda *items: '<div class="stack">' + ''.join(okr_card(n, st, k, krs) for n, st, k, krs in items) + '</div>'
-    return ['<div class="stack">' + ''.join(okr_card(*o) for o in OKRS) + '</div>' + pager(('1', '2')),
-            one(('Operations: one handoff, not three', 'Active', 'positive', [('Contract to workspace handoff is automatic', 50), ('Kick-off checklist used on every engagement', 80)])),
-            one(('Operations Q4: checklist live', 'Active', 'positive', [('Checklist in use on 20 engagements', 45)]), ('IT Q4: self-serve setup', 'Draft', 'light', [('Billing setup without a call', 10)])),
-            empty_state('i-okr', 'No OKRs found', 'No OKRs have been created for this level and period yet.'),
-            one(('Shared: time to first delivery', 'Active', 'positive', [('Median time to first delivery is 7 days', 64)]))]
+    q = ('Q1', 'Q2', 'Q3', 'Q4')
+    return [okr_bar() + okr_none(), okr_bar(who='All Functions') + okr_none(), okr_bar(q, 'All Functions') + okr_none(), okr_bar(q, 'All Functions') + okr_none(),
+            okr_bar(('Full year',) + q, 'All Org units', attributes=False) + okr_none('No shared Key Results found', 'No Key Results have been shared for this period yet.')]
 
 
 def rob_calendar():
@@ -2478,34 +2513,36 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),    dict(date='Nov 25, 2026', span='14:04–14:09', minutes=5, screens=['processes', 'initiatives', 'dashboard'],
          note='Compact and spreadsheet views redone against staging: compact is the same tree with one line per row, spreadsheet is a numbered, ruled grid with every layer open and a description beside the name. The spreadsheet view drops the filter and sort controls, as there.'),    dict(date='Nov 25, 2026', span='14:17–14:23', minutes=6, screens='all',
          note='Measured staging’s sizes against ours and matched them on every screen: tighter page padding, tabs straight under the title, tables without an outer box, shorter rows, larger pictures. Blue main buttons where the product has them, OKRs opening empty as there, the dashboard’s other tab as a tree. Each screen now carries a match estimate.'),    dict(date='Nov 25, 2026', span='14:23–14:25', minutes=2, screens=['profile-edit', 'team'],
-         note='Checked the tabs marked as not yet compared. Edit Profile was first compared while staging was still loading: its About box is a rich-text editor and Save Changes is green after all, so both are put back, and the form is filled in. Divisions rows lose their borders.'),
+         note='Checked the tabs marked as not yet compared. Edit Profile was first compared while staging was still loading: its About box is a rich-text editor and Save Changes is green after all, so both are put back, and the form is filled in. Divisions rows lose their borders.'),    dict(date='Nov 25, 2026', span='14:27–14:34', minutes=7,
+         screens=['okrs', 'rob-meetings', 'rob-meeting-view', 'profile', 'team-profile', 'people', 'talent-profile', 'self-review', 'dashboard', 'processes'],
+         note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),
 ]
 
 
 # How close each screen is to staging: my own estimate from putting the two side
 # by side, not a measurement. The second item is what still differs.
 MATCH = {
-    'dashboard': (93, 'Actions column on staging not seen; spreadsheet view has its own columns'),
-    'processes': (93, 'Rows under a process were not opened on staging; naming'),
+    'dashboard': (95, 'Spreadsheet view kept from the first capture; made-up data'),
+    'processes': (95, 'Named Processes where staging says Business as Usual'),
     'initiatives': (95, 'Made-up data only'),
     'initiative-view': (93, 'No documents; fields filled where staging has dashes'),
     'initiative-create': (94, 'Only the first screen of the form was compared'),
-    'rob-meetings': (90, 'Staging’s calendar was still loading when compared'),
-    'rob-meeting-view': (92, 'R and A letters are square tags; deck is a title card'),
-    'okrs': (90, 'Tabs after the first could not be read on staging'),
+    'rob-meetings': (95, 'Made-up meetings; Schedule and Week views not re-compared'),
+    'rob-meeting-view': (95, 'Deck shows a title card where staging’s example was empty'),
+    'okrs': (95, 'Every tab is empty for 2026 on staging, so the OKR card is only on the elements page; Team Quarterly’s owner filter is assumed'),
     'people': (96, 'Made-up data only'),
-    'profile': (93, 'Name and role on two lines in the chain; photo and map are placeholders'),
+    'profile': (95, 'Photo and map are placeholders'),
     'team': (95, 'Skills rows are striped here, plain on staging'),
-    'team-profile': (93, 'Logo is a generic icon; other tabs not re-compared'),
+    'team-profile': (94, 'Logo is a generic icon; OKRs tab is my own summary'),
     'rob-paused-meetings': (96, 'Made-up data only'),
     'profile-edit': (95, 'Field labels on Work and Contacts match; their layout was compared by text only'),
     'watercooler': (95, 'Fewer channels, made-up text'),
     'time-off': (95, 'Made-up data only'),
     'recognitions': (95, 'Badges are redrawn, not copied'),
     'peer-feedback': (95, 'Made-up data only'),
-    'self-review': (94, 'Compared by reading the text, not by eye'),
+    'self-review': (96, 'Made-up person only'),
     'not-found': (96, 'Drawing is redrawn'),
-    'talent-profile': (93, 'Compared by reading the text, not by eye'),
+    'talent-profile': (95, 'Photo is a placeholder; staging lists a third contact link'),
     'no-access': (96, 'Icon shape'),
     'sign-in': (None, 'Not compared: needs logging out of staging'),
     'profile-public-edit': (95, 'Only the first screen of the form was compared'),
@@ -2639,6 +2676,8 @@ def elements_page():
          '<div class="row"><button class="btn btn-primary ps-btn-accent" type="button">Give recognition</button><button class="btn btn-secondary ps-btn-accent" type="button" disabled>Save changes</button></div>'),
         ('Product density', 'ps-density', 'Every screen: the product’s tighter page padding, tabs set straight under the title, tables without an outer box, shorter rows and larger pictures. Rules that adjust kit classes, kept together.', 'people/index.html',
          '<p class="body-sm" style="margin: 0">See any list screen; this entry has no markup of its own.</p>'),
+        ('RACI letter', 'ps-raci', 'Meeting view: the role a person has, as a small round letter.', 'rob-meeting-view/index.html',
+         '<div class="row"><span class="ps-raci is-r">R</span><span class="ps-raci is-a">A</span><span class="ps-raci is-c">C</span><span class="ps-raci is-i">I</span></div>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'

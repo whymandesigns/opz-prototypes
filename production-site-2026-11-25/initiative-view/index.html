@@ -4406,7 +4406,9 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-cal-event.is-mine { border-left-color: var(--color-accent); }
 .ps-cal-event-title, .ps-cal-event-meta { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ps-cal-event-meta { color: var(--color-text-muted); }
-.ps-cal-more { padding-left: var(--spacing-2); color: var(--color-text-link); text-decoration: none; }
+.ps-cal-more { padding-left: var(--spacing-2); color: var(--color-text-muted); text-decoration: none; }
+.ps-cal-day.is-past .ps-cal-event-title { color: var(--color-text-muted); }
+.ps-cal-head { background: var(--color-surface); }
 
 /* Week grid: hours down, weekdays across */
 .ps-week { display: grid; grid-template-columns: 72px repeat(5, minmax(150px, 1fr)); min-width: 840px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
@@ -4630,6 +4632,15 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .table.ps-striped th, .table.ps-wtree th { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
 .table .cell-user > .avatar, .table .cell-user .ps-avatar-wrap > .avatar { width: var(--spacing-10); height: var(--spacing-10); }
 [data-show-in][hidden], [data-hide-in][hidden] { display: none; }
+
+/* RACI letter: the role a person has, as a small round letter. */
+.ps-raci { display: inline-grid; place-items: center; width: var(--spacing-6); height: var(--spacing-6); border-radius: 50%; font: var(--type-body-xs-semibold); background: var(--color-surface-muted); color: var(--color-text-muted); }
+.ps-raci.is-r { background: var(--color-success-subtle); color: var(--color-success); }
+.ps-raci.is-a { background: var(--color-danger-subtle); color: var(--color-danger); }
+.ps-raci.is-c { background: var(--color-warning-subtle); color: var(--color-warning); }
+.ps-raci.is-i { background: var(--color-accent-subtle); color: var(--color-accent); }
+/* A person card's first line: short name and role together, cut with an ellipsis. */
+.ps-node-line { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
 <body>
