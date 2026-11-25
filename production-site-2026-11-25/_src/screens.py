@@ -417,10 +417,10 @@ def initiative_create():
         fld('Status', select('Idea', ('Idea', 'Opportunity assessment', 'Definition', 'Execution', 'Impact assessment', 'Complete'), 'Status')),
         fld('Health', select('Not active', ('Not active', 'On track', 'At risk', 'Off track'), 'Health')),
         fld('Executive sponsor', ph_select('Select who gives governance and backing', 'Executive sponsor')),
-        fld('Beneficiary function', ph_select('Select the function that benefits from the outcome', 'Beneficiary function')),
+        fld('Beneficiary function ' + icon("i-info", "icon icon-16"), ph_select('Select the function that benefits from the outcome', 'Beneficiary function')),
         fld('Related initiatives &amp; projects', ph_select('Link initiatives or projects this relates to', 'Related initiatives and projects')),
-        fld('Core strategy', '<label class="row"><span class="switch"><input type="checkbox" class="switch-input" aria-label="Core strategy" /><span class="switch-track"></span></span></label>',
-            'Supports a company-level objective'),
+        fld('Core strategy<span class="body-xs" style="display: block; color: var(--color-text-muted)">Supports a company-level objective</span>',
+            '<label class="row"><span class="switch"><input type="checkbox" class="switch-input" aria-label="Core strategy" /><span class="switch-track"></span></span></label>'),
     ))
     people = ''.join((
         fld('Accountable owner', select('Cara Keane', label='Accountable owner')),
@@ -726,13 +726,13 @@ def profile():
         {f("Hire Date", '<span class="body">Dec 2, 2019</span>')}
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--spacing-8); margin-bottom: var(--spacing-8)">
-        <div class="stack"><span class="body-sm" {MUTED}>Contacts</span>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-bottom: var(--spacing-8)">
+        <div class="stack" style="flex: 0 1 220px; min-width: 0"><span class="body-sm" {MUTED}>Contacts</span>
           {contact("i-email", "cara.keane@harborsupport.com")}{contact("i-slack", "Cara Keane")}{contact("i-phone", "+353 1 555 0142")}</div>
-        <div class="stack"><span class="body-sm" {MUTED}>About</span>
+        <div class="stack" style="flex: 1 1 320px; min-width: 0"><span class="body-sm" {MUTED}>About</span>
           <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p>
           <div><button class="btn btn-ghost btn-xs" type="button">Read more</button></div></div>
-        <div class="stack"><span class="body-sm" {MUTED}>Location</span>
+        <div class="stack" style="flex: 0 1 240px; min-width: 0"><span class="body-sm" {MUTED}>Location</span>
           <article class="card"><div class="row">{icon("i-pin", "icon icon-16")}<span class="body-sm">Dublin, Ireland</span></div></article></div>
       </div>
 
@@ -775,7 +775,7 @@ def team():
 
       <div style="max-width: 420px; margin: var(--spacing-4) 0">{ph_select("Select org unit", "Org unit")}</div>
 
-      <div>{"".join(rows)}</div>'''
+      <div class="ps-striped-list">{"".join(rows)}</div>'''
 
 
 def team_profile():
@@ -790,8 +790,8 @@ def team_profile():
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-8); margin: var(--spacing-6) 0 var(--spacing-8)">
-        <div class="stack"><span class="body-sm" {MUTED}>About</span>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin: var(--spacing-6) 0 var(--spacing-8)">
+        <div class="stack" style="flex: 0 1 320px; min-width: 0"><span class="body-sm" {MUTED}>About</span>
           <p class="body" style="margin: 0">Operations runs the work customers pay for: delivery, quality and the handoffs between them. The function is measured on time to first delivery and on engagement health.</p></div>
         <div class="stack"><span class="body-sm" {MUTED}>Slack Channels</span>
           <span class="body-sm" {MUTED}>No Slack channels attached</span></div>
@@ -954,11 +954,11 @@ def profile_edit():
           <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("Preferred first name (optional)", "First name")}<span style="flex: 1 1 220px"></span></div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">
             {sel("Location", ph_select("Location", "Location") + '<span class="field-hint">Local time: 10:10</span>')}
-            {sel("Working hours", '<div class="row">' + select("09:00", ("08:00", "09:00", "10:00"), "Working hours start") + select("17:00", ("16:00", "17:00", "18:00"), "Working hours end") + '</div>')}
+            {sel("Working hours " + icon("i-help", "icon icon-16"), '<div class="row">' + "".join(f'<div class="input-icon input-icon-right" style="flex: 1 1 0; min-width: 0">{icon("i-time", "icon input-icon-glyph")}<input class="input" type="text" value="{v}" aria-label="{l}" /></div>' for v, l in (("09:00", "Working hours start"), ("17:00", "Working hours end"))) + '</div>')}
           </div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-4)">
             {sel("Date of Birth (optional)", '<div class="row">' + ph_select("Month", "Month of birth") + ph_select("Day", "Day of birth") + '</div>')}
-            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile</span></label>
+            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile {icon("i-help", "icon icon-16")}</span></label>
           </div>
           <label class="field"><span class="field-label">About (optional)</span><textarea class="input" rows="8" placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
         </div>
@@ -1140,14 +1140,25 @@ def week_grid(events=()):
             f'<tbody>{rows}</tbody></table></div>')
 
 
+def radios(name, options, on=0):
+    return ''.join(f'<label class="radio"><input type="radio" class="radio-input" name="{name}"{" checked" if i == on else ""} /><span class="radio-circle"></span><span class="radio-label">{o}</span></label>'
+                   for i, o in enumerate(options))
+
+
+def period_nav(label, sub_label=''):
+    below = f'<span class="body-xs" style="display: block; color: var(--color-text-muted)">{sub_label}</span>' if sub_label else ''
+    return (f'<div class="row"><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Previous">{icon("i-chevron-left", "btn-icon")}</button>'
+            f'<span class="body-semibold" style="text-align: center">{label}{below}</span>'
+            f'<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Next">{icon("i-chevron-right", "btn-icon")}</button><button class="btn btn-secondary" type="button">Today</button></div>')
+
+
 def rob_tab(who, count, show_label, show_opts, events):
     return f'''<h2 class="h3" style="margin: 0 0 var(--spacing-1)">RoB Meetings</h2>
       <p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">{who}</p>
       <div class="toolbar" style="margin-bottom: var(--spacing-4)">
-        <span class="body-semibold">Nov 23-29</span><span class="body-sm" {MUTED}>{count}</span>
-        <button class="btn btn-secondary" type="button">Today</button>
+        {period_nav("Nov 23-29", count)}
         <span class="toolbar-spacer"></span>
-        {select("All", show_opts, label=show_label, width=160)}
+        <span class="row" role="radiogroup" aria-label="{show_label}"><span class="body-sm-semibold">{show_label}</span>{radios("rob-" + show_label.lower(), show_opts)}</span>
         {segmented(("Schedule", "Week", "Month", "List"), 1, "Calendar view")}
       </div>
       {week_grid(events)}'''
@@ -1167,19 +1178,25 @@ def month_table(title, first, days, marks=()):
 def profile_panels():
     initiatives_p = table(WORK_HEADS, work_rows(WORK))
     processes_p = empty_state('i-cpu-2', 'You don’t own any Processes', 'No Processes yet')
-    hist = ''.join(f'<div class="list-row"><div><p class="list-row-title">{t}</p><p class="list-row-meta">{u}</p></div><span class="body-sm">{d}</span></div>' for t, u, d in (
-        ('Delivery Manager', 'Delivery Subfunction in Operations', 'Apr 2024 – Present'), ('Senior Project Coordinator', 'Delivery Subfunction in Operations', 'Jul 2022 – Apr 2024'),
-        ('Project Coordinator', 'Customer Support Team in Customer', 'Dec 2019 – Jul 2022')))
+    hist = ''.join(f'<div class="ps-timeline-item{" is-current" if i == 0 else ""}"><div><p class="body-semibold" style="margin: 0">{t}</p>'
+                   f'<p class="row body-sm" style="margin: var(--spacing-1) 0 0">{icon("i-org-unit", "icon icon-16")}{u}</p></div><span class="body-sm" style="text-align: right; color: var(--color-text-muted)">{d}</span></div>'
+                   for i, (t, u, d) in enumerate((
+        ('Delivery Manager', 'Delivery Subfunction in Operations', 'Apr 2024 -<br />Present'), ('Senior Project Coordinator', 'Delivery Subfunction in Operations', 'Jul 2022 -<br />Apr 2024'),
+        ('Project Coordinator', 'Customer Support Team in Customer', 'Dec 2019 -<br />Jul 2022'))))
     work_history = (f'<h2 class="h3" style="margin: 0 0 var(--spacing-1)">Work History</h2><p class="body-sm" style="margin: 0 0 var(--spacing-4); color: var(--color-text-muted)">Cara has been working here for 7 years.</p>'
-                    f'<div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-sm" {MUTED}>Type of Change</span>{segmented(("Position &amp; Team Change", "Associated Membership", "Business Ownership"), 0, "Type of change")}</div>{hist}')
+                    f'<div class="row" style="flex-wrap: wrap; gap: var(--spacing-4); margin-bottom: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); max-width: 720px">'
+                    f'<span class="body-sm-semibold">Type of Change</span>{check("Position &amp; Team Change", True)}{check("Associated Membership")}{check("Business Ownership")}</div>'
+                    f'<div class="ps-timeline" style="max-width: 720px">{hist}</div>')
     rob = rob_tab('Cara attends 4 RoB Meetings', '4 meetings', 'Role', ('All', 'Owner', 'Attendee'),
                   [((0, '10:00am'), ('[RoB] Onboarding in one week', 'Operations')), ((2, '1:00pm'), ('[RoB] Refund requests', 'Delivery')),
                    ((0, '3:00pm'), ('Delivery All Hands', 'Delivery')), ((3, '4:00pm'), ('[RoB] Partner marketing sites', 'Partnerships'))])
     actions = (f'<div class="list-row"><div><p class="list-row-meta">[RoB] Onboarding in one week · August 3, 2026</p><p class="list-row-title">Draft the kick-off checklist for new customers</p>'
                f'<p class="list-row-meta">Cara Keane</p></div>{tag("Done", "positive")}</div>')
-    time_off_p = (f'<h2 class="h3" style="margin: 0 0 var(--spacing-4)">Time Off</h2><div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-semibold">Nov 2026</span><button class="btn btn-secondary" type="button">Today</button></div>'
-                  f'<div style="display: flex; flex-wrap: wrap; gap: var(--spacing-6); margin-bottom: var(--spacing-6)">{month_table("November 2026", 6, 30, (25,))}{month_table("December 2026", 1, 31, tuple(range(21, 32)))}</div>'
-                  f'<article class="card"><h3 class="card-title">Upcoming Time Off</h3><div {GRID}>{field_row("Dates", sub("Dec 21, 2026 - Dec 31, 2026"))}{field_row("Who Is Covering", sub("No one is covering this time off"))}{field_row("Total Time Off", sub("9 days"))}</div></article>')
+    side = lambda t, body: f'<div><h3 class="body-semibold" style="margin: 0 0 var(--spacing-2)">{t}</h3>{body}</div>'
+    time_off_p = (f'<h2 class="h3" style="margin: 0 0 var(--spacing-4)">Time Off</h2><div style="margin-bottom: var(--spacing-6)">{period_nav("Nov 2026")}</div>'
+                  f'<div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8)">{month_table("November 2026", 6, 30, (25,))}{month_table("December 2026", 1, 31, tuple(range(21, 32)))}'
+                  f'<div class="stack" style="flex: 1 1 240px; min-width: 0; gap: var(--spacing-6)">{side("Upcoming Time Off", sub("Dec 21, 2026 - Dec 31, 2026"))}'
+                  f'{side("Who Is Covering", sub("No one is covering this time off"))}{side("Total Time Off", sub("9 days taken in 2026"))}</div></div>')
     return [initiatives_p, processes_p, work_history, rob, actions, time_off_p]
 
 
@@ -1781,7 +1798,7 @@ def month_table(title, first, days, marks=()):
     while len(cells) % 7:
         cells.append(('', 'is-outside'))
     body = ''.join(f'<span class="ps-month-dow body-xs">{d}</span>' for d in ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'))
-    body += ''.join(f'<span class="ps-month-day body-sm{" " + c if c else ""}">{d}</span>' for d, c in cells)
+    body += ''.join(f'<span class="ps-month-day body-sm{" " + c if c else ""}{" is-weekend" if i % 7 > 4 else ""}">{d}</span>' for i, (d, c) in enumerate(cells))
     return f'<div style="flex: 1 1 280px; min-width: 0; max-width: 360px"><h3 class="body-semibold" style="margin: 0 0 var(--spacing-2)">{title}</h3><div class="ps-month">{body}</div></div>'
 
 
@@ -1862,7 +1879,8 @@ def profile():
 def team_profile_panels():
     p = _tpp()
     days = list(range(23, 31)) + list(range(1, 7))
-    p[3] = (f'<div class="row" style="margin-bottom: var(--spacing-4)"><span class="body-semibold">Nov 2026</span><button class="btn btn-secondary" type="button">Today</button></div>'
+    p[3] = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)">{period_nav("Nov 2026")}<span class="toolbar-spacer"></span>'
+            f'{select("Direct members, Associated members", label="Members shown", width=220)}<div style="width: 180px">{text_in("Name")}</div>{ph_select("Position", "Position", 180)}</div>'
             + ooo_grid(days, [('lk', ()), ('ck', (26, 27)), ('lh', ()), ('tl', (30, 1, 2)), ('nr', ())]))
     return p
 
@@ -2041,6 +2059,9 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
     dict(date='Nov 25, 2026', span='12:20–12:21', minutes=5,
          screens=['rob-meeting-view', 'initiative-view', 'rob-meetings', 'talent-profile', 'time-off', 'peer-feedback'],
          note='Compared with staging: the meeting view gains its Deck section, key metric row, priority and recording tags, RACI letters and attendance marks; smaller fixes on five more screens.'),
+    dict(date='Nov 25, 2026', span='12:23–12:26', minutes=6,
+         screens=['profile', 'team-profile', 'team', 'initiative-create', 'profile-edit'],
+         note='Compared with staging: Work History is a timeline with checkboxes, Time Off and the RoB tab have their period navigation and radios, lists of org units are striped, and two forms get their icons and hints.'),
 ]
 
 
@@ -2144,6 +2165,10 @@ def elements_page():
          f'<div class="row" style="gap: var(--spacing-8)">{user_marked("ck", "yes")}{user_marked("tl", "no")}{user_marked("nr", "talent")}</div>'),
         ('Striped table', 'ps-striped', 'Every list: each second row is tinted.', 'people/index.html',
          table(('Name', 'Status'), ''.join(f'<tr><td><span class="cell-title">{n}</span></td><td>{tag("Active")}</td></tr>' for n in ('Vendor Management', 'Learning Programs', 'Workplace and IT', 'Refund requests'))).replace('class="table"', 'class="table ps-striped"')),
+        ('Timeline', 'ps-timeline', 'Profile, Work History tab: positions down a rail, newest first.', 'profile/index.html#tab-3',
+         '<div class="ps-timeline" style="max-width: 560px"><div class="ps-timeline-item is-current"><div><p class="body-semibold" style="margin: 0">Delivery Manager</p><p class="body-sm" style="margin: 0">Delivery Subfunction in Operations</p></div>'
+         '<span class="body-sm">Apr 2024 - Present</span></div><div class="ps-timeline-item"><div><p class="body-semibold" style="margin: 0">Senior Project Coordinator</p><p class="body-sm" style="margin: 0">Delivery Subfunction in Operations</p></div>'
+         '<span class="body-sm">Jul 2022 - Apr 2024</span></div></div>'),
         ('Tree rows', 'ps-row-child', 'Processes and Initiatives: rows that fold under a parent row. Click the caret on Refund requests.', 'processes/index.html',
          table(('Name', 'Status'), f'<tr><td><span class="cell-title">Refund requests</span></td><td>{tag("Active")}</td></tr><tr class="ps-row-child"><td><span class="cell-title">Refund review</span></td><td>{tag("Active")}</td></tr>')),
     ]
