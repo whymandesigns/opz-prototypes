@@ -996,8 +996,8 @@ def self_review():
 
 
 def profile_edit():
-    def txt(label, ph):
-        return f'<label class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span><input class="input" type="text" placeholder="{ph}" /></label>'
+    def txt(label, ph, value=''):
+        return f'<label class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span><input class="input" type="text" placeholder="{ph}" value="{value}" /></label>'
 
     def sel(label, control):
         return f'<div class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span>{control}</div>'
@@ -1007,17 +1007,17 @@ def profile_edit():
 
       <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8); margin-top: var(--spacing-6)">
         <div class="stack" style="flex: 3 1 420px; min-width: 0; max-width: 640px">
-          <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("First name", "First name")}{txt("Last name", "Last name")}</div>
+          <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("First name", "First name", "Cara")}{txt("Last name", "Last name", "Keane")}</div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">{txt("Preferred first name (optional)", "First name")}<span style="flex: 1 1 220px"></span></div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)">
-            {sel("Location", ph_select("Location", "Location") + '<span class="field-hint">Local time: 10:10</span>')}
+            {sel("Location", select("Dublin, Ireland", label="Location") + '<span class="field-hint">Local time: 13:22</span>')}
             {sel("Working hours " + icon("i-help", "icon icon-16"), '<div class="row">' + "".join(f'<div class="input-icon input-icon-right" style="flex: 1 1 0; min-width: 0">{icon("i-time", "icon input-icon-glyph")}<input class="input" type="text" value="{v}" aria-label="{l}" /></div>' for v, l in (("09:00", "Working hours start"), ("17:00", "Working hours end"))) + '</div>')}
           </div>
           <div class="row" style="flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-4)">
-            {sel("Date of Birth (optional)", '<div class="row" style="flex-wrap: nowrap">' + ph_select("Month", "Month of birth", 150) + ph_select("Day", "Day of birth", 110) + '</div>')}
-            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile {icon("i-help", "icon icon-16")}</span></label>
+            {sel("Date of Birth (optional)", '<div class="row" style="flex-wrap: nowrap">' + select("March", label="Month of birth", width=150) + select("14", label="Day of birth", width=110) + '</div>')}
+            <label class="checkbox" style="flex: 1 1 220px"><input type="checkbox" class="checkbox-input" checked /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show in my Operationalize profile {icon("i-help", "icon icon-16")}</span></label>
           </div>
-          <label class="field"><span class="field-label">About (optional)</span><textarea class="input" rows="8" data-plain placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
+          <label class="field"><span class="field-label">About Cara (optional)</span><textarea class="input" rows="8" placeholder="Share a bit about your background, interests, and what drives you…"></textarea></label>
         </div>
         <div class="stack" style="flex: 1 1 160px">
           <span class="field-label">Avatar (optional)</span>
@@ -1027,7 +1027,7 @@ def profile_edit():
 
       <div class="row" style="margin-top: var(--spacing-6)">
         <a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>
-        <button class="btn btn-primary ps-btn-accent" type="button" disabled>Save Changes</button>
+        <button class="btn btn-primary" type="button">Save Changes</button>
       </div>'''
 
 
@@ -1304,14 +1304,14 @@ def team_panels():
     divisions = (f'<div class="toolbar" style="margin-bottom: var(--spacing-6)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search for a division" aria-label="Search for a division" /></div>'
                  f'<label class="checkbox"><input type="checkbox" class="checkbox-input" /><span class="checkbox-box">{icon("i-check", "checkbox-mark")}</span><span class="checkbox-label">Show archived</span></label>'
                  f'<span class="toolbar-spacer"></span>{select("Structure View", ("Structure View", "Table View"), label="View", width=170)}</div>'
-                 f'<h2 class="body-lg-semibold" style="margin: 0 0 var(--spacing-3)">Categories &amp; Practices</h2>'
+                 f'<h2 class="body-lg-semibold" style="margin: 0 0 var(--spacing-3)">Categories &amp; Practices</h2><div class="ps-striped-list">'
                  + unit('Consulting', 'Category', 'Lydia Kaminski', 'Consists of 4 Practices ● Owns 1 Vertical and 2 Specializations')
                  + unit('Technology Services', 'Category', 'Elias Lowe', 'Consists of 6 Practices ● Owns 3 Verticals and 5 Specializations')
                  + unit('Marketing Agency', 'Category', 'Adele Delacroix', 'Consists of 7 Practices ● Owns 1 Vertical')
-                 + f'<h2 class="body-lg-semibold" style="margin: var(--spacing-8) 0 var(--spacing-3)">Verticals</h2>'
+                 + f'</div><h2 class="body-lg-semibold" style="margin: var(--spacing-8) 0 var(--spacing-3)">Verticals</h2><div class="ps-striped-list">'
                  + unit('Consultants', 'Vertical', '', 'Consists of 4 Specializations ● Owned By Consulting')
                  + unit('Developer', 'Vertical', '', 'Consists of 13 Specializations ● Owned By Technology Services')
-                 + unit('Design', 'Vertical', '', 'Consists of 2 Specializations'))
+                 + unit('Design', 'Vertical', '', 'Consists of 2 Specializations') + '</div>')
     def t(k, unit_, mgr, loc, time):
         return f'<tr><td>{user_marked(k, "talent")}</td><td>{two(*unit_)}</td><td>{user(mgr)}</td><td>{sub("-")}</td><td>{two(*loc)}</td><td>{sub(time)}</td></tr>'
     talents = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)"><button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button></div>'
@@ -2477,7 +2477,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),    dict(date='Nov 25, 2026', span='14:00–14:04', minutes=4, screens=['not-found', 'no-access', 'self-review', 'talent-profile', 'rob-paused-meetings', 'profile-public-edit'],
          note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),    dict(date='Nov 25, 2026', span='14:04–14:09', minutes=5, screens=['processes', 'initiatives', 'dashboard'],
          note='Compact and spreadsheet views redone against staging: compact is the same tree with one line per row, spreadsheet is a numbered, ruled grid with every layer open and a description beside the name. The spreadsheet view drops the filter and sort controls, as there.'),    dict(date='Nov 25, 2026', span='14:17–14:23', minutes=6, screens='all',
-         note='Measured staging’s sizes against ours and matched them on every screen: tighter page padding, tabs straight under the title, tables without an outer box, shorter rows, larger pictures. Blue main buttons where the product has them, OKRs opening empty as there, the dashboard’s other tab as a tree. Each screen now carries a match estimate.'),
+         note='Measured staging’s sizes against ours and matched them on every screen: tighter page padding, tabs straight under the title, tables without an outer box, shorter rows, larger pictures. Blue main buttons where the product has them, OKRs opening empty as there, the dashboard’s other tab as a tree. Each screen now carries a match estimate.'),    dict(date='Nov 25, 2026', span='14:23–14:25', minutes=2, screens=['profile-edit', 'team'],
+         note='Checked the tabs marked as not yet compared. Edit Profile was first compared while staging was still loading: its About box is a rich-text editor and Save Changes is green after all, so both are put back, and the form is filled in. Divisions rows lose their borders.'),
 ]
 
 
@@ -2494,10 +2495,10 @@ MATCH = {
     'okrs': (90, 'Tabs after the first could not be read on staging'),
     'people': (96, 'Made-up data only'),
     'profile': (93, 'Name and role on two lines in the chain; photo and map are placeholders'),
-    'team': (94, 'Divisions and Skills tabs not re-compared'),
+    'team': (95, 'Skills rows are striped here, plain on staging'),
     'team-profile': (93, 'Logo is a generic icon; other tabs not re-compared'),
     'rob-paused-meetings': (96, 'Made-up data only'),
-    'profile-edit': (94, 'Work and Contacts tabs not re-compared'),
+    'profile-edit': (95, 'Field labels on Work and Contacts match; their layout was compared by text only'),
     'watercooler': (95, 'Fewer channels, made-up text'),
     'time-off': (95, 'Made-up data only'),
     'recognitions': (95, 'Badges are redrawn, not copied'),
