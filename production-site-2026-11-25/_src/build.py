@@ -122,10 +122,20 @@ VIEW_SCRIPT = '''  <script>
     addEventListener('hashchange', route); route();
 
     // Work lists: a caret folds a row's children; Expand all does every row.
+    // A tree table stripes the rows that are open, not every second row in the markup.
+    const stripe = () => document.querySelectorAll('.ps-tree tbody').forEach(tb => {
+      let i = 0;
+      tb.querySelectorAll('tr').forEach(r => { if (!r.hidden) r.classList.toggle('is-alt', i++ % 2 === 1); });
+    });
     const fold = (btn, on) => {
       btn.setAttribute('aria-expanded', String(on));
-      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => show(r, on));
+      document.querySelectorAll('[data-child-of="' + btn.dataset.rows + '"]').forEach(r => {
+        show(r, on);
+        if (!on) r.querySelectorAll('[data-rows]').forEach(inner => fold(inner, false));   // closing a row closes what is under it
+      });
+      stripe();
     };
+    stripe();
     document.addEventListener('click', e => {
       const caret = e.target.closest('[data-rows]');
       if (caret) fold(caret, caret.getAttribute('aria-expanded') !== 'true');
@@ -142,7 +152,9 @@ VIEW_SCRIPT = '''  <script>
     document.addEventListener('input', e => {
       if (!e.target.matches('[data-search]')) return;
       const q = e.target.value.trim().toLowerCase();
-      document.querySelectorAll('[data-search-item]').forEach(el => show(el, !q || el.textContent.toLowerCase().includes(q)));
+      document.querySelectorAll('[data-search-item]').forEach(el => show(el, q ? el.textContent.toLowerCase().includes(q) : !el.dataset.childOf));
+      if (!q) document.querySelectorAll('[data-rows]').forEach(c => c.setAttribute('aria-expanded', 'false'));
+      stripe();
     });
   })();
   </script>
