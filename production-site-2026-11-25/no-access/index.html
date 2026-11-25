@@ -4645,6 +4645,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Prototype: what can be clicked through to another screen shows it. */
 .table .cell-user, .org-node, .ps-tree-node { cursor: pointer; }
 a.ps-wtree-title:hover { color: var(--color-text-link); }
+
+/* Audit control: ours, not the product's. Shows what on a screen is not a
+   library component as it ships. */
+.ps-audit-toggle { position: fixed; right: calc(4 * var(--spacing-6) + 150px); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); }
+.ps-audit-toggle[aria-pressed="true"] { border-color: var(--color-danger); }
+.ps-audit-dot { width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-danger); flex-shrink: 0; display: inline-block; }
+.ps-audit-panel { position: fixed; right: var(--spacing-6); bottom: calc(var(--spacing-6) + var(--spacing-12)); z-index: var(--z-snackbar); width: 300px; max-height: 60vh; overflow: auto; padding: var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-3); }
+.ps-audit-row { display: flex; align-items: center; gap: var(--spacing-2); width: 100%; padding: var(--spacing-1) 0; border: 0; background: none; text-align: left; cursor: pointer; color: var(--color-text); }
+.ps-audit-row > :nth-child(2) { flex: 1; }
+.ps-audit-row:hover { background: var(--color-surface-muted); }
+.ps-audit-layer { position: fixed; inset: 0; z-index: var(--z-tooltip); pointer-events: none; }
+.ps-audit-mark { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--color-danger); box-shadow: 0 0 0 2px var(--color-surface); pointer-events: auto; }
+.ps-audit-panel[hidden], .ps-audit-layer[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4996,6 +5009,63 @@ a.ps-wtree-title:hover { color: var(--color-text-link); }
   })();
   </script>
   <a class="btn btn-secondary ps-staging" href="https://team-staging.toptal.net/teams/1103/edit" target="_blank" rel="noopener" title="Open this screen on staging in a new tab"><svg class="btn-icon" aria-hidden="true"><use href="#i-external-link"/></svg>Open on staging</a>
+  <button class="btn btn-secondary ps-audit-toggle" type="button" data-audit-toggle aria-pressed="false" title="Show what on this screen is not a library component"><span class="ps-audit-dot"></span><span data-audit-label>Not in library</span></button>
+  <aside class="ps-audit-panel" data-audit-panel hidden><p class="body-sm-semibold" style="margin: 0 0 var(--spacing-2)">Not a library component as it ships</p><div data-audit-list></div><p class="body-xs" style="margin: var(--spacing-3) 0 0; color: var(--color-text-muted)">Red dots mark up to three of each on the page. Click a line to jump to the first.</p></aside>
+  <div class="ps-audit-layer" data-audit-layer hidden></div>
+  <script>
+  (() => {
+    const NAMES = {"ps-node": "Person card line", "ps-contents": "Layout helper", "ps-bars": "Bar chart", "ps-health": "Health bar", "ps-cal": "Month calendar", "ps-week": "Week grid", "ps-month": "Mini month", "ps-ooo": "Out-of-office grid", "ps-pagination": "Pagination", "ps-empty": "Empty state", "ps-anchors": "Anchor nav", "ps-popover": "Popover panel", "ps-tree": "Reporting tree", "ps-map": "Map panel", "ps-okr": "OKR card", "ps-bizline": "Business line switcher", "ps-avatar": "Avatar mark", "ps-avatar-mark": "Avatar mark", "ps-striped": "Striped table", "ps-timeline": "Timeline", "ps-row": "Tree rows", "ps-row-child": "Tree rows", "ps-wtree": "Tree table", "ps-dot": "Status dot", "ps-roadmap": "Roadmap marker", "ps-split": "Split card", "ps-chain": "Reporting chain", "ps-linkrow": "Link row", "ps-agenda": "Agenda", "ps-agenda-row": "Agenda row", "ps-sheet": "Sheet table", "ps-btn": "Blue action button", "ps-btn-accent": "Blue action button", "ps-density": "Product density", "ps-raci": "RACI letter", "ps-action": "Action item", "ps-minical": "Small month", "ps-seg": "Fill switch", "ps-seg-fill": "Fill switch", "i-external-link": "Open in new tab", "i-slack-color": "Slack, in colour", "i-badge-ambitious": "Badge: Ambitious", "i-badge-anniversary": "Badge: Anniversary", "i-badge-challenging": "Badge: Challenging", "i-badge-culture": "Badge: Culture Ambassador", "i-badge-driven": "Badge: Driven", "i-badge-helpful": "Badge: Helpful", "i-badge-hipo": "Badge: HiPo", "i-badge-inspiring": "Badge: Inspiring", "i-art-empty-list": "Empty list", "i-roadmap": "Roadmap", "i-art-not-found": "Page not found", "i-art-team-logo": "Team logo", "i-art-empty-alert": "Nothing owned"};
+    const KIT = [[".page-head", "Page head", "Tighter spacing; no rule when tabs follow"], [".table .cell-user .avatar", "Avatar in a table", "Larger, 40px"], [".table .cell-user-name", "Person name in a table", "Heavier weight"], [".table-scroll", "Table frame", "No outer border or radius"], [".org-node", "Person card", "Short name and role on one line, unit link under it"], [".ps-striped-list > .list-row", "List row", "No border; striped"], [".sidenav-footer", "Side menu foot", "Two groups that open, in place of Admin Settings"]];
+    const skip = new Set(['ps-staging', 'ps-audit', 'ps-density', 'ps-contents']);
+    const fam = c => { const m = /^ps-[a-z]+/.exec(c); return m && !skip.has(m[0]) ? m[0] : null; };
+    const btn = document.querySelector('[data-audit-toggle]'), panel = document.querySelector('[data-audit-panel]'),
+          layer = document.querySelector('[data-audit-layer]'), list = document.querySelector('[data-audit-list]');
+    const found = () => {
+      const groups = new Map();   // key -> {kind, name, note, els}
+      const add = (key, kind, name, note, el) => { if (!groups.has(key)) groups.set(key, {kind, name, note, els: []}); groups.get(key).els.push(el); };
+      document.querySelectorAll('[class*="ps-"]').forEach(el => {
+        if (el.closest('[data-audit-panel], [data-audit-layer], [data-audit-toggle], .ps-staging')) return;
+        new Set([...el.classList].map(fam).filter(Boolean)).forEach(f => {
+          if (!el.parentElement.closest('[class*="' + f + '"]')) add(f, 'New element', NAMES[f] || f, '.' + f, el);
+        });
+      });
+      const local = new Set([...document.querySelectorAll('svg[data-local-icons] symbol')].map(s => s.id));
+      document.querySelectorAll('svg use').forEach(u => { const id = (u.getAttribute('href') || '').slice(1); if (local.has(id)) add(id, 'New icon', NAMES[id] || id, id, u.parentElement); });
+      KIT.forEach(([sel, name, note]) => document.querySelectorAll(sel).forEach(el => { if (!el.closest('[data-audit-panel]')) add('kit:' + sel, 'Adjusted library component', name, note, el); }));
+      return groups;
+    };
+    const visible = el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    let groups = new Map();
+    const place = () => {
+      layer.innerHTML = '';
+      groups.forEach(g => g.els.filter(visible).slice(0, 3).forEach(el => {
+        const r = el.getBoundingClientRect(), d = document.createElement('span');
+        d.className = 'ps-audit-mark'; d.title = g.kind + ': ' + g.name + ' (' + g.note + ')';
+        d.style.left = Math.max(2, r.left - 5) + 'px'; d.style.top = Math.max(2, r.top - 5) + 'px';
+        layer.appendChild(d);
+      }));
+    };
+    const render = () => {
+      groups = found();
+      const kinds = ['New element', 'New icon', 'Adjusted library component'];
+      list.innerHTML = kinds.map(k => {
+        const rows = [...groups.entries()].filter(([, g]) => g.kind === k);
+        return rows.length ? '<p class="body-xs-semibold" style="margin: var(--spacing-3) 0 var(--spacing-1); color: var(--color-text-muted)">' + k + 's · ' + rows.length + '</p>' +
+          rows.map(([key, g]) => '<button class="ps-audit-row" type="button" data-audit-key="' + key + '"><span class="ps-audit-dot"></span><span class="body-sm">' + g.name + '</span><span class="body-xs" style="color: var(--color-text-muted)">' + g.els.length + '</span></button>').join('') : '';
+      }).join('');
+      btn.querySelector('[data-audit-label]').textContent = 'Not in library · ' + groups.size;
+      place();
+    };
+    const set = on => { btn.setAttribute('aria-pressed', String(on)); panel.hidden = !on; layer.hidden = !on; panel.style.display = on ? '' : 'none'; layer.style.display = on ? '' : 'none'; if (on) render(); };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-pressed') !== 'true'));
+    list.addEventListener('click', e => { const b = e.target.closest('[data-audit-key]'); if (!b) return; const el = groups.get(b.dataset.auditKey).els.find(visible); if (el) { el.scrollIntoView({block: 'center'}); setTimeout(place, 300); } });
+    addEventListener('scroll', () => { if (!layer.hidden) place(); }, true);
+    addEventListener('resize', () => { if (!layer.hidden) place(); });
+    document.addEventListener('click', () => { if (!layer.hidden) setTimeout(render, 60); });
+    btn.querySelector('[data-audit-label]').textContent = 'Not in library · ' + found().size;
+    if (location.hash.includes('audit')) set(true);
+  })();
+  </script>
 <!-- === review.css === -->
 <style>
 /* review.css — the review bar (author/reviewer tooling).

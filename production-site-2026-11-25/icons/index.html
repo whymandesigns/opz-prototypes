@@ -4645,6 +4645,19 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Prototype: what can be clicked through to another screen shows it. */
 .table .cell-user, .org-node, .ps-tree-node { cursor: pointer; }
 a.ps-wtree-title:hover { color: var(--color-text-link); }
+
+/* Audit control: ours, not the product's. Shows what on a screen is not a
+   library component as it ships. */
+.ps-audit-toggle { position: fixed; right: calc(4 * var(--spacing-6) + 150px); bottom: var(--spacing-6); z-index: var(--z-snackbar); box-shadow: var(--shadow-2); }
+.ps-audit-toggle[aria-pressed="true"] { border-color: var(--color-danger); }
+.ps-audit-dot { width: var(--spacing-2); height: var(--spacing-2); border-radius: 50%; background: var(--color-danger); flex-shrink: 0; display: inline-block; }
+.ps-audit-panel { position: fixed; right: var(--spacing-6); bottom: calc(var(--spacing-6) + var(--spacing-12)); z-index: var(--z-snackbar); width: 300px; max-height: 60vh; overflow: auto; padding: var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-3); }
+.ps-audit-row { display: flex; align-items: center; gap: var(--spacing-2); width: 100%; padding: var(--spacing-1) 0; border: 0; background: none; text-align: left; cursor: pointer; color: var(--color-text); }
+.ps-audit-row > :nth-child(2) { flex: 1; }
+.ps-audit-row:hover { background: var(--color-surface-muted); }
+.ps-audit-layer { position: fixed; inset: 0; z-index: var(--z-tooltip); pointer-events: none; }
+.ps-audit-mark { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--color-danger); box-shadow: 0 0 0 2px var(--color-surface); pointer-events: auto; }
+.ps-audit-panel[hidden], .ps-audit-layer[hidden] { display: none; }
 </style>
 </head>
 <body>
