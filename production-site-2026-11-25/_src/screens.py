@@ -1551,10 +1551,9 @@ INIT_QUERY = QUERY_PANEL.replace('Show processes being supported', 'Show initiat
 
 def initiatives_with_states():
     h = toggle(toggle(initiatives(), 'Filters', 'filters-panel'), 'Query', 'query-panel')
-    kid = lambda n, st, kind, k: (kid_cell(n, 'Project'), tag(st, kind), health('On track', 'positive'), user(k, 'Operations'), '', '', raci_btn())
-    h = child_rows(h, '>Onboarding in one week</a>', 'onboarding', [kid('Kick-off checklist', 'Execution', 'blue', 'ck'), kid('Contract to workspace handoff', 'Execution', 'blue', 'lh'), kid('First-week survey', 'Idea', 'light', 'tl')], 7)
-    h = tree_cells(h)
-    h = h.replace('<thead><tr><th>Name</th><th>Status</th><th>Health', '<thead><tr><th>Name <button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></th><th>Status</th><th>Health')
+    h = swap_table(h, tree_table(INIT_TREE, cols=('status', 'health', 'acc', 'roadmap', 'rob', 'actions'), prefix='init', sticky=False, attrs=' data-view="desktop"',
+                                 tags=lambda name, level: tag('# Core Strategy') if name in KIDS or level else tag('Operationalize', 'blue-light') if name == 'Learning programs' else '',
+                                 links={'Onboarding in one week': 'href="../initiative-view/index.html"'}))
     h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
     return with_views(h, *initiatives_views(), extra_panels=work_filters('Initiative', ('Initiative', 'Project', 'Sub-project')) + INIT_QUERY)
 
@@ -1603,47 +1602,81 @@ DASH_TREE = [
     ('Faster customer onboarding', 'sr', ('First-week success plan', 'Execution', 'On track', 'ck', 'Delivery', ('Oct 27 • 4:00pm', 'Every 2 weeks on Tuesday', True), [])),
 ]
 KINDS = ('Initiative', 'Project', 'Sub-project')
-TREE_HEADS = (('Name', 256), ('Strategic Objective', 192), ('Objective Owner', 136), ('Status', 144), ('Health', 96), ('Accountability', 152), ('Roadmap', 88), ('RoB Meeting', 184), ('Actions', 104))
+TREE_COLS = {'objective': ('Strategic Objective', 192), 'owner': ('Objective Owner', 136), 'status': ('Status', 144), 'health': ('Health', 96),
+             'acc': ('Accountability', 152), 'roadmap': ('Roadmap', 88), 'rob': ('RoB Meeting', 184), 'actions': ('Actions', 104)}
 
 
-def tree_table(tree):
-    """The dashboard's work list: rows that open a second and a third layer,
-    a name column that stays put while the rest scrolls sideways."""
-    out, n = [], [0]
+def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roadmap', 'rob', 'actions'), kinds=KINDS, prefix='dash', sticky=True,
+               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs=''):
+    """A work list as the product draws it: rows that open a second and a
+    third layer. With sticky, the name column stays put while the rest scrolls
+    sideways (the dashboard); without, the table fills the page (the lists).
+    tree: (objective, owner, node); node: (name, status, health, person, unit,
+    rob meeting (date, recurrence, past) or None, children)."""
+    out, n, links = [], [0], links or {}
 
     def row(node, level, objective, owner, parent):
         name, status, hlth, k, unit, rob, kids = node
         n[0] += 1
-        rid = f'dash-{n[0]}'
+        rid = f'{prefix}-{n[0]}'
         caret = (f'<button class="row-toggle" type="button" aria-expanded="false" aria-label="Toggle {name}" data-rows="{rid}">{icon("i-chevron-down")}</button>' if kids
                  else '<span class="row-toggle-spacer"></span>')
-        link = f'<a class="ps-tree-title" href="../initiative-view/index.html">{name}</a>' if level == 0 else f'<span class="ps-tree-title">{name}</span>'
+        link = f'<a class="ps-tree-title" {links[name]}>{name}</a>' if name in links else f'<span class="ps-tree-title">{name}</span>'
         first = (f'<div class="ps-tree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
-                 f'{tag(KINDS[level])}{tag("# Core Strategy")}</div></div>')
+                 f'{tag(kinds[level])}{tags(name, level)}</div></div>')
         if rob:
             date = f'<s>{rob[0]}</s>' if rob[2] else rob[0]
             meet = (f'<div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2); flex-wrap: nowrap">{icon("i-calendar", "icon icon-16")}<span style="white-space: nowrap">{date}</span></span>'
                     f'<span class="cell-meta-sub">{tag(rob[1])}</span></div>')
-        else:
+        elif 'health' in cols:
             meet = f'<span class="row body-sm" style="gap: var(--spacing-1); flex-wrap: nowrap; white-space: nowrap; color: var(--color-text-muted)"><span style="color: var(--color-warning); display: inline-flex">{icon("i-info", "icon icon-16")}</span>No meeting connected</span>'
-        road = (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>'
-                if level == 0 else '')
-        cells = (first, sub(objective), sub(PEOPLE[owner][0]), tag(status, STATUS_KIND.get(status, 'light')), health(hlth, HEALTH_KIND[hlth]), user(k, unit), road, meet, raci_btn())
-        attrs = f' data-child-of="{parent}" hidden' if parent else ''
-        out.append(f'<tr class="ps-tree-row" data-search-item{attrs}>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>')
+        else:
+            meet = ''
+        cell = {'objective': lambda: sub(objective), 'owner': lambda: sub(PEOPLE[owner][0]), 'status': lambda: tag(status, STATUS_KIND.get(status, 'light')),
+                'health': lambda: health(hlth, HEALTH_KIND[hlth]), 'acc': lambda: user(k, unit),
+                'roadmap': lambda: (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>' if level == 0 else ''),
+                'rob': lambda: meet, 'actions': raci_btn}
+        hide = f' data-child-of="{parent}" hidden' if parent else ''
+        out.append(f'<tr class="ps-tree-row" data-search-item{hide}><td>{first}</td>' + ''.join(f'<td>{cell[c]()}</td>' for c in cols) + '</tr>')
         for kid in kids:
             row(kid, level + 1, objective, owner, rid)
 
     for objective, owner, node in tree:
         row(node, 0, objective, owner, '')
-    th = ''
-    for h, w in TREE_HEADS:
-        inner = (f'<span class="row" style="gap: var(--spacing-2); flex-wrap: nowrap">Name<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></span>' if h == 'Name'
-                 else f'<span class="row" style="gap: var(--spacing-1); flex-wrap: nowrap">Health{icon("i-info", "icon icon-16")}</span>' if h == 'Health'
-                 else '<span style="display: block; text-align: right">Actions</span>' if h == 'Actions' else h)
-        th += f'<th style="width: {w}px">{inner}</th>'
-    return (f'<div class="table-scroll" style="max-height: none"><table class="table ps-tree" style="min-width: {sum(w for _, w in TREE_HEADS)}px; table-layout: fixed">'
+    width = lambda w: f' style="width: {w}px"' if sticky else ''
+    th = f'<th{width(256) if sticky else chr(32) + chr(115) + "tyle=" + chr(34) + "width: 30%" + chr(34)}><span class="row" style="gap: var(--spacing-2); flex-wrap: nowrap">Name<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button></span></th>'
+    for c in cols:
+        h, w = TREE_COLS[c]
+        inner = (f'<span class="row" style="gap: var(--spacing-1); flex-wrap: nowrap">Health{icon("i-info", "icon icon-16")}</span>' if c == 'health'
+                 else '<span style="display: block; text-align: right">Actions</span>' if c == 'actions' else h)
+        th += f'<th{width(w)}>{inner}</th>'
+    total = 256 + sum(TREE_COLS[c][1] for c in cols)
+    style = f' style="min-width: {total}px; table-layout: fixed"' if sticky else ''
+    return (f'<div class="table-scroll" style="max-height: none"{attrs}><table class="table ps-tree{" ps-tree-sticky" if sticky else ""}"{style}>'
             f'<thead><tr>{th}</tr></thead><tbody>{"".join(out)}</tbody></table></div>')
+
+
+def swap_table(html, table_html):
+    """Put a tree table where a screen's plain desktop table is."""
+    m = re_table.search(html)
+    assert m and len(re_table.findall(html)) == 1
+    return html[:m.start()] + table_html + html[m.end():]
+
+
+re_table = _re.compile(r'<div class="table-scroll" style="max-height: none" data-view="desktop">.*?</table>\s*</div>', _re.S)
+PAST = lambda r: (r[0], r[1], r[0].startswith('Oct')) if r else None
+KIDS = {node[0]: node[6] for _, _, node in DASH_TREE}
+PROC_KIDS = {
+    'Vendor Management': [('Supplier onboarding', 'Active', None, 'lk', 'Operations', None, []), ('Contract renewals', 'Not started', None, 'og', 'Legal', None, [])],
+    'Refund requests': [('Refund review', 'Active', None, 'lh', 'Delivery', None, [('Partial refunds', 'Active', None, 'tl', 'Delivery', None, []), ('Refunds over the limit', 'Paused', None, 'ck', 'Delivery', None, [])]),
+                        ('Reply to the customer', 'Active', None, 'tl', 'Delivery', None, [])],
+    'Legal Operations': [('Contract review', 'Active', None, 'og', 'Legal', None, []), ('Policy updates', 'Not active', None, 'og', 'Legal', None, [])],
+    'Recruiting Pipeline': [('Sourcing', 'Active', None, 'mv', 'Recruiting', None, [('Referral intake', 'Active', None, 'km', 'Northwind Hire', None, [])])],
+    'Analytics Reporting': [('Weekly numbers', 'Active', None, 'mt', 'Business Analytics', None, [])],
+}
+PROC_TREE = [(None, None, (n, st, None, k, unit, PAST(r), PROC_KIDS.get(n, []))) for n, st, k, unit, r in PROCESSES]
+DASH_LINKS = {n: 'href="../initiative-view/index.html"' for n in KIDS}
+INIT_TREE = [(None, None, (n, st, h[0], k, unit, PAST(r), KIDS.get(n, []))) for n, st, kind, h, k, unit, road, r in INITIATIVES]
 
 
 def dashboard_with_states():
@@ -1696,7 +1729,7 @@ def dashboard_with_states():
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     e = h.index('</div>\n<div data-panel="scope:1" hidden>')
     ccards = ''.join(work_card(nd[0], health(nd[2], HEALTH_KIND[nd[2]]) + tag("Initiative") + tag(nd[1], STATUS_KIND.get(nd[1], "light")) + tag("# Core Strategy"), nd[3], nd[4], caret=bool(nd[6])) for o, k, nd in DASH_TREE)
-    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
+    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE, links=DASH_LINKS)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
          + mobile('<div class="stack">' + ccards + '</div>') + h[e:])
     charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
@@ -1838,9 +1871,10 @@ def processes_with_states():
     h = h.replace('<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI">', '<button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="View RACI" data-modal-open="raci-drawer">')
     h = toggle(h, 'Filters', 'filters-panel')
     h = h.replace('<button class="btn btn-ghost btn-xs" type="button">Expand all</button>', '<button class="btn btn-ghost btn-xs" type="button" data-expand-all>Expand all</button>')
-    kid = lambda n, kind, st, k: (kid_cell(n, kind), tag(st), user(k, 'Delivery'), '', raci_btn())
-    h = child_rows(h, '>Refund requests</a>', 'refund', [kid('Refund review', 'Activity', 'Active', 'lh'), kid('Partial refunds', 'Sub-activity', 'Active', 'tl')], 5)
-    h = tree_cells(h)
+    h = swap_table(h, tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='proc', sticky=False, attrs=' data-view="desktop"',
+                                 tags=lambda name, level: tag('Northwind Hire', 'blue-light') if name == 'Northwind Hire' else '',
+                                 links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}))
+    h = h.replace('aria-label="View RACI">', 'aria-label="View RACI" data-modal-open="raci-drawer">')
     return with_views(h, *processes_views(), extra_panels=work_filters('Process', ('Process', 'Activity', 'Sub-activity')))
 
 
@@ -2355,7 +2389,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Every screen has a floating Open on staging link that opens the same view on the staging server in a new tab, for comparing the two.'),    dict(date='Nov 25, 2026', span='13:21–13:28', minutes=7,
          screens=['profile', 'team-profile', 'people', 'team', 'time-off', 'recognitions', 'watercooler', 'peer-feedback'],
          note='The Open on staging link follows the open tab on eight screens: it opens that same tab on staging.'),    dict(date='Nov 25, 2026', span='13:28–13:35', minutes=7, screens=['dashboard'],
-         note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),
+         note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),    dict(date='Nov 25, 2026', span='13:34–13:39', minutes=5, screens=['processes', 'initiatives'],
+         note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),
 ]
 
 
