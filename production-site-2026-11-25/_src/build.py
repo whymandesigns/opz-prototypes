@@ -216,7 +216,7 @@ def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
                   f'<a class="dropdown-item" href="{"../" * depth}sign-in/index.html">Sign out</a></div></div></div>')
     t, n = re.subn(r'<ul class="sidenav-list">.*?</ul>', lambda m: sidenav(active, depth), t, count=1, flags=re.S)
     assert n == 1
-    pad = ' style="padding: var(--spacing-10)"' if padded else ' style="padding: 0"'
+    pad = ' style="padding: var(--spacing-3) var(--spacing-8) var(--spacing-10)"' if padded else ' style="padding: 0"'
     t, n = re.subn(r'<main class="app-shell-main"[^>]*>.*?</main>',
                    lambda m: f'<main class="app-shell-main"{pad}>\n{main}\n    </main>', t, count=1, flags=re.S)
     assert n == 1
@@ -245,7 +245,7 @@ def plain(title, body):
   <link rel="stylesheet" href="../../designmd/components.css" />
 {ELEMENTS}</head>
 <body>
-  <main style="max-width: 1200px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
+  <main style="max-width: 1440px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
 {body}
   </main>
   <script>

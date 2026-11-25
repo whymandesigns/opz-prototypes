@@ -4614,6 +4614,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-sheet .row-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .ps-sheet .row-toggle[aria-expanded="true"] svg { transform: none; }
 .ps-sheet tr[hidden] { display: none; }
+
+/* Blue action button: where the product's main action is blue, not green. */
+.btn.ps-btn-accent { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-text-inverse); }
+.btn.ps-btn-accent:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.btn.ps-btn-accent:disabled { opacity: 0.5; }
+
+/* Product density (.ps-density is only its name on the elements page): the
+   product's tighter spacing, applied over the kit's classes on every screen. */
+.ps-density { display: block; }
+.page-head { margin-bottom: var(--spacing-6); }
+.page-head:has(+ .tabs) { margin-bottom: var(--spacing-3); padding-bottom: 0; border-bottom: 0; }
+.table-scroll:has(> .ps-striped), .table-scroll:has(> .ps-wtree), .table-scroll:has(> .ps-sheet) { border: 0; border-radius: 0; }
+.table.ps-striped td, .table.ps-wtree td { padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table.ps-striped th, .table.ps-wtree th { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table .cell-user > .avatar, .table .cell-user .ps-avatar-wrap > .avatar { width: var(--spacing-10); height: var(--spacing-10); }
+[data-show-in][hidden], [data-hide-in][hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4760,7 +4776,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </div>
     </aside>
 
-    <main class="app-shell-main" style="padding: var(--spacing-10)">
+    <main class="app-shell-main" style="padding: var(--spacing-3) var(--spacing-8) var(--spacing-10)">
       <div class="page-head">
         <div class="page-head-main">
           <div class="page-head-title">
@@ -4794,8 +4810,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <div class="stack" style="flex: 0 1 220px; min-width: 0"><span class="body-sm" style="color: var(--color-text-muted)">Contacts</span>
           <div class="row" style="justify-content: space-between; flex-wrap: nowrap"><span class="row" style="min-width: 0; flex-wrap: nowrap"><svg class="icon icon-16" aria-hidden="true"><use href="#i-email"/></svg><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">cara.keane@harborsupport.com</a></span><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy"><svg class="btn-icon" aria-hidden="true"><use href="#i-copy"/></svg></button></div><div class="row" style="justify-content: space-between; flex-wrap: nowrap"><span class="row" style="min-width: 0; flex-wrap: nowrap"><svg class="icon icon-16" aria-hidden="true"><use href="#i-slack-color"/></svg><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Cara Keane</a></span><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy"><svg class="btn-icon" aria-hidden="true"><use href="#i-copy"/></svg></button></div><div class="row" style="justify-content: space-between; flex-wrap: nowrap"><span class="row" style="min-width: 0; flex-wrap: nowrap"><svg class="icon icon-16" aria-hidden="true"><use href="#i-phone"/></svg><a class="body-sm" href="#" style="color: var(--color-text-link); text-decoration: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">+353 1 555 0142</a></span><button class="btn btn-icon-only btn-ghost btn-xs" type="button" aria-label="Copy"><svg class="btn-icon" aria-hidden="true"><use href="#i-copy"/></svg></button></div></div>
         <div class="stack" style="flex: 1 1 320px; min-width: 0"><span class="body-sm" style="color: var(--color-text-muted)">About</span>
-          <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p>
-          <div><button class="btn btn-ghost btn-xs" type="button">Read more</button></div></div>
+          <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p></div>
         <div class="stack" style="flex: 0 1 240px; min-width: 0"><span class="body-sm" style="color: var(--color-text-muted)">Location</span>
           <div class="ps-map is-small" role="img" aria-label="Map of where people are"><span class="ps-map-pin" style="left: 46%; top: 52%"></span><span class="ps-map-count body-xs">Dublin, Ireland</span></div></div>
       </div>

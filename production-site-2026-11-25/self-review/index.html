@@ -4614,6 +4614,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-sheet .row-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .ps-sheet .row-toggle[aria-expanded="true"] svg { transform: none; }
 .ps-sheet tr[hidden] { display: none; }
+
+/* Blue action button: where the product's main action is blue, not green. */
+.btn.ps-btn-accent { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-text-inverse); }
+.btn.ps-btn-accent:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.btn.ps-btn-accent:disabled { opacity: 0.5; }
+
+/* Product density (.ps-density is only its name on the elements page): the
+   product's tighter spacing, applied over the kit's classes on every screen. */
+.ps-density { display: block; }
+.page-head { margin-bottom: var(--spacing-6); }
+.page-head:has(+ .tabs) { margin-bottom: var(--spacing-3); padding-bottom: 0; border-bottom: 0; }
+.table-scroll:has(> .ps-striped), .table-scroll:has(> .ps-wtree), .table-scroll:has(> .ps-sheet) { border: 0; border-radius: 0; }
+.table.ps-striped td, .table.ps-wtree td { padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table.ps-striped th, .table.ps-wtree th { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table .cell-user > .avatar, .table .cell-user .ps-avatar-wrap > .avatar { width: var(--spacing-10); height: var(--spacing-10); }
+[data-show-in][hidden], [data-hide-in][hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4745,7 +4761,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </div>
     </aside>
 
-    <main class="app-shell-main" style="padding: var(--spacing-10)">
+    <main class="app-shell-main" style="padding: var(--spacing-3) var(--spacing-8) var(--spacing-10)">
       <div class="page-head">
         <div class="page-head-main">
           <div class="page-head-title">

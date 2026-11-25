@@ -4614,6 +4614,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-sheet .row-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .ps-sheet .row-toggle[aria-expanded="true"] svg { transform: none; }
 .ps-sheet tr[hidden] { display: none; }
+
+/* Blue action button: where the product's main action is blue, not green. */
+.btn.ps-btn-accent { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-text-inverse); }
+.btn.ps-btn-accent:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.btn.ps-btn-accent:disabled { opacity: 0.5; }
+
+/* Product density (.ps-density is only its name on the elements page): the
+   product's tighter spacing, applied over the kit's classes on every screen. */
+.ps-density { display: block; }
+.page-head { margin-bottom: var(--spacing-6); }
+.page-head:has(+ .tabs) { margin-bottom: var(--spacing-3); padding-bottom: 0; border-bottom: 0; }
+.table-scroll:has(> .ps-striped), .table-scroll:has(> .ps-wtree), .table-scroll:has(> .ps-sheet) { border: 0; border-radius: 0; }
+.table.ps-striped td, .table.ps-wtree td { padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table.ps-striped th, .table.ps-wtree th { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table .cell-user > .avatar, .table .cell-user .ps-avatar-wrap > .avatar { width: var(--spacing-10); height: var(--spacing-10); }
+[data-show-in][hidden], [data-hide-in][hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4749,7 +4765,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
       </div>
     </aside>
 
-    <main class="app-shell-main" style="padding: var(--spacing-10)">
+    <main class="app-shell-main" style="padding: var(--spacing-3) var(--spacing-8) var(--spacing-10)">
       <div class="page-head">
         <div class="page-head-main">
           <div class="page-head-title">
@@ -4771,12 +4787,12 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 <div data-panel="feedback:0">
 
       <div class="toolbar" style="margin: var(--spacing-4) 0">
-        <div class="input-icon input-icon-left toolbar-search">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 1 1 0">
           <svg class="icon input-icon-glyph" aria-hidden="true"><use href="#i-search"/></svg>
-          <input class="input" data-search type="text" placeholder="Receiver" aria-label="Receiver" />
+          <input class="input" type="text" placeholder="Receiver" aria-label="Receiver" />
         </div>
-        <span class="row" data-view="desktop"><div style="flex: 0 0 auto; width: 220px"><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Relationship"><span class="input-select-value input-select-placeholder">Relationship</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div>
-        <div class="input-icon input-icon-left" style="width: 220px"><svg class="icon input-icon-glyph" aria-hidden="true"><use href="#i-calendar"/></svg><input class="input" type="text" placeholder="Date requested" aria-label="Date requested" /></div></span>
+        <span class="row" data-view="desktop" style="flex: 2 1 0; flex-wrap: nowrap"><div style="flex: 1 1 0; min-width: 0"><div class="input-select"><button class="input-select-trigger" type="button" aria-expanded="false" aria-label="Relationship"><span class="input-select-value input-select-placeholder">Relationship</span><svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></button><div class="dropdown-menu" hidden></div></div></div>
+        <div class="input-icon input-icon-left" style="flex: 1 1 0; min-width: 0"><svg class="icon input-icon-glyph" aria-hidden="true"><use href="#i-calendar"/></svg><input class="input" type="text" placeholder="Date requested" aria-label="Date requested" /></div></span>
         <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters" data-view="mobile" hidden><svg class="btn-icon" aria-hidden="true"><use href="#i-filter"/></svg></button>
       </div>
 

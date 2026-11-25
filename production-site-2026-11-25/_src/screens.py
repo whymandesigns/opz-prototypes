@@ -768,8 +768,7 @@ def profile():
         <div class="stack" style="flex: 0 1 220px; min-width: 0"><span class="body-sm" {MUTED}>Contacts</span>
           {contact("i-email", "cara.keane@harborsupport.com")}{contact("i-slack-color", "Cara Keane")}{contact("i-phone", "+353 1 555 0142")}</div>
         <div class="stack" style="flex: 1 1 320px; min-width: 0"><span class="body-sm" {MUTED}>About</span>
-          <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p>
-          <div><button class="btn btn-ghost btn-xs" type="button">Read more</button></div></div>
+          <p class="body" style="margin: 0">I run the Delivery team in Dublin. Before that I spent eight years in customer support, which is where I learned that most problems are handoff problems.</p></div>
         <div class="stack" style="flex: 0 1 240px; min-width: 0"><span class="body-sm" {MUTED}>Location</span>
           <article class="card"><div class="row">{icon("i-pin", "icon icon-16")}<span class="body-sm">Dublin, Ireland</span></div></article></div>
       </div>
@@ -937,7 +936,7 @@ def time_off():
 
 
 def recognitions():
-    return f'''{head("Recognitions &amp; Badges", '<button class="btn btn-primary" type="button">Give recognition</button>')}
+    return f'''{head("Recognitions &amp; Badges", '<button class="btn btn-primary ps-btn-accent" type="button">Give recognition</button>')}
 
       {tabs(("Recognitions", "Badges"))}
 
@@ -960,12 +959,12 @@ def peer_feedback():
       {tabs(("Pending (2)", "Received", "Given"))}
 
       <div class="toolbar" style="margin: var(--spacing-4) 0">
-        <div class="input-icon input-icon-left toolbar-search">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 1 1 0">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="Receiver" aria-label="Receiver" />
         </div>
-        <span class="row" data-view="desktop">{ph_select("Relationship", "Relationship", 220)}
-        <div class="input-icon input-icon-left" style="width: 220px">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Date requested" aria-label="Date requested" /></div></span>
+        <span class="row" data-view="desktop" style="flex: 2 1 0; flex-wrap: nowrap"><div style="flex: 1 1 0; min-width: 0">{ph_select("Relationship", "Relationship")}</div>
+        <div class="input-icon input-icon-left" style="flex: 1 1 0; min-width: 0">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Date requested" aria-label="Date requested" /></div></span>
         <button class="btn btn-icon-only btn-ghost" type="button" aria-label="Filters" data-view="mobile" hidden>{icon("i-filter", "btn-icon")}</button>
       </div>
 
@@ -1028,7 +1027,7 @@ def profile_edit():
 
       <div class="row" style="margin-top: var(--spacing-6)">
         <a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>
-        <button class="btn btn-primary" type="button" disabled>Save Changes</button>
+        <button class="btn btn-primary ps-btn-accent" type="button" disabled>Save Changes</button>
       </div>'''
 
 
@@ -1057,7 +1056,7 @@ def not_found():
         {art("i-art-not-found", 112, "Page not found")}
         <h1 class="h3" style="margin: var(--spacing-2) 0 0">404</h1>
         <p class="body-sm" style="margin: 0; color: var(--color-text-muted)">Page not found</p>
-        <a class="btn btn-primary" href="../dashboard/index.html" style="text-decoration: none; margin-top: var(--spacing-3)">Go back to dashboard</a>
+        <a class="btn btn-primary ps-btn-accent" href="../dashboard/index.html" style="text-decoration: none; margin-top: var(--spacing-3)">Go back to dashboard</a>
       </div>'''
 
 
@@ -1115,7 +1114,7 @@ def public_profile_edit():
     def area(label):
         return f'<label class="field"><span class="field-label">{label}</span><textarea class="input" rows="6"></textarea></label>'
     actions = ('<a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>\n          '
-               '<button class="btn btn-primary" type="button">Save changes</button>')
+               '<button class="btn btn-primary ps-btn-accent" type="button">Save changes</button>')
     wrap = 'class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"'
     return f'''{head("Edit public profile for Cara", actions)}
 
@@ -1568,13 +1567,13 @@ def indent(n, lvl, bold=False):
 
 def processes_views():
     comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True,
-                      links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'})
+                      links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'}) + pager()
     return comp, sheet_tree(PROC_TREE, 'procs', with_health=False)
 
 
 def initiatives_views():
     comp = tree_table(INIT_TREE, cols=('status', 'health', 'acc', 'roadmap', 'rob', 'actions'), prefix='initc', sticky=False, compact=True,
-                      links={'Onboarding in one week': 'href="../initiative-view/index.html"'})
+                      links={'Onboarding in one week': 'href="../initiative-view/index.html"'}) + pager(("1", "2", "3"))
     return comp, sheet_tree(INIT_TREE, 'inits')
 
 
@@ -1792,8 +1791,9 @@ def dashboard_with_states():
         <div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" /></div>
         <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button><button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
       </div>
-      {table(("Name", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting", '<span style="display: block; text-align: right">Actions</span>'), orow)}</div>
+      {tree_table(INIT_TREE[1:7], cols=("status", "health", "acc", "roadmap", "rob", "actions"), prefix="dasho", sticky=False, tags=lambda name, level: "")}</div>
       {mobile('<div class="stack">' + ocards + '</div>')}'''
+    h = h.replace('<table class="table">\n          <thead><tr><th>#</th>', '<table class="table ps-sheet">\n          <thead><tr><th>#</th>')
     h = h.replace('<table class="table">', '<table class="table ps-striped">')
     h = h[:j] + '<div data-panel="scope:0">' + h[j:] + '</div>\n<div data-panel="scope:1" hidden>' + other + '</div>'
     k = '      <div class="table-scroll" style="max-height: none">'
@@ -2236,12 +2236,12 @@ def okrs():
     h = _okrs()
     a = h.index('      <div class="stack">')
     b = h.index('<nav class="ps-pagination"') if '<nav class="ps-pagination"' in h else h.index('<div class="row" style="margin-top: var(--spacing-4)">')
-    return h[:a] + '      <div class="stack">' + ''.join(okr_card(*o) for o in OKRS) + '</div>\n      ' + h[b:]
+    return h[:a] + '      ' + empty_state('i-okr', 'No OKRs found', 'No OKRs have been created for this level and period yet.')
 
 
 def okr_panels():
     one = lambda *items: '<div class="stack">' + ''.join(okr_card(n, st, k, krs) for n, st, k, krs in items) + '</div>'
-    return [one(('Customers start in a week', 'Active', 'positive', [('Median time to first delivery is 7 days', 64)])),
+    return ['<div class="stack">' + ''.join(okr_card(*o) for o in OKRS) + '</div>' + pager(('1', '2')),
             one(('Operations: one handoff, not three', 'Active', 'positive', [('Contract to workspace handoff is automatic', 50), ('Kick-off checklist used on every engagement', 80)])),
             one(('Operations Q4: checklist live', 'Active', 'positive', [('Checklist in use on 20 engagements', 45)]), ('IT Q4: self-serve setup', 'Draft', 'light', [('Billing setup without a call', 10)])),
             empty_state('i-okr', 'No OKRs found', 'No OKRs have been created for this level and period yet.'),
@@ -2476,8 +2476,39 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),    dict(date='Nov 25, 2026', span='13:56–14:00', minutes=4, screens=['initiative-create', 'profile-edit', 'rob-meeting-view'],
          note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),    dict(date='Nov 25, 2026', span='14:00–14:04', minutes=4, screens=['not-found', 'no-access', 'self-review', 'talent-profile', 'rob-paused-meetings', 'profile-public-edit'],
          note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),    dict(date='Nov 25, 2026', span='14:04–14:09', minutes=5, screens=['processes', 'initiatives', 'dashboard'],
-         note='Compact and spreadsheet views redone against staging: compact is the same tree with one line per row, spreadsheet is a numbered, ruled grid with every layer open and a description beside the name. The spreadsheet view drops the filter and sort controls, as there.'),
+         note='Compact and spreadsheet views redone against staging: compact is the same tree with one line per row, spreadsheet is a numbered, ruled grid with every layer open and a description beside the name. The spreadsheet view drops the filter and sort controls, as there.'),    dict(date='Nov 25, 2026', span='14:17–14:23', minutes=6, screens='all',
+         note='Measured staging’s sizes against ours and matched them on every screen: tighter page padding, tabs straight under the title, tables without an outer box, shorter rows, larger pictures. Blue main buttons where the product has them, OKRs opening empty as there, the dashboard’s other tab as a tree. Each screen now carries a match estimate.'),
 ]
+
+
+# How close each screen is to staging: my own estimate from putting the two side
+# by side, not a measurement. The second item is what still differs.
+MATCH = {
+    'dashboard': (93, 'Actions column on staging not seen; spreadsheet view has its own columns'),
+    'processes': (93, 'Rows under a process were not opened on staging; naming'),
+    'initiatives': (95, 'Made-up data only'),
+    'initiative-view': (93, 'No documents; fields filled where staging has dashes'),
+    'initiative-create': (94, 'Only the first screen of the form was compared'),
+    'rob-meetings': (90, 'Staging’s calendar was still loading when compared'),
+    'rob-meeting-view': (92, 'R and A letters are square tags; deck is a title card'),
+    'okrs': (90, 'Tabs after the first could not be read on staging'),
+    'people': (96, 'Made-up data only'),
+    'profile': (93, 'Name and role on two lines in the chain; photo and map are placeholders'),
+    'team': (94, 'Divisions and Skills tabs not re-compared'),
+    'team-profile': (93, 'Logo is a generic icon; other tabs not re-compared'),
+    'rob-paused-meetings': (96, 'Made-up data only'),
+    'profile-edit': (94, 'Work and Contacts tabs not re-compared'),
+    'watercooler': (95, 'Fewer channels, made-up text'),
+    'time-off': (95, 'Made-up data only'),
+    'recognitions': (95, 'Badges are redrawn, not copied'),
+    'peer-feedback': (95, 'Made-up data only'),
+    'self-review': (94, 'Compared by reading the text, not by eye'),
+    'not-found': (96, 'Drawing is redrawn'),
+    'talent-profile': (93, 'Compared by reading the text, not by eye'),
+    'no-access': (96, 'Icon shape'),
+    'sign-in': (None, 'Not compared: needs logging out of staging'),
+    'profile-public-edit': (95, 'Only the first screen of the form was compared'),
+}
 
 
 def index():
@@ -2496,7 +2527,7 @@ def index():
     body = []
     for area, rows in INVENTORY:
         n = sum(1 for r in rows if r[2])
-        body.append(f'<tr><td colspan="7"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
+        body.append(f'<tr><td colspan="9"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
         for name, route, folder in rows:
             if folder:
                 b = by_folder[folder].get('batch', 1)
@@ -2505,11 +2536,12 @@ def index():
                 ud = f'<span class="body-sm">{u[-1]["date"]}</span>' if u else dash
                 ut = f'<span class="body-sm">{u[-1]["minutes"] / (done if u[-1]["screens"] == "all" else len(u[-1]["screens"])):.1f} min</span>' if u else dash
                 cells = (f'<td><a class="cell-title" href="{folder}/index.html" {LINK}>{name}</a></td><td><code class="body-sm">{route}</code></td>'
-                         f'<td><span class="body-sm">{BATCHES[b]["date"]}</span></td><td><span class="body-sm">{mins:.1f} min</span></td><td>{ud}</td><td>{ut}</td>')
+                         f'<td><span class="body-sm">{BATCHES[b]["date"]}</span></td><td><span class="body-sm">{mins:.1f} min</span></td><td>{ud}</td><td>{ut}</td>'
+                         + (f'<td>{tag(str(MATCH[folder][0]) + "%", "positive" if MATCH[folder][0] >= 95 else "warning") if MATCH[folder][0] else dash}</td><td><span class="body-sm" {MUTED}>{MATCH[folder][1]}</span></td>'))
             else:
                 why = f'<span class="body-sm" {MUTED}>{WHY[name]}</span>' if name in WHY else dash
                 cells = (f'<td><span class="cell-title" {MUTED}>{name}</span></td><td><code class="body-sm">{route}</code></td>'
-                         f'<td colspan="4">{why}</td>')
+                         f'<td colspan="6">{why}</td>')
             body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td>{cells}</tr>')
     srows = ''.join(
         f'<tr><td style="width: var(--spacing-10)">{yes}</td><td><span class="body-sm">{titles.get(f, "Edit org unit")}</span></td>'
@@ -2533,7 +2565,7 @@ def index():
 
     <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Screens</h2>
     <div class="table-scroll" style="max-height: none; margin-bottom: var(--spacing-8)">
-      <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Built</th><th>Time to build</th><th>Updated</th><th>Time to update</th></tr></thead><tbody>{"".join(body)}</tbody></table>
+      <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Built</th><th>Time to build</th><th>Updated</th><th>Time to update</th><th>Match with staging</th><th>Still different</th></tr></thead><tbody>{"".join(body)}</tbody></table>
     </div>
 
     <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Tabs, drawers and modals</h2>
@@ -2602,6 +2634,10 @@ def elements_page():
          '<div style="max-width: 640px"><div class="ps-agenda-row"><span class="body-sm">1</span><span class="body-sm">Onboarding status: where each new customer is in the first week</span>' + tag('Weekly') + '<span class="body-xs">Cara Keane</span></div></div>'),
         ('Sheet table', 'ps-sheet', 'Processes and Initiatives, spreadsheet view: numbered rows, ruled cells, every layer open, a column of carets.', 'initiatives/index.html#show-view-2',
          sheet_tree(INIT_TREE[:1], 'el-sheet')),
+        ('Blue action button', 'ps-btn-accent', 'Recognitions, the public-profile form and the 404 page: the product’s main action there is blue, where the kit’s primary button is green.', 'recognitions/index.html',
+         '<div class="row"><button class="btn btn-primary ps-btn-accent" type="button">Give recognition</button><button class="btn btn-secondary ps-btn-accent" type="button" disabled>Save changes</button></div>'),
+        ('Product density', 'ps-density', 'Every screen: the product’s tighter page padding, tabs set straight under the title, tables without an outer box, shorter rows and larger pictures. Rules that adjust kit classes, kept together.', 'people/index.html',
+         '<p class="body-sm" style="margin: 0">See any list screen; this entry has no markup of its own.</p>'),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'
