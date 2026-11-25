@@ -982,6 +982,82 @@ def not_found():
       </div>'''
 
 
+# ------------------------------------------------------------- Batch 3
+def talent_profile():
+    def f(label, value):
+        return f'<div><span class="body-sm" {MUTED}>{label}</span><div>{value}</div></div>'
+    work = [('Onboarding in one week', 'Initiative', 0, 'Execution', 'blue', ('Dec 01 • 4:00pm', 'Every week on Tuesday'), ''),
+            ('Kick-off checklist', 'Project', 1, 'Execution', 'blue', ('Dec 01 • 5:30pm', 'Every week on Tuesday'), ''),
+            ('First-week survey', 'Sub-project', 2, 'Complete', 'positive', '', 'R')]
+    none = '<span class="row body-sm">' + icon('i-warning', 'icon icon-16') + 'No meeting connected</span>'
+    rows = ''.join(
+        f'<tr><td><div style="padding-left: calc({lvl} * var(--spacing-6))"><span class="cell-title">{n}</span><div>{tag(kind)}</div></div></td><td>{tag(st, c)}</td>'
+        f'<td>{rob_cell(r) if r else none}</td>'
+        f'<td>{tag(role, "positive") if role else ""}</td><td>{raci_btn()}</td></tr>' for n, kind, lvl, st, c, r, role in work)
+    cards = ''.join(work_card(n, tag(kind) + tag(st, c), 'sr', 'Operations') for n, kind, lvl, st, c, r, role in work)
+    return f'''{head("Talent Network Member Profile")}
+
+      <div class="alert alert-warning" style="margin-bottom: var(--spacing-6)">{icon("i-warning", "icon alert-icon")}<p class="alert-message">Not a Core Team member: Please reach out to Sofia Romano for more details</p></div>
+
+      <div class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-6)">
+        <span class="avatar avatar-2xl">RD</span>
+        <div class="stack" style="flex: 1 1 240px; min-width: 0">
+          <h2 class="h2" style="margin: 0">Rosa Dahl</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, max-content)); gap: var(--spacing-6)">
+            {f("Manager", f'<a class="body" href="#" {LINK}>Sofia Romano</a>')}
+            {f("Function", f'<a class="body" href="../team-profile/index.html" {LINK}>Operations</a>')}
+            {f("Team", f'<a class="body" href="#" {LINK}>Delivery</a>')}
+            {f("Hire Date", '<span class="body">Jun 1, 2026</span>')}
+          </div>
+        </div>
+      </div>
+
+      <div class="stack" style="margin: var(--spacing-6) 0; gap: var(--spacing-2)"><span class="body-sm" {MUTED}>Contacts</span>
+        <div class="row" style="flex-wrap: wrap; gap: var(--spacing-6)">
+          <span class="row">{icon("i-email", "icon icon-16")}<a class="body-sm" href="#" {LINK}>rosa.dahl@harborsupport.com</a></span>
+          <span class="row">{icon("i-slack", "icon icon-16")}<a class="body-sm" href="#" {LINK}>Rosa Dahl</a></span>
+        </div></div>
+
+      {tabs(("Initiatives", "Processes"))}
+
+      {mobile('<div class="stack" style="margin-top: var(--spacing-4)">' + cards + '</div>')}
+      <div class="table-scroll" style="max-height: none; margin-top: var(--spacing-4)" data-view="desktop">
+        <table class="table">
+          <thead><tr><th>Name</th><th>Status</th><th>RoB Meeting</th><th>Roles</th><th style="text-align: right">Actions</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>'''
+
+
+def public_profile_edit():
+    def txt(label):
+        return f'<label class="field" style="flex: 1 1 220px"><span class="field-label">{label}</span><input class="input" type="text" /></label>'
+
+    def area(label):
+        return f'<label class="field"><span class="field-label">{label}</span><textarea class="input" rows="6"></textarea></label>'
+    actions = ('<a class="btn btn-secondary" href="../profile/index.html" style="text-decoration: none">Cancel</a>\n          '
+               '<button class="btn btn-primary" type="button">Save changes</button>')
+    wrap = 'class="row" style="flex-wrap: wrap; align-items: flex-start; gap: var(--spacing-4)"'
+    return f'''{head("Edit public profile for Cara", actions)}
+
+      <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-8)">
+        <div class="stack" style="flex: 3 1 420px; min-width: 0; max-width: 720px">
+          <div {wrap}>{txt("Name (optional)")}{txt("Job title (optional)")}</div>
+          <div {wrap}>{txt("Previously at (optional)")}
+            <div class="field" style="flex: 1 1 220px"><span class="field-label">Career start year (optional)</span>{ph_select("Select a year", "Career start year")}</div></div>
+          {area("Bio (optional)")}
+          {area("Career highlight (optional)")}
+          {area("Achievements (optional)")}
+          <div {wrap}>{txt("External URL (optional)")}{txt("Phone (optional)")}</div>
+          <div {wrap}>{txt("Country (optional)")}{txt("City (optional)")}</div>
+        </div>
+        <div class="stack" style="flex: 1 1 160px">
+          <span class="field-label">Profile image (optional)</span>
+          <span class="avatar avatar-2xl">CK</span>
+        </div>
+      </div>'''
+
+
 P1 = ('btn-primary',)
 SCREENS = [
     dict(folder='dashboard', title='TopTrack Dashboard', nav='Dashboard', main=dashboard(), route='/dashboard',
@@ -1013,6 +1089,9 @@ SCREENS = [
          ctas=[('btn-secondary', 'Request feedback', 'i-comment-ask'), ('btn-primary', 'Give feedback', 'i-plus')]),
     dict(folder='self-review', batch=2, title='Self-review', nav=None, main=self_review(), route='/self-review/:userId'),
     dict(folder='not-found', batch=2, title='Page not found', nav=None, main=not_found(), route='/404'),
+    dict(folder='talent-profile', batch=3, title='Talent Network Member Profile', nav='Team', main=talent_profile(), route='/talent/:talentId'),
+    dict(folder='profile-public-edit', batch=3, title='Edit public profile', nav='People', main=public_profile_edit(), route='/people/:userId/edit-public-profile',
+         ctas=[('btn-secondary', 'Cancel', 'i-x'), ('btn-primary', 'Save changes', 'i-check')]),
 ]
 
 
@@ -1028,12 +1107,12 @@ INVENTORY = [
                       ('Paused meetings', '/rob/paused-meetings', 'rob-paused-meetings'), ('Slack card', '/rob/slack_cards/:id', None)]),
     ('OKRs', [('OKRs', '/okrs/list', 'okrs')]),
     ('People and profile', [('People', '/people/directory', 'people'), ('Profile', '/people/:userId', 'profile'),
-                            ('Edit profile', '/people/:userId/edit', 'profile-edit'), ('Edit public profile', '/people/:userId/edit-public-profile', None),
+                            ('Edit profile', '/people/:userId/edit', 'profile-edit'), ('Edit public profile', '/people/:userId/edit-public-profile', 'profile-public-edit'),
                             ('Create profile', '/people/create', None)]),
     ('Team and org structure', [('Organizational Structure', '/org-structure/org-units', 'team'), ('Team Profile', '/teams/:teamId', 'team-profile'),
                                 ('Create org unit', '/org-structure/create', None), ('Edit org unit', '/teams/:teamId/edit', None),
                                 ('Create division', '/org-structure/divisions/create', None), ('Edit division', '/org-structure/divisions/edit/:id', None),
-                                ('Talent profile', '/talent/:talentId', None), ('Create and edit talent', '/talent/create', None)]),
+                                ('Talent profile', '/talent/:talentId', 'talent-profile'), ('Create and edit talent', '/talent/create', None)]),
     ('Watercooler, Time off, Recognitions', [('Watercooler', '/watercooler', 'watercooler'), ('Time off', '/time-off', 'time-off'), ('Recognitions', '/recognitions', 'recognitions')]),
     ('Peer feedback', [('Peer feedback', '/peer-feedbacks/:viewMode/:tab', 'peer-feedback'), ('Give feedback', '/peer-feedbacks/:feedbackId/edit', None),
                        ('Feedback', '/peer-feedbacks/:feedbackId/view', None)]),
@@ -1067,7 +1146,19 @@ BATCHES = {
             note='Includes the one-off setup: the folder, the build script, the phone layouts and this list.'),
     2: dict(date='Nov 25, 2026', span='10:08–10:14', minutes=6,
             note='Capturing eight more screens on staging and building them.'),
+    3: dict(date='Nov 25, 2026', span='10:16–10:19', minutes=4,
+            note='Mostly spent finding what staging lets this account open; two screens came out of it.'),
 }
+# Why a screen is not built yet, where the reason is known.
+BLOCKED = {
+    'No access on staging': ['Create org unit', 'Edit org unit', 'Create division', 'Edit division', 'Create and edit talent', 'Create profile',
+                             'Create and edit meeting'] + [n for a, rows in INVENTORY if a in ('Admin settings', 'Planning cycles') for n, _, _ in rows],
+    'Errors on staging': ['Self-assessment', 'Manager view', 'Assessments', 'Edit assessment', 'Assessment', 'Reports', 'Cycle report', 'Reviewee breakdown'],
+    'Not a separate screen on desktop': ['Filters'],
+    'Full-screen page the kit has no layout for': ['Onboarding', 'Demo: create a Process', 'Demo: create an Initiative'],
+    'Needs signing out': ['Sign in', 'Sign up', 'Forgot password', 'Reset password'],
+}
+WHY = {n: reason for reason, names in BLOCKED.items() for n in names}
 UPDATES = []  # one dict(date, span, minutes, screens=[folders], note) per update pass; none yet
 
 
@@ -1093,8 +1184,9 @@ def index():
                 cells = (f'<td><a class="cell-title" href="{folder}/index.html" {LINK}>{name}</a></td><td><code class="body-sm">{route}</code></td>'
                          f'<td><span class="body-sm">{BATCHES[b]["date"]}</span></td><td><span class="body-sm">{mins:.1f} min</span></td><td>{dash}</td><td>{dash}</td>')
             else:
+                why = f'<span class="body-sm" {MUTED}>{WHY[name]}</span>' if name in WHY else dash
                 cells = (f'<td><span class="cell-title" {MUTED}>{name}</span></td><td><code class="body-sm">{route}</code></td>'
-                         f'<td>{dash}</td><td>{dash}</td><td>{dash}</td><td>{dash}</td>')
+                         f'<td colspan="4">{why}</td>')
             body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td>{cells}</tr>')
     log = ''.join(f'<tr><td><span class="body-sm-semibold">Build {b}</span></td><td><span class="body-sm">{v["date"]}, {v["span"]}</span></td>'
                   f'<td><span class="body-sm">{per_batch[b]} screens</span></td><td><span class="body-sm">{v["minutes"]} min</span></td>'
