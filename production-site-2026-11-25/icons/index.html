@@ -4614,6 +4614,22 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ps-sheet .row-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .ps-sheet .row-toggle[aria-expanded="true"] svg { transform: none; }
 .ps-sheet tr[hidden] { display: none; }
+
+/* Blue action button: where the product's main action is blue, not green. */
+.btn.ps-btn-accent { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-text-inverse); }
+.btn.ps-btn-accent:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.btn.ps-btn-accent:disabled { opacity: 0.5; }
+
+/* Product density (.ps-density is only its name on the elements page): the
+   product's tighter spacing, applied over the kit's classes on every screen. */
+.ps-density { display: block; }
+.page-head { margin-bottom: var(--spacing-6); }
+.page-head:has(+ .tabs) { margin-bottom: var(--spacing-3); padding-bottom: 0; border-bottom: 0; }
+.table-scroll:has(> .ps-striped), .table-scroll:has(> .ps-wtree), .table-scroll:has(> .ps-sheet) { border: 0; border-radius: 0; }
+.table.ps-striped td, .table.ps-wtree td { padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table.ps-striped th, .table.ps-wtree th { height: var(--spacing-10); padding-top: var(--spacing-2); padding-bottom: var(--spacing-2); }
+.table .cell-user > .avatar, .table .cell-user .ps-avatar-wrap > .avatar { width: var(--spacing-10); height: var(--spacing-10); }
+[data-show-in][hidden], [data-hide-in][hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -4659,7 +4675,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
   <symbol id="i-roadmap" viewBox="0 0 24 24"><path d="M3 4.500h11v4H3v-4Zm5 5.500h13v4H8v-4Zm-3 5.500h10v4H5v-4Z" fill="currentColor"/></symbol>
   <symbol id="i-art-not-found" viewBox="0 0 96 96"><path d="M22 14h52a6 6 0 0 1 6 6v40a6 6 0 0 1-6 6H40L26 80V66h-4a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 54h64v6a6 6 0 0 1-6 6H40L26 80V66h-4a6 6 0 0 1-6-6Z" fill="var(--color-accent-subtle)" stroke="var(--color-accent)" stroke-width="1.5" stroke-linejoin="round"/><path d="M48 24v16" stroke="var(--color-accent)" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="47" r="2.500" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1.500"/><path d="M37 28l-4-3m26 3 4-3M35 36h-5m36 0h-5M37 44l-4 3m26-3 4 3" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round"/></symbol>
 </svg>
-  <main style="max-width: 1200px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
+  <main style="max-width: 1440px; margin: 0 auto; padding: var(--spacing-10) var(--spacing-6)">
     <p class="body-sm" style="margin: 0 0 var(--spacing-2)"><a href="../index.html" style="color: var(--color-text-link); text-decoration: none">Production site · Nov 25, 2026</a></p>
     <h1 class="h1" style="margin: 0 0 var(--spacing-2)">New icons</h1>
     <p class="body" style="margin: 0 0 var(--spacing-6); max-width: 760px; color: var(--color-text-muted)">Icons and artwork the product has and the kit does not. These 14 were drawn for the reference screens, coloured with the kit’s tokens, and kept in one sprite, <code>_src/icons.svg</code>. <span class="body-semibold">Add to library</span> copies the request for that icon: paste it to Claude, or run the command in it, and the icon moves into the kit. It stays on this page with an <span class="body-semibold">Added to library</span> badge, so the filter below gives developers the list of what they still have to implement. See also: <a href="../elements/index.html" style="color: var(--color-text-link); text-decoration: none">New elements</a>.</p>
