@@ -343,6 +343,7 @@ def with_icons(html):
 
 def main():
     built = []
+    elements_html, icons_html = screens.elements_page(), screens.icons_page()   # first: they name what the audit control lists
     for s in screens.SCREENS:
         if s.get('plain'):
             html = plain(s['title'], s['main']).replace('../../designmd/', '../../../designmd/')
@@ -351,14 +352,16 @@ def main():
         d = OUT / s['folder']
         d.mkdir(exist_ok=True)
         html = wire(html, s['folder'])
-        html = html.replace('</body>', screens.staging_link(s['folder']) + '</body>', 1)
-        (d / 'index.html').write_text(with_icons(html))
+        html = html.replace('</body>', screens.staging_link(s['folder']) + screens.audit_ui(s['folder']) + '</body>', 1)
+        html = with_icons(html)
+        screens.AUDIT[s['folder']] = screens.audit_count(html)
+        (d / 'index.html').write_text(html)
         built.append(s['folder'])
     (OUT / 'index.html').write_text(plain('Production site · Nov 25, 2026', screens.index()))
     (OUT / 'elements').mkdir(exist_ok=True)
-    (OUT / 'elements' / 'index.html').write_text(with_icons(plain('New elements · Production site', screens.elements_page()).replace('../../designmd/', '../../../designmd/')))
+    (OUT / 'elements' / 'index.html').write_text(with_icons(plain('New elements · Production site', elements_html).replace('../../designmd/', '../../../designmd/')))
     (OUT / 'icons').mkdir(exist_ok=True)
-    (OUT / 'icons' / 'index.html').write_text(with_icons(plain('New icons · Production site', screens.icons_page()).replace('../../designmd/', '../../../designmd/')))
+    (OUT / 'icons' / 'index.html').write_text(with_icons(plain('New icons · Production site', icons_html).replace('../../designmd/', '../../../designmd/')))
     print('wrote', len(built), 'screens:', ', '.join(built))
 
 

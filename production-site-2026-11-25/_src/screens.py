@@ -2052,6 +2052,116 @@ STATE_GROUPS = [(STATES, 4), (STATES_2, 6), (STATES_3, 7)]   # each list of stat
 
 
 # ------------------------------------------------------------ New elements
+NAMES = {'ps-node': 'Person card line', 'ps-contents': 'Layout helper'}    # class or icon id -> its name on the elements and icons pages
+AUDIT = {}    # folder -> (elements, icons, adjusted kit components): what on that screen is not a library component as it ships
+# Kit components this reference adjusts without giving them a class of their own.
+KIT_VARIATIONS = [
+    ('.page-head', 'Page head', 'Tighter spacing; no rule when tabs follow'),
+    ('.table .cell-user .avatar', 'Avatar in a table', 'Larger, 40px'),
+    ('.table .cell-user-name', 'Person name in a table', 'Heavier weight'),
+    ('.table-scroll', 'Table frame', 'No outer border or radius'),
+    ('.org-node', 'Person card', 'Short name and role on one line, unit link under it'),
+    ('.ps-striped-list > .list-row', 'List row', 'No border; striped'),
+    ('.sidenav-footer', 'Side menu foot', 'Two groups that open, in place of Admin Settings'),
+]
+
+
+def family(cls):
+    """ps-wtree-name -> ps-wtree: the element a class belongs to."""
+    m = _re.match(r'ps-[a-z]+', cls)
+    return m.group(0) if m else None
+
+
+def audit_ui(folder):
+    """The floating control that shows, on any screen, what is not a library
+    component as it ships: new elements, new icons, adjusted kit components."""
+    import json as _j
+    names = {}
+    for cls, name in NAMES.items():
+        names[family(cls) or cls] = name
+        names[cls] = name
+    return ('  <button class="btn btn-secondary ps-audit-toggle" type="button" data-audit-toggle aria-pressed="false" title="Show what on this screen is not a library component">'
+            '<span class="ps-audit-dot"></span><span data-audit-label>Not in library</span></button>\n'
+            '  <aside class="ps-audit-panel" data-audit-panel hidden><p class="body-sm-semibold" style="margin: 0 0 var(--spacing-2)">Not a library component as it ships</p>'
+            '<div data-audit-list></div><p class="body-xs" style="margin: var(--spacing-3) 0 0; color: var(--color-text-muted)">Red dots mark up to three of each on the page. Click a line to jump to the first.</p></aside>\n'
+            '  <div class="ps-audit-layer" data-audit-layer hidden></div>\n'
+            '  <script>\n  (() => {\n'
+            '    const NAMES = ' + _j.dumps(names) + ';\n'
+            '    const KIT = ' + _j.dumps(KIT_VARIATIONS) + ';\n'
+            + AUDIT_JS + '  })();\n  </script>\n')
+
+
+AUDIT_JS = r"""    const skip = new Set(['ps-staging', 'ps-audit', 'ps-density', 'ps-contents']);
+    const fam = c => { const m = /^ps-[a-z]+/.exec(c); return m && !skip.has(m[0]) ? m[0] : null; };
+    const btn = document.querySelector('[data-audit-toggle]'), panel = document.querySelector('[data-audit-panel]'),
+          layer = document.querySelector('[data-audit-layer]'), list = document.querySelector('[data-audit-list]');
+    const found = () => {
+      const groups = new Map();   // key -> {kind, name, note, els}
+      const add = (key, kind, name, note, el) => { if (!groups.has(key)) groups.set(key, {kind, name, note, els: []}); groups.get(key).els.push(el); };
+      document.querySelectorAll('[class*="ps-"]').forEach(el => {
+        if (el.closest('[data-audit-panel], [data-audit-layer], [data-audit-toggle], .ps-staging')) return;
+        new Set([...el.classList].map(fam).filter(Boolean)).forEach(f => {
+          if (!el.parentElement.closest('[class*="' + f + '"]')) add(f, 'New element', NAMES[f] || f, '.' + f, el);
+        });
+      });
+      const local = new Set([...document.querySelectorAll('svg[data-local-icons] symbol')].map(s => s.id));
+      document.querySelectorAll('svg use').forEach(u => { const id = (u.getAttribute('href') || '').slice(1); if (local.has(id)) add(id, 'New icon', NAMES[id] || id, id, u.parentElement); });
+      KIT.forEach(([sel, name, note]) => document.querySelectorAll(sel).forEach(el => { if (!el.closest('[data-audit-panel]')) add('kit:' + sel, 'Adjusted library component', name, note, el); }));
+      return groups;
+    };
+    const visible = el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    let groups = new Map();
+    const place = () => {
+      layer.innerHTML = '';
+      groups.forEach(g => g.els.filter(visible).slice(0, 3).forEach(el => {
+        const r = el.getBoundingClientRect(), d = document.createElement('span');
+        d.className = 'ps-audit-mark'; d.title = g.kind + ': ' + g.name + ' (' + g.note + ')';
+        d.style.left = Math.max(2, r.left - 5) + 'px'; d.style.top = Math.max(2, r.top - 5) + 'px';
+        layer.appendChild(d);
+      }));
+    };
+    const render = () => {
+      groups = found();
+      const kinds = ['New element', 'New icon', 'Adjusted library component'];
+      list.innerHTML = kinds.map(k => {
+        const rows = [...groups.entries()].filter(([, g]) => g.kind === k);
+        return rows.length ? '<p class="body-xs-semibold" style="margin: var(--spacing-3) 0 var(--spacing-1); color: var(--color-text-muted)">' + k + 's · ' + rows.length + '</p>' +
+          rows.map(([key, g]) => '<button class="ps-audit-row" type="button" data-audit-key="' + key + '"><span class="ps-audit-dot"></span><span class="body-sm">' + g.name + '</span><span class="body-xs" style="color: var(--color-text-muted)">' + g.els.length + '</span></button>').join('') : '';
+      }).join('');
+      btn.querySelector('[data-audit-label]').textContent = 'Not in library · ' + groups.size;
+      place();
+    };
+    const set = on => { btn.setAttribute('aria-pressed', String(on)); panel.hidden = !on; layer.hidden = !on; panel.style.display = on ? '' : 'none'; layer.style.display = on ? '' : 'none'; if (on) render(); };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-pressed') !== 'true'));
+    list.addEventListener('click', e => { const b = e.target.closest('[data-audit-key]'); if (!b) return; const el = groups.get(b.dataset.auditKey).els.find(visible); if (el) { el.scrollIntoView({block: 'center'}); setTimeout(place, 300); } });
+    addEventListener('scroll', () => { if (!layer.hidden) place(); }, true);
+    addEventListener('resize', () => { if (!layer.hidden) place(); });
+    document.addEventListener('click', () => { if (!layer.hidden) setTimeout(render, 60); });
+    btn.querySelector('[data-audit-label]').textContent = 'Not in library · ' + found().size;
+    if (location.hash.includes('audit')) set(true);
+"""
+
+
+def audit_count(html):
+    """The same count the floating control shows, taken from the page's markup."""
+    body = html[html.find('<body'):]
+    body = _re.sub(r'<script.*?</script>', '', body, flags=_re.S)
+    fams = set()
+    for classes in _re.findall(r'class="([^"]*)"', body):
+        for c in classes.split():
+            f = family(c)
+            if f and f not in ('ps-staging', 'ps-audit', 'ps-density', 'ps-contents'):
+                fams.add(f)
+    local = set(_re.findall(r'<symbol id="([^"]+)"', body[body.find('data-local-icons'):body.find('</svg>', body.find('data-local-icons'))])) if 'data-local-icons' in body else set()
+    icons = local & set(_re.findall(r'href="#([\w-]+)"', body))
+    kit = 0
+    for sel, name, note in KIT_VARIATIONS:
+        last = sel.split()[-1].lstrip('>').strip().lstrip('.')
+        if _re.search(r'class="[^"]*\b' + _re.escape(last) + r'\b', body):
+            kit += 1
+    return len(fams), len(icons), kit
+
+
 def library_page(title, kind, items):
     """The list of what this reference added to the kit: elements or icons.
     Each has See it in place and Add to library; what promote.py has moved
@@ -2542,7 +2652,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          screens=['okrs', 'rob-meetings', 'rob-meeting-view', 'profile', 'team-profile', 'people', 'talent-profile', 'self-review', 'dashboard', 'processes'],
          note='Went back to staging for everything marked as not compared. OKRs: every tab is empty for 2026 there, each with its own toolbar, and now here too. RoB: the full month in All events, past days greyed. Person cards show a short name and role on one line with the unit under it; RACI letters are round. The talent profile’s table is the same tree as the lists; the self-review has its Back link. Staging’s dashboard Actions column and the rows under a process were checked and already matched.'),    dict(date='Nov 25, 2026', span='14:36–14:41', minutes=5, screens=['initiative-view', 'initiative-create', 'team-profile'],
          note='The last three under 95%. The create form’s lower half now follows staging: numbered objective and metric lines, quarter pickers, the Jira card, the upload box with its reminder, and the locked Projects note. The initiative view lists documents with a tick and a view count. Team Profile has a drawn logo.'),    dict(date='Nov 25, 2026', span='14:44–14:44', minutes=0, screens='all',
-         note='Wired into a clickable prototype. Every person’s name opens a profile, every unit a team profile, every meeting the meeting view, every initiative or project the initiative view, every process its drawer. Create and Save buttons land where the product lands, RACI buttons open the RACI drawer on every screen, the dashboard’s Filters and Query open their panels. Checked by clicking through 24 flows.'),
+         note='Wired into a clickable prototype. Every person’s name opens a profile, every unit a team profile, every meeting the meeting view, every initiative or project the initiative view, every process its drawer. Create and Save buttons land where the product lands, RACI buttons open the RACI drawer on every screen, the dashboard’s Filters and Query open their panels. Checked by clicking through 24 flows.'),    dict(date='Nov 25, 2026', span='14:44–14:48', minutes=4, screens='all',
+         note='Every screen has a Not in library button. It marks with red dots, and lists, what on that screen is not a library component as it ships: new elements, new icons, and library components this reference adjusts. The list page shows the count per screen.'),
 ]
 
 
@@ -2576,6 +2687,14 @@ MATCH = {
 }
 
 
+def audit_cell(folder):
+    if folder not in AUDIT:
+        return ''
+    e, i, k = AUDIT[folder]
+    return (f'<a class="body-sm-semibold" href="{folder}/index.html#audit" {LINK}>{e + i + k}</a>'
+            f'<span class="body-xs" style="display: block; color: var(--color-text-muted)">{e} new elements · {i} new icons · {k} adjusted</span>')
+
+
 def index():
     by_folder = {x['folder']: x for x in SCREENS}
     per_batch = {b: sum(1 for x in SCREENS if x.get('batch', 1) == b) for b in BATCHES}
@@ -2592,7 +2711,7 @@ def index():
     body = []
     for area, rows in INVENTORY:
         n = sum(1 for r in rows if r[2])
-        body.append(f'<tr><td colspan="9"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
+        body.append(f'<tr><td colspan="10"><span class="body-semibold">{area}</span> <span class="body-sm" {MUTED}>{n} of {len(rows)}</span></td></tr>')
         for name, route, folder in rows:
             if folder:
                 b = by_folder[folder].get('batch', 1)
@@ -2602,11 +2721,12 @@ def index():
                 ut = f'<span class="body-sm">{u[-1]["minutes"] / (done if u[-1]["screens"] == "all" else len(u[-1]["screens"])):.1f} min</span>' if u else dash
                 cells = (f'<td><a class="cell-title" href="{folder}/index.html" {LINK}>{name}</a></td><td><code class="body-sm">{route}</code></td>'
                          f'<td><span class="body-sm">{BATCHES[b]["date"]}</span></td><td><span class="body-sm">{mins:.1f} min</span></td><td>{ud}</td><td>{ut}</td>'
-                         + (f'<td>{tag(str(MATCH[folder][0]) + "%", "positive" if MATCH[folder][0] >= 95 else "warning") if MATCH[folder][0] else dash}</td><td><span class="body-sm" {MUTED}>{MATCH[folder][1]}</span></td>'))
+                         + (f'<td>{tag(str(MATCH[folder][0]) + "%", "positive" if MATCH[folder][0] >= 95 else "warning") if MATCH[folder][0] else dash}</td>'
+                            f'<td>{audit_cell(folder)}</td><td><span class="body-sm" {MUTED}>{MATCH[folder][1]}</span></td>'))
             else:
                 why = f'<span class="body-sm" {MUTED}>{WHY[name]}</span>' if name in WHY else dash
                 cells = (f'<td><span class="cell-title" {MUTED}>{name}</span></td><td><code class="body-sm">{route}</code></td>'
-                         f'<td colspan="6">{why}</td>')
+                         f'<td colspan="7">{why}</td>')
             body.append(f'<tr><td style="width: var(--spacing-10)">{yes if folder else no}</td>{cells}</tr>')
     srows = ''.join(
         f'<tr><td style="width: var(--spacing-10)">{yes}</td><td><span class="body-sm">{titles.get(f, "Edit org unit")}</span></td>'
@@ -2630,7 +2750,7 @@ def index():
 
     <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Screens</h2>
     <div class="table-scroll" style="max-height: none; margin-bottom: var(--spacing-8)">
-      <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Built</th><th>Time to build</th><th>Updated</th><th>Time to update</th><th>Match with staging</th><th>Still different</th></tr></thead><tbody>{"".join(body)}</tbody></table>
+      <table class="table"><thead><tr><th><span aria-hidden="true"></span></th><th>Screen</th><th>Route in the app</th><th>Built</th><th>Time to build</th><th>Updated</th><th>Time to update</th><th>Match with staging</th><th>Not library components</th><th>Still different</th></tr></thead><tbody>{"".join(body)}</tbody></table>
     </div>
 
     <h2 class="h3" style="margin: 0 0 var(--spacing-3)">Tabs, drawers and modals</h2>
@@ -2717,6 +2837,7 @@ def elements_page():
         ('Fill switch', 'ps-seg-fill', 'Dashboard on a phone: the kit’s segmented control stretched to the full row.', 'dashboard/index.html',
          '<div class="ps-seg-fill" style="max-width: 360px">' + segmented(('Core Strategy 28', 'Other initiatives 34'), 0, 'Example switch') + '</div>'),
     ]
+    NAMES.update({cls: name for name, cls, where, link, demo in items})
     return library_page('New elements', 'elements', items)
 
 
@@ -2742,4 +2863,5 @@ def icons_page():
         ('Team logo', 'i-art-team-logo', 'Team Profile: a stand-in for the picture a team uploads. In the product each team has its own.', 'team-profile/index.html', big('i-art-team-logo', 'Team logo')),
         ('Nothing owned', 'i-art-empty-alert', 'Profile and Team Profile, Processes tab: the drawing above “No Processes yet”.', 'profile/index.html#tab-2', big('i-art-empty-alert', 'Nothing owned')),
     ]
+    NAMES.update({cls: name for name, cls, where, link, demo in items})
     return library_page('New icons', 'icons', items)

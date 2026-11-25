@@ -114,3 +114,13 @@ talent profile), a unit the team profile, a meeting the meeting view, an
 initiative or project the initiative view, a process its drawer. Buttons that
 finish a flow carry `data-go`. What has no screen behind it stays inert:
 Confluence, TopTaste, Slack and Zoom links, documents, the roadmap button.
+
+## What is not a library component
+
+Every screen has a **Not in library** button (bottom right). It lists, and
+marks with red dots, what on that screen is not a library component as it
+ships: new elements (`ps-*`), new icons, and library components this
+reference adjusts (`KIT_VARIATIONS` in `_src/screens.py`). Add `#audit` to a
+screen's address to open it switched on. The list page shows the count per
+screen; it is taken from the markup, so it can differ by one from the
+button, which counts what is on the page at that moment.
