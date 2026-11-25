@@ -60,3 +60,17 @@ Every screen is one file that changes layout under 1024px. On staging, a phone
 is sent from Processes, Initiatives and OKRs to RoB Meetings: the product has
 no phone layout for those three lists. The reference keeps a phone layout for
 them anyway, built from the same cards as the dashboard.
+
+## Adding an element to the library
+
+On the elements page every element has **Add to library**. It copies a request
+with the command behind it:
+
+    python3 production-site-2026-11-25/_src/promote.py ps-bars
+
+The script moves that element's rules from `_src/elements.css` into designmd's
+`components.css`, regenerates `dist/kit.json` and rebuilds the reference. The
+element then shows as "In library", the linter stops flagging it as local, and
+the next screen picks it up from the kit. `--list` shows what can be moved,
+`--dry-run` shows the change without making it. Nothing is committed: review
+and commit the designmd change as any other.
