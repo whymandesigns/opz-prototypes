@@ -105,3 +105,12 @@ address on staging, so there it opens the screen.
 The menu ends as staging does for a non-admin account: a group holding
 Confluence, Watercooler and TopTaste, then the Learning hub. The group is
 labelled "Team Fun" here; the product names it after the company.
+
+## Clicking through
+
+The reference works as a prototype. `wire()` in `_src/build.py` turns every
+name into a link by what it names: a person opens a profile (a talent, the
+talent profile), a unit the team profile, a meeting the meeting view, an
+initiative or project the initiative view, a process its drawer. Buttons that
+finish a flow carry `data-go`. What has no screen behind it stays inert:
+Confluence, TopTaste, Slack and Zoom links, documents, the roadmap button.
