@@ -138,12 +138,13 @@ def work_toolbar(placeholder, columns, view=0):
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="{placeholder}" aria-label="Search" />
         </div>
-        <button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button>
-        <button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button>
+        <span class="row" data-hide-in="view:2"><button class="btn btn-secondary" type="button">{icon("i-filter", "btn-icon")}Filters</button>
+        <button class="btn btn-secondary" type="button">{icon("i-code", "btn-icon")}Query</button></span>
         <span class="toolbar-spacer"></span>
-        {select(columns, label="Columns", width=190, lead="i-settings")}
+        <span class="row" data-hide-in="view:2">{select(columns, label="Columns", width=190, lead="i-settings")}
         {select("Updated at", ("Updated at", "Name", "Status"), label="Sort by", width=150)}
-        <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button>
+        <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button></span>
+        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="View settings" data-show-in="view:2" hidden>{icon("i-controls", "btn-icon")}</button>
         {view_modes(view)}
       </div>''') + mobile_toolbar(placeholder)
 
@@ -213,10 +214,11 @@ def dashboard():
           <input class="input" type="text" placeholder="Search by name, owner or function" aria-label="Search" />
         </div>
         {"".join(f'<span data-panel="view:{i}"{"" if i == 0 else " hidden"}><span class="row"><button class="btn btn-secondary" type="button">' + icon("i-filter", "btn-icon") + 'Filters</button><button class="btn btn-secondary" type="button">' + icon("i-code", "btn-icon") + 'Query</button>' + check("Show in hierarchy", True) + '</span></span>' for i in (0, 1))}
-        {select("Strategic Objective, Objective Owner", ("Strategic Objective", "Objective Owner", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting"), label="Columns", width=150, lead="i-settings")}
+        <span class="row" data-hide-in="view:2">{select("Strategic Objective, Objective Owner", ("Strategic Objective", "Objective Owner", "Status", "Health", "Accountability", "Roadmap", "RoB Meeting"), label="Columns", width=150, lead="i-settings")}
         {select("Updated at", ("Updated at", "Name", "Status", "Health"), label="Sort by", width=160)}
-        <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button>
+        <button class="btn btn-secondary btn-icon-only" type="button" aria-label="Sort descending">{icon("i-arrow-down", "btn-icon")}</button></span>
         <span class="toolbar-spacer"></span>
+        <button class="btn btn-icon-only btn-ghost" type="button" aria-label="View settings" data-show-in="view:2" hidden>{icon("i-controls", "btn-icon")}</button>
         {view_modes(0)}
       </div>
       <div class="row" style="margin-bottom: var(--spacing-4)"><span class="chip">Tags: Core Strategy<button class="chip-remove" type="button" aria-label="Remove">{icon("i-x", "")}</button></span></div>
@@ -1565,31 +1567,15 @@ def indent(n, lvl, bold=False):
 
 
 def processes_views():
-    comp = table(('Name', 'Status', 'Accountability', 'RoB Meeting'), compact_rows([(n, 'Process', st, 'light', k, r) for n, st, k, unit, r in PROCESSES]))
-    tree = [('Refund requests', 0, 'Read the request, check the order, issue the refund and close the ticket.', 'Active', 'ck', 'Delivery'),
-            ('Refund review', 1, 'Check the order and what arrived against the request.', 'Active', 'lh', 'Delivery'),
-            ('Partial refunds', 2, 'Refund only the items that were wrong or missing.', 'Active', 'tl', 'Delivery'),
-            ('Vendor Management', 0, 'Choose, onboard and review the vendors the company depends on.', 'Not active', 'lk', 'Operations'),
-            ('Vendor onboarding', 1, 'Contracts, security review and access for a new vendor.', 'Not active', 'lk', 'Operations'),
-            ('Workplace and IT', 0, 'Equipment, accounts and access for everyone on the team.', 'Active', 'el', 'IT'),
-            ('Laptop refresh', 1, 'Replace laptops on a three-year cycle.', 'Paused', 'el', 'IT'),
-            ('Legal Operations', 0, 'Contract templates, reviews and renewals.', 'Active', 'og', 'Legal')]
-    sheet = sheet_table(('Name', 'Description', 'Status', 'Owner', 'Beneficiary Function'),
-                        [(indent(n, lvl, lvl < 2), sub(d), tag(st), sub(PEOPLE[k][0]), sub(f)) for n, lvl, d, st, k, f in tree])
-    return comp, sheet
+    comp = tree_table(PROC_TREE, cols=('status', 'acc', 'rob', 'actions'), kinds=('Process', 'Activity', 'Sub-activity'), prefix='procc', sticky=False, compact=True,
+                      links={'Refund requests': 'href="#open-process-drawer" data-modal-open="process-drawer"'})
+    return comp, sheet_tree(PROC_TREE, 'procs', with_health=False)
 
 
 def initiatives_views():
-    comp = table(('Name', 'Status', 'Accountability', 'RoB Meeting'), compact_rows([(n, 'Initiative', s_, kind, k, r) for n, s_, kind, h, k, unit, road, r in INITIATIVES]))
-    tree = [('Onboarding in one week', 0, 'Cut the time from signed contract to first delivered work.', 'Execution', 'sr', 'Operations'),
-            ('Kick-off checklist', 1, 'One checklist every engagement starts from.', 'Execution', 'ck', 'Operations'),
-            ('First-week survey', 2, 'Ask every new customer how the first week went.', 'Idea', 'tl', 'Operations'),
-            ('Delivery health reviews', 0, 'A weekly review of every active engagement.', 'Execution', 'lk', 'Operations'),
-            ('Partner marketing sites', 0, 'Co-branded pages for the ten largest partners.', 'Execution', 'ad', 'Partnerships'),
-            ('Learning programs', 0, 'A formal learning program for managers.', 'Execution', 'jp', 'People')]
-    sheet = sheet_table(('Name', 'Description', 'Status', 'Owner', 'Beneficiary Function'),
-                        [(indent(n, lvl, lvl < 2), sub(d), tag(st), sub(PEOPLE[k][0]), sub(f)) for n, lvl, d, st, k, f in tree])
-    return comp, sheet
+    comp = tree_table(INIT_TREE, cols=('status', 'health', 'acc', 'roadmap', 'rob', 'actions'), prefix='initc', sticky=False, compact=True,
+                      links={'Onboarding in one week': 'href="../initiative-view/index.html"'})
+    return comp, sheet_tree(INIT_TREE, 'inits')
 
 
 INIT_QUERY = QUERY_PANEL.replace('Show processes being supported', 'Show initiatives being supported').replace('Show processes where', 'Show initiatives where')
@@ -1653,7 +1639,7 @@ TREE_COLS = {'objective': ('Strategic Objective', 192), 'owner': ('Objective Own
 
 
 def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roadmap', 'rob', 'actions'), kinds=KINDS, prefix='dash', sticky=True,
-               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs=''):
+               tags=lambda name, level: tag('# Core Strategy'), links=None, attrs='', compact=False):
     """A work list as the product draws it: rows that open a second and a
     third layer. With sticky, the name column stays put while the rest scrolls
     sideways (the dashboard); without, the table fills the page (the lists).
@@ -1669,17 +1655,20 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
                  else '<span class="row-toggle-spacer"></span>')
         link = f'<a class="ps-wtree-title" {links[name]}>{name}</a>' if name in links else f'<span class="ps-wtree-title">{name}</span>'
         first = (f'<div class="ps-wtree-name" data-level="{level}">{caret}<div class="stack" style="gap: var(--spacing-1); align-items: flex-start; min-width: 0">{link}'
-                 f'{tag(kinds[level])}{tags(name, level)}</div></div>')
+                 f'{"" if compact else tag(kinds[level]) + tags(name, level)}</div></div>')
         if rob:
             date = f'<s>{rob[0]}</s>' if rob[2] else rob[0]
             meet = (f'<div class="cell-meta"><span class="cell-meta-title row" style="gap: var(--spacing-2); flex-wrap: nowrap">{icon("i-calendar", "icon icon-16")}<span style="white-space: nowrap">{date}</span></span>'
                     f'<span class="cell-meta-sub">{tag(rob[1])}</span></div>')
+            if compact:
+                meet = f'<span class="row body-sm" style="gap: var(--spacing-2); flex-wrap: nowrap; white-space: nowrap">{icon("i-calendar", "icon icon-16")}<span>{date}</span></span>'
         elif 'health' in cols:
             meet = f'<span class="row body-sm" style="gap: var(--spacing-1); flex-wrap: nowrap; white-space: nowrap; color: var(--color-text-muted)"><span style="color: var(--color-warning); display: inline-flex">{icon("i-info", "icon icon-16")}</span>No meeting connected</span>'
         else:
             meet = ''
         cell = {'objective': lambda: sub(objective), 'owner': lambda: sub(PEOPLE[owner][0]), 'status': lambda: tag(status, STATUS_KIND.get(status, 'light')),
-                'health': lambda: health(hlth, HEALTH_KIND[hlth]), 'acc': lambda: user(k, unit),
+                'health': lambda: health(hlth, HEALTH_KIND[hlth]),
+                'acc': lambda: f'<span class="body-sm-semibold" style="white-space: nowrap">{PEOPLE[k][0]}</span>' if compact else user(k, unit),
                 'roadmap': lambda: (f'<button class="btn btn-icon-only btn-ghost btn-xs ps-roadmap is-{HEALTH_KIND[hlth]}" type="button" aria-label="View roadmap for {name}">{icon("i-roadmap", "btn-icon")}</button>' if level == 0 else ''),
                 'rob': lambda: meet, 'actions': raci_btn}
         hide = f' data-child-of="{parent}" hidden' if parent else ''
@@ -1698,8 +1687,51 @@ def tree_table(tree, cols=('objective', 'owner', 'status', 'health', 'acc', 'roa
         th += f'<th{width(w)}>{inner}</th>'
     total = 256 + sum(TREE_COLS[c][1] for c in cols)
     style = f' style="min-width: {total}px; table-layout: fixed"' if sticky else ''
-    return (f'<div class="table-scroll" style="max-height: none"{attrs}><table class="table ps-wtree{" ps-wtree-sticky" if sticky else ""}"{style}>'
+    return (f'<div class="table-scroll" style="max-height: none"{attrs}><table class="table ps-wtree{" ps-wtree-sticky" if sticky else ""}{" ps-wtree-compact" if compact else ""}"{style}>'
             f'<thead><tr>{th}</tr></thead><tbody>{"".join(out)}</tbody></table></div>')
+
+
+DESCR = {n: d for o, k, n, d, st, kind in OBJECTIVES}
+DESCR.update({
+    'Refund requests': 'Read the request, check the order, issue the refund and close the ticket.', 'Refund review': 'Check the order and what arrived against the request.',
+    'Partial refunds': 'Refund only the items that were wrong or missing.', 'Vendor Management': 'Choose, onboard and review the vendors the company depends on.',
+    'Supplier onboarding': 'Contracts, security review and access for a new vendor.', 'Workplace and IT': 'Equipment, accounts and access for everyone on the team.',
+    'Legal Operations': 'Contract templates, reviews and renewals.', 'Kick-off checklist': 'One checklist every engagement starts from.',
+    'Checklist template': 'The shared template, with an owner for every line.', 'Customer welcome call': 'A first call in the week the contract is signed.',
+    'Account setup in one day': 'Accounts, billing and access ready the day after signing.', 'Onboarding status page': 'One page that shows where each new customer is.',
+    'Learning Programs': 'Courses and coaching for every team.', 'Partner Marketing Sites': 'The co-branded pages partners send customers to.',
+    'Northwind Hire': 'Hiring run for the Northwind business line.', 'Analytics Reporting': 'The weekly numbers every function reads.',
+    'Recruiting Pipeline': 'Sourcing, interviews and offers for open roles.', 'Member Experience': 'How the team experiences working here.',
+    'Billing setup wizard': 'Guide a new customer through billing without a call.', 'Invite your team flow': 'Let an admin bring their team in themselves.',
+    'One refund policy': 'The same refund rules in every region.', 'Refund review queue': 'One queue for refunds that need a second look.',
+})
+
+
+def sheet_tree(tree, prefix, with_health=True):
+    """The spreadsheet view: every layer open, numbered rows, ruled cells, a
+    column of carets, and the description beside the name."""
+    out, n = [], [0]
+
+    def row(node, level, parent):
+        name, status, hlth, k, unit, rob, kids = node
+        n[0] += 1
+        rid = f'{prefix}-{n[0]}'
+        caret = (f'<button class="row-toggle" type="button" aria-expanded="true" aria-label="Toggle {name}" data-rows="{rid}">{icon("i-chevron-down")}</button>' if kids else '')
+        cells = [sub(n[0]), caret, f'<div class="ps-wtree-name" data-level="{level}"><span class="{"body-sm-semibold" if kids else "body-sm"}">{name}</span></div>',
+                 sub(DESCR.get(name, '')), tag(status, STATUS_KIND.get(status, 'light'))]
+        if with_health:
+            cells.append(health(hlth, HEALTH_KIND[hlth]))
+        cells += [sub(PEOPLE[k][0]), sub(PEOPLE[k][0]), sub(unit)]
+        hide = f' data-child-of="{parent}"' if parent else ''
+        out.append(f'<tr data-search-item{hide}>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>')
+        for kid in kids:
+            row(kid, level + 1, rid)
+
+    for _, _, node in tree:
+        row(node, 0, '')
+    heads = ['#', f'<span style="display: inline-flex">{icon("i-chevron-down", "icon icon-16")}</span>', 'Name', 'Description', 'Status'] + (['Health'] if with_health else []) + ['Owner', 'Project manager', 'Beneficiary function']
+    th = ''.join(f'<th>{h}</th>' for h in heads)
+    return f'<div class="table-scroll" style="max-height: none"><table class="table ps-sheet"><thead><tr>{th}</tr></thead><tbody>{"".join(out)}</tbody></table></div>'
 
 
 def swap_table(html, table_html):
@@ -1775,7 +1807,7 @@ def dashboard_with_states():
                    f'<td>{health(*hl.get(st, ("Not active", "light")))}</td><td><span class="row"><span class="avatar avatar-sm">{ini(k)}</span>{sub(PEOPLE[k][0])}</span></td><td></td><td></td></tr>' for o, k, n, d, st, kind in OBJECTIVES)
     e = h.index('</div>\n<div data-panel="scope:1" hidden>')
     ccards = ''.join(work_card(nd[0], health(nd[2], HEALTH_KIND[nd[2]]) + tag("Initiative") + tag(nd[1], STATUS_KIND.get(nd[1], "light")) + tag("# Core Strategy"), nd[3], nd[4], caret=bool(nd[6])) for o, k, nd in DASH_TREE)
-    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE, links=DASH_LINKS)}</div>\n<div data-panel="view:1" hidden>{table(heads, comp)}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
+    h = (h[:i] + f'<div data-view="desktop"><div data-panel="view:0">{tree_table(DASH_TREE, links=DASH_LINKS)}</div>\n<div data-panel="view:1" hidden>{tree_table(DASH_TREE, links=DASH_LINKS, compact=True, prefix="dashc")}</div>\n<div data-panel="view:2" hidden>' + h[i:e] + '</div></div>'
          + mobile('<div class="stack">' + ccards + '</div>') + h[e:])
     charts = [barchart([('Idea', 33, ''), ('Opportunity assessment', 5, ''), ('Definition', 7, ''), ('Execution', 53, 'is-accent'), ('Impact assessment', 0, ''), ('Complete', 34, 'is-success'), ('On hold', 6, '')]),
               barchart([('Idea', 9, ''), ('Opportunity assessment', 0, ''), ('Definition', 8, ''), ('Execution', 31, 'is-accent'), ('Impact assessment', 7, ''), ('Complete', 60, 'is-success'), ('On hold', 18, '')])]
@@ -2443,7 +2475,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),    dict(date='Nov 25, 2026', span='13:49–13:52', minutes=3, screens=['initiative-view', 'initiative-create'],
          note='Compared the initiative view with a real one on staging; it was close. Connections now has Tags and the Agenda block, Projects is a list of link rows, the status tag is grey as there, and the staging link no longer covers the form’s Create button.'),    dict(date='Nov 25, 2026', span='13:56–14:00', minutes=4, screens=['initiative-create', 'profile-edit', 'rob-meeting-view'],
          note='Compared two forms and the meeting view with staging; all three were close. The initiative form’s fields span the main column, Edit Profile has month and day side by side and a plain About box, and the meeting’s Agenda lists items under This meeting and Other meetings.'),    dict(date='Nov 25, 2026', span='14:00–14:04', minutes=4, screens=['not-found', 'no-access', 'self-review', 'talent-profile', 'rob-paused-meetings', 'profile-public-edit'],
-         note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),
+         note='Compared the last screens with staging. Paused meetings, the public-profile form, the talent profile and the self-review already matched. The 404 page has its drawing, the no-rights notice runs edge to edge, and the self-review’s staging link opens the page itself.'),    dict(date='Nov 25, 2026', span='14:04–14:09', minutes=5, screens=['processes', 'initiatives', 'dashboard'],
+         note='Compact and spreadsheet views redone against staging: compact is the same tree with one line per row, spreadsheet is a numbered, ruled grid with every layer open and a description beside the name. The spreadsheet view drops the filter and sort controls, as there.'),
 ]
 
 
@@ -2567,6 +2600,8 @@ def elements_page():
          '<div style="max-width: 560px">' + ''.join(f'<a class="ps-linkrow" href="#"><span class="body-sm">{n}</span>{icon("i-chevron-right", "icon icon-16")}</a>' for n in ('Kick-off checklist', 'Account setup in one day')) + '</div>'),
         ('Agenda row', 'ps-agenda-row', 'Meeting view, Agenda: its number, the item, how often it comes up and who brings it.', 'rob-meeting-view/index.html',
          '<div style="max-width: 640px"><div class="ps-agenda-row"><span class="body-sm">1</span><span class="body-sm">Onboarding status: where each new customer is in the first week</span>' + tag('Weekly') + '<span class="body-xs">Cara Keane</span></div></div>'),
+        ('Sheet table', 'ps-sheet', 'Processes and Initiatives, spreadsheet view: numbered rows, ruled cells, every layer open, a column of carets.', 'initiatives/index.html#show-view-2',
+         sheet_tree(INIT_TREE[:1], 'el-sheet')),
         ('Action item', 'ps-action', 'Profile, Action Items tab: a grey box with the state, the person and the text, struck through once done.', 'profile/index.html#tab-5',
          f'<div class="ps-action is-done" style="max-width: 560px"><div class="row"><span class="ps-action-status"><span class="ps-action-dot"></span>Done</span><span class="body-xs-semibold">Cara Keane</span></div>'
          '<p class="ps-action-text">Draft the kick-off checklist for new customers</p></div>'

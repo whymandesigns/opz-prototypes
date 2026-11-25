@@ -95,6 +95,9 @@ VIEW_SCRIPT = '''  <script>
     const items = strip => [...strip.querySelectorAll('.tab, .segmented-item')];
     const pick = (group, i) => {
       document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
+      // a control can also drop out of, or appear in, one choice of a switch
+      document.querySelectorAll('[data-hide-in^="' + group + ':"]').forEach(el => show(el, el.dataset.hideIn !== group + ':' + i));
+      document.querySelectorAll('[data-show-in^="' + group + ':"]').forEach(el => show(el, el.dataset.showIn === group + ':' + i));
       document.querySelectorAll('[data-tabs="' + group + '"]').forEach(strip => items(strip).forEach((t, n) => {
         const on = n === Number(i);
         t.classList.toggle('is-active', on); if (t.matches('.tab')) t.setAttribute('aria-selected', String(on));
