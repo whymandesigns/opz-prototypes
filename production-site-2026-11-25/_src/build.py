@@ -72,24 +72,30 @@ VIEW_SCRIPT = '''  <script>
 
     // Tabs switch panels, and a control with data-toggle shows or hides a panel.
     const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const items = strip => [...strip.querySelectorAll('.tab, .segmented-item')];
     const pick = (group, i) => {
       document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
-      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
-        const on = t.dataset.tab === String(i);
-        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
-      });
+      document.querySelectorAll('[data-tabs="' + group + '"]').forEach(strip => items(strip).forEach((t, n) => {
+        const on = n === Number(i);
+        t.classList.toggle('is-active', on); if (t.matches('.tab')) t.setAttribute('aria-selected', String(on));
+      }));
     };
     document.addEventListener('click', e => {
-      const tab = e.target.closest('[data-tabs] .tab');
-      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tab = e.target.closest('[data-tabs] .tab, [data-tabs] .segmented-item');
+      if (tab) { const strip = tab.closest('[data-tabs]'); pick(strip.dataset.tabs, items(strip).indexOf(tab)); }
       const tog = e.target.closest('[data-toggle]');
       if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
     });
-    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal, menu or panel.
+    // Several can be joined with &.
     const route = () => {
-      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
-      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
-      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+      const strip = document.querySelector('.tabs[data-tabs]');
+      location.hash.slice(1).split('&').forEach(h => {
+        if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+        if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+        const m = /^show-(.+)-(\d+)$/.exec(h);   // #show-view-1: the second item of the "view" switch
+        if (m) pick(m[1], m[2]);
+      });
     };
     addEventListener('hashchange', route); route();
   })();
@@ -107,7 +113,13 @@ def page(title, active, main, ctas=(), overlays='', depth=1, padded=True):
         f'<svg class="btn-icon"><use href="#{icon}"/></svg></button>\n' for variant, label, icon in ctas)
     t, n = re.subn(r'(    <button class="btn btn-(?:secondary|primary) btn-icon-only topbar-cta".*\n)+', lambda m: cta, t, count=1)
     assert n == 1
-    t = t.replace('aria-label="Open profile">MV</a>', 'aria-label="Open profile">CK</a>')
+    acct = '<div class="topbar-account"><a class="avatar avatar-md" href="#" aria-label="Open profile">MV</a></div>'
+    assert t.count(acct) == 1
+    t = t.replace(acct, '<div class="topbar-account"><div class="dropdown"><button class="avatar avatar-md dropdown-trigger" type="button" aria-expanded="false" aria-label="Open account menu">CK</button>'
+                  '<div class="dropdown-menu dropdown-menu-end" id="user-menu" hidden>'
+                  f'<a class="dropdown-item" href="{"../" * depth}profile/index.html">My profile</a><a class="dropdown-item" href="#">Career map</a>'
+                  f'<a class="dropdown-item" href="{"../" * depth}recognitions/index.html">Recognitions</a><div class="dropdown-divider"></div>'
+                  f'<a class="dropdown-item" href="{"../" * depth}sign-in/index.html">Sign out</a></div></div></div>')
     t, n = re.subn(r'<ul class="sidenav-list">.*?</ul>', lambda m: sidenav(active, depth), t, count=1, flags=re.S)
     assert n == 1
     pad = ' style="padding: var(--spacing-10)"' if padded else ' style="padding: 0"'

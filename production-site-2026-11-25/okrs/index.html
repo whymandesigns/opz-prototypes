@@ -4438,7 +4438,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
         <svg class="search-icon"><use href="#i-search"/></svg>
         <input class="topbar-search-input" type="search" placeholder="Search Operationalize..." />
       </div>
-      <div class="topbar-account"><a class="avatar avatar-md" href="#" aria-label="Open profile">CK</a></div>
+      <div class="topbar-account"><div class="dropdown"><button class="avatar avatar-md dropdown-trigger" type="button" aria-expanded="false" aria-label="Open account menu">CK</button><div class="dropdown-menu dropdown-menu-end" id="user-menu" hidden><a class="dropdown-item" href="../profile/index.html">My profile</a><a class="dropdown-item" href="#">Career map</a><a class="dropdown-item" href="../recognitions/index.html">Recognitions</a><div class="dropdown-divider"></div><a class="dropdown-item" href="../sign-in/index.html">Sign out</a></div></div></div>
     </div>
   </header>
 
@@ -4498,7 +4498,7 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
           </div>
         </div>
         <div class="page-head-actions">
-          <button class="btn btn-secondary" type="button"><svg class="btn-icon" aria-hidden="true"><use href="#i-info"/></svg>Performance attributes</button>
+          <button class="btn btn-secondary" type="button" data-modal-open="perf-attrs"><svg class="btn-icon" aria-hidden="true"><use href="#i-info"/></svg>Performance attributes</button>
           <button class="btn btn-secondary" type="button">Export as CSV</button>
           <button class="btn btn-primary" type="button">Create OKR</button>
         </div>
@@ -4534,6 +4534,13 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
     </main>
   </div>
 
+  <div class="modal-overlay" id="perf-attrs" hidden>
+    <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="perf-attrs-title">
+      <header class="modal-header"><h2 class="modal-title" id="perf-attrs-title">Performance attributes</h2>
+        <button class="btn btn-icon-only btn-ghost btn-xs modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+      <div class="modal-body"><p class="body-sm" style="margin: 0 0 var(--spacing-3); color: var(--color-text-muted)">Each objective and key result can support one attribute. Numbers are for 2026.</p><div class="list-row"><div><p class="list-row-title">Brand</p><p class="list-row-meta">How customers, talent and the market see us</p></div><span class="count-badge count-badge-secondary">0</span></div><div class="list-row"><div><p class="list-row-title">Growth</p><p class="list-row-meta">New customers, markets and offerings</p></div><span class="count-badge count-badge-secondary">2</span></div><div class="list-row"><div><p class="list-row-title">Dynamic/Process</p><p class="list-row-meta">Efficient, adaptable ways of working that keep improving</p></div><span class="count-badge count-badge-secondary">1</span></div><div class="list-row"><div><p class="list-row-title">Growth/Revenue</p><p class="list-row-meta">Revenue and margin, directly</p></div><span class="count-badge count-badge-secondary">0</span></div><div class="list-row"><div><p class="list-row-title">People</p><p class="list-row-meta">Hiring, developing and keeping great people</p></div><span class="count-badge count-badge-secondary">1</span></div><div class="list-row"><div><p class="list-row-title">Organization</p><p class="list-row-meta">Structure, roles and accountability that let teams execute</p></div><span class="count-badge count-badge-secondary">0</span></div><div class="list-row"><div><p class="list-row-title">Speed</p><p class="list-row-meta">Deciding and shipping faster</p></div><span class="count-badge count-badge-secondary">0</span></div><div class="list-row"><div><p class="list-row-title">Quality</p><p class="list-row-meta">Higher standards, fewer defects, better customer experience</p></div><span class="count-badge count-badge-secondary">0</span></div></div>
+    </div>
+  </div>
   <script>
   // ---------------------------------------------------------------------
   // Dev-time icon sprite. The three stylesheets do NOT carry it — only
@@ -4670,24 +4677,30 @@ a.breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
 
     // Tabs switch panels, and a control with data-toggle shows or hides a panel.
     const show = (el, on) => { el.hidden = !on; el.style.display = on ? '' : 'none'; };
+    const items = strip => [...strip.querySelectorAll('.tab, .segmented-item')];
     const pick = (group, i) => {
       document.querySelectorAll('[data-panel^="' + group + ':"]').forEach(p => show(p, p.dataset.panel === group + ':' + i));
-      document.querySelectorAll('[data-tabs="' + group + '"] .tab').forEach(t => {
-        const on = t.dataset.tab === String(i);
-        t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
-      });
+      document.querySelectorAll('[data-tabs="' + group + '"]').forEach(strip => items(strip).forEach((t, n) => {
+        const on = n === Number(i);
+        t.classList.toggle('is-active', on); if (t.matches('.tab')) t.setAttribute('aria-selected', String(on));
+      }));
     };
     document.addEventListener('click', e => {
-      const tab = e.target.closest('[data-tabs] .tab');
-      if (tab) pick(tab.closest('[data-tabs]').dataset.tabs, tab.dataset.tab);
+      const tab = e.target.closest('[data-tabs] .tab, [data-tabs] .segmented-item');
+      if (tab) { const strip = tab.closest('[data-tabs]'); pick(strip.dataset.tabs, items(strip).indexOf(tab)); }
       const tog = e.target.closest('[data-toggle]');
       if (tog) { const p = document.getElementById(tog.dataset.toggle); show(p, p.hidden); }
     });
-    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal or panel.
+    // #tab-2 opens the third tab; #open-<id> opens that drawer, modal, menu or panel.
+    // Several can be joined with &.
     const route = () => {
-      const h = location.hash.slice(1), strip = document.querySelector('[data-tabs]');
-      if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
-      if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+      const strip = document.querySelector('.tabs[data-tabs]');
+      location.hash.slice(1).split('&').forEach(h => {
+        if (h.startsWith('tab-') && strip) pick(strip.dataset.tabs, h.slice(4));
+        if (h.startsWith('open-')) { const el = document.getElementById(h.slice(5)); if (el) show(el, true); }
+        const m = /^show-(.+)-(\d+)$/.exec(h);   // #show-view-1: the second item of the "view" switch
+        if (m) pick(m[1], m[2]);
+      });
     };
     addEventListener('hashchange', route); route();
   })();
