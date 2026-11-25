@@ -849,7 +849,12 @@ def team_profile():
 
 
 # ----------------------------------------------------- Batch 2: other pages
-def head_sub(title, sub, actions=''):
+def head_sub(title, sub, actions='', below=False):
+    if below:   # the line sits under the title, not beside it
+        h = head(title, actions)
+        k = '</h1>\n          </div>'
+        assert h.count(k) == 1
+        return h.replace(k, k + f'\n          <p class="body-sm" style="margin: var(--spacing-1) 0 0; color: var(--color-text-muted)">{sub}</p>')
     return head(title, actions, after_title=f'\n            <p class="page-head-subtitle">{sub}</p>')
 
 
@@ -898,7 +903,7 @@ def time_off():
       {tabs(("OOO summary", "OOO details"))}
 
       <div class="toolbar" style="margin: var(--spacing-4) 0">
-        <div class="input-icon input-icon-left toolbar-search">
+        <div class="input-icon input-icon-left toolbar-search" style="flex: 0 1 220px">
           {icon("i-search", "icon input-icon-glyph")}
           <input class="input" type="text" placeholder="Search by name" aria-label="Search by name" />
         </div>
@@ -936,7 +941,7 @@ def peer_feedback():
                     f'<div class="row row-end"><a class="body-sm" href="#" {LINK}>Skip</a><button class="btn btn-secondary btn-xs" type="button">Give Feedback</button></div></div></article>'
                     for k, r, d in PENDING_FB)
     actions = '<button class="btn btn-secondary" type="button">Request feedback</button>\n          <button class="btn btn-primary" type="button">Give feedback</button>'
-    return f'''{head_sub("Peer Feedback", "Sharing and receiving feedback across all levels promotes growth, alignment, and stronger teamwork.", actions)}
+    return f'''{head_sub("Peer Feedback", "Sharing and receiving feedback across all levels promotes growth, alignment, and stronger teamwork.", actions, below=True)}
 
       {tabs(("Pending (2)", "Received", "Given"))}
 
@@ -1341,7 +1346,7 @@ def ooo_details():
         ('ck', 'Vacation', ('Delivery', 'Operations'), 'Feb 23, 2026 - Mar 2, 2026', '6 days', 'Approved'),
         ('lh', 'Sick leave', ('Delivery', 'Operations'), 'Apr 7, 2026 - Apr 8, 2026', '2 days', 'Approved'),
         ('tl', 'Vacation', ('Delivery', 'Operations'), 'Jul 13, 2026 - Jul 31, 2026', '15 days', 'Approved')))
-    bar = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)"><div class="input-icon input-icon-left toolbar-search">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name" aria-label="Search by name" /></div>'
+    bar = (f'<div class="toolbar" style="margin-bottom: var(--spacing-4)"><div class="input-icon input-icon-left toolbar-search" style="flex: 0 1 220px">{icon("i-search", "icon input-icon-glyph")}<input class="input" type="text" placeholder="Search by name" aria-label="Search by name" /></div>'
            f'<span class="row" data-view="desktop">{select("Direct reports", ("Direct reports", "All reports", "Everyone"), label="People shown", width=170)}'
            f'<div class="input-icon input-icon-left" style="width: 230px">{icon("i-calendar", "icon input-icon-glyph")}<input class="input" type="text" value="Jan 1, 2026 - Dec 31, 2026" aria-label="Date range" /></div>'
            f'{ph_select("OOO type", "OOO type", 170)}{select("Approved, Pending", ("Approved", "Pending", "Rejected", "Cancelled"), label="Status", width=190)}'
@@ -2251,7 +2256,7 @@ SCREENS = [
     dict(folder='team-profile', title='Team Profile', nav='Team', main=with_tabs(team_profile(), 'teamprofile', team_profile_panels()), route='/teams/:teamId'),
     dict(folder='rob-paused-meetings', batch=2, title='View Paused Meetings', nav='RoB Meetings', main=paused_meetings(), route='/rob/paused-meetings'),
     dict(folder='profile-edit', batch=2, title='Edit Profile', nav='People', main=with_tabs(profile_edit(), 'profileedit', profile_edit_panels()), route='/people/:userId/edit'),
-    dict(folder='watercooler', batch=2, title='Watercooler', nav=None, main=with_tabs(watercooler(), 'watercooler', [empty_state('i-chat', 'No Top Messages Available', 'Messages with the most reactions show up here.')]), route='/watercooler'),
+    dict(folder='watercooler', batch=2, title='Watercooler', nav='Watercooler', main=with_tabs(watercooler(), 'watercooler', [empty_state('i-chat', 'No Top Messages Available', 'Messages with the most reactions show up here.')]), route='/watercooler'),
     dict(folder='time-off', batch=2, title='Time off', nav=None, main=with_tabs(time_off(), 'timeoff', [ooo_details()]), route='/time-off'),
     dict(folder='recognitions', batch=2, title='Recognitions & Badges', nav=None, main=with_tabs(recognitions(), 'recognitions', [badges()]), route='/recognitions',
          ctas=[('btn-primary', 'Give recognition', 'i-plus')]),
@@ -2421,7 +2426,8 @@ UPDATES = [  # one dict(date, span, minutes, screens=[folders] or 'all', note) p
          note='Dashboard rebuilt against staging, side by side: the list is a tree that opens a second and a third layer, with the name column held in place, the Roadmap, RoB Meeting and Actions columns, struck-through past meetings, the column and sort controls, and the card’s rule and health pills. Four elements and one icon were added to the lists.'),    dict(date='Nov 25, 2026', span='13:34–13:39', minutes=5, screens=['processes', 'initiatives'],
          note='Processes and Initiatives rebuilt against staging: both lists are the same tree as the dashboard, opening activities and sub-activities, projects and sub-projects, with struck-through past meetings and the roadmap marker.'),    dict(date='Nov 25, 2026', span='13:38–13:41', minutes=3, screens=['team', 'people', 'okrs'],
          note='Compared with staging: org units are plain striped rows that open their sub-units, the People list has its sort arrow and heavier names, and Create OKR is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:41–13:46', minutes=5, screens=['profile', 'team-profile', 'rob-meetings'],
-         note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),
+         note='Compared with staging: the profile’s reporting relationships are the left-to-right chain with the person marked among the people beside them, Team Profile lists its talent network members in a second column, and Create meeting is disabled as it is for this account.'),    dict(date='Nov 25, 2026', span='13:45–13:49', minutes=4, screens='all',
+         note='Compared Time off, Watercooler and Peer Feedback with staging; they were close. The side menu on every screen now ends as the product does for this account: a group that opens to Confluence, Watercooler and TopTaste, and the Learning hub with its three items, instead of Admin Settings. Peer Feedback has its line under the title and Time off a narrower search.'),
 ]
 
 
